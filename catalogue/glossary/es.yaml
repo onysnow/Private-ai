@@ -235,3 +235,239 @@ terms:
   indicators: []
   areas:
   - ES
+- term: Proxy (state threats)
+  definition: A person used by a foreign state to carry out tasks for it, often without knowing who is
+    behind the request.
+  examples: []
+  source_url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Cut-out
+  definition: An intermediary placed between a foreign power and the people doing its work, so the state's
+    role is hidden.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Hybrid threats
+  definition: Hostile-state activity mixing crime, sabotage, cyber-attacks and disinformation to destabilise
+    without open war.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Woodpecker pattern
+  definition: Europol's image for repeated small attacks that each look minor but together wear down stability
+    and trust.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Violence-as-a-service
+  definition: Criminals or hit squads hiring out violence, including to young perpetrators recruited online.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: State threats
+  definition: Discreet or visible actions by foreign governments against the UK, such as interference,
+    theft of information, disruption or threats to individuals.
+  examples: []
+  source_url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Foreign power condition
+  definition: The UK test that conduct was done for or on behalf of a foreign power, directly or indirectly,
+    or intended to benefit one.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2023/32/section/31
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Assisting a foreign intelligence service
+  definition: UK offence of conduct intended, or known to be likely, to materially assist a foreign intelligence
+    service in UK-related activities.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2023/32/section/3
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Material benefit (NSA 2023 s.17)
+  definition: Money, anything that could lead to money, or information obtained from a foreign intelligence
+    service.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2023/32/section/17
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Sabotage (NSA 2023 s.12)
+  definition: Conduct causing damage to any asset, for a purpose prejudicial to the UK, where the foreign
+    power condition is met.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2023/32/section/12
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Foreign interference (NSA 2023 s.13)
+  definition: Prohibited conduct linked to a foreign power that is intended to, or reckless as to whether
+    it will, have an interference effect.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2023/32/section/13
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Hostile reconnaissance
+  definition: Watching people or places to gather information for a hostile purpose, here for a foreign
+    state.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Talent recruitment programme
+  definition: A government-backed scheme to recruit researchers from abroad; joining is not illegal by
+    itself, but some schemes push transfer of ideas and IP.
+  examples: []
+  source_url: https://www.fbi.gov/file-repository/china-risk-to-academia-2019.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Malign foreign talent recruitment program
+  definition: US legal term for a foreign-sponsored programme that pays researchers in exchange for listed
+    activities such as unauthorised transfer, hidden participation or recruiting others.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/42/19237
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Conflict of commitment
+  definition: When outside work takes time or effort that should go to a funded post or award.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/42/19237
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Shadow lab
+  definition: A lab a researcher runs abroad without telling their home institution or funder, often doing
+    similar work.
+  examples: []
+  source_url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Non-traditional collector
+  definition: Someone gathering information for a foreign entity who is not an intelligence officer, such
+    as a student or researcher.
+  examples: []
+  source_url: https://www.fbi.gov/file-repository/china-risk-to-academia-2019.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Theft of trade secrets (18 U.S.C. 1832)
+  definition: Taking a trade secret for the economic benefit of someone other than its owner, knowing
+    it will harm the owner.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/1832
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Foreign instrumentality
+  definition: Any body or business substantially owned, controlled or directed by a foreign government.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/1839
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Treason (US)
+  definition: Levying war against the United States or adhering to its enemies, giving them aid and comfort,
+    by someone owing allegiance; needs two witnesses to the same overt act or a confession in open court.
+  examples: []
+  source_url: https://www.law.cornell.edu/constitution/articleiii
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Treason (UK, Treason Act 1351)
+  definition: Includes compassing the monarch's death, levying war against the monarch in the realm, and
+    adhering to the monarch's enemies giving them aid and comfort.
+  examples: []
+  source_url: https://www.legislation.gov.uk/aep/Edw3Stat5/25/2
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Misprision of treason
+  definition: Knowing of treason and concealing it instead of reporting it promptly to the authorities.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2382
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: FBAR
+  definition: US Report of Foreign Bank and Financial Accounts, which must be filed for qualifying foreign
+    accounts.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/harvard-university-professor-convicted-making-false-statements-and-tax-offenses
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Wagner Group
+  definition: A Russian mercenary organisation that, per the CPS, commissioned the 2024 Leyton warehouse
+    arson through a UK recruit.
+  examples: []
+  source_url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES

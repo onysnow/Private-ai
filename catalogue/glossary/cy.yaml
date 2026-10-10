@@ -557,3 +557,162 @@ terms:
   indicators: []
   areas:
   - CY
+- term: Personal data breach
+  definition: A security failure that leads to personal data being destroyed, lost, changed, disclosed
+    or accessed without permission, whether by accident or on purpose.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Confidentiality, integrity and availability breach
+  definition: 'The three kinds of breach: data seen by people who should not see it, data changed without
+    permission, and data lost or made unreachable.'
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Controller
+  definition: The organisation that decides why and how personal data is used and that carries the duty
+    to report breaches.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Processor
+  definition: A supplier that handles personal data on a controller's behalf and must tell the controller
+    promptly about a breach.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Awareness (GDPR)
+  definition: The moment a controller is reasonably certain a security incident has compromised personal
+    data; the 72-hour clock starts here.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Supervisory authority
+  definition: The national data protection regulator that receives breach notices, such as the ICO in
+    the UK or the DPC in Ireland.
+  examples: []
+  source_url: https://ico.org.uk/for-organisations/report-a-breach/personal-data-breach/personal-data-breaches-a-guide/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Breach register
+  definition: The internal record a controller must keep of every breach, its effects and the action taken,
+    whether reported or not.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Form 8-K Item 1.05
+  definition: The SEC filing a US-listed company must make within four business days of deciding a cybersecurity
+    incident is material.
+  examples: []
+  source_url: https://www.sec.gov/newsroom/press-releases/2023-139
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Materiality
+  definition: Whether information would matter to a reasonable investor; under the SEC rule the company
+    itself determines whether a cyber incident is material.
+  examples: []
+  source_url: https://www.sec.gov/newsroom/press-releases/2023-139
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Regulation S-K Item 106
+  definition: SEC rule requiring listed companies to describe how they assess and manage material cybersecurity
+    risks and who oversees them.
+  examples: []
+  source_url: https://www.sec.gov/newsroom/press-releases/2023-139
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Risk factors
+  definition: The section of an investor filing listing risks the company faces; the SEC has charged companies
+    for describing a breach as hypothetical there after it happened.
+  examples: []
+  source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Bug bounty
+  definition: A programme that pays outside researchers for reporting security flaws responsibly; it is
+    not meant to pay people who exploit flaws and take data.
+  examples: []
+  source_url: https://www.ftc.gov/news-events/news/press-releases/2018/04/uber-agrees-expanded-settlement-ftc-related-privacy-security-claims
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Misprision of felony
+  definition: A US federal crime of actively concealing a known felony and not reporting it to authorities
+    (18 U.S.C. 4).
+  examples: []
+  source_url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: HIPAA covered entity
+  definition: A US health plan, healthcare clearinghouse or healthcare provider bound by HIPAA's breach
+    notification rule.
+  examples: []
+  source_url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Interception
+  definition: Capturing the contents of a call, message or other communication while it is being transmitted.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2016/25/section/3
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Lawful authority (interception)
+  definition: Legal permission to intercept, such as a warrant or consent, without which interception
+    in the UK is an offence.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2016/25/section/3
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY

@@ -773,3 +773,298 @@ terms:
   indicators: []
   areas:
   - CO
+- term: Ex parte communication
+  definition: Contact between a judge and one side of a case about the case without the other side present.
+  examples: []
+  source_url: https://www.uscourts.gov/judges-judgeships/code-conduct-united-states-judges
+  cases: []
+  related:
+  - Recusal
+  indicators: []
+  areas:
+  - CO
+- term: Recusal (disqualification)
+  definition: A judge stepping aside from a case because of a conflict or a reasonable doubt about impartiality.
+  examples:
+  - Judge owns shares in a party
+  source_url: https://www.law.cornell.edu/uscode/text/28/455
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Financial interest (28 U.S.C. 455)
+  definition: Any legal or equitable ownership stake, however small, in a party or the subject of a case,
+    with listed exceptions such as mutual funds.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/28/455
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Code of Conduct for United States Judges
+  definition: The ethics rules for US federal judges, covering impartiality, ex parte contact, gifts and
+    outside activity.
+  examples: []
+  source_url: https://www.uscourts.gov/judges-judgeships/code-conduct-united-states-judges
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Judicial conduct commission
+  definition: A state body that investigates complaints against judges and recommends or imposes discipline
+    such as removal.
+  examples: []
+  source_url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Ticket fixing
+  definition: Getting traffic or minor charges dismissed or reduced as a personal favour rather than on
+    the merits.
+  examples: []
+  source_url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Contempt power
+  definition: A court's power to punish people who disobey its orders or disrupt proceedings, which can
+    be abused.
+  examples: []
+  source_url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Random case assignment
+  definition: Allocating cases to judges by chance or neutral rules so no one can pick the judge.
+  examples: []
+  source_url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Asset declaration
+  definition: A periodic statement by an official or judge listing their assets and income, and often
+    those of close relatives.
+  examples: []
+  source_url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Financial disclosure report (US judges)
+  definition: Annual filing by federal judges of holdings and transactions, now published in a searchable
+    online database.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/PLAW-117publ125/html/PLAW-117publ125.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Contraband (prison)
+  definition: Items prisoners are not allowed to have, such as mobile phones, drugs or weapons.
+  examples: []
+  source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Parole
+  definition: Conditional early release of a prisoner under supervision, decided by a board or authority.
+  examples: []
+  source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Corruption risk assessment
+  definition: A structured review that identifies weak points ('red flags') where corruption could occur
+    in an institution.
+  examples: []
+  source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Vetting
+  definition: Background checks on job candidates or staff, such as criminal records, family ties and
+    finances.
+  examples: []
+  source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Ghost employee
+  definition: A person on the payroll who does not actually work for the organisation, or does not exist.
+  examples: []
+  source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  cases: []
+  related:
+  - Payroll scheme
+  indicators: []
+  areas:
+  - CO
+- term: Payroll scheme
+  definition: A fraud where an employee makes the employer pay false compensation claims, such as adding
+    ghost employees.
+  examples: []
+  source_url: https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Embezzlement
+  definition: Taking money or property you were entrusted with because of your job, for yourself or others.
+  examples: []
+  source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Behavioral red flag (fraud)
+  definition: A personal behaviour, such as living beyond one's means, that fraud surveys find often accompanies
+    fraud.
+  examples: []
+  source_url: https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Foreign Agents Registration Act (FARA)
+  definition: US law requiring people who act for foreign principals in political or similar activities
+    to register and disclose.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Agent of a foreign principal
+  definition: Someone who acts at the order, request, direction or control of a foreign government, party
+    or other foreign principal.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Informational materials
+  definition: Materials a FARA registrant distributes for a foreign principal, which must be labelled
+    and filed within 48 hours.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Conspicuous statement
+  definition: The label FARA requires on materials saying who distributed them on behalf of which foreign
+    principal.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Supplemental statement
+  definition: The report a FARA registrant files every six months updating its activities and payments.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: LDA exemption
+  definition: FARA exemption for agents properly registered under the Lobbying Disclosure Act, which does
+    not cover work directed by foreign governments or parties.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Deferred prosecution agreement
+  definition: A deal in which prosecutors hold off charges if the person meets conditions such as paying
+    a fine.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/recent-cases
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Foreign Influence Registration Scheme (FIRS)
+  definition: UK scheme under Part 4 of the National Security Act 2023 requiring registration of certain
+    arrangements with foreign powers.
+  examples: []
+  source_url: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Political influence tier (FIRS)
+  definition: FIRS tier requiring registration within 28 days when a foreign power directs political influence
+    activities in the UK.
+  examples: []
+  source_url: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Enhanced tier (FIRS)
+  definition: FIRS tier requiring registration within 10 days of any activity directed by specified foreign
+    powers or entities.
+  examples: []
+  source_url: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Foreign power (FIRS)
+  definition: A foreign head of state, foreign government or part of one, and similar bodies listed in
+    the Act.
+  examples: []
+  source_url: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Political influence activity
+  definition: Under FIRS, communications to senior officials or politicians, public communications, or
+    disbursements meant to influence UK politics.
+  examples: []
+  source_url: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO

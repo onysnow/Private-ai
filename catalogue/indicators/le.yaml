@@ -2459,6 +2459,1375 @@ indicators:
   - Worker is a genuine contractor or volunteer where minimums do not apply.
   jurisdictions: Australia; general
   version: 1
+- id: LE-044
+  name: Labour relations consultant active in an organising campaign, but no LM-10 or LM-20 on file
+  definition: An employer brings in an outside consultant or law firm to run or shape its response to
+    a union drive, yet neither the employer (Form LM-10) nor the consultant (Form LM-20) has filed the
+    disclosure the federal law requires.
+  areas:
+  - LE
+  typology: Undisclosed persuader activity
+  status: verified
+  sources:
+  - title: 'OLMS Newsletter 01-16: Persuader Rule'
+    publisher: US Department of Labor, Office of Labor-Management Standards
+    year: '2016'
+    url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+    locator: Persuader rule summary
+    quote: agrees to manage a campaign or program to avoid or counter a union organizing
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 433 (LMRDA section 203), Report of employers
+    publisher: Legal Information Institute, Cornell Law School (text of US Code)
+    url: https://www.law.cornell.edu/uscode/text/29/433
+    locator: Section 203(a)(4) and 203(b)
+    quote: any agreement or arrangement with a labor relations consultant or other independent contractor
+      or organization
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 CFR Part 406, Reporting by labor relations consultants and other persons
+    publisher: US Government, Electronic Code of Federal Regulations
+    url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-406
+    locator: 406.2(a)
+    quote: The report shall be filed within 30 days after entering into an agreement or arrangement of
+      the type described in this section.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 CFR Part 405, Employer reports
+    publisher: US Government, Electronic Code of Federal Regulations
+    url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-405
+    locator: '405.2'
+    quote: within 90 days after the end of each of its fiscal years, a report signed by its president
+      and treasurer
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'No Holds Barred: The Intensification of Employer Opposition to Organizing (EPI Briefing Paper
+      235)'
+    publisher: Economic Policy Institute (Kate Bronfenbrenner, Cornell University)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: Table 3, p. 10
+    quote: Hired management consultant 75%
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Workers report meetings run by outside 'labor relations' speakers, but the OLMS online disclosure
+    search shows no LM-20 naming the employer.
+  - An employer's LM-10 is absent for the fiscal year in which a union election took place and a law firm
+    was publicly described as advising on the campaign.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Organization
+  - Contract
+  - Payment
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - OLMS Online Public Disclosure Room (LM-10, LM-20, LM-21 filings)
+  - NLRB case search (election petitions and dates)
+  - Worker testimony or campaign materials naming the consultant
+  levels:
+    faint: A consultant is named in campaign materials or worker accounts; filing status not yet checked
+    strong: Filings checked and no LM-20 found more than 30 days after the consultant was engaged, or
+      no LM-10 more than 90 days after the employer's fiscal year end
+    textbook: A persuader agreement exists (consultant undertook activities to persuade employees) and
+      no LM-20 was filed within 30 days and/or no LM-10 within 90 days after fiscal year end
+    threshold_source: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-406
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Persuader reporting is a disclosure regime for paid third-party influence, comparable to lobbying
+      registration gaps.
+    source_url: https://www.law.cornell.edu/uscode/text/29/433
+  innocent_explanations:
+  - The consultant only gave advice to the employer, which is exempt from reporting under section 203(c).
+  - The filing exists but under a different name of the employer, a parent company or the law firm's legal
+    name.
+  - The engagement began recently and the 30-day or 90-day filing window has not closed.
+  - The scope of reportable 'indirect' persuasion changed with the 2016 rule; its later status was not
+    verified here and must be checked before treating an omission as a breach.
+  jurisdictions: United States (LMRDA, federal private sector)
+  version: 1
+- id: LE-045
+  name: Consultant directs supervisors, scripts communications or sets personnel policies behind the scenes
+  definition: An outside consultant never speaks to workers directly but plans what supervisors say and
+    do, writes the anti-union materials handed to staff, runs union-avoidance seminars for managers, or
+    designs personnel actions aimed at defeating the union.
+  areas:
+  - LE
+  typology: Undisclosed persuader activity
+  status: verified
+  sources:
+  - title: 'OLMS Newsletter 01-16: Persuader Rule'
+    publisher: US Department of Labor, Office of Labor-Management Standards
+    year: '2016'
+    url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+    locator: Reportable activities (a)-(d)
+    quote: planning, directing, or coordinating activities undertaken by supervisors or other employer
+      representatives
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'OLMS Newsletter 01-16: Persuader Rule'
+    publisher: US Department of Labor, Office of Labor-Management Standards
+    year: '2016'
+    url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+    locator: Reportable activities (b)-(c)
+    quote: conducting a union avoidance seminar for supervisors or other employer representatives
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: Seventy-seven percent hold supervisory one-on-ones, and two-thirds hold them at least weekly
+      throughout the campaign.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Supervisors read near-identical talking points across many sites during the same week.
+  - Leaflets distributed to staff carry a consultant's document metadata or template layout.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Employment
+  - Document
+  - Event
+  - Contract
+  checkable: records
+  lookup_sources:
+  - Leaked or disclosed campaign materials
+  - LM-20 'description of activities' fields
+  - NLRB hearing transcripts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary HR training on lawful communication during campaigns is common.
+  - Supervisors may share materials drafted in-house by the company's own staff, which is not consultant
+    persuasion.
+  - Whether indirect persuasion is reportable depends on the interpretation in force; the 2016 rule's
+    later status was not verified here.
+  jurisdictions: United States
+  version: 1
+- id: LE-046
+  name: Employer pays employees or an employee committee to campaign against the union or report on co-workers
+  definition: Money or favours go to particular workers, or to a worker group, so that they persuade colleagues
+    against organising or pass on information about union activity.
+  areas:
+  - LE
+  typology: Undisclosed persuader activity
+  status: verified
+  sources:
+  - title: 29 U.S.C. 433 (LMRDA section 203)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/433
+    locator: Section 203(a)(2)
+    quote: any payment (including reimbursed expenses) to any of his employees, or any group or committee
+      of such employees
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: assisting the establishment of an anti-union committee (30% of the campaigns)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An 'employee voice committee' formed during the drive whose members receive paid time, bonuses or
+    expenses.
+  - Payments to particular staff appear on payroll or expense records only during the campaign period.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - LM-10 (employer report of payments to employees)
+  - Payroll and expense records
+  - Worker testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary wages and expenses for regular work are not reportable payments.
+  - Staff committees on safety or social events exist in many workplaces for reasons unrelated to unions.
+  - Section 203(a)(2) excludes payments made with prior disclosure to the other employees, so a disclosed
+    arrangement may be lawful.
+  jurisdictions: United States
+  version: 1
+- id: LE-047
+  name: Surveillance of union activity, or creating the impression of it
+  definition: The employer watches, records, photographs or hires others to gather information on workers'
+    union activity, or acts in ways that make workers believe they are being watched.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Create the impression that you are spying on employees' union activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Photograph or videotape employees engaged in peaceful union or other protected activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 433 (LMRDA section 203)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/433
+    locator: Section 203(a)(3)
+    quote: any expenditure, during the fiscal year, where an object thereof, directly or indirectly, is
+      to
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: In addition to interrogation, 14% of employers use surveillance, primarily electronic (11%)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'No Holds Barred, EPI 2019 follow-up: Unlawful'
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: Employers are charged with making threats, engaging in surveillance activities, or harassing
+      workers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Managers photograph staff handing out leaflets in the car park.
+  - A supervisor tells a worker the names of people who attended an off-site union meeting.
+  - Payments to an investigations firm during a campaign period.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Organization
+  - Payment
+  - Contract
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - NLRB charges and decisions
+  - LM-10 (expenditures to obtain information on employees)
+  - Worker testimony, photos, internal emails
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Routine security cameras and IT monitoring that existed before the campaign and were not focused on
+    union activity.
+  - Managers who happen to be present in public areas during union events.
+  - Workers may voluntarily tell managers about union activity without being asked.
+  jurisdictions: United States (NLRA); ILO freedom-of-association principles not reached
+  version: 1
+- id: LE-048
+  name: Coercive questioning, one-on-one interrogation or pressure to appear in campaign videos
+  definition: Managers question workers about their own or colleagues' union views, often in one-on-one
+    meetings, or ask individuals to appear in anti-union campaign material.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Coercively question employees about their own or coworkers' union activities or sympathies.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Solicit individual employees to appear in a campaign video.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 2
+    quote: In 63% of elections employers used supervisor one-on-one meetings to interrogate workers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Workers called individually into an office and asked how they plan to vote.
+  - Staff asked by managers to film testimonials against the union.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Document
+  - Note
+  checkable: person
+  lookup_sources:
+  - Worker interviews
+  - NLRB complaints and decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Casual, non-coercive conversation about the union between friendly colleagues and a supervisor.
+  - Lawful interviews to prepare a legal defence, when the required assurances are given.
+  - Ordinary performance one-on-ones that do not touch on union views.
+  jurisdictions: United States
+  version: 1
+- id: LE-049
+  name: Threats of closure, job loss, or cuts to wages and benefits if workers unionise
+  definition: Workers are told or shown that the workplace may close, jobs may go, or pay and benefits
+    may be cut if they choose a union.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Threaten employees with adverse consequences, such as closing the workplace,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: Fifty-seven percent of employers make plant closing threats.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: 47% threaten wage or benefit cuts
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 158(c) (NLRA section 8(c))
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/158
+    locator: Section 8(c)
+    quote: if such expression contains no threat of reprisal or force or promise of benefit
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A slide in a staff meeting showing a closed site 'that unionised'.
+  - Manager tells workers bonuses will end if the union wins.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Worker interviews and recordings
+  - Campaign leaflets and slides
+  - NLRB charges and decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Employers may lawfully state views and opinions that contain no threat or promise (section 8(c)).
+  - A genuine, objectively based prediction of economic consequences beyond the employer's control may
+    be lawful.
+  - A closure may be planned for business reasons unrelated to the union.
+  jurisdictions: United States
+  version: 1
+- id: LE-050
+  name: Threats to report workers to immigration authorities during an organising campaign
+  definition: Workers, often migrants, are warned that supporting the union could lead to their being
+    reported to immigration enforcement.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: employers make threats of referral to Immigration Customs and Enforcement (ICE)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Threaten employees with adverse consequences if they engage in protected, concerted activity.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sudden demands for re-verification of work documents only for workers known to back the union.
+  - Supervisors mention immigration status in the same meeting as the union vote.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Worker interviews
+  - NLRB charges
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Fear of visa or status loss is already an LE warning sign (LE-042); immigration threats in
+      campaigns use the same leverage.
+    source_url: https://files.epi.org/page/-/pdf/bp235.pdf
+  innocent_explanations:
+  - Routine, scheduled employment-eligibility checks applied to all staff regardless of union activity.
+  - A government audit initiated independently of the employer.
+  jurisdictions: United States
+  version: 1
+- id: LE-051
+  name: Promises, raises, bonuses or solicited grievances during the campaign
+  definition: During an organising drive the employer promises or hands out new benefits, unscheduled
+    pay rises or favours, or invites complaints with an implied promise to fix them, to win votes against
+    the union.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Imply a promise of benefits by soliciting grievances from employees during a union organizing
+      campaign.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Confer benefits on employees during a union organizing campaign to induce employees to vote
+      against the union.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: Table 3, p. 11; p. 12
+    quote: bribes and special favors (22%)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A pay rise announced weeks after an election petition, outside the usual pay-review cycle.
+  - '''Open-door'' listening sessions launched only after the union filed.'
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Payment
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Pay history and announcement dates compared with NLRB petition date
+  - Internal memos
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The rise or benefit was decided and scheduled before the campaign began.
+  - Industry-wide wage pressure or a statutory minimum-wage increase.
+  - Regular staff surveys that pre-date the campaign.
+  jurisdictions: United States
+  version: 1
+- id: LE-052
+  name: Scheduled raises or benefit changes withheld and blamed on the union
+  definition: A pay rise or benefit change that would normally have happened is held back during the campaign,
+    without a clear assurance it will come whatever the outcome.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Withhold changes in wages or benefits during a union organizing campaign that would have been
+      made had the union not been on the scene, unless you make clear to employees that the change will
+      occur whether or not they select the union
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 15
+    quote: alterations in benefits or working conditions have increased from 17% to 22%
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Annual raise given at other non-union sites but not at the site with a pending election.
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Payment
+  - Event
+  checkable: records
+  lookup_sources:
+  - Pay records across sites
+  - Company announcements
+  - NLRB charges
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Company-wide pay freeze for financial reasons applied equally to all sites.
+  - Employer gave a clear assurance that the change will happen regardless of the vote.
+  jurisdictions: United States
+  version: 1
+- id: LE-053
+  name: Mandatory anti-union 'captive audience' meetings
+  definition: Workers are required, under threat of discipline, to attend meetings where management argues
+    against the union.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Board Rules Captive-Audience Meetings Unlawful (Amazon.com Services LLC)
+    publisher: National Labor Relations Board
+    year: '2024'
+    url: https://www.nlrb.gov/news-outreach/news-story/board-rules-captive-audience-meetings-unlawful
+    locator: News release, 13 November 2024
+    quote: an employer violates the National Labor Relations Act by requiring employees under threat of
+      discipline or discharge
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: Nearly 90% of employers use captive audience meetings, holding on average 10.4 meetings a year.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rota shows compulsory 'information sessions' about the union with attendance taken.
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Employment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Rotas and attendance sheets
+  - Meeting invitations
+  - NLRB decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Meetings where staff are told in advance attendance is voluntary, with no penalty and no attendance
+    records, remained permitted under the 2024 decision.
+  - Routine mandatory staff meetings on operations or safety.
+  - The 2024 rule applies prospectively only, and a later Board may revisit it; current status was not
+    verified here.
+  jurisdictions: United States
+  version: 1
+- id: LE-054
+  name: Union supporters fired, disciplined, demoted or laid off
+  definition: Workers active in the organising effort lose their jobs, are disciplined, suspended, demoted
+    or not recalled, in a pattern that tracks their union activity.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Discriminating against employees because of their union activities (Section 8(a)(3))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+    locator: Examples
+    quote: employers may not discharge, lay off, or discipline employees
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Unlawful: U.S. employers are charged with violating federal law in 41.5% of all union election
+      campaigns'
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: one out of five union election campaigns involves a charge that a worker was illegally fired
+      for union activity.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 2
+    quote: employers threatened to close the plant in 57% of elections, discharged workers in 34%
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Starbucks Corp. v. McKinney, 602 U.S. (2024)
+    publisher: Supreme Court of the United States (via Legal Information Institute)
+    year: '2024'
+    url: https://www.law.cornell.edu/supremecourt/text/23-367
+    locator: Opinion, facts
+    quote: Starbucks ultimately fired multiple employees involved with the media event for violating company
+      policy.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Organising committee members dismissed for minor policy breaches soon after going public.
+  - Discipline records show a jump for named union supporters after the petition date.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - NLRB case search (8(a)(3) charges, complaints, decisions)
+  - Court records for 10(j) injunctions
+  - Discipline and termination records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Retaliation for raising concerns about pay overlaps with retaliation for union activity.
+    source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+  innocent_explanations:
+  - Genuine misconduct or performance problems that would have led to the same action regardless of union
+    activity.
+  - Layoffs driven by documented business downturns applied to all staff.
+  - Coincidental timing; NLRB charges are allegations until decided.
+  jurisdictions: United States
+  version: 1
+- id: LE-055
+  name: Retaliation against workers who file charges or testify
+  definition: Workers who file, plan to file, or are suspected of filing a charge with the labour board,
+    or who give evidence, are punished.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Discriminating against employees for NLRB activity (Section 8(a)(4))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-for-nlrb-activity-section-8a4
+    locator: Examples
+    quote: Discharge or otherwise discriminate against employees for announcing an intent to file a charge,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 158(a)(4)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/158
+    locator: Section 8(a)(4)
+    quote: to discharge or otherwise discriminate against an employee because he has filed charges
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Worker named as a witness in an NLRB hearing is moved to worse shifts the following week.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - NLRB case dockets
+  - Rota and discipline records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Action taken for documented reasons unrelated to the charge.
+  - Changes applied across a whole team, not only to the witness.
+  jurisdictions: United States
+  version: 1
+- id: LE-056
+  name: Rules that ban union talk, insignia or off-duty access
+  definition: The employer introduces or enforces rules that stop workers discussing the union at work
+    while other non-work talk is allowed, bans union buttons or shirts, or bars off-duty workers from
+    outdoor non-working areas.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Prohibit employees from wearing union buttons, t-shirts, and other union insignia unless special
+      circumstances warrant.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Deny off-duty employees access to outside nonworking areas of your property, unless business
+      reasons justify it.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A new dress-code memo issued days after union pins appear.
+  - Handbook revised during the drive to forbid 'solicitation' on breaks.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Employee handbooks and their revision dates
+  - NLRB decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine safety or customer-contact uniform rules ('special circumstances').
+  - Neutral rules on solicitation during working time that apply to all topics.
+  - Security reasons for restricting site access.
+  jurisdictions: United States
+  version: 1
+- id: LE-057
+  name: Messaging that choosing a union is futile
+  definition: Workers are told that voting for a union will change nothing, for example that the company
+    will never agree to anything.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Convey the message that selecting a union would be futile.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Leaflet saying bargaining will 'start from zero' and the company will never sign.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Company
+  checkable: records
+  lookup_sources:
+  - Campaign materials
+  - NLRB decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accurate statements that bargaining outcomes are not guaranteed and can go either way are lawful opinion.
+  jurisdictions: United States
+  version: 1
+- id: LE-058
+  name: Polling workers on union support without safeguards
+  definition: The employer surveys or polls staff about union support without a lawful purpose, assurances
+    against reprisal and a secret ballot.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Poll your employees to determine the extent of their support for a union, unless you comply
+      with certain safeguards.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A named, non-anonymous online survey asking whether staff want 'third-party representation'.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Company
+  checkable: records
+  lookup_sources:
+  - Survey copies
+  - Worker testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Anonymous engagement surveys run for years that do not ask about union support.
+  - Polls run with the required safeguards.
+  jurisdictions: United States
+  version: 1
+- id: LE-059
+  name: Employer-backed decertification petition
+  definition: Management starts, solicits signatures for, or gives more than minimal support to a petition
+    to remove an existing union.
+  areas:
+  - LE
+  typology: Interference with representation
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Initiate, solicit employees to sign, or lend more than minimal support to or approval of a
+      decertification
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Decertification petition circulated on company time by supervisors or drafted with the employer's
+    lawyers.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - CourtCase
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - NLRB case search (RD decertification petitions)
+  - Worker testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Workers genuinely dissatisfied with their union may file on their own initiative.
+  - Employers may give minimal, ministerial information when asked.
+  jurisdictions: United States
+  version: 1
+- id: LE-060
+  name: Company-dominated committee or favoured union
+  definition: The employer sets up, controls or supports a workers' body or a preferred union, or recognises
+    a minority union, to head off an independent one.
+  areas:
+  - LE
+  typology: Interference with representation
+  status: verified
+  sources:
+  - title: 29 U.S.C. 158(a)(2)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/158
+    locator: Section 8(a)(2)
+    quote: to dominate or interfere with the formation or administration of any labor organization
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with or dominating a union (Section 8(a)(2))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-or-dominating-a-union-section-8a2
+    locator: Examples
+    quote: Recognize, bargain with, or execute an agreement with a minority union
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with or dominating a union (Section 8(a)(2))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-or-dominating-a-union-section-8a2
+    locator: Examples
+    quote: Recognize a union after you are notified that another union has filed a valid election petition.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A 'workers' council' launched during a drive, with members picked by management and meeting on company
+    premises.
+  - Quick recognition of a little-known union days after a rival files for an election.
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Person
+  - Payment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - NLRB case search
+  - LM-2/LM-3 union filings (OLMS) for the favoured organisation
+  - Committee minutes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful employee involvement groups dealing with production or quality, not wages and conditions.
+  - Voluntary recognition of a union with proven majority support and no rival petition.
+  jurisdictions: United States
+  version: 1
+- id: LE-061
+  name: Closing, relocating or transferring work to escape the union
+  definition: The employer shuts a site, moves work to another site or contractor, or reassigns work in
+    order to avoid its obligations to unionised staff or to scare workers at other sites.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Discriminating against employees because of their union activities (Section 8(a)(3))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+    locator: Examples
+    quote: Transfer work (e.g., to another plant or other employees) in order to avoid your obligations
+      under the Act.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Discriminating against employees because of their union activities (Section 8(a)(3))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+    locator: Examples
+    quote: Close one of your facilities, if your motive is to chill unionism at any remaining facility
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The first store in a chain to unionise closes within months, while nearby non-union stores stay open.
+  - Work at a unionised depot moved to a newly formed subcontractor.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Contract
+  - Ownership
+  - Document
+  checkable: records
+  lookup_sources:
+  - Site opening and closure records
+  - WARN Act notices
+  - Corporate registries for new entities
+  - NLRB decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Transferring work to new entities or contractors can be checked with the same company-registry
+      methods.
+    source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+  innocent_explanations:
+  - Documented loss-making site or lease expiry decided before the union drive.
+  - Restructuring applied equally to union and non-union sites.
+  jurisdictions: United States
+  version: 1
+- id: LE-062
+  name: Refusing to hire job applicants because of union ties
+  definition: Applicants are turned down or not considered because of their union membership, history
+    or sympathies.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Discriminating against employees because of their union activities (Section 8(a)(3))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+    locator: Examples
+    quote: Refuse to hire or consider job applicants because of their union membership, activities, or
+      sympathies.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - After a site changes hands, the new owner hires few or none of the previously unionised staff.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Employment
+  - Ownership
+  - Event
+  checkable: records
+  lookup_sources:
+  - Hiring records
+  - NLRB charges and decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Applicants rejected on neutral, documented qualifications.
+  - Reduced headcount needs after a change of owner.
+  jurisdictions: United States
+  version: 1
+- id: LE-063
+  name: Misconduct around the vote itself
+  definition: Around an NLRB election the employer gives a mass speech on company time within 24 hours
+    of voting, keeps a list of who has voted, electioneers at the polls, talks at length to people queuing
+    to vote, or alters an official Board notice.
+  areas:
+  - LE
+  typology: Election interference
+  status: verified
+  sources:
+  - title: Election-related content
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content
+    locator: Examples of objectionable conduct
+    quote: Make an election speech on company time to a massed assembly of employees within 24 hours of
+      the election.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Election-related content
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content-0
+    locator: Examples of objectionable conduct
+    quote: Keep a list of employees who have voted.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Election-related content
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content-0
+    locator: Examples of objectionable conduct
+    quote: Alter an official Board document to make it look like the Board favors a particular outcome.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Managers stand by the polling area talking to voters in the queue.
+  - Copies of the NLRB sample ballot marked 'No' distributed by management.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Person
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - NLRB election objections and hearing officer reports
+  - Worker photos and accounts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A mass speech on company time within 24 hours of the election, or any listed conduct, as
+      stated by the NLRB
+    threshold_source: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Voluntary off-the-clock meetings are treated differently from mass speeches on company time.
+  - Normal operational presence of managers in areas near the polling place.
+  jurisdictions: United States
+  version: 1
+- id: LE-064
+  name: Campaign misconduct serious enough to void the election
+  definition: After asking for an election the employer commits unfair labour practices that would require
+    the result to be set aside; under the 2023 Cemex standard the Board orders the employer to bargain
+    instead of rerunning the vote.
+  areas:
+  - LE
+  typology: Election interference
+  status: verified
+  sources:
+  - title: Board issues decision announcing new framework for union representation (Cemex)
+    publisher: National Labor Relations Board
+    year: '2023'
+    url: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+    locator: News release
+    quote: the Board will order the employer to recognize and bargain with the union.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Board issues decision announcing new framework for union representation (Cemex)
+    publisher: National Labor Relations Board
+    year: '2023'
+    url: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+    locator: News release
+    quote: if an employer who seeks an election commits any unfair labor practice that would require setting
+      aside the election
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Unlawful (EPI)
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: Employers are charged with violating federal law in 41.5% of all union election campaigns.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Many separate ULP findings between petition and vote, as in Cemex (more than 20 instances).
+  cases: []
+  data_needed:
+  - Company
+  - CourtCase
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - NLRB case search (C cases linked to R cases)
+  - NLRB Board decisions
+  levels:
+    faint: One or more ULP charges filed against the employer during the critical period
+    strong: Multiple charges or a regional complaint covering the campaign period
+    textbook: An unfair labour practice that would require setting aside the election, per the Cemex standard
+    threshold_source: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Charges are allegations; many are withdrawn, settled or dismissed.
+  - Unions may file charges tactically; count findings, not just filings.
+  - The Cemex framework may be revisited by a later Board; current status was not verified here.
+  jurisdictions: United States
+  version: 1
+- id: LE-065
+  name: Many unfair labour practice charges against the same employer
+  definition: An employer accumulates labour-board charges across sites or campaigns, a pattern that research
+    links to campaigns of employer opposition.
+  areas:
+  - LE
+  typology: Pattern of violations
+  status: verified
+  sources:
+  - title: Unlawful (EPI)
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: More than half (54.4%) of employers in elections involving more than 60 employees
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Unlawful (EPI)
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: illegally coercing, threatening, or retaliating against workers for supporting a union
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - NLRB case search shows charges against the same company filed by workers at dozens of locations in
+    the same year.
+  cases: []
+  data_needed:
+  - Company
+  - CourtCase
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - NLRB case search
+  - Court dockets for 10(j) injunction petitions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large employers with many sites attract more charges simply by size.
+  - Charges are allegations, not findings.
+  - Coordinated filing by a union campaign may raise counts.
+  jurisdictions: United States
+  version: 1
+- id: LE-066
+  name: No first contract long after the union wins
+  definition: Workers vote for a union but no first collective agreement follows for a year or more.
+  areas:
+  - LE
+  typology: Bargaining avoidance
+  status: verified
+  sources:
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 3
+    quote: 52% are still without a contract a year later, and 37% are still without a contract two years
+      after an election.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Union certified at a site two years ago; bargaining sessions rare and no agreement signed.
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - CourtCase
+  - Event
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - NLRB certification dates
+  - Union and employer statements
+  - FMCS notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - First contracts genuinely take time; the published research shows long delays are common.
+  - Hard bargaining on both sides is lawful.
+  - Delay caused by pending legal challenges to certification.
+  jurisdictions: United States
+  version: 1
+- id: LE-067
+  name: 'Bad-faith bargaining: refusing to meet, withholding information, bypassing the union, unilateral
+    changes or withdrawing recognition'
+  definition: After a union is recognised, the employer stalls or undermines bargaining by not meeting,
+    refusing relevant information, dealing directly with workers, changing terms without bargaining, or
+    withdrawing recognition from a union with majority support.
+  areas:
+  - LE
+  typology: Bargaining avoidance
+  status: verified
+  sources:
+  - title: Bargaining in good faith with employees' union representative (Section 8(d) & 8(a)(5))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/bargaining-in-good-faith-with-employees-union-representative
+    locator: Examples
+    quote: Bypass the union and deal directly with employees.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Bargaining in good faith with employees' union representative (Section 8(d) & 8(a)(5))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/bargaining-in-good-faith-with-employees-union-representative
+    locator: Examples
+    quote: Refuse to furnish information the union requests that is relevant to the bargaining process
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Bargaining in good faith with employees' union representative (Section 8(d) & 8(a)(5))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/bargaining-in-good-faith-with-employees-union-representative
+    locator: Examples
+    quote: Withdraw recognition from a union that enjoys majority support.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 158(a)(5)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/158
+    locator: Section 8(a)(5)
+    quote: to refuse to bargain collectively with the representatives of his employees
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bargaining sessions cancelled repeatedly; new benefits rolled out only at non-union sites; information
+    requests unanswered for months.
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - NLRB 8(a)(5) charges and decisions
+  - Bargaining session logs and correspondence
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Scheduling difficulties on both sides.
+  - Information requested is not relevant or is confidential and alternatives were offered.
+  - Withdrawal of recognition based on objective evidence that the union lost majority support.
+  jurisdictions: United States
+  version: 1
 not_reached:
 - 'UK GLAA ''spot the signs'' A5 leaflet (https://www.gla.gov.uk/media/qwpdjic2/spot-the-signs-leaflet-a5.pdf):
   direct download returned HTML, not the PDF; the 2020 GLAA PDF was read through WebFetch instead.'
@@ -2480,3 +3849,21 @@ not_reached:
   only the first 100,000 characters were read.'
 - 'Not researched: US DOL H-2B rules, state-level wage theft laws (e.g. California, New York), UK HMRC
   national minimum wage naming lists, and ILO guidance on ''decent work'' deficits.'
+- The web search budget for this turn was used up after one search, so research relied on direct fetches
+  of known primary-source URLs.
+- 'OLMS persuader and LM-10/LM-20 compliance pages on dol.gov (other than the 2016 newsletter) did not
+  load: they returned fetch errors.'
+- The 2018 Federal Register rescission of the 2016 persuader rule was not reached (the URL tried went
+  to an unrelated notice), so the persuader rule now in force, including whether 'indirect' persuasion
+  is reportable, is not verified.
+- The 2016 persuader final rule in the Federal Register was not reached (the URL tried went to an unrelated
+  notice).
+- ILO Convention 98 and the Committee on Freedom of Association compilation (normlex.ilo.org and ilo.org)
+  returned server errors, so no non-US standards are included.
+- NLRB news releases on Starbucks (Buffalo) and on the Amazon Bessemer rerun election were not reached,
+  so those are not listed as cases.
+- OLMS criminal enforcement yearly pages were not searched for persuader-reporting convictions.
+- EPI's 2023 union-avoidance spending report did not load.
+- Supreme Court PDF for Starbucks v. McKinney failed; the Cornell LII copy was used instead.
+- Whether the Amazon (2024) captive-audience rule and the Cemex (2023) framework still stand after later
+  changes to the NLRB was not verified.

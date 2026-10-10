@@ -4614,6 +4614,1822 @@ indicators:
   - Some cryptocurrency use is ordinary and lawful
   jurisdictions: Global
   version: 1
+- id: EN-083
+  name: Vague, all-encompassing green claim ('eco', 'sustainable', 'environmentally friendly') with no
+    specifics
+  definition: A company describes a product, service or the whole business with a broad green word or
+    phrase without saying what it means or proving it.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: 'Green Claims Code: environmental claims on goods and services'
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: 'Principle 2: Claims must be clear and unambiguous'
+    quote: General or all-encompassing sustainability claims such as 'environmentally friendly', 'eco',
+      or 'sustainable' don't provide any real indication of what is meant.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2024/825 (Empowering consumers for the green transition), Annex I point 4a
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+    locator: Annex, amendment to Annex I of Directive 2005/29/EC, point 4a
+    quote: Making a generic environmental claim for which the trader is not able to demonstrate recognised
+      excellent environmental performance relevant to the claim.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guides for the Use of Environmental Marketing Claims, 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.4 General environmental benefit claims
+    quote: Unqualified general environmental benefit claims are difficult to interpret and likely convey
+      a wide range of meanings.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Packaging says 'eco-friendly' with no explanation of which environmental benefit is meant
+  - A brand advertises itself as 'sustainable' across all its lines
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Advertising and packaging archives
+  - Company websites (archived versions)
+  - EU Ecolabel and national ecolabel registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: a generic environmental claim not specified on
+      the same medium and without demonstrated recognised excellent environmental performance (EU Annex
+      I 4a)'
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The EU rule is part of the Unfair Commercial Practices Directive blacklist, i.e. consumer-protection
+      law.
+    source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  innocent_explanations:
+  - The specifics are given elsewhere on the same label or page
+  - The product holds a recognised official ecolabel (e.g. EU Ecolabel) that backs the general claim
+  - Marketing copy predates the 2024 EU rules and has not yet been updated
+  jurisdictions: UK, EU, US
+  version: 1
+- id: EN-084
+  name: Green claim the company cannot back up with current, robust evidence
+  definition: An environmental claim is made without credible, up-to-date evidence (often scientific)
+    that shows it is true.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: 'Principle 6: Claims must be substantiated'
+    quote: Businesses should therefore be able to back up their claims.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: 'Principle 6: Claims must be substantiated'
+    quote: They should hold robust, credible, relevant and up to date evidence that supports them.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.2 Interpretation and substantiation of environmental marketing claims
+    quote: a reasonable basis often requires competent and reliable scientific evidence.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: 'Principle 1: Claims must be truthful and accurate'
+    quote: Businesses must live up to the environmental claims they make about products, services, brands
+      and activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A company cannot produce the test or study behind a 'uses 30% less water' claim
+  - Evidence relied on is years old and predates a change in the product
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Right-of-reply request to the company
+  - Advertising regulator rulings (e.g. ASA)
+  - Published life-cycle assessments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: the trader cannot produce evidence supporting
+      the claim'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Evidence exists but is commercially confidential and was not published
+  - Evidence is held by a supplier or certifier rather than the brand
+  - The claim is accurate but evidence is still being updated after a product change
+  jurisdictions: UK, US, EU
+  version: 1
+- id: EN-085
+  name: Claim omits or hides information buyers need, or cherry-picks the good parts
+  definition: A green claim leaves out important facts, such as significant negative impacts, so the product
+    or business looks greener than it is.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: 'Principle 3: Claims must not omit or hide important information'
+    quote: Claims made by businesses must not omit or hide information that consumers need to make informed
+      choices.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Principle 3
+    quote: Cherry-picking information like this is likely to make consumers think a product, service,
+      process, brand or business as a whole is greener than it really is.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.3 General principles
+    quote: To prevent deceptive claims, qualifications and disclosures should be clear, prominent, and
+      understandable.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An airline promotes a small biofuel trial while not mentioning fleet-wide emissions growth
+  - Key conditions of a claim are in small print far from the claim
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Company sustainability reports
+  - Emissions disclosures (e.g. CDP, mandatory GHG reporting)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Space limits on labels; the full information is on a linked page
+  - The omitted impact is minor in context
+  - The company publishes full sustainability reporting elsewhere
+  jurisdictions: UK, US
+  version: 1
+- id: EN-086
+  name: Claim about the whole product or business when it is true of only one part
+  definition: The company presents one green feature or activity as if it described the entire product,
+    brand or business.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/825, Annex I point 4b
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+    locator: Annex, point 4b
+    quote: Making an environmental claim about the entire product or the trader's entire business when
+      it concerns only a certain aspect of the product or a specific activity of the trader's business.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Principle 3
+    quote: Cherry-picking information like this is likely to make consumers think a product, service,
+      process, brand or business as a whole is greener than it really is.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - '''Made with recycled materials'' on a garment where only the label is recycled'
+  - A 'green' collection used to market a whole fashion brand
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Product listings and labels
+  - Company sustainability reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (EU Annex I 4b)
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The limited scope is stated clearly next to the claim
+  - The aspect concerned is the dominant part of the product's footprint
+  jurisdictions: EU, UK
+  version: 1
+- id: EN-087
+  name: Unfair or unrepresentative green comparison
+  definition: A product is said to be greener than others, but the comparison is not like-for-like, uses
+    an unrepresentative comparison group or is false.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: 'Principle 4: Comparisons must be fair and meaningful'
+    quote: Comparative claims should compare like with like.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Principle 4
+    quote: They should not benefit one product or brand to the detriment of another if the comparison
+      is inaccurate or false.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A toothbrush that 'contains 50% less plastic than other toothbrushes on the market' compared only
+    against an unrepresentative group (CMA worked example)
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Competitor product data
+  - Industry benchmark studies
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Comparison basis is stated and is genuinely representative
+  - Comparison is against the company's own previous product, clearly labelled
+  jurisdictions: UK
+  version: 1
+- id: EN-088
+  name: Claim that reflects only part of the product's life cycle
+  definition: A footprint or impact claim leaves out a major stage of the product's life (for example
+    transport, use or disposal) without saying so.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: 'Principle 5: Consider the full life cycle of the product or service'
+    quote: Claims can mislead where they reflect only part of the life cycle.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Principle 5
+    quote: Claims should also make clear the limits of any life cycle assessment the business has done.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A '33% lower carbon impact' claim that excluded transportation, a major part of the footprint (CMA
+    worked example)
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Published life-cycle assessments (LCA)
+  - Environmental Product Declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Excluded stage is negligible for that product
+  - The scope of the assessment is clearly disclosed with the claim
+  jurisdictions: UK
+  version: 1
+- id: EN-089
+  name: Self-declared or uncertified sustainability label, seal or logo
+  definition: A product carries a green trust mark the company created itself or that is not backed by
+    an independent certification scheme or public authority.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/825, Annex I point 2a
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+    locator: Annex, point 2a
+    quote: Displaying a sustainability label that is not based on a certification scheme or not established
+      by public authorities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Section on third-party schemes and accreditation
+    quote: Self-assessed and self-declared marks or symbols are more likely to raise concerns.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.6 Certifications and seals of approval
+    quote: Third-party certification does not eliminate a marketer's obligation to ensure that it has
+      substantiation for all claims reasonably communicated by the certification.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An in-house 'planet promise' badge with no published criteria or independent audit
+  - A seal that does not say what it certifies
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Certification scheme registers (e.g. FSC, EU Ecolabel)
+  - Ecolabel Index-type directories
+  - Company filings on label ownership
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (EU Annex I 2a)
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: FTC also warns that certifier seals must convey their basis; verifier independence is already
+      covered at EN-070.
+    source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  innocent_explanations:
+  - The label is a legitimate third-party scheme the reader does not recognise
+  - Label predates EU rules and is being phased out
+  - Scheme criteria are published but hard to find
+  jurisdictions: EU, UK, US
+  version: 1
+- id: EN-090
+  name: '''Carbon neutral'', ''climate neutral'' or ''net zero'' product claim that rests on offsetting'
+  definition: A product or business is marketed as having neutral, reduced or positive climate impact
+    because of bought offsets rather than its own emission cuts.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/825, Annex I point 4c
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+    locator: Annex, point 4c
+    quote: Claiming, based on the offsetting of greenhouse gas emissions, that a product has a neutral,
+      reduced or positive impact on the environment in terms of greenhouse gas emissions.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Principle 3 (carbon neutral and net zero claims)
+    quote: Where they are off-setting, businesses should provide information about any scheme they are
+      using
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.5 Carbon offsets
+    quote: would have occurred regardless of whether consumers purchased the offsets.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Integrity Matters: Net Zero Commitments by Businesses, Financial Institutions, Cities and
+      Regions'
+    publisher: UN Secretary-General's High-Level Expert Group on Net Zero Emissions Commitments
+    year: '2022'
+    url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+    locator: 'Recommendation 3: Using Voluntary Credits'
+    quote: cannot be counted toward a non-state actor's interim emissions reductions required by its net
+      zero pathway.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A 'CO2-neutral' flight or delivery option funded by forestry credits
+  - A drink labelled 'carbon neutral' with offsets as the only basis
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Contract
+  - Payment
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Carbon registry retirement records (Verra, Gold Standard)
+  - Company climate reports
+  - Advertising regulator rulings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (EU Annex I 4c). FTC: offset reductions that will
+      not occur for two years or longer should be clearly disclosed'
+    threshold_source: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: FTC § 260.5 names double selling and non-additional reductions, which are the existing carbon-credit
+      indicators.
+    source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  innocent_explanations:
+  - The claim is about the company's contribution to climate projects and is worded as such
+  - Outside the EU, offset-based claims may be lawful if fully disclosed and the credits are high-quality
+  - Offsets cover only residual emissions after deep verified cuts
+  jurisdictions: EU (banned for products from 2026), UK, US
+  version: 1
+- id: EN-091
+  name: Future green target (net zero by year X) with no verifiable plan or short-term milestones
+  definition: A company promotes a future environmental goal without a detailed, measurable, independently
+    checked plan and without near-term interim targets.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/825, Article 1 amending Article 6(2)(d) of Directive 2005/29/EC
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+    locator: Article 6(2)(d) as amended
+    quote: making an environmental claim related to future environmental performance without clear, objective,
+      publicly available and verifiable commitments set out in a detailed and realistic implementation
+      plan
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Section on claims about future aims and targets
+    quote: if the business has a clear and verifiable strategy to deliver them.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Integrity Matters
+    publisher: UN High-Level Expert Group on Net Zero Emissions Commitments
+    year: '2022'
+    url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+    locator: 'Recommendation 2: Setting Net Zero Targets'
+    quote: Non-state actors must annually disclose their greenhouse gas data, net zero targets and the
+      plans for, and progress towards, meeting those targets, and other relevant information against their
+      baseline
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Integrity Matters
+    publisher: UN High-Level Expert Group on Net Zero Emissions Commitments
+    year: '2022'
+    url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+    locator: 'Recommendation 8: Increasing Transparency and Accountability'
+    quote: Non-state actors must annually disclose their greenhouse gas data, net zero targets and the
+      plans for, and progress towards, meeting those targets, and other relevant information against their
+      baseline
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - '''Net zero by 2050'' advertised with no interim targets and no published transition plan'
+  - Target excludes scope 3 emissions, which the UN group says must be covered
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: records
+  lookup_sources:
+  - Company transition plans
+  - Science Based Targets initiative target dashboard
+  - CDP disclosures
+  levels:
+    faint: To be set by Ony
+    strong: No interim target within five years, or no annual GHG disclosure (UN HLEG)
+    textbook: 'Meets the published definition as worded: no detailed plan with measurable, time-bound
+      targets and independent verification (EU Art. 6(2)(d))'
+    threshold_source: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A plan exists and is in an annual report rather than the advert
+  - Company is newly committed and its plan is being validated (e.g. by a standard-setter)
+  - Small firms may lack resources for third-party verification
+  jurisdictions: EU, UK, global (UN guidance)
+  version: 1
+- id: EN-092
+  name: Legal requirement or absent substance presented as a special green feature
+  definition: A company advertises something every product must do by law, or the absence of a substance
+    that is banned or never used in that category, as if it were a distinctive green benefit.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/825, Annex I point 10a
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+    locator: Annex, point 10a
+    quote: Presenting requirements imposed by law on all products within the relevant product category
+      on the Union market as a distinctive feature of the trader's offer.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Principle 3
+    quote: Businesses should not claim an environmental virtue out of something which is a necessity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.9 Free-of claims
+    quote: The substance has not been associated with the product category.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A rinse-off cosmetic marketed as 'microbead-free' where microbeads are already banned (CMA example)
+  - '''CFC-free'' on a product type that has not used CFCs for decades'
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Product regulations and bans (e.g. national microbead bans, REACH restrictions)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (EU Annex I 10a)
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The claim is accompanied by a statement that all such products meet the requirement
+  - Product is sold in markets where the substance is still legal and common
+  jurisdictions: EU, UK, US
+  version: 1
+- id: EN-093
+  name: Recyclable, compostable or degradable claim that does not hold in real conditions
+  definition: A product is called recyclable, compostable or degradable when most buyers cannot actually
+    recycle or compost it, or it does not break down in the stated time or conditions.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.12 Recyclable claims
+    quote: all the materials in the item will break down into, or otherwise become part of, usable compost
+      (e.g., soil-conditioning material, mulch) in a safe and timely manner
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.8 Degradable claims
+    quote: all the materials in the item will break down into, or otherwise become part of, usable compost
+      (e.g., soil-conditioning material, mulch) in a safe and timely manner
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.7 Compostable claims
+    quote: all the materials in the item will break down into, or otherwise become part of, usable compost
+      (e.g., soil-conditioning material, mulch) in a safe and timely manner
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: Section on recyclable, compostable and biodegradable claims
+    quote: cannot be recycled in the current UK recycling infrastructure
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Coffee pods marketed as recyclable where most local schemes do not accept them
+  - '''Biodegradable'' plastic bags that only degrade in industrial facilities, with no qualification'
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Local authority recycling acceptance lists
+  - Recycling-access studies
+  - Compostability certifications (e.g. EN 13432)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Unqualified 'recyclable' claim where recycling facilities are not available to at least
+      60% of consumers or communities where sold; unqualified 'degradable' claim for an item that does
+      not decompose within one year after customary disposal (FTC)
+    threshold_source: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: Material marketed as recyclable but not processable may end up in the waste flows covered
+      by the waste-crime indicators.
+    source_url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+  innocent_explanations:
+  - Claim is correctly qualified (e.g. 'check locally', 'industrial composting only')
+  - Recycling access varies and the company relied on credible access data
+  - Infrastructure changed after the packaging was printed
+  jurisdictions: US, UK
+  version: 1
+- id: EN-094
+  name: Unqualified recycled-content, renewable-energy or renewable-materials claim
+  definition: A product says it is made from recycled or renewable materials, or with renewable energy,
+    when only part of it is, or fossil energy was used without matching certificates.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.13 Recycled content claims
+    quote: unless it is composed of materials that have been recovered or otherwise diverted from the
+      waste stream.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.15 Renewable energy claims
+    quote: A marketer should not make unqualified renewable energy claims
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 260
+    publisher: US Federal Trade Commission (eCFR)
+    year: '2012'
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+    locator: § 260.16 Renewable materials claims
+    quote: Research suggests that reasonable consumers may interpret renewable materials claims differently
+      than marketers may intend.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - '''Made with renewable energy'' where the factory runs on grid fossil power with no renewable energy
+    certificates'
+  - '''Recycled'' bottle containing a small share of recycled plastic'
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Contract
+  - Note
+  checkable: records
+  lookup_sources:
+  - Renewable energy certificate registries
+  - Recycled-content certifications
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (FTC §§ 260.13, 260.15, 260.16)
+    threshold_source: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Percentage is stated next to the claim
+  - Renewable energy certificates were bought and retired
+  - Recycled share is genuinely high and verified by a chain-of-custody scheme
+  jurisdictions: US
+  version: 1
+- id: EN-095
+  name: Green images, colours, names or logos that imply a benefit the product lacks
+  definition: Nature pictures, green colouring, eco-sounding brand names or symbols create a green impression
+    that the facts do not support.
+  areas:
+  - EN
+  typology: Greenwashing - misleading environmental claims
+  status: verified
+  sources:
+  - title: Green Claims Code
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+    locator: 'Principle 2: Claims must be clear and unambiguous (visual presentation)'
+    quote: the images, logos, packaging and colours used
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fossil fuel product advertised with forests and wind turbines
+  - A product line named 'Earth' with no environmental difference
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Advertising archives (e.g. Meta Ad Library)
+  - Advertising regulator rulings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Brand colours or names chosen for unrelated reasons, long before green marketing
+  - Imagery reflects a genuine, substantiated benefit
+  jurisdictions: UK
+  version: 1
+- id: EN-096
+  name: Net-zero or climate pledge while expanding or financing new fossil fuel supply
+  definition: A company or financial institution claims net zero, or a net-zero path, while still building
+    or investing in new oil, gas or coal supply.
+  areas:
+  - EN
+  typology: Greenwashing - corporate climate pledges
+  status: verified
+  sources:
+  - title: Integrity Matters
+    publisher: UN High-Level Expert Group on Net Zero Emissions Commitments
+    year: '2022'
+    url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+    locator: 'Recommendation 5: Phasing Out of Fossil Fuels and Scaling Up Renewable Energy'
+    quote: Financial institutions should have a policy of not investing or financing businesses linked
+      to deforestation, and should eliminate agricultural commodity-driven deforestation from their investment
+      and credit portfolios by 2025
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Integrity Matters
+    publisher: UN High-Level Expert Group on Net Zero Emissions Commitments
+    year: '2022'
+    url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+    locator: 'Recommendation 7: People and Nature in the Just Transition'
+    quote: Financial institutions should have a policy of not investing or financing businesses linked
+      to deforestation, and should eliminate agricultural commodity-driven deforestation from their investment
+      and credit portfolios by 2025
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A bank in a net-zero alliance arranging finance for new oil field development
+  - An oil major marketing a net-zero ambition while approving new upstream projects
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Payment
+  - Contract
+  - Ownership
+  - Document
+  checkable: records
+  lookup_sources:
+  - Bond and loan databases
+  - Project finance announcements
+  - Fossil fuel finance trackers by NGOs
+  - Company capital expenditure disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (UN HLEG Recommendation 5)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Misleading sustainability statements by financial firms are greenwashing under the ESAs' definition
+      and have led to SEC penalties.
+    source_url: https://www.esma.europa.eu/press-news/esma-news/esas-put-forward-common-understanding-greenwashing-and-warn-risks
+  innocent_explanations:
+  - Financing is for existing assets during managed decline, not new supply
+  - Investment is in a diversified fund with no direct new-supply exposure
+  - Pledge is framed as an aim, not a claim to be net zero
+  jurisdictions: Global (UN guidance)
+  version: 1
+- id: EN-097
+  name: Green claims made while lobbying against climate policy
+  definition: A company presents itself as climate-friendly in public while it, or trade bodies it funds,
+    lobbies against climate action.
+  areas:
+  - EN
+  typology: Greenwashing - corporate climate pledges
+  status: verified
+  sources:
+  - title: Integrity Matters
+    publisher: UN High-Level Expert Group on Net Zero Emissions Commitments
+    year: '2022'
+    url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+    locator: 'Recommendation 6: Aligning Lobbying and Advocacy'
+    quote: Non-state actors must lobby for positive climate action and not against it.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A net-zero pledging company funding a trade association campaigning against emissions standards
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Payment
+  - Associate
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Lobbying registers (EU Transparency Register, US LDA filings)
+  - Trade association membership lists
+  - Political donation records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (UN HLEG Recommendation 6)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Checking requires lobbying registers and donations data.
+    source_url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+  innocent_explanations:
+  - Trade association membership is for unrelated reasons and the company has publicly disagreed with
+    its climate position
+  - Lobbying concerns implementation details, not opposition to the policy
+  jurisdictions: Global
+  version: 1
+- id: EN-098
+  name: Investment fund or adviser ESG claims that do not match what it actually does
+  definition: A fund manager tells investors that sustainability or ESG checks are applied to investments
+    when they are not, or not consistently.
+  areas:
+  - EN
+  typology: Greenwashing - financial products
+  status: verified
+  sources:
+  - title: ESAs put forward common understanding of greenwashing and warn on risks
+    publisher: European Supervisory Authorities (ESMA, EBA, EIOPA)
+    year: '2023'
+    url: https://www.esma.europa.eu/press-news/esma-news/esas-put-forward-common-understanding-greenwashing-and-warn-risks
+    locator: Common high-level understanding of greenwashing
+    quote: do not clearly and fairly reflect the underlying sustainability profile of an entity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: SEC charges BNY Mellon Investment Adviser for misstatements and omissions concerning ESG considerations
+    publisher: US Securities and Exchange Commission
+    year: '2022'
+    url: https://www.sec.gov/news/press-release/2022-86
+    locator: Press release 2022-86
+    quote: numerous investments held by certain funds did not have an ESG quality review score as of the
+      time of investment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: DWS to pay $25 million for anti-money laundering violations and misstatements regarding ESG
+      investments
+    publisher: US Securities and Exchange Commission
+    year: '2023'
+    url: https://www.sec.gov/news/press-release/2023-194
+    locator: Press release 2023-194
+    quote: made materially misleading statements about its controls for incorporating ESG factors
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fund marketing says all holdings pass an ESG review, but some had no score at purchase (SEC BNY Mellon
+    finding)
+  - ESG research procedures described to clients were not followed (SEC GSAM finding)
+  cases:
+  - name: DWS Investment Management Americas (SEC ESG misstatements)
+    year: '2023'
+    jurisdiction: United States
+    what_happened: SEC found DWS made materially misleading statements about its controls for incorporating
+      ESG factors; DWS agreed, without admitting or denying, to a cease-and-desist order, censure and
+      a $19 million penalty in the ESG action.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2023-194
+    source_title: SEC press release 2023-194
+  - name: BNY Mellon Investment Adviser (SEC ESG misstatements)
+    year: '2022'
+    jurisdiction: United States
+    what_happened: SEC found the adviser represented or implied that all investments in certain funds
+      had undergone an ESG quality review when numerous holdings had no score at the time of investment;
+      it agreed to pay a $1.5 million penalty.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2022-86
+    source_title: SEC press release 2022-86
+  - name: Goldman Sachs Asset Management (SEC ESG policy failures)
+    year: '2022'
+    jurisdiction: United States
+    what_happened: SEC found policies and procedures failures involving ESG research from April 2017 to
+      February 2020; GSAM agreed, without admitting or denying, to a $4 million penalty, cease-and-desist
+      order and censure.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2022-209
+    source_title: SEC press release 2022-209
+  data_needed:
+  - Company
+  - Organization
+  - Document
+  - Ownership
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - SEC enforcement releases
+  - Fund prospectuses and SFDR Article 8/9 disclosures
+  - Fund holdings data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (ESAs common understanding)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: SEC treated ESG misstatements as violations of the Investment Advisers Act.
+    source_url: https://www.sec.gov/news/press-release/2022-209
+  innocent_explanations:
+  - Holdings bought before ESG scoring was available and scored later
+  - Fund discloses that ESG is one factor among many, not a strict screen
+  - Data provider coverage gaps
+  jurisdictions: US, EU
+  version: 1
+- id: EN-099
+  name: Attack directed at part of the natural environment that is not a military objective
+  definition: In armed conflict, a forest, river, farmland or other part of nature is attacked even though
+    it is not being used for military purposes.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: 'Study on customary international humanitarian law, Annex: List of customary rules (Rule 43A)'
+    publisher: ICRC / International Review of the Red Cross, Vol. 87 No. 857
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 43 A
+    quote: No part of the natural environment may be attacked, unless it is a military objective.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Deliberate burning of a nature reserve with no military presence
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources:
+  - Satellite imagery (fire and land-cover data)
+  - UN and OSCE monitoring reports
+  - Military statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (Customary IHL Rule 43A)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: These are IHL conduct-of-hostilities rules that also feature in war-crimes investigations.
+    source_url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  innocent_explanations:
+  - The area was in fact a military objective (e.g. used for cover or positions)
+  - Damage was incidental to an attack on a nearby lawful target
+  - Fire or damage caused by the other party or by accident
+  jurisdictions: International (international and non-international armed conflicts)
+  version: 1
+- id: EN-100
+  name: Destruction of the natural environment not required by imperative military necessity
+  definition: A party to a conflict destroys part of the environment when there was no pressing military
+    need to do so.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Customary IHL Rule 43B
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 43 B
+    quote: Destruction of any part of the natural environment is prohibited, unless required by imperative
+      military necessity.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Scorched-earth destruction of crops, orchards or forests during a withdrawal
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Satellite imagery
+  - Witness and monitoring reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (Customary IHL Rule 43B)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clearing was needed for defensive positions or fields of fire
+  - Damage was caused by fighting rather than deliberate destruction
+  jurisdictions: International
+  version: 1
+- id: EN-101
+  name: Attack expected to cause excessive incidental environmental damage
+  definition: An attack on a lawful military target is launched although the expected damage to the environment
+    is out of proportion to the military advantage.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Customary IHL Rule 43C
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 43 C
+    quote: which would be excessive in relation to the concrete and direct military advantage anticipated
+      is prohibited.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Striking a fuel depot beside a river or wetland, causing a large oil spill
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Pollution monitoring data
+  - Satellite imagery
+  - Military statements on targets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (Customary IHL Rule 43C)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The military advantage was significant and the damage not foreseeable
+  - Damage came from secondary effects outside the attacker's control
+  jurisdictions: International
+  version: 1
+- id: EN-102
+  name: No feasible precautions taken to avoid or minimise environmental damage
+  definition: A party conducts military operations without the practical steps that would have reduced
+    harm to the environment, including where effects are scientifically uncertain.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Customary IHL Rule 44
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 44
+    quote: Methods and means of warfare must be employed with due regard to the protection and preservation
+      of the natural environment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Customary IHL Rule 44
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 44
+    quote: Lack of scientific certainty as to the effects on the environment of certain military operations
+      does not absolve a party
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Military positions placed in sensitive ecosystems when alternatives were available
+  cases: []
+  data_needed:
+  - Event
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Military doctrine and orders (if published)
+  - Environmental monitoring reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (Customary IHL Rule 44)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Precautions were taken but failed
+  - No feasible alternative existed in the circumstances
+  jurisdictions: International
+  version: 1
+- id: EN-103
+  name: Widespread, long-term and severe damage to the natural environment, or environment destroyed as
+    a weapon
+  definition: Methods of warfare used that are meant or expected to cause damage to nature that is at
+    once widespread, long-lasting and severe, or destruction of the environment is used as a weapon.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Protocol Additional to the Geneva Conventions (Protocol I), Article 35(3)
+    publisher: UN OHCHR (treaty text)
+    year: '1977'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+    locator: Article 35(3)
+    quote: to cause widespread, long-term and severe damage to the natural environment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Protocol I, Article 55(1)
+    publisher: UN OHCHR (treaty text)
+    year: '1977'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+    locator: Article 55(1)
+    quote: Care shall be taken in warfare to protect the natural environment against widespread, long-term
+      and severe damage.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Customary IHL Rule 45
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 45
+    quote: Destruction of the natural environment may not be used as a weapon.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Deliberate mass oil releases or oil-well fires affecting a region for years
+  - Destruction of large ecosystems to deny them to the enemy
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources:
+  - Satellite imagery and remote sensing
+  - UNEP post-conflict environmental assessments
+  - Scientific monitoring data
+  levels:
+    faint: To be set by Ony
+    strong: Damage meets one or two of the three conditions (widespread, long-term, severe)
+    textbook: 'Meets the published definition as worded: all three conditions (widespread, long-term and
+      severe) together (AP I Arts 35(3), 55(1))'
+    threshold_source: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: The same 'widespread, long-term and severe' wording is used in the Rome Statute war crime
+      of excessive environmental damage (text not reached in this run).
+    source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  innocent_explanations:
+  - Damage is serious but short-lived or local, so it does not meet all three cumulative conditions
+  - Damage was not intended or reasonably expected
+  - Cause disputed between parties
+  jurisdictions: International (treaty for AP I parties; customary per ICRC study)
+  version: 1
+- id: EN-104
+  name: Attack on dams, dykes or nuclear power stations (works containing dangerous forces)
+  definition: A dam, dyke or nuclear power plant is attacked or endangered in a way that could release
+    floods or radiation and cause severe civilian losses.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Protocol I, Article 56(1)
+    publisher: UN OHCHR (treaty text)
+    year: '1977'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+    locator: Article 56(1)
+    quote: Works or installations containing dangerous forces, namely dams, dykes and nuclear electrical
+      generating stations,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Customary IHL Rule 42
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 42
+    quote: Particular care must be taken if works and installations containing dangerous forces
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Breach of a hydroelectric dam flooding downstream communities and ecosystems
+  - Shelling near an operating nuclear power station
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources:
+  - Satellite imagery
+  - Seismic data
+  - IAEA statements (nuclear sites)
+  - UN monitoring reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: attack on such works that may release dangerous
+      forces and cause severe losses among civilians (AP I Art. 56(1))'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Structural failure from neglect or prior damage rather than attack
+  - Responsibility disputed between parties
+  - Military use of the installation may affect the legal protection (AP I Art. 56(2), not quoted here)
+  jurisdictions: International
+  version: 1
+- id: EN-105
+  name: Destroying farmland, water supplies or irrigation works needed for civilian survival
+  definition: Agricultural areas, crops, livestock, drinking-water installations or irrigation works are
+    attacked, removed or made useless to deny them to civilians or the enemy.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Protocol I, Article 54(2)
+    publisher: UN OHCHR (treaty text)
+    year: '1977'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+    locator: Article 54(2)
+    quote: crops, livestock, drinking water installations and supplies and irrigation works,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Customary IHL Rule 54
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 54
+    quote: Attacking, destroying, removing or rendering useless objects indispensable to the survival
+      of the civilian population
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Irrigation canals cut off after a reservoir is lost
+  - Poisoned or destroyed water-supply infrastructure in a besieged area
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - PublicBody
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Humanitarian situation reports (OCHA)
+  - Water utility statements
+  - Satellite imagery of crops and canals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (AP I Art. 54(2))
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Starvation and attacks on objects indispensable to survival are conflict-related violations
+      beyond environmental harm.
+    source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  innocent_explanations:
+  - Infrastructure damaged incidentally in lawful fighting
+  - Damage caused by lack of maintenance during conflict
+  jurisdictions: International
+  version: 1
+- id: EN-106
+  name: Attacks on the environment as reprisals
+  definition: A party attacks the natural environment in retaliation for the other side's violations.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Protocol I, Article 55(2)
+    publisher: UN OHCHR (treaty text)
+    year: '1977'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+    locator: Article 55(2)
+    quote: Attacks against the natural environment by way of reprisals are prohibited.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Draft principles on protection of the environment in relation to armed conflicts (Principle
+      15)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: Principle 15
+    quote: Attacks against the environment by way of reprisals are prohibited.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Official statements framing destruction of natural areas as retaliation
+  cases: []
+  data_needed:
+  - Event
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Official military and government statements
+  - Media archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (AP I Art. 55(2))
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Statements are rhetorical and the attacks had another, lawful basis
+  jurisdictions: International
+  version: 1
+- id: EN-107
+  name: Pillage or plunder of natural resources in armed conflict
+  definition: Armed forces or others take timber, minerals, oil or other natural resources for private
+    or military gain during conflict or occupation.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Customary IHL Rule 52
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 52
+    quote: Pillage is prohibited.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Draft principles on protection of the environment in relation to armed conflicts (Principle
+      16)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: Principle 16
+    quote: Pillage of natural resources is prohibited.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Armed Activities on the Territory of the Congo (DRC v. Uganda)
+    publisher: International Court of Justice
+    year: '2022'
+    url: https://www.icj-cij.org/case/116
+    locator: Judgment on reparations, 9 February 2022
+    quote: US$60,000,000 for damage related to natural resources.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Soldiers and officers looting minerals, timber or coffee in occupied areas (ICJ DRC v Uganda findings)
+  cases:
+  - name: Armed Activities on the Territory of the Congo (Democratic Republic of the Congo v. Uganda)
+    year: 2005; reparations 2022
+    jurisdiction: International Court of Justice
+    what_happened: The ICJ found credible and persuasive evidence that officers and soldiers of the Ugandan
+      army (UPDF) were involved in looting, plundering and exploiting Congolese natural resources and
+      held Uganda responsible; it did not find a governmental policy of exploitation. In 2022 it ordered
+      Uganda to pay US$60 million for damage related to natural resources. (Judgment of an international
+      court on state responsibility; the outcome list has no closer category.)
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.icj-cij.org/case/116
+    source_title: 'ICJ case page: Armed Activities on the Territory of the Congo (DRC v. Uganda)'
+  data_needed:
+  - Event
+  - Organization
+  - Company
+  - Person
+  - Payment
+  - Address
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - UN Group of Experts reports
+  - Trade and export statistics
+  - Court and tribunal judgments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (Customary IHL Rule 52; ILC Principle 16)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: The ICJ found resource looting by armed forces; the existing indicators cover the trade side
+      of such resources.
+    source_url: https://www.icj-cij.org/case/116
+  innocent_explanations:
+  - Resources bought lawfully from legitimate owners
+  - Requisition by an occupying power within IHL limits
+  jurisdictions: International
+  version: 1
+- id: EN-108
+  name: Hostile use of environmental modification techniques
+  definition: A State deliberately manipulates natural processes (such as weather or water systems) as
+    a means of destruction against another State, with widespread, long-lasting or severe effects.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: pending
+  sources:
+  - title: Draft principles on protection of the environment in relation to armed conflicts (Principle
+      17)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: Principle 17
+    quote: shall not engage in military or any other hostile use of environmental modification techniques
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Convention on the Prohibition of Military or Any Other Hostile Use of Environmental Modification
+      Techniques (ENMOD)
+    publisher: UN Office for Disarmament Affairs
+    year: '1976'
+    url: https://disarmament.unoda.org/enmod/
+    locator: Treaty summary page (Article I paraphrase)
+    quote: not to engage in military or any other hostile use of environmental modification techniques
+    quote_verified: false
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources:
+  - Scientific attribution studies
+  - Government statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (ENMOD Art. I: widespread, long-lasting or severe
+      effects - any one suffices)'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Peaceful weather modification (e.g. cloud seeding for agriculture) is not covered
+  - Natural events wrongly attributed to deliberate manipulation
+  jurisdictions: International (ENMOD States parties)
+  version: 1
+- id: EN-109
+  name: Herbicides or poison used as a method of warfare
+  definition: Chemical herbicides are used to destroy vegetation in a prohibited way, or poison is used
+    as a weapon, harming the environment.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Customary IHL Rule 76
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 76 (conditions (a)-(e) follow in the source)
+    quote: 'The use of herbicides as a method of warfare is prohibited if they:'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Customary IHL Rule 72
+    publisher: ICRC / International Review of the Red Cross
+    year: '2005'
+    url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+    locator: Rule 72
+    quote: The use of poison or poisoned weapons is prohibited.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Large-scale defoliation of forests or crops in a conflict zone
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Soil and water sampling
+  - Satellite vegetation indices
+  - OPCW reports where chemical weapons are suspected
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (Customary IHL Rules 72 and 76)
+    threshold_source: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Rule 76 condition (a) links prohibited herbicide use to chemical weapons.
+    source_url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  innocent_explanations:
+  - Lawful herbicide use for vegetation control around own bases (Rule 76 conditions apply)
+  - Agricultural chemical contamination from damaged storage, not deliberate use
+  jurisdictions: International
+  version: 1
+- id: EN-110
+  name: Attack on a designated protected zone of environmental importance
+  definition: An area agreed or designated as environmentally important and protected in wartime is attacked
+    when it contains no military objective.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Draft principles on protection of the environment in relation to armed conflicts (Principles
+      4 and 18)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: 'Principle 18: Protected zones'
+    quote: shall be protected against any attack, except insofar as it contains a military objective.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Military strikes in a national park or biosphere reserve designated as a protected zone
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - PublicBody
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Protected Planet / World Database on Protected Areas
+  - UNESCO World Heritage and biosphere lists
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (ILC Principle 18)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The zone contained a military objective at the time
+  - No formal protected-zone designation had been made for the conflict
+  jurisdictions: International (ILC draft principles, not a treaty)
+  version: 1
+- id: EN-111
+  name: Occupying power exploiting natural resources unsustainably or causing harm beyond the territory
+  definition: An occupying power uses the occupied area's natural resources in an unsustainable way, not
+    for the local population's benefit, or lets activities there seriously harm other States' environment.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Draft principles on protection of the environment in relation to armed conflicts (Principle
+      20)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: 'Principle 20: Sustainable use of natural resources'
+    quote: do not cause significant harm to the environment of other States or areas beyond national jurisdiction
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Draft principles (Principle 21)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: 'Principle 21: Prevention of transboundary harm'
+    quote: do not cause significant harm to the environment of other States or areas beyond national jurisdiction
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Intensive logging, quarrying or groundwater extraction in occupied territory exported for the occupier's
+    benefit
+  cases: []
+  data_needed:
+  - Company
+  - PublicBody
+  - Contract
+  - Address
+  - Event
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Company registries in occupied areas
+  - Trade data
+  - Satellite imagery of extraction sites
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (ILC Principles 20, 21)
+    threshold_source: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Resource extraction in occupied territories is often subject to sanctions regimes (not sourced
+      in this run; check sanctions lists).
+    source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  innocent_explanations:
+  - Continuation of pre-occupation extraction at similar levels for the local population's benefit
+  - Resource use authorised under applicable law of occupation
+  jurisdictions: International (ILC draft principles)
+  version: 1
+- id: EN-112
+  name: Businesses in conflict areas without environmental due diligence
+  definition: Companies operating in or buying from conflict-affected areas do not check and manage their
+    environmental impact, including how natural resources are obtained.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Draft principles (Principle 10)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: 'Principle 10: Due diligence by business enterprises'
+    quote: exercise due diligence with respect to the protection of the environment
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Draft principles (Principle 11)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: 'Principle 11: Liability of business enterprises'
+    quote: be held liable for harm caused by them to the environment
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A trader sourcing timber or minerals from a war zone without supply-chain checks
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Contract
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - Company due-diligence and supply-chain reports
+  - Customs and trade data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (ILC Principle 10)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: ILC Principle 10 refers to obtaining natural resources sustainably in conflict areas.
+    source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  innocent_explanations:
+  - Due diligence was done but not published
+  - Company withdrew once conflict began
+  jurisdictions: International (ILC draft principles)
+  version: 1
+- id: EN-113
+  name: Toxic remnants of war left in place, or environmental information withheld after conflict
+  definition: After fighting, hazardous remnants (munitions, contaminated sites, wrecks) are not removed
+    or made safe, or parties refuse to share information or cooperate on environmental assessment and
+    clean-up.
+  areas:
+  - EN
+  typology: Wartime environmental damage (IHL)
+  status: verified
+  sources:
+  - title: Draft principles (Principle 26)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: 'Principle 26: Remnants of war'
+    quote: remove or render harmless toxic or other hazardous remnants of war
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Draft principles (Principle 27)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: 'Principle 27: Remnants of war at sea'
+    quote: do not constitute a danger to the environment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Draft principles (Principle 24)
+    publisher: UN International Law Commission
+    year: '2022'
+    url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+    locator: Principle 24
+    quote: cooperate with respect to post-armed conflict environmental assessments and remedial measures
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sunken munitions or damaged tankers leaking at sea years after a conflict
+  - Contaminated military sites with no clean-up plan
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - PublicBody
+  - Vessel
+  - Document
+  checkable: records
+  lookup_sources:
+  - UNEP post-conflict assessments
+  - Mine-action databases
+  - Maritime pollution reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (ILC Principles 24, 26, 27)
+    threshold_source: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clearance under way but slowed by insecurity or funding
+  - Responsible party unidentified (ILC Principle 25 covers this case)
+  - Information withheld on lawful security grounds (Principle 23 allows this)
+  jurisdictions: International (ILC draft principles)
+  version: 1
 not_reached:
 - FATF website PDFs (fatf-gafi.org /content/dam/fatf-gafi/reports/...) blocked automated download (robots/bot
   check). The FATF 2020 IWT report was read from the OJK Indonesia mirror, the FATF 2021 environmental
@@ -4649,3 +6465,24 @@ not_reached:
 - 'Europol 2009 press-release body text (needs JavaScript): only the summary was readable.'
 - 'Online wildlife cases (e.g. prosecutions over social-media sales): not sourced, because search was
   unavailable.'
+- 'ICRC Guidelines on the Protection of the Natural Environment in Armed Conflict (2020): the landing
+  page gives only an outline; the PDF on icrc.org failed to fetch and the shop page has no working download
+  link. Its 32 rules were rebuilt from the underlying treaty and customary rules (AP I, ICRC customary
+  IHL study) and the ILC 2022 principles instead. Its recommendations (beyond the rules) were not reached.'
+- ICRC customary IHL database (ihl-databases.icrc.org) needs JavaScript and returned no content; customary
+  rules were taken from the 2005 IRRC annex PDF, which was cut off after Rule 94 (Rule 150 on reparation
+  not reached).
+- 'Rome Statute Article 8(2)(b)(iv) (war crime of excessive environmental damage): icc-cpi.int PDFs and
+  legal.un.org page failed to fetch.'
+- 'ENMOD Convention exact text and the Understanding on Article I thresholds: the UNODA page paraphrases
+  only; no thresholds confirmed.'
+- 'Kakhovka dam destruction (2023): UNEP pages failed to fetch; no primary source reached, so no case
+  entry was made.'
+- 'UNCC (Gulf War 1990-91 environmental claims): robots.txt blocked the fetch.'
+- 'Greenwashing cases not reached: Dutch court ruling against KLM (ECLI:NL:RBAMS:2024:1512, page needs
+  JS), ASIC v Mercer, ACCC v Clorox (Glad), FTC Kohl''s/Walmart bamboo, CMA ASOS/Boohoo/Asda undertakings
+  (all fetch errors).'
+- EUR-Lex ELI page for Directive (EU) 2024/825 returned no text; the CELEX HTML version was used.
+- 'Green Claims Code page: final 12,374 characters not read.'
+- WebSearch budget for this turn was exhausted after the first search, so wider discovery (ISO 14021,
+  ASA rulings, UNEP post-conflict assessments, Rome Statute alternatives) was not done.

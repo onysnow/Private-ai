@@ -54,6 +54,17 @@ AREAS: dict[str, str] = {
     "PM": "Police misconduct and state violence", "CA": "Child sexual abuse in institutions",
     # Added 10 October 2026 at Ony's request.
     "HO": "Homicide and suspicious deaths",
+    # Coverage round 3 (10 October 2026): checked against complete crime taxonomies.
+    "HC": "Health care harm and patient safety", "SV": "Sexual harassment and sexual violence against adults",
+    "CP": "Child protection failures and illicit adoption", "VA": "Abuse and neglect of older and disabled adults in care",
+    "WS": "Workplace, industrial and transport safety", "PS": "Unsafe products, food fraud and falsified medicines",
+    "PL": "Pollution and environmental health", "CF": "Consumer, housing and lending exploitation",
+    "DA": "Domestic abuse, coercive control and stalking", "DT": "Torture, arbitrary detention and enforced disappearance",
+    "TH": "Organised theft and fencing", "KX": "Kidnapping, extortion and protection rackets",
+    "CT": "Price-fixing and market-sharing cartels", "TR": "Transnational repression",
+    "AG": "Aggression, coups, insurrection and unlawful militias", "SP": "Sport integrity: doping and abuse of athletes",
+    "CG": "Cults and high-control groups", "AN": "Animal cruelty and welfare abuse",
+    "OH": "Online encouragement of suicide and self-harm",
 }
 
 # One plain line per area for people choosing an investigation's type (the
@@ -82,6 +93,25 @@ AREA_SUMMARIES: dict[str, str] = {
     "PM": "Misconduct and violence by police and other state officers.",
     "CA": "Child sexual abuse in churches, schools, sport and care, and how institutions respond.",
     "HO": "Murders and suspicious deaths: botched death probes, possible serial killings, wrongful convictions, contract killings.",
+    "HC": "Unsafe hospitals and units, dangerous practitioners, harmful medical devices and cover-ups of patient harm.",
+    "SV": "Sexual harassment and violence against adults, image-based abuse, and institutions that cover it up.",
+    "CP": "Children harmed while known to services, care-system failures, and illicit or fraudulent adoption.",
+    "VA": "Neglect and abuse of older and disabled people in care homes, at home and under guardianship.",
+    "WS": "Deaths and injuries at work, in industry and in transport, and safety rules ignored.",
+    "PS": "Dangerous products, food fraud, fake or falsified medicines and illicit alcohol.",
+    "PL": "Illegal pollution, faked emissions data and harm to people's health from the environment.",
+    "CF": "Predatory lending, abusive landlords, debt collection, discrimination and scams aimed at consumers.",
+    "DA": "Domestic abuse, coercive control, stalking, honour-based abuse and the missed warnings before harm.",
+    "DT": "Torture, ill-treatment and deaths in detention, secret detention and people made to disappear.",
+    "TH": "Organised theft rings, cargo and retail crime, and the people who sell on stolen goods.",
+    "KX": "Kidnapping for ransom, extortion and protection rackets.",
+    "CT": "Companies that fix prices, rig bids together or share out markets.",
+    "TR": "States reaching across borders to watch, threaten or harm critics and exiles.",
+    "AG": "Coups, insurrections, unlawful private armies and acts of aggression between states.",
+    "SP": "Doping in sport and abuse of athletes by coaches and sports bodies.",
+    "CG": "Coercive control by cults and high-control groups over members and their money.",
+    "AN": "Cruelty to animals, neglect in farming and breeding, and animal fighting.",
+    "OH": "Online spaces that encourage suicide or self-harm, as public-health bodies describe them.",
 }
 
 

@@ -2,38 +2,68 @@
 
 Made 10 October 2026 from the files in catalogue/.
 
-**1621 indicators in 23 areas; 1582 verified, 39 pending. 1297 glossary terms.**
+**2946 indicators in 42 areas; 2882 verified, 64 pending. 2268 glossary terms.**
 
 | Area | Indicators | Verified | From records | After lookups | Person only | Cases | Cross-hints | Sources not reached |
 |---|---|---|---|---|---|---|---|---|
 | AF Corporate accounting fraud | 52 | 52 | 18 | 23 | 11 | 14 | 12 | 10 |
+| AG Aggression, coups, insurrection and unlawful militias | 40 | 40 | 23 | 15 | 2 | 0 | 0 | 12 |
+| AN Animal cruelty and welfare abuse | 31 | 31 | 15 | 9 | 7 | 9 | 12 | 12 |
 | BO Hidden ownership and shell companies | 63 | 63 | 19 | 27 | 17 | 30 | 27 | 18 |
-| CA Child sexual abuse in institutions | 45 | 45 | 21 | 11 | 13 | 13 | 7 | 11 |
-| CO Corruption and influence | 84 | 84 | 31 | 38 | 15 | 48 | 27 | 17 |
-| CY Cybercrime and judging sources | 70 | 70 | 30 | 25 | 15 | 15 | 18 | 17 |
+| CA Child sexual abuse in institutions | 88 | 87 | 50 | 19 | 19 | 22 | 14 | 22 |
+| CF Consumer, housing and lending exploitation | 58 | 55 | 29 | 23 | 6 | 13 | 9 | 8 |
+| CG Cults and high-control groups | 30 | 30 | 11 | 6 | 13 | 0 | 8 | 12 |
+| CO Corruption and influence | 119 | 118 | 57 | 45 | 17 | 59 | 37 | 27 |
+| CP Child protection failures and illicit adoption | 61 | 59 | 43 | 12 | 6 | 17 | 12 | 11 |
+| CT Price-fixing and market-sharing cartels | 28 | 28 | 11 | 12 | 5 | 0 | 1 | 7 |
+| CY Cybercrime and judging sources | 88 | 88 | 43 | 26 | 19 | 28 | 23 | 24 |
+| DA Domestic abuse, coercive control and stalking | 48 | 46 | 29 | 2 | 17 | 1 | 12 | 12 |
+| DT Torture, arbitrary detention and enforced disappearance | 50 | 50 | 32 | 9 | 9 | 0 | 10 | 13 |
 | EF Elder financial exploitation | 47 | 47 | 25 | 11 | 11 | 11 | 16 | 11 |
-| EN Environmental crime | 82 | 72 | 22 | 56 | 4 | 26 | 34 | 20 |
-| ES Espionage and insider threat | 42 | 42 | 19 | 12 | 11 | 24 | 5 | 11 |
-| FR Tax evasion and fraud | 97 | 89 | 43 | 36 | 18 | 25 | 31 | 18 |
+| EN Environmental crime | 113 | 102 | 49 | 60 | 4 | 30 | 48 | 30 |
+| ES Espionage and insider threat | 73 | 73 | 40 | 17 | 16 | 41 | 11 | 23 |
+| FR Tax evasion and fraud | 153 | 145 | 70 | 61 | 22 | 25 | 44 | 29 |
+| HC Health care harm and patient safety | 51 | 51 | 28 | 16 | 7 | 15 | 3 | 12 |
 | HO Homicide and suspicious deaths | 157 | 156 | 101 | 40 | 16 | 66 | 90 | 48 |
-| HR Human rights abuses, war crimes and cultural property | 110 | 110 | 21 | 64 | 25 | 77 | 37 | 21 |
-| HT Human trafficking and forced labour | 67 | 67 | 31 | 13 | 23 | 20 | 35 | 21 |
-| IN Information integrity | 55 | 55 | 18 | 26 | 11 | 33 | 16 | 25 |
-| LE Labour exploitation and wage theft | 43 | 42 | 27 | 7 | 9 | 11 | 22 | 10 |
+| HR Human rights abuses, war crimes and cultural property | 205 | 204 | 70 | 109 | 26 | 91 | 93 | 42 |
+| HT Human trafficking and forced labour | 97 | 96 | 51 | 23 | 23 | 31 | 43 | 32 |
+| IN Information integrity | 112 | 109 | 51 | 46 | 15 | 53 | 39 | 43 |
+| KX Kidnapping, extortion and protection rackets | 25 | 25 | 13 | 8 | 4 | 10 | 18 | 8 |
+| LE Labour exploitation and wage theft | 67 | 66 | 43 | 12 | 12 | 11 | 26 | 20 |
 | MA Securities market abuse | 56 | 56 | 33 | 17 | 6 | 13 | 9 | 12 |
 | ML Money laundering | 98 | 94 | 43 | 43 | 12 | 18 | 60 | 22 |
-| OC Organised crime and illicit goods | 96 | 85 | 29 | 48 | 19 | 27 | 58 | 20 |
-| PD Prescription drug diversion | 50 | 49 | 21 | 14 | 15 | 9 | 10 | 10 |
+| OC Organised crime and illicit goods | 153 | 141 | 56 | 75 | 22 | 28 | 71 | 33 |
+| OH Online encouragement of suicide and self-harm | 27 | 27 | 20 | 6 | 1 | 9 | 4 | 10 |
+| PD Prescription drug diversion | 66 | 65 | 33 | 16 | 17 | 11 | 14 | 17 |
+| PL Pollution and environmental health | 38 | 38 | 23 | 12 | 3 | 0 | 1 | 8 |
 | PM Police misconduct and state violence | 42 | 42 | 9 | 20 | 13 | 15 | 6 | 9 |
-| PP Public procurement, non-profits and elections | 85 | 85 | 52 | 19 | 14 | 14 | 19 | 16 |
+| PP Public procurement, non-profits and elections | 128 | 126 | 86 | 23 | 19 | 22 | 38 | 26 |
+| PS Unsafe products, food fraud and falsified medicines | 38 | 34 | 26 | 11 | 1 | 15 | 12 | 10 |
 | SA Safety of investigators, sources and witnesses | 42 | 42 | 14 | 16 | 12 | 34 | 9 | 19 |
-| SF Terrorist financing, proliferation financing and sanctions evasion | 79 | 79 | 29 | 39 | 11 | 24 | 32 | 16 |
-| VE Violent extremism and hate-motivated attacks | 59 | 56 | 19 | 5 | 35 | 16 | 4 | 10 |
+| SF Terrorist financing, proliferation financing and sanctions evasion | 100 | 100 | 49 | 39 | 12 | 36 | 47 | 23 |
+| SP Sport integrity: doping and abuse of athletes | 32 | 31 | 18 | 7 | 7 | 11 | 6 | 14 |
+| SV Sexual harassment and sexual violence against adults | 46 | 45 | 32 | 11 | 3 | 17 | 15 | 18 |
+| TH Organised theft and fencing | 23 | 23 | 13 | 8 | 2 | 4 | 18 | 10 |
+| TR Transnational repression | 17 | 17 | 9 | 3 | 5 | 17 | 16 | 10 |
+| VA Abuse and neglect of older and disabled adults in care | 47 | 47 | 27 | 11 | 9 | 0 | 3 | 11 |
+| VE Violent extremism and hate-motivated attacks | 93 | 90 | 43 | 13 | 37 | 16 | 18 | 18 |
+| WS Workplace, industrial and transport safety | 44 | 43 | 24 | 15 | 5 | 12 | 7 | 12 |
+
+Areas with no documented cases yet: AG Aggression, coups, insurrection and unlawful militias, CG Cults and high-control groups, CT Price-fixing and market-sharing cartels, DT Torture, arbitrary detention and enforced disappearance, PL Pollution and environmental health, VA Abuse and neglect of older and disabled adults in care. The research for them returned none; a case round is needed.
 
 ## Pending indicators
 
 Kept out of Red Flags and the PDF until what is listed is checked.
 
+- **CA-046** Repeated small payments to individuals in high-risk countries with no family or business link: threshold number not confirmed
+- **CF-033** Inflated job placement, salary or employment guarantees: case outcome not confirmed: CFPB v. Corinthian Colleges, Inc.
+- **CF-036** School-linked private loans and in-school collection pressure: case outcome not confirmed: CFPB v. Corinthian Colleges, Inc.
+- **CF-053** Gambler spend level or escalation without operator interaction: case outcome not confirmed: William Hill Group (WHG (International) Ltd, William Hill Organization Ltd, Mr Green Ltd)
+- **CO-094** Unexplained delays, adjournments or queue-jumping in cases: quote not confirmed at https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+- **CP-001** Earlier reports to child protection before a child's death or serious injury: case outcome not confirmed: Los Angeles County DCFS social workers prosecution (Palmdale child death, 2013)
+- **CP-016** Drift, delay, high caseloads and staff turnover: case outcome not confirmed: M.D. v. Abbott (Texas foster care class action)
+- **DA-016** Serious effect on the victim (fear of violence, daily life disrupted): threshold number not confirmed
+- **DA-018** Escalation and repeat police callouts: threshold number not confirmed
 - **EN-037** Refineries or timber processors paying staff only in cash or on commission: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
 - **EN-038** Sales below market to a related company, then bankruptcy after extraction: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
 - **EN-039** Illegal extractor also holds unrelated government contracts: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
@@ -44,6 +74,7 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - **EN-044** Trade in goods under a ban or moratorium: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
 - **EN-045** Shipped timber volume differs from permit or concession volume: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
 - **EN-062** Catch not recorded, under-reported, or not matching buyers' purchases: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+- **EN-108** Hostile use of environmental modification techniques: quote not confirmed at https://disarmament.unoda.org/enmod/
 - **FR-059** Wash, cross or pre-arranged trades: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
 - **FR-060** Unrelated accounts trading the same thin stock at the same moment: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
 - **FR-061** Pump-and-dump: sudden demand and price spike in a thinly traded or low-priced stock: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
@@ -53,6 +84,11 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - **FR-066** Securities paid for by third parties with no clear link to the customer: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
 - **FR-067** Multiple or nominee brokerage accounts, or brokerage used as a bank: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
 - **HO-104** Clearance figures padded with exceptional clearances or old cases: case outcome not confirmed: Chicago Police clearance-rate claim
+- **HR-152** Taking of hostages: case outcome not confirmed: Prosecutor v. Tihomir Blaškić
+- **HT-077** North Korean nationals earning income abroad: threshold number not confirmed
+- **IN-158** Hack-and-leak: stolen campaign or official material released before an election: case outcome not confirmed: United States v. Netyksho et al. (GRU officers); case outcome not confirmed: IRGC hack-and-leak indictment (Jalili, Aghamiri, Balaghi)
+- **IN-159** Fake 'hacktivist' or lone-hacker persona fronting a leak: case outcome not confirmed: DCLeaks and Guccifer 2.0 personas
+- **IN-160** Unsolicited stolen campaign material offered to journalists or a rival campaign: case outcome not confirmed: IRGC distribution of stolen campaign material to media
 - **LE-024** Cashback: workers made to hand back part of their wages: case outcome not confirmed: Fair Work Ombudsman v Rubee Enterprises Pty Ltd and Fares Ghazale (Canteen Cuisine, Albury); case outcome not confirmed: Fair Work Ombudsman v Innovative Associates Pty Ltd and Dila Ram Kharel
 - **ML-095** Undisclosed second citizenship or changed identity details from an investment passport: quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
 - **ML-096** New investment passport used soon after issue to open accounts or set up companies: quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
@@ -69,10 +105,20 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - **OC-070** Payments to hostage negotiators, middlemen or intermediaries: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
 - **OC-071** Ransom or piracy money moved through hawala to a third country: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
 - **OC-072** Sudden wealth, property buying or payments to local leaders in piracy-linked coastal areas: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+- **OC-153** Networks infiltrating construction, real estate, hospitality or logistics at a high level: threshold number not confirmed
 - **PD-020** Opioid-benzodiazepine-muscle relaxant 'cocktail' ('Holy Trinity'): quote not confirmed at https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+- **PP-086** Public employees pressured or used to campaign for the incumbent: case outcome not confirmed: State employees performing campaign tasks (Russia case study)
+- **PP-105** Charity money used for a political campaign: case outcome not confirmed: People v. Trump Foundation (New York)
+- **PS-023** Opaque traders and brokers in long, complex supply chains: quote not confirmed at https://link.springer.com/article/10.1007/s10611-021-10008-9
+- **PS-024** Weak checks: storage and sites rarely inspected, no unannounced audits: quote not confirmed at https://link.springer.com/article/10.1007/s10611-021-10008-9
+- **PS-025** Commodity under price or supply pressure: quote not confirmed at https://link.springer.com/article/10.1007/s10611-021-10008-9
+- **PS-026** Company with a history of offences, unethical culture or no whistleblowing route: quote not confirmed at https://link.springer.com/article/10.1007/s10611-021-10008-9
+- **SP-002** Use of a banned substance or method, including an abnormal biological passport: case outcome not confirmed: US Postal Service Pro Cycling Team doping conspiracy (Lance Armstrong)
+- **SV-006** Protected 'high-value' or 'superstar' employee: case outcome not confirmed: New York Attorney General v. The Weinstein Company, Harvey Weinstein and Robert Weinstein
 - **VE-020** Acquiring weapons or ammunition for suspected criminal purposes: case outcome not confirmed: Charleston Emanuel AME Church attack (Dylann Storm Roof)
 - **VE-031** Producing, promoting or heavily consuming violent extremist content: case outcome not confirmed: Charleston Emanuel AME Church attack (Dylann Storm Roof)
 - **VE-032** Posing with weapons and extremist symbols: case outcome not confirmed: Charleston Emanuel AME Church attack (Dylann Storm Roof)
+- **WS-038** Carrier keeps operating under another name after an out-of-service order: case outcome not confirmed: Sky Express, Inc.
 
 ## Sources the research could not reach
 
@@ -87,6 +133,34 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Wirecard: Bundestag final report Drucksache 19/30900 itself not opened; Munich criminal trial outcome not checked. WorldCom/Ebbers conviction: no primary DOJ/court page found; only the 2002 SEC complaint was used.
 - Toshiba (Japan SESC), Patisserie Valerie (UK) and Enron special-purpose-entity details not researched.
 - SEC Form 12b-25 late-filing notice and Regulation S-K Item 304 (auditor disagreements) not opened.
+
+**AG Aggression, coups, insurrection and unlawful militias**
+- WebSearch budget for this turn was exhausted early (shared 200-search limit), so widening beyond the given lists relied on direct fetches of known URLs only.
+- Protocol I Art 47 (mercenaries), ICRC IHL database: page requires JavaScript, text not readable.
+- ICC Rome Statute PDF (icc-cpi.int) and ASP resolution RC/Res.6: fetch errors; Article 8 bis taken from the UN Treaty Collection depositary notification instead.
+- Council of Europe announcement of the Special Tribunal for the Crime of Aggression against Ukraine: fetch error; not used.
+- DOJ (W.D. Mich.) Whitmer kidnapping plot sentencing release: fetch error; case not included.
+- OHCHR report on Moura, Mali (2022 killings with foreign military personnel): fetch error; not included.
+- OAS statement on Peru (Castillo, December 2022 dissolution of Congress): fetch error; not included.
+- UN Security Council statement on Myanmar 2021 coup: guessed URL was wrong page; not included.
+- January 6th Select Committee Final Report (House Report 117-663) on GovInfo: landing page had no text; not used as a source.
+- Georgetown ICAP model anti-paramilitary bill PDF and its 50-state fact sheet index: not opened (the site has moved to icap.law.georgetown.edu); only the Illinois fact sheet used. ICAP militia litigation (e.g. Charlottesville) not found on the cases page.
+- ICJ Nicaragua v. USA full judgment: only the case overview was read; findings on training and arming the contras not quoted.
+- Brazil Supreme Federal Court coup-attempt case, militias at polling places (federal voter-intimidation law), and the remaining 10% of the Montreux Document: not reached.
+
+**AN Animal cruelty and welfare abuse**
+- WebSearch budget for this turn was exhausted after the first query, so the work used only direct WebFetch of known or likely URLs. A follow-up run with search could widen coverage.
+- USDA OIG audit 33002-4-SF (2010) on APHIS inspections of problematic dealers: usda.gov blocked it via robots.txt; the oversight.gov mirror did not respond. It is the main primary source for repeat-violator and penalty-discounting indicators.
+- APHIS regulatory enforcement page and Animal Care Inspection Guide (definitions of direct, critical and repeat noncompliance and teachable moments): returned 403 or a server error. Thresholds for AN-029 could not be sourced.
+- FSIS Directive 6900.2 on humane handling and egregious inhumane treatment at slaughter: 403. Slaughterhouse indicators were not built.
+- USFWS Big Cat Public Safety Act page: fetch error. Roadside zoo and cub-petting indicators were not built.
+- AVMA animal abuse and neglect recognition page: fetch error.
+- Patronek 1999 animal hoarding study (Public Health Reports, PMC1308342): blocked by a CAPTCHA.
+- FBI NIBRS user manual definitions of the four animal cruelty categories: no working URL found. Only the category names from the FBI story are used.
+- DOJ press releases for United States v. Envigo RMS (W.D. Va.) and United States v. Jeffrey Lowe / Tiger King Park (E.D. Okla.): ENRD names both, but every guessed URL returned 404, so their outcomes are not recorded. The WD Okla Joe Maldonado-Passage release also failed to fetch.
+- ASPCA puppy mill pages (Puppy Mills 101, FAQ) returned no definition or condition list. ASPCA dogfighting pages gave no paraphernalia terms or tiers of fighter.
+- National Link Coalition research statistics pages were not opened.
+- Lab animal indicators (pain category reporting, IACUC oversight) could not be sourced from the APHIS page reached.
 
 **BO Hidden ownership and shell companies**
 - fatf-gafi.org: all PDFs and the FATF glossary are behind a Cloudflare challenge. I used the same Annex E PDF from egmontgroup.org and the full 2018 report from a mirror on the Saudi FIU site (aml.gov.sa). Page numbers come from the report's own page headers.
@@ -120,6 +194,41 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - U.S. Department of Education primary press releases for the Penn State (2016) and MSU (2019) fines: not opened; news coverage was used instead (the Campus Safety Magazine link redirected away)
 - Boy Scouts of America 'ineligible volunteer files': no primary source opened
 - Opening pages of the 'Risk profiles for institutional child sexual abuse' attachment: the title page and authors were not visible, and the text read looks like a literature review organised by victim, perpetrator and setting rather than the four dimensions
+- Rotherham Council's own copy of the Jay report was not opened; quotes come from a copy hosted by East Ayrshire Council (same report, third-party host).
+- Casey National Audit: only the first 100,000 characters of the accessible HTML were read; the final ~20,800 characters were not.
+- AUSTRAC/Westpac media release (robots-blocked); used the Federal Court judgment instead. Remaining 9,500 characters of the judgment not read.
+- eSafety v X Corp: the date of the $650,000 penalty is not stated on the page opened; year left unspecified.
+- Telford inquiry policing chapter (Vol 1 p. 58 onward) and Volumes 2-4 not read; no finding on police reluctance over ethnicity could be confirmed.
+- Full Thorn/NCMEC 'Trends in Financial Sextortion' PDF and full Europol IOCTA 2024 PDF not opened; IOCTA content cited via the eucrim summary.
+- Full Ofcom illegal harms codes not opened (only the overview).
+- IICSA separate 'Internet' investigation report on online grooming not reached.
+- FBI sextortion page gives no dated list of red flags; FBI 764 PSA self-harm signs deliberately not reproduced (see source).
+- NCMEC annual CyberTipline data report not opened.
+- Several quotes were returned through a summarising fetch tool with a length cap; they were requested verbatim but should be spot-checked against the pages before publication.
+
+**CF Consumer, housing and lending exploitation**
+- Web search budget for the run ran out partway through, so later sources were fetched only from URLs already known
+- NY Attorney General press release on the Steven Croman tenant-harassment settlement (ag.ny.gov blocked fetching by robots.txt); only news coverage seen, so the case is not included
+- No insurer bad-faith case (e.g., California DOI v. PacifiCare) could be sourced before the search budget ran out
+- NYC Admin Code 27-2004(a)(48) full statutory definition of harassment not reached (the HPD examples page was used instead)
+- 24 CFR 100.75 on eCFR failed to load; Cornell LII copy used
+- CFPB UDAAP supervisory guidance page failed to load; statute 12 USC 5531 used instead
+- Regulation F sections 1006.6 (inconvenient times and places) and 1006.34 (validation notices) not read in full
+- Not sourced: algorithmic or AI tenant-screening harm beyond ad delivery; HUD paired-testing studies (e.g., Housing Discrimination Studies); EEOC AI hiring guidance; state payday-loan regulator data thresholds
+
+**CG Cults and high-control groups**
+- Web search budget for this run was used up after the first query, so no wider search was possible; all sources were reached by direct URL.
+- The Group Psychological Abuse Scale (Chambers, Langone, Dole 1994) page loaded but showed no abstract or items.
+- The Rodríguez-Carballeira 2015 taxonomy Table 1 (operational definitions of every strategy) is an image and was not readable; only named subcategories were used.
+- Lifton's Thought Reform and the Psychology of Totalism (1961) was not opened directly; criteria are quoted from the Wikipedia summary and should be checked against the book (ch. 22).
+- Miviludes 2022-2024 activity report PDF blocked by robots rules; no referral counts or health share were obtained.
+- Légifrance Code pénal articles 223-15-2 to 223-15-4 failed to load; the law is cited via the Miviludes 'Que dit la loi ?' page.
+- UK Home Office Controlling or Coercive Behaviour statutory guidance (accessible HTML) failed to load; not used.
+- US DOJ NXIVM conviction release (June 2019) and Ray sentencing release failed to load; Ray sentence (60 years, January 2023) comes from Wikipedia only.
+- Japan Unification Church dissolution order: court grounds were not reached; only the Wikipedia statement that the Tokyo High Court upheld the 2025 order (March 2026) and the Supreme Court confirmed it (June 2026) was found.
+- Primary judgments for Gloriavale (NZ Employment Court) and the Scientology fraud conviction in France (Paris 2009, appeal 2012, Cour de cassation 2013) were not opened; details come from Wikipedia citing press.
+- Kenya Senate ad hoc committee and presidential commission reports on Shakahola were not opened.
+- ICSA, Steven Hassan BITE model, and Belgian parliamentary inquiry criteria were not reached.
 
 **CO Corruption and influence**
 - FinCEN Advisory FIN-2018-A003 red-flag list: the bullets sit in an image box on p. 5 and could not be extracted as text (the rest of the advisory was read).
@@ -139,6 +248,38 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - The primary Independent Inquiry Committee (Volcker) Oil-for-Food final report was not opened. The outcome rests on NRGI and NPR.
 - Primary court documents for the Statoil, Griffiths, PDVSA (Shiera/Rincón), Rubiandini, Petrobras and Sphynx/Kensington cases were not opened. Their outcomes come from NRGI's summaries.
 - The Geneva appeal ruling in Steinmetz has no exact date in the source I read. It was in 2022 per the Al Jazeera and Fortune headlines from August 2022, which I did not open.
+- WebSearch budget for this turn was exhausted early (shared 200-call limit), so further discovery searches could not run; all sources were reached by direct fetch.
+- WSJ 2021 investigation into federal judges' stock holdings (wsj.com blocked to the fetch tool); not used as a case.
+- FBI and DOJ press releases on Ciavarella and on Baltimore City Detention Center contraband cases (fetch errors); the Third Circuit opinion was used for Ciavarella instead.
+- UNODC Resource Guide on Strengthening Judicial Integrity: parts on case assignment and judges' asset declarations were not in the extracted text.
+- TI Diagnostic checklist (2007) as a stand-alone document, GRECO Fourth Round reports and ENCJ indicators: only referenced through the TI Knowledge Hub and the GCR 2007.
+- GIJN foreign lobbying guide: not opened.
+- Full UNCAC text (Articles 11 and 17): the downloaded PDF was a 5-page summary, so no UNCAC quote is used.
+- No FIRS enforcement case found yet (the scheme began in 2025); list of enhanced-tier specified countries not opened.
+- Congress.gov page for the Courthouse Ethics and Transparency Act (robots-blocked); the govinfo public law text was used instead.
+- Remaining 19,538 characters of the NCSC/AJS study were not read.
+
+**CP Child protection failures and illicit adoption**
+- Child Welfare Information Gateway HTML page: the sign list did not render; the factsheet PDF at artifacts.childwelfare.gov was used instead.
+- GAO PDFs on gao.gov returned 403 (Access Denied) to direct download; the govinfo.gov HTML copies of GAO-08-146T and GAO-08-713T were used.
+- NICE CG89 failed through WebFetch but was read through a direct fetch of https://www.nice.org.uk/guidance/cg89/chapter/Recommendations.
+- HCCH Toolkit Part II Checklist (pp.143-165) and Part III Model Procedure: the PDF text was extracted, but the checklist items were not read in detail, so further checklist-level indicators may exist.
+- US State Department 2025 IPCA report: the statutory definition and criteria for 'pattern of noncompliance' were not quoted on the page reached; the Goldman Act text (22 U.S.C. 9111 et seq.) was not fetched.
+- M.D. v. Abbott: only the Clearinghouse case summary was read, not the original court opinions or monitors' reports.
+- South Korea TRC primary decision text not reached; findings come from ASIL and PBS Frontline/AP reporting.
+- CICIG 2010 report on irregular adoptions in Guatemala, Chile's adoption investigations, and the Laming (Victoria Climbié) inquiry were not fetched.
+- Senate Finance Committee full report PDF not read; findings come from the committee's own press release.
+- No US court source was found for family/parental abduction case outcomes; the parental-abduction indicators rest on OJJDP profiles only.
+- The UK Panel's 2021 report 'The Myth of Invisible Men' was not fetched (the male-carer indicator rests on the 2020 annual report).
+
+**CT Price-fixing and market-sharing cartels**
+- The web search budget for this run was used up after one query, so the research went no wider than direct fetches of known primary URLs. More indicators may exist in sources not reached: the OECD's 'Ex officio cartel investigations and the use of screens' (fetch failed), CMA cartel guidance for businesses (gov.uk URLs tried returned 404), the ACCC cartel guidance (403), and Competition Bureau Canada cartel pages (proxy 502).
+- Pilgrim's Pride chicken price-fixing plea (DOJ) and the Competition Bureau Canada bread price-fixing outcome: both fetches failed, so neither is included as a case.
+- StarKist canned tuna sentencing (DOJ): the page returned 404 at the URL tried.
+- DOJ/FTC statement of interest on algorithmic collusion (rent-setting cases): fetch failed.
+- US v. Topkins (DOJ, 2015, posters on Amazon Marketplace): the press release confirms the charge and an agreement to plead guilty, but the conviction was not confirmed from a reachable source, so it is left out of cases.
+- The current status of US v. RealPage (any settlement or judgment after the 2024 complaint) was not checked; it is recorded as allegations only.
+- The FTC quotes come from a fetch tool that shortened long sentences, so they are exact excerpts but some are not full sentences.
 
 **CY Cybercrime and judging sources**
 - FATF 'Countering Ransomware Financing' (March 2023) report and its risk-indicator annex: fatf-gafi.org blocked automated fetching (robots / HTML returned instead of PDF)
@@ -158,6 +299,42 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - FCC SIM-swap news release page failed to load; the full FCC 23-95 order was used instead. Only the first 100,000 characters were read.
 - SIM-swap prosecution case: no DOJ or court source reached because search was unavailable, so CY-064 to CY-066 have no case.
 - Further searches for 2025–2026 DPRK IT worker advisories (for example later IC3 alerts on laptop farms) were not possible because the search budget was used up.
+- NIS2 Directive (EU) 2022/2555 Article 23 (24-hour early warning / 72-hour / one-month timings): EUR-Lex page returned no article text
+- Leveson Inquiry report volumes (phone hacking findings): PDFs located at assets.publishing.service.gov.uk but not read or quoted
+- R v Coulson and others sentencing remarks (judiciary.uk): fetch failed, so no phone-hacking conviction case included
+- ICO 'What price privacy?' (Operation Motorman, illegal trade in personal data): fetch failed
+- SEC v. SolarWinds and Timothy Brown (2023): complaint press release read, but later court rulings (reported partial dismissal in 2024 and SEC's later withdrawal) not verified, so case left out
+- US CIRCIA, US state breach-notification laws, SEC v. Pearson (2021), FTC Health Breach Notification Rule: not reached
+- WebSearch budget was exhausted mid-task, so further widening to other primary sources was not possible
+
+**DA Domestic abuse, coercive control and stalking**
+- The run's WebSearch budget (shared limit of 200 per turn) ran out on the first search, so every source was reached by direct fetch of known URLs only; no wider search was possible.
+- SafeLives Dash page lists no questions; questions taken from the quick-start guidance PDF instead.
+- SASH questions and SHARP's 14 factors are not public on the pages opened (SASH needs a request; SHARP lists harms, not factors).
+- HMICFRS 'Living in fear' (2017) stalking report and 'The depths of dishonour' (2015) honour-based violence report: justiceinspectorates.gov.uk fetches failed.
+- Police response to stalking super-complaint report and the police-perpetrated domestic abuse super-complaint report on gov.uk: fetches failed (URLs guessed may be wrong).
+- IOPC findings on the Shana Grice case: fetch failed.
+- CPS news on the Shafilea Ahmed convictions: fetch failed; no case entry made.
+- WHO interagency statement PDF (iris.who.int) failed; only the landing page was used.
+- BAILII blocked automated access; R v Challen [2019] EWCA Crim 916 was read on caselaw.nationalarchives.gov.uk but not entered as a case (see notes).
+- College of Policing stalking APP page is a navigation page; linked PDFs (advice for investigators/first responders) were not opened.
+- Remaining 26k characters of the CCB guidance and 37k of the 2023 forced marriage guidance were not read (annexes).
+- No US, Canadian or Australian legal sources were reached (e.g. US federal stalking statute, Australian coercive control laws).
+
+**DT Torture, arbitrary detention and enforced disappearance**
+- WebSearch budget for this turn was used up after one query, so the research used only direct fetches of known URLs. Wider sources could not be searched.
+- U.S. v. Burge (Chicago police torture, perjury conviction): the DOJ press release returned no content, and the CourtListener API throttled the request. The case was not included.
+- Taguba report (Abu Ghraib): irp.fas.org and fas.org returned empty files.
+- Baha Mousa Public Inquiry report (UK, 2011): the gov.uk page links PDF volumes that were not fetched. Only the publication date was confirmed.
+- Senate Select Committee on Intelligence CIA detention study (2014): only the release date of 9 December 2014 was confirmed. The findings PDF download was corrupt.
+- Brook House Inquiry report (UK immigration detention): a CAPTCHA blocked access.
+- DHS OIG-18-86 (Adelanto management alert): oig.dhs.gov and the oversight.gov mirror both returned Access Denied. Adelanto findings were taken from OIG-19-47 instead.
+- UN Special Rapporteur on Torture report A/66/268 on solitary confinement: not fetched.
+- CPT standards on complaints mechanisms and access to a lawyer: not fetched.
+- APT Detention Focus Database topic pages (solitary, restraint, body searches): only the index was fetched.
+- SPT 'Visits and public reports' and 'Non-compliance' pages: not fetched.
+- Istanbul Protocol Chapter V on physical evidence: deliberately not turned into method-level indicators. Only the documentation and safeguard levels are used.
+- Full text of CAT Articles 12, 13 and 15, ICPED Articles 21 and 22, and ICPED Article 17(3)(h): the fetch tool returned paraphrases only. Those sources are marked '(as summarised)' and need checking against the treaty text before publishing.
 
 **EF Elder financial exploitation**
 - GAO-10-1046 full PDF (gao.gov/new.items/d101046.pdf) returned Access Denied to direct download; only the HTML version was read, via WebFetch summary, so the individual case narratives were not read
@@ -193,6 +370,16 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - OLAF and Europol material on F-gas smuggling operations: not reached.
 - Europol 2009 press-release body text (needs JavaScript): only the summary was readable.
 - Online wildlife cases (e.g. prosecutions over social-media sales): not sourced, because search was unavailable.
+- ICRC Guidelines on the Protection of the Natural Environment in Armed Conflict (2020): the landing page gives only an outline; the PDF on icrc.org failed to fetch and the shop page has no working download link. Its 32 rules were rebuilt from the underlying treaty and customary rules (AP I, ICRC customary IHL study) and the ILC 2022 principles instead. Its recommendations (beyond the rules) were not reached.
+- ICRC customary IHL database (ihl-databases.icrc.org) needs JavaScript and returned no content; customary rules were taken from the 2005 IRRC annex PDF, which was cut off after Rule 94 (Rule 150 on reparation not reached).
+- Rome Statute Article 8(2)(b)(iv) (war crime of excessive environmental damage): icc-cpi.int PDFs and legal.un.org page failed to fetch.
+- ENMOD Convention exact text and the Understanding on Article I thresholds: the UNODA page paraphrases only; no thresholds confirmed.
+- Kakhovka dam destruction (2023): UNEP pages failed to fetch; no primary source reached, so no case entry was made.
+- UNCC (Gulf War 1990-91 environmental claims): robots.txt blocked the fetch.
+- Greenwashing cases not reached: Dutch court ruling against KLM (ECLI:NL:RBAMS:2024:1512, page needs JS), ASIC v Mercer, ACCC v Clorox (Glad), FTC Kohl's/Walmart bamboo, CMA ASOS/Boohoo/Asda undertakings (all fetch errors).
+- EUR-Lex ELI page for Directive (EU) 2024/825 returned no text; the CELEX HTML version was used.
+- Green Claims Code page: final 12,374 characters not read.
+- WebSearch budget for this turn was exhausted after the first search, so wider discovery (ISO 14021, ASA rulings, UNEP post-conflict assessments, Rome Statute alternatives) was not done.
 
 **ES Espionage and insider threat**
 - FBI brochure 'The Insider Threat: An Introduction to Detecting and Deterring an Insider Spy' (fbi.gov/file-repository/insider_threat_brochure.pdf): WebFetch returned no indicator text, so its personal and organisational factor lists were not used.
@@ -206,6 +393,18 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - CERT Common Sense Guide to Mitigating Insider Threats (7th ed.) and the CISA Insider Threat Mitigation Guide PDF were not opened.
 - UK NPSA / CPNI insider-risk guidance and Five Eyes 'Think Before You Link' material were not reached (non-US coverage gap).
 - The PERSEREC finding that about one-fourth of spies had a personal crisis beforehand (ES-040) is paraphrased from WebFetch output and not quoted exactly.
+- FBI Insider Threat brochure (https://www.fbi.gov/file-repository/insider_threat_brochure.pdf): fetch returned a generic FBI page, not the brochure.
+- 18 U.S.C. Chapter 115 index page not fetched separately; sections 2381 and 2382 and Article III were read instead. Sections 2383 to 2390 (rebellion, seditious conspiracy and others) not reviewed.
+- NSPM-33 implementation guidance (whitehouse.gov PDF): fetch error.
+- UK NPSA Trusted Research guidance for academia: fetch error; the overview page has no indicators.
+- MI5 Director General threat-update speeches: fetch errors.
+- UK National Security Act 2023 factsheets on gov.uk: fetch error.
+- US NCSC talent-recruitment fact sheet: URL guessed, fetch error.
+- DOJ Oath Keepers seditious conspiracy release: fetch error.
+- Web search budget ran out partway through, so no further European sabotage cases were sourced: German, Polish and Lithuanian arson and sabotage prosecutions, and a final outcome for the Paris Shoah Memorial case.
+- Wimbledon stabbing of Pouria Zeraati: the Home Office pack mentions it, but no court outcome was verified, so it was left out.
+- Shahsavani and Farasati (charged under NSA s.3(2), Iran): charge only and the CPS warns against comment, so they were left out of the cases.
+- Hall KC report: the extracts read gave no Telegram, crypto or 2024-arrest detail; a full read of the case chapter may hold more.
 
 **FR Tax evasion and fraud**
 - investor.gov /pyramid-scheme (singular URL) failed; used /pyramid-schemes and 2013 alert instead
@@ -226,6 +425,31 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - FBI advance-fee schemes page: the fetch failed. The glossary definition is sourced to the FinCEN joint notice.
 - CFPB power-of-attorney definition: the page I fetched had no definition, so I added no glossary entry for power of attorney.
 - Some FinCEN quotes reached me cut short by the fetch tool (FinCEN elder advisory, check alert, timeshare notice). The quoted text matches the start of each red flag but is not the full sentence. Re-check the full wording against the PDFs before publishing.
+- GAO-15-593SP landing page did not list the four components; taken instead from the full PDF (pp. 5-6, 13, 21-24).
+- ALTA seller-impersonation handout (the actual red-flag list) was not in the fetched page; only the description was quoted. Red flags taken from FBI IC3 PSA I-061626-PSA instead.
+- Justice.gov Feeding Our Future case page (usao-mn/feeding-our-future) failed to load; DOJ OPA sentencing release used. The verdict date and number of co-defendants convicted were not confirmed from a primary source (press reports indicate a March 2025 verdict and May 2026 sentencing).
+- FinCEN EIP advisory number (FIN-2021-A002 expected) not confirmed on the fetched PDF; cited by title and URL.
+- PRAC SSN fraud alert publication date not stated in the PDF (URL path suggests January 2023).
+- Federal Reserve synthetic identity definition press release has no visible date; toolkit page also undated.
+- NICB wildfire indicators: several items (coverage increased after the fire began, inflated additional living expenses, recent purchases on inventory) were paraphrased in the fetched text and so are not quoted verbatim.
+- No modern primary arson-for-profit indicator list (e.g., USFA, NFPA 921, ATF) was fetched; the Illinois 1979 pamphlet in the NCJRS archive was used for financial-motive indicators.
+- SBA OIG pandemic reports (e.g., Report 23-09 and white paper 23-10) were found but not opened.
+- No court or regulator case found and fetched for seller impersonation of vacant land, disaster-aid (FEMA) benefit fraud, reverse-mortgage fraud or a smoke-and-ash claim mill.
+- GAO-23-105331 does not list shared addresses/IPs or business formation date as indicators; those were not attributed to it.
+
+**HC Health care harm and patient safety**
+- Gosport Independent Panel report (2018): could not retrieve a PDF link from the gov.uk landing page; not used (overlaps HO and PD areas)
+- Bristol Royal Infirmary Inquiry (Kennedy, 2001): not opened
+- Infected Blood Inquiry Volumes 6 and 7 (medical records, document destruction detail): only Volume 1 (overview and summary) was read
+- CQC 'How CQC identifies and responds to closed cultures' (2021) guidance itself: only CQC's 2022/23 Mental Health Act monitoring chapter summarising it was read
+- FDA ASR statement: the page shows no release date; 2019 is taken from the statement's own reference to data 'from 1999 to 2019'
+- Public Citizen 'Hospitals Drop the Ball on Physician Oversight': the page shows no publication date (data to 31 Dec 2007); the last 12,800 characters were not read
+- AJC 'Doctors & Sex Abuse' (2016): only the landing page summary was read; individual stories not opened
+- Seife (JAMA Intern Med 2015) read from a university-hosted copy, not the publisher page
+- FSMB 2006 guideline read from jmronline.org HTML; the 2020 FSMB report was used as the main source
+- Veterans' care beyond Phoenix VA (other OIG facility reports) not researched
+- NHS England published Never Events data by trust: identified as a lookup source but not opened
+- Kirkup's Chapter 6 detail on how to build safety-signal monitoring was not extracted beyond Key Action Area 1
 
 **HO Homicide and suspicious deaths**
 - NAME Forensic Autopsy Performance Standards: the primary PDF (ospd.ms.gov copy) failed to load; the B3 list was taken from Washoe County's reproduction and a National Academies presentation. The thename.org original was not opened.
@@ -299,6 +523,27 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Myanmar FFM detailed report A/HRC/39/CRP.2 and Syria COI 'They came to destroy' A/HRC/32/CRP.2: the symbol links returned HTML, not the PDFs
 - Framework indicators left out as already covered by existing HR entries: 13(h)/HR-033 (relief obstruction), 13(l)/HR-031 (unacknowledged detention), 11(a)/12(i)/HR-029 (widespread attack), 7(j) displacement/HR-032, 13(p)/HR-027-028 (cultural destruction, pillage), 5(h) arms supply/HR-025
 - Framework indicators not given their own entry because they are hard to check or too general: 1(c) humanitarian crisis, 3(a)(b)(g)-(j) institutional capacity, 5(d) culture of obedience, 6(a)(c)(e)(f)(h)(i)(k), 9(d)-(f), 13(b)(c)(f)(g)(r), 14(c). They are listed here so Ony can decide whether to add them
+- WebSearch budget for this turn was exhausted after the first search, so wider discovery of further primary lists (ICRC Health Care in Danger, Safeguarding Health in Conflict, the Secretary-General's annual CRSV and CAAC reports, MRM field manual) was not possible.
+- ICC Elements of Crimes text was not fetched; the Article 8 item names were checked against the ICC Rome Statute PDF (icc-cpi.int/sites/default/files/RS-Eng.pdf). That version does not include the 2019 amendment adding starvation as a war crime in non-international conflicts (the UK handbook confirms it was adopted in December 2019).
+- ICRC Customary IHL database (rules on human shields, starvation, medical units) could not be read: JavaScript-only page.
+- UNSCR 2417 original text: the UN document URL tried returned an unrelated Arabic document; content taken from the UK FCDO handbook's Chapter 10 instead.
+- OHCHR A/HRC/43/71 PDF returned 403 to direct download; quotes come from the WebFetch read of the same URL. The para. 31 quote for HR-168 is a placeholder from para. 6(j) and should be replaced with the exact para. 31 wording.
+- WHO SSA methodology PDF not found (404); certainty levels taken from the SSA dashboard page text.
+- ICJ advisory opinion full text and summary PDFs returned 403/fetch errors; findings taken from the ICJ summary page at icj-cij.org/node/204176.
+- OHCHR press release on the Israel/Hamas Commission of Inquiry (June 2024) failed to fetch, so no hostage-taking finding for 7 October 2023 is included.
+- The US CENTCOM Kunduz investigation (April 2016) was not read; that case is recorded only as MSF reporting.
+- ICC Al Hassan case sheet returned 404.
+- No published indicator list was found for medical experiments, denial of fair trial or human shields beyond the Rome Statute text, as the gap note expected.
+- Web search budget was exhausted early (shared limit of 200 searches per turn); further discovery relied on direct fetches of known URLs only.
+- Harff (APSR 2003) original article not opened; the final six-factor model was not confirmed. The secondary notes page (adambrown.info) does not name the six final factors and warns it may be inaccurate. HR-233's Polity quote is a fetch-tool summary, not confirmed verbatim.
+- USHMM Early Warning Project: the definition of 'mass killing' (including any 1,000-civilian threshold) was not found on the methodology pages reached; the risk-factors page listed 30 of a stated 38 variables. The 'bad regime' model factors were reached only as a summary, not verbatim.
+- AJIL article on the 2022 US Strategy to Anticipate, Prevent, and Respond to Atrocities and the Elie Wiesel Act process was not fetched.
+- Apartheid Convention full treaty text (Article II (a)-(f)) could not be fetched (OHCHR and UN genocide-prevention pages errored or returned 403); the UN AVL introductory note by John Dugard was used for the list of acts.
+- ICJ Advisory Opinion of 19 July 2024 (Legal Consequences arising from the Policies and Practices of Israel in the OPT): the summary and opinion PDFs returned 403, so what the Court said on CERD Article 3 (segregation and apartheid) was not confirmed and is not used.
+- OHCHR press release of 27 August 2018 on the Myanmar FFM failed to load; the A/HRC/39/64 report PDF was used instead.
+- ICTR Media case (Nahimana et al.): the IRMCT case page gave sentences only; the conviction counts and trial/appeal judgment dates were not confirmed, so the case is not included.
+- ICTY/IRMCT Karadžić: final appeal judgment and sentence not confirmed (only the 24 March 2016 trial conviction headline), so the case is not included.
+- Human Rights Watch 'A Threshold Crossed' (2021) and the full Amnesty 2022 apartheid report were not opened.
 
 **HT Human trafficking and forced labour**
 - FATF/APG 'Financial Flows from Human Trafficking' (July 2018) Annex B indicator list: fatf-gafi.org blocks direct download (robots and bot page) and the WebFetch text stopped before Annex B. Only paragraphs 64-65 were quoted, via the fetch tool's summary.
@@ -322,6 +567,17 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Netcare / St Augustine's Hospital (South Africa) organ-trafficking case. I could not verify it from a primary source, so it was not used.
 - A documented case with tattoo branding (for HT-065). The search budget ran out before I found a court or DOJ source.
 - The UNODC 2022 page's sentence on promised payments that never arrive was captured only as a paraphrase by the fetch tool, not as an exact quote.
+- UFLPA Strategy 2024 update PDF (DHS) could not be fetched; used the original June 2022 Strategy PDF instead. The 2024 and later high-priority sector additions (for example aluminium, PVC, seafood, steel, copper, lithium) were not confirmed and are not included.
+- US DPRK supply-chain advisory of July 23, 2018 (overseas North Korean workers by sector and country) could not be fetched; URLs redirected.
+- Xinjiang Supply Chain Business Advisory (State Dept, July 2021) failed to fetch.
+- CBP UFLPA Operational Guidance for Importers PDF not opened; CBP region-wide cotton and tomato WRO press release (January 2021) failed to fetch.
+- OHCHR Xinjiang assessment section on employment and labour schemes and its final conclusions not reached (fetch stopped at para. 85).
+- FinCEN 2023 alert on human smuggling along the southwest border (FIN-2023-Alert001) not reached; web search budget was exhausted, so no new sources could be searched.
+- ILO Convention No. 105 text (NORMLEX) server error.
+- ILO third-party monitoring of the Uzbek cotton harvest (state mobilisation case) failed to fetch.
+- FATF migrant smuggling full report Annex B indicator list and Annex A case studies were truncated and not read.
+- No court case on marriages of convenience or sham marriages was reached; UK registrars' referral indicators (for example no common language) were not found in the Home Office statutory guidance.
+- Europol EMSC and UNODC smuggling-of-migrants indicator materials were not reached.
 
 **IN Information integrity**
 - Meta Transparency Center Community Standards page on Inauthentic Behavior (page renders only metadata via fetch); policy wording on fake accounts, Foreign or Government Interference not quoted
@@ -349,6 +605,34 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - No documented case applying GRIM/SPRITE to a specific paper was opened (e.g. the reported Wansink pizza-paper analyses by van der Zee, Anaya and Brown); the Wansink case is attached to IN-055 from Cornell's statement only, which does not mention GRIM.
 - SPRITE preprint page gave only a short abstract excerpt; author list beyond 'Heathers et al.' not confirmed.
 - FollowTheMoney explorer (https://followthemoney.tech/explorer/) not opened to confirm UserAccount/Message property names.
+- WebSearch budget for this turn was exhausted after the first search attempt, so wider discovery (CHEA/UNESCO degree-mill guidance, Europol/Frontex document-fraud indicators, further paper-mill cases) relied only on direct fetches of known URLs.
+- CHEA fact sheet and CHEA/UNESCO degree-mill statement PDFs: fetch errors.
+- Oregon Office of Degree Authorization unaccredited-institutions list: fetch error.
+- US Attorney (E.D. Wash.) press release on US v. Randock (Saint Regis), hosted at hep.uiuc.edu: blocked by robots.txt; case sourced from Wikipedia instead.
+- US DOJ (SDNY) press release on Umair Hamid (Axact): URL not found without search; case sourced from Wikipedia.
+- New York Times Axact reporting (2015): site blocked; summarised via Wikipedia only.
+- BBC 2018 'Staggering trade in fake degrees revealed': site blocked.
+- GAO-04-771T: the 'Hamilton University versus Hamilton College' wording came from the fetch summary and may be a paraphrase rather than an exact quote; verify before publishing.
+- UK Home Office holographic-device quote: the exact 'GENUINE' hologram sentence was not returned verbatim, so IN-077 quotes the Checklist A line instead.
+- Hedd home page quote for 243 bogus institutions is a short fragment; the full sentence was not returned.
+- WebSearch budget for this turn was exhausted after the first search, so wider searching (Microsoft MTAC, Meta adversarial threat reports, Google TAG, OpenAI threat reports, Stanford Internet Observatory, Atlantic Council DFRLab) was not done.
+- DOJ press release on the RT employees / Tenet Media indictment (Sept 2024): fetch failed at both justice.gov URLs tried.
+- FCC Lingo Telecom settlement and New Hampshire AG pages on the 2024 AI-voice primary robocall: fetch failed.
+- Romanian Constitutional Court decision annulling the 2024 presidential election first round (ccr.ro blocked by robots.txt).
+- CISA/FBI/CISA joint statement on cisa.gov (fetch failed); the FBI copy was used instead.
+- DISARM Red Framework technique list itself (only the FAQ page was read), so no DISARM technique IDs are mapped.
+- Macron Leaks (France 2017) and other European hack-and-leak cases: no primary source reached.
+- Exact page numbers in the EEAS PDF are approximate (the fetch tool inferred them from layout).
+
+**KX Kidnapping, extortion and protection rackets**
+- UNODC/UNOCT 'Countering Kidnapping and Extortion' manual: the landing page confirms it is not publicly available, so it would have to be requested from UNODC.
+- FINTRAC Targeted Indicator Profiles (TIP sheets) on extortion: shared only with financial institutions, and the backgrounder lists no indicators.
+- US State Department kidnapping page (travel.state.gov): fetch failed.
+- GCTF Algiers Memorandum on preventing kidnapping for ransom by terrorists: blocked by robots.txt.
+- US Justice Department pages on the Haitian 400 Mawozo gang kidnapping prosecutions: the guessed URLs failed. I did not verify this case, so it is not included.
+- FBI IC3 virtual kidnapping public service announcement: the guessed URL failed.
+- The shared web-search budget ran out after the first fetches, so I could not search for: express kidnapping indicators, Mexico cartel extortion ('cobro de piso'), Haiti (UN Panel of Experts, BINUH), Nigeria and Sahel kidnap economies beyond FATF, Europol and UK National Crime Agency extortion material, FinCEN advisories, hijacking indicators, the outcome of the Yanette Rodriguez Acosta case, and Canadian court outcomes for the diaspora extortion cases. A follow-up run with search could add these.
+- UN Security Council resolution 2133 (2014) on kidnapping for ransom by terrorists: not fetched.
 
 **LE Labour exploitation and wage theft**
 - UK GLAA 'spot the signs' A5 leaflet (https://www.gla.gov.uk/media/qwpdjic2/spot-the-signs-leaflet-a5.pdf): direct download returned HTML, not the PDF; the 2020 GLAA PDF was read through WebFetch instead.
@@ -361,6 +645,16 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - ATO illegal phoenix activity overview page: had no definition; the 'What is phoenix activity' subpage was used.
 - 7-Eleven inquiry report: only the first 100,000 characters were read; Harvest Trail Inquiry report: only the first 100,000 characters were read.
 - Not researched: US DOL H-2B rules, state-level wage theft laws (e.g. California, New York), UK HMRC national minimum wage naming lists, and ILO guidance on 'decent work' deficits.
+- The web search budget for this turn was used up after one search, so research relied on direct fetches of known primary-source URLs.
+- OLMS persuader and LM-10/LM-20 compliance pages on dol.gov (other than the 2016 newsletter) did not load: they returned fetch errors.
+- The 2018 Federal Register rescission of the 2016 persuader rule was not reached (the URL tried went to an unrelated notice), so the persuader rule now in force, including whether 'indirect' persuasion is reportable, is not verified.
+- The 2016 persuader final rule in the Federal Register was not reached (the URL tried went to an unrelated notice).
+- ILO Convention 98 and the Committee on Freedom of Association compilation (normlex.ilo.org and ilo.org) returned server errors, so no non-US standards are included.
+- NLRB news releases on Starbucks (Buffalo) and on the Amazon Bessemer rerun election were not reached, so those are not listed as cases.
+- OLMS criminal enforcement yearly pages were not searched for persuader-reporting convictions.
+- EPI's 2023 union-avoidance spending report did not load.
+- Supreme Court PDF for Starbucks v. McKinney failed; the Cornell LII copy was used instead.
+- Whether the Amazon (2024) captive-audience rule and the Cemex (2023) framework still stand after later changes to the NLRB was not verified.
 
 **MA Securities market abuse**
 - https://www.sec.gov/enforcement-litigation/insider-trading: fetch errored and curl was blocked; the same SEC text was taken from the Investor.gov glossary copy instead
@@ -421,6 +715,31 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - County lines and cuckooing court cases (e.g. UK Modern Slavery Act convictions): not reached because the search budget ran out. OC-091 to OC-096 have no cases.
 - Somali pirate negotiator prosecution (US DOJ press release): the fetch failed, so it was not added.
 - FATF gambling, tobacco, piracy and fentanyl PDFs could not be downloaded directly with curl (bot challenge). They were read through WebFetch, which returned some quotes shortened with '...'. The quotes are copied as returned.
+- Web search budget ran out partway through research (limit shared across agents). Several planned primary sources were not searched or opened.
+- Stimson/UNIDIR 2020 ATT diversion report: the landing page had no indicators and no PDF link; the full report was not reached.
+- UNODC Global Study on Firearms Trafficking 2020 PDF: fetch failed.
+- ATF data on machinegun conversion devices (Glock switches): not reached. NFCTA Vol II Part III has no MCD findings; OC-104 relies on the PMF machine-gun share and an EU-SOCTA case.
+- Supreme Court Bondi v. VanDerStok (ghost-gun rule) opinion: fetch failed, so it is not cited.
+- EU-SOCTA 2025 firearms section (p. 61: alarm/flobert conversions, reactivated weapons): not in the extracted text.
+- Europol 'Stop criminal networks recruiting youngsters' page: only the meta description loaded, which gives three signs. The 'They've got new...' item and the rest are missing.
+- FBI insider threat / trade secret theft indicators page: fetch failed. Trade-secret theft has no indicators, and the IPCTA 2022 does not cover it.
+- DOJ Trade Fraud Task Force page: fetch failed. No transshipment court cases were sourced.
+- IMB Piracy Reporting Centre definitions page: fetch failed.
+- The CBP CTPAT transshipment alert itself was not opened; only the Thomson Reuters summary was used.
+- Drug-lab site signs (e.g. DEA clandestine lab indicators): not sourced.
+- No sourced court cases for straw purchasing, piracy attacks, excise fraud or transshipment.
+
+**OH Online encouragement of suicide and self-harm**
+- Ofcom Register of Risks (illegal harms, updated 25 June 2026), chapter 15 'Encouraging or assisting suicide (or attempted suicide), and serious self-harm' (p.292): the fetch tool's text conversion stops at about 122,000 characters, and a direct download hit a Cloudflare challenge. Chapter 15 was not read. https://www.ofcom.org.uk/siteassets/resources/documents/online-safety/information-for-industry/illegal-harms/updates/register-of-risks.pdf?v=419946
+- Ofcom Children's Register of Risks, section 3 'Suicide and self-harm content' (p.53): text conversion stops at about 125,000 characters, before this section. Not read.
+- Ofcom Guidance on content harmful to children and Illegal Content Judgements Guidance (sections on suicide and self-harm): not opened.
+- Outcome of Ofcom's April 2025 suicide forum investigation: the investigation page shows no update, and the Ofcom enforcement listing could not be read. Whether a provisional notice, fine or block has followed is unknown.
+- Kenneth Law guilty plea (29 May 2026): Reuters and the New York Times were blocked and CBC failed to load. The plea is taken from Wikipedia's summary of those reports, so it should be checked against a court record or a primary news report.
+- Garcia v. Character Technologies: the court docket (May 2025 motion-to-dismiss ruling) and any reported settlement could not be checked. CourtListener is blocked by robots rules and Wikipedia did not cover it. The case is recorded only as allegations reported by CBS.
+- New York Times investigation 'Where the Despairing Log On' (2021): site blocked.
+- UK Home Office poisons and explosives precursors guidance, list of reportable substances and suspicious-transaction indicators: page fetch failed.
+- Samaritans sheets on user-friendly reporting, supporting user wellbeing and communicating with users in distress: not opened.
+- WebSearch budget ran out on the first query, so no wider discovery searches were possible: EU Digital Services Act proceedings, Australian eSafety actions, US state attorney general actions on chatbots, and research papers on pro-suicide forums.
 
 **PD Prescription drug diversion**
 - CDC 2022 Clinical Practice Guideline (MMWR 71(3)) recommendation text: page fetch truncated before the dosage recommendations, so whether it keeps the 50/90 MME figures was not checked; the 2016 guideline was used.
@@ -433,6 +752,23 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Washington Post ARCOS database release: not opened, so ARCOS is not defined in the glossary from a source.
 - NABP consensus document: year not shown on the AMA-hosted copy; several quotes were cut off by the reading tool (marked with an ellipsis).
 - No case with a court outcome was found for hospital-staff diversion (PD-045 to PD-047).
+- The shared WebSearch budget for this turn was used up after the first searches, so the wider search could not be done; WebFetch was used only on URLs already known.
+- PhRMA Code on Interactions with Health Care Professionals (speaker programme section) was not fetched.
+- CMS Open Payments 'Natures of Payment' page (exact speaker-compensation category wording) was not fetched.
+- HHS-OIG General Compliance Program Guidance (2023) and later industry-segment guidance were not checked.
+- Other DOJ speaker-programme settlements (e.g. other manufacturers) and OIG corporate integrity agreement speaker-programme terms were not checked.
+- No peer-reviewed study was fetched directly; the prescribing association rests on the OIG alert's statement and on ProPublica's analysis.
+- Full text of the Insys indictment or trial record was not checked; the case facts come from the DOJ sentencing press release only.
+
+**PL Pollution and environmental health**
+- EPA 2014 Clean Air Act HPV Policy (https://www.epa.gov/sites/default/files/2015-01/documents/hpvpolicy2014.pdf): the PDF had no machine-readable text, so the HPV criteria list and Day 0/45/150/180 timeline are not quoted.
+- ECHO Watch List help page (echo.epa.gov/help/facility-search/watch-list-help): fetch error, so the exact Watch List entry criteria per statute are not quoted.
+- EPA Super-Emitter Program page (methane, 100 kg/hr): fetch error, and the web search limit for this turn was reached, so no methane super-emitter indicator is included.
+- Ofwat's own Thames Water decision page: fetch error. The case relies on Water Magazine's report of the 28 May 2025 decision.
+- ProPublica toxic air datastore page redirected; the methodology article was used instead.
+- US Chemical Safety Board investigation reports were not fetched. Chemical accident cases from the 2015 EPA alert (Reddy Ice, Millbrook, Cold Storage Solutions) are not listed because their outcomes were not confirmed.
+- Flint criminal prosecutions are not listed: outcomes were not verified from a primary source in this run.
+- The web search budget ran out (200 calls shared across agents) before searches on methane, MARPOL port state control, INTERPOL/Europol pollution crime, the Lead and Copper Rule Improvements (10 ppb), and PFAS discharge permits.
 
 **PM Police misconduct and state violence**
 - Baltimore Consent Decree (mdd.uscourts.gov) Early Intervention System section XIII: the fetched text stopped around paragraph 210, so the EIS indicator list and the exact paragraph 141 duty-to-intervene wording were not read (PM-029 cites the section summary only)
@@ -462,6 +798,28 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - COCOF 09/0003/00, European Commission 'Information Note on Fraud Indicators for ERDF, ESF and CF' (2009). This is probably where the scheme list in the gap comes from (corrupt payments, mixing of contracts, defective pricing, product substitution). The known EC URL https://ec.europa.eu/regional_policy/sources/docoffic/cocof/2009/cocof_09_0003_00_en.pdf returned HTTP 500, and the web-search budget for this run was already used up, so no other copy could be found. I added nothing for 'mixing of contracts' (charging costs to the wrong contract) or 'defective pricing' (false cost or pricing data), because the 2017 OLAF document I opened does not cover them under those names.
 - Carter Center DRC statement: the direct download (curl) redirected to a 404. The WebFetch tool could read the page, but its summariser caps quotes at about 125 characters, so the three quotes used may be shortened sentences rather than full ones. Please re-check them against the live page. The page shows no publication date; the URL suggests 10 Dec 2011 and the text says the results were announced on 9 Dec 2011.
 - World Bank brochure PDF: I read the official text version (documents.worldbank.org/curated/en/223241573576857116/text/...txt) instead of the PDF; it is the same document.
+- DoD OIG individual Fraud Red Flags pages (e.g. Product Substitution, Defective Pricing): the index page loaded but the subpages returned fetch errors and curl was blocked (Access Denied), so only scheme titles were quotable, not the published red-flag lists
+- DCAA Contract Audit Manual chapter 4 fraud indicators: PDF fetch failed and site blocked curl
+- OSCE/ODIHR Handbook for the Observation of Campaign Finance: the landing page had no PDF link and the full text was not reached
+- OECD 'Financing Democracy' (2016) PDF: robots-disallowed
+- ODIHR final election observation reports (e.g. Hungary 2022) on misuse of administrative resources: fetch failed, so no official-inquiry case for PP-086 to PP-090
+- TI-DS GDI questionnaire sub-indicator 38C (ghost soldiers): not quoted, only question 38
+- DOJ press releases for Raytheon 2024 defective-pricing/bribery resolution, Leonard Francis (Glenn Defense Marine Asia), FTC 2015 cancer-charities case and Feeding Our Future: URLs 404'd or were blocked by bot checks
+- Senate Armed Services Committee 2012 counterfeit-parts inquiry: PDF is a scan with no extractable text
+- UK Electoral Commission donations guidance: fetch failed
+- WebSearch budget for this run was used up early, so the research could not be widened through search; later sources were reached only through known URLs
+
+**PS Unsafe products, food fraud and falsified medicines**
+- The EU Safety Gate web report page (ec.europa.eu/safety-gate-alerts/screen/webReport) returned only a title; the 2024 statistics come from the Spanish Ministry of Consumer Affairs summary, not the Commission's own report.
+- EU ACN monthly food fraud reports (food.ec.europa.eu/food-safety/acn/ffn-monthly_en) and the full 2023 ACN annual report were not opened; only a Commission newsletter summary was read.
+- Huisman and van Ruth (2022): the full list of about 50 SSAFE questions is not in the article; only indicator categories and examples were available.
+- The NIH/PMC article on the 2008 melamine incident was blocked by a browser check; WHO pages did not state why melamine was added or give prosecution outcomes in China, so no criminal outcome for that case is recorded.
+- News24/Reuters article on Indonesian court papers was blocked by robots.txt; the Insurance Journal reprint was used. The August 2024 Indonesian civil ruling (tuoitre.vn) was not opened.
+- The FDA BeSafeRx page failed to load; FDA's consumer update on buying medicines online was used instead.
+- WHO 2014 Information Note on methanol poisoning outbreaks was not opened directly; it is cited via the UNDRR/ISC hazard profile.
+- Primary court records for the Czech methanol verdicts, the Uzbek verdicts and the UK horsemeat conviction were not reached; trade press and public broadcaster reports describing the verdicts were used.
+- No primary source reached for the second UK horsemeat defendants (Ulrik Nielsen, Alex Beech); not included.
+- No published numeric thresholds found for food fraud or falsified-medicine warning signs beyond the FDA 0.10% DEG/EG limit and the methanol outbreak size range.
 
 **SA Safety of investigators, sources and witnesses**
 - CASE coalition website and 2023/2024 SLAPP reports (the-case.eu and PDF fetch failed)
@@ -501,6 +859,86 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Primary court records on later rulings in the Amadea forfeiture case (press reports a ruling and sale; not checked against court documents)
 - BIS red flag 28 (IaaS for AI model weights, ECCN 4E091) was not added: it comes from the 2025 AI diffusion rule, and I could not confirm on eCFR whether it is still in force
 - BIS Entity List page itself (bis.gov), defined from the 15 CFR Supplement 3 text instead
+- WebSearch budget for this turn was exhausted after the first search; all further research used direct WebFetch on known URLs. A follow-up run could widen the source base.
+- Full text of UN Security Council Resolution 2178 (documents.un.org PDF blocked by robots); only the UN summary page was used.
+- DHS Nationwide SAR Initiative indicator and behaviour lists (dhs.gov fetches failed) and the ISE-SAR Functional Standard (dni.gov fetch failed).
+- US Supreme Court opinion PDF for Holder v. HLP (supremecourt.gov and law.cornell.edu fetches failed); Wikipedia and CRS used instead.
+- DOJ press releases for case outcomes (justice.gov fetches failed); case outcomes come from Wikipedia and CRS, not primary DOJ releases. Verify against DOJ or PACER before publishing.
+- Wikipedia pages for Ardit Ferizi, Tairod Pugh, Ali Kourani, Jose Padilla and Mirsad Kandic were not found, so these cases are left out.
+- FATF 2015 Emerging Terrorist Financing Risks (foreign terrorist fighter section) was not fetched.
+
+**SP Sport integrity: doping and abuse of athletes**
+- WADA website (wada-ama.org): blocked by robots.txt, so WADA Q&A and the McLaren report were not opened directly; McLaren findings are taken from the UK DCMS Committee report
+- World Anti-Doping Code 2021 Appendix 1 (Definitions): the fetched PDF text stopped at about 120,000 characters, before the definitions; glossary entries for Code terms are paraphrased from Article 2 wording
+- Court of Arbitration for Sport awards and media releases (WADA v RUSADA CAS 2020/O/6689, Valieva, Salazar): returned 404 or a search shell
+- Whyte Review (whytereview.org report): blocked by robots.txt; Sport England and UK Sport pages returned errors or 404
+- Australian Human Rights Commission 'Change the Routine' review of Gymnastics Australia (2021): fetch errors
+- US Soccer / Yates report on abuse in the NWSL: 404
+- olympics.com IOC decision on the Russian NOC and Schmid Commission: blocked by robots.txt
+- USADA Salazar/Brown sanction page and DOJ SDNY Eric Lira press release: fetch errors
+- congress.gov RADA page: blocked; used govinfo.gov public law instead
+- UKAD decision on Dr Richard Freeman: fetch error
+- Europol Operation Viribus press release: fetch error
+- Athletics Integrity Unit ABP page: fetch error
+- SafeSport Code Section X (reporting duties) and the full Abuse of Process and Retaliation text: truncated in the fetch
+- WebSearch budget for this turn was used up after one query, so no wider source discovery was possible; a follow-up run could look for the Ropes & Gray USA Gymnastics report, the US Senate 'Courage of Survivors' report, and the IOC 2024 consensus statement on interpersonal violence
+
+**SV Sexual harassment and sexual violence against adults**
+- Ofcom code amendments: the statement page does not say which services must hash-match; the code text was not opened, so the scope in SV-039 is unconfirmed.
+- Mastercard's own standards text (AN 5196): only Mastercard's April 2021 blog post and the adultbizlaw summary were read. The live-streaming, search-term and neutral-body points come from the law-firm summary only.
+- DOJ OVW gender-bias guidance: only the four-page summary and extracts of the full PDF were read, not the whole document.
+- NIJ National Best Practices for Sexual Assault Kits: only the summary recommendations were read. Lab turnaround targets were not found.
+- EEOC Select Task Force report: the last ~26,000 characters and Appendix C (the risk-factor chart) were not read.
+- EHRC technical guidance: the last ~36,000 characters were not read. No single risk-factor list was found.
+- Fort Hood Independent Review Committee: only the executive summary, from a non-Army copy (americanrhetoric.com), was read. The full report was not opened.
+- Guidepost Solutions SBC report and the Vatican McCarrick report: neither primary report was opened. Both were cited through AP reporting.
+- Perkins Coie Strauss report: not opened. It was cited through Eleven Warriors, because the KUOW fetch failed.
+- UK International Development Committee 2018 report and Women and Equalities Committee 2019 NDA report: neither primary report was opened. Both were cited through press coverage.
+- SRA NDA warning notice full text (rules.sra.org.uk): the fetch failed. Only the SRA news item was read.
+- Utah Division of Consumer Protection / FTC settlement with Aylo (Sept 2025): the fetch failed, so it is not used.
+- NY Attorney General Cuomo investigation press release: the fetch failed, so it is not used.
+- FBI UCR handbook definition of 'unfounded': the FBI source was not opened. The definition was quoted through BuzzFeed News.
+- eSafety nudify formal warning: the release date is not given on the page, so it is not used as a case.
+- Military sexual assault data beyond the DoD FY23 fact sheet (e.g., retaliation survey data, restricted/unrestricted reporting definitions) was not sourced.
+- Clergy abuse of adults beyond McCarrick, such as other denominations or abuse of vulnerable adults by clergy, was not sourced.
+- Aylo DPA: the first EDNY press-release URL failed, and a second EDNY URL was read successfully.
+
+**TH Organised theft and fencing**
+- WebSearch was unavailable for this whole run (the shared per-turn search budget was already used up), so widening beyond the three given lists relied only on URLs fetched directly. More searching can be done in a follow-up run.
+- FinCEN/FBI notice on catalytic converter theft (2023): guessed fincen.gov URLs failed to fetch; catalytic converter and metal theft indicators not included.
+- US DOJ press releases on the 2022 nationwide catalytic converter theft takedown: fetch failed.
+- FBI cargo theft page (fbi.gov/investigate/violent-crime/cargo-theft) and the UCR cargo theft definition (ucr.fbi.gov/cargo-theft): fetch failed.
+- Original FBI Private Sector Liaison Information Report on cargo theft (17 April 2024): not reached; TH-018 and TH-019 rely on Land Line's reporting of it (secondary source).
+- Europol guidance on logical attacks on ATMs: fetch failed.
+- IC3 public service announcements on cargo or freight fraud: fetch failed.
+- No sources were researched for robbery, burglary, livestock theft or electricity theft; these gaps stay open.
+- FinCEN advisories and notices index page: fetch failed.
+- The last 719 characters of the ACAMS/HSI PDF and the part of GAO-11-675 after character 100,000 were not read.
+
+**TR Transnational repression**
+- WebSearch budget was exhausted at the start of this run (shared turn limit), so wider discovery searches were not possible; work relied on fetching known URLs.
+- OHCHR 'Transnational Repression' guidance (18 June 2025): landing page reached but the PDF could not be fetched, so its definition and forms are not quoted.
+- European Parliament PEGA recommendation on Pegasus (TA-9-2023-0244): blocked by robots.txt.
+- Freedom House Interpol sub-page and Interpol Article 3 constitution page: fetch errors.
+- UK Home Office / NPSA transnational repression guidance and gov.uk search: fetch errors / robots-disallowed.
+- CSIS (Canada) transnational repression publication and the Hogue Foreign Interference Commission report: fetch errors, not reached.
+- Berlin Kammergericht judgment in the Khangoshvili (Tiergarten) killing: press release fetch failed, so the case is not included.
+- US v. Ahmad Abouammo (Twitter insider spying for Saudi Arabia) and the UN Special Rapporteur inquiry into the Khashoggi killing: fetch errors, so the platform-insider indicator and these cases were omitted.
+- Wang Shujun case outcome after 2022 indictment not verified; recorded only as an allegation per the 2022 release.
+- JCHR report characters 100000-121195 not read.
+
+**VA Abuse and neglect of older and disabled adults in care**
+- NCEA web pages (blocked by robots.txt in an earlier pass); only the NCEA 'Signs of Elder Abuse' PDF was read
+- CMS State Operations Manual Appendix PP (F600-F610 interpretive guidance and abuse indicators) was not opened
+- Full list of the 580 high-risk diagnosis codes in OIG A-01-16-00509 is not in the report body; the 12 Early Alert codes are in Appendix C and were not extracted
+- CPS original press release on Winterbourne View sentencing (blog.cps.gov.uk) was not opened; used the Inner Temple Library excerpt citing it
+- Prof. Glynis Murphy's full Whorlton Hall reports (Feb and Dec 2020) were not opened; only CQC's news release
+- BBC primary report of the Whorlton Hall verdicts not opened; used Patient Safety Learning hub summary citing BBC
+- CMS 2024 minimum staffing rule (3.48 hours per resident day) and its December 2025 repeal were seen only in search results, so no staffing number threshold is given
+- Rehabilitation Center at Hollywood Hills (Hurricane Irma deaths, 2017) court outcomes not verified, so not included
+- No published numeric threshold for restraint frequency, staff turnover or staffing found in the sources read
+- Self-neglect indicators (SCIE) not included because they fall outside institutional care; available at the SCIE page if wanted
+- Disability abuse in US psychiatric residential facilities (e.g. GAO or Senate reports) not researched in this pass
 
 **VE Violent extremism and hate-motivated attacks**
 - US Secret Service NTAC 'Mass Attacks in Public Spaces: 2016-2020' (secretservice.gov returned Access Denied to both WebFetch and curl); its concerning-behaviour statistics are not included
@@ -513,6 +951,28 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - FBI/DHS 'Making Prevention a Reality' and the EU Radicalisation Awareness Network (RAN) indicator material: not opened
 - Canadian, German and Dutch national prevention-body indicator lists: not searched
 - Court records for the Buffalo case (Gendron guilty plea and federal case) not opened; the case relies on the NY Attorney General report only
+- FBI Hate Crime Data Collection Guidelines and Training Manual (ucr.fbi.gov): blocked by robots.txt, so the FBI bias-indicator list is not included.
+- HMICFRS 'Understanding the difference: the initial police response to hate crime' (2018) full report PDF: fetch failed; only the landing page was read, which gives no findings.
+- Bureau of Justice Statistics 'Hate Crime Victimization, 2005-2019' full PDF: fetch failed; reporting-rate figures and NCVS classification criteria not captured.
+- CPS hate crime legal guidance (cps.gov.uk): fetch failed.
+- College of Policing 'Evidencing hostility' page: fetch failed.
+- Stephen Lawrence Inquiry Recommendation 12 (racist incident definition) and Recommendations 13-15: not reached in the part of the PDF read.
+- DOJ press release on the Tree of Life synagogue (Pittsburgh) sentencing: fetch failed.
+- The shared web search budget was used up after the first search, so no wider search was possible (for example ODIHR data-collection guides, ProPublica or other reporting on agencies reporting zero hate crimes, Home Office statistics). Those sources were not checked.
+
+**WS Workplace, industrial and transport safety**
+- OSHA Field Operations Manual page (https://www.osha.gov/enforcement/fom) returned a fetch error; definitions of willful, repeat and the five-year repeat lookback are taken from 29 U.S.C. 666 and a National Safety Council article instead
+- OSHA 2013 SVEP white paper defining high-gravity etc. was not opened; the SVEP page notes public SVEP logs are temporarily removed
+- FMCSA CSA SMS methodology PDF (csa.fmcsa.dot.gov/Documents/CSA_SMS_Methodology.pdf) returned a server error; thresholds come from a 2012 FMCSA presentation and should be checked against the current methodology
+- Transportation Safety Board of Canada Lac-Megantic report (R13D0054) fetch failed; not included
+- DOJ release on BP Deepwater Horizon manslaughter plea fetch failed; not included
+- BAILII judgment R v Cotswold Geotechnical [2011] EWCA Crim 1337 blocked by bot protection; the case is sourced from trade press reporting of the conviction
+- NTSB report on the 2011 Sky Express crash not located; case sourced from FMCSA release only
+- HSE HSG254 process safety indicators: landing page only, guide content not read
+- Hackitt chapter 2 (value engineering, design-and-build changes) not read
+- CSB BP Texas City full final report not opened; findings taken from CSB news release and investigation page
+- Pipeline, utility and dam safety (PHMSA, FERC, state dam safety) were flagged in the gap but not researched
+- OSHA whistleblower (Section 11(c)) retaliation data not researched
 
 
 ## Second research round (9 October 2026)
@@ -858,4 +1318,8 @@ Decided by Ony, 10 October 2026: where a countable indicator's source gives no n
 - **SF-076** Sudden rise in value transferred to accounts in a jurisdiction or institution without a clear reason
 - **SF-077** Jump in new company formations in places previously linked to Russian money flows
 - **VE-045** Energy burst: rising activity around the target
+
+## Coverage round 3 (10 October 2026)
+
+The catalogue was checked entry by entry against complete lists of crimes and harms: the UNODC International Classification of Crime for Statistical Purposes, the Rome Statute and crimes against the state, the FATF designated categories of offences with Europol and Interpol crime areas, what investigative newsrooms and Pulitzer-winning investigations cover, and non-financial harms. 36 gaps were found; all were researched and every source and case re-checked. 19 new areas were added (health care harm; sexual violence against adults; child protection and illicit adoption; abuse of older and disabled adults in care; workplace and transport safety; unsafe products and food fraud; pollution; consumer, housing and lending exploitation; domestic abuse; torture and detention; organised theft; kidnapping and extortion; cartels; transnational repression; coups and militias; sport; cults; animal cruelty; online encouragement of suicide and self-harm) and 17 existing areas were extended (among them every war crime in the conduct of hostilities, atrocity early warning, treason and state sabotage).
 

@@ -769,3 +769,324 @@ terms:
   indicators: []
   areas:
   - FR
+- term: Unemployment insurance (UI) fraud
+  definition: Claiming unemployment benefits you are not entitled to, often with stolen identities or
+    fake employers.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fictitious employer-employee fraud
+  definition: Inventing a company and fake staff and wage records to claim unemployment benefits.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Economic Impact Payment (EIP)
+  definition: The US federal stimulus payments sent to individuals during the COVID-19 pandemic.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Benefits fraud
+  definition: Applying for emergency assistance benefits you are not entitled to.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Paycheck Protection Program (PPP) and COVID-19 EIDL
+  definition: SBA pandemic loan programmes for businesses; PPP required the business to be operating by
+    15 February 2020.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fraud indicator
+  definition: GAO's term for characteristics and flags that warn of possible fraud; not proof of fraud.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fictitious entity
+  definition: A fake business presented as real to obtain relief funds.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Shell company (GAO usage)
+  definition: A business with no employees or operations.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Kickback (relief fraud)
+  definition: Part of loan or grant money paid to someone in return for illicit help getting it.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: National Directory of New Hires (NDNH)
+  definition: Federal database of wage and employment records that GAO matched against relief loan data.
+  examples: []
+  source_url: https://www.gao.gov/products/gao-23-105331
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fraud Risk Management Framework
+  definition: 'GAO''s model of four steps for federal programmes: commit, assess, design and implement
+    controls, evaluate and adapt.'
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-15-593sp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Data matching
+  definition: Comparing information from one source with another to find inconsistencies, such as checking
+    self-reported eligibility data.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-15-593sp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Pay-and-chase
+  definition: Paying out first and trying to recover fraudulent payments later, which GAO says prevention
+    avoids.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-15-593sp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Pandemic Response Accountability Committee (PRAC)
+  definition: Body of inspectors general overseeing US pandemic relief spending; it publishes fraud alerts.
+  examples: []
+  source_url: https://www.pandemicoversight.gov/news/articles/prac-issues-fraud-prevention-alert-pre-award-vetting-using-data-analytics-could-have-prevented-over-79-billion-in-potentially-fraudulent-pandemic-relief-payments
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Stolen identity refund fraud
+  definition: Filing tax returns in other people's names to collect refunds.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Foreclosure rescue scam
+  definition: A scheme promising distressed homeowners help to avoid foreclosure, usually taking fees
+    or the home itself.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Loan modification
+  definition: A change to the terms of an existing mortgage to make it affordable; scammers sell fake
+    help with it.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Equity skimming
+  definition: Draining the value of someone's home, for example through equity loans or false quitclaim
+    deeds.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Quitclaim deed
+  definition: A deed that transfers whatever interest the signer has in a property; FinCEN notes false
+    ones are used to steal homes.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Straw borrower
+  definition: A person whose name is used on a loan to hide who is really behind it.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Short sale
+  definition: A home sale for less than the mortgage owed, approved by the lender; FinCEN flags quick
+    resales and related-party buyers.
+  examples: []
+  source_url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Debt elimination scheme
+  definition: Using invalid documents or fake checks to claim a mortgage or debt is cancelled.
+  examples: []
+  source_url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Home Equity Conversion Mortgage (HECM)
+  definition: The federally insured US reverse mortgage that lets homeowners 62 and older draw on home
+    equity.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Cross-selling (HECM)
+  definition: Pushing seniors to put reverse-mortgage money into annuities or other products.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Deed theft
+  definition: Taking title to a home without the owner's knowledge or approval, by forgery or trickery.
+  examples: []
+  source_url: https://ag.ny.gov/publications/deed-theft
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Seller impersonation fraud
+  definition: Criminals posing as property owners to sell land or homes they do not own.
+  examples: []
+  source_url: https://alta.org/news-and-publications/news/20230509-Red-Flags-and-Tips-to-Help-Prevent-Seller-Impersonation-in-Real-Estate
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: VoIP
+  definition: Internet-based phone numbers; the FBI notes impostor sellers use them.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2026/PSA260616
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Synthetic identity fraud
+  definition: Using a combination of personal information to fabricate a person or entity for gain.
+  examples: []
+  source_url: https://fedpaymentsimprovement.org/news/press-releases/federal-reserve-system-announces-industry-recommended-definition-of-synthetic-identity-fraud/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Drop address
+  definition: An address (house, flat or PO box) used only to receive mail for false identities.
+  examples: []
+  source_url: https://archives.fbi.gov/archives/newark/press-releases/2013/ten-indicted-in-200-million-international-credit-card-fraud-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Credit pumping
+  definition: Feeding false information to credit bureaus to make a fake identity look creditworthy before
+    maxing it out.
+  examples: []
+  source_url: https://archives.fbi.gov/archives/newark/press-releases/2013/ten-indicted-in-200-million-international-credit-card-fraud-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Arson for profit
+  definition: Setting a fire deliberately to collect insurance or escape a financial burden.
+  examples: []
+  source_url: https://www.ojp.gov/pdffiles1/Digitization/54514NCJRS.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Smoke and ash claim
+  definition: An insurance claim for contamination from wildfire smoke and ash rather than direct burning;
+    NICB lists ways these are inflated.
+  examples: []
+  source_url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Examination Under Oath
+  definition: A sworn questioning of a claimant by an insurer, which NICB suggests to deter questionable
+    claims.
+  examples: []
+  source_url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Federal Child Nutrition Program sponsor
+  definition: An organisation that enrols meal sites in federal child nutrition programmes and receives
+    administrative fees; Feeding Our Future was one.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/feeding-our-future-ringleader-sentenced-500-months
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR

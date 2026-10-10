@@ -581,3 +581,509 @@ terms:
   indicators: []
   areas:
   - IN
+- term: Diploma mill (degree mill)
+  definition: An organisation that sells degrees for a fee with little or no study required.
+  examples: []
+  source_url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+  cases: []
+  related:
+  - Accreditation mill
+  indicators: []
+  areas:
+  - IN
+- term: Accreditation mill
+  definition: A bogus, official-sounding accrediting body set up to give diploma mills a false look of
+    approval.
+  examples: []
+  source_url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+  cases: []
+  related:
+  - Diploma mill
+  - Accreditation
+  indicators: []
+  areas:
+  - IN
+- term: Accreditation (US)
+  definition: A voluntary, non-governmental review of whether a school meets quality standards; the Department
+    of Education recognises the accrediting agencies that count.
+  examples: []
+  source_url: https://www.ed.gov/laws-and-policy/higher-education-laws-and-policy/college-accreditation/diploma-mills-and-accreditation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Nationally recognized accrediting agency
+  definition: An accreditor that meets US Department of Education criteria and appears on its official
+    list.
+  examples: []
+  source_url: https://www.ed.gov/laws-and-policy/higher-education-laws-and-policy/college-accreditation/diploma-mills-and-accreditation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Unaccredited institution
+  definition: A school not reviewed by a recognised accreditor; not necessarily poor quality, but not
+    checked against standards.
+  examples: []
+  source_url: https://www.ed.gov/laws-and-policy/higher-education-laws-and-policy/college-accreditation/diploma-mills-and-accreditation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Degree fraud
+  definition: Claiming a degree-level qualification a person does not have.
+  examples: []
+  source_url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Employers%20Toolkit%202020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Recognised provider (UK)
+  definition: A body with UK government approval to award degrees.
+  examples: []
+  source_url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Employers%20Toolkit%202020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Listed body (UK)
+  definition: An institution that can award a degree in partnership with a recognised provider.
+  examples: []
+  source_url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Employers%20Toolkit%202020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Hedd (Higher Education Degree Datacheck)
+  definition: The UK service for verifying degrees and checking whether an institution is recognised or
+    bogus.
+  examples: []
+  source_url: https://hedd.ac.uk/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Essay mill
+  definition: A service that writes coursework for students to submit as their own.
+  examples: []
+  source_url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Providers%20Toolkit%202020%20GR.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Counterfeit document
+  definition: A complete fake made from scratch to look like an official document.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+  cases: []
+  related:
+  - Forgery
+  indicators: []
+  areas:
+  - IN
+- term: Forgery (document)
+  definition: A genuine document that has been unlawfully altered, for example by swapping pages or photos
+    or changing details.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Impersonation / impostor
+  definition: A person using someone else's genuine document, usually because they look alike.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Pseudo / fantasy document
+  definition: Something that looks like a passport or ID card but is not issued or recognised by any authority.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Fraudulently obtained genuine document
+  definition: A real, officially issued document obtained using false supporting papers.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Machine readable zone (MRZ)
+  definition: The lines of coded characters at the bottom of a passport or ID data page that repeat key
+    printed details for machine reading.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related:
+  - Check digit
+  - OCR-B
+  indicators: []
+  areas:
+  - IN
+- term: Check digit
+  definition: A digit in the MRZ calculated from other characters (modulus 10, weights 7-3-1) so readers
+    can confirm the data were read correctly.
+  examples: []
+  source_url: https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: OCR-B
+  definition: The typeface the ICAO standard requires for MRZ characters.
+  examples: []
+  source_url: https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: ICAO Doc 9303
+  definition: The International Civil Aviation Organization's standard for machine-readable travel documents
+    such as passports.
+  examples: []
+  source_url: https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Intaglio printing
+  definition: A printing method using an engraved plate that leaves raised ink you can feel.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: UV fluorescence
+  definition: A glow visible under ultraviolet light; security paper should react dully, while many fakes
+    glow brightly.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Optically variable ink (OVI)
+  definition: Ink containing tiny pigments that change colour as the document is tilted.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Laser engraving
+  definition: Burning text and images into plastic layers with a laser, giving grey or brown tones rather
+    than printed dots.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Security thread
+  definition: A strip of plastic, metal or other material built into the paper during manufacture.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Guilloche
+  definition: Fine interlaced line patterns printed as a hard-to-copy background design.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Watermark
+  definition: An image formed in the paper itself, seen as light and dark tones when held to light, and
+    which should not react under UV.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Collation mark
+  definition: A feature running across pages of a booklet that helps show if pages were exchanged or removed.
+  examples: []
+  source_url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: PRADO
+  definition: The EU's public online register of authentic travel and identity documents, used to compare
+    a document with genuine examples.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: COPE (Committee on Publication Ethics)
+  definition: An international body that sets publication ethics guidance for journals and publishers.
+  examples: []
+  source_url: https://publicationethics.org/resources/research/paper-mills-research
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Foreign Information Manipulation and Interference (FIMI)
+  definition: The EU term for deliberate, coordinated manipulation of information by foreign actors, often
+    states, to harm a country's interests or democratic processes.
+  examples: []
+  source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  cases: []
+  related:
+  - FIMI Exposure Matrix
+  indicators: []
+  areas:
+  - IN
+- term: FIMI Exposure Matrix
+  definition: 'The EEAS''s four-category scheme for grading how closely a channel is tied to a state:
+    official state channels, state-controlled outlets, state-linked channels and state-aligned channels.'
+  examples: []
+  source_url: https://euvsdisinfo.eu/behind-the-curtain-a-novel-analytical-approach-to-fimi-exposure/
+  cases: []
+  related:
+  - Official state channel
+  - State-controlled outlet
+  - State-linked channel
+  - State-aligned channel
+  indicators: []
+  areas:
+  - IN
+- term: Official state channel
+  definition: A communication channel run directly by a government or its representatives, such as a ministry
+    or embassy account.
+  examples: []
+  source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: State-controlled outlet
+  definition: A media outlet funded, managed and editorially controlled by state-appointed bodies or the
+    ruling party.
+  examples: []
+  source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: State-linked channel
+  definition: A channel that works under state oversight but does not disclose that link publicly.
+  examples: []
+  source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: State-aligned channel
+  definition: A channel that pushes a state's narratives but cannot be directly tied to state control
+    or funding, so it stays unattributed.
+  examples: []
+  source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Technical evidence (attribution)
+  definition: Evidence about the digital infrastructure behind an operation, such as IP addresses, hosting,
+    domain ownership and network numbers.
+  examples: []
+  source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Behavioural evidence (attribution)
+  definition: Evidence from activity patterns, such as coordinated posting, mirrored content or repeated
+    playbooks, across channels in an operation.
+  examples: []
+  source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Autonomous System Number (ASN)
+  definition: An identifier for a block of internet networks run by one operator; the EEAS lists it among
+    technical attribution indicators.
+  examples: []
+  source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Proxy media
+  definition: Outlets that present themselves as independent but have hidden ties to a foreign state.
+  examples: []
+  source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Foreign malign influence
+  definition: US government term for hostile efforts by foreign states to sway public opinion or elections
+    through covert, deceptive or coercive means.
+  examples: []
+  source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Hack-and-leak
+  definition: Stealing private material through hacking and then publishing or leaking it to shape public
+    opinion.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/three-irgc-cyber-actors-indicted-hack-and-leak-operation-designed-influence-2024-us
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Cyber-enabled information operation
+  definition: An influence campaign that combines computer intrusions with publicity about them or about
+    what was stolen.
+  examples: []
+  source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Voice cloning
+  definition: Using AI tools to make a fake recording that sounds like a real person.
+  examples: []
+  source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Synthetic media / deepfake
+  definition: Images, audio or video made or altered with AI so it looks real.
+  examples: []
+  source_url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Data void
+  definition: A topic or search term with too little credible information, which bad actors can fill with
+    their own content.
+  examples: []
+  source_url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Astroturfing
+  definition: Faking the look of grassroots support by using many fake or coordinated accounts or groups.
+  examples: []
+  source_url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Flooding / firehosing
+  definition: Posting overwhelming amounts of similar content to drown out other information.
+  examples: []
+  source_url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Misinformation
+  definition: False information shared without intent to cause harm.
+  examples: []
+  source_url: https://www.cisa.gov/topics/election-security/foreign-influence-operations-and-disinformation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Disinformation
+  definition: Information deliberately created to mislead, harm or manipulate.
+  examples: []
+  source_url: https://www.cisa.gov/topics/election-security/foreign-influence-operations-and-disinformation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Malinformation
+  definition: True information used out of context to mislead, harm or manipulate.
+  examples: []
+  source_url: https://www.cisa.gov/topics/election-security/foreign-influence-operations-and-disinformation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: GRU
+  definition: Russia's Main Intelligence Directorate, the military intelligence service whose officers
+    were indicted over 2016 election hacking.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/grand-jury-indicts-12-russian-intelligence-officers-hacking-offenses-related-2016-election
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: IRGC
+  definition: Iran's Islamic Revolutionary Guard Corps, whose employees were indicted over a 2024 hack-and-leak
+    operation.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/three-irgc-cyber-actors-indicted-hack-and-leak-operation-designed-influence-2024-us
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN

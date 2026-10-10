@@ -1,0 +1,1686 @@
+key: SP
+name: 'Sport integrity: doping and abuse of athletes'
+scope: Anti-doping rule violations and state doping; psychological and physical abuse, hazing and neglect
+  of adult and elite athletes.
+indicators:
+- id: SP-001
+  name: Prohibited substance found in an athlete's sample
+  definition: A laboratory finds a banned substance, or a by-product or marker of one, in an athlete's
+    urine or blood sample.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.1)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.1
+    quote: Presence of a Prohibited Substance or its Metabolites or Markers in an Athlete's Sample
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A national anti-doping agency announces a provisional suspension after a positive test
+  - A results-management decision published by an international federation
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Sanction
+  - Document
+  - Event
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - National anti-doping agency sanction lists (e.g. USADA, UKAD)
+  - International federation and Athletics Integrity Unit decision lists
+  - Court of Arbitration for Sport (CAS) awards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Valid Therapeutic Use Exemption for the substance
+  - Contaminated supplement or food (the Code has a separate contaminated-product route)
+  - Laboratory or chain-of-custody error later overturned on appeal
+  - Atypical finding that is not confirmed as a violation
+  jurisdictions: All WADA Code signatories (international and national sport bodies worldwide)
+  version: 1
+- id: SP-002
+  name: Use of a banned substance or method, including an abnormal biological passport
+  definition: Evidence other than a single positive test, such as an athlete's biological passport, records
+    or testimony, shows the athlete used or tried to use a banned substance or method.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.2)
+  status: pending
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.2
+    quote: Use or Attempted Use by an Athlete of a Prohibited Substance or a Prohibited Method
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Athlete Biological Passport
+    publisher: USADA
+    url: https://www.usada.org/spirit-of-sport/education/athlete-biological-passport/
+    locator: ABP page, opening section
+    quote: The principle behind the Athlete Biological Passport (ABP) is the monitoring of selected biological
+      parameters over time
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sanction based on longitudinal blood values (haemoglobin, reticulocytes, OFF-score) rather than a
+    positive test
+  - USADA's 2012 case against the US Postal Service team relied on sworn testimony, emails and payments
+  cases:
+  - name: US Postal Service Pro Cycling Team doping conspiracy (Lance Armstrong)
+    year: '2012'
+    jurisdiction: United States (USADA)
+    what_happened: USADA said evidence including sworn testimony from 26 people, financial payments, emails,
+      scientific data and laboratory results showed the team ran a doping programme; Armstrong accepted
+      a lifetime ban rather than contest the evidence. The sanction was imposed by an anti-doping agency,
+      not a court.
+    outcome: fined_by_regulator
+    outcome_verified: false
+    source_url: https://www.usada.org/news/statement-from-usada-ceo-travis-t-tygart-regarding-the-u-s-postal-service-pro-cycling-team-doping-conspiracy/
+    source_title: Statement from USADA CEO Travis T. Tygart regarding the U.S. Postal Service Pro Cycling
+      Team doping conspiracy
+  data_needed:
+  - Person
+  - Sanction
+  - Document
+  - Event
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Anti-doping agency sanction announcements
+  - CAS awards
+  - Athletics Integrity Unit decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Altitude training, illness, dehydration or genetic factors can shift blood values
+  - Valid Therapeutic Use Exemption
+  - Testimony that is uncorroborated or disputed
+  jurisdictions: All WADA Code signatories
+  version: 1
+- id: SP-003
+  name: Evading or refusing sample collection
+  definition: An athlete avoids, refuses or fails to give a sample after being properly notified, without
+    a compelling reason.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.3)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.3, p. 22
+    quote: Evading Sample collection; or refusing or failing to submit to Sample collection without compelling
+      justification
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Athlete leaves venue before doping control after notification
+  - Athlete refuses to provide a sample to a doping control officer
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Sanction
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Anti-doping agency sanction lists
+  - CAS awards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Medical emergency or genuine compelling justification
+  - Defective notification by the collecting authority
+  - Misunderstanding, language barrier or minor procedural confusion
+  jurisdictions: All WADA Code signatories
+  version: 1
+- id: SP-004
+  name: Repeated whereabouts failures
+  definition: An athlete in a testing pool repeatedly misses tests or fails to file where they will be,
+    making out-of-competition testing harder.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.4)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.4, p. 22
+    quote: Any combination of three missed tests and/or filing failures, as defined in the International
+      Standard
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Whereabouts
+    publisher: USADA
+    url: https://www.usada.org/athletes/whereabouts/
+    locator: Whereabouts page, consequences section
+    quote: Any combination of three Whereabouts Failures (Filing Failures and/or Missed Tests)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Athlete unavailable during their declared 60-minute slot on separate occasions
+  - Late or missing quarterly whereabouts filing
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Sanction
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Anti-doping agency sanction lists
+  - CAS awards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Three whereabouts failures (missed tests and/or filing failures) within any 12-month period
+      by an athlete in a Registered Testing Pool
+    threshold_source: https://www.usada.org/athletes/whereabouts/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Travel disruption, family emergencies or administrative mistakes
+  - Errors by the testing authority
+  - A single failure is common and is not itself a violation
+  jurisdictions: All WADA Code signatories; applies to athletes in a Registered Testing Pool
+  version: 1
+- id: SP-005
+  name: Tampering with doping control
+  definition: Someone interferes with any part of the testing process, such as samples, paperwork or the
+    people running it.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.5)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.5
+    quote: Tampering or Attempted Tampering with any Part of Doping Control by an Athlete or Other Person
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sample swapping found by the McLaren investigation at the Sochi laboratory
+  cases:
+  - name: Sochi 2014 sample swapping (McLaren investigation)
+    year: '2016'
+    jurisdiction: Russia / international (WADA)
+    what_happened: A UK parliamentary committee report records that McLaren's WADA-commissioned investigation
+      established sample swapping at the Sochi laboratory during the Games, with state oversight and control
+      of the Moscow laboratory and FSB involvement.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    source_title: House of Commons DCMS Committee, Combatting doping in sport (2018), paras 25-26
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Anti-doping agency decisions
+  - Official inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine procedural errors in collection or transport
+  - Damaged sample from shipping problems
+  jurisdictions: All WADA Code signatories
+  version: 1
+- id: SP-006
+  name: Possession of banned substances or methods
+  definition: An athlete or member of their support staff holds banned substances or equipment for banned
+    methods without justification.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.6)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.6
+    quote: Possession of a Prohibited Substance or a Prohibited Method by an Athlete or Athlete Support
+      Person
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Substances found during customs or police searches linked to an athlete's entourage
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - Anti-doping sanctions
+  - Court records
+  - Customs seizure announcements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Medication held under a valid TUE or other acceptable justification
+  - Prescribed for a family member
+  - Medical staff legitimately holding medicines for treatment
+  jurisdictions: All WADA Code signatories
+  version: 1
+- id: SP-007
+  name: Trafficking of banned substances or methods
+  definition: Someone sells, gives, transports or distributes banned substances or methods, or tries to.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.7)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.7
+    quote: Trafficking or Attempted Trafficking in any Prohibited Substance or Prohibited Method by an
+      Athlete or Other Person
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Coach or supplier distributing testosterone to athletes
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Address
+  - Event
+  - CourtCase
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - Anti-doping sanctions
+  - Federal and national court records
+  - Prosecutor press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Trafficking of performance-enhancing drugs overlaps with organised supply of controlled medicines;
+      the area brief notes OC covers related sport crime (match-fixing).
+    source_url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  innocent_explanations:
+  - Legitimate medical supply chains (pharmacies, clinics) handling the same substances
+  - Prescription medicines supplied for genuine treatment
+  jurisdictions: All WADA Code signatories; may also be a criminal offence nationally
+  version: 1
+- id: SP-008
+  name: Administering banned substances or methods to athletes
+  definition: Someone gives, or tries to give, a banned substance or method to an athlete.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.8)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.8
+    quote: Administration or Attempted Administration by an Athlete or Other Person to any Athlete In-Competition
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Team doctor or trainer administering substances to riders (USPS case charged team doctor and trainer)
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - Sanction
+  - Document
+  checkable: records
+  lookup_sources:
+  - Anti-doping sanctions
+  - CAS awards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Emergency or TUE-authorised medical treatment
+  - Permitted substances or methods confused with banned ones
+  jurisdictions: All WADA Code signatories
+  version: 1
+- id: SP-009
+  name: Complicity and cover-up of doping
+  definition: Someone helps, encourages, conspires in or covers up another person's anti-doping rule violation.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.9)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.9, p. 23
+    quote: Assisting, encouraging, aiding, abetting, conspiring, covering up or any other type of intentional
+      complicity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Combatting doping in sport
+    publisher: House of Commons DCMS Committee
+    year: '2018'
+    url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    locator: Para 26 (quoting McLaren)
+    quote: An institutionalised conspiracy existed across summer and winter sports athletes
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Officials delaying naming athletes to avoid bad publicity (DCMS para 30)
+  cases:
+  - name: Russian state-sponsored doping (McLaren and Independent Commission findings)
+    year: '2016'
+    jurisdiction: Russia / international
+    what_happened: The DCMS Committee report records McLaren's finding of an institutionalised conspiracy
+      and an evolving cover-up, and the Independent Commission's finding of systematic, state-sponsored
+      doping encouraged by Russian federations and anti-doping bodies.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    source_title: Combatting doping in sport, paras 26 and 28
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Associate
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Anti-doping decisions
+  - Official inquiry reports
+  - CAS awards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Administrative delays in results management that are not intended to hide anything
+  - Confidentiality rules that require results to stay unpublished until a decision
+  jurisdictions: All WADA Code signatories
+  version: 1
+- id: SP-010
+  name: Working with a banned or disqualified coach, doctor or adviser
+  definition: An athlete or other person works in a sport capacity with a support person who is banned,
+    has been found guilty of doping conduct, or acts as a front for such a person.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.10, Prohibited Association)
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.10.1.3, pp. 24-25
+    quote: Is serving as a front or intermediary for an individual described in Article 2.10.1.1 or 2.10.1.2.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Athlete continues training under a coach serving a period of ineligibility
+  - Banned adviser works through an intermediary
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Associate
+  - Sanction
+  - Organization
+  checkable: lookups
+  lookup_sources:
+  - Anti-doping sanction lists (to check coach and doctor status)
+  - Team staff lists and accreditation records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Association in a professional or sport-related capacity with a person serving ineligibility,
+      or found to have engaged in doping conduct within the longer of six years or the sanction length,
+      or their front
+    threshold_source: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family or purely social relationships rather than professional ones
+  - Athlete was not notified of the person's status
+  - The person's ban has expired
+  jurisdictions: All WADA Code signatories
+  version: 1
+- id: SP-011
+  name: Intimidating or retaliating against people who report doping or abuse
+  definition: Someone threatens people to stop them reporting doping or misconduct, or punishes those
+    who did report in good faith.
+  areas:
+  - SP
+  typology: Anti-doping rule violation (WADA Code Art. 2.11); SafeSport Code retaliation
+  status: verified
+  sources:
+  - title: World Anti-Doping Code 2021
+    publisher: WADA (hosted by USADA)
+    year: '2021'
+    url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+    locator: Article 2.11.1, p. 25
+    quote: Any act which threatens or seeks to intimidate another Person with the intent of discouraging
+      the Person
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 2026 SafeSport Code
+    publisher: U.S. Center for SafeSport
+    year: '2026'
+    url: https://uscenterforsafesport.org/2026-safesport-code/
+    locator: Section IV.A.4
+    quote: Misconduct Related to Aiding and Abetting, Abuse of Process, or Retaliation, when it relates
+      to the Center's process;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Whistleblower dropped from selection after speaking to investigators
+  - Threats to athletes who cooperate with an investigation
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Interviews with whistleblowers
+  - Selection and employment records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Selection or employment decisions made on performance grounds
+  - Ordinary disputes unrelated to the report
+  jurisdictions: WADA Code signatories; US Olympic and Paralympic movement (SafeSport)
+  version: 1
+- id: SP-012
+  name: Medical exemptions or medicines used to enhance performance
+  definition: Therapeutic Use Exemptions or permitted medicines are used to boost performance rather than
+    to treat a genuine medical need.
+  areas:
+  - SP
+  typology: Ethics and abuse of the TUE system
+  status: verified
+  sources:
+  - title: Combatting doping in sport
+    publisher: House of Commons DCMS Committee
+    year: '2018'
+    url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36606.htm
+    locator: Para 105
+    quote: the Therapeutic Use Exemption (TUE) system is open to abuse
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Therapeutic Use Exemptions
+    publisher: USADA
+    url: https://www.usada.org/athletes/tue/
+    locator: Step four, assessment
+    quote: no potential for enhanced performance beyond returing the athlete to a normal state of health
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - TUE applications clustered just before major races
+  - Team-wide use of a permitted medicine without diagnosis
+  cases:
+  - name: Team Sky and British Cycling medicines use
+    year: '2018'
+    jurisdiction: United Kingdom
+    what_happened: The DCMS Committee said it believed medicines were used within the team to enhance
+      the performance of riders and not just to treat medical need, and that this crossed the ethical
+      line David Brailsford had drawn. This is a committee conclusion, not an anti-doping rule violation
+      finding.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36606.htm
+    source_title: Combatting doping in sport, para 110
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Leaked or disclosed TUE records
+  - Parliamentary and official inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine chronic conditions (e.g. asthma, allergies) that need treatment
+  - TUEs are lawful and approved by independent committees
+  jurisdictions: WADA Code signatories; UK finding
+  version: 1
+- id: SP-013
+  name: Missing medical and medicines records in a team
+  definition: A team or federation cannot show proper records of what medicines were ordered, delivered
+    or given to athletes.
+  areas:
+  - SP
+  typology: Governance failure enabling doping
+  status: verified
+  sources:
+  - title: Combatting doping in sport
+    publisher: House of Commons DCMS Committee
+    year: '2018'
+    url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36606.htm
+    locator: Para 89
+    quote: The lack of these records is a serious failure both for Team Sky and British Cycling.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Package delivered to a team doctor with no documented contents (DCMS para 109)
+  cases:
+  - name: Package delivered to Team Sky doctor (2011)
+    year: '2018'
+    jurisdiction: United Kingdom
+    what_happened: The Committee said it was not in a position to state what was in the package delivered
+      to Team Sky and that there remained no documented evidence of its contents; it called the lack of
+      records a serious failure.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36606.htm
+    source_title: Combatting doping in sport, paras 89, 107, 109
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Freedom of information requests
+  - Inquiry evidence
+  - Regulator records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poor administration, lost laptops or IT failures
+  - Records held by a different body
+  jurisdictions: UK finding; general
+  version: 1
+- id: SP-014
+  name: Abnormal blood values not followed up
+  definition: A sport body holds test data showing highly abnormal athlete blood values but does not investigate
+    or sanction.
+  areas:
+  - SP
+  typology: Governance failure in results management
+  status: verified
+  sources:
+  - title: Combatting doping in sport
+    publisher: House of Commons DCMS Committee
+    year: '2018'
+    url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    locator: Para 14
+    quote: the athletics authorities have allowed athletes with highly abnormal blood scores to continue
+      to compete
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Only a third of 105 likely cheats identified under the ABP received bans between 2009 and 2012 (DCMS
+    para 14)
+  cases:
+  - name: Leaked IAAF blood test data
+    year: '2018'
+    jurisdiction: International (IAAF)
+    what_happened: The Committee recorded expert evidence that 21 athletes had values so extreme they
+      risked heart attacks or strokes, and that only one of 26 under-19 and under-23 athletes with extreme
+      scores was disciplined.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    source_title: Combatting doping in sport, paras 12-14
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - Leaked test databases
+  - Federation sanction records
+  - Official inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Abnormal values can have natural causes (altitude, illness)
+  - Passport cases need expert review and take time
+  - Legal caution before sanctioning
+  jurisdictions: International athletics (IAAF finding); general
+  version: 1
+- id: SP-015
+  name: Officials delay tests, suppress investigations or cut sanctions
+  definition: Sport or anti-doping officials collude to slow testing, block investigations or reduce punishments.
+  areas:
+  - SP
+  typology: Institutional corruption in anti-doping
+  status: verified
+  sources:
+  - title: Combatting doping in sport
+    publisher: House of Commons DCMS Committee
+    year: '2018'
+    url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    locator: Para 23 (WADA Independent Commission second report)
+    quote: evidence of collusion between senior IAAF officials and the Russian athletics and anti-doping
+      organisations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Plan to delay naming Russian athletes to avoid bad publicity (para 30)
+  cases:
+  - name: IAAF corruption under Lamine Diack
+    year: '2016'
+    jurisdiction: International (IAAF)
+    what_happened: The DCMS report records the Independent Commission's conclusion that Diack was responsible
+      for organising and enabling the conspiracy and corruption that took place in the IAAF and that corruption
+      was embedded in the organisation.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    source_title: Combatting doping in sport, para 29
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Directorship
+  - Employment
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Official inquiry reports
+  - Ethics board decisions
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Senior officials of a sport governing body were found to have colluded and taken part in corruption.
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+  innocent_explanations:
+  - Ordinary case backlogs
+  - Due-process requirements that lengthen cases
+  - Sanction reductions allowed under the Code for substantial assistance or no significant fault
+  jurisdictions: International athletics; general
+  version: 1
+- id: SP-016
+  name: Athletes asked to pay to have positive tests covered up
+  definition: Officials demand money from athletes in exchange for hiding or delaying doping cases.
+  areas:
+  - SP
+  typology: Extortion linked to anti-doping results
+  status: verified
+  sources:
+  - title: Combatting doping in sport
+    publisher: House of Commons DCMS Committee
+    year: '2018'
+    url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    locator: Para 45
+    quote: the collusion of athletics officials in extorting money from drugs cheats
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Request for 450,000 euros to cover up drugs offences (para 38)
+  cases:
+  - name: Payment demand to marathon runner Liliya Shobukhova
+    year: '2018'
+    jurisdiction: International (IAAF / Russia)
+    what_happened: The Committee reported that Shobukhova was asked to pay 450,000 euros to senior officials
+      to have her drugs offences covered up; she later provided information as a whistleblower.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    source_title: Combatting doping in sport, paras 14 and 38
+  data_needed:
+  - Person
+  - Payment
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Bank records disclosed in proceedings
+  - Official inquiry reports
+  - Criminal court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Extortion of payments by officials.
+    source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+  innocent_explanations:
+  - Legitimate payments to federations (fees, fines) that look similar in bank records
+  jurisdictions: International athletics
+  version: 1
+- id: SP-017
+  name: State control over a testing laboratory
+  definition: Government or security services oversee or direct a doping-control laboratory, compromising
+    independent testing.
+  areas:
+  - SP
+  typology: State-sponsored doping
+  status: verified
+  sources:
+  - title: Combatting doping in sport
+    publisher: House of Commons DCMS Committee
+    year: '2018'
+    url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    locator: Para 25
+    quote: state oversight and direct control of the Moscow Laboratory
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Security service involvement in sample handling at a host-nation laboratory
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Person
+  - Employment
+  - Event
+  checkable: records
+  lookup_sources:
+  - WADA compliance decisions
+  - Official inquiry reports
+  - CAS awards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Laboratories are often state-funded or attached to public bodies without interference
+  - Security presence at major events for ordinary reasons
+  jurisdictions: Russia finding; general
+  version: 1
+- id: SP-018
+  name: Testing data withheld from anti-doping agencies
+  definition: A sport body does not share test databases or results with the agencies responsible for
+    anti-doping.
+  areas:
+  - SP
+  typology: Governance failure
+  status: verified
+  sources:
+  - title: Combatting doping in sport
+    publisher: House of Commons DCMS Committee
+    year: '2018'
+    url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+    locator: Para 15
+    quote: The failure to share databases with anti-doping agencies is inexcusable and undermines a central
+      foundation of the system.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - National agency unaware of a federation's pre-2009 blood database
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources:
+  - Inquiry reports
+  - Data-sharing agreements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Data-protection rules restricting sharing
+  - Data held in incompatible systems
+  jurisdictions: International athletics; general
+  version: 1
+- id: SP-019
+  name: Doping fraud conspiracy around major international competitions
+  definition: Coaches, doctors, suppliers or others (not the athlete) take part in a scheme to influence
+    a major international competition with banned substances or methods.
+  areas:
+  - SP
+  typology: Criminal offence (US Rodchenkov Anti-Doping Act)
+  status: verified
+  sources:
+  - title: Rodchenkov Anti-Doping Act of 2019 (Public Law 116-206)
+    publisher: US Government Publishing Office
+    year: '2020'
+    url: https://www.govinfo.gov/content/pkg/PLAW-116publ206/html/PLAW-116publ206.htm
+    locator: Section 3 (21 U.S.C. 2402)
+    quote: It shall be unlawful for any person, other than an athlete, to knowingly carry into effect,
+      attempt to carry into effect,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Coach supplying testosterone to a professional track athlete before international events
+  cases:
+  - name: Paul Askew
+    year: '2026'
+    jurisdiction: United States (Middle District of Florida)
+    what_happened: USADA reported that Askew pleaded guilty to conspiracy to influence major international
+      sports competitions by doping a professional track and field athlete with testosterone and was sentenced
+      to six months in federal prison.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.usada.org/statement/usada-ceo-paul-askew-rada/
+    source_title: USADA statement on Paul Askew sentencing
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - PACER / federal court records
+  - US Attorney press releases
+  - USADA statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the statutory definition: a knowing scheme in commerce to influence a major international
+      sports competition by a prohibited substance or method'
+    threshold_source: https://www.govinfo.gov/content/pkg/PLAW-116publ206/html/PLAW-116publ206.htm
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful medical treatment of athletes
+  - Supplements sold legally without knowledge of misuse
+  jurisdictions: United States (competitions with US athletes and US commercial links)
+  version: 1
+- id: SP-020
+  name: Organised team doping programme and code of silence
+  definition: A team runs doping as a managed programme, pressuring athletes to take part and keeping
+    a culture of silence.
+  areas:
+  - SP
+  typology: Organised doping
+  status: verified
+  sources:
+  - title: Statement regarding the U.S. Postal Service Pro Cycling Team doping conspiracy
+    publisher: USADA
+    year: '2012'
+    url: https://www.usada.org/news/statement-from-usada-ceo-travis-t-tygart-regarding-the-u-s-postal-service-pro-cycling-team-doping-conspiracy/
+    locator: Statement, 10 October 2012
+    quote: the 'Code of Silence' of performance enhancing drug use in the sport of cycling has been shattered
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Team director, doctor and trainer charged together; riders give sworn testimony
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Employment
+  - Payment
+  - Document
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Anti-doping reasoned decisions
+  - Sworn testimony in proceedings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Close-knit teams naturally share medical staff and routines
+  - Silence can reflect confidentiality agreements rather than cover-up
+  jurisdictions: General (US finding)
+  version: 1
+- id: SP-021
+  name: Psychological or emotional abuse of athletes
+  definition: A pattern of repeated non-contact behaviour, such as verbal attacks, threats or deliberate
+    isolation, by someone with power over an athlete.
+  areas:
+  - SP
+  typology: Non-accidental violence in sport
+  status: verified
+  sources:
+  - title: 'IOC consensus statement: harassment and abuse (non-accidental violence) in sport'
+    publisher: IOC / British Journal of Sports Medicine
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Box 1, Definitions
+    quote: A pattern of deliberate, prolonged, repeated non-contact behaviours within a power differentiated
+      relationship
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 2026 SafeSport Code
+    publisher: U.S. Center for SafeSport
+    year: '2026'
+    url: https://uscenterforsafesport.org/2026-safesport-code/
+    locator: IX.D.1.a
+    quote: Repeatedly and excessively verbally assaulting or attacking someone personally
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Athletes describe repeated personal verbal attacks or being ignored and isolated for long periods
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Event
+  - Document
+  - Sanction
+  checkable: person
+  lookup_sources:
+  - SafeSport Centralized Disciplinary Database
+  - Governing-body sanction lists
+  - Athlete interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Demanding but respectful coaching
+  - One-off conflicts or criticism of performance
+  - Disputes over selection
+  jurisdictions: International (IOC); US Olympic and Paralympic movement (SafeSport)
+  version: 1
+- id: SP-022
+  name: Physical misconduct and neglect of athlete safety
+  definition: Hitting athletes, or denying them adequate water, food, medical attention, rest or sleep,
+    or forcing inappropriate physical activity.
+  areas:
+  - SP
+  typology: Non-accidental violence in sport
+  status: verified
+  sources:
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Box 1, Negligence
+    quote: depriving an athlete of food/or drink; insufficient rest and recovery
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 2026 SafeSport Code
+    publisher: U.S. Center for SafeSport
+    year: '2026'
+    url: https://uscenterforsafesport.org/2026-safesport-code/
+    locator: IX.D.2.b
+    quote: withholding, recommending against, or denying adequate hydration, nutrition, medical attention
+      or sleep
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Athletes made to train through injury
+  - Restricted access to medical staff
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Disciplinary databases
+  - Medical and injury records
+  - Athlete interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate weight-category sport nutrition plans under medical supervision
+  - Hard training that is planned and consented to
+  - Injury treatment decisions made by qualified medics
+  jurisdictions: International (IOC); US (SafeSport)
+  version: 1
+- id: SP-023
+  name: Doping forced or supplied as a form of abuse
+  definition: People with power over athletes impose systematic doping, or give them illegal drugs or
+    non-prescribed medicines.
+  areas:
+  - SP
+  typology: Non-accidental violence linked to doping
+  status: verified
+  sources:
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Box 1, Physical abuse
+    quote: forced alcohol consumption; or systematic doping practices
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 2026 SafeSport Code
+    publisher: U.S. Center for SafeSport
+    year: '2026'
+    url: https://uscenterforsafesport.org/2026-safesport-code/
+    locator: IX.D.2.b
+    quote: providing illegal drugs or non-prescribed medications to another
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - USADA described the USPS programme as designed to groom and pressure athletes to use dangerous drugs
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Document
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - Anti-doping decisions
+  - SafeSport decisions
+  - Official inquiries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Prescribed medication given by qualified medical staff
+  - Legal supplements
+  jurisdictions: International (IOC); US (SafeSport)
+  version: 1
+- id: SP-024
+  name: Hazing
+  definition: Organised, usually team-based initiation rituals that subject members to physical or mental
+    harm, humiliation or forced consumption of alcohol or drugs.
+  areas:
+  - SP
+  typology: Non-accidental violence in sport
+  status: verified
+  sources:
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Hazing and bullying section
+    quote: An organised, usually team-based, form of bullying in sport
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 2026 SafeSport Code
+    publisher: U.S. Center for SafeSport
+    year: '2026'
+    url: https://uscenterforsafesport.org/2026-safesport-code/
+    locator: IX.D.4.b
+    quote: Requiring or forcing the consumption of alcohol, illegal drugs or other substances
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Team initiation events reported to a university or governing body
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - University and federation disciplinary records
+  - Court records under state hazing laws
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded, or constitutes hazing under applicable federal
+      or state law
+    threshold_source: https://uscenterforsafesport.org/2026-safesport-code/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Voluntary, harmless team-bonding activities
+  jurisdictions: International (IOC); US (SafeSport and state law)
+  version: 1
+- id: SP-025
+  name: Bullying and harassment of athletes
+  definition: Repeated or severe aggressive conduct directed at an athlete, by peers or others, that is
+    meant or likely to intimidate or harm.
+  areas:
+  - SP
+  typology: Non-accidental violence in sport
+  status: verified
+  sources:
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Hazing and bullying section
+    quote: unwanted, repeated and intentional, aggressive behaviour usually among peers
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 2026 SafeSport Code
+    publisher: U.S. Center for SafeSport
+    year: '2026'
+    url: https://uscenterforsafesport.org/2026-safesport-code/
+    locator: IX.D.5
+    quote: 'Harassment is repeated or severe conduct directed at or about another person that is intended
+      or likely to:'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated homophobic or misogynist abuse in a team (IOC notes 80% of 9,500 respondents witnessed or
+    experienced homophobia in sport)
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Disciplinary databases
+  - Athlete interviews
+  - Social media records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary competitive banter
+  - Isolated conflicts between teammates
+  jurisdictions: International (IOC); US (SafeSport)
+  version: 1
+- id: SP-026
+  name: Coach-athlete intimate relationship across a power imbalance
+  definition: An adult in authority, such as a coach, starts or pursues an intimate relationship with
+    an athlete they hold power over.
+  areas:
+  - SP
+  typology: Power imbalance misconduct
+  status: verified
+  sources:
+  - title: 2026 SafeSport Code
+    publisher: U.S. Center for SafeSport
+    year: '2026'
+    url: https://uscenterforsafesport.org/2026-safesport-code/
+    locator: VIII.N
+    quote: A Power Imbalance is presumed to exist, but may be rebutted, in (a) any coach-Athlete relationship
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Risk factors
+    quote: Entourage members, in positions of power and authority, are often perpetrators of abuse
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Coach in a relationship with an athlete whose selection they control
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Associate
+  - Family
+  - Organization
+  checkable: person
+  lookup_sources:
+  - SafeSport disciplinary database
+  - Club and federation staff records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: Where the athlete is a minor, child-protection indicators in the CA area apply instead.
+    source_url: https://uscenterforsafesport.org/2026-safesport-code/
+  innocent_explanations:
+  - Relationship that pre-dates the coaching relationship (the SafeSport Code allows this presumption
+    to be rebutted)
+  - Spouses or long-term partners who coach each other openly
+  jurisdictions: US Olympic and Paralympic movement (SafeSport)
+  version: 1
+- id: SP-027
+  name: Organisational culture of secrecy, denial or tolerance of abuse
+  definition: A sport organisation ignores, denies or quietly accepts abuse, and people in power stay
+    silent to protect reputation or success.
+  areas:
+  - SP
+  typology: Organisational risk factor
+  status: verified
+  sources:
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Risk factors
+    quote: an organisational culture that ignores, denies, fails to prevent or even tacitly accepts such
+      problems
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Risk factors
+    quote: cultures of secrecy and deference that too often facilitate abuse
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Complaints repeatedly closed without action
+  - Celebrated coaches treated as untouchable (athlete idolisation)
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Directorship
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Independent reviews of governing bodies
+  - Former staff and athlete interviews
+  - Board minutes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Confidentiality is legally required during investigations
+  - Lack of complaints can reflect genuine absence of problems
+  jurisdictions: International (IOC)
+  version: 1
+- id: SP-028
+  name: No safeguarding policy, welfare officer or complaints system
+  definition: A sport body lacks written safe-sport policies, designated welfare staff, or a working way
+    for athletes and whistleblowers to raise concerns.
+  areas:
+  - SP
+  typology: Organisational risk factor
+  status: verified
+  sources:
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Risk factors
+    quote: Detail a response system for handling athlete/whistleblower concerns and complaints, with reporting
+      and referral mechanisms
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Recommendations for sport organisations
+    quote: Detail a response system for handling athlete/whistleblower concerns and complaints, with reporting
+      and referral mechanisms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - No named safeguarding lead on a federation website
+  - No published complaints procedure
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Governing body websites and annual reports
+  - Funding-body governance codes and audits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small clubs may rely on a parent body's policy
+  - Policies may exist but not be published online
+  jurisdictions: International (IOC)
+  version: 1
+- id: SP-029
+  name: Failure to report or slow reporting to authorities
+  definition: Adults or institutions told of suspected abuse do not report it to the proper authorities
+    promptly or do not document it.
+  areas:
+  - SP
+  typology: Reporting failure
+  status: verified
+  sources:
+  - title: 2026 SafeSport Code
+    publisher: U.S. Center for SafeSport
+    year: '2026'
+    url: https://uscenterforsafesport.org/2026-safesport-code/
+    locator: IX.G.1.a
+    quote: Failure to comply with any provision of Section X.A-E. by an Adult Participant is a violation
+      of the Code.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Investigation and Review of the FBI's Handling of Allegations of Sexual Abuse by Former USA
+      Gymnastics Physician Lawrence Gerard Nassar
+    publisher: US Department of Justice Office of the Inspector General
+    year: '2021'
+    url: https://oig.justice.gov/sites/default/files/reports/21-093.pdf
+    locator: Executive Summary
+    quote: the Indianapolis office did not notify state or local authorities of the sexual assault allegations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Governing body conducts an internal investigation before going to police
+  - Agency receives report but takes no investigative action for months
+  cases:
+  - name: FBI handling of allegations against Lawrence Gerard Nassar
+    year: '2021'
+    jurisdiction: United States
+    what_happened: The DOJ Inspector General found that FBI officials failed to respond to the Nassar
+      allegations with the utmost seriousness and urgency, did not properly document the July 2015 meeting
+      with USA Gymnastics, and did not notify state or local authorities.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://oig.justice.gov/sites/default/files/reports/21-093.pdf
+    source_title: DOJ OIG Report 21-093
+  data_needed:
+  - Organization
+  - PublicBody
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Official inquiry reports
+  - Inspector general reports
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: Many of those harmed in the Nassar case were young athletes; child sexual abuse indicators
+      in CA apply.
+    source_url: https://oig.justice.gov/sites/default/files/reports/21-093.pdf
+  innocent_explanations:
+  - Report made through a different, valid channel
+  - Initial information too vague to report
+  - Reporting rules differ by jurisdiction
+  jurisdictions: US (SafeSport mandatory reporting); general
+  version: 1
+- id: SP-030
+  name: Accused person stays in post with access to athletes after a report
+  definition: After allegations reach an organisation or authority, the accused keeps working with athletes
+    in the same or other institutions.
+  areas:
+  - SP
+  typology: Institutional failure
+  status: verified
+  sources:
+  - title: DOJ OIG Report 21-093 (Nassar)
+    publisher: US Department of Justice Office of the Inspector General
+    year: '2021'
+    url: https://oig.justice.gov/sites/default/files/reports/21-093.pdf
+    locator: Executive Summary, p. i
+    quote: Nassar continued to maintain his positions at MSU, Twistars USA Gymnastics Club, and Holt High
+      School.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Practitioner continues treating patients at other institutions while one body investigates
+  cases:
+  - name: Lawrence Gerard Nassar
+    year: '2018'
+    jurisdiction: United States (federal and Michigan state courts)
+    what_happened: Per the OIG report, Nassar continued to treat patients until August 2016 after USA
+      Gymnastics reported to the FBI in July 2015; he pleaded guilty to federal child pornography offences
+      (sentenced to 60 years, December 2017) and to criminal sexual conduct in Michigan state court (sentenced
+      January and February 2018).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://oig.justice.gov/sites/default/files/reports/21-093.pdf
+    source_title: DOJ OIG Report 21-093
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Employment and licensing records
+  - Inquiry reports
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: Case involves child sexual abuse; use CA indicators for the child-protection side.
+    source_url: https://oig.justice.gov/sites/default/files/reports/21-093.pdf
+  innocent_explanations:
+  - Presumption of innocence and due-process limits on suspension
+  - Allegations later unfounded
+  - Other employers not legally permitted to be told
+  jurisdictions: US finding; general
+  version: 1
+- id: SP-031
+  name: Others enabling misconduct (aiding and abetting)
+  definition: Adults knowingly help, encourage or cover for someone else's prohibited conduct toward athletes.
+  areas:
+  - SP
+  typology: Complicity in abuse
+  status: verified
+  sources:
+  - title: SafeSport Code Glossary
+    publisher: U.S. Center for SafeSport
+    url: https://uscenterforsafesport.org/code-glossary/
+    locator: Glossary, Aiding and Abetting
+    quote: Aiding and Abetting occurs when an Adult Participant knowingly helps (or encourages) a Participant
+      engage in Prohibited
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Risk factors (bystanders)
+    quote: passive attitudes/non-intervention, denial or silence by people in positions of power in sport
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Staff who arrange access to athletes for a suspended coach
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Employment
+  - Organization
+  checkable: person
+  lookup_sources:
+  - SafeSport disciplinary database
+  - Inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Colleagues unaware of the misconduct or of a sanction
+  jurisdictions: US (SafeSport); international (IOC)
+  version: 1
+- id: SP-032
+  name: Athletes in higher-risk groups without added protection
+  definition: Elite, disabled and LGBT athletes face higher published risks of abuse, so a lack of specific
+    protections for them is a warning sign.
+  areas:
+  - SP
+  typology: Risk context
+  status: verified
+  sources:
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Athletes at higher risk
+    quote: science has confirmed that the risks are highest among elite, disabled, child and LGBT athletes
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'IOC consensus statement: harassment and abuse in sport'
+    publisher: IOC / BJSM
+    year: '2016'
+    url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+    locator: Risk factors
+    quote: the risk of experiencing psychological, physical and sexual violence rises as the athlete progresses
+      up the talent ladder
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Para-sport programme with no accessible reporting route
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Governing-body safeguarding documents
+  - Funding-body audits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - This is a risk context, not evidence of abuse; most programmes for these groups are safe
+  jurisdictions: International (IOC)
+  version: 1
+not_reached:
+- 'WADA website (wada-ama.org): blocked by robots.txt, so WADA Q&A and the McLaren report were not opened
+  directly; McLaren findings are taken from the UK DCMS Committee report'
+- 'World Anti-Doping Code 2021 Appendix 1 (Definitions): the fetched PDF text stopped at about 120,000
+  characters, before the definitions; glossary entries for Code terms are paraphrased from Article 2 wording'
+- 'Court of Arbitration for Sport awards and media releases (WADA v RUSADA CAS 2020/O/6689, Valieva, Salazar):
+  returned 404 or a search shell'
+- 'Whyte Review (whytereview.org report): blocked by robots.txt; Sport England and UK Sport pages returned
+  errors or 404'
+- 'Australian Human Rights Commission ''Change the Routine'' review of Gymnastics Australia (2021): fetch
+  errors'
+- 'US Soccer / Yates report on abuse in the NWSL: 404'
+- 'olympics.com IOC decision on the Russian NOC and Schmid Commission: blocked by robots.txt'
+- 'USADA Salazar/Brown sanction page and DOJ SDNY Eric Lira press release: fetch errors'
+- 'congress.gov RADA page: blocked; used govinfo.gov public law instead'
+- 'UKAD decision on Dr Richard Freeman: fetch error'
+- 'Europol Operation Viribus press release: fetch error'
+- 'Athletics Integrity Unit ABP page: fetch error'
+- 'SafeSport Code Section X (reporting duties) and the full Abuse of Process and Retaliation text: truncated
+  in the fetch'
+- WebSearch budget for this turn was used up after one query, so no wider source discovery was possible;
+  a follow-up run could look for the Ropes & Gray USA Gymnastics report, the US Senate 'Courage of Survivors'
+  report, and the IOC 2024 consensus statement on interpersonal violence

@@ -3970,6 +3970,1754 @@ indicators:
   - Business or family travel arranged entirely by someone else.
   jurisdictions: United States guidance; HOTT research (EU)
   version: 1
+- id: HT-068
+  name: Workers supplied through a state labour-transfer or 'poverty alleviation' programme
+  definition: A supplier's workforce comes, wholly or partly, from a government scheme that moves ethnic-minority
+    workers (for example Uyghurs from Xinjiang) into farms and factories in Xinjiang or other Chinese
+    provinces.
+  areas:
+  - HT
+  typology: State-imposed forced labour
+  status: verified
+  sources:
+  - title: Strategy to Prevent the Importation of Goods Mined, Produced, or Manufactured with Forced Labor
+      in the People's Republic of China (UFLPA Strategy)
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 20
+    quote: were assigned out of Xinjiang to work in factories in eastern Chinese provinces
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 20 (poverty alleviation programmes)
+    quote: compel them to work involuntarily under threat of penalty
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: UFLPA Entity List
+    publisher: US Department of Homeland Security
+    year: '2024'
+    url: https://www.dhs.gov/uflpa-entity-list
+    locator: Category (ii)
+    quote: A list of entities working with the government of Xinjiang to recruit, transport, transfer...
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A garment factory in an eastern province reports a batch of workers recruited 'from Xinjiang under
+    the government programme'.
+  - Company or local-government publicity celebrates the number of minority workers 'transferred' to a
+    factory.
+  cases:
+  - name: Camel Group Co., Ltd. added to UFLPA Entity List
+    year: '2023'
+    jurisdiction: United States (FLETF)
+    what_happened: Listed on August 2, 2023 under category (ii), entities working with the Xinjiang government
+      to recruit, transport or transfer workers.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.dhs.gov/uflpa-entity-list
+    source_title: UFLPA Entity List
+  - name: Xinjiang Tianshan Wool Textile Co. Ltd. added to UFLPA Entity List
+    year: '2023'
+    jurisdiction: United States (FLETF)
+    what_happened: Listed on September 27, 2023 under category (ii).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.dhs.gov/uflpa-entity-list
+    source_title: UFLPA Entity List
+  data_needed:
+  - Company
+  - Employment
+  - Organization
+  - PublicBody
+  - Address
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - UFLPA Entity List (DHS)
+  - Company websites, annual reports and Chinese state media announcements
+  - Customs and shipping records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded; an entity that recruits, transports or transfers
+      workers with the Xinjiang government qualifies for Entity List category (ii)
+    threshold_source: https://www.dhs.gov/uflpa-entity-list
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Voluntary internal labour migration is very common in China and may be reported with similar language.
+  - Company may employ minority workers hired directly on ordinary terms, not via a state scheme.
+  - Publicity may describe a scheme the company later left.
+  jurisdictions: China (Xinjiang and other provinces); enforced at import by the US under the UFLPA
+  version: 1
+- id: HT-069
+  name: Satellite factory or government subsidy tied to employing minority or detained workers
+  definition: A company set up a factory in Xinjiang under the 'mutual pairing assistance' programme or
+    receives state payments for each minority worker or detainee it trains and employs.
+  areas:
+  - HT
+  typology: State-imposed forced labour
+  status: verified
+  sources:
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 19 (mutual pairing assistance)
+    quote: facilitates PRC companies establishing satellite factories in Xinjiang
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 19
+    quote: providing companies subsidies for each detainee they train and employ
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Annual report lists government grants for 'employment of surplus rural labour from Xinjiang'.
+  - An eastern-China company opens a Xinjiang branch factory announced as part of a provincial pairing
+    programme.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - PublicBody
+  - Ownership
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - Company annual reports and subsidy disclosures (listed Chinese companies)
+  - Provincial pairing-programme announcements
+  - Corporate registries for branch factories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Regional-development subsidies are widespread and not all are linked to labour transfer.
+  - Branch factories in western China can exist for cost or market reasons.
+  jurisdictions: China; UFLPA (US)
+  version: 1
+- id: HT-070
+  name: Factory at or linked to a detention or 'vocational training' centre
+  definition: Production takes place inside, next to, or with labour drawn from an internment or 'vocational
+    education and training' facility.
+  areas:
+  - HR
+  - HT
+  typology: State-imposed forced labour
+  status: verified
+  sources:
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 19
+    quote: Factories are directly involved in the use of internment camp labor
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: OHCHR Assessment of human rights concerns in the Xinjiang Uyghur Autonomous Region
+    publisher: Office of the UN High Commissioner for Human Rights
+    year: '2022'
+    url: https://www.ohchr.org/sites/default/files/documents/countries/2022-08-31/22-08-31-final-assesment.pdf
+    locator: para. 57
+    quote: a pattern of large-scale arbitrary detention occurred in VETC facilities, at least during 2017
+      to 2019.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: OHCHR Assessment (Xinjiang)
+    publisher: Office of the UN High Commissioner for Human Rights
+    year: '2022'
+    url: https://www.ohchr.org/sites/default/files/documents/countries/2022-08-31/22-08-31-final-assesment.pdf
+    locator: para. 50 (citing ILO Committee of Experts)
+    quote: at least in part carried out in high-security and high surveillance settings
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Satellite imagery or site addresses show a factory inside a walled compound identified as a training
+    centre.
+  - A supplier's address matches a listed 'vocational skills education training center'.
+  cases:
+  - name: No. 4 Vocation Skills Education Training Center added to UFLPA Entity List
+    year: '2022'
+    jurisdiction: United States (FLETF)
+    what_happened: Listed on June 21, 2022 under category (ii).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.dhs.gov/uflpa-entity-list
+    source_title: UFLPA Entity List
+  - name: OHCHR assessment of VETC facilities
+    year: '2022'
+    jurisdiction: United Nations (OHCHR)
+    what_happened: UN human rights office concluded a pattern of large-scale arbitrary detention occurred
+      in VETC facilities, at least during 2017 to 2019.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ohchr.org/sites/default/files/documents/countries/2022-08-31/22-08-31-final-assesment.pdf
+    source_title: OHCHR Assessment of human rights concerns in the XUAR
+  data_needed:
+  - Company
+  - Address
+  - Organization
+  - PublicBody
+  - Employment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - UFLPA Entity List
+  - Satellite imagery and public geolocation research
+  - Supplier addresses in shipping records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Industrial parks may sit near security facilities without sharing labour.
+  - Address data may be imprecise or out of date.
+  jurisdictions: China (Xinjiang)
+  version: 1
+- id: HT-071
+  name: Transferred workers housed apart, moved in dedicated transport and watched by minders
+  definition: Workers from a state programme live in segregated dormitories, travel in dedicated trains
+    or buses, and are monitored by government minders or employers reporting to the government.
+  areas:
+  - HT
+  typology: State-imposed forced labour
+  status: verified
+  sources:
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 22
+    quote: Workers live in segregated dormitories and are transported in dedicated trains.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 21
+    quote: government minders, or by employers reporting to the government
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 22
+    quote: Workers are subject to political, cultural, and ideological indoctrination
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Factory photos show separate dormitory blocks and flag-raising or 'study' sessions for one group of
+    workers.
+  - Local media report a chartered train carrying workers from Xinjiang to a factory.
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Company and state-media publicity
+  - Worker testimony
+  - Audit reports where available
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Employer-provided dormitories and group transport are normal for migrant workers in China.
+  - Separate housing may reflect dietary or language arrangements.
+  jurisdictions: China
+  version: 1
+- id: HT-072
+  name: Independent auditors cannot access the supplier or region
+  definition: The supplier, or the region it operates in, restricts independent social audits, so labour
+    conditions cannot be verified.
+  areas:
+  - HT
+  typology: State-imposed forced labour
+  status: verified
+  sources:
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 12
+    quote: restrictions on independent auditors in the region
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An audit firm declines to work in Xinjiang; a brand relies only on supplier self-declarations.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Brand due-diligence and modern-slavery statements
+  - Audit-firm public statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Audit access can be refused for commercial confidentiality or pandemic-era travel limits.
+  jurisdictions: China (Xinjiang) and any region with audit restrictions
+  version: 1
+- id: HT-073
+  name: Inputs processed in another province or a third country before export
+  definition: Raw materials or semi-finished goods from a high-risk region are shipped elsewhere in China
+    or to a third country for processing, which can blend them with other inputs and hide their origin.
+  areas:
+  - HT
+  typology: State-imposed forced labour; supply-chain laundering
+  status: verified
+  sources:
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 13
+    quote: may be shipped to another region or province in the PRC or to a third country for processing
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 13
+    quote: could be commingled with inputs from other regions
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 14
+    quote: rely on prohibited Xinjiang raw materials or semi-finished goods
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A third-country spinning mill imports Chinese cotton yarn and exports finished garments declared as
+    that country's origin.
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Document
+  - Address
+  - Vessel
+  checkable: lookups
+  lookup_sources:
+  - Import/export bills of lading and customs data
+  - Isotope or fibre-origin testing results where published
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Multi-country processing is normal in textiles, solar and food supply chains.
+  - Inputs may come from other regions with no forced-labour link.
+  jurisdictions: Global supply chains; UFLPA (US)
+  version: 1
+- id: HT-074
+  name: Transshipment or false country of origin hiding a high-risk region
+  definition: Goods are routed through another country or given a different declared origin so that a
+    Xinjiang origin is concealed at import.
+  areas:
+  - HT
+  typology: State-imposed forced labour; customs fraud
+  status: verified
+  sources:
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 13
+    quote: companies attempt to use illegal transshipment to conceal the origin of goods or inputs from
+      Xinjiang
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Shipping records show goods leaving China, briefly landing in a third country, then re-exported with
+    that country's origin.
+  cases: []
+  data_needed:
+  - Company
+  - Vessel
+  - Document
+  - Address
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Bill-of-lading and trade data
+  - CBP UFLPA detention statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate transshipment through hubs is routine logistics.
+  - Substantial transformation in a third country legally changes origin.
+  jurisdictions: United States import controls; global
+  version: 1
+- id: HT-075
+  name: Supplier or input in a sector the UFLPA Strategy flags as high priority
+  definition: The product or one of its inputs is apparel, cotton, tomatoes, or silica-based products
+    such as polysilicon, sectors the US Strategy names as high-risk for Xinjiang forced labour.
+  areas:
+  - HT
+  typology: State-imposed forced labour
+  status: verified
+  sources:
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 28 (silica/polysilicon)
+    quote: Companies operating in Xinjiang are offered government subsidies to use the labor of ethnic
+      minority groups
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: UFLPA Strategy
+    publisher: US DHS Forced Labor Enforcement Task Force
+    year: '2022'
+    url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+    locator: p. 28 (tomato products)
+    quote: have frequently engaged in coercive recruitment
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A solar-panel importer sources polysilicon from a Chinese producer with Xinjiang plants.
+  - A brand's cotton comes from an unspecified Chinese origin.
+  cases:
+  - name: Changji Esquel Textile Co. Ltd. added to UFLPA Entity List
+    year: '2022'
+    jurisdiction: United States (FLETF)
+    what_happened: Listed on June 21, 2022 under category (i), entities in Xinjiang that mine, produce
+      or manufacture goods wholly or in part with forced labour.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.dhs.gov/uflpa-entity-list
+    source_title: UFLPA Entity List
+  - name: Xinjiang Junggar Cotton and Linen Co., Ltd. added to UFLPA Entity List
+    year: '2022'
+    jurisdiction: United States (FLETF)
+    what_happened: Listed on June 21, 2022 under category (i).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.dhs.gov/uflpa-entity-list
+    source_title: UFLPA Entity List
+  data_needed:
+  - Company
+  - Contract
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Customs and trade data
+  - Supplier disclosures
+  - UFLPA Strategy sector list (later updates add sectors; 2024 update not read)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most goods in these sectors come from regions without state labour transfer.
+  - Sector risk alone says nothing about a specific supplier.
+  jurisdictions: Global; UFLPA (US)
+  version: 1
+- id: HT-076
+  name: Prison labour, conscript labour or state mobilisation in production
+  definition: Goods or services are produced by prisoners working for private profit, by conscripts doing
+    non-military work, or by people the state mobilises for 'economic development' or as political punishment
+    or discrimination.
+  areas:
+  - HR
+  - HT
+  typology: State-imposed forced labour
+  status: verified
+  sources:
+  - title: 'Global Estimates of Modern Slavery: Forced Labour and Forced Marriage (2022)'
+    publisher: ILO, Walk Free, IOM
+    year: '2022'
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@ipec/documents/publication/wcms_854733.pdf
+    locator: Panel 1, p. 14
+    quote: State-imposed forced labour refers to forced labour imposed by State authorities
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Estimates of Modern Slavery (2022)
+    publisher: ILO, Walk Free, IOM
+    year: '2022'
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@ipec/documents/publication/wcms_854733.pdf
+    locator: Executive summary, p. 4
+    quote: Over half (55 per cent) of all cases involve some form of abuse of compulsory prison labour.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Estimates of Modern Slavery (2022)
+    publisher: ILO, Walk Free, IOM
+    year: '2022'
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@ipec/documents/publication/wcms_854733.pdf
+    locator: Panel 1, p. 14
+    quote: as a method of mobilizing labour for the purpose of economic development
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A supplier's address is a prison enterprise; public-sector staff ordered to harvest crops.
+  cases: []
+  data_needed:
+  - Company
+  - PublicBody
+  - Employment
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Prison-enterprise registries where public
+  - ILO supervisory body (CEACR) observations
+  - US DOL List of Goods Produced by Child Labor or Forced Labor
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded; ILO counts 3.9 million people in state-imposed
+      forced labour (2021)
+    threshold_source: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@ipec/documents/publication/wcms_854733.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Voluntary, paid and supervised prison work is lawful in many countries.
+  - Genuine compulsory military service for purely military work is excluded by the ILO definition.
+  - Normal civic obligations and emergency work are not forced labour.
+  jurisdictions: Global
+  version: 1
+- id: HT-077
+  name: North Korean nationals earning income abroad
+  definition: A business employs or contracts North Korean nationals working abroad, which UN sanctions
+    require countries to end because the earnings fund the regime.
+  areas:
+  - HT
+  typology: State-imposed labour; sanctions evasion
+  status: pending
+  sources:
+  - title: Security Council resolution 2397 (2017) press release SC/13141
+    publisher: United Nations Security Council
+    year: '2017'
+    url: https://press.un.org/en/2017/sc13141.doc.htm
+    locator: para. 8
+    quote: shall repatriate to the DPRK all DPRK nationals earning income in that Member State's jurisdiction
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Security Council resolution 2397 (2017) press release SC/13141
+    publisher: United Nations Security Council
+    year: '2017'
+    url: https://press.un.org/en/2017/sc13141.doc.htm
+    locator: para. 8
+    quote: immediately but no later than 24 months from the date of adoption of this resolution
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A seafood plant, construction firm or IT contractor abroad is reported to use North Korean workers
+    after the repatriation deadline.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Employment
+  - Sanction
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - UN 1718 Committee Panel of Experts reports
+  - OFAC SDN list
+  - Company and visa records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Any DPRK national earning income in a UN member state after December 2019 (24 months from
+      adoption in December 2017)
+    threshold_source: https://press.un.org/en/2017/sc13141.doc.htm
+  threshold_verified: false
+  cross_hints: []
+  innocent_explanations:
+  - Workers may be South Korean or ethnic Koreans of other nationality.
+  - Refugees or defectors from North Korea are not state-dispatched workers.
+  jurisdictions: All UN member states
+  version: 1
+- id: HT-078
+  name: Remote IT contractor whose identity details do not add up
+  definition: A freelance or remote developer shows inconsistent name spelling, nationality, location
+    or contact details, biographical information that does not match, or a thin portfolio, which US authorities
+    list as signs of a North Korean IT worker.
+  areas:
+  - CY
+  - HT
+  typology: State-dispatched workers; sanctions evasion
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags for companies employing freelance developers
+    quote: Inconsistencies in name spelling, nationality, claimed work location, contact information,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on the DPRK IT Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags
+    quote: Biographical information which does not appear to match the applicant;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on the DPRK IT Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags
+    quote: Surprisingly simple portfolio websites, social media profiles, or developer profiles;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A hire's CV says US-based but the phone number and working hours point elsewhere; the person cannot
+    work required business hours.
+  cases:
+  - name: US Department of Justice coordinated actions against North Korean remote IT worker schemes (Zhenxing
+      Wang et al.; Kim Kwang Jin et al.)
+    year: '2025'
+    jurisdiction: United States (D. Mass.; N.D. Ga.)
+    what_happened: DOJ announced charges alleging North Koreans used stolen or fake identities to get
+      remote IT jobs at more than 100 US companies, with US-based laptop farms, front companies and financial
+      accounts; searches of 29 suspected laptop farms in 16 states. Charges are allegations; the release
+      notes one guilty plea in Massachusetts.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+    source_title: Justice Department Announces Coordinated, Nationwide Actions to Combat North Korean
+      Remote Information Technology Workers
+  data_needed:
+  - Person
+  - Employment
+  - Company
+  - Document
+  - Address
+  checkable: records
+  lookup_sources:
+  - Employment and contractor onboarding records
+  - Freelance platform profiles
+  - OFAC SDN list
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transliteration varies name spelling.
+  - Genuine freelancers move, change numbers and keep simple portfolios.
+  - Time-zone differences explain unusual hours.
+  jurisdictions: United States and global
+  version: 1
+- id: HT-079
+  name: 'Platform login patterns: many accounts on one IP, one account from many IPs, remote-desktop set-ups'
+  definition: Freelance or payment platform data show several developer accounts on one IP address, one
+    account logged in from many IPs in a short time, continuous multi-day sessions, or remote-desktop
+    configurations.
+  areas:
+  - CY
+  - HT
+  typology: State-dispatched workers; sanctions evasion
+  status: verified
+  sources:
+  - title: Guidance on the DPRK IT Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags for freelance work and payment platforms
+    quote: Developers are logging into multiple accounts on the same platform from one IP address;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on the DPRK IT Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags
+    quote: Developers are logged into their accounts continuously for one or more days at a time;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on the DPRK IT Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags
+    quote: Developer accounts use a fraudulent client account to increase developer account ratings,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A leaked platform dataset shows five 'developers' sharing one IP and rating each other highly.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Platform logs (via leaks, court filings or platform disclosures)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Signals are technical platform data.
+    source_url: https://ofac.treasury.gov/media/923126/download?inline
+  innocent_explanations:
+  - Shared office networks, VPNs and co-working spaces put many users on one IP.
+  - Remote-desktop tools are standard for IT work.
+  jurisdictions: Global
+  version: 1
+- id: HT-080
+  name: Work laptop shipped to a third party's address or 'laptop farm'
+  definition: Company equipment for a remote hire is sent to an address not the worker's own, where a
+    facilitator hosts many laptops for workers abroad to use remotely.
+  areas:
+  - CY
+  - HT
+  typology: State-dispatched workers; sanctions evasion
+  status: verified
+  sources:
+  - title: Justice Department Announces Coordinated, Nationwide Actions to Combat North Korean Remote
+      IT Workers
+    publisher: US Department of Justice
+    year: '2025'
+    url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+    locator: Press release, June 30, 2025
+    quote: designed to evade sanctions and fund the North Korean regime's illicit programs, including
+      its weapons programs
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on the DPRK IT Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags
+    quote: An employer proposes to send documents or work-related equipment such as a laptop to a developer,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several employers ship laptops to the same residential address for workers with different names.
+  cases:
+  - name: DOJ June 2025 laptop-farm searches
+    year: '2025'
+    jurisdiction: United States
+    what_happened: Authorities searched 29 known or suspected laptop farms across 16 states and seized
+      29 financial accounts and 21 fraudulent websites (charges are allegations).
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+    source_title: DOJ press release
+  data_needed:
+  - Person
+  - Address
+  - Employment
+  - Company
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Court filings in DOJ laptop-farm cases
+  - Shipping records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Workers may use a relative's or forwarding address while moving.
+  - Managed IT providers sometimes receive equipment on staff's behalf.
+  jurisdictions: United States; global
+  version: 1
+- id: HT-081
+  name: Contractor pay routed to PRC-linked payment services or virtual currency
+  definition: A remote contractor asks to be paid in virtual currency or through PRC-linked digital payment
+    services, or platform balances are frequently moved to PRC-based bank accounts.
+  areas:
+  - HT
+  - ML
+  typology: State-dispatched workers; sanctions evasion
+  status: verified
+  sources:
+  - title: Guidance on the DPRK IT Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags
+    quote: Frequent transfers of money through payment platforms, especially to PRC-based bank accounts,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on the DPRK IT Workers
+    publisher: US Department of State, Department of the Treasury and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red flags
+    quote: Seeking payment in virtual currency in an effort to evade KYC/AML measures and use of the formal
+      financial system;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Invoices from a 'US' developer request payment to a wallet address or a Chinese payment app.
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Accounts payable records
+  - Blockchain explorers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Virtual-currency payment to evade KYC/AML is a money-laundering signal.
+    source_url: https://ofac.treasury.gov/media/923126/download?inline
+  innocent_explanations:
+  - Many freelancers are paid in crypto or via international payment apps for lower fees.
+  - Chinese-resident contractors legitimately use PRC accounts.
+  jurisdictions: Global
+  version: 1
+- id: HT-082
+  name: Many migrants transacting from the same IP address or device
+  definition: Several foreign nationals or migrants carry out payments or transfers from one shared IP
+    address or machine ID, suggesting a smuggler or controller operates their accounts.
+  areas:
+  - HT
+  - ML
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: Money laundering indicators
+    quote: Foreign/Migrants using the same IP or machine ID to perform transactions.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bank data show a dozen newly opened migrant accounts all logged in from one device.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document
+  - Address
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Bank or payment-app data (leaks, court records, SAR summaries)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF lists it as a money-laundering indicator.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+  innocent_explanations:
+  - Reception centres, hostels and internet cafés share Wi-Fi.
+  - NGOs or relatives help newcomers use banking apps on one phone.
+  jurisdictions: FATF members
+  version: 1
+- id: HT-083
+  name: Hawala payments held in guarantee until the migrant arrives
+  definition: Smuggling fees are paid in advance to a hawala office or third party that holds them and
+    releases them to smugglers stage by stage or only once the journey succeeds.
+  areas:
+  - HT
+  - ML
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    locator: Part Two, p. 23
+    quote: The disbursement to the smugglers only takes place once the smuggling has been successfully
+      concluded.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: Money laundering indicators
+    quote: Use of Hawala/Hundi transaction system.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Messages show a family depositing money with a hawaladar, released to a smuggler only after the migrant
+    phones from the destination.
+  cases:
+  - name: Greek hawala ring (FATF case study 11)
+    year: '2022'
+    jurisdiction: Greece
+    what_happened: FATF reports a hawala ring run by three siblings that used Telegram to promote smuggling;
+      assets were frozen and later confiscated pending trial.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    source_title: FATF, ML/TF Risks Arising from Migrant Smuggling, pp. 33-34
+  data_needed:
+  - Payment
+  - Person
+  - Organization
+  - Associate
+  - Document
+  checkable: records
+  lookup_sources:
+  - Court and police case files
+  - Registers of licensed money transmitters
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Informal value transfer is a core money-laundering channel.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+  innocent_explanations:
+  - Hawala is a widely used, often lawful remittance channel for diaspora communities.
+  - Families send money to relatives in transit for food and shelter.
+  jurisdictions: Global
+  version: 1
+- id: HT-084
+  name: Unusual payments for accommodation along smuggling routes
+  definition: Accounts make abnormal payments to hotels, apartments or other lodging located on or near
+    migrant smuggling routes.
+  areas:
+  - HT
+  - ML
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: 'Indicators (continues: migrant smuggling routes)'
+    quote: Abnormal payments to hotels, apartments and other accommodation services that are located on
+      or close to
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - One card pays for many rooms in border towns over several weeks.
+  cases: []
+  data_needed:
+  - Payment
+  - Address
+  - Person
+  - Company
+  checkable: records
+  lookup_sources:
+  - Financial records
+  - Hotel registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Aid workers, journalists, tour operators and families travel along the same routes.
+  jurisdictions: FATF members
+  version: 1
+- id: HT-085
+  name: Funds received and immediately withdrawn or passed through money mules
+  definition: Incoming remittances are liquidated at once, or moved through third parties, relatives or
+    cash couriers acting as mules.
+  areas:
+  - HT
+  - ML
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: Money laundering indicators
+    quote: Immediate liquidation of money.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: Money laundering indicators
+    quote: Transfer remittance through third parties 'money mules'.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    locator: p. 25
+    quote: Straw men and third parties, mainly relatives, are also recruited
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A person with no job receives dozens of transfers and withdraws each in cash the same day.
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Associate
+  - Family
+  checkable: records
+  lookup_sources:
+  - Financial records
+  - Court files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Money mules are a general laundering typology.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+  innocent_explanations:
+  - Unbanked people often withdraw remittances immediately for living costs.
+  - Relatives commonly collect money on behalf of family.
+  jurisdictions: FATF members
+  version: 1
+- id: HT-086
+  name: Smuggling proceeds invested in travel agencies, car dealers, phone shops or property
+  definition: Smuggling money is placed into businesses such as travel agencies, car dealerships, restaurants,
+    telephony shops or real estate, sometimes with prices far above market value.
+  areas:
+  - HT
+  - ML
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    locator: p. 21
+    quote: legal businesses in both the countries of origin and the country of destination
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: Indicators
+    quote: Use of front cash intensive legitimate businesses.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A car dealer sells vehicles at two to three times market value (FATF Germany case 6).
+  - A travel agency also acts as an unlicensed remittance channel (FATF Brazil case 2).
+  cases:
+  - name: Hong Kong migrant smuggling organiser (FATF case study 8)
+    year: '2020'
+    jurisdiction: Hong Kong, China
+    what_happened: FATF reports the organiser was sentenced to three years in April 2020 and about HKD
+      223,010 was confiscated in January 2021.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    source_title: FATF, ML/TF Risks Arising from Migrant Smuggling, pp. 31-32
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Payment
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Land registries
+  - Money-transmitter licence registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Front businesses and real estate are standard integration channels.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+  innocent_explanations:
+  - Diaspora communities run many legitimate travel, remittance and phone businesses.
+  - Price differences can reflect vehicle specification or export markets.
+  jurisdictions: Global
+  version: 1
+- id: HT-087
+  name: Transactions with people previously convicted of smuggling or trafficking
+  definition: Money moves to or from individuals with criminal records for migrant smuggling or human
+    trafficking.
+  areas:
+  - HT
+  - ML
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: Money laundering indicators
+    quote: Transactions involved persons with criminal records for migrant smuggling and human trafficking.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A remittance recipient matches a name in a smuggling conviction.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - CourtCase
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Court records and judgments
+  - Europol and national police press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Name matches may be coincidental.
+  - People with past convictions have ordinary financial lives and family ties.
+  jurisdictions: FATF members
+  version: 1
+- id: HT-088
+  name: Money-transfer agents running card-reload and transfer networks
+  definition: Owners, managers or staff of money transfer (MVTS) agencies, or unemployed people, carry
+    out large, intertwined transfers and prepaid-card reloads across several regions with no business
+    reason.
+  areas:
+  - HT
+  - ML
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: Terrorist financing indicators
+    quote: Owners, managers or employees of MVTS Agencies involved in the network of recharging transactions
+      in any capacity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: ML/TF Risks Arising from Migrant Smuggling (handout)
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+    locator: Money laundering indicators
+    quote: Numerous transactions with money remittance companies and online payment services companies,
+      sometimes without logical reason.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A money-transfer shop employee holds cards reloaded from many towns near reception centres (FATF Italy
+    case 7 used prepaid cards, MVTS and couriers).
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Employment
+  - Address
+  checkable: records
+  lookup_sources:
+  - MVTS agent registers
+  - Financial records
+  - Customs cash declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - MVTS agents legitimately handle many transfers for migrant communities.
+  - Families pool money through one trusted agent.
+  jurisdictions: FATF members
+  version: 1
+- id: HT-089
+  name: Smuggling services advertised on social media or messaging channels
+  definition: Social media pages or encrypted messaging channels promote border crossings or 'guaranteed'
+    journeys.
+  areas:
+  - HT
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    locator: Case study 11, p. 33
+    quote: The OCG extensively used the Telegram channel in order to promote smuggling services.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    locator: Executive summary, p. 4
+    quote: smugglers have started to widely use social media and encrypted digital communication services.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A Telegram channel posts prices for routes and contact numbers.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Open social media and messaging channels
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Migrants and NGOs share legitimate route and asylum information online.
+  - Scam pages may advertise services that do not exist.
+  jurisdictions: Global
+  version: 1
+- id: HT-090
+  name: Forged travel documents and corrupt officials along a route
+  definition: A smuggling operation relies on fraudulent identity or travel documents and on bribing officials.
+  areas:
+  - CO
+  - HT
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    locator: Part One, p. 16
+    quote: Corrupt practices linked to migrant smuggling have been reported along nearly all the identified
+      routes.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    locator: Part One, p. 14
+    quote: Technology also plays a major role in the creation of fraudulent travel or identity documents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A Spanish network was charged with migrant smuggling and document forgery alongside money laundering
+    (FATF case 1).
+  cases:
+  - name: Spanish smuggling and document-forgery network (FATF case study 1)
+    year: '2022'
+    jurisdiction: Spain
+    what_happened: FATF reports 19 arrests on money laundering, organised crime, migrant smuggling and
+      document-forgery charges.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    source_title: FATF, ML/TF Risks Arising from Migrant Smuggling, p. 20
+  data_needed:
+  - Person
+  - PublicBody
+  - Payment
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Anti-corruption agency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: FATF reports systematic corruption along smuggling routes.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+  innocent_explanations:
+  - Refugees fleeing persecution sometimes have no lawful way to obtain documents.
+  - Document errors arise from poor issuing systems, not fraud.
+  jurisdictions: Global
+  version: 1
+- id: HT-091
+  name: Identity documents of migrants who have already left used for transfers
+  definition: Money transfers are made in the names of smuggled migrants who are no longer in the country,
+    or new customers take over the same activity after related accounts near a border are closed.
+  areas:
+  - HT
+  - ML
+  typology: Migrant smuggling
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+    locator: p. 22
+    quote: mainly the IDs of smuggled migrants that had already left the country
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on Recognizing Activity that May be Associated with Human Smuggling and Human Trafficking
+      (FIN-2014-A008)
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix A (red flag on new customers transacting for holders of closed accounts near the
+      border)
+    quote: No single transactional red flag is a clear indicator of human smuggling or trafficking-related
+      activity.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Remittances are sent in the names of people whose asylum records show they moved on months earlier.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document
+  - Address
+  checkable: records
+  lookup_sources:
+  - Remittance records
+  - Court files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Records may lag a person's departure; relatives may legitimately close and reopen accounts.
+  jurisdictions: Global; United States (FinCEN)
+  version: 1
+- id: HT-092
+  name: Spouses never met before the wedding or share no common language
+  definition: A couple marrying where one party gains a residence right had never met in person before
+    the marriage, or cannot communicate in any shared language.
+  areas:
+  - HT
+  typology: Marriage of convenience
+  status: verified
+  sources:
+  - title: Handbook on addressing the issue of alleged marriages of convenience between EU citizens and
+      non-EU nationals (SWD(2014) 284)
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4, Hints of abuse
+    quote: are more likely to never have met in person before the marriage
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely not to speak a common language understood by both
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Interview notes record that spouses needed an interpreter to speak to each other.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Marriage records
+  - Immigration tribunal decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Arranged marriages are lawful and genuine in many cultures, often without prior meetings.
+  - Couples who met online may share limited language yet be genuine; the Handbook says no hint is 'safe'.
+  jurisdictions: EU (free movement law)
+  version: 1
+- id: HT-093
+  name: Marriage arranged by a third party or agency, with unexplained payment
+  definition: A wedding is organised by a disreputable agency or a third party with no apparent reason
+    to be involved, and money or gifts change hands to make the marriage happen.
+  areas:
+  - HT
+  - OC
+  typology: Marriage of convenience
+  status: verified
+  sources:
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to have their wedding organised by a third party who does not seem to fit this
+      purpose
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to hand over an "unexplained" sum of money or gifts in order for the marriage
+      to be contracted
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to have got together through the services of a disreputable marriage agency
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The same organiser books ceremonies and pays travel for several unrelated couples.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Payment
+  - Event
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Court judgments
+  - Registry office records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Handbook links third-party organisers to suspected organised crime.
+    source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+  innocent_explanations:
+  - Dowries, bride price and wedding gifts are customary.
+  - Lawful marriage agencies and wedding planners organise many weddings.
+  jurisdictions: EU
+  version: 1
+- id: HT-094
+  name: Group ceremonies, repeat witnesses and a spouse flown in just for the wedding
+  definition: Several couples marry together, often with the same witnesses, and the EU-citizen spouse
+    arrives only shortly before the ceremony.
+  areas:
+  - HT
+  - OC
+  typology: Marriage of convenience
+  status: verified
+  sources:
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to celebrate their wedding ceremony together with other couples
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to have the EU citizen flown to the country only a short time before the marriage
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Registry records show the same witness signing for many marriages at one office.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Address
+  - Document
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Marriage registers (where public)
+  - Flight or travel records in court files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Group and community weddings are common in some traditions.
+  - Registry staff or friends often act as witnesses for several couples.
+  - Long-distance couples routinely travel just before a wedding.
+  jurisdictions: EU
+  version: 1
+- id: HT-095
+  name: Spouse with past short marriages, a past marriage of convenience, or financial vulnerability
+  definition: The EU-citizen spouse has previously had short marriages to non-EU nationals or a marriage
+    of convenience, or is in financial difficulty or otherwise vulnerable to recruitment.
+  areas:
+  - HT
+  typology: Marriage of convenience
+  status: verified
+  sources:
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to have previously concluded short marriages with non-EU nationals
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to involve EU citizens who are more vulnerable
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to be in a bad financial situation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Records show one EU citizen married and divorced three non-EU nationals within a few years.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Marriage and divorce registers
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poverty and past divorces are common among genuine couples.
+  - Vulnerable people may themselves be exploited and should be treated as possible victims.
+  jurisdictions: EU
+  version: 1
+- id: HT-096
+  name: Party with an adverse immigration history or prior sponsorship of another partner
+  definition: The non-national party has overstayed, entered illegally, used deception or false documents
+    before, has a pending application based on another partner, or has sponsored or been sponsored by
+    another spouse before.
+  areas:
+  - HT
+  typology: Sham marriage
+  status: verified
+  sources:
+  - title: 'Marriage and civil partnership referral and investigation scheme: statutory guidance for Home
+      Office staff'
+    publisher: UK Home Office
+    year: '2025'
+    url: https://www.gov.uk/government/publications/marriage-and-civil-partnership-referral-and-investigation-scheme/marriage-and-civil-partnership-referral-and-investigation-scheme-statutory-guidance-for-home-office-staff-accessible-version
+    locator: The investigation decision, Condition B risk factors
+    quote: has previously obtained leave, or sought to do so, on the basis of deception or of false or
+      forged document
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Marriage and civil partnership referral and investigation scheme
+    publisher: UK Home Office
+    year: '2025'
+    url: https://www.gov.uk/government/publications/marriage-and-civil-partnership-referral-and-investigation-scheme/marriage-and-civil-partnership-referral-and-investigation-scheme-statutory-guidance-for-home-office-staff-accessible-version
+    locator: Condition B risk factors
+    quote: has an outstanding immigration application based on their relationship with another spouse
+      / partner
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to present the passport of the non-EU spouse which has recently been issued
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Tribunal decision notes a party gave notice to marry weeks after a refused visa application.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Document
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Immigration tribunal decisions (published)
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - People with irregular status fall in love and marry genuinely.
+  - The Home Office guidance says these factors only justify manual assessment, not automatic investigation.
+  - Passports are renewed for ordinary reasons.
+  jurisdictions: United Kingdom; EU
+  version: 1
+- id: HT-097
+  name: Conflicting accounts, false address, or spouse living with someone else
+  definition: Spouses give inconsistent or false information about each other or the wedding, give a false
+    or uncertain address, or the non-EU spouse lives with a third person instead of the partner.
+  areas:
+  - HT
+  typology: Marriage of convenience
+  status: verified
+  sources:
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to give conflicting, inconsistent or false information about
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to indicate an erroneous, false or uncertain address in the application for
+      a residence document
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Handbook on marriages of convenience
+    publisher: European Commission
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+    locator: Section 4.4
+    quote: are more likely to have the non-EU spouse live together with a third person
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Many residence applications give the same flat as the marital home.
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Family
+  - Document
+  checkable: records
+  lookup_sources:
+  - Electoral rolls and address registers
+  - Residence-document records in court files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Couples live apart for work, study or care duties.
+  - Interview nerves and language barriers produce inconsistent answers.
+  - Address errors are common in forms.
+  jurisdictions: EU
+  version: 1
 not_reached:
 - 'FATF/APG ''Financial Flows from Human Trafficking'' (July 2018) Annex B indicator list: fatf-gafi.org
   blocks direct download (robots and bot page) and the WebFetch text stopped before Annex B. Only paragraphs
@@ -4013,3 +5761,22 @@ not_reached:
   or DOJ source.
 - The UNODC 2022 page's sentence on promised payments that never arrive was captured only as a paraphrase
   by the fetch tool, not as an exact quote.
+- UFLPA Strategy 2024 update PDF (DHS) could not be fetched; used the original June 2022 Strategy PDF
+  instead. The 2024 and later high-priority sector additions (for example aluminium, PVC, seafood, steel,
+  copper, lithium) were not confirmed and are not included.
+- US DPRK supply-chain advisory of July 23, 2018 (overseas North Korean workers by sector and country)
+  could not be fetched; URLs redirected.
+- Xinjiang Supply Chain Business Advisory (State Dept, July 2021) failed to fetch.
+- CBP UFLPA Operational Guidance for Importers PDF not opened; CBP region-wide cotton and tomato WRO press
+  release (January 2021) failed to fetch.
+- OHCHR Xinjiang assessment section on employment and labour schemes and its final conclusions not reached
+  (fetch stopped at para. 85).
+- FinCEN 2023 alert on human smuggling along the southwest border (FIN-2023-Alert001) not reached; web
+  search budget was exhausted, so no new sources could be searched.
+- ILO Convention No. 105 text (NORMLEX) server error.
+- ILO third-party monitoring of the Uzbek cotton harvest (state mobilisation case) failed to fetch.
+- FATF migrant smuggling full report Annex B indicator list and Annex A case studies were truncated and
+  not read.
+- No court case on marriages of convenience or sham marriages was reached; UK registrars' referral indicators
+  (for example no common language) were not found in the Home Office statutory guidance.
+- Europol EMSC and UNODC smuggling-of-migrants indicator materials were not reached.

@@ -1,0 +1,2201 @@
+key: WS
+name: Workplace, industrial and transport safety
+scope: Corporate and negligent manslaughter, workplace deaths, repeat safety violators, chemical explosions,
+  building and fire-safety failures, and 'chameleon' trucking and bus carriers.
+indicators:
+- id: WS-001
+  name: Employer meets OSHA severe-violator criteria (fatality or catastrophe)
+  definition: An OSHA inspection tied to a worker death or to three or more people hospitalised finds
+    at least one willful or repeated violation or a failure-to-abate notice.
+  areas:
+  - WS
+  typology: Repeat safety violator
+  status: verified
+  sources:
+  - title: Severe Violator Enforcement Program (SVEP)
+    publisher: OSHA
+    year: '2022'
+    url: https://www.osha.gov/enforcement/svep
+    locator: 'SVEP criteria: Fatality/Catastrophe (instruction CPL 02-00-169, 15 Sept 2022)'
+    quote: at least one willful or repeated violation or issues a failure-to-abate notice
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An OSHA inspection after a fatal fall results in a willful citation for missing fall protection and
+    the employer is placed in SVEP.
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - CourtCase
+  - Sanction
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - OSHA establishment search / inspection data (osha.gov)
+  - OSHA SVEP log (public log temporarily removed per OSHA page)
+  - State Plan OSHA inspection records
+  levels:
+    faint: Any willful, repeat or failure-to-abate citation at the employer
+    strong: Such a citation in an inspection tied to a death or hospitalisation
+    textbook: At least one willful/repeated violation or failure-to-abate notice in an inspection tied
+      to a fatality or three or more hospitalisations (SVEP criterion)
+    threshold_source: https://www.osha.gov/enforcement/svep
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: A willful violation that caused a death can be prosecuted criminally under 29 U.S.C. 666(e).
+    source_url: https://www.law.cornell.edu/uscode/text/29/666
+  innocent_explanations:
+  - Citations can be contested, reduced or vacated; check the final order
+  - A willful classification may be downgraded in settlement
+  - Large multi-site employers accumulate citations in proportion to size
+  - A death can occur despite a generally good programme
+  jurisdictions: US (federal OSHA; State Plans via referral)
+  version: 1
+- id: WS-002
+  name: Multiple high-gravity willful, repeat or failure-to-abate violations without a death
+  definition: An inspection finds two or more willful or repeated high-gravity serious violations or failure-to-abate
+    notices even though no one died.
+  areas:
+  - WS
+  typology: Repeat safety violator
+  status: verified
+  sources:
+  - title: Severe Violator Enforcement Program (SVEP)
+    publisher: OSHA
+    year: '2022'
+    url: https://www.osha.gov/enforcement/svep
+    locator: 'SVEP criteria: Non-Fatality/Catastrophe'
+    quote: at least two willful or repeated violations or issues failure-to-abate notices
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A plant is cited twice as a repeat violator for unguarded machinery rated high gravity.
+  cases: []
+  data_needed:
+  - Company
+  - Sanction
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - OSHA inspection data
+  - State Plan enforcement records
+  levels:
+    faint: One willful or repeat high-gravity citation
+    strong: Two such citations in different inspections
+    textbook: Two or more willful/repeated high-gravity serious violations or failure-to-abate notices
+      in one inspection (SVEP non-fatality criterion; low and moderate gravity do not count)
+    threshold_source: https://www.osha.gov/enforcement/svep
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Citations may be under contest and not final
+  - Gravity ratings are inspector judgements and may change on settlement
+  - Acquired sites may carry hazards from previous owners
+  jurisdictions: US
+  version: 1
+- id: WS-003
+  name: Egregious (per-instance) OSHA enforcement action
+  definition: OSHA cites each instance of a violation separately, its most severe treatment, which automatically
+    makes the case a severe-violator case.
+  areas:
+  - WS
+  typology: Repeat safety violator
+  status: verified
+  sources:
+  - title: Severe Violator Enforcement Program (SVEP)
+    publisher: OSHA
+    year: '2022'
+    url: https://www.osha.gov/enforcement/svep
+    locator: 'SVEP criteria: Egregious'
+    quote: All egregious (e.g., per-instance citations) enforcement actions shall be considered SVEP cases.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Separate willful citations for each worker exposed to the same hazard.
+  cases: []
+  data_needed:
+  - Company
+  - Sanction
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - OSHA inspection data and news releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Egregious citations may be reduced to single citations in settlement
+  - Per-instance treatment reflects the number of exposed workers, which scales with workforce size
+  jurisdictions: US
+  version: 1
+- id: WS-004
+  name: Repeat citation for a substantially similar hazard
+  definition: An employer is cited again for a hazard substantially similar to one in an earlier citation
+    that has become final.
+  areas:
+  - WS
+  typology: Repeat safety violator
+  status: verified
+  sources:
+  - title: 29 U.S.C. 666 - Civil and criminal penalties
+    publisher: US Code via Legal Information Institute
+    url: https://www.law.cornell.edu/uscode/text/29/666
+    locator: Subsection (a), willful or repeated violations (statutory text; amounts since inflation-adjusted)
+    quote: may be assessed a civil penalty of not more than $70,000 for each violation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: OSHA and repeat violations
+    publisher: National Safety Council
+    url: https://www.nsc.org/safety-first/osha-and-repeat-violations
+    locator: Article body
+    quote: the original citation must be final; a citation under contest may not serve as the basis for
+      a subsequent repeat citation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A warehouse cited again for blocked exits two years after a final citation for the same issue.
+  cases: []
+  data_needed:
+  - Company
+  - Sanction
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - OSHA inspection data by establishment and parent company
+  levels:
+    faint: Same standard cited twice at the same employer
+    strong: Repeat classification issued
+    textbook: Repeat citation issued on a final earlier citation; OSHA's coverage window was expanded
+      from three to five years (NSC); courts have held the lookback is not binding
+    threshold_source: https://www.nsc.org/safety-first/osha-and-repeat-violations
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Different sites of a large company may be counted together
+  - Hazard similarity is contested and sometimes overturned
+  - Repeat findings may follow a change of ownership or contractor
+  jurisdictions: US
+  version: 1
+- id: WS-005
+  name: Hazards left unfixed after a citation or settlement (failure to abate)
+  definition: The employer does not correct a cited hazard or keep a settlement promise, so the regulator
+    issues failure-to-abate notices.
+  areas:
+  - WS
+  typology: Repeat safety violator
+  status: verified
+  sources:
+  - title: US Department of Labor's OSHA issues record-breaking fines to BP
+    publisher: US Department of Labor / OSHA
+    year: '2009'
+    url: https://www.dol.gov/newsroom/releases/osha/osha20091030
+    locator: News release, 30 Oct 2009
+    quote: 270 'notifications of failure to abate' with fines totaling $56.7 million
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 666 - Civil and criminal penalties
+    publisher: US Code via Legal Information Institute
+    url: https://www.law.cornell.edu/uscode/text/29/666
+    locator: Subsection (d) failure to correct (as summarised on the LII page; statutory figure before
+      inflation adjustment)
+    quote: may be assessed a civil penalty of not more than $7,000 for each day during which such failure
+      or violation continues.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'BP Texas City refinery: 270 failure-to-abate notifications four years after the 2005 explosion settlement.'
+  cases:
+  - name: 'BP Products North America, Texas City refinery: OSHA penalties'
+    year: '2009'
+    jurisdiction: US (Texas)
+    what_happened: OSHA proposed $87,430,000 in penalties, including 270 failure-to-abate notifications
+      ($56.7m) for not meeting the 2005 settlement and 439 new willful violations ($30.7m).
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.dol.gov/newsroom/releases/osha/osha20091030
+    source_title: OSHA news release 30 Oct 2009
+  data_needed:
+  - Company
+  - Sanction
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - OSHA inspection data
+  - Settlement agreements
+  - OSHRC decisions
+  levels:
+    faint: Abatement certification late or missing
+    strong: Failure-to-abate notice issued
+    textbook: Failure-to-abate notice issued (also a SVEP trigger when tied to a fatality or catastrophe)
+    threshold_source: https://www.osha.gov/enforcement/svep
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Abatement deadlines may be extended for engineering work
+  - Contested citations do not start the correction clock until the final order
+  - Paperwork lag rather than physical non-correction
+  jurisdictions: US
+  version: 1
+- id: WS-006
+  name: Willful safety violation that caused a worker's death
+  definition: A death results from a safety rule the employer knowingly broke, the threshold for a federal
+    criminal case under the OSH Act.
+  areas:
+  - WS
+  typology: Negligent / corporate manslaughter
+  status: verified
+  sources:
+  - title: 29 U.S.C. 666(e)
+    publisher: US Code via Legal Information Institute
+    url: https://www.law.cornell.edu/uscode/text/29/666
+    locator: Subsection (e)
+    quote: Any employer who willfully violates any standard, rule, or order promulgated pursuant to section
+      655 of this title
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A company knowingly sends workers into an unprotected trench and one is killed.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Event
+  - CourtCase
+  - Sanction
+  - Employment
+  checkable: records
+  lookup_sources:
+  - OSHA fatality inspection records
+  - DOJ press releases
+  - Court dockets (PACER)
+  levels:
+    faint: Fatality inspection with any willful citation
+    strong: Willful citation directly tied to the cause of death
+    textbook: Willful violation of a standard that caused an employee's death (29 U.S.C. 666(e)); first
+      conviction up to $10,000 and six months
+    threshold_source: https://www.law.cornell.edu/uscode/text/29/666
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Criminal prosecution route for workplace deaths.
+    source_url: https://www.law.cornell.edu/uscode/text/29/666
+  innocent_explanations:
+  - Willful classification may be contested and dropped
+  - Death may have had independent causes
+  - Criminal referral is rare and requires proof of intent
+  jurisdictions: US
+  version: 1
+- id: WS-007
+  name: Mine shows a pattern of significant and substantial violations
+  definition: A mine racks up many serious ('significant and substantial') citations and elevated enforcement
+    orders, reaching MSHA's pattern-of-violations screen.
+  areas:
+  - WS
+  typology: Repeat safety violator
+  status: verified
+  sources:
+  - title: Pattern of Violations (POV)
+    publisher: Mine Safety and Health Administration
+    url: https://www.msha.gov/compliance-and-enforcement/pattern-violations-pov
+    locator: Program description and screening criteria
+    quote: recurring pattern of Significant and Substantial (S&S) violations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coal mine with more than 50 S&S citations in a year and an injury severity measure above the industry
+    figure.
+  cases:
+  - name: Upper Big Branch mine (Performance Coal Co./Massey Energy)
+    year: '2010'
+    jurisdiction: US (West Virginia)
+    what_happened: MSHA found that unlawful policies and practices of PCC/Massey were the root cause of
+      the coal dust explosion that killed 29 miners, and issued 369 citations and orders, nine contributory
+      violations designated flagrant.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.msha.gov/sites/default/files/Data_Reports/Fatals/Coal/Upper%20Big%20Branch/ExecutiveSummary.pdf
+    source_title: MSHA Report of Investigation, Executive Summary
+  data_needed:
+  - Company
+  - Organization
+  - Address
+  - Sanction
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - MSHA Mine Data Retrieval System
+  - MSHA POV screening results
+  levels:
+    faint: S&S citations rising year on year
+    strong: Meets some but not all POV screening criteria
+    textbook: 'Set One: 50+ S&S citations/orders in 12 months, plus 8+ S&S per 100 inspection hours or
+      25%+ high/reckless negligence, plus 0.5+ elevated orders per 100 inspection hours, plus injury severity
+      above industry; or Set Two: 100+ S&S and 40+ elevated orders in 12 months'
+    threshold_source: https://www.msha.gov/compliance-and-enforcement/pattern-violations-pov
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large mines receive more inspection hours and so more citations
+  - An approved Corrective Action Program can justify postponing a notice
+  - Citations may be reduced on contest
+  jurisdictions: US
+  version: 1
+- id: WS-008
+  name: Slow correction of identified hazards
+  definition: Hazards found in inspections stay open for days, weeks or longer, or interim fixes become
+    permanent.
+  areas:
+  - WS
+  typology: Weak safety management (leading indicators)
+  status: verified
+  sources:
+  - title: Using Leading Indicators to Improve Safety and Health Outcomes (OSHA 3970)
+    publisher: OSHA
+    url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+    locator: Section 2.3, Hazard Prevention and Control, p. 12
+    quote: Percentage of hazards abated on the same day, week, or month in which the hazard was identified.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Internal audit shows guardrail hazards open for months with only temporary tape.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Company
+  - Note
+  checkable: records
+  lookup_sources:
+  - Internal inspection logs (via sources, litigation discovery or FOIA of regulator files)
+  levels:
+    faint: Hazards routinely open beyond the period they were found in
+    strong: Interim controls in place long term
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some fixes need capital work or parts with long lead times
+  - Interim controls may be adequate while engineering work is planned
+  jurisdictions: General (US guidance)
+  version: 1
+- id: WS-009
+  name: Overdue corrective actions from inspections
+  definition: A large share of action items raised by safety inspections are past their due date.
+  areas:
+  - WS
+  typology: Weak safety management (leading indicators)
+  status: verified
+  sources:
+  - title: Using Leading Indicators to Improve Safety and Health Outcomes (OSHA 3970)
+    publisher: OSHA
+    url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+    locator: 'Worked example: past-due action items, pp. 15-16 (wording as extracted)'
+    quote: In this example, your leading indicator is the percentage of pastdue action items, and you
+      set a goal of no more than 10%.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A corrective-action tracker with a third of items overdue.
+  cases: []
+  data_needed:
+  - Document
+  - Note
+  - Company
+  checkable: records
+  lookup_sources:
+  - Internal action trackers
+  - Regulator inspection files
+  levels:
+    faint: Above 10% of inspection action items past due (OSHA worked-example goal)
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Backlogs after a large audit
+  - Due dates set unrealistically short
+  jurisdictions: General
+  version: 1
+- id: WS-010
+  name: Required safety inspections or examinations missed or done poorly
+  definition: Scheduled inspections or legally required examinations are not completed, skip areas, or
+    do not lead to fixes.
+  areas:
+  - WS
+  typology: Weak safety management (leading indicators)
+  status: verified
+  sources:
+  - title: Using Leading Indicators to Improve Safety and Health Outcomes (OSHA 3970)
+    publisher: OSHA
+    url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+    locator: Section 2.3, Program Evaluation and Improvement, p. 13
+    quote: Number of inspections completed to identify hazards or program weaknesses.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Upper Big Branch Report of Investigation, Executive Summary
+    publisher: MSHA
+    year: '2011'
+    url: https://www.msha.gov/sites/default/files/Data_Reports/Fatals/Coal/Upper%20Big%20Branch/ExecutiveSummary.pdf
+    locator: Executive Summary
+    quote: PCC/Massey failed to perform required mine examinations adequately and remedy known hazards
+      and violations of law
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Pre-shift examination records show areas never visited.
+  cases:
+  - name: Upper Big Branch mine
+    year: '2010'
+    jurisdiction: US (West Virginia)
+    what_happened: MSHA found examiners failed to perform required examinations adequately and to remedy
+      known hazards.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.msha.gov/sites/default/files/Data_Reports/Fatals/Coal/Upper%20Big%20Branch/ExecutiveSummary.pdf
+    source_title: MSHA Report of Investigation, Executive Summary
+  data_needed:
+  - Document
+  - Event
+  - Company
+  - Person
+  checkable: records
+  lookup_sources:
+  - Examination books
+  - Regulator citations for examination failures
+  levels:
+    faint: Some scheduled inspections missed
+    strong: Citations for inadequate examinations
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff shortages or access problems
+  - Records incomplete rather than inspections missed
+  jurisdictions: General
+  version: 1
+- id: WS-011
+  name: Slow start to incident investigations
+  definition: Many hours or days pass after an incident before anyone begins investigating it.
+  areas:
+  - WS
+  typology: Weak safety management (leading indicators)
+  status: verified
+  sources:
+  - title: Using Leading Indicators to Improve Safety and Health Outcomes (OSHA 3970)
+    publisher: OSHA
+    url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+    locator: Section 2.3, Hazard Identification and Assessment, p. 12
+    quote: Number of hours passed after an incident before an investigation is started.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Near-miss reports closed without any investigation recorded.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Internal incident logs
+  - Regulator files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Minor incidents triaged for later review
+  - Investigator availability after hours
+  jurisdictions: General
+  version: 1
+- id: WS-012
+  name: Management slow to acknowledge worker hazard reports
+  definition: Workers' reports of hazards wait a long time before managers acknowledge or act on them.
+  areas:
+  - WS
+  typology: Weak safety management (leading indicators)
+  status: verified
+  sources:
+  - title: Using Leading Indicators to Improve Safety and Health Outcomes (OSHA 3970)
+    publisher: OSHA
+    url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+    locator: Section 2.3, Management Leadership, p. 11
+    quote: Average time between worker report of a hazard or concern and management acknowledgement of
+      the report.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hazard reports sit unanswered for weeks.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Employment
+  - Note
+  checkable: person
+  lookup_sources:
+  - Worker interviews
+  - Internal reporting systems
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reporting systems that do not record acknowledgements
+  - Duplicate reports
+  jurisdictions: General
+  version: 1
+- id: WS-013
+  name: Workers intimidated from raising safety concerns; no complaints reach the regulator
+  definition: Workers are told or shown that raising safety issues will cost them their jobs, and safety
+    complaints to the regulator dry up.
+  areas:
+  - WS
+  typology: Safety culture
+  status: verified
+  sources:
+  - title: Upper Big Branch Report of Investigation, Executive Summary
+    publisher: MSHA
+    year: '2011'
+    url: https://www.msha.gov/sites/default/files/Data_Reports/Fatals/Coal/Upper%20Big%20Branch/ExecutiveSummary.pdf
+    locator: Executive Summary
+    quote: Witness testimony revealed that miners were intimidated by UBB management and were told that
+      raising safety concerns would jeopardize their jobs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - No safety complaints from underground miners reached MSHA for about four years before the UBB explosion.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document
+  - Event
+  - CourtCase
+  checkable: person
+  lookup_sources:
+  - Worker interviews
+  - Whistleblower retaliation complaints (OSHA/MSHA)
+  - Regulator complaint counts
+  levels:
+    faint: Few or no complaints from a high-hazard workforce
+    strong: Workers describe threats for raising concerns
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Low complaints can mean hazards are well managed
+  - Workers may raise concerns internally through working channels
+  jurisdictions: General
+  version: 1
+- id: WS-014
+  name: Mandatory safety training not delivered on schedule
+  definition: Workers or managers are not getting required safety training on time.
+  areas:
+  - WS
+  typology: Weak safety management (leading indicators)
+  status: verified
+  sources:
+  - title: Using Leading Indicators to Improve Safety and Health Outcomes (OSHA 3970)
+    publisher: OSHA
+    url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+    locator: Section 2.3, Education and Training, pp. 12-13
+    quote: Percentage of workers receiving mandatory training on schedule.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.97 (wording as extracted)
+    quote: no structured or regular refresher training in handling fire survival guidance calls was designed
+      or delivered to control room staff
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Training records show refresher courses lapsed for most staff.
+  cases: []
+  data_needed:
+  - Document
+  - Employment
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Training records
+  - Regulator citations for training
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New starters not yet due
+  - Records not digitised
+  jurisdictions: General
+  version: 1
+- id: WS-015
+  name: No oversight of contractors' safety; everyone assumes someone else is responsible
+  definition: Contractors are not audited, contracts are loose, and each party assumes another is responsible
+    for safety-critical matters.
+  areas:
+  - WS
+  typology: Building and fire-safety failure
+  status: verified
+  sources:
+  - title: Using Leading Indicators to Improve Safety and Health Outcomes (OSHA 3970)
+    publisher: OSHA
+    url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+    locator: Section 2.3, Communication and Coordination, pp. 13-14
+    quote: Number of audits conducted to ensure contractors are following site safety and health policies
+      to include in their own safety policies.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.74
+    quote: Studio E, Rydon and Harley all took a casual approach to contractual relations.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Building a Safer Future (Hackitt Review final report)
+    publisher: UK Government (MHCLG)
+    year: '2018'
+    url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+    locator: Foreword, p. 5
+    quote: Lack of clarity on roles and responsibilities – there is ambiguity over where responsibility
+      lies
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Architect, main contractor and cladding subcontractor each assumed another checked fire performance
+    (Grenfell).
+  cases: []
+  data_needed:
+  - Contract
+  - ContractAward
+  - Company
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Procurement and contract records
+  - Planning and building-control files
+  levels:
+    faint: No contractor audits on record
+    strong: Contracts leave safety duties unassigned
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Grenfell Inquiry linked fire-safety failures to how the refurbishment was procured and contracted.
+    source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  innocent_explanations:
+  - Small jobs with informal but competent contractors
+  - Responsibility assigned in documents not yet obtained
+  jurisdictions: General; UK building sector
+  version: 1
+- id: WS-016
+  name: Advance warning of regulator inspections or obstruction of inspectors
+  definition: Staff tip off workers that inspectors are arriving, or the company organises efforts to
+    obstruct or mislead inspectors.
+  areas:
+  - WS
+  typology: Concealment from regulator
+  status: verified
+  sources:
+  - title: Upper Big Branch Report of Investigation, Executive Summary
+    publisher: MSHA
+    year: '2011'
+    url: https://www.msha.gov/sites/default/files/Data_Reports/Fatals/Coal/Upper%20Big%20Branch/ExecutiveSummary.pdf
+    locator: 'Executive Summary (sentence continues: of inspections)'
+    quote: Under the Mine Act, it is illegal for mine operators' employees to give advance notice of
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Blankenship sentenced to a year in federal prison
+    publisher: US Attorney's Office, Southern District of West Virginia
+    year: '2016'
+    url: https://www.justice.gov/usao-sdwv/pr/blankenship-sentenced-year-federal-prison
+    locator: Press release
+    quote: organized efforts to obstruct and interfere with MSHA inspectors
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Surface staff radio underground crews when inspectors arrive.
+  cases:
+  - name: United States v. Donald Blankenship (Massey Energy)
+    year: '2015'
+    jurisdiction: US (S.D. West Virginia)
+    what_happened: Former Massey CEO convicted of conspiracy to willfully violate mine health and safety
+      standards; sentenced in 2016 to a year in prison and a $250,000 fine.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdwv/pr/blankenship-sentenced-year-federal-prison
+    source_title: DOJ USAO-SDWV press release
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - CourtCase
+  - Employment
+  checkable: person
+  lookup_sources:
+  - Worker testimony
+  - Court records
+  - Regulator citations
+  levels:
+    faint: Workers describe warnings before inspections
+    strong: Regulator citation or court evidence of advance notice
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Obstruction of safety inspectors led to a criminal conviction of a CEO.
+    source_url: https://www.justice.gov/usao-sdwv/pr/blankenship-sentenced-year-federal-prison
+  innocent_explanations:
+  - Site security must log visitors and may announce arrivals for access control
+  - Inspectors sometimes give notice for scheduled audits
+  jurisdictions: US
+  version: 1
+- id: WS-017
+  name: Two sets of safety records
+  definition: The company records hazards in internal books that differ from the official records shown
+    to the regulator and workers.
+  areas:
+  - WS
+  typology: Concealment from regulator
+  status: verified
+  sources:
+  - title: Upper Big Branch Report of Investigation, Executive Summary
+    publisher: MSHA
+    year: '2011'
+    url: https://www.msha.gov/sites/default/files/Data_Reports/Fatals/Coal/Upper%20Big%20Branch/ExecutiveSummary.pdf
+    locator: Executive Summary
+    quote: PCC/Massey kept two sets of books with respect to safety and health hazards in the UBB mine.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hazards logged in production books but missing from the statutory examination book.
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Note
+  checkable: records
+  lookup_sources:
+  - Statutory examination books
+  - Internal production/maintenance logs (via discovery or sources)
+  levels:
+    faint: Discrepancies between internal and official logs
+    strong: Hazards appear only in internal records
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Maintenance logs legitimately record items that are not statutory hazards
+  - Different recording timelines
+  jurisdictions: General
+  version: 1
+- id: WS-018
+  name: Safety judged by injury rates while process safety deteriorates
+  definition: Leaders measure safety mainly by worker injury statistics and miss signs of catastrophic
+    process risk.
+  areas:
+  - WS
+  typology: Process safety failure
+  status: verified
+  sources:
+  - title: CSB news release on BP Texas City final report
+    publisher: US Chemical Safety and Hazard Investigation Board
+    year: '2007'
+    url: https://www.csb.gov/newsroom/detail.aspx?nid=205
+    locator: Statement by Supervisory Investigator Don Holmstrom
+    quote: rather than on improving process safety performance, which continued to deteriorate.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Using Leading Indicators to Improve Safety and Health Outcomes (OSHA 3970)
+    publisher: OSHA
+    url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+    locator: Section 1.1, p. 2
+    quote: lagging indicators measure the occurrence and frequency of events that occurred in the past,
+      such as the number or rate of injuries, illnesses, and fatalities.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Executives at BP relied unduly on injury statistics in judging Texas City's safety.
+  cases:
+  - name: BP Texas City refinery explosion
+    year: '2005'
+    jurisdiction: US (Texas)
+    what_happened: Explosions during an isomerization unit restart killed 15 workers and injured 180;
+      CSB found organizational and safety deficiencies at all levels of BP, cost-cutting and reliance
+      on injury statistics.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.csb.gov/bp-america-texas-city-refinery-explosion/
+    source_title: CSB investigation page and news release
+  data_needed:
+  - Document
+  - Company
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Annual/sustainability reports
+  - Board safety reports
+  - Regulator investigation reports
+  levels:
+    faint: Safety reporting dominated by injury rates
+    strong: Low injury rates alongside process incidents, leaks or overdue integrity work
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Low-hazard workplaces where injury rates are the main relevant measure
+  - Process safety metrics kept but not published
+  jurisdictions: General
+  version: 1
+- id: WS-019
+  name: Maintenance and safety cost-cutting linked to integrity problems
+  definition: Cuts to maintenance or safety budgets, or production pressure, coincide with deteriorating
+    equipment and safety.
+  areas:
+  - WS
+  typology: Process safety failure
+  status: verified
+  sources:
+  - title: CSB news release on BP Texas City final report
+    publisher: US Chemical Safety and Hazard Investigation Board
+    year: '2007'
+    url: https://www.csb.gov/newsroom/detail.aspx?nid=205
+    locator: Statement by Chairman Carolyn Merritt
+    quote: The combination of cost-cutting, production pressures, and failure to invest caused a progressive
+      deterioration
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Corporate Manslaughter (legal guidance)
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/corporate-manslaughter
+    locator: The Gross Breach, section 8 factors (paraphrased by the fetch tool; exact wording not captured)
+    quote: For example, evidence of a previous 'near miss' incident, a failure to follow the organisation's
+      own written procedures, or evidence of cost cutting may all be relevant.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Building a Safer Future (Hackitt Review final report)
+    publisher: UK Government
+    year: '2018'
+    url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+    locator: Foreword, p. 5
+    quote: Indifference – the primary motivation is to do things as quickly and cheaply as possible
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A 2002 internal BP report linked integrity issues to reduced maintenance spending over the previous
+    decade.
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Payment
+  - Note
+  checkable: records
+  lookup_sources:
+  - Annual reports and capex/opex disclosures
+  - Internal reports via sources or litigation
+  levels:
+    faint: Maintenance spend falling while output rises
+    strong: Internal documents link cuts to integrity issues
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Efficiency gains or new equipment reduce maintenance needs
+  - Spending shifted to capital projects that improve safety
+  jurisdictions: General
+  version: 1
+- id: WS-020
+  name: Internal warnings or near misses that a catastrophe could happen
+  definition: The organisation's own surveys, risk plans or earlier near misses warn of a fatal or catastrophic
+    event, and the response is too small or late.
+  areas:
+  - WS
+  typology: Process safety failure
+  status: verified
+  sources:
+  - title: CSB news release on BP Texas City final report
+    publisher: US Chemical Safety and Hazard Investigation Board
+    year: '2007'
+    url: https://www.csb.gov/newsroom/detail.aspx?nid=205
+    locator: 2005 safety business plan quoted in the release
+    quote: Texas City kills someone in the next 12-18 months.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Corporate Manslaughter (legal guidance)
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/corporate-manslaughter
+    locator: The Gross Breach, section 8 factors
+    quote: Evidence of failings which are unrelated to the fatal incident may be relevant
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A 2004 survey at Texas City found an exceptional degree of fear of catastrophic incidents.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Company
+  - Note
+  checkable: records
+  lookup_sources:
+  - Internal risk registers and audits
+  - Prior incident reports
+  - Regulator files
+  levels:
+    faint: Prior near miss of the same type
+    strong: Written internal warning of fatality risk
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Risk registers deliberately list worst cases
+  - Warnings may have been acted on in ways not yet documented
+  jurisdictions: General
+  version: 1
+- id: WS-021
+  name: People placed near major hazards (occupied trailers, homes, schools)
+  definition: Occupied buildings, trailers or community sites are located close to process units or stores
+    of explosive material.
+  areas:
+  - WS
+  typology: Chemical / process safety
+  status: verified
+  sources:
+  - title: BP America (Texas City) Refinery Explosion
+    publisher: US Chemical Safety and Hazard Investigation Board
+    url: https://www.csb.gov/bp-america-texas-city-refinery-explosion/
+    locator: Recommendation to API
+    quote: the safe placement of occupied trailers away from hazardous areas of process plants.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: West Fertilizer Explosion and Fire
+    publisher: US Chemical Safety and Hazard Investigation Board
+    url: https://www.csb.gov/west-fertilizer-explosion-and-fire-/
+    locator: Recommendation 2013-02-I-TX-17
+    quote: the proximity of FGAN facilities to nearby residences, schools, hospitals
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Victims at Texas City were in or around work trailers near a vent stack.
+  cases:
+  - name: West Fertilizer explosion
+    year: '2013'
+    jurisdiction: US (Texas)
+    what_happened: Explosion killed twelve volunteer firefighters and two members of the public; CSB found
+      a lack of regulation at all levels of government.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.csb.gov/west-fertilizer-explosion-and-fire-/
+    source_title: CSB investigation page
+  data_needed:
+  - Address
+  - Organization
+  - PublicBody
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - EPA RMP facility data
+  - Tier II chemical inventory reports
+  - Zoning and planning maps
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Facilities that predate surrounding development
+  - Siting studies may show adequate separation
+  jurisdictions: US
+  version: 1
+- id: WS-022
+  name: Excessive working hours and fatigue in safety-critical roles
+  definition: Operators work long hours, many days in a row, or shifts that cause fatigue, especially
+    during risky operations like startups.
+  areas:
+  - WS
+  typology: Process safety failure
+  status: verified
+  sources:
+  - title: BP America (Texas City) Refinery Explosion
+    publisher: US Chemical Safety and Hazard Investigation Board
+    url: https://www.csb.gov/bp-america-texas-city-refinery-explosion/
+    locator: Recommendations
+    quote: limit hours and days of work and address shift work.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Board operators working consecutive 12-hour shifts for weeks before a startup.
+  cases: []
+  data_needed:
+  - Employment
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - Timesheets and rosters
+  - Hours-of-service logs (transport)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Turnarounds and emergencies require overtime
+  - Workers choose overtime voluntarily
+  jurisdictions: General
+  version: 1
+- id: WS-023
+  name: Combustible dust allowed to accumulate
+  definition: Dust from products such as sugar, grain or metals builds up on floors and elevated surfaces
+    where it can fuel an explosion.
+  areas:
+  - WS
+  typology: Chemical / process safety
+  status: verified
+  sources:
+  - title: Imperial Sugar Company Dust Explosion and Fire
+    publisher: US Chemical Safety and Hazard Investigation Board
+    url: https://www.csb.gov/imperial-sugar-company-dust-explosion-and-fire/
+    locator: Investigation summary
+    quote: The explosion was fueled by massive accumulations of combustible sugar dust throughout the
+      packaging building.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Imperial Sugar, Port Wentworth, Georgia, 2008: 14 deaths.'
+  cases:
+  - name: Imperial Sugar refinery explosion
+    year: '2008'
+    jurisdiction: US (Georgia)
+    what_happened: Sugar dust explosion and fire killed 14 and injured 38; CSB recommended a corporate-wide
+      housekeeping programme and an OSHA dust standard.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.csb.gov/imperial-sugar-company-dust-explosion-and-fire/
+    source_title: CSB investigation page
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - OSHA citations under General Duty / housekeeping
+  - Worker photos and interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some dust is normal between cleaning cycles
+  - Dust may be non-combustible
+  jurisdictions: US
+  version: 1
+- id: WS-024
+  name: Hazardous materials stored in combustible buildings without fire protection
+  definition: Explosive or reactive chemicals are kept in wooden bins or buildings without sprinklers
+    or detection.
+  areas:
+  - WS
+  typology: Chemical / process safety
+  status: verified
+  sources:
+  - title: West Fertilizer Explosion and Fire
+    publisher: US Chemical Safety and Hazard Investigation Board
+    url: https://www.csb.gov/west-fertilizer-explosion-and-fire-/
+    locator: Recommendation to OSHA (2013-02-I-TX-5 related)
+    quote: Require automatic fire sprinkler systems and fire detection systems for indoor FGAN storage
+      areas.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Ammonium nitrate fertiliser stored in wooden bins.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Tier II chemical inventories
+  - Fire marshal inspection records
+  - Insurance surveys
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Older facilities compliant with the rules of the time
+  - Small quantities below hazard thresholds
+  jurisdictions: US
+  version: 1
+- id: WS-025
+  name: Safety recommendations from earlier investigations left open
+  definition: Recommendations from accident boards, coroners or inquiries stay unaddressed when a similar
+    incident happens.
+  areas:
+  - WS
+  typology: Lessons not learned
+  status: verified
+  sources:
+  - title: CSB Investigations
+    publisher: US Chemical Safety and Hazard Investigation Board
+    url: https://www.csb.gov/investigations/
+    locator: Recommendation statistics on the investigations page (wording as extracted)
+    quote: 'Open Recommendations # 129'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.12 (Lakanal House coroner's recommendations)
+    quote: her recommendations were not treated with any sense of urgency
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Lakanal House coroner's recommendations not acted on before Grenfell.
+  cases: []
+  data_needed:
+  - Document
+  - PublicBody
+  - Organization
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - CSB recommendations status database
+  - Coroners' Prevention of Future Deaths reports (UK)
+  - NTSB recommendations database
+  levels:
+    faint: Recommendation to the organisation still open
+    strong: Similar incident while the recommendation is open
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Recommendation superseded or rejected for sound reasons
+  - Implementation underway but not yet recorded
+  jurisdictions: US / UK
+  version: 1
+- id: WS-026
+  name: Weak or absent regulatory oversight of a high-hazard site
+  definition: The regulator rarely inspects a dangerous site or does not pursue enforcement when needed.
+  areas:
+  - WS
+  typology: Regulatory failure
+  status: verified
+  sources:
+  - title: CSB news release on BP Texas City final report
+    publisher: US Chemical Safety and Hazard Investigation Board
+    year: '2007'
+    url: https://www.csb.gov/newsroom/detail.aspx?nid=205
+    locator: News release quoting report
+    quote: OSHA conducted only one planned PSM inspection at the Texas City Refinery, in 1998.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Building a Safer Future (Hackitt Review final report)
+    publisher: UK Government
+    year: '2018'
+    url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+    locator: Foreword, p. 5
+    quote: Where enforcement is necessary, it is often not pursued.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - One planned process safety inspection at Texas City in the years before 2005.
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - OSHA/MSHA/EPA inspection histories
+  - FOIA requests to regulators
+  levels:
+    faint: No inspection in several years at a major-hazard site
+    strong: Known problems with no enforcement action
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Regulator resources target higher-risk sites
+  - Inspections done under a different programme name
+  jurisdictions: US / UK
+  version: 1
+- id: WS-027
+  name: Government or regulator knew of a risk and failed to act
+  definition: An official body has warnings about a life-safety risk but does not change rules or guidance,
+    often under deregulatory pressure.
+  areas:
+  - WS
+  typology: Regulatory failure
+  status: verified
+  sources:
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.5
+    quote: by 2016 the department was well aware of those risks, but failed to act on what it knew.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Approved Document B guidance left unamended despite warnings.
+  cases:
+  - name: Grenfell Tower fire
+    year: '2017'
+    jurisdiction: UK (England)
+    what_happened: The Phase 2 report (2024) found the fire was the culmination of decades of failure
+      by central government and other bodies, and systematic dishonesty by cladding and insulation manufacturers.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    source_title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  - Person
+  checkable: records
+  lookup_sources:
+  - FOI requests
+  - Parliamentary records
+  - Consultation responses
+  levels:
+    faint: Warnings on record with no response
+    strong: Repeated warnings with no change over years
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rule changes require long consultation
+  - Evidence was disputed at the time
+  jurisdictions: UK
+  version: 1
+- id: WS-028
+  name: Vague safety guidance used to game the system
+  definition: Ambiguous rules or guidance let builders and suppliers claim compliance for unsafe choices.
+  areas:
+  - WS
+  typology: Building and fire-safety failure
+  status: verified
+  sources:
+  - title: Building a Safer Future (Hackitt Review final report)
+    publisher: UK Government
+    year: '2018'
+    url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+    locator: Foreword, p. 5
+    quote: using the ambiguity of regulations and guidance to game the system
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.8
+    quote: the language used was vague and ill-considered words were added at a late stage in the process
+      without proper consultation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Reliance on 'Class 0' in guidance after it was known to be inappropriate.
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Building-control submissions
+  - Product marketing literature
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Good-faith reading of genuinely unclear guidance
+  jurisdictions: UK
+  version: 1
+- id: WS-029
+  name: Manipulated product safety tests
+  definition: Manufacturers rig or misreport fire or safety tests so a product appears to pass.
+  areas:
+  - WS
+  typology: Building and fire-safety failure
+  status: verified
+  sources:
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.19
+    quote: manipulate the testing processes, misrepresent test data and mislead the market
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Celotex's test report omitted the magnesium oxide boards used to make the system pass (para 2.29).
+  cases:
+  - name: Celotex (RS5000 insulation), Grenfell Inquiry finding
+    year: '2024'
+    jurisdiction: UK
+    what_happened: The Inquiry found Celotex embarked on a dishonest scheme to mislead its customers and
+      the wider market.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    source_title: Grenfell Tower Inquiry Phase 2 Report, para 2.28
+  data_needed:
+  - Company
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Test reports
+  - Certification documents
+  - Inquiry evidence
+  levels:
+    faint: Test set-up differs from the product as sold
+    strong: Test report omits components used in the test
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Inquiry found systematic dishonesty in product marketing.
+    source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  innocent_explanations:
+  - Tests legitimately apply to specific system build-ups
+  - Products changed after testing for unrelated reasons
+  jurisdictions: UK; general
+  version: 1
+- id: WS-030
+  name: Safety claims beyond test evidence or concealment of known danger
+  definition: A maker markets a product as safe for uses its tests do not support, or hides test results
+    showing danger.
+  areas:
+  - WS
+  typology: Building and fire-safety failure
+  status: verified
+  sources:
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.21
+    quote: Arconic deliberately concealed from the market the true extent of the danger
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.32
+    quote: Kingspan knowingly created a false market in insulation for use on buildings over 18 metres
+      in height
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Building a Safer Future (Hackitt Review final report)
+    publisher: UK Government
+    year: '2018'
+    url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+    locator: Executive summary, p. 11
+    quote: the product testing, labelling and marketing regime is opaque and insufficient; and
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Reynobond 55 PE in cassette form sold on a fire performance statement Arconic knew was false (para
+    2.25).
+  cases:
+  - name: Arconic and Kingspan, Grenfell Inquiry findings
+    year: '2024'
+    jurisdiction: UK
+    what_happened: The Inquiry found Arconic concealed the danger of Reynobond 55 PE and Kingspan knowingly
+      created a false market in K15 insulation above 18 metres.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    source_title: Grenfell Tower Inquiry Phase 2 Report, paras 2.21, 2.32
+  data_needed:
+  - Company
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Product datasheets and certificates
+  - Test reports
+  levels:
+    faint: Marketing claims broader than certificate scope
+    strong: Internal tests contradict marketing
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Marketing errors corrected on discovery
+  - Different product variants tested
+  jurisdictions: UK; general
+  version: 1
+- id: WS-031
+  name: Certification body accepts manufacturer wording without checking
+  definition: A body that certifies products copies the maker's claims into certificates without verifying
+    them against test evidence.
+  areas:
+  - WS
+  typology: Building and fire-safety failure
+  status: verified
+  sources:
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.43 (BBA)
+    quote: accepted for inclusion in certificates forms of wording proposed by manufacturers that were
+      wrong and misleading.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.49 (LABC)
+    quote: willing to accommodate the customer at the expense of those who relied on the certificates.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - BBA certificates for K15 and Reynobond 55 PE; LABC certificates for RS5000 and K15.
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Certificates and their revision history
+  - Certifier client relationships
+  levels:
+    faint: Certificate wording matches maker's marketing verbatim
+    strong: Certificate claims not supported by referenced tests
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Standard wording shared across certificates
+  - Certifier relied on accredited test labs
+  jurisdictions: UK
+  version: 1
+- id: WS-032
+  name: Fire risk assessor with misrepresented qualifications or no follow-up
+  definition: The person assessing fire risk overstated their competence or did not check that earlier
+    risks were fixed.
+  areas:
+  - WS
+  typology: Building and fire-safety failure
+  status: verified
+  sources:
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.63
+    quote: He often failed to check whether the TMO had taken action in response to risks
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Building a Safer Future (Hackitt Review final report)
+    publisher: UK Government
+    year: '2018'
+    url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+    locator: Executive summary, p. 11
+    quote: competence across the system is patchy;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The Grenfell assessor had invented some qualifications (para 2.62).
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document
+  - Organization
+  checkable: lookups
+  lookup_sources:
+  - Professional registers (e.g. fire risk assessor accreditation schemes)
+  - Fire risk assessment documents
+  levels:
+    faint: Assessor not on a recognised register
+    strong: Claimed qualifications cannot be verified
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Competent assessors without formal registration
+  - Registers incomplete
+  jurisdictions: UK
+  version: 1
+- id: WS-033
+  name: Residents' or workers' safety concerns ignored
+  definition: Concerns raised by residents or others about safety are dismissed, and relations become
+    hostile.
+  areas:
+  - WS
+  typology: Building and fire-safety failure
+  status: verified
+  sources:
+  - title: Building a Safer Future (Hackitt Review final report)
+    publisher: UK Government
+    year: '2018'
+    url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+    locator: Foreword, p. 5
+    quote: When concerns are raised, by others involved in building work or by residents, they are often
+      ignored.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.56
+    quote: the TMO lost sight of the fact that the residents were people who depended on it
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Resident blogs and complaints about fire safety before a fire.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Resident association records
+  - Council complaints and FOI
+  - Public blogs and social media
+  levels:
+    faint: Repeated resident complaints on safety
+    strong: Complaints met with hostility or no reply
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complaints investigated and found unfounded
+  - Landlord responded through channels not visible publicly
+  jurisdictions: UK; general
+  version: 1
+- id: WS-034
+  name: Safety information withheld from boards or oversight bodies
+  definition: Managers do not tell their board or the body overseeing them about fire or safety problems,
+    including critical reports.
+  areas:
+  - WS
+  typology: Building and fire-safety failure
+  status: verified
+  sources:
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.60 (TMO chief executive's reluctance to inform board and RBKC)
+    quote: an entrenched reluctance
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.58
+    quote: The years between 2009 and 2017 were marked by a persistent indifference to fire safety
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - RBKC did not know of a 2013 critical report the TMO failed to disclose (para 2.59).
+  cases: []
+  data_needed:
+  - Document
+  - Organization
+  - PublicBody
+  - Person
+  - Directorship
+  checkable: records
+  lookup_sources:
+  - Board minutes
+  - Council scrutiny papers
+  - FOI requests
+  levels:
+    faint: Safety absent from board agendas
+    strong: Critical report not shared with board or overseer
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reports shared informally or in committees not yet reviewed
+  jurisdictions: UK; general
+  version: 1
+- id: WS-035
+  name: Emergency services complacent about known operational weaknesses
+  definition: A fire or rescue service does not fix shortcomings revealed by earlier incidents.
+  areas:
+  - WS
+  typology: Lessons not learned
+  status: verified
+  sources:
+  - title: Grenfell Tower Inquiry Phase 2 Report, Volume 1
+    publisher: Grenfell Tower Inquiry
+    year: '2024'
+    url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+    locator: Para 2.91
+    quote: Senior officers were complacent about the operational efficiency of the brigade and lacked
+      the management skills
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Lakanal House lessons on high-rise firefighting not absorbed by the LFB (para 2.90).
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Fire service inspectorate reports (e.g. HMICFRS)
+  - Training records via FOI
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Budget limits on training
+  - Changes underway but not complete
+  jurisdictions: UK
+  version: 1
+- id: WS-036
+  name: 'Chameleon carrier: new registration matches a carrier with a reason to hide'
+  definition: A newly registered trucking or bus company shares names, addresses, phone numbers or officers
+    with an earlier carrier that had a poor safety record, enforcement action or bankruptcy.
+  areas:
+  - WS
+  typology: Chameleon trucking and bus carriers
+  status: verified
+  sources:
+  - title: 'Motor Carrier Safety: New Applicant Reviews (GAO-12-364)'
+    publisher: US Government Accountability Office
+    year: '2012'
+    url: https://www.gao.gov/products/GAO-12-364
+    locator: Report summary; full report p. 14
+    quote: they submitted registration information that matched information for a previously registered
+      carrier
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: GAO-12-364 full report
+    publisher: US Government Accountability Office
+    year: '2012'
+    url: https://www.gao.gov/assets/gao-12-364.pdf
+    locator: p. 14; footnote 24 lists severe crash, FMCSA fine, out-of-service or imminent hazard order,
+      unsatisfactory/unfit rating
+    quote: The previously registered carrier had a motive for evading detection.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A new applicant with the same company name, officer and phone number as a carrier placed out of service.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Address
+  - Directorship
+  - Ownership
+  - Sanction
+  - Vehicle
+  checkable: lookups
+  lookup_sources:
+  - FMCSA SAFER / Licensing and Insurance (L&I) records
+  - FMCSA enforcement and out-of-service data
+  - State business registries
+  levels:
+    faint: Registration fields match an earlier carrier
+    strong: Match with an earlier carrier that had enforcement action
+    textbook: 'Both GAO criteria met: matching registration data and the earlier carrier had a motive
+      to evade (safety violations, crash, fine, out-of-service order, unfit rating or bankruptcy)'
+    threshold_source: https://www.gao.gov/assets/gao-12-364.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: Chameleon carriers re-register under new identities to shed enforcement history, the same
+      pattern as phoenix companies.
+    source_url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-386/subpart-G/section-386.73
+  innocent_explanations:
+  - Legitimate purchase of a failed carrier's vehicles (GAO notes vehicle matches can be legitimate)
+  - Family members starting a separate genuine business
+  - Shared office or dispatch services
+  - Restructuring after bankruptcy
+  jurisdictions: US
+  version: 1
+- id: WS-037
+  name: Affiliated or reincarnated carrier sharing officers, addresses, equipment, insurance or drivers
+  definition: A carrier operates as a continuation of another through common ownership, officers, contact
+    details, vehicles, insurance, drivers or customers to avoid orders, penalties or a bad record.
+  areas:
+  - WS
+  typology: Chameleon trucking and bus carriers
+  status: verified
+  sources:
+  - title: 49 CFR 386.73 Operating authority / out-of-service for reincarnated or affiliated carriers
+    publisher: eCFR (US Government)
+    url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-386/subpart-G/section-386.73
+    locator: Paragraph (a); affiliation factors in paragraph (c)
+    quote: Avoid being linked with a negative compliance history
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Two carriers with the same officers, address, vehicles and insurer, one under an out-of-service order.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Directorship
+  - Ownership
+  - Address
+  - Vehicle
+  - Employment
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - FMCSA registration (MCS-150) data
+  - Insurance filings in FMCSA L&I
+  - Vehicle registration (VIN) records
+  levels:
+    faint: One shared factor (e.g. address)
+    strong: Several shared factors (officers, equipment, insurance, drivers)
+    textbook: Meets the published definition as worded (FMCSA finds operation under a new identity or
+      as an affiliate to avoid an order, requirement, penalty, enforcement or negative history)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate multi-company groups with separate compliance
+  - Drivers moving between employers
+  - Shared yards in trucking hubs
+  jurisdictions: US
+  version: 1
+- id: WS-038
+  name: Carrier keeps operating under another name after an out-of-service order
+  definition: A carrier ordered off the road continues selling tickets or running trips under a different
+    company name.
+  areas:
+  - WS
+  typology: Chameleon trucking and bus carriers
+  status: pending
+  sources:
+  - title: FMCSA issues cease and desist order against Sky Express, Inc.
+    publisher: Federal Motor Carrier Safety Administration
+    year: '2011'
+    url: https://www.fmcsa.dot.gov/newsroom/fmcsa-issues-cease-and-desist-order-against-sky-express-inc-prohibiting-illegal-bus-company
+    locator: Press release, 3 June 2011
+    quote: is attempting to operate and sell tickets under a different company name, including 108 Tours
+      and 108 Bus.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sky Express after the fatal I-95 crash.
+  cases:
+  - name: Sky Express, Inc.
+    year: '2011'
+    jurisdiction: US (North Carolina / Virginia)
+    what_happened: After a crash on I-95 near Fredericksburg, Virginia killed four people, FMCSA placed
+      Sky Express out of service and then issued a cease-and-desist order because it was trying to operate
+      under other names. The release reports orders, not a fine.
+    outcome: fined_by_regulator
+    outcome_verified: false
+    source_url: https://www.fmcsa.dot.gov/newsroom/fmcsa-issues-cease-and-desist-order-against-sky-express-inc-prohibiting-illegal-bus-company
+    source_title: FMCSA press release, 3 June 2011
+  data_needed:
+  - Company
+  - Sanction
+  - Event
+  - Address
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - FMCSA out-of-service orders
+  - Ticketing websites
+  - State business registries
+  levels:
+    faint: New brand appears at the same pick-up points
+    strong: New name sells trips after an out-of-service order
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ticket resellers listing many operators
+  - Legitimate sale of routes to an unrelated operator
+  jurisdictions: US
+  version: 1
+- id: WS-039
+  name: Carrier safety scores above FMCSA intervention thresholds
+  definition: A carrier's percentile in one of FMCSA's safety categories (BASICs) is high enough to trigger
+    regulator intervention.
+  areas:
+  - WS
+  typology: Transport safety
+  status: verified
+  sources:
+  - title: CSA SBA Roundtable presentation (Feb 2012)
+    publisher: Federal Motor Carrier Safety Administration
+    year: '2012'
+    url: https://csa.fmcsa.dot.gov/Documents/SBA_02142012_Final_508.pdf
+    locator: Slide 17 (threshold table)
+    quote: How Thresholds Were Identified
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A bus company with an Unsafe Driving percentile above 50%.
+  cases: []
+  data_needed:
+  - Company
+  - Vehicle
+  - Event
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - FMCSA SMS / CSA public data
+  - FMCSA SAFER company snapshot
+  levels:
+    faint: Percentile rising toward the threshold
+    strong: Above threshold in one BASIC
+    textbook: 'Unsafe Driving, Hours-of-Service and Crash Indicator: 65% general, 60% hazmat, 50% passenger;
+      other BASICs: 80% general, 75% hazmat, 65% passenger (2012 presentation; check current SMS methodology)'
+    threshold_source: https://csa.fmcsa.dot.gov/Documents/SBA_02142012_Final_508.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small carriers with few inspections have volatile scores
+  - Crashes counted regardless of fault
+  - Methodology has been revised since 2012
+  jurisdictions: US
+  version: 1
+- id: WS-040
+  name: Late or missing reports of workplace deaths and serious injuries
+  definition: An employer does not report a work-related death within 8 hours, or a hospitalisation, amputation
+    or eye loss within 24 hours.
+  areas:
+  - WS
+  typology: Concealment from regulator
+  status: verified
+  sources:
+  - title: 29 CFR 1904.39 Reporting fatalities, hospitalizations, amputations, and losses of an eye
+    publisher: OSHA
+    url: https://www.osha.gov/laws-regs/regulations/standardnumber/1904/1904.39
+    locator: 1904.39(a)(1)
+    quote: Within eight (8) hours after the death of any employee as a result of a work-related incident,
+      you must report the fatality
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A death revealed by a coroner or news report with no OSHA report on file.
+  cases: []
+  data_needed:
+  - Event
+  - Company
+  - Person
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - OSHA severe injury reports dataset
+  - Coroner/medical examiner records
+  - Local news
+  levels:
+    faint: Death or hospitalisation known but report timing unclear
+    strong: No report found
+    textbook: Not reported within 8 hours (fatality) or 24 hours (hospitalisation, amputation, eye loss)
+      as 29 CFR 1904.39 requires
+    threshold_source: https://www.osha.gov/laws-regs/regulations/standardnumber/1904/1904.39
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Work-relatedness unclear at first
+  - Reported to a State Plan rather than federal OSHA
+  - Some deaths (e.g. certain motor vehicle incidents on public roads) have reporting exceptions
+  jurisdictions: US
+  version: 1
+- id: WS-041
+  name: Senior management failure amounting to a gross breach causing death (corporate manslaughter)
+  definition: How senior managers organise the business causes a death and falls far below what can reasonably
+    be expected.
+  areas:
+  - WS
+  typology: Negligent / corporate manslaughter
+  status: verified
+  sources:
+  - title: Corporate Manslaughter and Corporate Homicide Act 2007, section 1
+    publisher: legislation.gov.uk
+    year: '2007'
+    url: https://www.legislation.gov.uk/ukpga/2007/19/section/1
+    locator: s.1(4)(b)
+    quote: falls far below what can reasonably be expected of the organisation in the circumstances;
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-10'
+  - title: Corporate Manslaughter (legal guidance)
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/corporate-manslaughter
+    locator: Senior management test
+    quote: The failings of senior management must have formed a substantial element in the breach.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A geologist left to work alone in an unshored 3.5 m trench (Cotswold Geotechnical).
+  cases:
+  - name: R v Cotswold Geotechnical Holdings Ltd
+    year: '2011'
+    jurisdiction: UK (England)
+    what_happened: First conviction under the Corporate Manslaughter Act after geologist Alexander Wright
+      died in a collapsed, unshored trench in 2008; fined £385,000.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.constructionenquirer.com/2011/02/17/cotswold-geotechnical-fined-385000-over-trench-death/
+    source_title: Construction Enquirer, 17 Feb 2011
+  data_needed:
+  - Company
+  - Person
+  - Directorship
+  - Event
+  - CourtCase
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - Court records and sentencing remarks
+  - HSE prosecution records
+  - CPS press releases
+  levels:
+    faint: Workplace death with organisational causes
+    strong: Investigation finds senior-management decisions central
+    textbook: Meets the published definition as worded (CMCHA s.1)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Corporate manslaughter is a criminal offence; individuals face gross negligence manslaughter.
+    source_url: https://www.cps.gov.uk/legal-guidance/corporate-manslaughter
+  innocent_explanations:
+  - Death caused by individual error outside management control
+  - Organisation complied with guidance and industry standards
+  jurisdictions: UK (England, Wales, Scotland, NI)
+  version: 1
+- id: WS-042
+  name: Attitudes, policies or accepted practices that tolerate safety failures
+  definition: The organisation's culture or habits encourage or accept breaking safety rules, including
+    failures unrelated to the incident.
+  areas:
+  - WS
+  typology: Negligent / corporate manslaughter
+  status: verified
+  sources:
+  - title: Corporate Manslaughter and Corporate Homicide Act 2007, section 8
+    publisher: legislation.gov.uk
+    year: '2007'
+    url: https://www.legislation.gov.uk/ukpga/2007/19/section/8
+    locator: s.8(2); s.8(3) attitudes, policies, systems or accepted practices
+    quote: the organisation failed to comply with any health and safety legislation
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-10'
+  - title: Corporate Manslaughter (legal guidance)
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/corporate-manslaughter
+    locator: Section 8 factors
+    quote: attitudes, policies, systems or accepted practices within the organisation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Widespread disregard of permits-to-work across sites.
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Sanction
+  - Event
+  checkable: records
+  lookup_sources:
+  - Regulator enforcement history
+  - Internal audits
+  - Worker testimony
+  levels:
+    faint: Several unrelated safety citations
+    strong: Evidence that rule-breaking was routine and accepted
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Isolated lapses in an otherwise sound system
+  jurisdictions: UK; general
+  version: 1
+- id: WS-043
+  name: Failure to follow the organisation's own written safety procedures
+  definition: Work is done in ways that contradict the company's own written procedures or out-of-date
+    procedures are left in use.
+  areas:
+  - WS
+  typology: Negligent / corporate manslaughter
+  status: verified
+  sources:
+  - title: Corporate Manslaughter (legal guidance)
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/corporate-manslaughter
+    locator: The Gross Breach, section 8(4) examples (wording as extracted)
+    quote: a failure to follow the organisation's own written procedures
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BP America (Texas City) Refinery Explosion
+    publisher: US Chemical Safety and Hazard Investigation Board
+    url: https://www.csb.gov/bp-america-texas-city-refinery-explosion/
+    locator: Recommendations on startup procedures
+    quote: updated to reflect actual process conditions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Startup procedures that did not match how the unit was actually run.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Company
+  checkable: records
+  lookup_sources:
+  - Procedures and work records via discovery, FOI or sources
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Procedures outdated and informally replaced by safer practice
+  - Deviation authorised through management of change
+  jurisdictions: General
+  version: 1
+- id: WS-044
+  name: Workers left alone on high-risk tasks without protective measures
+  definition: An employee is left to work alone in a known dangerous situation, such as an unsupported
+    excavation.
+  areas:
+  - WS
+  typology: Negligent / corporate manslaughter
+  status: verified
+  sources:
+  - title: Ground testing firm fined £385,000 for manslaughter
+    publisher: Construction Enquirer
+    year: '2011'
+    url: https://www.constructionenquirer.com/2011/02/17/cotswold-geotechnical-fined-385000-over-trench-death/
+    locator: Article body
+    quote: had been left to work alone in an unshored 3.5 metre-deep trench
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cotswold Geotechnical trench death, 2008.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Company
+  checkable: person
+  lookup_sources:
+  - Court reporting
+  - HSE/OSHA investigation files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lone working permitted with a proper risk assessment and controls
+  jurisdictions: General
+  version: 1
+not_reached:
+- OSHA Field Operations Manual page (https://www.osha.gov/enforcement/fom) returned a fetch error; definitions
+  of willful, repeat and the five-year repeat lookback are taken from 29 U.S.C. 666 and a National Safety
+  Council article instead
+- OSHA 2013 SVEP white paper defining high-gravity etc. was not opened; the SVEP page notes public SVEP
+  logs are temporarily removed
+- FMCSA CSA SMS methodology PDF (csa.fmcsa.dot.gov/Documents/CSA_SMS_Methodology.pdf) returned a server
+  error; thresholds come from a 2012 FMCSA presentation and should be checked against the current methodology
+- Transportation Safety Board of Canada Lac-Megantic report (R13D0054) fetch failed; not included
+- DOJ release on BP Deepwater Horizon manslaughter plea fetch failed; not included
+- BAILII judgment R v Cotswold Geotechnical [2011] EWCA Crim 1337 blocked by bot protection; the case
+  is sourced from trade press reporting of the conviction
+- NTSB report on the 2011 Sky Express crash not located; case sourced from FMCSA release only
+- 'HSE HSG254 process safety indicators: landing page only, guide content not read'
+- Hackitt chapter 2 (value engineering, design-and-build changes) not read
+- CSB BP Texas City full final report not opened; findings taken from CSB news release and investigation
+  page
+- Pipeline, utility and dam safety (PHMSA, FERC, state dam safety) were flagged in the gap but not researched
+- OSHA whistleblower (Section 11(c)) retaliation data not researched

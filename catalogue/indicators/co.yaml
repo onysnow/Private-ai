@@ -4922,6 +4922,1938 @@ indicators:
   - Commodity prices rose sharply
   jurisdictions: Global
   version: 1
+- id: CO-085
+  name: Judge rules in a case where they or their household hold a financial interest
+  definition: A judge hears or decides a case in which they, a spouse or a minor child in the household
+    own any stake in a party or in the subject matter.
+  areas:
+  - CO
+  typology: Judicial conflict of interest
+  status: verified
+  sources:
+  - title: 28 U.S. Code 455 - Disqualification of justice, judge, or magistrate judge
+    publisher: Legal Information Institute (US Code text)
+    url: https://www.law.cornell.edu/uscode/text/28/455
+    locator: s.455(d)(4)
+    quote: ownership of a legal or equitable interest, however small
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Code of Conduct for United States Judges
+    publisher: Administrative Office of the US Courts
+    url: https://www.uscourts.gov/judges-judgeships/code-conduct-united-states-judges
+    locator: Canon 3C(1)(c)
+    quote: has a financial interest in the subject matter in controversy or in a party to the proceeding
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: A Study of State Judicial Discipline Sanctions (Cynthia Gray)
+    publisher: American Judicature Society (hosted by National Center for State Courts)
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 18 (Florida, McMillan)
+    quote: presiding over a court case despite a personal direct conflict of interest
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Judge's annual financial disclosure lists shares in a company that is a party on the judge's docket
+    that year
+  cases:
+  - name: United States v. Ciavarella
+    year: 2011 (affirmed 2013)
+    jurisdiction: US, Pennsylvania (federal)
+    what_happened: A Luzerne County judge committed juveniles to private detention centres co-owned by
+      a businessman who, with the builder, paid the judges millions in 'referral fees'; the conflict was
+      not disclosed. Convicted of racketeering, honest-services mail fraud and related counts; sentenced
+      to 336 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://law.justia.com/cases/federal/appellate-courts/ca3/11-3277/11-3277-2013-05-24.html
+    source_title: United States v. Ciavarella, No. 11-3277 (3d Cir. 2013)
+  data_needed:
+  - Person
+  - CourtCase
+  - Ownership
+  - Company
+  - Document
+  - Family
+  checkable: records
+  lookup_sources:
+  - US judges' financial disclosure reports (searchable database required by Public Law 117-125)
+  - PACER / state court dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Any ownership interest, 'however small', in a party or the subject matter while the judge
+      sits on the case (US federal rule)
+    threshold_source: https://www.law.cornell.edu/uscode/text/28/455
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Judicial version of an official deciding a matter in which they have a private interest
+    source_url: https://www.law.cornell.edu/uscode/text/28/455
+  innocent_explanations:
+  - Holding is in a mutual or common investment fund, which 455(d)(4) excludes
+  - Interest held by a blind trust or broker without the judge's knowledge, later divested under 455(f)
+  - Party name matches but is a different legal entity
+  - Conflict disclosed on the record and the parties waived where waiver is allowed
+  jurisdictions: US federal (28 U.S.C. 455; Code of Conduct for US Judges); comparable state rules
+  version: 1
+- id: CO-086
+  name: Judge fails to step aside where impartiality might reasonably be questioned
+  definition: A judge keeps hearing cases despite a relationship, prior involvement or bias that the rules
+    say requires disqualification.
+  areas:
+  - CO
+  typology: Judicial conflict of interest
+  status: verified
+  sources:
+  - title: 28 U.S. Code 455
+    publisher: Legal Information Institute (US Code text)
+    url: https://www.law.cornell.edu/uscode/text/28/455
+    locator: s.455(a)
+    quote: his impartiality might reasonably be questioned
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 9 (Pennsylvania, Pekarski)
+    quote: failing to recuse from at least 33 cases
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A judge repeatedly hears cases argued by a lawyer who is a relative or business partner
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Family
+  - Associate
+  - Directorship
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Court dockets
+  - Bar membership and law-firm records
+  - Judicial conduct commission decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Relationship was disclosed and parties consented where the rules allow
+  - 'Rule of necessity: no other judge available'
+  - Relationship is remote or ended long ago
+  - Recusal motion was considered and lawfully denied
+  jurisdictions: US federal and states
+  version: 1
+- id: CO-087
+  name: Judge holds private (ex parte) contact with one side
+  definition: A judge communicates about a pending case with one party or their lawyer without the other
+    side present or informed.
+  areas:
+  - CO
+  typology: Judicial misconduct
+  status: verified
+  sources:
+  - title: Code of Conduct for United States Judges
+    publisher: Administrative Office of the US Courts
+    url: https://www.uscourts.gov/judges-judgeships/code-conduct-united-states-judges
+    locator: Canon 3A(4)
+    quote: a judge should not initiate, permit, or consider ex parte communications
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 14 (Nevada, Fine)
+    quote: engaged in numerous and repeated ex parte communications
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Global Corruption Report 2007: Corruption in Judicial Systems'
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Diagnostic checklist for assessing safeguards against judicial corruption
+    quote: Rules on ex parte communication with judges in particular cases.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Calendars, emails or visitor logs show a litigant's lawyer meeting the judge alone during the case
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Event
+  - Document
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Court calendars and visitor logs (public records requests)
+  - Judicial conduct commission decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Scheduling or administrative contact the rules permit
+  - Emergency applications heard ex parte by law (e.g. some injunctions)
+  - Contact disclosed promptly to the other side
+  jurisdictions: US; widely recognised internationally
+  version: 1
+- id: CO-088
+  name: Judge receives money from people who profit from the judge's rulings
+  definition: Payments, 'fees' or gifts flow to a judge from a party, lawyer or business that benefits
+    from how the judge decides cases.
+  areas:
+  - CO
+  typology: Judicial bribery
+  status: verified
+  sources:
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 11 (Michigan, Jenkins)
+    quote: routinely solicited and accepted bribes
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Corruption Report 2007
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Executive summary, Comparative analysis, B. Bribery
+    quote: judges may accept bribes to delay or accelerate cases, accept or deny appeals, influence other
+      judges or simply decide a case in a certain way.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: United States v. Ciavarella (3d Cir. 2013)
+    publisher: US Court of Appeals for the Third Circuit (via Justia)
+    year: '2013'
+    url: https://law.justia.com/cases/federal/appellate-courts/ca3/11-3277/11-3277-2013-05-24.html
+    quote: 336 months of imprisonment
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A company that receives placements or work ordered by a court pays 'finder's' or 'referral' fees to
+    the judge
+  cases:
+  - name: United States v. Ciavarella ('kids for cash')
+    year: '2011'
+    jurisdiction: US, Pennsylvania (federal)
+    what_happened: Builder and co-owner of private juvenile detention centres paid the judges over $2.8
+      million in three years while the judge sent juveniles to those centres; jury convicted on racketeering
+      and related counts (acquitted of bribery and extortion counts). Co-defendant Judge Conahan pleaded
+      guilty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://law.justia.com/cases/federal/appellate-courts/ca3/11-3277/11-3277-2013-05-24.html
+    source_title: United States v. Ciavarella (3d Cir. 2013)
+  data_needed:
+  - Person
+  - CourtCase
+  - Payment
+  - Company
+  - Ownership
+  - Contract
+  checkable: records
+  lookup_sources:
+  - Judicial financial disclosures
+  - Property and company registers
+  - Court contracts and placement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Judicial instance of kickbacks for official decisions
+    source_url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+  innocent_explanations:
+  - Payment is for a lawful, disclosed transaction unrelated to cases (e.g. sale of property at market
+    value)
+  - Gifts from close family within disclosure rules
+  jurisdictions: Global
+  version: 1
+- id: CO-089
+  name: Litigant with a case pending pours money into the judge's election
+  definition: A party with a personal stake in a pending or imminent case gives or spends disproportionately
+    to elect the judge who then hears it.
+  areas:
+  - CO
+  typology: Judicial capture via campaign finance
+  status: verified
+  sources:
+  - title: Caperton v. A.T. Massey Coal Co., 556 U.S. 868
+    publisher: US Supreme Court (via Justia)
+    year: '2009'
+    url: https://supreme.justia.com/cases/federal/us/556/868/
+    quote: His contributions eclipsed the total amount spent by all other Benjamin supporters.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Corruption Report 2007
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Executive summary
+    quote: In the United States, judicial elections are marred by concerns that donations to judges' election
+      campaigns will inevitably influence judicial decision making.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Executive of a company appealing a large verdict funds independent spending to elect a state supreme
+    court justice, who then votes in the company's favour
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - CourtCase
+  - Payment
+  - Event
+  - Organization
+  checkable: records
+  lookup_sources:
+  - State campaign finance databases
+  - Independent expenditure filings
+  - Court dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (Caperton: ''serious risk of actual bias'' from
+      significant and disproportionate influence)'
+    threshold_source: https://supreme.justia.com/cases/federal/us/556/868/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary small donations by lawyers who appear before many judges
+  - Contribution made long before any related case existed
+  - Judge recused once the contribution became relevant
+  jurisdictions: US states with elected judges
+  version: 1
+- id: CO-090
+  name: Tickets or minor cases disposed of as favours (ticket fixing)
+  definition: A judge or court officer dismisses or reduces traffic tickets or minor charges for connected
+    people outside the normal process.
+  areas:
+  - CO
+  typology: Judicial favouritism
+  status: verified
+  sources:
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 13 (Mississippi, Chinn)
+    quote: engaged in ticket fixing
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Court records show tickets of officials' relatives dismissed without a hearing at a rate far above
+    other defendants
+  cases:
+  - name: In re Chinn (Mississippi)
+    year: before 2002 (reported in 2002 study)
+    jurisdiction: US, Mississippi
+    what_happened: Judge removed from office in discipline proceedings that included ticket fixing.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    source_title: A Study of State Judicial Discipline Sanctions, p. 13
+  data_needed:
+  - Person
+  - CourtCase
+  - Family
+  - Associate
+  - Document
+  checkable: records
+  lookup_sources:
+  - Traffic court case records
+  - Judicial conduct commission decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Dismissal under a lawful diversion or amnesty programme
+  - Defective ticket or missing officer
+  - Standard plea practice applied to everyone
+  jurisdictions: US states
+  version: 1
+- id: CO-091
+  name: Court funds or property in court custody taken for personal use
+  definition: A judge or court employee diverts fines, fees, deposits or seized property held by the court.
+  areas:
+  - CO
+  typology: Embezzlement in courts
+  status: verified
+  sources:
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 11 (New York, Sterling)
+    quote: converted $6,150 in court funds to his personal use
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Corruption Report 2007 (Buscaglia chapter)
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Part one, chapter on judicial corruption in criminal and civil cases (Edgardo Buscaglia)
+    quote: or where court personnel embezzle public or private property that is in court custody.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bail deposits or fine receipts that never reach the court's bank account
+  cases:
+  - name: In re Sterling (New York)
+    year: before 2002 (reported in 2002 study)
+    jurisdiction: US, New York
+    what_happened: Judge removed after converting $6,150 in court funds to personal use.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    source_title: A Study of State Judicial Discipline Sanctions, p. 11
+  data_needed:
+  - Person
+  - PublicBody
+  - Payment
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court audit reports
+  - State auditor reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Bookkeeping or timing errors later reconciled
+  - Refunds or transfers to other agencies not yet recorded
+  jurisdictions: Global
+  version: 1
+- id: CO-092
+  name: Judge's financial disclosure is false, incomplete or out of line with lifestyle
+  definition: A judge leaves loans, holdings or income off required disclosures, or lives in visible contrast
+    to declared income.
+  areas:
+  - CO
+  typology: Judicial integrity / asset declaration
+  status: verified
+  sources:
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 18 (California, Doan)
+    quote: failing to report several loans in the statement of economic interests
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Corruption Report 2007
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Introducing the problem, p. 9
+    quote: Judges who live lifestyles in notable contrast to the size of their salaries generate perceptions
+      of a corrupt judiciary.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Courthouse Ethics and Transparency Act, Public Law 117-125
+    publisher: US Government Publishing Office
+    year: '2022'
+    url: https://www.govinfo.gov/content/pkg/PLAW-117publ125/html/PLAW-117publ125.htm
+    quote: establish a searchable internet database to enable public access
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Property records show a judge's spouse bought assets that do not appear on the judge's disclosure
+  cases:
+  - name: In re Doan (California)
+    year: before 2002 (reported in 2002 study)
+    jurisdiction: US, California
+    what_happened: Judge removed; findings included failing to report several loans on the statement of
+      economic interests.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    source_title: A Study of State Judicial Discipline Sanctions, p. 18
+  data_needed:
+  - Person
+  - Document
+  - Ownership
+  - Family
+  - Address
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Judicial financial disclosure database
+  - Land and company registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clerical omission corrected by amendment
+  - Inheritance or spouse's independent income
+  - Item falls under a reporting exemption
+  jurisdictions: US and countries with asset declaration laws
+  version: 1
+- id: CO-093
+  name: Cases steered to a chosen judge instead of assigned at random
+  definition: Case assignment is non-random or manipulated so that a particular case lands with a compliant
+    judge.
+  areas:
+  - CO
+  typology: Judicial administration corruption
+  status: verified
+  sources:
+  - title: Global Corruption Report 2007
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Introducing the problem, p. 8
+    quote: Where case assignment is not random, a court president who seeks to control the outcome of
+      a case can readily assign a case to a compliant judge.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Corruption Report 2007 (Comparative analysis)
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Independence, political interference and corruption, p. 23
+    quote: Bribes to staff can speed up (or slow down) cases, avoid random assignment of judges and otherwise
+      smooth the path of a case.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - One judge receives a share of a powerful litigant's cases far above their share of the court's caseload
+  cases: []
+  data_needed:
+  - CourtCase
+  - Person
+  - PublicBody
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court docket data by judge
+  - Court assignment rules
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Specialist chambers or related-case rules send cases to one judge
+  - Small court with few judges
+  - Recusals or vacancies reshuffled assignments
+  jurisdictions: Global
+  version: 1
+- id: CO-094
+  name: Unexplained delays, adjournments or queue-jumping in cases
+  definition: Cases stall or jump ahead without reason, a pattern sources link to payments to speed up
+    or slow down justice.
+  areas:
+  - CO
+  typology: Judicial administration corruption
+  status: pending
+  sources:
+  - title: Global Corruption Report 2007
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Comparative analysis, p. 22
+    quote: In the extreme, judges and their staff can create delays in order to generate payoffs.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Corruption Report 2007 (Buscaglia chapter)
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    quote: where users pay bribes to court employees to accelerate or delay a case or to illegally alter
+      the order in which the case is to be attended or heard by the judge
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Code of Conduct for United States Judges
+    publisher: Administrative Office of the US Courts
+    url: https://www.uscourts.gov/judges-judgeships/code-conduct-united-states-judges
+    locator: Canon 3A(5)
+    quote: A judge should dispose promptly of the business of the court.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 16 (New York, Assini)
+    quote: refusing to deal with more than 100 cases over eight months
+    quote_verified: false
+    checked: '2026-10-10'
+  examples:
+  - Repeated adjournments in one litigant's case while comparable cases move; a case heard far sooner
+    than the court's average
+  cases: []
+  data_needed:
+  - CourtCase
+  - Event
+  - Person
+  checkable: records
+  lookup_sources:
+  - Court docket timelines
+  - Court performance statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Court backlog and understaffing
+  - Lawful priority rules (custody, urgent injunctions)
+  - Delays requested by the parties themselves
+  jurisdictions: Global
+  version: 1
+- id: CO-095
+  name: Case files or evidence altered, lost or mishandled by court staff
+  definition: Files, evidence or records in a case are changed, go missing or are handled outside procedure,
+    often to benefit one side.
+  areas:
+  - CO
+  typology: Judicial administration corruption
+  status: verified
+  sources:
+  - title: Global Corruption Report 2007 (Buscaglia chapter)
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    quote: Examples include cases where court users pay bribes to the court's support personnel in order
+      to alter the legal treatment of files or evidentiary material
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Key exhibit missing from the file only in a case involving a well-connected defendant
+  cases: []
+  data_needed:
+  - CourtCase
+  - Document
+  - Person
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records and audit reports
+  - Appeal rulings noting incomplete records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poor records management or storage damage
+  - Files moved during digitisation
+  - Clerical misfiling
+  jurisdictions: Global
+  version: 1
+- id: CO-096
+  name: Abuse of contempt power or procedural discretion
+  definition: A judge uses contempt, injunctions, notices or procedural rulings in an improper way to
+    benefit or punish a party.
+  areas:
+  - CO
+  typology: Judicial misconduct
+  status: verified
+  sources:
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 10 (Nevada, Goldman)
+    quote: abuse of his contempt power in 6 cases
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Corruption Report 2007 (Buscaglia chapter)
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    quote: issuing notifications to parties in dispute, calling witnesses, issuing injunctions or allowing
+      procedural delays based on frivolous motions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Ex parte injunctions repeatedly granted to the same applicant in commercial disputes
+  cases: []
+  data_needed:
+  - CourtCase
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Dockets and appellate reversals
+  - Judicial conduct commission decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful contempt to enforce court orders
+  - Legitimate urgency for interim relief
+  - Judicial error corrected on appeal rather than misconduct
+  jurisdictions: US states; global
+  version: 1
+- id: CO-097
+  name: Judge associates with criminals or with parties appearing before them
+  definition: A judge keeps social or business ties with known criminals or with litigants in a way discipline
+    bodies have found improper.
+  areas:
+  - CO
+  typology: Judicial misconduct
+  status: verified
+  sources:
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 22
+    quote: Two cases involved judges' improper association with criminals.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 22
+    quote: inappropriate financial relationships or dealings
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Judge co-owns property with a person later prosecuted for organised crime
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Ownership
+  - Company
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Company and land registers
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family relationship the judge cannot end, properly disclosed
+  - Acquaintance predates the person's criminal conduct
+  - Small community where contact is unavoidable
+  jurisdictions: US states
+  version: 1
+- id: CO-098
+  name: Judges transferred, demoted or passed over after ruling against powerful interests
+  definition: Top judges or political actors use promotions, transfers or case removal to punish judges
+    who will not rule as wanted.
+  areas:
+  - CO
+  typology: Political interference in the judiciary
+  status: verified
+  sources:
+  - title: Global Corruption Report 2007
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Comparative analysis, p. 22
+    quote: If top judges are corrupt or dependent on political leaders, they can use promotions and transfers
+      of judges to discipline those unwilling to play the corruption game.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Resource Guide on Strengthening Judicial Integrity and Capacity
+    publisher: UNODC
+    year: '2011'
+    url: https://icclr.org/wp-content/uploads/2019/05/11-85709_ebook.pdf?x15698
+    locator: Ch. I s.5, p. 13
+    quote: risk that professional evaluations be used to indirectly influence judicial decisions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Judge moved to a remote post weeks after acquitting an opposition figure
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Employment
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Judicial council appointment and transfer decisions
+  - GRECO and ENCJ country reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Control of the judiciary by political or economic interests
+    source_url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+  innocent_explanations:
+  - Routine rotation policy applied to all judges
+  - Performance-based decisions documented in advance
+  - Judge's own request for transfer
+  jurisdictions: Global
+  version: 1
+- id: CO-099
+  name: Court or prison staff charge for services that should be free
+  definition: Clerks, guards or other justice staff demand payment for routine services such as filing,
+    hearings, food, health care or visits.
+  areas:
+  - CO
+  typology: Petty bribery and extortion in the justice sector
+  status: verified
+  sources:
+  - title: Global Corruption Report 2007
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Executive summary, B. Bribery
+    quote: court officials may extort money for work they should do anyway
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 2.1, p. 21
+    quote: Prison staff may seek or accept bribes to provide services, including such basic services as
+      food and health care or for allowance of visits.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Prisoners' families report paying guards to ensure food or medicine reaches relatives
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Payment
+  - Event
+  - Note
+  checkable: person
+  lookup_sources:
+  - Interviews with court users and prisoners' families
+  - Ombudsman and inspection reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful official fees or commissary charges
+  - Payments to licensed private service providers
+  jurisdictions: Global
+  version: 1
+- id: CO-100
+  name: Phones, drugs or weapons entering prison with staff involvement
+  definition: Contraband reaches prisoners through staff who take bribes, rather than only through visitors.
+  areas:
+  - CO
+  typology: Prison corruption
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 2.1, p. 22
+    quote: Bribery is not just limited to the context of provision of services; it is also commonly used
+      to facilitate the smuggling of contraband (drugs, phones, weapons, etc.) into prisons.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 2 conclusion, pp. 23-24
+    quote: there may exist a tendency to jump to the conclusion that visitors are the sole culprit and
+      exclusive source of any such contraband, rather than giving equal attention to the involvement of
+      prison staff
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Large phone seizures in units with no visits; officer's bank deposits rise in step with seizures
+  cases:
+  - name: NYC Department of Investigation finding on Rikers Island
+    year: c. 2015 (reported 2016)
+    jurisdiction: US, New York City
+    what_happened: DOI found correction officers could earn $400 to $900 a day smuggling drugs and other
+      contraband into the Rikers complex (as quoted in the UNODC handbook from a Columbia Law School CAPI
+      paper).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    source_title: UNODC Handbook, Ch. 4 box on pay (citing CAPI 2016)
+  data_needed:
+  - Person
+  - PublicBody
+  - Employment
+  - Payment
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Prison inspection and inspector-general reports
+  - Criminal court records
+  - Contraband seizure statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Handbook links prison corruption to drug trafficking and organised crime operations
+    source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  innocent_explanations:
+  - Contraband thrown over walls or dropped by drone
+  - Visitor smuggling
+  - Rising seizures reflect better detection, not more smuggling (UNODC p. 39 notes this)
+  jurisdictions: Global
+  version: 1
+- id: CO-101
+  name: Better cells, jobs or regimes sold to prisoners
+  definition: Staff take payments to decide where a prisoner is housed, which job they get, whether they
+    skip labour, or move to a softer regime.
+  areas:
+  - CO
+  typology: Prison corruption
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 2.1, p. 22
+    quote: Furthermore, bribery may be used to influence the physical location of a prisoner within the
+      prison and the quality of accommodation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Introduction
+    quote: some prison personnel will be willing to sell freedom or privileges
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Wealthy prisoners consistently in single cells or less restrictive units against classification rules
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Payment
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Prison classification records (requests)
+  - Inspection reports
+  - Prisoner interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Placement based on lawful risk classification, health or protection needs
+  - Good-behaviour privileges awarded by rule
+  jurisdictions: Global
+  version: 1
+- id: CO-102
+  name: Payments or influence around parole, early release or transfer
+  definition: Staff solicit or take payments to push a prisoner up the parole list, influence the board,
+    or arrange a transfer.
+  areas:
+  - CO
+  typology: Prison corruption / trading in influence
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 2.1, p. 22
+    quote: Trying to influence the decision of a parole board, putting a person on a list to be considered
+      for parole ahead of the rightful date or suggesting a prisoner for relocation to a different prison
+      facility could be classified as corruption
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Prisoner considered for parole before the eligible date with no record of why
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Parole board decisions
+  - Sentence calculation records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Handbook classes this as trading in influence
+    source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  innocent_explanations:
+  - Lawful sentence credits or compassionate release
+  - Transfer for capacity, safety or family reasons
+  jurisdictions: Global
+  version: 1
+- id: CO-103
+  name: Powerful prisoners or gangs exert control over staff
+  definition: Dominant prisoners use threats or pressure to make staff look away, leading to loss of control
+    of the prison.
+  areas:
+  - CO
+  typology: Prison corruption / organised crime
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 1.4
+    quote: Certain dominant prisoners may seek to condition, manipulate or corrupt staff, using threats,
+      intimidation, coercion or other forms of pressure to affect the way in which prison staff behave
+      and respond.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Introduction, p. 2
+    quote: This risk is further increased if members of organized crime groups or high-risk prisoners
+      manage to come into a position of power and control with respect to prison officials.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection reports describe prisoner leaders running wings or disciplining others
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Event
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Prison inspection reports
+  - Court records of offences committed from prison
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Handbook ties prisoner control to organised crime influence
+    source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  innocent_explanations:
+  - Legitimate prisoner representative or peer-support schemes
+  - Understaffing rather than corruption causes passive supervision
+  jurisdictions: Global
+  version: 1
+- id: CO-104
+  name: Staff with personal ties to prisoners or over-familiar relationships
+  definition: A prison officer has an undeclared relationship with a prisoner, trades goods, leaks information,
+    or guards a relative.
+  areas:
+  - CO
+  typology: Prison corruption / conflict of interest
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 4, staff training
+    quote: Obvious violations include having a personal relationship with a prisoner, trafficking goods,
+      disclosing classified information, or bypassing procedures for any reason.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 4, conflicts of interest
+    quote: if a prison officer is in charge of a block that is housing a close relative, or a procurement
+      officer is involved in a tender for which a family member has submitted an offer, these conflicts
+      of interest should be registered.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Officer and prisoner share an address or family name; frequent calls between officer's phone and prisoner's
+    contacts
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Employment
+  - Address
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Court and prison employment records
+  - Address and family records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Handbook frames this as a conflict to register, restrict or relinquish
+    source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+  innocent_explanations:
+  - Relationship registered and officer reassigned
+  - Small local community where staff and prisoners know each other
+  jurisdictions: Global
+  version: 1
+- id: CO-105
+  name: Searches, entry checks or seized-contraband storage that are weak or bypassed
+  definition: Body and cell searches, entry procedures or storage of seized items are skipped or controlled
+    by few people, creating openings for bribes.
+  areas:
+  - CO
+  typology: Prison corruption risk
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 3 corruption risk assessment, p. 34
+    quote: entry procedures to the prison; other relevant aspects of procedural security, including the
+      way in which body and cell searches are carried out; the storage of seized contraband
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 3, data to collect, p. 33
+    quote: Data on the amount of contraband intercepted
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Seized phones vanish from evidence storage; staff entrances exempt from scanning
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - Inspection and audit reports
+  - Contraband seizure statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff shortages force reduced searching
+  - Equipment failure
+  - Changes in seizure numbers can reflect detection effectiveness
+  jurisdictions: Global
+  version: 1
+- id: CO-106
+  name: Prison goods, prisoners' money or work-programme funds misappropriated
+  definition: Staff divert supplies, prisoners' mail money, wages or prison-industry cash, or use prison
+    vehicles and equipment privately.
+  areas:
+  - CO
+  typology: Embezzlement in prisons
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 2.2, p. 23
+    quote: A further risk of embezzlement and misappropriation relates to financial transactions and cash
+      flows associated with the management of work programmes for prisoners or prison industries
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 2.2, p. 23
+    quote: the misappropriation of public property for private purposes, such as the use of official vehicles
+      or other prison equipment for private business
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Prisoners complain that money sent by post never arrives
+  cases:
+  - name: Prison post officer embezzlement case (Court of Appeals of Colmar)
+    year: '2006'
+    jurisdiction: France
+    what_happened: A prison officer handling prisoners' mail took over 17,000 EUR from letters in under
+      a year; convicted of embezzlement and forgery offences, suspended sentence and barred from public
+      office (officer not named in the source).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    source_title: UNODC Handbook, Ch. 2.2 example
+  data_needed:
+  - Person
+  - PublicBody
+  - Payment
+  - Contract
+  - Vehicle
+  - Document
+  checkable: records
+  lookup_sources:
+  - Prison audit reports
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accounting delays
+  - Authorised deductions from prisoners' accounts
+  jurisdictions: Global
+  version: 1
+- id: CO-107
+  name: Justice-sector staff hired through connections or with vetting bypassed
+  definition: Prison or court staff are recruited on family ties or patronage, or vetting information
+    is removed or ignored.
+  areas:
+  - CO
+  typology: Recruitment corruption in justice institutions
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 4, vetting, p. 44
+    quote: Important information may be removed from a personnel file or deliberately ignored in a recruitment
+      or promotion process.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Resource Guide on Strengthening Judicial Integrity and Capacity
+    publisher: UNODC
+    year: '2011'
+    url: https://icclr.org/wp-content/uploads/2019/05/11-85709_ebook.pdf?x15698
+    locator: Ch. II s.2, p. 22
+    quote: rather than on nepotism or other inappropriate personal or political considerations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Code of Conduct for United States Judges
+    publisher: Administrative Office of the US Courts
+    url: https://www.uscourts.gov/judges-judgeships/code-conduct-united-states-judges
+    locator: Canon 3B(3)
+    quote: avoiding unnecessary appointments, nepotism, and favoritism.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several officers in one wing related to each other; hire with a known criminal associate
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Family
+  - Associate
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Public payroll and employment records
+  - Family and address records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Local labour market draws on the same families
+  - Open competition that a relative happened to win
+  jurisdictions: Global
+  version: 1
+- id: CO-108
+  name: Ghost employees on the public payroll
+  definition: People who do not work for the body, or do not exist, are paid salaries from the payroll.
+  areas:
+  - CO
+  typology: Payroll fraud / embezzlement
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 4, remuneration, p. 49
+    quote: an emphasis should be placed on ensuring correspondence between the payroll lists, the actual
+      list of public employees in departments/public bodies as recorded in the computerized personal information
+      system, and the personnel files of public employees.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Occupational Fraud 2024: A Report to the Nations'
+    publisher: Association of Certified Fraud Examiners
+    year: '2024'
+    url: https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf
+    locator: Glossary of Terminology, p. 104
+    quote: 'Payroll scheme: A fraudulent disbursement scheme in which an employee causes their employer
+      to issue a payment by making false claims for compensation'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Salaries paid to staff with no attendance records, shared bank accounts or addresses, or dates of
+    birth that make them implausible
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - PublicBody
+  - Address
+  checkable: records
+  lookup_sources:
+  - Payroll versus personnel records (public records)
+  - Civil service census or audit reports
+  - Death and civil registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Both are fraudulent disbursement schemes in the ACFE fraud tree
+    source_url: https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf
+  innocent_explanations:
+  - Employees on authorised leave, secondment or remote posts
+  - Payroll not yet updated after resignation or death (administrative lag)
+  - Shared accounts within a family
+  jurisdictions: Global
+  version: 1
+- id: CO-109
+  name: Public funds or property diverted by the official entrusted with them
+  definition: An official takes, for themselves or others, money or property they hold because of their
+    position.
+  areas:
+  - CO
+  typology: Embezzlement / misappropriation
+  status: verified
+  sources:
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Ch. 2.2, p. 23
+    quote: Embezzlement in the public sector is a widespread phenomenon from which prisons are not exempt.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Handbook on Anti-Corruption Measures in Prisons
+    publisher: UNODC
+    year: '2017'
+    url: https://unodc.org/documents/corruption/Publications/2017/17-06140_HB_anti-corr_prisons_eBook.pdf
+    locator: Introduction, p. 2
+    quote: Relevant examples include embezzlement of funds needed for necessary security measures and
+      infrastructure; misappropriation of goods
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Budget for prison security upgrades spent but works never done
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Payment
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Supreme audit institution reports
+  - Budget execution reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Funds lawfully re-allocated by budget amendment
+  - Project delayed but money still held
+  - Accounting error
+  jurisdictions: Global
+  version: 1
+- id: CO-110
+  name: Person controlling funds refuses to share duties or take leave
+  definition: An employee who handles money keeps sole control, resists oversight or never takes holidays,
+    behaviours fraud surveys link to concealed schemes.
+  areas:
+  - CO
+  typology: Behavioural red flag of embezzlement
+  status: verified
+  sources:
+  - title: 'Occupational Fraud 2024: A Report to the Nations'
+    publisher: Association of Certified Fraud Examiners
+    year: '2024'
+    url: https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf
+    locator: Fig. 54, p. 66
+    quote: Control issues, unwillingness to share duties 13%
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Occupational Fraud 2024: A Report to the Nations'
+    publisher: Association of Certified Fraud Examiners
+    year: '2024'
+    url: https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf
+    locator: Fig. 54, p. 66
+    quote: Refusal to take vacations 6%
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Treasurer of a public body has not taken leave in years and alone reconciles the accounts
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - PublicBody
+  - Note
+  checkable: person
+  lookup_sources:
+  - Interviews with colleagues
+  - Audit management letters
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Understaffed office with nobody to cover
+  - Personal work ethic or financial need for overtime
+  jurisdictions: Global
+  version: 1
+- id: CO-111
+  name: Foreign agent registers late (more than 10 days after agreeing to act)
+  definition: A person or firm working for a foreign principal files its FARA registration well after
+    the 10-day deadline, often retroactively.
+  areas:
+  - CO
+  typology: Foreign agent registration breach
+  status: verified
+  sources:
+  - title: FARA Frequently Asked Questions
+    publisher: US Department of Justice, FARA Unit
+    url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+    quote: parties must file a registration statement within 10 days of having agreed to act as an agent
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Registration filed years after the activity began, listing past meetings with officials
+  cases:
+  - name: Barry Bennett and Douglas Watts
+    year: '2024'
+    jurisdiction: US
+    what_happened: Resolved FARA violations through deferred prosecution agreements with fines of $100,000
+      and $25,000.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+    source_title: DOJ FARA Unit, Recent FARA Cases
+  data_needed:
+  - Person
+  - Company
+  - Organization
+  - PublicBody
+  - Contract
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - FARA eFile public database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Registration filed more than 10 days after agreeing to act as an agent
+    threshold_source: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Good-faith belief an exemption applied, corrected after DOJ advice
+  - Uncertainty whether the client is a foreign principal
+  jurisdictions: US
+  version: 1
+- id: CO-112
+  name: Foreign agent's informational materials not filed within 48 hours
+  definition: Materials a registered agent sends out for a foreign principal are not filed with the FARA
+    Unit within 48 hours of distribution.
+  areas:
+  - CO
+  typology: Foreign agent disclosure breach
+  status: verified
+  sources:
+  - title: FARA Frequently Asked Questions
+    publisher: US Department of Justice, FARA Unit
+    url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+    quote: an agent must file informational materials with the FARA Unit, within 48 hours of transmittal.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Op-ed or briefing paper circulated to Congress that never appears in the registrant's filings
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - FARA eFile informational materials
+  - News and congressional records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Material filed more than 48 hours after transmittal, or never filed
+    threshold_source: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Material is not 'informational material' under the Act
+  - Late filing due to administrative error
+  jurisdictions: US
+  version: 1
+- id: CO-113
+  name: Foreign agent's six-month supplemental statements missing or thin
+  definition: A FARA registrant misses its six-monthly supplemental statements or leaves out activities,
+    payments or contacts.
+  areas:
+  - CO
+  typology: Foreign agent disclosure breach
+  status: verified
+  sources:
+  - title: FARA Frequently Asked Questions
+    publisher: US Department of Justice, FARA Unit
+    url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+    quote: Registrants must file supplemental statements at six-month intervals
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: FARA Frequently Asked Questions
+    publisher: US Department of Justice, FARA Unit
+    url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+    quote: FARA authorizes the Department of Justice to inspect registrants' books and records
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Statement reports no political activity while lobbying meetings appear in officials' calendars
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - FARA eFile
+  - Officials' calendars
+  - Lobbying disclosure filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Supplemental statement not filed for a six-month period
+    threshold_source: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Registration terminated
+  - Genuinely no activity in the period
+  jurisdictions: US
+  version: 1
+- id: CO-114
+  name: Work for a foreign government filed as ordinary lobbying or commercial activity
+  definition: An agent relies on the Lobbying Disclosure Act or commercial exemption although a foreign
+    government or party directs the work.
+  areas:
+  - CO
+  typology: Foreign agent exemption misuse
+  status: verified
+  sources:
+  - title: FARA Frequently Asked Questions
+    publisher: US Department of Justice, FARA Unit
+    url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+    quote: the exemption will not apply if such activities are directed by a foreign government or political
+      party
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: FARA Frequently Asked Questions
+    publisher: US Department of Justice, FARA Unit
+    url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+    quote: An agent who is properly registered under the LDA is exempt from registration under FARA,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - LDA filing names a private company client that is state-owned or acting for a foreign ministry
+  cases: []
+  data_needed:
+  - Company
+  - PublicBody
+  - Ownership
+  - Contract
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Senate/House LDA database
+  - FARA eFile
+  - Company ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Client is a genuinely private foreign company acting for its own commercial interest
+  - Agent sought DOJ advisory opinion
+  jurisdictions: US
+  version: 1
+- id: CO-115
+  name: Sitting public official acts for a foreign government
+  definition: An elected or appointed official carries out work at the direction of a foreign government,
+    which US law bars.
+  areas:
+  - CO
+  typology: Foreign agent / bribery
+  status: verified
+  sources:
+  - title: Recent FARA Cases
+    publisher: US Department of Justice, FARA Unit
+    year: '2024'
+    url: https://www.justice.gov/nsd-fara/recent-cases
+    locator: Menendez entry
+    quote: were convicted on all charges
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Official passes non-public information to foreign officials while receiving gifts from intermediaries
+  cases:
+  - name: United States v. Menendez, Hana and Daibes
+    year: '2024'
+    jurisdiction: US, S.D.N.Y.
+    what_happened: Senator Robert Menendez and businessmen Wael Hana and Fred Daibes were convicted on
+      all charges, including conspiracy for Menendez to act as an agent of Egypt.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+    source_title: DOJ FARA Unit, Recent FARA Cases
+  - name: United States v. Michel
+    year: '2023'
+    jurisdiction: US, D.D.C.
+    what_happened: Prakazrel 'Pras' Michel convicted by a jury including of acting as an unregistered
+      agent of a foreign power; Elliott Broidy had pleaded guilty in 2020 to conspiracy to violate FARA.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+    source_title: DOJ FARA Unit, Recent FARA Cases
+  data_needed:
+  - Person
+  - PublicBody
+  - Payment
+  - Associate
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Gift and financial disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Menendez case combined bribery with agent-of-foreign-government charges
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+  innocent_explanations:
+  - Ordinary diplomatic or constituent contact with foreign officials
+  - Authorised official duties
+  jurisdictions: US
+  version: 1
+- id: CO-116
+  name: 'UK: political influence activity directed by a foreign power but not registered within 28 days'
+  definition: Someone lobbies UK officials, publishes or spends money at a foreign power's direction without
+    registering under FIRS within 28 days.
+  areas:
+  - CO
+  typology: Foreign influence registration breach (UK)
+  status: verified
+  sources:
+  - title: Introduction to the Foreign Influence Registration Scheme
+    publisher: UK Home Office
+    url: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+    locator: Political influence tier, para 9
+    quote: Registration is required within 28 calendar days of the direction being given by the foreign
+      power.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Security Act 2023, Part 4
+    publisher: legislation.gov.uk
+    year: '2023'
+    url: https://www.legislation.gov.uk/ukpga/2023/32/part/4
+    locator: s.71(2)(a)
+    quote: after the end of the registration period P carries out a political influence activity
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A consultancy arranges meetings for a foreign ministry with MPs and no FIRS registration appears
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - PublicBody
+  - Contract
+  - Event
+  - Document
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - FIRS public register
+  - MPs' register of interests
+  - Ministerial meeting disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Political influence activity at a foreign power's direction carried out after the 28-day
+      registration period without registration
+    threshold_source: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Activity falls under a scheme exemption (e.g. diplomatic or legal services)
+  - Direction came from a private foreign company, not a foreign power
+  - Registration filed but not yet published
+  jurisdictions: UK (National Security Act 2023, Part 4)
+  version: 1
+- id: CO-117
+  name: 'UK enhanced tier: arrangement with a specified foreign power not registered within 10 days'
+  definition: Someone acting at the direction of a foreign power or entity specified for the enhanced
+    tier carries out any activity in the UK without registering within 10 days.
+  areas:
+  - CO
+  typology: Foreign influence registration breach (UK)
+  status: verified
+  sources:
+  - title: Introduction to the Foreign Influence Registration Scheme
+    publisher: UK Home Office
+    url: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+    locator: Enhanced tier, para 18
+    quote: Registration is required within 10 calendar days of the direction being given
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Security Act 2023, Part 4
+    publisher: legislation.gov.uk
+    year: '2023'
+    url: https://www.legislation.gov.uk/ukpga/2023/32/part/4
+    locator: s.80(1)(a)
+    quote: on conviction on indictment, to imprisonment for a term not exceeding 5 years or to a fine
+      (or both);
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - UK company carrying out commercial or research work at the direction of a specified foreign state
+    entity with no registration
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - PublicBody
+  - Ownership
+  - Contract
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Home Office list of enhanced-tier specified powers and entities
+  - Companies House ownership records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Activity under an arrangement with a specified power/entity without registration within
+      10 days
+    threshold_source: https://www.legislation.gov.uk/ukpga/2023/32/part/4
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Enhanced tier targets specified foreign powers and controlled entities
+    source_url: https://gov.uk/government/publications/foreign-influence-registration-scheme-introduction/introduction-to-the-foreign-influence-registration-scheme-firs-accessible-version
+  innocent_explanations:
+  - Counterparty is not on the specified list
+  - Activity exempt or not 'relevant activity' as specified
+  - Arrangement predates the scheme and was registered in time
+  jurisdictions: UK
+  version: 1
+- id: CO-118
+  name: False or misleading information in a foreign influence registration
+  definition: A FIRS registrant gives information that is false, inaccurate or misleading in a material
+    way.
+  areas:
+  - CO
+  typology: Foreign influence registration breach (UK)
+  status: verified
+  sources:
+  - title: National Security Act 2023, Part 4
+    publisher: legislation.gov.uk
+    year: '2023'
+    url: https://www.legislation.gov.uk/ukpga/2023/32/part/4
+    locator: s.77(1)(b)
+    quote: the information is false, inaccurate or misleading in a material way.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Registration names a private intermediary while emails show direction from a foreign ministry
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - PublicBody
+  - Document
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - FIRS public register
+  - Company and ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest error corrected promptly
+  - Information changed after filing and updated
+  jurisdictions: UK
+  version: 1
+- id: CO-119
+  name: Judge engages in partisan political activity
+  definition: A sitting judge seeks party endorsements, campaigns or otherwise takes part in partisan
+    politics against conduct rules.
+  areas:
+  - CO
+  typology: Judicial misconduct / politicisation
+  status: verified
+  sources:
+  - title: A Study of State Judicial Discipline Sanctions
+    publisher: American Judicature Society / NCSC
+    year: '2002'
+    url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    locator: p. 23 (Delaware, Buckson)
+    quote: sought the endorsement of a political party convention
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Global Corruption Report 2007
+    publisher: Transparency International
+    year: '2007'
+    url: https://images.transparencycdn.org/images/2007_GCR_EN.pdf
+    locator: Back-cover summary
+    quote: political interference to pressure judges for rulings in favour of political or economic interests
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Judge appears at party fundraisers while hearing cases involving the party
+  cases:
+  - name: In re Buckson (Delaware)
+    year: before 2002 (reported in 2002 study)
+    jurisdiction: US, Delaware
+    what_happened: Judge removed; conduct included seeking a political party convention's endorsement.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://ncfsc-web.squiz.cloud/__data/assets/pdf_file/0026/18881/study-of-state-judicial-discipline-sanctions.pdf
+    source_title: A Study of State Judicial Discipline Sanctions, p. 23
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Campaign finance and party records
+  - Judicial conduct commission decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Campaigning permitted for elected judges within state rules
+  - Activity before taking judicial office
+  jurisdictions: US states and federal
+  version: 1
 not_reached:
 - 'FinCEN Advisory FIN-2018-A003 red-flag list: the bullets sit in an image box on p. 5 and could not
   be extracted as text (the rest of the advisory was read).'
@@ -4957,3 +6889,21 @@ not_reached:
   Sphynx/Kensington cases were not opened. Their outcomes come from NRGI's summaries.
 - The Geneva appeal ruling in Steinmetz has no exact date in the source I read. It was in 2022 per the
   Al Jazeera and Fortune headlines from August 2022, which I did not open.
+- WebSearch budget for this turn was exhausted early (shared 200-call limit), so further discovery searches
+  could not run; all sources were reached by direct fetch.
+- WSJ 2021 investigation into federal judges' stock holdings (wsj.com blocked to the fetch tool); not
+  used as a case.
+- FBI and DOJ press releases on Ciavarella and on Baltimore City Detention Center contraband cases (fetch
+  errors); the Third Circuit opinion was used for Ciavarella instead.
+- 'UNODC Resource Guide on Strengthening Judicial Integrity: parts on case assignment and judges'' asset
+  declarations were not in the extracted text.'
+- 'TI Diagnostic checklist (2007) as a stand-alone document, GRECO Fourth Round reports and ENCJ indicators:
+  only referenced through the TI Knowledge Hub and the GCR 2007.'
+- 'GIJN foreign lobbying guide: not opened.'
+- 'Full UNCAC text (Articles 11 and 17): the downloaded PDF was a 5-page summary, so no UNCAC quote is
+  used.'
+- No FIRS enforcement case found yet (the scheme began in 2025); list of enhanced-tier specified countries
+  not opened.
+- Congress.gov page for the Courthouse Ethics and Transparency Act (robots-blocked); the govinfo public
+  law text was used instead.
+- Remaining 19,538 characters of the NCSC/AJS study were not read.

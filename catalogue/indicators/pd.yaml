@@ -2580,6 +2580,785 @@ indicators:
   - Late but honest chart completion
   jurisdictions: US
   version: 1
+- id: PD-051
+  name: Speaker programme with little or no substantive content
+  definition: A drug or device company pays for 'educational' speaker events at which little or no real
+    medical information is actually presented.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: The company sponsors speaker programs where little or no substantive information is actually
+      presented;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Novartis Pays Over $642 Million to Settle Allegations of Improper Payments to Patients and
+      Physicians
+    publisher: US Department of Justice
+    year: '2020'
+    url: https://www.justice.gov/opa/pr/novartis-pays-over-642-million-settle-allegations-improper-payments-patients-and-physicians
+    quote: hosted tens of thousands of speaker programs and related events under the guise of providing
+      educational content
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Novartis settlement (2020): government alleged programmes were ''nothing more than social events
+    held at expensive restaurants''.'
+  cases:
+  - name: United States v. Novartis Pharmaceuticals (speaker programme kickbacks, SDNY)
+    year: '2020'
+    jurisdiction: US (Southern District of New York)
+    what_happened: Government alleged Novartis used tens of thousands of speaker programmes as social
+      events to induce prescribing; Novartis paid over $642 million across settlements, made factual admissions
+      and entered a five-year corporate integrity agreement; the release states claims are allegations
+      with no determination of liability.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/novartis-pays-over-642-million-settle-allegations-improper-payments-patients-and-physicians
+    source_title: Novartis Pays Over $642 Million to Settle Allegations of Improper Payments to Patients
+      and Physicians
+  data_needed:
+  - Event
+  - Company
+  - Person
+  - Payment
+  - Document
+  checkable: person
+  lookup_sources:
+  - CMS Open Payments (speaker compensation records)
+  - DOJ and HHS-OIG press releases and settlement agreements
+  - Company speaker-programme disclosures under corporate integrity agreements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Speaker-programme remuneration is analysed under the federal anti-kickback statute and resolved
+      via False Claims Act settlements (health-care fraud).
+    source_url: https://www.justice.gov/opa/pr/novartis-pays-over-642-million-settle-allegations-improper-payments-patients-and-physicians
+  innocent_explanations:
+  - Genuine peer education on a new product, safety update or dosing change
+  - Short programmes may still convey real information
+  - Attendee recollection of content may be incomplete
+  jurisdictions: US (federal health care programmes)
+  version: 1
+- id: PD-052
+  name: Alcohol or meals above modest value at speaker events
+  definition: Attendees at a company speaker programme are given alcohol, especially free alcohol, or
+    meals worth more than a modest amount.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: Alcohol is available or a meal exceeding modest value is provided to the attendees of the program
+      (the concern is heightened when the alcohol is free);
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: Background
+    quote: the average food and alcohol cost per attendee was over $500
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Novartis Pays Over $642 Million to Settle Allegations of Improper Payments to Patients and
+      Physicians
+    publisher: US Department of Justice
+    year: '2020'
+    url: https://www.justice.gov/opa/pr/novartis-pays-over-642-million-settle-allegations-improper-payments-patients-and-physicians
+    quote: speaking fees, exorbitant meals, and top-shelf alcohol
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - OIG reported cases where average food and alcohol cost per attendee exceeded $500 (cited as an observed
+    example, not a threshold).
+  cases: []
+  data_needed:
+  - Event
+  - Payment
+  - Company
+  - Person
+  - Address
+  checkable: records
+  lookup_sources:
+  - CMS Open Payments (food and beverage records)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Modest meals are commonly provided at legitimate educational events
+  - Local restaurant prices vary widely
+  - Open Payments food-and-beverage values may be averaged across attendees
+  jurisdictions: US
+  version: 1
+- id: PD-053
+  name: Speaker event held at a venue unsuited to education
+  definition: The programme takes place somewhere poorly suited to sharing medical information, such as
+    a restaurant, entertainment venue or sports venue.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: The program is held at a location that is not conducive to the exchange of educational information
+      (e.g., restaurants or entertainment or sports venues);
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Novartis Pays Over $642 Million to Settle Allegations of Improper Payments to Patients and
+      Physicians
+    publisher: US Department of Justice
+    year: '2020'
+    url: https://www.justice.gov/opa/pr/novartis-pays-over-642-million-settle-allegations-improper-payments-patients-and-physicians
+    quote: many of these programs were nothing more than social events held at expensive restaurants
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Novartis programmes held at expensive restaurants (alleged; settled).
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Company
+  checkable: records
+  lookup_sources:
+  - Open Payments (city/state of event where reported)
+  - Venue listings and event photos
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Restaurants with private rooms are often the only practical evening venue in small towns
+  - Some events are held alongside conferences in hotels or venues for logistical reasons
+  jurisdictions: US
+  version: 1
+- id: PD-054
+  name: Many speaker events on the same product or topic with no new information
+  definition: A company runs a large number of programmes on the same product or topic when nothing important
+    has changed in the medical information about it.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: The company sponsors a large number of programs on the same or substantially the same topic
+      or product, especially in situations involving no recent substantive change in relevant information;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Novartis: government alleged tens of thousands of speaker programmes and related events.'
+  cases: []
+  data_needed:
+  - Event
+  - Company
+  - Payment
+  checkable: records
+  lookup_sources:
+  - CMS Open Payments (count of speaker payments per product)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Product launch periods legitimately generate many events
+  - National programmes reach many regions with the same content
+  jurisdictions: US
+  version: 1
+- id: PD-055
+  name: Long period with no new science or FDA indication while programmes continue
+  definition: Speaker programmes keep running for a product although there has been a long stretch with
+    no new medical or scientific information and no new FDA-approved or cleared use.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: There has been a significant period of time with no new medical or scientific information nor
+      a new FDA-approved or cleared indication for the product;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Company
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - FDA Drugs@FDA approval history
+  - Open Payments speaker records by product and year
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New safety data or guidelines may justify events even without a new indication
+  - Training new prescribers entering the field
+  jurisdictions: US
+  version: 1
+- id: PD-056
+  name: Repeat attendance at programmes on the same topic
+  definition: The same clinicians attend programmes on the same topic more than once, including attending
+    after having been the speaker on that topic.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: HCPs attend programs on the same or substantially the same topics more than once (as either
+      a repeat attendee or as an attendee after being a speaker on the same or substantially the same
+      topic);
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources:
+  - CMS Open Payments (repeated food-and-beverage records tied to the same product)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A clinician may attend twice by accident or because of a scheduling change
+  - Programmes with updated content may share a title
+  jurisdictions: US
+  version: 1
+- id: PD-057
+  name: Attendees with no legitimate reason to attend
+  definition: People with no professional use for the information attend, such as the speaker's friends
+    or family, staff of the speaker's own practice, or staff of facilities the speaker directs.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: Attendees include individuals who don't have a legitimate business reason to attend the program,
+      including, for example, friends, significant others, or family members of the speaker or HCP attendee;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Members of the speaker's own medical practice attending the speaker's programme.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Employment
+  - Associate
+  - Event
+  checkable: person
+  lookup_sources:
+  - Sign-in sheets obtained through litigation or whistleblower documents
+  - State licensing lookups to check attendee credentials
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Practice nurses or pharmacists may have a genuine need for prescribing information
+  - Spouses may themselves be clinicians
+  jurisdictions: US
+  version: 1
+- id: PD-058
+  name: Speakers or attendees chosen by prescribing volume or by sales staff
+  definition: Sales or marketing staff influence who is picked as a speaker, or speakers and attendees
+    are chosen for the prescriptions they have written or are expected to write, for example using a return-on-investment
+    analysis.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: The company's sales or marketing business units influence the selection of speakers or the
+      company selects HCP speakers or attendees based on past or expected revenue that the speakers or
+      attendees have or will generate by prescribing or ordering the company's product(s) (e.g., a return
+      on investment analysis is considered in identifying participants);
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Novartis Pays Over $642 Million to Settle Allegations of Improper Payments to Patients and
+      Physicians
+    publisher: US Department of Justice
+    year: '2020'
+    url: https://www.justice.gov/opa/pr/novartis-pays-over-642-million-settle-allegations-improper-payments-patients-and-physicians
+    quote: selected high-volume prescribers to serve as the paid 'speakers' at these events
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Founder and Former Chairman of the Board of Insys Therapeutics Sentenced to 66 Months in Prison
+    publisher: US Attorney's Office, District of Massachusetts
+    year: '2020'
+    url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+    quote: the programs were used as a vehicle to pay bribes and kickbacks to targeted practitioners
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Insys calculated each speaker's return on investment (per DOJ release).
+  - Novartis sales reps selected high-volume prescribers as speakers (alleged; settled).
+  cases:
+  - name: United States v. Kapoor et al. (Insys Therapeutics)
+    year: '2019'
+    jurisdiction: US (District of Massachusetts)
+    what_happened: Insys founder John Kapoor and four other executives were convicted of racketeering
+      conspiracy; DOJ said speaker programmes for the fentanyl spray Subsys were used to pay bribes and
+      kickbacks to targeted practitioners, with each speaker's return on investment tracked; Kapoor was
+      sentenced to 66 months in January 2020.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+    source_title: Founder and Former Chairman of the Board of Insys Therapeutics Sentenced to 66 Months
+      in Prison
+  data_needed:
+  - Person
+  - Payment
+  - Company
+  - Employment
+  - Event
+  checkable: records
+  lookup_sources:
+  - CMS Open Payments matched with Medicare Part D Prescribers data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PD
+    reason: Insys scheme involved an opioid (fentanyl) product; links to existing PD-014 and PD-043 on
+      kickbacks and manufacturer targeting of prescribers.
+    source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+  - target_area: FR
+    reason: Kickbacks via speaker fees are prosecuted as health-care fraud and racketeering.
+    source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+  innocent_explanations:
+  - Experienced prescribers of a product may genuinely be the most knowledgeable speakers
+  - High prescribing can reflect specialty or patient mix
+  jurisdictions: US
+  version: 1
+- id: PD-059
+  name: Speaker pay above fair market value or tied to prescribing
+  definition: Speakers are paid more than the fair market value of the talk, or their pay reflects the
+    volume or value of business they have generated or may generate.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: List of suspect characteristics
+    quote: The company pays HCP speakers more than fair market value for the speaking service or pays
+      compensation that takes into account the volume or value of past business generated or potential
+      future business generated by the HCPs.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: OIG Compliance Program Guidance for Pharmaceutical Manufacturers
+    publisher: HHS Office of Inspector General (Federal Register, 68 FR 23731)
+    year: '2003'
+    url: https://www.govinfo.gov/content/pkg/FR-2003-05-05/pdf/03-10949.pdf
+    locator: 'Relationships with physicians: key questions'
+    quote: Does the remuneration take into account, directly or indirectly, the volume or value of business
+      generated
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - OIG noted some HCPs received hundreds of thousands of dollars for speaking.
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Contract
+  checkable: records
+  lookup_sources:
+  - CMS Open Payments (speaker compensation)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Recognised experts command higher fees
+  - Travel time and preparation can justify higher pay
+  jurisdictions: US
+  version: 1
+- id: PD-060
+  name: Speakers dropped when their prescribing does not rise
+  definition: Clinicians are removed from a company's speaker programme if they fail to increase prescriptions
+    of its products.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: Novartis Pays Over $642 Million to Settle Allegations of Improper Payments to Patients and
+      Physicians
+    publisher: US Department of Justice
+    year: '2020'
+    url: https://www.justice.gov/opa/pr/novartis-pays-over-642-million-settle-allegations-improper-payments-patients-and-physicians
+    quote: often dropped doctors from the speaker program if they failed to do so
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Founder and Former Chairman of the Board of Insys Therapeutics Sentenced to 66 Months in Prison
+    publisher: US Attorney's Office, District of Massachusetts
+    year: '2020'
+    url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+    quote: the programs were used as a vehicle to pay bribes and kickbacks to targeted practitioners
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Insys removed practitioners who did not meet prescribing requirements (per DOJ release).
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Company
+  - Event
+  checkable: records
+  lookup_sources:
+  - Open Payments year-over-year speaker records matched to Medicare Part D prescribing
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Programmes end for budget reasons or when a product loses exclusivity
+  - Speakers may leave voluntarily
+  jurisdictions: US
+  version: 1
+- id: PD-061
+  name: Prescriber receiving company payments prescribes its products at outlier rates
+  definition: A clinician who receives speaking fees, meals or other payments from a company prescribes
+    that company's (or brand-name) drugs at unusually high rates compared with peers.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: 'Special Fraud Alert: Speaker Programs'
+    publisher: HHS Office of Inspector General
+    year: '2020'
+    url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+    locator: Background
+    quote: Furthermore, studies have shown that HCPs who receive remuneration from a company are more
+      likely to prescribe or order that company's products.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Doctors Who Take Company Cash Tend to Prescribe More Brand-Name Drugs
+    publisher: ProPublica
+    year: '2016'
+    url: https://www.propublica.org/article/doctors-who-take-company-cash-tend-to-prescribe-more-brand-name-drugs
+    quote: two to three times as likely to prescribe brand-name drugs at exceptionally high rates
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'ProPublica (2014 data): internists with no payments averaged about 20 percent brand-name prescribing
+    versus about 30 percent for those receiving over $5,000 (association, not causation).'
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - CMS Open Payments
+  - CMS Medicare Part D Prescribers by Provider and Drug
+  - ProPublica Dollars for Docs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PD
+    reason: Complements PD-019 prescriber outlier analysis using Medicare Part D data.
+    source_url: https://www.propublica.org/article/doctors-who-take-company-cash-tend-to-prescribe-more-brand-name-drugs
+  innocent_explanations:
+  - Companies may seek out clinicians who already favour their drug
+  - Specialty and patient mix drive brand-name use
+  - ProPublica stresses association, not causation
+  jurisdictions: US
+  version: 1
+- id: PD-062
+  name: Physicians paid as 'consultants' for passive attendance
+  definition: A company pays clinicians consulting fees when they are mainly expected to sit in meetings
+    or conferences rather than provide a real, needed service.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: OIG Compliance Program Guidance for Pharmaceutical Manufacturers
+    publisher: HHS Office of Inspector General (Federal Register, 68 FR 23731)
+    year: '2003'
+    url: https://www.govinfo.gov/content/pkg/FR-2003-05-05/pdf/03-10949.pdf
+    locator: 'Relationships with physicians: consulting and advisory payments'
+    quote: Compensating physicians as 'consultants' when they are expected to attend meetings or conferences
+      primarily in a passive capacity is suspect.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Contract
+  - Event
+  checkable: records
+  lookup_sources:
+  - CMS Open Payments (consulting fee records)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine advisory boards need input from small numbers of experts paid fair market value, which OIG
+    says is unlikely to raise significant concern
+  jurisdictions: US
+  version: 1
+- id: PD-063
+  name: Research contracts originating in sales or marketing
+  definition: Research grants or contracts given to prescribers are started or directed by a company's
+    sales or marketing staff rather than its research function.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: OIG Compliance Program Guidance for Pharmaceutical Manufacturers
+    publisher: HHS Office of Inspector General (Federal Register, 68 FR 23731)
+    year: '2003'
+    url: https://www.govinfo.gov/content/pkg/FR-2003-05-05/pdf/03-10949.pdf
+    locator: 'Relationships with physicians: research funding'
+    quote: Research contracts that originate through the sales or marketing functions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Post-marketing 'research' initiated by marketers or sales agents.
+  cases: []
+  data_needed:
+  - Payment
+  - Contract
+  - Person
+  - Company
+  - Employment
+  checkable: records
+  lookup_sources:
+  - CMS Open Payments (research payments)
+  - ClinicalTrials.gov
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Field staff may pass on genuine investigator-initiated research proposals to medical affairs
+  jurisdictions: US
+  version: 1
+- id: PD-064
+  name: Educational grants or CME controlled by sales or conditioned on content
+  definition: Educational grants or continuing-medical-education funding are steered by sales and marketing
+    or are tied to control over content or faculty, so they can channel improper payments.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: OIG Compliance Program Guidance for Pharmaceutical Manufacturers
+    publisher: HHS Office of Inspector General (Federal Register, 68 FR 23731)
+    year: '2003'
+    url: https://www.govinfo.gov/content/pkg/FR-2003-05-05/pdf/03-10949.pdf
+    locator: Educational and research funding
+    quote: manufacturers should separate their grant making functions from their sales and marketing functions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Organization
+  - Company
+  - Event
+  - Person
+  checkable: records
+  lookup_sources:
+  - Company grant registries
+  - ACCME provider listings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Unrestricted grants to accredited CME providers are an accepted practice when content and faculty
+    are independent
+  jurisdictions: US
+  version: 1
+- id: PD-065
+  name: Ghost-written papers or speeches using clinicians for marketing
+  definition: Clinicians are paid to present or put their names on papers or speeches written for marketing
+    purposes by the company.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: OIG Compliance Program Guidance for Pharmaceutical Manufacturers
+    publisher: HHS Office of Inspector General (Federal Register, 68 FR 23731)
+    year: '2003'
+    url: https://www.govinfo.gov/content/pkg/FR-2003-05-05/pdf/03-10949.pdf
+    locator: Relationships with physicians
+    quote: the use of health care professionals for marketing purposes—including, for example, ghost-written
+      papers or speeches
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Company
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Litigation document archives
+  - Journal authorship and funding disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Companies legitimately supply FDA-required on-label slide decks to speakers
+  - Disclosed medical-writing support is common in publications
+  jurisdictions: US
+  version: 1
+- id: PD-066
+  name: Entertainment, recreation or travel bundled with marketing presentations
+  definition: Clinicians receive entertainment, recreation, travel or meals connected with company information
+    or marketing presentations.
+  areas:
+  - PD
+  typology: Pharmaceutical speaker-programme kickbacks
+  status: verified
+  sources:
+  - title: OIG Compliance Program Guidance for Pharmaceutical Manufacturers
+    publisher: HHS Office of Inspector General (Federal Register, 68 FR 23731)
+    year: '2003'
+    url: https://www.govinfo.gov/content/pkg/FR-2003-05-05/pdf/03-10949.pdf
+    locator: 'Relationships with physicians: business courtesies'
+    quote: Entertainment, recreation, travel, meals, or other benefits in association with information
+      or marketing presentations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Event
+  - Person
+  - Company
+  checkable: records
+  lookup_sources:
+  - CMS Open Payments (travel and lodging, entertainment records)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reasonable travel and lodging for faculty presenting at legitimate meetings
+  jurisdictions: US
+  version: 1
 not_reached:
 - 'CDC 2022 Clinical Practice Guideline (MMWR 71(3)) recommendation text: page fetch truncated before
   the dosage recommendations, so whether it keeps the 50/90 MME figures was not checked; the 2016 guideline
@@ -2599,3 +3378,14 @@ not_reached:
 - 'NABP consensus document: year not shown on the AMA-hosted copy; several quotes were cut off by the
   reading tool (marked with an ellipsis).'
 - No case with a court outcome was found for hospital-staff diversion (PD-045 to PD-047).
+- The shared WebSearch budget for this turn was used up after the first searches, so the wider search
+  could not be done; WebFetch was used only on URLs already known.
+- PhRMA Code on Interactions with Health Care Professionals (speaker programme section) was not fetched.
+- CMS Open Payments 'Natures of Payment' page (exact speaker-compensation category wording) was not fetched.
+- HHS-OIG General Compliance Program Guidance (2023) and later industry-segment guidance were not checked.
+- Other DOJ speaker-programme settlements (e.g. other manufacturers) and OIG corporate integrity agreement
+  speaker-programme terms were not checked.
+- No peer-reviewed study was fetched directly; the prescribing association rests on the OIG alert's statement
+  and on ProPublica's analysis.
+- Full text of the Insys indictment or trial record was not checked; the case facts come from the DOJ
+  sentencing press release only.

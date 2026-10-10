@@ -311,3 +311,113 @@ terms:
   indicators: []
   areas:
   - PD
+- term: Speaker programme
+  definition: A company-sponsored event where a clinician gives a talk to other clinicians about a drug,
+    device or disease.
+  examples: []
+  source_url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: HCP (health care professional)
+  definition: A doctor or other clinician who can prescribe or order products; the term used throughout
+    the OIG alert.
+  examples: []
+  source_url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Remuneration
+  definition: Anything of value passed directly or indirectly, openly or covertly, in cash or in kind.
+  examples: []
+  source_url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Special Fraud Alert
+  definition: A public notice from HHS-OIG describing practices it considers suspect under fraud and abuse
+    laws.
+  examples: []
+  source_url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Fair market value
+  definition: The price a legitimate, necessary service would fetch in an arm's-length deal; paying more
+    than this for clinicians' services is a warning sign in OIG guidance.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2003-05-05/pdf/03-10949.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Open Payments
+  definition: Public CMS database of payments and other transfers of value from drug and device makers
+    to doctors and teaching hospitals, reported annually by the companies.
+  examples: []
+  source_url: https://www.cms.gov/priorities/key-initiatives/open-payments/data
+  cases: []
+  related:
+  - Dollars for Docs
+  indicators: []
+  areas:
+  - PD
+- term: Dollars for Docs
+  definition: ProPublica's searchable reporting project matching industry payments to doctors with their
+    prescribing.
+  examples: []
+  source_url: https://www.propublica.org/article/doctors-who-take-company-cash-tend-to-prescribe-more-brand-name-drugs
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Corporate integrity agreement (CIA)
+  definition: A multi-year compliance agreement a company signs with HHS-OIG as part of resolving fraud
+    allegations, such as Novartis's five-year CIA in 2020.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/novartis-pays-over-642-million-settle-allegations-improper-payments-patients-and-physicians
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Return on investment (ROI) analysis
+  definition: Measuring how much prescribing a payment to a clinician produces; OIG lists using it to
+    pick speakers as suspect, and Insys tracked it per speaker.
+  examples: []
+  source_url: https://oig.hhs.gov/documents/special-fraud-alerts/865/SpecialFraudAlertSpeakerPrograms.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Compliance Program Guidance
+  definition: OIG guidance telling an industry what risk areas to police; the 2003 pharmaceutical edition
+    covers payments to physicians.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2003-05-05/pdf/03-10949.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Racketeering conspiracy
+  definition: Federal crime of agreeing to run an enterprise through a pattern of crimes; the charge on
+    which Insys executives were convicted.
+  examples: []
+  source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD

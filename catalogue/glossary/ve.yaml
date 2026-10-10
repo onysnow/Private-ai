@@ -263,3 +263,175 @@ terms:
   indicators: []
   areas:
   - VE
+- term: Bias motivation
+  definition: Prejudice, intolerance or hatred towards a group sharing an identity trait, which leads
+    the offender to choose the target.
+  examples: []
+  source_url: https://hatecrime.osce.org/
+  cases: []
+  related:
+  - Hate crime
+  - Identity trait
+  indicators: []
+  areas:
+  - VE
+- term: Bias indicator
+  definition: An objective fact or circumstance around a crime that suggests the offender acted, in whole
+    or in part, out of bias; it does not prove a hate crime by itself.
+  examples: []
+  source_url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+  cases: []
+  related:
+  - Bias motivation
+  indicators: []
+  areas:
+  - VE
+- term: Identity trait (protected characteristic)
+  definition: A shared characteristic, such as race, ethnicity, language, religion, nationality, sexual
+    orientation, disability or gender, that hate crime law protects.
+  examples: []
+  source_url: https://hatecrime.osce.org/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Bias or hate incident
+  definition: In US DOJ usage, an act of prejudice that is not a crime and does not involve violence,
+    threats or property damage.
+  examples: []
+  source_url: https://www.justice.gov/hatecrimes/learn-about-hate-crimes
+  cases: []
+  related:
+  - Non-crime hate incident
+  indicators: []
+  areas:
+  - VE
+- term: Non-crime hate incident
+  definition: In England and Wales, an incident perceived as motivated by hostility that is not a criminal
+    offence; supervisors are told to check such reports.
+  examples: []
+  source_url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Perception-based recording
+  definition: The England and Wales rule that a crime is recorded as hate crime when the victim or anyone
+    else perceives it was motivated by hostility, without needing evidence at the reporting stage.
+  examples: []
+  source_url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Monitored strands
+  definition: 'The five categories of hate crime police in England and Wales count: disability, race,
+    religion, sexual orientation and transgender.'
+  examples: []
+  source_url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Hate crime flag
+  definition: A marker added to a police crime record to show it was perceived as a hate crime, used for
+    statistics and oversight.
+  examples: []
+  source_url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Hostility
+  definition: In College of Policing guidance, given its ordinary meaning, including ill-will, spite,
+    contempt, prejudice, antagonism, resentment and dislike.
+  examples: []
+  source_url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Repeat victimisation
+  definition: Being the victim of the same type of crime, such as hate crime, more than once in 12 months.
+  examples: []
+  source_url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Hate crimes reporting gap
+  definition: The difference between hate crimes that actually happen and those reported to law enforcement.
+  examples: []
+  source_url: https://www.justice.gov/hatecrimes/learn-about-hate-crimes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Institutional racism
+  definition: An organisation's collective failure to give proper service to people because of their colour,
+    culture or ethnic origin, seen in its processes, attitudes and behaviour.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5a7c2af540f0b645ba3c7202/4262.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Disability-related harassment
+  definition: Harassment, abuse or violence against disabled people, including low-level incidents that
+    can escalate, as examined by the EHRC inquiry.
+  examples: []
+  source_url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Antisocial behaviour
+  definition: A UK category for nuisance or harassing conduct, often non-criminal, under which the EHRC
+    found disability harassment was sometimes handled instead of as hate crime.
+  examples: []
+  source_url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Church Arson Prevention Act
+  definition: A US federal law under which damaging religious property because of its religious character
+    is prosecuted.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/washington-man-sentenced-hate-crimes-and-firearm-offense-four-attacks-jehovahs-witness
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: '1488'
+  definition: A white-supremacist number code referring to Adolf Hitler and the 'Fourteen words' slogan;
+    look-alike numbers such as 1377 have been used to echo it.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/oregon-man-pleads-guilty-three-federal-hate-crimes-defacing-synagogue
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: But-for cause
+  definition: A legal test meaning the act would not have happened without the factor, used by US prosecutors
+    to show race caused the defendants' actions.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/federal-jury-finds-three-men-guilty-hate-crimes-connection-pursuit-and-killing-ahmaud-arbery
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE

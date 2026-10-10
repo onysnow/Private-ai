@@ -1,0 +1,1454 @@
+key: CG
+name: Cults and high-control groups
+scope: 'Coercive control by groups: isolation, control of information, money taken from members, medical
+  neglect, and abuse by leaders.'
+indicators:
+- id: CG-001
+  name: Mental destabilisation and psychological subjection
+  definition: Members are put under pressure or techniques that leave them dependent on the group, losing
+    critical judgement and autonomy and acting against their own interests.
+  areas:
+  - CG
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes (French Ministry of the Interior)
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Section Définition > Critères, item 1
+    quote: La déstabilisation mentale et la sujétion psychologique ou physique conduisant à des actions
+      ou abstentions
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Que dit la loi ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-et-prevenir/que-dit-loi
+    locator: La loi du 10 mai 2024
+    quote: le fait de placer ou de maintenir une personne dans cet état
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Group psychological abuse: Taxonomy and severity of its components'
+    publisher: Rodríguez-Carballeira et al., European Journal of Psychology Applied to Legal Context 7(1)
+      2015
+    year: '2015'
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2014.11.001
+    locator: Abstract
+    quote: Group psychological abuse was defined by the application of abusive strategies, their continued
+      duration,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Former members describe losing the ability to decide anything without the leader's approval
+  - Family members report a relative acting against their own health or finances on the group's instruction
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Associate
+  - Document
+  - Event
+  - CourtCase
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Intense commitment to a demanding religious, monastic, military or athletic life chosen freely
+  - Personal crisis, mental illness or bereavement unrelated to the group
+  - Accounts from a single estranged relative in a family dispute
+  jurisdictions: France (criterion and criminal law); applicable generally
+  version: 1
+- id: CG-002
+  name: Break with family and original surroundings
+  definition: Members are cut off, or pushed to cut themselves off, from relatives, friends and their
+    previous social network.
+  areas:
+  - CG
+  typology: Isolation
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 2
+    quote: La rupture avec l'environnement d'origine (proches, famille)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Group psychological abuse: Taxonomy and severity of its components'
+    publisher: Rodríguez-Carballeira et al. 2015
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2014.11.001
+    locator: 'Isolation category (subcategories: isolation from the family; isolation from friends and
+      social support network); Delphi severity M = 30.71 and 27.65'
+    quote: indirect strategies related to how to operate in the person's immediate environment
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Lawrence Ray convicted (press release)
+    publisher: US Attorney's Office, SDNY
+    url: https://www.justice.gov/usao-sdny/pr/lawrence-ray-convicted-racketeering-violent-assault-extortion-sex-trafficking-forced
+    locator: Body
+    quote: RAY's tactics included sleep deprivation, psychological and sexual humiliation, verbal abuse,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Member moves into a group residence and stops contact with parents
+  - Relatives say calls and visits are blocked or supervised
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Address
+  - Organization
+  - Associate
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: The Ray conviction combined isolation from family with forced labour and sex trafficking counts.
+    source_url: https://www.justice.gov/usao-sdny/pr/lawrence-ray-convicted-racketeering-violent-assault-extortion-sex-trafficking-forced
+  innocent_explanations:
+  - Adult choosing to distance from an abusive or unsupportive family
+  - Relocation for a religious vocation, study or work
+  - Ordinary family estrangement unrelated to any group
+  jurisdictions: General
+  version: 1
+- id: CG-003
+  name: Sudden radical change in behaviour
+  definition: A person's behaviour, habits or personality change sharply after joining the group.
+  areas:
+  - CG
+  typology: Effects on members
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 3
+    quote: Le changement radical de comportement
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Relatives report a member quit a job, sold property and changed appearance within months of joining
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Employment
+  - Ownership
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Religious conversion or lifestyle change freely chosen
+  - Recovery from addiction or a health event
+  - Normal life transitions such as a move, marriage or new career
+  jurisdictions: General
+  version: 1
+- id: CG-004
+  name: Control of information and cut-off from media
+  definition: The group restricts or filters what members can read, watch or communicate, sometimes removing
+    access to media and phones entirely.
+  areas:
+  - CG
+  typology: Information control
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 4
+    quote: 'Le refus de l''autre et le dénigrement du monde extérieur : l''absence totale d''accès aux
+      médias ou moyens de communication'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Group psychological abuse: Taxonomy and severity of its components'
+    publisher: Rodríguez-Carballeira et al. 2015
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2014.11.001
+    locator: 'Category: Control and manipulation of information; subcategory manipulation of information
+      (Delphi M = 55.65)'
+    quote: The taxonomy showed adequate content validity.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Thought Reform and the Psychology of Totalism (Lifton 1961), summary of the eight criteria
+    publisher: Wikipedia (secondary summary of Robert J. Lifton's book)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Criterion 1, Milieu Control
+    quote: The group or its leaders controls information and communication
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Phones collected on arrival at a residential retreat
+  - Members told outside news and former members' accounts are lies
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Person
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short, voluntary silent or digital-detox retreats
+  - Enclosed religious orders with openly declared rules
+  - Security rules in sensitive workplaces
+  jurisdictions: General
+  version: 1
+- id: CG-005
+  name: Us-versus-them worldview and denigration of outsiders
+  definition: The group teaches a black-and-white belief system that glorifies insiders and rejects or
+    demonises outsiders and leavers.
+  areas:
+  - CG
+  typology: Indoctrination
+  status: verified
+  sources:
+  - title: Psychological Abuse Experienced in Groups Scale
+    publisher: Saldaña, Rodríguez-Carballeira et al., European Journal of Psychology Applied to Legal
+      Context 2017
+    year: '2017'
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2017.01.002
+    locator: Introduction, taxonomy components (e)
+    quote: The scale covers a wide range of subtle and explicit abusive behaviors
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Group psychological abuse: Taxonomy and severity of its components'
+    publisher: Rodríguez-Carballeira et al. 2015
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2014.11.001
+    locator: Indoctrination category; subcategory glorification of the ingroup and rejection of the outgroup
+      (M = 21.16)
+    quote: The purpose of this study was to delimit group psychological abuse through a psychosocial approach.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Thought Reform and the Psychology of Totalism (Lifton), criteria 3 and 8
+    publisher: Wikipedia (secondary summary)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Demand for Purity; Dispensing of Existence
+    quote: The group has the prerogative to decide who has the right to exist and who does not.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Teaching that former members are traitors or spiritually dead
+  - Outsiders described as enemies, unclean or doomed
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Strong religious or political conviction expressed without coercion
+  - Distinct community identity (e.g. ethnic, religious minority) defending itself against real discrimination
+  jurisdictions: General
+  version: 1
+- id: CG-006
+  name: Gruelling or destabilising living conditions
+  definition: Members live under exhausting conditions such as sleep deprivation, overwork or harsh routines
+    that wear down their resistance.
+  areas:
+  - CG
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 5
+    quote: Les conditions de vie particulièrement éprouvantes ou déstabilisantes
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Lawrence Ray convicted (press release)
+    publisher: US Attorney's Office, SDNY
+    url: https://www.justice.gov/usao-sdny/pr/lawrence-ray-convicted-racketeering-violent-assault-extortion-sex-trafficking-forced
+    locator: Body
+    quote: RAY's tactics included sleep deprivation, psychological and sexual humiliation, verbal abuse,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Long overnight sessions, very little sleep, cramped shared housing
+  cases: []
+  data_needed:
+  - Address
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Voluntary ascetic practice, fasting seasons or intensive training camps
+  - Poverty or overcrowding unrelated to group control
+  jurisdictions: General
+  version: 1
+- id: CG-007
+  name: Deceptive recruitment
+  definition: People are recruited under false or incomplete pretences about what the group is, who leads
+    it or what will be asked of them.
+  areas:
+  - CG
+  typology: Recruitment
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 6
+    quote: Les méthodes de recrutement trompeuses
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: NXIVM leader Keith Raniere sentenced to 120 years
+    publisher: US Attorney's Office, EDNY
+    year: '2020'
+    url: https://www.justice.gov/usao-edny/pr/nxivm-leader-keith-raniere-sentenced-120-years-prison-racketeering-and-sex-trafficking
+    quote: Raniere created and led DOS, a secret organization in which women were recruited under the
+      false pretense
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A self-help course or wellness workshop that later turns out to be the entry point to a hidden inner
+    circle
+  - Front organisations with different names from the core group
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Directorship
+  - Ownership
+  - Person
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registries (shared directors, addresses)
+  - Charity registers
+  - Domain and website registration records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary marketing that simplifies a programme
+  - Groups that use several brand names for legitimate separate activities
+  jurisdictions: General
+  version: 1
+- id: CG-008
+  name: Enrolment of children
+  definition: Children are drawn into the group's discipline, beliefs or work in ways that cut them off
+    from schooling, care or outside contact; observed at the institutional level.
+  areas:
+  - CG
+  typology: Children
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 7
+    quote: L'embrigadement des enfants
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Children withdrawn from school into group-run instruction with no oversight
+  - Children working in group enterprises (see Gloriavale Employment Court rulings)
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - School registration and home-education records
+  - Child-protection or care inquiries
+  - Employment court judgments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: Miviludes lists enrolment of children as a criterion; Gloriavale ex-members were found to
+      have been employees since childhood.
+    source_url: https://en.wikipedia.org/wiki/Gloriavale_Christian_Community
+  innocent_explanations:
+  - Lawful religious schooling or home education meeting standards
+  - Children helping in a family business within legal limits
+  jurisdictions: General
+  version: 1
+- id: CG-009
+  name: Authoritarian, opaque, sealed-off structure around a single leader
+  definition: The group is run in an authoritarian, secretive and compartmentalised way around a charismatic
+    leader or an exclusive practitioner whose special qualities members must believe in.
+  areas:
+  - CG
+  typology: Leadership
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 8
+    quote: L'existence d'un groupe organisé sur un mode autoritaire, opaque et cloisonné,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Group psychological abuse: Taxonomy and severity of its components'
+    publisher: Rodríguez-Carballeira et al. 2015
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2014.11.001
+    locator: Imposition of a single and extraordinary authority; subcategory implantation of the belief
+      in the special qualities of the leader (M = 52.1)
+    quote: Experts' judgments allowed for hierarchically organizing the strategies based on their severity,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Thought Reform and the Psychology of Totalism (Lifton), criterion 5
+    publisher: Wikipedia (secondary summary)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Sacred Science
+    quote: The group's doctrine or ideology is considered to be the ultimate Truth, beyond all questioning
+      or dispute.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Secret inner circles unknown to ordinary members
+  - Leader controls all entities through nominees
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Company
+  - Directorship
+  - Ownership
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Company and charity registries for officers and controllers
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Founder-led organisations in early stages
+  - Hierarchical religious traditions with transparent governance
+  jurisdictions: General
+  version: 1
+- id: CG-010
+  name: Great difficulty or impossibility of leaving
+  definition: Members who want to leave face threats, punishment, loss of everything they have, or leverage
+    held over them.
+  areas:
+  - CG
+  typology: Exit barriers
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 9
+    quote: De grandes difficultés voire une impossibilité pour un membre de quitter ledit groupe
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: NXIVM leader Keith Raniere sentenced to 120 years
+    publisher: US Attorney's Office, EDNY
+    url: https://www.justice.gov/usao-edny/pr/nxivm-leader-keith-raniere-sentenced-120-years-prison-racketeering-and-sex-trafficking
+    quote: to prevent them from leaving the group or disclosing its existence to others.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Leavers lose housing, income and contact with children who remain
+  - Compromising material held as 'collateral'
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - Address
+  - CourtCase
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary social and emotional cost of leaving any close community
+  - Lawful contractual notice periods or repayment of genuine loans
+  jurisdictions: General
+  version: 1
+- id: CG-011
+  name: Physical harm and crimes against members
+  definition: Members, especially vulnerable adults or minors, suffer physical harm or other criminal
+    acts within the group.
+  areas:
+  - CG
+  typology: Abuse by leaders
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 10
+    quote: Les atteintes à l'intégrité physique des personnes en état de faiblesse et d'ignorance,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: NXIVM leader Keith Raniere sentenced to 120 years
+    publisher: US Attorney's Office, EDNY
+    url: https://www.justice.gov/usao-edny/pr/nxivm-leader-keith-raniere-sentenced-120-years-prison-racketeering-and-sex-trafficking
+    quote: Raniere exploited and abused his victims emotionally, physically and sexually for his personal
+      gratification.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Police reports or court cases involving injuries at group premises
+  cases: []
+  data_needed:
+  - CourtCase
+  - Event
+  - Person
+  - Address
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Police and coroner records
+  - Child-protection inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accidents in risky but lawful activities
+  - Unproven allegations in custody or family disputes
+  jurisdictions: General
+  version: 1
+- id: CG-012
+  name: Hostility to institutions and threats to public order
+  definition: The group contests state institutions, disrupts public order or threatens to do so.
+  areas:
+  - CG
+  typology: Public order
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 11
+    quote: La contestation des institutions et les troubles à l'ordre public ; la menace d'atteinte à
+      l'ordre public
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Leader instructs members to refuse official registration or schooling (Shakahola leader was arrested
+    in 2019 for inciting against national ID registration, per reporting)
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful protest, civil disobedience or conscientious objection
+  - Legitimate legal challenges to government decisions
+  jurisdictions: France (criterion); applicable generally
+  version: 1
+- id: CG-013
+  name: Large volume of legal disputes
+  definition: The group or its leaders are involved in many court cases, complaints or legal conflicts.
+  areas:
+  - CG
+  typology: Legal history
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 12
+    quote: L'importance des démêlés judiciaires
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated suits by ex-members for unpaid wages or return of donations
+  - Prior criminal cases against the leader
+  cases: []
+  data_needed:
+  - CourtCase
+  - Person
+  - Organization
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Court docket searches (e.g. PACER, national court portals)
+  - Regulator enforcement databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large organisations attract routine litigation
+  - Groups facing harassment or discrimination suits they win
+  - Defamation suits brought to defend reputation
+  jurisdictions: General
+  version: 1
+- id: CG-014
+  name: Exorbitant financial demands
+  definition: Members are asked for very large sums, through fees, courses, donations or purchases, out
+    of proportion to their means.
+  areas:
+  - CG
+  typology: Financial exploitation
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 13
+    quote: Le caractère exorbitant des exigences financières ; la violation des règlements ou de la loi
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Lawrence Ray convicted (press release)
+    publisher: US Attorney's Office, SDNY
+    url: https://www.justice.gov/usao-sdny/pr/lawrence-ray-convicted-racketeering-violent-assault-extortion-sex-trafficking-forced
+    quote: The victims made payments to RAY by draining their parents' savings, opening credit lines,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Escalating course levels each costing thousands
+  - Members taking loans or emptying family savings to pay the group or leader
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Organization
+  - Company
+  - Document
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Charity accounts and tax filings
+  - Court records of refund or fraud suits
+  - Property records showing sales by members
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: French courts convicted Scientology entities of fraud over money taken from recruits.
+    source_url: https://en.wikipedia.org/wiki/Scientology_in_France
+  innocent_explanations:
+  - Tithing or voluntary giving in established traditions
+  - Expensive but legitimate professional training
+  - Generous donations by wealthy members acting freely
+  jurisdictions: General
+  version: 1
+- id: CG-015
+  name: Illegal or unpaid labour and deviant professional training
+  definition: Members work for the group or leader without pay or outside labour law, or the group runs
+    training that breaks professional rules.
+  areas:
+  - CG
+  typology: Labour exploitation
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 13 (continued)
+    quote: (travail illégal, formation professionnelle déviante…) et/ ou l'opacité de la gestion financière
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Lawrence Ray convicted (press release)
+    publisher: US Attorney's Office, SDNY
+    url: https://www.justice.gov/usao-sdny/pr/lawrence-ray-convicted-racketeering-violent-assault-extortion-sex-trafficking-forced
+    quote: RAY forced multiple victims to perform unpaid labor on a family member's property in North
+      Carolina.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Members staffing group businesses for no wage
+  - Group-run accredited training courses that recruit into the group
+  cases: []
+  data_needed:
+  - Employment
+  - Company
+  - Organization
+  - Person
+  - Payment
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Employment tribunal and labour inspectorate records
+  - Company accounts showing low wage costs
+  - Training accreditation registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Ray was convicted of forced labour; NZ Employment Court found Gloriavale ex-members were employees
+      held in servitude.
+    source_url: https://www.justice.gov/usao-sdny/pr/lawrence-ray-convicted-racketeering-violent-assault-extortion-sex-trafficking-forced
+  innocent_explanations:
+  - Genuine volunteering with free choice
+  - Religious communities with lawful vow-of-poverty arrangements
+  jurisdictions: General
+  version: 1
+- id: CG-016
+  name: Opaque financial management
+  definition: The group's money flows are hidden, mixed with the leader's personal finances or spread
+    across hard-to-trace entities.
+  areas:
+  - CG
+  typology: Financial exploitation
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 13 (continued)
+    quote: (travail illégal, formation professionnelle déviante…) et/ ou l'opacité de la gestion financière
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Founder of NXIVM and five others charged in superseding indictment
+    publisher: US Attorney's Office, EDNY
+    year: '2018'
+    url: https://www.justice.gov/usao-edny/pr/founder-nxivm-purported-self-help-organization-and-five-others-charged-superseding
+    locator: Allegations in indictment
+    quote: Bronfman sent Raniere regular emails documenting expenses charged to the woman's credit card
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Leader's personal expenses paid via members' cards
+  - Many linked companies and charities with shared officers but no published accounts
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Ownership
+  - Directorship
+  - Payment
+  - Person
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Charity regulators' filings
+  - Property and land registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small informal groups with poor bookkeeping
+  - Religious bodies exempt from publishing accounts under local law
+  jurisdictions: General
+  version: 1
+- id: CG-017
+  name: Attempts to infiltrate public authorities
+  definition: The group seeks influence inside government bodies, public services or decision-makers.
+  areas:
+  - CG
+  typology: Influence
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 14
+    quote: Les tentatives d'infiltration des pouvoirs publics
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Members placed in roles that oversee the group, or officials attending group events while regulating
+    it
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Employment
+  - Associate
+  - Payment
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Public employee and appointment records
+  - Lobbying and political donation registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Miviludes treats infiltration of public authorities as a criterion; checks overlap with officials'
+      interests and lobbying.
+    source_url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+  innocent_explanations:
+  - Members' ordinary right to work in public service and take part in politics
+  - Lawful lobbying declared in registers
+  jurisdictions: General
+  version: 1
+- id: CG-018
+  name: Dubious health offerings that exclude conventional care (medical neglect)
+  definition: The group offers doubtful treatments or remedies and steers members away from conventional
+    medicine.
+  areas:
+  - CG
+  typology: Health
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 15
+    quote: L'offre de soins et de médicaments douteux et exclusive du recours à des pratiques conventionnelles
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Rapport d'activité 2022-2024 (summary page)
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/rapport-dactivite-2022-2024-de-miviludes
+    locator: Summary, domains of harm
+    quote: domaines d'activité très variés
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Members told to stop prescribed treatment in favour of the leader's remedy
+  - Unlicensed 'healers' selling products to members
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Company
+  - Payment
+  - Document
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - Medical and health-practitioner registers
+  - Health regulator warnings
+  - Product safety notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Miviludes lists health and well-being among main domains of referrals and names dubious care
+      as a criterion.
+    source_url: https://www.miviludes.interieur.gouv.fr/rapport-dactivite-2022-2024-de-miviludes
+  innocent_explanations:
+  - Use of complementary practices alongside conventional care
+  - Lawful religious objection to specific treatments by informed adults
+  jurisdictions: General
+  version: 1
+- id: CG-019
+  name: Worrying change in eating habits
+  definition: Members' diet changes in a way that alarms relatives or harms health, including extreme
+    fasting imposed by the group.
+  areas:
+  - CG
+  typology: Health
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 16
+    quote: Le changement inquiétant des habitudes alimentaires
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Prolonged group fasts; group controls what members eat (Ray case reporting)
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Organization
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Religious fasts of set, safe duration
+  - Vegetarian, vegan or medical diets chosen freely
+  - Eating disorders unrelated to any group
+  jurisdictions: General
+  version: 1
+- id: CG-020
+  name: Violation of the Republic's founding principles
+  definition: The group's practices conflict with core constitutional principles such as equality, secularism
+    or individual rights (a French-specific criterion).
+  areas:
+  - CG
+  typology: Public order
+  status: verified
+  sources:
+  - title: Comment identifier une dérive sectaire ?
+    publisher: Miviludes
+    url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+    locator: Critères, item 17
+    quote: La violation des principes fondateurs de la République
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Systematic denial of equal rights to women members
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Protected religious practice within the law
+  - Difference of views expressed lawfully
+  jurisdictions: France
+  version: 1
+- id: CG-021
+  name: Control over personal life, time and activities
+  definition: The group decides how members spend their time, where they go, whom they see, and other
+    basic choices about their own existence.
+  areas:
+  - CG
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: 'Group psychological abuse: Taxonomy and severity of its components'
+    publisher: Rodríguez-Carballeira et al. 2015
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2014.11.001
+    locator: Control over personal life; subcategories control of activities and use of time (M = 20.29),
+      control of self-existence (M = 18.13)
+    quote: Operationalizing, classifying, and organizing the strategies hierarchically contributes to
+      a better delimitation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Psychological Abuse Experienced in Groups Scale
+    publisher: Saldaña et al. 2017
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2017.01.002
+    locator: Taxonomy component (c) control over personal life
+    quote: An exploratory factor analysis revealed a common factor, which showed appropriate reliability.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Members need permission to travel, marry or change job
+  - Daily schedules dictated by leaders
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Address
+  - Family
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Freely accepted rules of religious orders, boarding schools or the military
+  - Workplace rotas and policies
+  jurisdictions: General
+  version: 1
+- id: CG-022
+  name: 'Emotional abuse: manipulation of guilt and affection'
+  definition: Leaders use blame, guilt, shame and alternately warmth or forgiveness to steer members'
+    feelings and compliance.
+  areas:
+  - CG
+  typology: Emotional abuse
+  status: verified
+  sources:
+  - title: 'Group psychological abuse: Taxonomy and severity of its components'
+    publisher: Rodríguez-Carballeira et al. 2015
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2014.11.001
+    locator: Emotional abuse; subcategories manipulation of blame (M = 18.32), interested activation of
+      positive feelings (M = 16.81)
+    quote: being the most severe those directed to the emotional area.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Thought Reform and the Psychology of Totalism (Lifton), criterion 3
+    publisher: Wikipedia (secondary summary)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Demand for Purity
+    quote: The group constantly exhorts members to view the world as black and white, conform to the group
+      ideology, and strive for perfection.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Members blamed publicly for group failures
+  - Intense affection on joining, withdrawn when a member questions the leader
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary religious teaching on sin and forgiveness
+  - Warm welcome culture in healthy communities
+  jurisdictions: General
+  version: 1
+- id: CG-023
+  name: Rewriting members' past and previous identity
+  definition: The group teaches members to see their life before joining as worthless or harmful and to
+    replace their former identity.
+  areas:
+  - CG
+  typology: Indoctrination
+  status: verified
+  sources:
+  - title: 'Group psychological abuse: Taxonomy and severity of its components'
+    publisher: Rodríguez-Carballeira et al. 2015
+    url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2014.11.001
+    locator: Indoctrination in an absolute and Manichean belief system; subcategory negative reconstruction
+      of the past and the previous identity (M = 21.81)
+    quote: The purpose of this study was to delimit group psychological abuse through a psychosocial approach.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - New names given; former relationships described as 'toxic'
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Conversion narratives common in many faiths
+  - Therapeutic reflection on past harm
+  jurisdictions: General
+  version: 1
+- id: CG-024
+  name: Confession and collateral used as leverage
+  definition: Members are made to confess wrongdoing or hand over compromising material, which leaders
+    then hold over them.
+  areas:
+  - CG
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: Thought Reform and the Psychology of Totalism (Lifton), criterion 4
+    publisher: Wikipedia (secondary summary)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Confession
+    quote: There is no confidentiality; the leaders discuss and exploit members' "sins," "attitudes,"
+      and "faults".
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Lawrence Ray convicted (press release)
+    publisher: US Attorney's Office, SDNY
+    url: https://www.justice.gov/usao-sdny/pr/lawrence-ray-convicted-racketeering-violent-assault-extortion-sex-trafficking-forced
+    quote: RAY extracted false confessions from the victims to causing purported damages to RAY and his
+      family and associates
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: NXIVM leader Keith Raniere sentenced to 120 years
+    publisher: US Attorney's Office, EDNY
+    url: https://www.justice.gov/usao-edny/pr/nxivm-leader-keith-raniere-sentenced-120-years-prison-racketeering-and-sex-trafficking
+    quote: to prevent them from leaving the group or disclosing its existence to others.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Written or recorded confessions kept in files by leaders
+  - Demand for 'collateral' before admission to an inner circle
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Payment
+  - CourtCase
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Confidential confession in established religious practice
+  - Accountability groups with real confidentiality
+  jurisdictions: General
+  version: 1
+- id: CG-025
+  name: Loaded language
+  definition: The group uses its own jargon and thought-stopping phrases that shape and limit how members
+    think and talk.
+  areas:
+  - CG
+  typology: Indoctrination
+  status: verified
+  sources:
+  - title: Thought Reform and the Psychology of Totalism (Lifton), criterion 6
+    publisher: Wikipedia (secondary summary)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Loading the Language
+    quote: The group interprets or uses words and phrases in new ways so that often the outside world
+      does not understand.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Internal vocabulary that ex-members cannot easily translate for outsiders
+  cases: []
+  data_needed:
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Every profession, faith and hobby has jargon
+  jurisdictions: General
+  version: 1
+- id: CG-026
+  name: Doctrine over personal experience
+  definition: Members must deny or reinterpret their own experiences and feelings when they contradict
+    the group's teaching.
+  areas:
+  - CG
+  typology: Indoctrination
+  status: verified
+  sources:
+  - title: Thought Reform and the Psychology of Totalism (Lifton), criterion 7
+    publisher: Wikipedia (secondary summary)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Doctrine over Person
+    quote: Members' personal experiences are subordinate to the sacred science; members must deny or reinterpret
+      any contrary experiences to fit the group ideology.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Illness or abuse reported by a member is reframed as the member's spiritual failing
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Faith traditions that interpret hardship spiritually without suppressing complaint
+  jurisdictions: General
+  version: 1
+- id: CG-027
+  name: Staged signs of the leader's special power
+  definition: Events are arranged or interpreted to look spontaneous or supernatural so as to prove the
+    leader's authority.
+  areas:
+  - CG
+  typology: Leadership
+  status: verified
+  sources:
+  - title: Thought Reform and the Psychology of Totalism (Lifton), criterion 2
+    publisher: Wikipedia (secondary summary)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Mystical Manipulation
+    quote: The group manipulates experiences that appear spontaneous to demonstrate divine authority,
+      spiritual advancement, or some exceptional talent or insight
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Coincidences presented as prophecies fulfilled by the leader
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sincere religious belief in signs and miracles
+  jurisdictions: General
+  version: 1
+- id: CG-028
+  name: Pyramid-structured recruitment for profit
+  definition: Members are paid or rewarded for recruiting others into tiered programmes, so the group
+    grows like a pyramid scheme.
+  areas:
+  - CG
+  typology: Financial exploitation
+  status: verified
+  sources:
+  - title: Founder of NXIVM and five others charged in superseding indictment
+    publisher: US Attorney's Office, EDNY
+    year: '2018'
+    url: https://www.justice.gov/usao-edny/pr/founder-nxivm-purported-self-help-organization-and-five-others-charged-superseding
+    locator: Allegations in indictment (later convicted on all counts, 2019)
+    quote: founded several pyramid-structured organizations including Nxivm, a purported self-help organization
+      for women
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Course 'coaches' earn commission and rank for enrolling new students
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Payment
+  - Person
+  - Contract
+  checkable: records
+  lookup_sources:
+  - Company filings
+  - Consumer-protection regulator complaints
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: DOJ described NXIVM entities as pyramid-structured with recruitment for financial benefit.
+    source_url: https://www.justice.gov/usao-edny/pr/founder-nxivm-purported-self-help-organization-and-five-others-charged-superseding
+  innocent_explanations:
+  - Lawful referral bonuses and affiliate programmes
+  - Legitimate multi-level sales with real retail customers
+  jurisdictions: General
+  version: 1
+- id: CG-029
+  name: Surveillance and targeting of critics and ex-members
+  definition: The group or its leaders monitor, hack or pursue people they see as enemies, including critics
+    and former members.
+  areas:
+  - CG
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Founder of NXIVM and five others charged in superseding indictment
+    publisher: US Attorney's Office, EDNY
+    year: '2018'
+    url: https://www.justice.gov/usao-edny/pr/founder-nxivm-purported-self-help-organization-and-five-others-charged-superseding
+    locator: Allegations in indictment
+    quote: a scheme to obtain the e-mail usernames and passwords of perceived enemies and critics of Raniere
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Thought Reform and the Psychology of Totalism (Lifton), criterion 8
+    publisher: Wikipedia (secondary summary)
+    url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+    locator: Dispensing of Existence
+    quote: The group has the prerogative to decide who has the right to exist and who does not.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Lawsuits, private investigators or online campaigns aimed at ex-members and journalists
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Event
+  - Associate
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Court records (defamation, harassment, computer-crime cases)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful defence against defamation
+  - Routine reputation monitoring
+  jurisdictions: General
+  version: 1
+- id: CG-030
+  name: Identity and immigration document abuse involving members
+  definition: Leaders help bring members into a country illegally or give them false identity documents,
+    increasing members' dependence.
+  areas:
+  - CG
+  typology: Dependence
+  status: verified
+  sources:
+  - title: Founder of NXIVM and five others charged in superseding indictment
+    publisher: US Attorney's Office, EDNY
+    year: '2018'
+    url: https://www.justice.gov/usao-edny/pr/founder-nxivm-purported-self-help-organization-and-five-others-charged-superseding
+    locator: Allegations in indictment
+    quote: Russell provided the alien with an identification card bearing the last name and birthday of
+      a dead woman.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Foreign members whose visas are sponsored by group entities
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Company
+  - Address
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Visa sponsorship and immigration court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Control of immigration status is a dependence lever named in the NXIVM indictment.
+    source_url: https://www.justice.gov/usao-edny/pr/founder-nxivm-purported-self-help-organization-and-five-others-charged-superseding
+  innocent_explanations:
+  - Lawful visa sponsorship by religious or educational bodies
+  jurisdictions: General
+  version: 1
+not_reached:
+- Web search budget for this run was used up after the first query, so no wider search was possible; all
+  sources were reached by direct URL.
+- The Group Psychological Abuse Scale (Chambers, Langone, Dole 1994) page loaded but showed no abstract
+  or items.
+- The Rodríguez-Carballeira 2015 taxonomy Table 1 (operational definitions of every strategy) is an image
+  and was not readable; only named subcategories were used.
+- Lifton's Thought Reform and the Psychology of Totalism (1961) was not opened directly; criteria are
+  quoted from the Wikipedia summary and should be checked against the book (ch. 22).
+- Miviludes 2022-2024 activity report PDF blocked by robots rules; no referral counts or health share
+  were obtained.
+- Légifrance Code pénal articles 223-15-2 to 223-15-4 failed to load; the law is cited via the Miviludes
+  'Que dit la loi ?' page.
+- UK Home Office Controlling or Coercive Behaviour statutory guidance (accessible HTML) failed to load;
+  not used.
+- US DOJ NXIVM conviction release (June 2019) and Ray sentencing release failed to load; Ray sentence
+  (60 years, January 2023) comes from Wikipedia only.
+- 'Japan Unification Church dissolution order: court grounds were not reached; only the Wikipedia statement
+  that the Tokyo High Court upheld the 2025 order (March 2026) and the Supreme Court confirmed it (June
+  2026) was found.'
+- Primary judgments for Gloriavale (NZ Employment Court) and the Scientology fraud conviction in France
+  (Paris 2009, appeal 2012, Cour de cassation 2013) were not opened; details come from Wikipedia citing
+  press.
+- Kenya Senate ad hoc committee and presidential commission reports on Shakahola were not opened.
+- ICSA, Steven Hassan BITE model, and Belgian parliamentary inquiry criteria were not reached.

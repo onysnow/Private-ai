@@ -1,0 +1,287 @@
+area: SP
+terms:
+- term: Anti-doping rule violation (ADRV)
+  definition: One of the eleven offences listed in Article 2 of the World Anti-Doping Code, from a positive
+    test to retaliation against whistleblowers.
+  examples: []
+  source_url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  cases: []
+  related:
+  - World Anti-Doping Code
+  indicators: []
+  areas:
+  - SP
+- term: World Anti-Doping Code
+  definition: The global rulebook adopted by sport bodies and national anti-doping agencies that defines
+    doping offences and sanctions.
+  examples: []
+  source_url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Prohibited substance / prohibited method
+  definition: A substance or technique on WADA's Prohibited List that athletes may not use; US law borrows
+    the definition from the UNESCO Convention.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/PLAW-116publ206/html/PLAW-116publ206.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Athlete Biological Passport (ABP)
+  definition: An electronic record of an athlete's blood and urine markers over time, used to spot doping
+    indirectly through abnormal changes.
+  examples:
+  - Haemoglobin, haematocrit, reticulocytes, OFF-score
+  - Steroid profile
+  source_url: https://www.usada.org/spirit-of-sport/education/athlete-biological-passport/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: OFF-score
+  definition: A blood measure combining haemoglobin and reticulocytes, monitored in the biological passport;
+    extreme values were cited in the IAAF blood data inquiry.
+  examples: []
+  source_url: https://www.usada.org/spirit-of-sport/education/athlete-biological-passport/
+  cases: []
+  related:
+  - Athlete Biological Passport
+  indicators: []
+  areas:
+  - SP
+- term: Registered Testing Pool (RTP)
+  definition: The group of top athletes who must report where they will be so they can be tested without
+    notice.
+  examples: []
+  source_url: https://www.usada.org/athletes/whereabouts/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Whereabouts failure (filing failure / missed test)
+  definition: A filing failure is not submitting location information on time; a missed test is not being
+    available during the declared 60-minute slot.
+  examples: []
+  source_url: https://www.usada.org/athletes/whereabouts/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Therapeutic Use Exemption (TUE)
+  definition: Permission for an athlete to use a banned medicine when a confirmed diagnosis needs it,
+    no alternative exists, and it gives no extra performance boost.
+  examples: []
+  source_url: https://www.usada.org/athletes/tue/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Tampering
+  definition: Interfering with any part of doping control, such as samples or paperwork.
+  examples: []
+  source_url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Complicity
+  definition: Helping, encouraging, conspiring in or covering up another person's doping offence.
+  examples: []
+  source_url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Prohibited Association
+  definition: Working in a sport capacity with a coach, doctor or adviser who is banned or has been found
+    to have engaged in doping conduct, or with their front.
+  examples: []
+  source_url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Athlete Support Person
+  definition: Coaches, trainers, managers, medical staff and others who work with or treat athletes.
+  examples: []
+  source_url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Ineligibility
+  definition: The period in which a sanctioned athlete or support person is barred from sport.
+  examples: []
+  source_url: https://www.usada.org/wp-content/uploads/2021_wada_code.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Rodchenkov Anti-Doping Act (RADA)
+  definition: A 2020 US law that makes it a crime for non-athletes to knowingly take part in schemes to
+    dope major international sports competitions, with up to 10 years' imprisonment.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/PLAW-116publ206/html/PLAW-116publ206.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Major International Sport Competition
+  definition: Under RADA, a Code-governed competition with at least one US athlete and three foreign athletes
+    and US sponsorship or broadcast money.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/PLAW-116publ206/html/PLAW-116publ206.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: State-sponsored doping
+  definition: Doping organised or protected by government bodies, such as the oversight of the Moscow
+    laboratory found by the McLaren investigation.
+  examples: []
+  source_url: https://publications.parliament.uk/pa/cm201719/cmselect/cmcumeds/366/36605.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Non-accidental violence
+  definition: 'The IOC''s umbrella term for harassment and abuse in sport: psychological, physical, sexual
+    and neglect.'
+  examples: []
+  source_url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Psychological abuse
+  definition: Repeated, deliberate non-contact behaviour by someone with power over an athlete.
+  examples: []
+  source_url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Physical abuse
+  definition: Deliberately causing physical injury, including forced inappropriate physical activity and
+    systematic doping practices.
+  examples: []
+  source_url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Neglect / negligence
+  definition: Failing to meet an athlete's safety needs, such as food, drink, rest or recovery.
+  examples: []
+  source_url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Sexual harassment
+  definition: Unwanted and unwelcome conduct of a sexual nature, verbal, non-verbal or physical.
+  examples: []
+  source_url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Hazing
+  definition: Organised, usually team-based bullying, often presented as initiation, intended to increase
+    commitment.
+  examples: []
+  source_url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Bullying
+  definition: Unwanted, repeated, intentional aggressive behaviour, usually among peers.
+  examples: []
+  source_url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Emotional misconduct
+  definition: Under the SafeSport Code, verbal attacks, physically aggressive acts or deliberate isolation,
+    judged by the behaviour itself rather than intent.
+  examples: []
+  source_url: https://uscenterforsafesport.org/2026-safesport-code/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Physical misconduct
+  definition: Under the SafeSport Code, intentional contact or non-contact behaviour that causes or threatens
+    harm, including denying water, food, medical care or sleep.
+  examples: []
+  source_url: https://uscenterforsafesport.org/2026-safesport-code/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Power imbalance
+  definition: An actual or perceived unequal distribution of power between people; presumed in any coach-athlete
+    relationship under the SafeSport Code.
+  examples: []
+  source_url: https://uscenterforsafesport.org/2026-safesport-code/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Aiding and abetting (SafeSport)
+  definition: An adult knowingly helping or encouraging someone else to commit prohibited conduct.
+  examples: []
+  source_url: https://uscenterforsafesport.org/code-glossary/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: U.S. Center for SafeSport
+  definition: The US body that enforces the SafeSport Code on abuse and misconduct in the Olympic and
+    Paralympic movement.
+  examples: []
+  source_url: https://uscenterforsafesport.org/2026-safesport-code/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP
+- term: Safeguarding (safe sport)
+  definition: Policies, designated staff, education and complaints systems that sport bodies set up to
+    prevent and respond to abuse.
+  examples: []
+  source_url: https://bjsm.bmj.com/content/bjsports/early/2016/04/26/bjsports-2016-096121.full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SP

@@ -9,12 +9,12 @@ the app chooses).
 2. The kinds of records: a kind of record (an FtM schema) points to an area
    only when it says something about the case. Kinds that most areas need
    (Person, Company, Payment, Address, Organization) point nowhere. A kind
-   needed by indicators in at most 8 of the areas points to the area where
+   needed by indicators in at most 8 in 22 of the areas points to the area where
    the largest share of indicators needs it, if that share is at least 15%
    (and to any other area within 80% of that share): Security points to
    securities market abuse, ContractAward to corruption and procurement,
    Vessel to sanctions evasion. Share = the area's verified indicators whose
-   data needed names the kind. MAX_AREAS, MIN_SHARE and NEAR are design
+   data needed names the kind. MAX_SHARE_OF_AREAS, MIN_SHARE and NEAR are design
    choices, not published figures; the reason shown gives the share.
 """
 
@@ -33,7 +33,7 @@ from app.models.domain import Entity, Investigation, PatternFlag, RelationshipEd
 # The safety area (SA) is about danger to the reporter, sources and witnesses,
 # never about the subject (indicators.md), so it is not a type of investigation.
 NOT_A_TYPE = {"SA"}
-MAX_AREAS = 8  # a kind needed in more areas than this points nowhere
+MAX_SHARE_OF_AREAS = 8 / 22  # a kind needed by more of the areas than this points nowhere (8 of the first 22)
 MIN_SHARE = 0.15
 NEAR = 0.8
 
@@ -86,7 +86,7 @@ def suggested(db: Session, investigation_id: str) -> list[dict[str, Any]]:
     pointed: dict[str, float] = {}
     for kind in sorted(_held_schemas(db, investigation_id)):
         needing = users.get(kind, set())
-        if not needing or len(needing) > MAX_AREAS:
+        if not needing or len(needing) > MAX_SHARE_OF_AREAS * len(share):
             continue
         shares = {a: share[a].get(kind, 0.0) for a in needing}
         top = max(shares.values())

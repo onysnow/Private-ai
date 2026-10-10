@@ -2774,6 +2774,1559 @@ indicators:
     activity
   - Study and journalism
   version: 1
+- id: VE-060
+  name: Victim or witness believes the attack was bias-motivated
+  definition: The victim, a witness or another person thinks the crime happened because of who the victim
+    is, or is seen to be.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: victim and witness perception'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 1, Victim and witness perceptions, p. 6
+    quote: Do the victim or witnesses perceive that the criminal act that occurred was motivated by bias?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hate crime: Responding to hate (Authorised Professional Practice)'
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+    locator: Definitions
+    quote: any criminal offence which is perceived by the victim or any other person to be motivated by
+      a hostility or prejudice
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - OSCE/ODIHR tool notes that a victim's impression 'cannot be discarded' even where other indicators
+    are weak.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - CourtCase
+  - Document
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: In England and Wales, perception alone means the crime should be recorded and flagged as hate
+      crime, so a perceived-bias case without a flag is a recording question.
+    source_url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  innocent_explanations:
+  - Victims of any crime may search for a reason and attribute it to their identity when the motive was
+    robbery, a personal dispute or chance.
+  - Perception is a trigger for recording and investigation, not proof; the OSCE tool says indicators
+    do not automatically prove a hate crime.
+  jurisdictions: OSCE participating States; England and Wales (police recording)
+  version: 1
+- id: VE-061
+  name: Suspect's words, writing or gestures refer to the victim's group
+  definition: Before, during or after the offence the suspect said, wrote or gestured something about
+    the victim's real or assumed group.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: comments, statements, gestures'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 2, Comments, written statements, gestures or graffiti, pp. 7-8
+    quote: Did the suspect make comments, written statements or gestures regarding the victim's membership…
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Hate Crimes Case Examples
+    publisher: U.S. Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/hatecrimes/hate-crimes-case-examples
+    locator: Massachusetts case summary
+    quote: Go back to China
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Massachusetts, 2024: the defendant yelled ''Go back to China'' at a Vietnamese man and his children
+    before striking him with a car (DOJ case examples).'
+  - 'Arbery case: DOJ cited the defendants'' racial slurs and statements as evidence that race was a but-for
+    cause.'
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - CourtCase
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Insults during an argument that began for another reason may reference identity without the identity
+    being why the offence happened.
+  - College of Policing guidance notes a young person may repeat words heard elsewhere without understanding
+    their impact.
+  jurisdictions: OSCE participating States; United States (federal hate crime prosecutions)
+  version: 1
+- id: VE-062
+  name: Hate symbols, drawings or graffiti left at the scene
+  definition: Markings, symbols, codes or graffiti linked to hostility against a group were left at or
+    on the target.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: symbols and graffiti'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 2, pp. 7-8
+    quote: Were drawings, markings, symbols or graffiti left at the scene of the incident?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Oregon Man Pleads Guilty to Three Federal Hate Crimes for Defacing Synagogue
+    publisher: U.S. Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/opa/pr/oregon-man-pleads-guilty-three-federal-hate-crimes-defacing-synagogue
+    quote: popular white-supremacist slogan that references Adolf Hitler and the 'Fourteen words.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Eugene, Oregon: ''1377'' and ''WHITE POWER'' painted on Temple Beth Israel.'
+  - 'Warren, Michigan: swastikas and the word ''die'' painted on a predominantly Black church (DOJ case
+    examples, 2024).'
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Document
+  - CourtCase
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: VE
+    reason: Coded white-supremacist numbers such as 1488 are the same symbol vocabulary used in extremist
+      content.
+    source_url: https://www.justice.gov/opa/pr/oregon-man-pleads-guilty-three-federal-hate-crimes-defacing-synagogue
+  innocent_explanations:
+  - Graffiti may predate the incident or be unrelated tagging.
+  - Symbols can have non-hate meanings (for example religious swastika use in some traditions) or be coded
+    numbers with ordinary uses.
+  jurisdictions: OSCE participating States; United States
+  version: 1
+- id: VE-063
+  name: Suspect and victim differ in race, religion, ethnicity or other identity
+  definition: The victim and the suspect belong to different identity groups, such as race, religion,
+    ethnicity, nationality, sexual orientation or disability.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: perpetrator-victim difference'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 3, Ethnic, religious or cultural differences between perpetrator and victim, pp.
+      9-11
+    quote: Do the suspect and victim differ in terms of their racial, religious, ethnic/national background…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most crimes between people of different groups are not bias-motivated; difference alone is weak and
+    must be combined with other indicators.
+  - Hate crime can also occur within the same broad group, so absence of difference does not rule it out.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-064
+  name: History of animosity between the victim's group and the suspect's group
+  definition: There is a known record of tension or hostility between the community the victim belongs
+    to and the suspect's community.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: perpetrator-victim difference'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 3, pp. 9-11
+    quote: Is there a history of animosity between the victim's group and the suspect's group?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Organization
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Local news archives
+  - Police incident data by area
+  - Civil society hate incident monitoring reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Community tension can coexist with incidents that are personal, financial or random.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-065
+  name: Victim belongs to a heavily outnumbered group in the area
+  definition: The victim is one of very few members of their group where the incident happened.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: perpetrator-victim difference'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 3, pp. 9-11
+    quote: Is the victim a member of a group that is overwhelmingly outnumbered by members of another
+      group…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Census or demographic data for the area
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Being a minority in an area does not make a crime bias-motivated; it may simply reflect where the
+    victim lives or works.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-066
+  name: Victim was promoting or representing their group at the time
+  definition: When attacked, the victim was taking part in an activity that promoted or represented their
+    group, such as an event, march or advocacy work.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: perpetrator-victim difference'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 3, pp. 9-11
+    quote: Was the victim engaged in activities promoting his or her group at the time of the incident?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Public events attract crowds, crime and disputes unrelated to the cause being promoted.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-067
+  name: Victim was visibly identifiable as a member of a group
+  definition: The victim's dress, symbols, language or appearance made their group membership obvious
+    to the suspect.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: perpetrator-victim difference'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 3, pp. 9-11
+    quote: Was the victim visibly identifiable as a member of a minority group?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Visible identity is common and does not by itself show the suspect noticed it or acted on it.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-068
+  name: Victim targeted for association with a group they do not belong to
+  definition: The victim is not a member of the group but is linked to it, for example by working for,
+    living with or supporting its members.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: association'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 1 example
+    quote: The victim is convinced the attack was due to the fact that he works for a civil society organization
+      representing Roma.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hate crime: Responding to hate (Authorised Professional Practice)'
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+    locator: Definitions
+    quote: A victim, complainant or the person reporting the incident does not have to be a member of
+      the group.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - OSCE/ODIHR example of a worker at a Roma civil society organisation.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Associate
+  - Organization
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Advocates and staff of organisations can be targeted over unrelated disputes, money or personal matters.
+  jurisdictions: OSCE participating States; England and Wales
+  version: 1
+- id: VE-069
+  name: Organised hate group active in the neighbourhood
+  definition: There is evidence such as posters, leaflets or graffiti that an organised hate group operates
+    where the incident happened.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: organised hate groups'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 4, Organized hate groups, pp. 12-14
+    quote: Is there evidence that such a group is active in the neighbourhood (e.g., posters, graffiti
+      or leaflets?)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Local news
+  - Civil society extremism trackers
+  - Police intelligence summaries where public
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: VE
+    reason: Hate-group presence and membership overlap with the radicalisation indicators already in VE.
+    source_url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+  innocent_explanations:
+  - Leafleting by a group does not mean any particular crime nearby was committed by its supporters.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-070
+  name: Offender uses behaviour, clothing, tattoos or insignia of a hate group
+  definition: The offender acted like, dressed like or carried marks associated with an extremist or hate
+    organisation.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: organised hate groups'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 4, pp. 12-14
+    quote: Did the offender have clothing, tattoos or other insignia associated with a particular extremist…
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 4, pp. 12-14
+    quote: Did the offender use behaviour associated with membership in a hate organization…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some symbols are worn as fashion, ignorance of meaning, or old tattoos from a past the person has
+    left.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-071
+  name: Suspect's background or online presence links them to a hate group
+  definition: The suspect's history, posts or messages show connection with, or sympathy for, a hate group
+    or hostility to the victim's group.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: organised hate groups'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 4, pp. 12-14
+    quote: Does the suspect's background or online presence indicate possible links with a hate group?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Federal Jury Finds Three Men Guilty of Hate Crimes in Connection with the Pursuit and Killing
+      of Ahmaud Arbery
+    publisher: U.S. Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/federal-jury-finds-three-men-guilty-hate-crimes-connection-pursuit-and-killing-ahmaud-arbery
+    quote: had for many years associated Black people with criminality
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Arbery case: prosecutors used years of texts and social media posts to show racial bias.'
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Associate
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: VE
+    reason: The same online-presence evidence supports both radicalisation and bias-motive assessments.
+    source_url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+  innocent_explanations:
+  - Offensive views are not crimes; the DOJ notes people cannot be prosecuted simply for their beliefs,
+    so the link to this offence must be shown.
+  - Online accounts may be misattributed or shared.
+  jurisdictions: OSCE participating States; United States
+  version: 1
+- id: VE-072
+  name: Incident follows a hate-group rally or public threats against the group
+  definition: The incident happened during or soon after a hate-group rally, or after a hate group publicly
+    threatened the victim's group.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: organised hate groups'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 4, pp. 12-14
+    quote: Did the incident occur during or shortly after a rally of such group?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 4, pp. 12-14
+    quote: Did a hate group recently make public threats towards a particular group?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Organization
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - News archives
+  - Event permits
+  - Group social media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: VE
+    reason: Public threats by groups precede incidents in both the hate-crime and violent-extremism lists.
+    source_url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+  innocent_explanations:
+  - Timing can be coincidental, especially in busy areas with frequent crime.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-073
+  name: Incident on a date significant to the victim's group or to the perpetrators
+  definition: The incident fell on a religious holiday, commemoration or anniversary that matters to the
+    victim's group or to the offender's movement.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: location and timing'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 5, Location and timing, pp. 15-18
+    quote: Did the incident occur on a day of particular significance for either the victim's group or
+      the perpetrators…
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hate crime: Responding to hate (Authorised Professional Practice)'
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+    locator: 'Impact factors: proximity'
+    quote: Those speaking in the aftermath or an anniversary
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'OSCE/ODIHR example: a wreath laid at the Babi Yar Holocaust memorial in Kyiv by an Israeli official
+    was set on fire.'
+  cases: []
+  data_needed:
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Religious and commemorative calendars
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Holidays bring crowds, drinking and disputes that raise all crime, not only bias crime.
+  jurisdictions: OSCE participating States; England and Wales
+  version: 1
+- id: VE-074
+  name: Incident at a time when the victim's group usually gathers
+  definition: The incident happened at the time of day or week when members of the victim's group are
+    usually present, such as service times.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: location and timing'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 5, pp. 15-18
+    quote: Did the incident occur during a specific part of the day when people associated with the victim
+      group…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Gatherings create opportunity for ordinary theft, parking disputes and traffic incidents.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-075
+  name: Victim in or near a place associated with their group
+  definition: The victim was at or near a place linked to a group, such as a place of worship, community
+    centre or LGBT venue.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: location and timing'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 5, pp. 15-18
+    quote: Was the victim in or near an area or place commonly associated with or frequented by a particular
+      group…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'OSCE/ODIHR example: a grenade attack on the gay bar ''Libertine'' in Odesa.'
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Venues and community centres are also sites of ordinary nightlife crime and disputes.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-076
+  name: Property target with religious, cultural or community significance
+  definition: The damaged or attacked property is a place of worship, cemetery, memorial or other site
+    meaningful to a group.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: location and timing'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 5, pp. 15-18
+    quote: If the target was property, was it an object, facility or place with religious or cultural
+      significance…
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Washington Man Sentenced for Hate Crimes and Firearm Offense in Four Attacks on Jehovah's Witness
+      Kingdom Halls
+    publisher: U.S. Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/archives/opa/pr/washington-man-sentenced-hate-crimes-and-firearm-offense-four-attacks-jehovahs-witness
+    quote: significant damage to each of the Kingdom Halls
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Kingdom Halls in Tumwater, Olympia and Yelm attacked in 2018.
+  - 'OSCE/ODIHR example: 42 gravestones damaged in the Kolomiya Jewish cemetery.'
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Religious buildings are also hit by burglary, metal theft, arson by people in crisis and general vandalism.
+  jurisdictions: OSCE participating States; United States
+  version: 1
+- id: VE-077
+  name: Incident soon after a change in a minority's presence in the area
+  definition: The incident happened shortly after members of a minority moved into the area or opened
+    a business, venue or place of worship there.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: location and timing'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 5, pp. 15-18
+    quote: Did the incident occur only a short time after a change in a minority's presence in the area…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Person
+  - Organization
+  checkable: lookups
+  lookup_sources:
+  - Property and business registration records
+  - Planning applications
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Newcomers may be targeted because they are unfamiliar or because of neighbour disputes over noise,
+    parking or property.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-078
+  name: Similar incidents against the same group in the same area
+  definition: There have been earlier comparable incidents targeting the same group at or near the same
+    place.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: patterns of previous incidents'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 6, Patterns or frequent previous crimes or incidents, pp. 18-20
+    quote: Have there been similar incidents in the same area against the same group?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hate crime: Responding to hate (Authorised Professional Practice)'
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+    locator: Information gathering
+    quote: including previous incidents involving the same complainant, subject, target group or location
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'OSCE/ODIHR example: a Jehovah''s Witnesses Kingdom Hall in Krolevets was desecrated ten times.'
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - CourtCase
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-crime areas show repeated incidents against everyone, not just one group.
+  jurisdictions: OSCE participating States; England and Wales
+  version: 1
+- id: VE-079
+  name: Escalation from low-level harassment to serious crime
+  definition: Incidents against the same group or person have grown from minor harassment to more serious
+    offences.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: patterns of previous incidents'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 6, pp. 18-20
+    quote: Has there been a recent escalation of incidents against the same group, beginning with low-level
+      harassment…
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 23
+    quote: Left unmanaged, non-criminal behaviour and 'petty' crime has the potential to escalate into
+      more extreme behaviour.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - David Askew was harassed by at least 26 people over more than 12 years before his death (EHRC inquiry).
+  cases: []
+  data_needed:
+  - Event
+  - Person
+  - Address
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Neighbour disputes can escalate for personal reasons with no identity motive.
+  jurisdictions: OSCE participating States; Great Britain
+  version: 1
+- id: VE-080
+  name: Earlier threats or intimidation against the victim or community
+  definition: The victim or their community recently received threats or other intimidation before the
+    incident.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: patterns of previous incidents'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 6, pp. 18-20
+    quote: Has the victim or community recently received threats or been the target of other forms of
+      intimidation…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Attleboro, Massachusetts, 2024: a voicemail to a synagogue called for violence against the Jewish
+    community; the defendant pleaded guilty (DOJ case examples).'
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Person
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: VE
+    reason: Prior threats are a shared warning sign across both lists.
+    source_url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+  innocent_explanations:
+  - Threats may come from a different person than the one who committed the later crime.
+  jurisdictions: OSCE participating States; United States
+  version: 1
+- id: VE-081
+  name: Possible retaliation for an earlier trigger event
+  definition: The incident may be a revenge response against a group after an earlier event, such as a
+    terror attack or a crime blamed on that group.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: patterns of previous incidents'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 6, pp. 18-20
+    quote: Was there a previous incident that may have sparked a retaliatory response against the targeted
+      group?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - News archives for trigger events
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Crime rates fluctuate for many reasons; a nearby news event can be coincidental.
+  jurisdictions: OSCE participating States; England and Wales
+  version: 1
+- id: VE-082
+  name: Unprovoked, extreme violence or degrading treatment
+  definition: The attack had no clear trigger and involved violence or humiliation out of proportion to
+    any ordinary motive.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: nature of the attack'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 7, Nature of the attack, pp. 20-21
+    quote: Did the incident involve unprovoked and extreme violence or degrading treatment?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Steven Hoskin, a man with learning disabilities, was killed in St Austell in 2006 after prolonged
+    abuse; Darren Stewart was convicted of murder (EHRC inquiry, p. 40).
+  cases: []
+  data_needed:
+  - Event
+  - CourtCase
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Extreme violence also occurs with intoxication, mental illness, gang conflict or domestic abuse.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-083
+  name: Attack carried out publicly or filmed and shared
+  definition: The offence was done in public view or recorded and posted, as if to send a message to the
+    group.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: nature of the attack'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 7, pp. 20-21
+    quote: Was the incident carried out publicly or in a manner that it could be made public…
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Case example
+    quote: The assailants posted information about the attack on social media.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: VE
+    reason: Publicising an attack is an indicator in both lists.
+    source_url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+  innocent_explanations:
+  - Many people film fights or crimes for attention unrelated to bias.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-084
+  name: Mutilation, hate symbols or defiling material used in the attack
+  definition: Violence involved mutilation or hate symbols, or property was damaged with materials meant
+    to defile it.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: nature of the attack'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 7, pp. 20-21
+    quote: Did violence involve mutilation or racist symbols, or did property damage involve symbols meant
+      to defile…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Vandalism sometimes uses whatever material is to hand without symbolic intent.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-085
+  name: No other apparent motive
+  definition: After weighing the facts, no ordinary motive such as theft, a dispute or revenge explains
+    the offence.
+  areas:
+  - VE
+  typology: 'Hate crime bias indicators: lack of other motives'
+  status: verified
+  sources:
+  - title: 'Using Bias Indicators: A Practical Tool for Police'
+    publisher: OSCE/ODIHR
+    year: '2019'
+    url: https://cdn.osce.org/sites/default/files/f/documents/8/9/419897_0.pdf
+    locator: Section 8, Lack of other motives, p. 22
+    quote: Considering other potential bias indicators, such as the nature of the violence or the difference…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Arbery case: DOJ said the evidence showed ''race formed a but-for cause of the defendants'' actions.'''
+  cases: []
+  data_needed:
+  - Event
+  - Person
+  - CourtCase
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A motive may exist but be unknown to investigators or reporters; mixed motives are common and the
+    OSCE definition covers bias 'in whole or in part'.
+  jurisdictions: OSCE participating States
+  version: 1
+- id: VE-086
+  name: Repeat victimisation treated as separate, isolated incidents
+  definition: The same person, household or place is targeted again and again, but each report is handled
+    on its own without linking them.
+  areas:
+  - VE
+  typology: Hate crime under-recording and police response
+  status: verified
+  sources:
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: pp. 25-26
+    quote: There was no tracking of repeat victimisation so the police tended to deal with incidents in
+      isolation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hate crime: Responding to hate (Authorised Professional Practice)'
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+    locator: Repeat victimisation
+    quote: being the victim of the same type of crime (for example, hate crime) more than once in the
+      last 12 months
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'David Askew: police knew of incidents as far back as 1998 (EHRC inquiry, p. 24).'
+  cases: []
+  data_needed:
+  - Event
+  - Person
+  - Address
+  - PublicBody
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: The same victim suffers the same type of crime (such as hate crime) more than once in 12
+      months and the reports are not linked
+    threshold_source: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: The EHRC found agencies failed to share intelligence and coordinate responses.
+    source_url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+  innocent_explanations:
+  - Different officers, shifts or systems may genuinely lack the data to link incidents; addresses and
+    names may be recorded inconsistently.
+  jurisdictions: England and Wales; Great Britain
+  version: 1
+- id: VE-087
+  name: Possible hate crimes recorded without a hate flag or as antisocial behaviour
+  definition: Crimes with bias indicators are recorded as ordinary crime or antisocial behaviour, with
+    no hate-crime flag.
+  areas:
+  - VE
+  typology: Hate crime under-recording and police response
+  status: verified
+  sources:
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 25 (Askew case)
+    quote: None of the 31 crimes recorded from the 78 incidents had been identified as hate-related.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 16
+    quote: Harassment of disabled people may be dealt with as antisocial behaviour
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hate crime: Responding to hate (Authorised Professional Practice)'
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+    locator: Recording
+    quote: the crime should be recorded and flagged as a hate crime.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Askew case: 78 incidents, 31 crimes, none identified as hate-related (EHRC).'
+  cases: []
+  data_needed:
+  - Event
+  - PublicBody
+  - Document
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A victim or other person perceived hostility but the crime was not recorded and flagged
+      as hate crime, as the College of Policing guidance requires
+    threshold_source: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: Missing flags are a recording-quality issue for public bodies, and guidance requires supervisors
+      to check hate crime reports.
+    source_url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+  innocent_explanations:
+  - Flags may be added later or held in a separate system; the victim may not have mentioned perceived
+    hostility at the time.
+  - Different jurisdictions use different (not perception-based) recording rules.
+  jurisdictions: England and Wales; Great Britain
+  version: 1
+- id: VE-088
+  name: Disability was not considered as a possible motive
+  definition: Crimes against disabled people are investigated without anyone asking whether disability
+    was the reason they were targeted.
+  areas:
+  - VE
+  typology: Hate crime under-recording and police response
+  status: verified
+  sources:
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 23
+    quote: Disability was rarely considered as a possible motivating factor in crime and antisocial behaviour.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 32
+    quote: Hostility is not always explicit. It does not need to be the sole motivation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The EHRC found most of the murders it examined were not prosecuted as disability hate crimes.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - CourtCase
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: EHRC cases involved social services and health bodies that knew of abuse.
+    source_url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+  innocent_explanations:
+  - Some offences against disabled people are driven by opportunity or a personal relationship rather
+    than hostility; evidence of hostility may be lacking for a charge.
+  jurisdictions: Great Britain
+  version: 1
+- id: VE-089
+  name: Harassment inside an exploitative relationship
+  definition: A disabled or otherwise targeted person is harassed or exploited, including financially,
+    by people presenting as friends or carers.
+  areas:
+  - VE
+  typology: Hate crime under-recording and police response
+  status: verified
+  sources:
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 23
+    quote: The harassment often took place in the context of exploitative relationships.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Christopher Foulkes case: thefts described as financial exploitation; the risk the perpetrator posed
+    ''was never assessed'' (EHRC, p. 37).'
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  - Event
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: EHRC described financial exploitation within these relationships.
+    source_url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+  innocent_explanations:
+  - Shared finances and informal care arrangements are common and usually benign.
+  jurisdictions: Great Britain
+  version: 1
+- id: VE-090
+  name: Authorities blame or disbelieve the victim
+  definition: Agencies respond to reports by questioning the victim's account or behaviour rather than
+    dealing with the offenders.
+  areas:
+  - VE
+  typology: Hate crime under-recording and police response
+  status: verified
+  sources:
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 24
+    quote: Reports of violence may be treated by public authorities with disbelief and disregard
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 23
+    quote: Public authorities sometimes focused on the victim’s behaviour and suggested uncalled for restrictions
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The Stephen Lawrence Inquiry
+    publisher: Home Office (Report of an inquiry by Sir William Macpherson)
+    year: '1999'
+    url: https://assets.publishing.service.gov.uk/media/5a7c2af540f0b645ba3c7202/4262.pdf
+    locator: para 5.31
+    quote: Mr Brooks was the victim of racist stereotyping.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Stephen Lawrence Inquiry: Duwayne Brooks, a victim and witness, was stereotyped by officers (para
+    5.12, 5.31).'
+  cases: []
+  data_needed:
+  - Event
+  - PublicBody
+  - Person
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: Official inquiries found stereotyping and disbelief by police.
+    source_url: https://assets.publishing.service.gov.uk/media/5a7c2af540f0b645ba3c7202/4262.pdf
+  innocent_explanations:
+  - Officers must test every account; some reports are inconsistent or mistaken.
+  jurisdictions: Great Britain; England and Wales
+  version: 1
+- id: VE-091
+  name: Officers reject a bias motive despite clear indicators
+  definition: Investigators decline to accept that a crime was bias-motivated even where the evidence
+    points to it.
+  areas:
+  - VE
+  typology: Hate crime under-recording and police response
+  status: verified
+  sources:
+  - title: The Stephen Lawrence Inquiry
+    publisher: Home Office (Report of an inquiry by Sir William Macpherson)
+    year: '1999'
+    url: https://assets.publishing.service.gov.uk/media/5a7c2af540f0b645ba3c7202/4262.pdf
+    locator: para 6.21
+    quote: a substantial number of officers of junior rank would not accept that the murder of Stephen
+      Lawrence was simply and solely
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The Stephen Lawrence Inquiry
+    publisher: Home Office (Report of an inquiry by Sir William Macpherson)
+    year: '1999'
+    url: https://assets.publishing.service.gov.uk/media/5a7c2af540f0b645ba3c7202/4262.pdf
+    locator: para 1.11
+    quote: Stephen Lawrence's murder was simply and solely and unequivocally motivated by racism.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Stephen Lawrence murder, London, 1993; inquiry report 1999.
+  cases: []
+  data_needed:
+  - Event
+  - PublicBody
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: Macpherson defined institutional racism as an organisation's collective failure, seen in processes,
+      attitudes and behaviour.
+    source_url: https://assets.publishing.service.gov.uk/media/5a7c2af540f0b645ba3c7202/4262.pdf
+  innocent_explanations:
+  - Early in an investigation the motive may genuinely be unclear; caution against labelling before evidence
+    exists is reasonable.
+  jurisdictions: England and Wales
+  version: 1
+- id: VE-092
+  name: Agencies knew of earlier incidents but did not share or act
+  definition: Police, councils, housing or social services each had reports about the same victim but
+    did not combine information or respond together.
+  areas:
+  - VE
+  typology: Hate crime under-recording and police response
+  status: verified
+  sources:
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 23
+    quote: Public authorities were often aware of earlier, less serious incidents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hidden in plain sight: Inquiry into disability-related harassment'
+    publisher: Equality and Human Rights Commission
+    year: '2011'
+    url: https://www.equalityhumanrights.com/sites/default/files/ehrc_hidden_in_plain_sight_3.pdf
+    locator: p. 23
+    quote: The failure of public agencies to share intelligence, co-ordinate their responses and treat
+      harassment as a priority
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Askew case: the response was ''neither joined up nor effective in dealing with the harassment'' (EHRC,
+    p. 25).'
+  - 'Hoskin case: ''Opportunities to intervene to halt the abuse were missed'' (EHRC).'
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  - Person
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Data protection rules, separate IT systems and staff shortages limit sharing even when staff act in
+    good faith.
+  jurisdictions: Great Britain
+  version: 1
+- id: VE-093
+  name: Gap between estimated hate crime and crime reported to police
+  definition: Survey estimates of hate crime are far higher than the number reported to or recorded by
+    police in the same place.
+  areas:
+  - VE
+  typology: Hate crime under-recording and police response
+  status: verified
+  sources:
+  - title: Learn About Hate Crimes
+    publisher: U.S. Department of Justice
+    url: https://www.justice.gov/hatecrimes/learn-about-hate-crimes
+    quote: Experts estimate an average of 250,000 hate crimes were committed each year between 2004 and
+      2015 in the United States
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hate crime: Responding to hate (Authorised Professional Practice)'
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/major-investigation-and-public-protection/hate-crime/responding-hate
+    locator: Under-reporting
+    quote: Chief officers should consider how to encourage increased reporting
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'DOJ: FBI figures for 2025 were 10,881 incidents reported by law enforcement, against an expert estimate
+    of about 250,000 hate crimes a year for 2004-2015 (different periods; DOJ hate crime statistics and
+    Learn About Hate Crimes pages).'
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - FBI Hate Crime Statistics (UCR/NIBRS)
+  - Bureau of Justice Statistics NCVS hate crime reports
+  - Home Office hate crime statistics (England and Wales)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: DOJ describes a 'Hate Crimes Reporting Gap'.
+    source_url: https://www.justice.gov/hatecrimes/learn-about-hate-crimes
+  innocent_explanations:
+  - Victim surveys and police counts use different definitions and periods; victims may choose not to
+    report for reasons agencies cannot control.
+  - US reporting to the FBI is by participating agencies, so totals depend on participation.
+  jurisdictions: United States; England and Wales
+  version: 1
 not_reached:
 - 'US Secret Service NTAC ''Mass Attacks in Public Spaces: 2016-2020'' (secretservice.gov returned Access
   Denied to both WebFetch and curl); its concerning-behaviour statistics are not included'
@@ -2791,3 +4344,17 @@ not_reached:
 - 'Canadian, German and Dutch national prevention-body indicator lists: not searched'
 - Court records for the Buffalo case (Gendron guilty plea and federal case) not opened; the case relies
   on the NY Attorney General report only
+- 'FBI Hate Crime Data Collection Guidelines and Training Manual (ucr.fbi.gov): blocked by robots.txt,
+  so the FBI bias-indicator list is not included.'
+- 'HMICFRS ''Understanding the difference: the initial police response to hate crime'' (2018) full report
+  PDF: fetch failed; only the landing page was read, which gives no findings.'
+- 'Bureau of Justice Statistics ''Hate Crime Victimization, 2005-2019'' full PDF: fetch failed; reporting-rate
+  figures and NCVS classification criteria not captured.'
+- 'CPS hate crime legal guidance (cps.gov.uk): fetch failed.'
+- 'College of Policing ''Evidencing hostility'' page: fetch failed.'
+- 'Stephen Lawrence Inquiry Recommendation 12 (racist incident definition) and Recommendations 13-15:
+  not reached in the part of the PDF read.'
+- 'DOJ press release on the Tree of Life synagogue (Pittsburgh) sentencing: fetch failed.'
+- The shared web search budget was used up after the first search, so no wider search was possible (for
+  example ODIHR data-collection guides, ProPublica or other reporting on agencies reporting zero hate
+  crimes, Home Office statistics). Those sources were not checked.

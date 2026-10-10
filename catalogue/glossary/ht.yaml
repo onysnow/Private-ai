@@ -651,3 +651,211 @@ terms:
   indicators: []
   areas:
   - HT
+- term: UFLPA (Uyghur Forced Labor Prevention Act)
+  definition: US law enacted on December 23, 2021 that strengthens the ban on importing goods made with
+    forced labour and targets forced labour in Xinjiang.
+  examples: []
+  source_url: https://www.dhs.gov/uflpa-strategy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Rebuttable presumption (UFLPA)
+  definition: US Customs assumes goods made wholly or partly in Xinjiang, or by an Entity List company,
+    are banned unless the importer proves otherwise by clear and convincing evidence.
+  examples: []
+  source_url: https://www.cbp.gov/trade/forced-labor/UFLPA
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Forced Labor Enforcement Task Force (FLETF)
+  definition: US interagency body chaired by DHS that writes the UFLPA Strategy and maintains the Entity
+    List.
+  examples: []
+  source_url: https://www.dhs.gov/uflpa-strategy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Labour transfer programme
+  definition: Chinese government scheme that moves ethnic-minority workers, labelled 'surplus labour',
+    into farms and factories in Xinjiang and other provinces, which US authorities describe as coercive.
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Mutual pairing assistance
+  definition: Chinese programme pairing other provinces and their companies with Xinjiang, including setting
+    up satellite factories there.
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Poverty alleviation (Xinjiang context)
+  definition: Official name for programmes that place minority workers in jobs; the UFLPA Strategy says
+    workers are compelled to work under threat of penalty.
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: VETC (Vocational Education and Training Centre)
+  definition: Facilities in Xinjiang that the UN human rights office found were used for large-scale arbitrary
+    detention, at least from 2017 to 2019.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/documents/countries/2022-08-31/22-08-31-final-assesment.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: XPCC (Xinjiang Production and Construction Corps)
+  definition: A state-run paramilitary economic organisation in Xinjiang; the US issued a withhold release
+    order on its goods in 2020 and it falls under Entity List category (v).
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: WRO (Withhold Release Order)
+  definition: A US Customs order to detain imports suspected of being made with forced labour.
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Transshipment
+  definition: Routing goods through another country; illegal transshipment hides where goods or inputs
+    really came from.
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Commingling
+  definition: Mixing inputs from a high-risk region with inputs from elsewhere so their origin can no
+    longer be traced.
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2022-06/22_0617_fletf_uflpa-strategy.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: State-imposed forced labour
+  definition: Forced labour imposed by state authorities, for example through abuse of prison labour,
+    abuse of conscription, or mobilising labour for economic development or as political punishment.
+  examples: []
+  source_url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@ipec/documents/publication/wcms_854733.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: UN Security Council resolution 2397
+  definition: December 2017 UN sanctions resolution requiring countries to send home all North Korean
+    nationals earning income abroad within 24 months.
+  examples: []
+  source_url: https://press.un.org/en/2017/sc13141.doc.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: DPRK IT workers
+  definition: North Korean information-technology workers who take remote jobs abroad, often under false
+    identities, earning revenue for the North Korean state.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/923126/download?inline
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Laptop farm
+  definition: A location, often a home, where a facilitator hosts many company laptops so overseas workers
+    can use them remotely and appear to be working locally.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: KVM switch
+  definition: Hardware that lets one person control several computers remotely; DOJ says laptop-farm hosts
+    often used them.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Guaranteed smuggling (escrow payment)
+  definition: Payment made before the journey and held by a hawala office or third party, released to
+    smugglers only once the smuggling succeeds.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML-TF-Risks-Arising-from-Migrant-Smuggling.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: MVTS (money or value transfer services)
+  definition: Businesses that move money for customers, such as remittance companies and their agents.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf/documents/reports/Migrant-smuggling-handout.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Marriage of convenience (EU)
+  definition: A marriage contracted mainly to give a non-EU spouse a right to move to and live in the
+    EU that they would not otherwise have.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Sham marriage or civil partnership (UK)
+  definition: Under the UK Immigration and Asylum Act 1999, a marriage where one party is not a relevant
+    national, there is no genuine relationship, and it is entered to get around immigration control.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/marriage-and-civil-partnership-referral-and-investigation-scheme/marriage-and-civil-partnership-referral-and-investigation-scheme-statutory-guidance-for-home-office-staff-accessible-version
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Hints of abuse / double-lock approach
+  definition: 'EU Handbook method: check first for signs a marriage is genuine, then weigh signs of abuse
+    together, since no single hint is proof.'
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52014SC0284
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT

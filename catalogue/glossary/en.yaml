@@ -743,3 +743,290 @@ terms:
   indicators: []
   areas:
   - EN
+- term: Greenwashing
+  definition: Presenting a company, product or financial product as more sustainable than it is, in ways
+    that may mislead consumers or investors.
+  examples: []
+  source_url: https://www.esma.europa.eu/press-news/esma-news/esas-put-forward-common-understanding-greenwashing-and-warn-risks
+  cases: []
+  related:
+  - Environmental claim
+  indicators: []
+  areas:
+  - EN
+- term: Environmental claim
+  definition: Any voluntary message that says or implies a product, brand or trader is good for, neutral
+    for, or less harmful to the environment, or has improved over time.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related:
+  - Generic environmental claim
+  indicators: []
+  areas:
+  - EN
+- term: Generic environmental claim
+  definition: A broad green claim not on a sustainability label and not explained clearly on the same
+    medium.
+  examples:
+  - eco-friendly
+  - green
+  - sustainable
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Sustainability label
+  definition: A voluntary trust or quality mark that sets a product, process or business apart for its
+    environmental or social features; mandatory labels are excluded.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Certification scheme
+  definition: An independent third-party scheme with public requirements that verifies a product, process
+    or business and allows use of a label.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Recognised excellent environmental performance
+  definition: Performance that meets the EU Ecolabel, an officially recognised ISO 14024 type I ecolabel,
+    or top performance under other EU law.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Green Claims Code
+  definition: UK competition regulator guidance setting six principles that environmental claims must
+    meet under consumer law.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Life cycle
+  definition: All stages of a product's existence, from raw materials and manufacture through transport
+    and use to disposal; claims covering only part can mislead.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Substantiation
+  definition: The evidence a business holds to prove its claim is true; in the US often competent and
+    reliable scientific evidence.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Green Guides
+  definition: US Federal Trade Commission guidance (16 CFR Part 260) on how environmental marketing claims
+    can avoid being deceptive.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Carbon offset
+  definition: A credit representing an emission reduction or removal elsewhere, bought to balance one's
+    own emissions; it must not be sold twice or represent reductions that would have happened anyway.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  cases: []
+  related:
+  - Carbon neutral claim
+  indicators: []
+  areas:
+  - EN
+- term: Substantial majority (recyclable claims)
+  definition: In the FTC Guides, at least 60 percent of consumers or communities where a product is sold
+    having access to recycling for it.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Net zero pledge
+  definition: A commitment to cut greenhouse gas emissions so that remaining emissions are balanced by
+    removals; UN experts say it needs interim targets, a transition plan and no new fossil fuel supply.
+  examples: []
+  source_url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Scope 1, 2 and 3 emissions
+  definition: A company's direct emissions (1), emissions from the energy it buys (2), and emissions in
+    its wider value chain (3); UN experts say business net-zero targets must cover all three.
+  examples: []
+  source_url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: ESG
+  definition: Environmental, social and governance factors used in investment decisions; misstating how
+    they are applied has led to SEC penalties.
+  examples: []
+  source_url: https://www.sec.gov/news/press-release/2022-86
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: International humanitarian law (IHL)
+  definition: The rules that limit how wars are fought, protecting civilians, civilian objects and the
+    natural environment; includes the Geneva Conventions, their Protocols and customary rules.
+  examples: []
+  source_url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Customary international humanitarian law
+  definition: IHL rules binding on all parties because of widespread State practice and acceptance, catalogued
+    in the ICRC's 2005 study.
+  examples: []
+  source_url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Additional Protocol I
+  definition: The 1977 treaty adding to the Geneva Conventions for international armed conflicts; Articles
+    35(3) and 55 protect the natural environment.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Widespread, long-term and severe damage
+  definition: The treaty threshold for prohibited environmental damage in war under Protocol I; all three
+    conditions must be met.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related:
+  - Ecocide (popular term, not sourced here)
+  indicators: []
+  areas:
+  - EN
+- term: Military objective / imperative military necessity
+  definition: Parts of nature may be attacked only if they are military objectives, and destroyed only
+    when military necessity demands it.
+  examples: []
+  source_url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Works and installations containing dangerous forces
+  definition: Dams, dykes and nuclear power stations, whose attack could release floods or radiation;
+    specially protected in war.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Objects indispensable to the survival of the civilian population
+  definition: Things civilians need to live, such as food, farmland, crops, livestock, drinking water
+    and irrigation works, which may not be attacked to deny them.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Reprisal
+  definition: An otherwise unlawful act taken to force an enemy to stop violating the law; reprisals against
+    the environment are prohibited.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Pillage
+  definition: Taking property, including natural resources, for private or unlawful gain in armed conflict;
+    prohibited.
+  examples: []
+  source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Environmental modification techniques (ENMOD)
+  definition: Deliberate manipulation of natural processes; the 1976 ENMOD Convention bans hostile use
+    with widespread, long-lasting or severe effects.
+  examples: []
+  source_url: https://disarmament.unoda.org/enmod/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: PERAC draft principles
+  definition: The UN International Law Commission's 2022 principles on protecting the environment before,
+    during and after armed conflict and in occupation.
+  examples: []
+  source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Occupying power
+  definition: A State exercising control over foreign territory in armed conflict; ILC principles require
+    it to use natural resources there sustainably.
+  examples: []
+  source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Remnants of war
+  definition: Toxic or hazardous material left after fighting, such as munitions or contamination, which
+    parties should remove or make harmless.
+  examples: []
+  source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN

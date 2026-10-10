@@ -4649,6 +4649,1425 @@ indicators:
   - Currency swings prompt hedging or conversions.
   jurisdictions: United States (FinCEN)
   version: 1
+- id: SF-080
+  name: Person offers themselves or others to work under a terrorist group's direction or control (personnel)
+  definition: Someone joins, or sends other people to join, a designated terrorist group so that they
+    work under the group's direction or help organise or run it.
+  areas:
+  - SF
+  typology: 'Non-financial material support: personnel'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339B - Providing material support or resources to designated foreign terrorist organizations
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339B
+    locator: Subsection (a)(1); see also (h) Provision of personnel
+    quote: Whoever knowingly provides material support or resources to a foreign terrorist organization
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Terrorist Material Support: An Overview of 18 U.S.C. 2339A and 2339B (R41333)'
+    publisher: Congressional Research Service (Charles Doyle)
+    year: '2023'
+    url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+    locator: Discussion of 2339B(h) personnel
+    quote: Individuals who act entirely independently of the foreign terrorist organization
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 4
+    quote: participating in the activities of a terrorist group, including by supplying information or
+      material resources
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Additional Protocol to the Council of Europe Convention on the Prevention of Terrorism (CETS
+      No. 217)
+    publisher: Council of Europe
+    year: '2015'
+    url: https://rm.coe.int/168047c5ea
+    locator: Article 2
+    quote: to participate in the activities of an association or group for the purpose of committing
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A defendant acted as an ISIS agent and recruited others (US v. Hendricks, 6th Cir. 2020, as described
+    by CRS)
+  - A lawyer passed messages between an imprisoned leader and his group (US v. Stewart)
+  cases:
+  - name: United States v. Stewart (Lynne Stewart)
+    year: '2005'
+    jurisdiction: US, S.D.N.Y.; affirmed 2d Cir. 2009
+    what_happened: Convicted of providing material support to terrorists and conspiring to conceal it,
+      centred on passing messages from her client Sheikh Omar Abdel-Rahman to members of al-Gama'a al-Islamiyya;
+      resentenced to 10 years in 2010. CRS notes the charge alleged support in the form of 'personnel'.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Lynne_Stewart
+    source_title: Lynne Stewart (Wikipedia); CRS R41333
+  - name: United States v. Hendricks
+    year: '2020'
+    jurisdiction: US, 6th Cir.
+    what_happened: Appeals court found a jury could infer he took direction from ISIS members and acted
+      as an ISIS agent recruiting others, satisfying the personnel direction-and-control limit.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+    source_title: CRS R41333 (citing 950 F.3d 348)
+  data_needed:
+  - Person
+  - Organization
+  - Membership
+  - Employment
+  - Associate
+  - Event
+  - CourtCase
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - US State Department Foreign Terrorist Organization list
+  - OFAC SDN list
+  - PACER / CourtListener federal dockets
+  - DOJ National Security Division press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: works under the direction or control of a designated
+      organization (18 U.S.C. 2339B(h))'
+    threshold_source: https://www.law.cornell.edu/uscode/text/18/2339B
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Personnel cases usually begin with public or law-enforcement links between a person and a
+      designated group.
+    source_url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+  innocent_explanations:
+  - Independent advocacy or sympathy expressed without any coordination with the group is not 'personnel'
+    under 2339B(h)
+  - Humanitarian, journalistic or academic contact with group members
+  - Mistaken identity or shared names
+  - Membership in a group before it was designated, or in a lawful organisation with a similar name
+  jurisdictions: US (18 U.S.C. 2339A/2339B); EU (Directive 2017/541 Art. 4); Council of Europe parties
+    (CETS 217 Art. 2)
+  version: 1
+- id: SF-081
+  name: Travel, or planned travel, abroad to join a terrorist group, seek training or fight in a conflict
+    zone
+  definition: A person goes, or gets ready to go, to another country to join a violent extremist group,
+    train with it or take part in fighting.
+  areas:
+  - SF
+  typology: 'Non-financial material support: personnel / foreign terrorist fighters'
+  status: verified
+  sources:
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 10, p. 12; also Mobilization Indicator 1, p. 6
+    quote: Planning or preparing to travel abroad to join violent extremist organizations, seek training,
+      or engage in a conflict zone
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 9
+    quote: travelling to a country other than that Member State for the purpose of committing
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Additional Protocol to the Council of Europe Convention on the Prevention of Terrorism (CETS
+      No. 217)
+    publisher: Council of Europe
+    year: '2015'
+    url: https://rm.coe.int/168047c5ea
+    locator: Article 4
+    quote: travelling to a State, which is not that of the traveller's nationality or residence
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Security Council Resolution 2178 (2014) summary page
+    publisher: United Nations Security Council
+    year: '2014'
+    url: https://main.un.org/securitycouncil/en/s/res/2178-%282014%29
+    locator: Resolution summary
+    quote: prevent and suppress recruiting, organising, transporting or equipping
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A man spent two weeks in Yemen trying to get training at a militant camp (Tarek Mehanna, convicted
+    2011)
+  cases:
+  - name: United States v. Mehanna (Tarek Mehanna)
+    year: '2011'
+    jurisdiction: US, D. Mass.; affirmed 1st Cir. 2013
+    what_happened: Convicted after travelling to Yemen in 2004 seeking training at a militant camp and
+      later translating and posting material prosecutors called al-Qaeda propaganda; sentenced to 17.5
+      years; Supreme Court declined review in 2014.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Tarek_Mehanna
+    source_title: Tarek Mehanna (Wikipedia); CRS R41333 cites 735 F.3d 32
+  data_needed:
+  - Person
+  - Event
+  - Address
+  - Document
+  - Associate
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records and DOJ press releases
+  - Court-released travel records
+  - Published reporting naming its evidence
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: The financial footprint of the same travel is already covered there; this indicator covers
+      the travel itself.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+  innocent_explanations:
+  - Family visits, humanitarian or aid work, journalism, research or religious pilgrimage in or near conflict
+    regions
+  - Diaspora travel to home country
+  - Refugee or migration movement
+  - Travel to fight with lawful state forces
+  jurisdictions: US, EU, Council of Europe parties; UN member states under UNSCR 2178
+  version: 1
+- id: SF-082
+  name: Organising or facilitating other people's travel to join a terrorist group (tickets, routes, transit
+    contacts)
+  definition: Someone arranges travel for others who are going to join a terrorist group, for example
+    by buying their tickets, setting routes or giving them contacts along the way.
+  areas:
+  - SF
+  typology: 'Non-financial material support: transportation / facilitation'
+  status: verified
+  sources:
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 10
+    quote: any act of organisation or facilitation that assists any person in travelling for the purpose
+      of terrorism
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Additional Protocol to the Council of Europe Convention on the Prevention of Terrorism (CETS
+      No. 217)
+    publisher: Council of Europe
+    year: '2015'
+    url: https://rm.coe.int/168047c5ea
+    locator: Article 6
+    quote: any act of organisation or facilitation that assists any person in travelling abroad for the
+      purpose of terrorism
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of Recruitment for Terrorist Purposes
+    publisher: Financial Action Task Force (FATF)
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+    locator: Para. 46, p. 21; see also Box 7 (Spain) p. 13 and Box 17 (United States) p. 22
+    quote: facilitating the process of recruitment, buying their tickets, a fake passport, providing contacts
+      on transit
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'FATF Box 17 (United States): a person who ''coordinates travel and communications for ISIL'''
+  - 'FATF Box 7 (Spain): money used ''to buy flight tickets for them to travel to conflict zones'''
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Event
+  - Associate
+  - Document
+  - Address
+  checkable: records
+  lookup_sources:
+  - Court records
+  - FATF and national typology reports
+  - Ticketing or booking records released in court
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF ties ticket purchases and transit facilitation to recruitment funding flows.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+  innocent_explanations:
+  - Ordinary travel agents, relatives or community members booking trips for family
+  - Humanitarian organisations moving aid workers
+  - Booking tickets without knowing the traveller's purpose
+  jurisdictions: EU; Council of Europe parties; US (as personnel/transportation under 2339A/B)
+  version: 1
+- id: SF-083
+  name: Recruiting or soliciting others to join or contribute to a terrorist group
+  definition: Someone tries to get other people, often friends or family, to join a terrorist group or
+    help it commit attacks.
+  areas:
+  - SF
+  typology: 'Non-financial material support: personnel (recruitment)'
+  status: verified
+  sources:
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 6 (Recruitment for terrorism)
+    quote: soliciting another person to commit or contribute to the commission of
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Motivation, Indicator 35, p. 19
+    quote: Attempting to radicalize others—especially family members and peers—to violence
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of Recruitment for Terrorist Purposes
+    publisher: Financial Action Task Force (FATF)
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+    locator: Box 17 (United States), p. 21
+    quote: exploit social media to recruit others to travel to Syria and Iraq to join ISIL
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'CRS describes US v. Hendricks: the defendant saw himself and his recruits as ISIS agents'
+  cases:
+  - name: United States v. Hendricks
+    year: '2020'
+    jurisdiction: US, 6th Cir.
+    what_happened: Evidence allowed a jury to infer he took direction from ISIS members and treated himself
+      and his recruits as ISIS agents.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+    source_title: CRS R41333
+  data_needed:
+  - Person
+  - Associate
+  - Family
+  - Event
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Platform takedown and transparency reports
+  - DOJ press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful religious or political proselytising
+  - Strong rhetoric or advocacy that is constitutionally protected (NCTC booklet warns these alone are
+    not a basis for action)
+  - Recruitment for lawful organisations or armed forces
+  jurisdictions: EU; US (personnel under 2339B where under direction or control)
+  version: 1
+- id: SF-084
+  name: Providing training or instruction in weapons, explosives or other specific skills to a terrorist
+    group
+  definition: Someone teaches a terrorist group, or people linked to it, a specific skill such as using
+    weapons or explosives.
+  areas:
+  - SF
+  typology: 'Non-financial material support: training'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (b)(2)
+    quote: instruction or teaching designed to impart a specific skill, as opposed to general knowledge
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 7
+    quote: providing instruction on the making or use of explosives, firearms or other weapons
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Terrorism Act 2000, section 54 (Weapons training)
+    publisher: UK legislation.gov.uk
+    year: '2000'
+    url: https://www.legislation.gov.uk/ukpga/2000/11/section/54
+    locator: Section 54(1)
+    quote: A person commits an offence if he provides instruction or training in the making or use of—
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Terrorism Act 2006, section 6 (Training for terrorism)
+    publisher: UK legislation.gov.uk
+    year: '2006'
+    url: https://www.legislation.gov.uk/ukpga/2006/11/section/6
+    locator: Section 6(1)(a)
+    quote: provides instruction or training in any of the skills mentioned in subsection (3)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A woman led an all-female ISIL battalion and trained women in weapons and explosive belts (Allison
+    Fluke-Ekren, pleaded guilty 2022)
+  cases:
+  - name: United States v. Fluke-Ekren (Allison Fluke-Ekren)
+    year: '2022'
+    jurisdiction: US, E.D. Va.
+    what_happened: Pleaded guilty to providing material support to ISIL; she led the all-female Khatibah
+      Nusaybah battalion and set up a centre in Raqqa that trained women and girls in grenades, AK-47
+      rifles, car bombs and suicide belts; sentenced to 20 years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Allison_Fluke-Ekren
+    source_title: Allison Fluke-Ekren (Wikipedia)
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Address
+  - Associate
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - DOJ press releases
+  - Firearms-instructor licensing records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: instruction imparting a specific skill, as opposed
+      to general knowledge (18 U.S.C. 2339A(b)(2))'
+    threshold_source: https://www.law.cornell.edu/uscode/text/18/2339A
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licensed firearms, security, martial arts or military instruction to lawful clients
+  - Teaching general knowledge or academic subjects (excluded from the US definition)
+  - Former military personnel training private security or shooting clubs
+  jurisdictions: US; EU; UK
+  version: 1
+- id: SF-085
+  name: Receiving or seeking military-type training from a terrorist group
+  definition: A person attends, or tries to attend, weapons or combat training run by or for a designated
+    terrorist group.
+  areas:
+  - SF
+  typology: 'Non-financial material support: training (receiving)'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339D - Receiving military-type training from a foreign terrorist organization
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339D
+    locator: Subsection (a); definition in (c)(1)
+    quote: Whoever knowingly receives military-type training from or on behalf of any organization designated
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 8
+    quote: receiving instruction on the making or use of explosives, firearms or other weapons
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Additional Protocol to the Council of Europe Convention on the Prevention of Terrorism (CETS
+      No. 217)
+    publisher: Council of Europe
+    year: '2015'
+    url: https://rm.coe.int/168047c5ea
+    locator: Article 3
+    quote: to receive instruction, including obtaining knowledge or practical skills, from another person
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 21, p. 14
+    quote: Change in or initiation of physical or weapons training for suspected criminal purposes
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Tarek Mehanna's 2004 attempt to get training at a militant camp in Yemen
+  cases:
+  - name: United States v. Mehanna (Tarek Mehanna)
+    year: '2011'
+    jurisdiction: US, D. Mass.
+    what_happened: Convicted; conduct included a 2004 trip to Yemen trying unsuccessfully to get training
+      at a militant camp.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Tarek_Mehanna
+    source_title: Tarek Mehanna (Wikipedia)
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Address
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - DOJ press releases
+  - State Department FTO designation dates
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: training in means that can cause death or serious
+      bodily injury, or in weapons, from a designated organization (18 U.S.C. 2339D(c)(1))'
+    threshold_source: https://www.law.cornell.edu/uscode/text/18/2339D
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful hunting, sport shooting, martial arts or fitness training
+  - Service in national armed forces or reserves
+  - Training received from a group before it was designated (2339D requires designation at the time)
+  jurisdictions: US; EU; UK (TA 2000 s.54(2), TA 2006 s.6(2)); Council of Europe parties
+  version: 1
+- id: SF-086
+  name: Expert advice or assistance from specialised, scientific or technical knowledge given to a terrorist
+    group
+  definition: Someone uses professional, scientific or technical expertise (for example in chemistry,
+    electronics, IT or law) to help a terrorist group.
+  areas:
+  - SF
+  typology: 'Non-financial material support: expert advice or assistance'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (b)(3)
+    quote: advice or assistance derived from scientific, technical or other specialized knowledge.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 27, p. 15
+    quote: Attempting to seek technical expertise (for example, in aviation, biology, chemistry, electronics)
+      to enable planned violence
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Terrorist Material Support: An Overview of 18 U.S.C. 2339A and 2339B (R41333)'
+    publisher: Congressional Research Service
+    year: '2023'
+    url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+    locator: Discussion of Holder v. Humanitarian Law Project
+    quote: '''[S]ervice'' similarly refers to concerted activity, not independent advocacy.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Holder v. Humanitarian Law Project (2010): teaching PKK and LTTE members to use international law
+    and humanitarian law treated as training and expert advice'
+  - A graduate student charged over computer skills used for websites was acquitted (Sami Al-Hussayen,
+    2004)
+  cases:
+  - name: United States v. Al-Hussayen (Sami Omar Al-Hussayen)
+    year: '2004'
+    jurisdiction: US, D. Idaho
+    what_happened: Charged with conspiracy to provide material support using his computer skills and with
+      supporting Hamas through donation links on websites he allegedly maintained; acquitted of all three
+      terrorism charges.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Sami_Omar_Al-Hussayen
+    source_title: Sami Omar Al-Hussayen (Wikipedia)
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Associate
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Professional licensing bodies
+  - Supreme Court opinions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Technical services provided to sanctioned or listed actors are also covered by the remote-worker
+      indicators.
+    source_url: https://www.law.cornell.edu/uscode/text/18/2339A
+  innocent_explanations:
+  - Independent academic research, publication or teaching of general knowledge
+  - Lawyers representing clients in court (US law treats representation differently from advocacy coordinated
+    by the group)
+  - Humanitarian or conflict-resolution work authorised under 2339B(j) by the Secretary of State
+  - Professionals unknowingly serving a front organisation
+  jurisdictions: US
+  version: 1
+- id: SF-087
+  name: Setting up or running training camps or other facilities for a terrorist group
+  definition: Someone provides, sets up or runs a place, such as a camp or premises, where a terrorist
+    group can train or operate.
+  areas:
+  - SF
+  typology: 'Non-financial material support: facilities'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (b)(1)
+    quote: communications equipment, facilities, weapons, lethal substances, explosives, personnel
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of Recruitment for Terrorist Purposes
+    publisher: Financial Action Task Force (FATF)
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+    locator: Para. 6, p. 4; see also para. 39, p. 18
+    quote: can establish complicated recruitment and facilitation infrastructures
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Support for an alleged attempt to set up a training camp near Bly, Oregon, in 1999-2000 (Mustafa Kamel
+    Mustafa / Abu Hamza al-Masri, convicted 2014)
+  cases:
+  - name: United States v. Mustafa (Abu Hamza al-Masri)
+    year: '2014'
+    jurisdiction: US, S.D.N.Y.
+    what_happened: Found guilty of eleven terrorism charges, including four counts of providing material
+      support; the US case included supporting an alleged attempt to establish a 'terrorist training camp'
+      near Bly, Oregon; sentenced to life without parole in 2015.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Abu_Hamza_al-Masri
+    source_title: Abu Hamza al-Masri (Wikipedia)
+  data_needed:
+  - Person
+  - Address
+  - Ownership
+  - Contract
+  - Organization
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Property and land records
+  - Court records
+  - Local permitting records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Facilities and premises for groups appear in property records the same way as nominee holdings.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+  innocent_explanations:
+  - Lawful firing ranges, survival courses, militia-style recreation or airsoft sites
+  - Religious retreats or youth camps
+  - Rural land bought for farming or hunting
+  jurisdictions: US; other states with equivalent offences
+  version: 1
+- id: SF-088
+  name: Safehouses or lodging for group members or recruits (renting premises to house them)
+  definition: Someone provides or rents housing where members of a terrorist group, or recruits on their
+    way to join it, can stay.
+  areas:
+  - SF
+  typology: 'Non-financial material support: lodging and safehouses'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (b)(1)
+    quote: financial services, lodging, training, expert advice or assistance, safehouses, false documentation
+      or identification,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of Recruitment for Terrorist Purposes
+    publisher: Financial Action Task Force (FATF)
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+    locator: Box 18 (Russian Federation), p. 22
+    quote: renting residential premises to accommodate persons who arrived from different countries to
+      join ISIL
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'FATF Box 18: premises rented to house arrivals from several countries who intended to join ISIL'
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Contract
+  - Payment
+  - Associate
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Property and tenancy records
+  - Court records
+  - FATF typology reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Address analysis used for sanctions screening also surfaces shared lodging used by networks.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+  innocent_explanations:
+  - Landlords renting to tenants without knowledge of their purpose
+  - Hosting relatives, students or migrant workers
+  - Short-term rentals booked through platforms
+  jurisdictions: US; typologies from FATF members
+  version: 1
+- id: SF-089
+  name: False documents or identification, fraudulent passport applications, or fraudulently obtained
+    immigration status for group members
+  definition: Someone obtains, makes or uses false identity or travel documents, or helps a person get
+    legal status by fraud, so that people linked to a terrorist group can travel or stay somewhere.
+  areas:
+  - SF
+  typology: 'Non-financial material support: false documentation or identification'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (b)(1)
+    quote: financial services, lodging, training, expert advice or assistance, safehouses, false documentation
+      or identification,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 12(c)
+    quote: drawing up or using false administrative documents with a view to committing
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of Recruitment for Terrorist Purposes
+    publisher: Financial Action Task Force (FATF)
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+    locator: Box 1 (Russian Federation), p. 8; see also para. 18, p. 6
+    quote: guaranteed assistance to accomplices in obtaining false passports for travel to Syria
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 22 (examples), p. 14
+    quote: fraudulent passport application
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'FATF: recruiters providing ''fake identification documents or flight tickets'' (para. 18)'
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Passport
+  - Identification
+  - Associate
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Immigration court and fraud prosecutions
+  - INTERPOL Stolen and Lost Travel Documents (law enforcement only)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Identity-document fraud techniques are shared across sanctions evasion and terrorism support
+      typologies.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+  innocent_explanations:
+  - Ordinary document fraud for economic migration or asylum, with no terrorist link
+  - Clerical errors, name transliteration differences or lawful name changes
+  - Helping someone with immigration paperwork without knowing their affiliations (see Paracha note)
+  jurisdictions: US; EU; FATF members
+  version: 1
+- id: SF-090
+  name: 'Communications equipment or services for a group: supplying phones, relaying messages or coordinating
+    its communications'
+  definition: Someone gives a terrorist group phones or other communications gear, or carries or coordinates
+    messages for it.
+  areas:
+  - SF
+  typology: 'Non-financial material support: communications equipment / service'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (b)(1)
+    quote: communications equipment, facilities, weapons, lethal substances, explosives, personnel
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of Recruitment for Terrorist Purposes
+    publisher: Financial Action Task Force (FATF)
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+    locator: Box 17 (United States), p. 22
+    quote: coordinates travel and communications for ISIL
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Passing messages from an imprisoned leader to his group's members (Lynne Stewart, convicted 2005)
+  cases:
+  - name: United States v. Stewart (Lynne Stewart)
+    year: '2005'
+    jurisdiction: US, S.D.N.Y.
+    what_happened: Convicted of material support, conspiracy to conceal it and false statements; the case
+      centred on passing messages from Sheikh Omar Abdel-Rahman to al-Gama'a al-Islamiyya members.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Lynne_Stewart
+    source_title: Lynne Stewart (Wikipedia)
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Associate
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Prison communication rules and special administrative measures cited in cases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Telecom retailers selling phones or SIM cards in normal trade
+  - Lawyers communicating with clients within legal and prison rules
+  - Journalists contacting group members for interviews
+  jurisdictions: US
+  version: 1
+- id: SF-091
+  name: 'Transportation for a group: providing vehicles, transport channels or moving members and recruits'
+  definition: Someone moves people or goods for a terrorist group, or provides it with vehicles or regular
+    transport routes.
+  areas:
+  - SF
+  typology: 'Non-financial material support: transportation'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (b)(1)
+    quote: (1 or more individuals who may be or include oneself), and transportation, except medicine
+      or religious materials;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of Recruitment for Terrorist Purposes
+    publisher: Financial Action Task Force (FATF)
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+    locator: Box 6 (Russian Federation), p. 13; see also para. 39, p. 18 ('rent of real estate and transport
+      vehicles')
+    quote: establishing schemes and channels of transportation of young recruits travelling to Syria
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Security Council Resolution 2178 (2014) summary page
+    publisher: United Nations Security Council
+    year: '2014'
+    url: https://main.un.org/securitycouncil/en/s/res/2178-%282014%29
+    locator: Resolution summary
+    quote: prevent and suppress recruiting, organising, transporting or equipping
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'FATF Box 6: a network that set up transport channels for young recruits travelling to Syria'
+  cases: []
+  data_needed:
+  - Person
+  - Vehicle
+  - Vessel
+  - Address
+  - Event
+  - Associate
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Vehicle registration records
+  - Court records
+  - FATF typology reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Vehicle-related businesses appear in both financing and transport-support typologies.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+  innocent_explanations:
+  - Taxi, ride-share, bus or freight operators carrying passengers without knowledge
+  - Migrant smuggling unconnected to terrorism
+  - Family members giving rides
+  jurisdictions: US; UN member states under UNSCR 2178; FATF members
+  version: 1
+- id: SF-092
+  name: Media, website, translation or dissemination services coordinated with a terrorist group
+  definition: Someone runs websites, produces or translates material, or spreads recruitment content for
+    a terrorist group in coordination with it, rather than as independent speech.
+  areas:
+  - SF
+  typology: 'Non-financial material support: service'
+  status: verified
+  sources:
+  - title: 'Terrorist Material Support: An Overview of 18 U.S.C. 2339A and 2339B (R41333)'
+    publisher: Congressional Research Service
+    year: '2023'
+    url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+    locator: Discussion of Holder v. Humanitarian Law Project
+    quote: '''[S]ervice'' similarly refers to concerted activity, not independent advocacy.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of Recruitment for Terrorist Purposes
+    publisher: Financial Action Task Force (FATF)
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+    locator: Para. 44, p. 19; see also para. 21, p. 7
+    quote: may seek to develop complex systems or hire professionals to help disseminate the recruitment
+      materials
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 5 (Public provocation)
+    quote: the distribution, or otherwise making available by any means, whether online or offline, of
+      a message to the public
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Motivation, Indicator 32, p. 18
+    quote: Producing, promoting, or extensively consuming violent extremist content online or in person,
+      including violent extremist
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Babar Ahmad pleaded guilty in 2013 to conspiracy and material support tied to the Azzam.com website
+  - Tarek Mehanna translated and posted material prosecutors called al-Qaeda propaganda
+  cases:
+  - name: United States v. Ahmad (Babar Ahmad)
+    year: '2013'
+    jurisdiction: US, D. Conn.
+    what_happened: Pleaded guilty to conspiracy and providing material support to terrorism tied to the
+      Azzam.com website; sentenced to 12.5 years in 2014.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Babar_Ahmad
+    source_title: Babar Ahmad (Wikipedia)
+  - name: United States v. Al-Hussayen
+    year: '2004'
+    jurisdiction: US, D. Idaho
+    what_happened: Charged over websites and computer skills allegedly used to support terrorists and
+      Hamas; acquitted of all terrorism charges.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Sami_Omar_Al-Hussayen
+    source_title: Sami Omar Al-Hussayen (Wikipedia)
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Associate
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Domain registration (WHOIS) history
+  - Platform transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: concerted activity with the group, not independent
+      advocacy'
+    threshold_source: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Payments to extremist media sellers and coordinated media services are two views of the same
+      activity.
+    source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  innocent_explanations:
+  - Independent speech, commentary or advocacy (protected in the US; HLP draws the line at coordination)
+  - Journalists, researchers and archivists collecting or republishing material for reporting or study
+  - Web hosts and translators working for clients without knowledge of the group link
+  jurisdictions: US; EU; UK
+  version: 1
+- id: SF-093
+  name: Supplying weapons, explosives, lethal substances or equipment to a terrorist group or violent
+    extremists
+  definition: Someone sends weapons, explosives, dangerous substances or other equipment to a terrorist
+    group or to violent extremists.
+  areas:
+  - SF
+  typology: 'Non-financial material support: weapons and equipment'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (b)(1)
+    quote: communications equipment, facilities, weapons, lethal substances, explosives, personnel
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 23, p. 15
+    quote: Sending or receiving unexplained financial resources or equipment to/from violent extremists
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Security Council Resolution 2178 (2014) summary page
+    publisher: United Nations Security Council
+    year: '2014'
+    url: https://main.un.org/securitycouncil/en/s/res/2178-%282014%29
+    locator: Resolution summary
+    quote: prevent and suppress recruiting, organising, transporting or equipping
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Payment
+  - Event
+  - Address
+  - Associate
+  - Document
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Export-control enforcement records
+  - Shipping records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: The purchase side is covered there; this indicator covers onward supply to a group.
+    source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  innocent_explanations:
+  - Licensed arms dealers and lawful exports
+  - Gifts of hunting or outdoor gear to family
+  - Shipments of medicine or religious materials, which US law excludes from material support
+  jurisdictions: US; UN member states under UNSCR 2178
+  version: 1
+- id: SF-094
+  name: Concealing or disguising the nature, location, source or ownership of support given to terrorists
+  definition: Someone hides what kind of help was given to terrorists, where it went, where it came from
+    or who owns it.
+  areas:
+  - SF
+  typology: 'Non-financial material support: concealment'
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2339A - Providing material support to terrorists
+    publisher: Legal Information Institute, Cornell Law School (US Code text)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/2339A
+    locator: Subsection (a)
+    quote: Whoever provides material support or resources or conceals or disguises the nature, location,
+      source, or ownership
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Terrorist Material Support: An Overview of 18 U.S.C. 2339A and 2339B (R41333)'
+    publisher: Congressional Research Service
+    year: '2023'
+    url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+    locator: Case discussion (paraphrase of CRS citation; see note)
+    quote: Kassir v. United States, 3 F.4th 556, 559 (2d Cir. 2021) ("various counts of (1) providing
+      and concealing material support and resources to terrorists, 18 U.S.C. §§ 2339A, 2339B . . .")
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The Stewart charges alleged covert conduct to conceal the nature, location and source of personnel
+    support (CRS R41333)
+  cases:
+  - name: United States v. Stewart (Lynne Stewart)
+    year: '2005'
+    jurisdiction: US, S.D.N.Y.
+    what_happened: Convicted of material support and conspiring to conceal it.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Lynne_Stewart
+    source_title: Lynne Stewart (Wikipedia); CRS R41333
+  data_needed:
+  - Person
+  - Organization
+  - Associate
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Concealment of support often uses the same front structures as sanctions evasion.
+    source_url: https://www.law.cornell.edu/uscode/text/18/2339A
+  innocent_explanations:
+  - Ordinary privacy practices
+  - Confidential legal or medical communications
+  - Records lost or kept poorly
+  jurisdictions: US
+  version: 1
+- id: SF-095
+  name: Increased physical or online concealment tactics (disposable phones, countersurveillance, deleting
+    or hiding accounts)
+  definition: A person starts hiding their activity more than before, such as using throwaway phones,
+    watching for surveillance, or deleting or hiding social media.
+  areas:
+  - SF
+  typology: Mobilization behaviour linked to support activity
+  status: verified
+  sources:
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicators 16 and 17, p. 13
+    quote: Increased use of physical concealment tactics (for example, countersurveillance techniques,
+      disposable phone) in support of
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  - Document
+  checkable: person
+  lookup_sources:
+  - Court records describing conduct
+  - Archived social media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Privacy-conscious behaviour, encrypted messaging and account cleanup are common and lawful
+  - Domestic-abuse survivors, journalists and activists hiding from threats
+  - Pre-paid phones used for cost reasons
+  jurisdictions: US (guidance)
+  version: 1
+- id: SF-096
+  name: Communicating with, or seeking a relationship with, violent extremists or a designated group
+  definition: A person contacts, or tries to build ties with, violent extremists, or is contacted by them.
+  areas:
+  - SF
+  typology: Mobilization behaviour preceding support
+  status: verified
+  sources:
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 18, p. 14
+    quote: Communicating directly with or seeking to develop a relationship with violent extremists, or
+      being contacted
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Event
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Published reporting naming its evidence
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Contact patterns with listed parties are tracked in the sanctions-screening indicators too.
+    source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  innocent_explanations:
+  - Journalists, researchers, negotiators, lawyers and family members contacting group members
+  - Unsolicited contact the person did not seek
+  - Mistaken identity
+  jurisdictions: US (guidance)
+  version: 1
+- id: SF-097
+  name: Creating, joining or claiming membership of a violent extremist group, or forming a smaller operationally
+    secure cell
+  definition: A person joins or claims to belong to a violent extremist group, or splits off to form a
+    smaller, more secretive group, in order to further violence.
+  areas:
+  - SF
+  typology: Mobilization behaviour linked to personnel support
+  status: verified
+  sources:
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicators 14 (p. 13) and 24 (p. 15)
+    quote: Breaking away from a larger group or creating a more exclusive or operationally secure group
+      to
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Terrorist Material Support: An Overview of 18 U.S.C. 2339A and 2339B (R41333)'
+    publisher: Congressional Research Service
+    year: '2023'
+    url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+    locator: Discussion of Holder v. Humanitarian Law Project (statute reaches conduct, not membership)
+    quote: did not impermissibly intrude on the right of free association
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Membership
+  - Associate
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Corporate and non-profit registries for front groups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: New groups sometimes register as non-profits or associations.
+    source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  innocent_explanations:
+  - Membership alone is not material support under US law (HLP)
+  - Splinter groups form in lawful political and religious movements
+  - Online bragging or role-play without real ties
+  jurisdictions: US (guidance); EU and CoE criminalise participation in group activities
+  version: 1
+- id: SF-098
+  name: Pursuing or exploiting jobs or insiders with sensitive access to help a group
+  definition: A person seeks or uses a job, or recruits someone in a job, that gives access to sensitive
+    places, systems or information that could help plan violence.
+  areas:
+  - SF
+  typology: 'Non-financial material support: insider access / service'
+  status: verified
+  sources:
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 26, p. 15
+    quote: Pursuing or exploiting jobs or personnel who provide sensitive access to enable violent acts
+      (for example
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - PublicBody
+  - Company
+  - Event
+  checkable: records
+  lookup_sources:
+  - Employment records disclosed in court
+  - Professional licensing
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Insider-access risk overlaps with fraudulent remote hiring.
+    source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  innocent_explanations:
+  - Ordinary career moves into security, aviation, utilities or government
+  - Job changes for pay or location
+  jurisdictions: US (guidance)
+  version: 1
+- id: SF-099
+  name: 'Suspicious travel planning: one-way tickets, false excuses for travel, or fraudulent passport
+    applications'
+  definition: A person plans travel in an unusual way, such as buying one-way tickets, giving false reasons
+    for the trip, or applying for a passport fraudulently.
+  areas:
+  - SF
+  typology: Mobilization behaviour preceding personnel support
+  status: verified
+  sources:
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 22, p. 14
+    quote: Planning or pursuing suspicious travel activity (for example, unusual purchase of one-way tickets,
+      false excuses
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Passport fraud prosecutions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Ticket purchases near conflict zones are a shared signal.
+    source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  innocent_explanations:
+  - One-way tickets are common for relocation, study abroad, work contracts or open-ended trips
+  - Privacy about travel plans within families
+  - Passport application errors
+  jurisdictions: US (guidance)
+  version: 1
+- id: SF-100
+  name: Supplying information to a terrorist group, including target research (maps, blueprints, personal
+    data)
+  definition: Someone gathers or hands over information that a terrorist group could use, such as details
+    about places or people it might target.
+  areas:
+  - SF
+  typology: 'Non-financial material support: information'
+  status: verified
+  sources:
+  - title: Directive (EU) 2017/541 on combating terrorism
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2017'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+    locator: Article 4
+    quote: participating in the activities of a terrorist group, including by supplying information or
+      material resources
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: US Violent Extremist Mobilization Indicators (2021 edition)
+    publisher: National Counterterrorism Center, FBI and DHS
+    year: '2021'
+    url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+    locator: Preparation, Indicator 25, p. 15; see also Indicator 15 'Surveilling potential attack targets',
+      p. 13
+    quote: Conducting research for target or tactic selection for violent acts (for example, acquiring
+      blueprints, maps
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Address
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Architects, students, journalists, tourists and photographers routinely research buildings, maps and
+    public figures
+  - Open-source researchers and data brokers compiling lawful data
+  jurisdictions: EU; US (guidance)
+  version: 1
 not_reached:
 - 'FATF Guidance on Proliferation Financing Risk Assessment and Mitigation (2021) on fatf-gafi.org: direct
   PDF download was blocked (403); read through a copy hosted by the Singapore government (isomer-user-content.by.gov.sg).
@@ -4677,3 +6096,16 @@ not_reached:
 - 'BIS red flag 28 (IaaS for AI model weights, ECCN 4E091) was not added: it comes from the 2025 AI diffusion
   rule, and I could not confirm on eCFR whether it is still in force'
 - BIS Entity List page itself (bis.gov), defined from the 15 CFR Supplement 3 text instead
+- WebSearch budget for this turn was exhausted after the first search; all further research used direct
+  WebFetch on known URLs. A follow-up run could widen the source base.
+- Full text of UN Security Council Resolution 2178 (documents.un.org PDF blocked by robots); only the
+  UN summary page was used.
+- DHS Nationwide SAR Initiative indicator and behaviour lists (dhs.gov fetches failed) and the ISE-SAR
+  Functional Standard (dni.gov fetch failed).
+- US Supreme Court opinion PDF for Holder v. HLP (supremecourt.gov and law.cornell.edu fetches failed);
+  Wikipedia and CRS used instead.
+- DOJ press releases for case outcomes (justice.gov fetches failed); case outcomes come from Wikipedia
+  and CRS, not primary DOJ releases. Verify against DOJ or PACER before publishing.
+- Wikipedia pages for Ardit Ferizi, Tairod Pugh, Ali Kourani, Jose Padilla and Mirsad Kandic were not
+  found, so these cases are left out.
+- FATF 2015 Emerging Terrorist Financing Risks (foreign terrorist fighter section) was not fetched.

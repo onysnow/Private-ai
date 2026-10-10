@@ -3089,6 +3089,2943 @@ indicators:
   - Poor record-keeping that makes real results hard to verify.
   jurisdictions: United States federal definition (42 CFR Part 93); similar definitions used elsewhere
   version: 1
+- id: IN-056
+  name: Degrees out of sequence (advanced degree with no earlier degree)
+  definition: A person claims a master's or doctorate but has no bachelor's degree, or the degrees do
+    not follow a normal order.
+  areas:
+  - IN
+  typology: Credential fraud / diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Tell-tale signs of a bogus degree: Out of sequence degrees'
+    quote: If an applicant claims a master's or doctoral degree, but no bachelor's degree
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An official's CV lists a PhD and an MBA but no undergraduate study.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Employment
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some countries and institutions admit mature students to postgraduate study on professional experience
+    or non-degree qualifications.
+  - Integrated or combined bachelor-master programmes may list only the higher award.
+  - The CV may simply omit the first degree.
+  jurisdictions: US guidance; applies generally
+  version: 1
+- id: IN-057
+  name: 'Quickie degrees: degree earned in very short time or several degrees in one year'
+  definition: A degree was obtained much faster than an accredited course takes, or several degrees are
+    dated the same year.
+  areas:
+  - IN
+  typology: Credential fraud / diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Tell-tale signs: Quickie degrees'
+    quote: A degree earned in a very short time, or several degrees listed for the same year, are warning
+      signs for the hiring official or the person doing the preliminary screening.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation (Better Business Bureau red flags)
+    publisher: US Department of Education
+    url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+    locator: 'Diploma mills: BBB red flags, item 1'
+    quote: Degrees that can be earned in less time than at an accredited postsecondary institution
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A bachelor's, master's and doctorate all dated within the same twelve months.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accelerated or credit-transfer programmes can shorten study legitimately.
+  - Degree date may be the conferral date of work completed over earlier years.
+  - Honorary degrees may be listed alongside earned ones.
+  jurisdictions: US guidance; applies generally
+  version: 1
+- id: IN-058
+  name: Degree from a distant or foreign school where the person never lived
+  definition: The claimed institution is far away or in a country where the person never lived, and it
+    is not a known, accredited distance-learning provider.
+  areas:
+  - IN
+  typology: Credential fraud / diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Tell-tale signs: Foreign schools; Degrees from distant schools'
+    quote: consider it a warning sign if an applicant claims a degree from a country where she never lived.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A local official claims a degree from a university in another country while records show continuous
+    local employment in the same years.
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Employment
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate accredited distance and online programmes are common.
+  - Overseas branch campuses and partnership programmes award foreign degrees locally.
+  - The person may have lived abroad for a period not on public record.
+  jurisdictions: US guidance; applies generally
+  version: 1
+- id: IN-059
+  name: Sound-alike or look-alike institution name
+  definition: The awarding body's name closely imitates a well-known university, or copies its branding.
+  areas:
+  - IN
+  typology: Credential fraud / diploma mill / imitation university
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Tell-tale signs: Sound-alike names'
+    quote: Some diploma mills use names that sound or look like those of well-known colleges or universities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation (BBB red flags)
+    publisher: US Department of Education
+    url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+    locator: BBB red flags, item 6
+    quote: Names that are similar to well known reputable universities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Diploma Mills: Federal Employees Have Obtained Degrees from Diploma Mills and Other Unaccredited
+      Schools (GAO-04-771T)'
+    publisher: US Government Accountability Office
+    year: '2004'
+    url: https://www.gao.gov/assets/gao-04-771t.pdf
+    locator: Testimony text (as summarised on fetch; wording may be paraphrase of GAO)
+    quote: diploma mills frequently use names similar to those used by accredited schools
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: HEDD Higher Education Providers Toolkit 2020
+    publisher: Higher Education Degree Datacheck (Hedd), Prospects Luminate (UK)
+    year: '2020'
+    url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Providers%20Toolkit%202020%20GR.pdf
+    locator: How does degree fraud affect institutions?
+    quote: It's common for fraudsters to set up imitation universities.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - HEDD contrasts 'The University of Manchester (legitimate)' with 'Manchester University (illegitimate)'.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Hedd institution search (UK recognised and bogus institutions)
+  - US Department of Education database of accredited institutions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many legitimate institutions share place names (e.g. several real universities named after the same
+    city or saint).
+  - Institutions merge and rename, so an older name may look unfamiliar.
+  - Translation of foreign institution names varies.
+  jurisdictions: US, UK
+  version: 1
+- id: IN-060
+  name: Accreditation from an unrecognised or bogus accrediting body (accreditation mill)
+  definition: The school claims accreditation, but the accreditor is not recognised by the relevant government
+    or is an invented, official-sounding body.
+  areas:
+  - IN
+  typology: Accreditation mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Research the school online: Bogus accreditation'
+    quote: the accreditation is from a bogus, but official-sounding, agency they invented.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation (BBB red flags)
+    publisher: US Department of Education
+    url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+    locator: BBB red flags, item 2
+    quote: A list of accrediting agencies that sounds a little too impressive.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation
+    publisher: US Department of Education
+    url: https://www.ed.gov/laws-and-policy/higher-education-laws-and-policy/college-accreditation/diploma-mills-and-accreditation
+    locator: Main page text
+    quote: Any institution can claim to be accredited.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: GAO-04-771T
+    publisher: US Government Accountability Office
+    year: '2004'
+    url: https://www.gao.gov/assets/gao-04-771t.pdf
+    locator: Testimony, on LaSalle University
+    quote: found to have made false claims of accreditation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Saint Regis University operators ran their own 'accreditation mill' and paid officials for government
+    accreditation claims (see case).
+  cases:
+  - name: Saint Regis University diploma mill prosecution (US v. Randock et al.)
+    year: 2005-2008
+    jurisdiction: US, Eastern District of Washington
+    what_happened: Eight people were indicted over a diploma-mill operation that used an accreditation
+      mill and falsely claimed Liberian government approval; all pleaded guilty, with Dixie Randock and
+      Steven Randock each sentenced to three years in 2008.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Saint_Regis_University
+    source_title: Saint Regis University (Wikipedia, citing US Attorney press release and court documents)
+  data_needed:
+  - Organization
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - US Department of Education List of Nationally Recognized Accrediting Agencies
+  - US Department of Education list of accredited institutions and programs
+  - Hedd recognised-provider register (UK)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: In the Saint Regis case a defendant pleaded guilty to a Foreign Corrupt Practices Act count
+      for paying Liberian officials $44,000 for accreditation claims.
+    source_url: https://en.wikipedia.org/wiki/Saint_Regis_University
+  innocent_explanations:
+  - Some legitimate but niche or religious institutions choose not to seek accreditation; the Department
+    of Education notes unaccredited does not necessarily mean poor quality.
+  - Foreign institutions are accredited by national ministries, not US agencies.
+  - A newly established legitimate institution may be in candidacy for accreditation.
+  jurisdictions: US; applies generally
+  version: 1
+- id: IN-061
+  name: Degrees awarded for life or work experience
+  definition: The school's main offer is credit or whole degrees for life or work experience rather than
+    study.
+  areas:
+  - IN
+  typology: Diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Research the school online: website warning signs'
+    quote: the emphasis is on degrees for work or life experience, and
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation (BBB red flags)
+    publisher: US Department of Education
+    url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+    locator: BBB red flags, item 3
+    quote: Offers that place unrealistic emphasis on offering college credits for lifetime or real world
+      experience.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: GAO-04-771T
+    publisher: US Government Accountability Office
+    year: '2004'
+    url: https://www.gao.gov/assets/gao-04-771t.pdf
+    locator: Testimony, definition
+    quote: Other schools, commonly referred to as diploma mills, sell academic degrees based upon life
+      experience or substandard or negligible academic work.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A website advertising 'get your degree based on what you already know'.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accredited institutions run legitimate prior-learning assessment that grants limited credit for experience.
+  - Honorary degrees are openly awarded without study.
+  jurisdictions: US; applies generally
+  version: 1
+- id: IN-062
+  name: Flat fee charged per degree rather than per credit or course
+  definition: Tuition is priced per degree, often with discounts for buying several degrees.
+  areas:
+  - IN
+  typology: Diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Research the school online: website warning signs'
+    quote: tuition is charged on a per-degree basis, rather than per credit, course, or semester
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation (BBB red flags)
+    publisher: US Department of Education
+    url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+    locator: BBB red flags, item 4
+    quote: Tuition paid on a per-degree basis, or discounts for enrolling in multiple degree programs.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: GAO-04-771T
+    publisher: US Government Accountability Office
+    year: '2004'
+    url: https://www.gao.gov/assets/gao-04-771t.pdf
+    locator: Testimony, findings on schools examined
+    quote: each charge a flat fee for a degree
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - GAO reported one school charged $2,295 for a bachelor's degree and $2,595 for a PhD.
+  cases: []
+  data_needed:
+  - Payment
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some legitimate programmes advertise an all-inclusive programme fee for convenience.
+  - Competency-based programmes may charge flat subscription periods.
+  jurisdictions: US
+  version: 1
+- id: IN-063
+  name: Degree fees split into per-course charges to fit employer or government reimbursement
+  definition: The school restructures a single degree fee into course-sized bills so that an employer
+    or public body will pay for it.
+  areas:
+  - IN
+  typology: Diploma mill / misuse of public funds
+  status: verified
+  sources:
+  - title: GAO-04-771T
+    publisher: US Government Accountability Office
+    year: '2004'
+    url: https://www.gao.gov/assets/gao-04-771t.pdf
+    locator: Testimony, findings
+    quote: structure their charges in order to facilitate payment by the federal government
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - GAO found federal agencies had paid diploma mills and unaccredited schools for employees' degrees.
+  cases:
+  - name: GAO investigation of federal payments for diploma-mill degrees
+    year: '2004'
+    jurisdiction: US
+    what_happened: GAO found school records identifying 463 students employed by the federal government,
+      reported payments from federal agencies, and found 28 senior-level employees at eight agencies listed
+      degrees from unaccredited schools.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.gao.gov/assets/gao-04-771t.pdf
+    source_title: GAO-04-771T
+  data_needed:
+  - Payment
+  - PublicBody
+  - Person
+  - Employment
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: GAO found federal agencies paid diploma mills and unaccredited schools for employee degrees,
+      which the law restricts to accredited institutions.
+    source_url: https://www.gao.gov/assets/gao-04-771t.pdf
+  innocent_explanations:
+  - Accredited schools also bill per course, which is the normal pattern.
+  - Employer training budgets legitimately pay course by course.
+  jurisdictions: US
+  version: 1
+- id: IN-064
+  name: Few or no degree requirements and little contact with teaching staff
+  definition: The school requires little or no coursework and offers little or no interaction with professors.
+  areas:
+  - IN
+  typology: Diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Research the school online: website warning signs'
+    quote: there are few or unspecified degree requirements, or none at all
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation (BBB red flags)
+    publisher: US Department of Education
+    url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+    locator: BBB red flags, item 5
+    quote: Little or no interaction with professors.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation (HEOA definition)
+    publisher: US Department of Education
+    url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+    locator: Definition from the Higher Education Opportunity Act
+    quote: requires such individual to complete little or no education or coursework to obtain such degree,
+      diploma, or certificate
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A programme page lists no modules, assessments or faculty.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Self-paced online programmes legitimately have limited live contact.
+  - A website may simply be poorly maintained.
+  jurisdictions: US
+  version: 1
+- id: IN-065
+  name: School is new, recently renamed, or uses a box-number or suite address
+  definition: The awarding institution has a short history, changed its name recently, or gives only a
+    mailbox or suite as its address.
+  areas:
+  - IN
+  typology: Diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Research the school online: website warning signs'
+    quote: the school is relatively new, or has recently changed its name.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation (BBB red flags)
+    publisher: US Department of Education
+    url: https://www2.ed.gov/students/prep/college/diplomamills/diploma-mills.html
+    locator: BBB red flags, item 7
+    quote: Addresses that are box numbers or suites.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The only address for a 'university' is a mail-forwarding suite.
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Business and corporate registries
+  - Domain registration records
+  - Address lookups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New legitimate institutions open regularly; mergers lead to renaming.
+  - Online providers may use administrative offices in shared buildings.
+  jurisdictions: US; applies generally
+  version: 1
+- id: IN-066
+  name: Slick website or '.edu' domain offered as proof of legitimacy
+  definition: The institution's professional-looking website or education domain is relied on as proof,
+    though neither shows it is real.
+  areas:
+  - IN
+  typology: Diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: Research the school online
+    quote: Some diploma mills have slick websites, and a "dot-edu" Web address doesn't guarantee legitimacy.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A polished site with stock campus photos and no verifiable faculty.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Domain registration (WHOIS) records
+  - Web archive captures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real universities also have professional websites; the sign is only that the site is not proof.
+  jurisdictions: US; applies generally
+  version: 1
+- id: IN-067
+  name: School's own 'verification service' confirms the degree
+  definition: Verification comes from a service run by or tied to the school, which may send a phony transcript,
+    rather than from an independent registrar or official register.
+  areas:
+  - IN
+  typology: Diploma mill
+  status: verified
+  sources:
+  - title: Avoid Fake-Degree Burns By Researching Academic Credentials
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/tips-advice/business-center/guidance/avoid-fake-degree-burns-researching-academic-credentials
+    locator: 'Checking out academic credentials: 1. Contact the school'
+    quote: Some diploma mills offer a 'verification service' that will send a phony transcript to a prospective
+      employer who calls.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The phone number on the certificate reaches a call centre that confirms any name.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Official degree verification registers (e.g. Hedd in the UK)
+  - Institution's registrar contacted via independently sourced details
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many legitimate universities outsource verification to third-party clearinghouses.
+  jurisdictions: US; applies generally
+  version: 1
+- id: IN-068
+  name: Awarding institution absent from the official register of recognised providers, or listed as bogus
+  definition: The named institution does not appear among government-recognised degree-awarding bodies,
+    or appears on a list of bogus institutions.
+  areas:
+  - IN
+  typology: Degree fraud / unrecognised provider
+  status: verified
+  sources:
+  - title: Hedd home page
+    publisher: Higher Education Degree Datacheck (UK)
+    url: https://hedd.ac.uk/
+    locator: Home page (243 bogus institutions alongside 471 recognised UK institutions)
+    quote: holds details of
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: HEDD Employers Toolkit 2020
+    publisher: Hedd (UK)
+    year: '2020'
+    url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Employers%20Toolkit%202020.pdf
+    locator: How does degree fraud happen? / Fake universities
+    quote: A student with an education from an unrecognised provider, or worse no education at all
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Diploma Mills and Accreditation
+    publisher: US Department of Education
+    url: https://www.ed.gov/laws-and-policy/higher-education-laws-and-policy/college-accreditation/diploma-mills-and-accreditation
+    locator: Main page text
+    quote: An unrecognized accrediting agency should be viewed with caution until its reputation can be
+      determined.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A claimed UK university that Hedd's institution search does not list as recognised.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Hedd institution search
+  - US Department of Education accredited institutions list
+  - National ministry of education registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Registers may not list foreign, closed or merged institutions.
+  - Spelling or translation of the name may differ from the register entry.
+  jurisdictions: UK, US
+  version: 1
+- id: IN-069
+  name: Inflated grades or invented qualifications not verified with the issuer
+  definition: A CV gives a better grade or extra qualifications than the person earned, which only shows
+    up when checked directly with the university.
+  areas:
+  - IN
+  typology: Degree fraud / confidence trick
+  status: verified
+  sources:
+  - title: HEDD Employers Toolkit 2020
+    publisher: Hedd (UK)
+    year: '2020'
+    url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Employers%20Toolkit%202020.pdf
+    locator: How does degree fraud happen? / Confidence tricks
+    quote: giving themselves a better grade than they achieved, or making up new qualifications to boost
+      their CV
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: HEDD Higher Education Providers Toolkit 2020
+    publisher: Hedd (UK)
+    year: '2020'
+    url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Providers%20Toolkit%202020%20GR.pdf
+    locator: Confidence tricks
+    quote: A confidence trick uses no other prop than the candidate's ability to blag.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hedd describes an unnamed NHS executive who lied about a master's, PhD and military background and
+    was ordered to repay £300,000.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Employment
+  - Organization
+  checkable: lookups
+  lookup_sources:
+  - Degree verification with the awarding institution or Hedd
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Grade classifications differ between systems and can be mistranslated.
+  - Recruiters or biographers sometimes introduce errors into CVs.
+  jurisdictions: UK; applies generally
+  version: 1
+- id: IN-070
+  name: Counterfeit certificate of a real university
+  definition: A degree certificate bearing a genuine institution's name is a copy produced outside the
+    institution, sometimes with copied security features.
+  areas:
+  - IN
+  typology: Degree fraud / fake certificates
+  status: verified
+  sources:
+  - title: HEDD Higher Education Providers Toolkit 2020
+    publisher: Hedd (UK)
+    year: '2020'
+    url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Providers%20Toolkit%202020%20GR.pdf
+    locator: Fake certificates
+    quote: fraudsters can and will poach security methods to make counterfeit certificates.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: HEDD Employers Toolkit 2020
+    publisher: Hedd (UK)
+    year: '2020'
+    url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Employers%20Toolkit%202020.pdf
+    locator: Fake certificates
+    quote: Watermarks, holographic foils and quality of paper are all seemingly proof of a real degree
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A certificate whose details the university's records do not confirm.
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Organization
+  checkable: lookups
+  lookup_sources:
+  - Verification with the awarding institution or Hedd
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Counterfeit certificates relate to IN-014 forged or altered documents and IN-026 documents
+      relied on without authentication.
+    source_url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Providers%20Toolkit%202020%20GR.pdf
+  innocent_explanations:
+  - Certificate designs change over the years, so an older genuine certificate may look different.
+  - Legitimate replacement certificates may differ from originals.
+  jurisdictions: UK; applies generally
+  version: 1
+- id: IN-071
+  name: Essay mill or contract-cheating use behind a qualification
+  definition: Coursework behind a qualification was bought from a service that writes essays for students
+    to submit as their own.
+  areas:
+  - IN
+  typology: Academic fraud / essay mills
+  status: verified
+  sources:
+  - title: HEDD Higher Education Providers Toolkit 2020
+    publisher: Hedd (UK)
+    year: '2020'
+    url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Providers%20Toolkit%202020%20GR.pdf
+    locator: Essay mills
+    quote: commission original essays and submit them as their own work.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: HEDD Employers Toolkit 2020
+    publisher: Hedd (UK)
+    year: '2020'
+    url: https://cdn-hedd.prospects.ac.uk/cdn-hedd/2.0.26/pdf/HEDD%20Employers%20Toolkit%202020.pdf
+    locator: Essay mills
+    quote: If candidates pay to pass all their coursework the end result is not indicative of their knowledge.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Payments from a student to an essay-writing company.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate tutoring, proofreading and study-skills services exist.
+  - Similar wording can come from shared sources rather than purchase.
+  jurisdictions: UK; applies generally
+  version: 1
+- id: IN-072
+  name: Identity document presented by a look-alike (impersonation)
+  definition: 'A genuine document is presented by someone who resembles but is not the holder: facial
+    features, age, marks or signature do not match.'
+  areas:
+  - IN
+  typology: 'Identity document fraud: impersonation'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: Impersonation checks
+    quote: Check the signature – can the person recreate it without sight of the document?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Identification Document Validation Technology
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/identity-document-validation-technology/identification-document-validation-technology
+    locator: Suspected impostors
+    quote: You may come across genuine identity documents being used by impostors.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PRADO Glossary
+    publisher: Council of the European Union
+    url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+    locator: Impostor
+    quote: A person - the impostor - practises deception under an assumed character, identity or name.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The Home Office advises comparing face shape, each facial feature and their positions, and notes 'Ears
+    are unique to each person.'
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ageing, weight change, illness, hairstyle and cosmetic changes alter appearance.
+  - Signatures vary naturally over time.
+  jurisdictions: UK guidance; EU glossary
+  version: 1
+- id: IN-073
+  name: Poor manufacture or commercial printing on a security document
+  definition: 'The document''s build or print quality falls below security printing: dotted rather than
+    solid fine lines, no raised intaglio print, poor cover or embossing.'
+  areas:
+  - IN
+  typology: 'Identity document fraud: counterfeit'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Counterfeit checks: Quality of printing'
+    quote: Commercial printing cannot produce the same quality as security printing.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Counterfeit checks: Intaglio printing'
+    quote: Genuine intaglio printing will have raised print which can be identified by touch.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Under magnification, fine background lines are made of dots.
+  cases: []
+  data_needed:
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Wear, water damage and age degrade genuine documents.
+  - Journalists often see only scans or photos, which cannot show print quality or raised ink.
+  jurisdictions: UK guidance; applies generally
+  version: 1
+- id: IN-074
+  name: Bright fluorescence under UV light
+  definition: The document paper glows brightly under ultraviolet light, where security paper should give
+    a dull reaction.
+  areas:
+  - IN
+  typology: 'Identity document fraud: counterfeit or substituted image'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Counterfeit checks: Base fluorescence (UV)'
+    quote: Note the different reactions – security documents should have a dull reaction.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Identification Document Validation Technology
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/identity-document-validation-technology/identification-document-validation-technology
+    locator: Warning signs
+    quote: Low quality counterfeit documents will often fluoresce (shine or glow brightly) when held under
+      a UV light source.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A passport data page glows blue-white under a UV torch.
+  cases: []
+  data_needed:
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Contamination by detergents or optical brighteners (e.g. after laundering) can make genuine paper
+    fluoresce.
+  - Intended UV security features are meant to glow in set places.
+  jurisdictions: UK guidance; applies generally
+  version: 1
+- id: IN-075
+  name: Watermark missing, reacting under UV, or lacking tonal variation
+  definition: The watermark is absent, glows under UV, or lacks the subtle light and dark tones of a real
+    watermark seen against light.
+  areas:
+  - IN
+  typology: 'Identity document fraud: counterfeit'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Counterfeit checks: Watermarks'
+    quote: A watermark should never react under UV light.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A printed-on imitation watermark visible without transmitted light.
+  cases: []
+  data_needed:
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some document types or pages carry no watermark by design.
+  - Damage may obscure a genuine watermark.
+  jurisdictions: UK guidance
+  version: 1
+- id: IN-076
+  name: Security fibres in a repeated pattern
+  definition: Coloured security fibres appear in the same positions on each page, when real fibres are
+    scattered randomly.
+  areas:
+  - IN
+  typology: 'Identity document fraud: counterfeit'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Counterfeit checks: Random security fibres'
+    quote: No repeated pattern should be seen as the process is completely random.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Identical fibre placement on consecutive visa pages.
+  cases: []
+  data_needed:
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Coincidental similarity on a single page; the sign is repetition across pages.
+  jurisdictions: UK guidance
+  version: 1
+- id: IN-077
+  name: Generic hologram or optically variable feature that does not change
+  definition: The hologram is simple or generic (for example just reading 'GENUINE') or optically variable
+    ink does not shift colour and design when tilted.
+  areas:
+  - IN
+  typology: 'Identity document fraud: counterfeit'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Basic document checks: Checklist A (holographic devices section describes generic ''GENUINE''
+      hologram as a warning sign)'
+    quote: A clear colour change from one colour to another should be seen when the document is tilted.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A sticker hologram with a stock design on an ID card.
+  cases: []
+  data_needed:
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Worn holograms lose detail.
+  - Photos and scans cannot show colour shift, so absence in an image proves nothing.
+  jurisdictions: UK guidance
+  version: 1
+- id: IN-078
+  name: 'Machine-readable zone errors: wrong font, data mismatch or failed check digit'
+  definition: The MRZ uses characters not in the OCR-B font, its data differs from the printed details,
+    or its check digits do not compute.
+  areas:
+  - IN
+  typology: 'Identity document fraud: counterfeit or forgery'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Counterfeit checks: Machine readable zone (MRZ)'
+    quote: The presence of any characters that do not match this font exactly
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Identification Document Validation Technology
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/identity-document-validation-technology/identification-document-validation-technology
+    locator: Warning signs (basic checks compare biographic details with the MRZ)
+    quote: Often this is where a genuine document has been cleverly forged.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Doc 9303 Machine Readable Travel Documents, Part 3
+    publisher: International Civil Aviation Organization (ICAO)
+    url: https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf
+    locator: Section 4.9
+    quote: The check digits permit readers to verify that data in the MRZ is correctly interpreted.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Date of birth in the MRZ differs from the visual zone, or the passport-number check digit is wrong.
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A check digit fails the ICAO modulus-10 calculation with 7-3-1 weighting, or MRZ data differ
+      from the visual inspection zone
+    threshold_source: https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Names are truncated or transliterated in the MRZ by rule, so spelling differences can be legitimate.
+  - OCR or transcription errors when reading a photo of the document.
+  jurisdictions: International (ICAO standard); UK guidance
+  version: 1
+- id: IN-079
+  name: Substituted pages in a passport or booklet
+  definition: 'Pages, especially the biodata page, have been replaced: misaligned pages, wrong page numbers
+    or design, or counterfeit pages in an otherwise genuine booklet.'
+  areas:
+  - IN
+  typology: 'Identity document fraud: forgery'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Forgery checks: Substituted pages'
+    quote: The pages and cover should therefore all be in perfect alignment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PRADO Glossary
+    publisher: Council of the European Union
+    url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+    locator: Collation mark
+    quote: makes it easier to spot whether any pages have been exchanged or removed.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The biodata page sits unevenly with the rest of the booklet.
+  cases: []
+  data_needed:
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Wear and binding damage can loosen genuine pages.
+  - Some official repairs or extra pages are legitimate.
+  jurisdictions: UK guidance; EU glossary
+  version: 1
+- id: IN-080
+  name: Photo substitution on an identity document
+  definition: 'The holder''s image has been replaced: the ink stamp or emboss does not continue across
+    the photo, the image fluoresces differently, a second laminate is present, the image sits above security
+    features, or a laser-engraved image shows black or coloured dots.'
+  areas:
+  - IN
+  typology: 'Identity document fraud: forgery'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Forgery checks: Printed images'
+    quote: This printed image should not react any differently when viewed under a UV light.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Forgery checks: Laminate overlays'
+    quote: Examine holographic and UV features as the new image may incorrectly sit above them.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Forgery checks: Laser engraving'
+    quote: Forgeries usually have printed images which contain jet black or coloured dots.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The stamp on the photo does not line up with the stamp on the page.
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Older document series used glued photos and stamps that can shift or wear.
+  - Image compression in photos of documents creates dot-like artefacts.
+  jurisdictions: UK guidance
+  version: 1
+- id: IN-081
+  name: Altered personal details (abrasion or overwriting)
+  definition: Details such as date of birth or expiry have been erased and rewritten, leaving damage to
+    the paper around them.
+  areas:
+  - IN
+  typology: 'Identity document fraud: forgery'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Forgery checks: Altered details'
+    quote: The forger has abraded the original pen ink and then over-written a new date.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Roughened paper and different ink around a handwritten date.
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Same pattern as IN-014 forged or altered documents, applied to identity documents.
+    source_url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+  innocent_explanations:
+  - Official amendments and endorsements are sometimes made by hand.
+  - General wear around frequently handled areas.
+  jurisdictions: UK guidance
+  version: 1
+- id: IN-082
+  name: Pseudo or fantasy document not issued by any recognised authority
+  definition: A document looks like a passport or ID card but is not officially recognised, which a check
+    against reference collections shows.
+  areas:
+  - IN
+  typology: 'Identity document fraud: pseudo/fantasy documents'
+  status: verified
+  sources:
+  - title: Guidance on examining identity documents (accessible)
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/recognising-fraudulent-identity-documents/guidance-on-examining-identity-documents-accessible
+    locator: 'Types of fraudulent documents: Pseudo/fantasy documents'
+    quote: Documents which may have the physical appearance of a passport or identity card but are not
+      officially recognised.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A 'world passport' or a passport of a state that does not exist, absent from PRADO.
+  cases: []
+  data_needed:
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - PRADO (EU Public Register of Authentic travel and identity Documents Online)
+  - EDISON reference database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New document series may not yet appear in reference collections.
+  - Some souvenir or campaign documents are openly novelty items, not used to deceive.
+  jurisdictions: UK guidance; EU register
+  version: 1
+- id: IN-083
+  name: Genuine document obtained on fraudulent source documents
+  definition: An authentic, officially issued document was applied for using false supporting documents,
+    so it passes physical checks but the identity behind it is false.
+  areas:
+  - IN
+  typology: 'Identity document fraud: fraudulently obtained genuine'
+  status: verified
+  sources:
+  - title: PRADO Glossary
+    publisher: Council of the European Union
+    url: https://www.consilium.europa.eu/prado/en/prado-glossary/prado-glossary.pdf
+    locator: Fraudulently obtained genuine document
+    quote: authentic documents applied for on the basis of fraudulent source documents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An ID card whose physical features are genuine but whose name has no history in other records.
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Civil registry and public-record history of the named person
+  - Corporate, property and court records for footprint
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - People with thin public-record footprints (young people, recent migrants, people who avoid publicity)
+    are common.
+  - Legal name changes create breaks in records.
+  jurisdictions: EU glossary; applies generally
+  version: 1
+- id: IN-084
+  name: 'Paper-mill sign: authors with no record at the journal and new ORCIDs per submission'
+  definition: Submitting authors have never published in the journal and new ORCID identifiers appear
+    to be created for each submission.
+  areas:
+  - IN
+  typology: Research fraud / paper mills
+  status: verified
+  sources:
+  - title: 'Paper Mills: Research report from COPE & STM'
+    publisher: Committee on Publication Ethics and STM
+    year: '2022'
+    url: https://publicationethics.org/media/532/download?attachment
+    locator: Where are we now? Authors, p. 9
+    quote: New ORCIDs seem to be created for each individual submission.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A batch of submissions whose ORCID records were each created days before submission.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Organization
+  checkable: lookups
+  lookup_sources:
+  - ORCID public records
+  - Journal and bibliographic databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Early-career researchers often create ORCIDs when first required at submission.
+  - Many genuine authors are new to a given journal.
+  jurisdictions: International
+  version: 1
+- id: IN-085
+  name: 'Paper-mill sign: ''too clean'' Western blots or cytometry and missing molecular-weight markers'
+  definition: Blot and cytometry images look unnaturally clean and Western blots omit molecular-weight
+    markers, a pattern publishers report in paper-mill output.
+  areas:
+  - IN
+  typology: Research fraud / paper mills
+  status: verified
+  sources:
+  - title: 'Paper Mills: Research report from COPE & STM'
+    publisher: Committee on Publication Ethics and STM
+    year: '2022'
+    url: https://publicationethics.org/media/532/download?attachment
+    locator: Where are we now? Experimental data, p. 8
+    quote: molecular weight markers are usually not shown for Western blot experiments.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Many blots with blank, uniform backgrounds and no ladder.
+  cases: []
+  data_needed:
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: COPE also lists reuse of blot and cell images across papers, linking to IN-031 and IN-032.
+    source_url: https://publicationethics.org/media/532/download?attachment
+  innocent_explanations:
+  - Journals sometimes ask authors to crop images, removing markers.
+  - Good lab technique produces clean blots.
+  jurisdictions: International
+  version: 1
+- id: IN-086
+  name: 'Paper-mill sign: methods, reagents or design cannot produce the reported data'
+  definition: The reported data do not fit the described methods, or the reagents named cannot do what
+    the paper says.
+  areas:
+  - IN
+  typology: Research fraud / paper mills
+  status: verified
+  sources:
+  - title: 'Paper Mills: Research report from COPE & STM'
+    publisher: Committee on Publication Ethics and STM
+    year: '2022'
+    url: https://publicationethics.org/media/532/download?attachment
+    locator: Where are we now? Experimental design, p. 9
+    quote: Upon closer evaluation, flaws in experimental design are found.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An antibody named in methods is not suited to the species studied.
+  cases: []
+  data_needed:
+  - Document
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest errors in methods sections and reagent catalogue numbers are common.
+  - Poor writing or translation can misdescribe a valid method.
+  jurisdictions: International
+  version: 1
+- id: IN-087
+  name: 'Paper-mill sign: missing ethical approval for animal experiments'
+  definition: A paper reports animal experiments without stating ethics approval.
+  areas:
+  - IN
+  typology: Research fraud / paper mills
+  status: verified
+  sources:
+  - title: 'Paper Mills: Research report from COPE & STM'
+    publisher: Committee on Publication Ethics and STM
+    year: '2022'
+    url: https://publicationethics.org/media/532/download?attachment
+    locator: Where are we now? Other, p. 9
+    quote: Missing ethical approval for animal experiments.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A mouse study with no ethics committee or approval number.
+  cases: []
+  data_needed:
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Approval may have been obtained but omitted from the text.
+  - Reporting rules differ between journals and countries.
+  jurisdictions: International
+  version: 1
+- id: IN-088
+  name: 'Paper-mill sign: no specific university, or department that does not match the topic'
+  definition: Author affiliations name no specific university, or the department listed has nothing to
+    do with the paper's subject.
+  areas:
+  - IN
+  typology: Research fraud / paper mills
+  status: verified
+  sources:
+  - title: 'Paper Mills: Research report from COPE & STM'
+    publisher: Committee on Publication Ethics and STM
+    year: '2022'
+    url: https://publicationethics.org/media/532/download?attachment
+    locator: Where are we now? Affiliations, p. 8
+    quote: At times, the mentioned departments do not seem to match the topic of the paper.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An orthopaedics department publishing on cancer cell signalling.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Institution staff directories
+  - Bibliographic databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clinicians in hospital departments legitimately run lab research outside their specialty.
+  - Interdisciplinary collaborations cross departments.
+  jurisdictions: International
+  version: 1
+- id: IN-089
+  name: Authorship offered for sale
+  definition: Places on the author list of a manuscript are sold to researchers who did not do the work.
+  areas:
+  - IN
+  typology: Research fraud / paper mills
+  status: verified
+  sources:
+  - title: 'Paper Mills: Research report from COPE & STM'
+    publisher: Committee on Publication Ethics and STM
+    year: '2022'
+    url: https://publicationethics.org/media/532/download?attachment
+    locator: What is a paper mill?, p. 4
+    quote: with the purpose of providing an easy publication for them, or to offer authorship for sale
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Paper mills research
+    publisher: Committee on Publication Ethics
+    url: https://publicationethics.org/resources/research/paper-mills-research
+    locator: Key points
+    quote: Paper mills produce fake manuscripts for researchers to easily publish or buy authorship
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An advert listing author positions on an accepted paper at different prices.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: COPE lists substantial author-list changes during revision, linking to IN-039.
+    source_url: https://publicationethics.org/media/532/download?attachment
+  innocent_explanations:
+  - Legitimate editing and publication-support services exist and charge fees.
+  - Authorship disputes and late additions also arise honestly.
+  jurisdictions: International
+  version: 1
+- id: IN-090
+  name: Official or professional holding a degree from a known diploma mill
+  definition: A public official, doctor or other professional relies on a qualification from an institution
+    named in a court case, regulator finding or official inquiry as a diploma mill.
+  areas:
+  - IN
+  typology: Credential fraud
+  status: verified
+  sources:
+  - title: GAO-04-771T
+    publisher: US Government Accountability Office
+    year: '2004'
+    url: https://www.gao.gov/assets/gao-04-771t.pdf
+    locator: Testimony, findings on eight agencies
+    quote: 28 employees listed degrees from unaccredited schools
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Axact CEO, 22 others sentenced in fake degrees case
+    publisher: Dawn
+    year: '2018'
+    url: https://www.dawn.com/news/1418156
+    locator: Article, 5 July 2018
+    quote: convicted Axact chief executive officer Shoaib Sheikh and 22 others
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A senior employee listing a degree from a school named in a diploma-mill prosecution.
+  cases:
+  - name: Axact fake degrees case (Pakistan)
+    year: '2018'
+    jurisdiction: Pakistan, Islamabad sessions court
+    what_happened: The court convicted Axact CEO Shoaib Sheikh and 22 others under Penal Code fraud and
+      forgery sections, with sentences running concurrently to a maximum of seven years and fines of Rs1.3
+      million each; three co-accused were acquitted and money-laundering charges were not proved. Wikipedia
+      reports later acquittals by the Sindh and Islamabad High Courts (dates not given, not verified from
+      a primary source).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.dawn.com/news/1418156
+    source_title: Dawn, 5 July 2018
+  - name: Axact investigation by the New York Times
+    year: '2015'
+    jurisdiction: Pakistan / international
+    what_happened: The NYT reported that Axact ran at least 370 degree and accreditation mill websites;
+      Axact denied the allegations.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Axact
+    source_title: Fake Diplomas, Real Cash (NYT, via Wikipedia summary)
+  - name: United States v. Umair Hamid (Axact)
+    year: '2017'
+    jurisdiction: US, Southern District of New York
+    what_happened: An Axact executive was charged with wire fraud, conspiracy and aggravated identity
+      theft, found guilty in 2017 and sentenced to 21 months in prison (per Wikipedia citing news reports;
+      DOJ release not reached).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Axact
+    source_title: Axact (Wikipedia)
+  data_needed:
+  - Person
+  - Employment
+  - PublicBody
+  - Document
+  - Organization
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - Court records of diploma-mill prosecutions
+  - State unaccredited-school lists
+  - Professional licensing registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Axact executives were charged with money laundering in Pakistan, though the 2018 court found
+      the AML charge not proved.
+    source_url: https://www.dawn.com/news/1418156
+  innocent_explanations:
+  - Buyers may have been deceived and believed the school was real.
+  - The degree may not have been needed for, or used to obtain, the job.
+  jurisdictions: US, Pakistan
+  version: 1
+- id: IN-156
+  name: 'Disguised proxy media: outlet presenting itself as independent but tied to a foreign state'
+  definition: A news site or channel that claims to be independent or local but has undisclosed funding,
+    management or editorial ties to a foreign government.
+  areas:
+  - IN
+  typology: Foreign state election interference / proxy media
+  status: verified
+  sources:
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI Foreign Malign Influence Center
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Tactic: Disguising Proxy Media'
+    quote: Proxy media outlets often portray themselves as independent, but actually have ties to foreign
+      nation-state actors.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 3rd EEAS Report on Foreign Information Manipulation and Interference Threats (March 2025)
+    publisher: European External Action Service
+    year: '2025'
+    url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    locator: FIMI Exposure Matrix, p. 15 (state-linked channels)
+    quote: Channels that operate under state oversight without publicly disclosing their affiliation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Russia-linked sites posing as US local news (e.g. 'D.C. Weekly') mixing real reporting with disinformation,
+    per CISA/FBI/ODNI 2024
+  - Doppelganger-operated media brands such as 'Recent Reliable News', per DOJ 2024
+  cases:
+  - name: Russia-linked proxy 'local news' sites (D.C. Weekly)
+    year: '2024'
+    jurisdiction: United States
+    what_happened: The joint CISA/FBI/ODNI guidance describes Russia-linked sites posing as US local news
+      outlets, mixing real reporting with disinformation including a fabricated recording of a State Department
+      official.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    source_title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+  data_needed:
+  - Organization
+  - Company
+  - Ownership
+  - Payment
+  - Person
+  - Employment
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Domain WHOIS and hosting history
+  - Corporate registries
+  - US FARA registrations
+  - EEAS / EUvsDisinfo database
+  - Government attribution statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Proxy media relies on undisclosed foreign funding, which PP-059 covers.
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  innocent_explanations:
+  - Genuinely independent outlets often share editorial views with a foreign government without any ties
+  - Small outlets frequently hide ownership for privacy or safety reasons
+  - Licensed syndication of foreign wire or state-media content is legal and sometimes disclosed elsewhere
+    on the site
+  jurisdictions: Global; guidance from US (CISA, FBI, ODNI FMIC) and EU (EEAS)
+  version: 1
+- id: IN-157
+  name: 'State-aligned channel: consistently pushes a foreign state''s narratives but cannot be attributed'
+  definition: An account, site or channel that repeatedly spreads a foreign state's narratives but has
+    no proven funding or control link to that state, the EEAS's lowest attribution tier.
+  areas:
+  - IN
+  typology: Attribution grading
+  status: verified
+  sources:
+  - title: 3rd EEAS Report on Foreign Information Manipulation and Interference Threats (March 2025)
+    publisher: European External Action Service
+    year: '2025'
+    url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    locator: 'FIMI Exposure Matrix, p. 15 (non-attributed: state-aligned channels)'
+    quote: Channels that cannot be directly attributed to state control or funding and therefore remain
+      unattributed
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Behind the curtain: a novel analytical approach to FIMI exposure'
+    publisher: EEAS / EUvsDisinfo
+    year: '2025'
+    url: https://euvsdisinfo.eu/behind-the-curtain-a-novel-analytical-approach-to-fimi-exposure/
+    quote: Behavioural evidence may include amplification patterns (e.g. mirroring content, automated
+      translations, republishing).
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'EEAS network graph: non-attributed state-aligned nodes made up 76.5% of the mapped architecture (p.
+    20)'
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  - Note
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Platform transparency reports
+  - EEAS / EUvsDisinfo database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many people sincerely hold views that match a foreign government's positions
+  - Commentators may republish state media because it is free and fast, not because they are directed
+    to
+  - Shared narratives can come from shared ideology rather than coordination
+  jurisdictions: EU (EEAS methodology), applicable globally
+  version: 1
+- id: IN-158
+  name: 'Hack-and-leak: stolen campaign or official material released before an election'
+  definition: Private emails or documents taken through a cyber intrusion are published or leaked in stages,
+    timed to influence an election.
+  areas:
+  - IN
+  typology: Cyber-enabled information operation
+  status: pending
+  sources:
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Tactic: Cyber-Enabled Information Operations'
+    quote: Nation-state adversaries use information operations and cyber intrusions hand-in-hand
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Grand Jury Indicts 12 Russian Intelligence Officers for Hacking Offenses Related to the 2016
+      Election
+    publisher: US Department of Justice
+    year: '2018'
+    url: https://www.justice.gov/opa/pr/grand-jury-indicts-12-russian-intelligence-officers-hacking-offenses-related-2016-election
+    quote: staged the release of thousands of stolen emails and documents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Three IRGC Cyber Actors Indicted for Hack-and-Leak Operation Designed to Influence the 2024
+      U.S. Presidential Election
+    publisher: US Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/opa/pr/three-irgc-cyber-actors-indicted-hack-and-leak-operation-designed-influence-2024-us
+    quote: I think this information is worth a good [U.S. news publication] piece with your narration.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - GRU release of DNC/DCCC/Clinton campaign material via DCLeaks (2016)
+  - IRGC theft and distribution of a 2024 US presidential campaign's documents
+  - Reported theft of a former British official's emails and leak of documents before the 2019 UK election
+    (CISA/FBI/ODNI)
+  cases:
+  - name: United States v. Netyksho et al. (GRU officers)
+    year: '2018'
+    jurisdiction: United States
+    what_happened: Twelve GRU officers were indicted for hacking the DNC, DCCC and Clinton campaign and
+      releasing stolen material through DCLeaks and the Guccifer 2.0 persona; the charges are allegations.
+    outcome: alleged_in_reporting
+    outcome_verified: false
+    source_url: https://www.justice.gov/opa/pr/grand-jury-indicts-12-russian-intelligence-officers-hacking-offenses-related-2016-election
+    source_title: Grand Jury Indicts 12 Russian Intelligence Officers
+  - name: IRGC hack-and-leak indictment (Jalili, Aghamiri, Balaghi)
+    year: '2024'
+    jurisdiction: United States
+    what_happened: Three IRGC employees were indicted for hacking people tied to a presidential campaign
+      and sending stolen material to a rival campaign and to journalists; the charges are allegations.
+    outcome: alleged_in_reporting
+    outcome_verified: false
+    source_url: https://www.justice.gov/opa/pr/three-irgc-cyber-actors-indicted-hack-and-leak-operation-designed-influence-2024-us
+    source_title: Three IRGC Cyber Actors Indicted for Hack-and-Leak Operation
+  data_needed:
+  - Document
+  - Event
+  - Person
+  - Organization
+  - CourtCase
+  - Note
+  checkable: records
+  lookup_sources:
+  - Court records and indictments
+  - Government attribution statements
+  - Leak site archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Leaked caches can mix authentic and forged documents, which IN-014 covers.
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  innocent_explanations:
+  - Genuine whistleblowers leak authentic documents for public-interest reasons
+  - Insiders may leak near elections because that is when scrutiny is highest
+  - Material may come from an accidental exposure such as a misconfigured server rather than a state hack
+  jurisdictions: Global; US indictments 2018 and 2024
+  version: 1
+- id: IN-159
+  name: Fake 'hacktivist' or lone-hacker persona fronting a leak
+  definition: A leak is credited to an invented activist or individual hacker persona that hides the state
+    actor behind it and may falsely claim another origin.
+  areas:
+  - IN
+  typology: Hack-and-leak / false attribution
+  status: pending
+  sources:
+  - title: Grand Jury Indicts 12 Russian Intelligence Officers for Hacking Offenses Related to the 2016
+      Election
+    publisher: US Department of Justice
+    year: '2018'
+    url: https://www.justice.gov/opa/pr/grand-jury-indicts-12-russian-intelligence-officers-hacking-offenses-related-2016-election
+    quote: staged the release of thousands of stolen emails and documents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - DCLeaks presented as run by 'American hacktivists'; Guccifer 2.0 persona whose first post claimed
+    a lone Romanian hacker was responsible (per the indictment)
+  cases:
+  - name: DCLeaks and Guccifer 2.0 personas
+    year: '2018'
+    jurisdiction: United States
+    what_happened: The indictment alleges GRU officers created the DCLeaks site and the Guccifer 2.0 persona,
+      which falsely claimed a lone Romanian hacker was behind the hacks.
+    outcome: alleged_in_reporting
+    outcome_verified: false
+    source_url: https://www.justice.gov/opa/pr/grand-jury-indicts-12-russian-intelligence-officers-hacking-offenses-related-2016-election
+    source_title: Grand Jury Indicts 12 Russian Intelligence Officers
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Event
+  - Note
+  checkable: records
+  lookup_sources:
+  - Domain registration records
+  - Court records
+  - Leak site archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: The front persona is a kind of fictitious persona.
+    source_url: https://www.justice.gov/opa/pr/grand-jury-indicts-12-russian-intelligence-officers-hacking-offenses-related-2016-election
+  innocent_explanations:
+  - Real hacktivist groups exist and often use pseudonyms
+  - Whistleblowers adopt pseudonyms for their own safety
+  jurisdictions: United States (2016 case), applicable globally
+  version: 1
+- id: IN-160
+  name: Unsolicited stolen campaign material offered to journalists or a rival campaign
+  definition: Reporters or a rival campaign receive unrequested emails containing private campaign material,
+    often with a suggested story angle.
+  areas:
+  - IN
+  typology: Hack-and-leak delivery
+  status: pending
+  sources:
+  - title: Three IRGC Cyber Actors Indicted for Hack-and-Leak Operation Designed to Influence the 2024
+      U.S. Presidential Election
+    publisher: US Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/opa/pr/three-irgc-cyber-actors-indicted-hack-and-leak-operation-designed-influence-2024-us
+    quote: I think this information is worth a good [U.S. news publication] piece with your narration.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Emails with stolen material sent to people believed tied to a rival campaign (27 June to 3 July 2024)
+    and to multiple journalists (22 July to 31 August 2024), per the indictment
+  cases:
+  - name: IRGC distribution of stolen campaign material to media
+    year: '2024'
+    jurisdiction: United States
+    what_happened: The indictment alleges the conspirators emailed stolen material about potential vice-presidential
+      candidates to members of the news media to get it published.
+    outcome: alleged_in_reporting
+    outcome_verified: false
+    source_url: https://www.justice.gov/opa/pr/three-irgc-cyber-actors-indicted-hack-and-leak-operation-designed-influence-2024-us
+    source_title: Three IRGC Cyber Actors Indicted
+  data_needed:
+  - Document
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources:
+  - Sender email headers and account history
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Material received this way needs independent authentication and chain of custody.
+    source_url: https://www.justice.gov/opa/pr/three-irgc-cyber-actors-indicted-hack-and-leak-operation-designed-influence-2024-us
+  innocent_explanations:
+  - Genuine sources often approach journalists unsolicited and anonymously
+  - Campaign staff sometimes leak internal material to the press themselves
+  jurisdictions: United States (2024 case)
+  version: 1
+- id: IN-161
+  name: Synthetic or staged audio or video of a candidate released close to voting
+  definition: A cloned-voice recording or staged video of a candidate or official surfaces shortly before
+    polling, when there is little time to debunk it.
+  areas:
+  - IN
+  typology: Election deepfake / voice cloning
+  status: verified
+  sources:
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Tactic: Voice Cloning of Public Figures'
+    quote: Voice cloning tools allow foreign nation-state actors to create a fake recording of a public
+      official or figure
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Joint ODNI, FBI, and CISA Statement on Russian Election Influence Efforts (1 Nov 2024)
+    publisher: ODNI, FBI, CISA
+    year: '2024'
+    url: https://www.fbi.gov/news/press-releases/joint-odni-fbi-and-cisa-statement-on-russian-election-influence-efforts
+    quote: manufactured a video falsely accusing an individual associated with the Democratic presidential
+      ticket
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fake recording of a Slovak party leader discussing vote rigging spread two days before the 2023 vote
+    (CISA/FBI/ODNI)
+  - Russian-made video falsely accusing a person tied to the Democratic ticket of taking a bribe (ODNI/FBI/CISA,
+    Nov 2024)
+  cases:
+  - name: Slovakia election fake audio
+    year: '2023'
+    jurisdiction: Slovakia
+    what_happened: The joint US guidance describes a fake recording of a party leader discussing vote
+      rigging spreading two days before voting.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    source_title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+  data_needed:
+  - Document
+  - Event
+  - Person
+  - Note
+  checkable: records
+  lookup_sources:
+  - Election calendar and blackout rules
+  - Media forensics / provenance checks
+  - Government attribution statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: General deepfake detection signs apply; this indicator adds the election timing.
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  innocent_explanations:
+  - Authentic embarrassing recordings do surface late in campaigns
+  - Satire and parody clips are sometimes shared without their label
+  - Poor audio quality can make a real recording sound synthetic
+  jurisdictions: Global; cases in Slovakia and the United States
+  version: 1
+- id: IN-162
+  name: Fabricated evidence of an election security incident (fraud, ballot destruction, cyber attack)
+  definition: Videos, images or documents that claim to show voter fraud, destroyed ballots or a hacked
+    election system, made to undermine trust in the result.
+  areas:
+  - IN
+  typology: Manufactured security incident
+  status: verified
+  sources:
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Tactic: Manufacturing False Evidence of an Alleged Security Incident'
+    quote: Foreign nation-state actors can create and spread false "proof" of cyber or physical incidents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Joint ODNI, FBI, and CISA Statement on Russian Election Influence Efforts (1 Nov 2024)
+    publisher: ODNI, FBI, CISA
+    year: '2024'
+    url: https://www.fbi.gov/news/press-releases/joint-odni-fbi-and-cisa-statement-on-russian-election-influence-efforts
+    quote: Russian influence actors manufactured a recent video
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fabricated video of people claiming to be from Haiti voting illegally in several Georgia counties,
+    assessed as Russian (Nov 2024)
+  - Likely AI-generated image of an explosion at the Pentagon amplified by Russian state media (May 2023)
+  cases:
+  - name: Fabricated Georgia illegal-voting video
+    year: '2024'
+    jurisdiction: United States
+    what_happened: ODNI, FBI and CISA assessed that Russian influence actors manufactured a video falsely
+      showing people claiming to be from Haiti voting illegally in Georgia; Georgia's Secretary of State
+      rejected its claims.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fbi.gov/news/press-releases/joint-odni-fbi-and-cisa-statement-on-russian-election-influence-efforts
+    source_title: Joint ODNI, FBI, and CISA Statement on Russian Election Influence Efforts
+  data_needed:
+  - Document
+  - Event
+  - Address
+  - PublicBody
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Election official statements
+  - Media forensics
+  - Government attribution statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Checking earlier copies, place and weather helps test such footage.
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  innocent_explanations:
+  - Real election problems (equipment faults, misplaced ballots) do happen and get filmed
+  - Voters may sincerely misread ordinary procedures as fraud
+  - Old footage is often reshared in good faith
+  jurisdictions: United States (2024 cases), applicable globally
+  version: 1
+- id: IN-163
+  name: Cyber intrusion amplified by influence accounts posing as locals
+  definition: A real or claimed hack is publicised and exaggerated by accounts pretending to be local
+    activists, so the breach and its spin work together.
+  areas:
+  - IN
+  typology: Cyber-enabled information operation
+  status: verified
+  sources:
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Tactic: Cyber-Enabled Information Operations'
+    quote: Nation-state adversaries use information operations and cyber intrusions hand-in-hand
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Iran-linked actors compromised Israeli IT systems and used accounts posing as Israeli activists to
+    amplify the intrusions (CISA/FBI/ODNI)
+  cases:
+  - name: Iran-linked intrusions amplified by fake Israeli activist accounts
+    year: ''
+    jurisdiction: Israel
+    what_happened: The joint US guidance describes Iran-linked cyber actors compromising Israeli IT systems
+      and using influence accounts posing as Israeli activists to amplify the intrusions.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    source_title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+  data_needed:
+  - Event
+  - Organization
+  - Person
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Incident disclosures by the breached body
+  - CISA / national CERT advisories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: The amplifying accounts are fictitious local personas.
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  innocent_explanations:
+  - Genuine local users often react loudly to real breaches
+  - Security researchers publicise breaches to warn the public
+  jurisdictions: Global
+  version: 1
+- id: IN-164
+  name: Foreign-funded influencers or production companies posting without disclosure
+  definition: Established online influencers or content studios are paid, directly or through intermediaries,
+    to carry a foreign state's messages without telling their audience.
+  areas:
+  - IN
+  typology: Paid influence
+  status: verified
+  sources:
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Tactic: Paid Influence'
+    quote: Foreign malign influence actors utilize established internet entities, such as online influencers
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Justice Department Disrupts Covert Russian Government-Sponsored Foreign Malign Influence Operation
+    publisher: US Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+    quote: paid social media advertisements (in some cases created using artificial intelligence tools)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Western social media production companies distributing pro-PRC Xinjiang videos without disclosing
+    origin (CISA/FBI/ODNI)
+  - Doppelganger use of influencers worldwide (DOJ 2024)
+  cases:
+  - name: Undisclosed pro-PRC video production
+    year: ''
+    jurisdiction: Multiple
+    what_happened: The joint US guidance describes Western production companies distributing pro-PRC videos
+      about Xinjiang without disclosing their origin.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    source_title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Contract
+  - Ownership
+  - Document
+  checkable: records
+  lookup_sources:
+  - US FARA filings
+  - Platform paid-partnership labels
+  - Corporate registries
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Covert foreign payment to domestic voices is foreign money in politics.
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  - target_area: IN
+    reason: Concealed sponsorship behind content is the general form of this sign.
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  innocent_explanations:
+  - Influencers routinely take sponsorships and may disclose them in ways that are easy to miss
+  - Creators may hold views matching a foreign state without being paid
+  - Payment may come through a media company the creator believes is independent
+  jurisdictions: Global
+  version: 1
+- id: IN-165
+  name: Foreign-linked PR firm placing content with local newsroom staff
+  definition: A public-relations firm with ties to a foreign state pays or supplies material to local
+    editors so that state messaging appears as local journalism.
+  areas:
+  - IN
+  typology: Paid influence / content placement
+  status: verified
+  sources:
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Tactic: Paid Influence (example)'
+    quote: Foreign malign influence actors utilize established internet entities, such as online influencers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A Russia-linked PR firm paid to create content for local media editorial staff in Latin America (CISA/FBI/ODNI)
+  cases:
+  - name: Russia-linked PR firm content for Latin American media
+    year: ''
+    jurisdiction: Latin America
+    what_happened: The joint US guidance describes a Russia-linked PR firm being paid to create content
+      for local media editorial staff.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    source_title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Contract
+  - Employment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Corporate registries
+  - FARA or foreign-agent registers
+  - Newsroom bylines and syndication notes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Payments to local media by a foreign-linked firm are foreign money.
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+  innocent_explanations:
+  - Press releases and PR-supplied content are a normal, if imperfect, newsroom practice
+  - Foreign embassies legitimately promote their positions through disclosed PR
+  jurisdictions: Latin America example; applicable globally
+  version: 1
+- id: IN-166
+  name: Paid social ads driving traffic to foreign-run lookalike or fake news domains
+  definition: Sponsored social-media posts, sometimes AI-made, push users toward sites that copy real
+    outlets or invented media brands run by a foreign state campaign.
+  areas:
+  - IN
+  typology: Doppelganger-style operation
+  status: verified
+  sources:
+  - title: Justice Department Disrupts Covert Russian Government-Sponsored Foreign Malign Influence Operation
+    publisher: US Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+    quote: paid social media advertisements (in some cases created using artificial intelligence tools)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 3rd EEAS Report on FIMI Threats
+    publisher: EEAS
+    year: '2025'
+    url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    locator: Named campaigns, p. 26
+    quote: Channels that operate under state oversight without publicly disclosing their affiliation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - washingtonpost.pm registered to mimic washingtonpost.com (DOJ 2024)
+  - EEAS counted 228 Doppelgänger domains linked to 60 incidents
+  cases:
+  - name: Doppelganger domain seizures (Social Design Agency, Structura, ANO Dialog)
+    year: '2024'
+    jurisdiction: United States
+    what_happened: DOJ announced the seizure of 32 internet domains used in Russian government-directed
+      'Doppelganger' campaigns run by SDA, Structura and ANO Dialog; these are DOJ allegations supporting
+      a seizure, not a conviction.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+    source_title: Justice Department Disrupts Covert Russian Government-Sponsored Foreign Malign Influence
+      Operation
+  - name: Doppelgänger campaign mapping
+    year: '2025'
+    jurisdiction: European Union
+    what_happened: The EEAS threat report counted 228 Doppelgänger domains linked to 60 FIMI incidents.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    source_title: 3rd EEAS Report on FIMI Threats
+  data_needed:
+  - Organization
+  - Company
+  - Payment
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Meta Ad Library and other ad transparency libraries
+  - Domain WHOIS / registration
+  - DOJ seizure notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: The destination sites are often cybersquatted copies of real outlets.
+    source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+  innocent_explanations:
+  - Political ads from legitimate domestic groups also use AI images and aggressive targeting
+  - Small outlets promote their own articles with paid posts
+  jurisdictions: US, EU
+  version: 1
+- id: IN-167
+  name: Election topic with a data void filled by influence content
+  definition: A search term or local election issue with little credible information gets filled quickly
+    with content from influence actors.
+  areas:
+  - IN
+  typology: Exploiting information gaps
+  status: verified
+  sources:
+  - title: Tactics of Disinformation
+    publisher: CISA
+    year: '2022'
+    url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+    locator: Exploit Information Gaps
+    quote: Data voids, or information gaps, occur when there is insufficient credible information to satisfy
+      a search inquiry.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Additional tactic: Exploit Information Gaps'
+    quote: Foreign malign influence actors fill data voids with influence content.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - PRC officials and media used a data void to spread conspiracy theories about a US Army research facility
+    (CISA/FBI/ODNI)
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Search results for the term over time
+  - Official election office publications
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New or local topics naturally have few authoritative sources at first
+  - Fringe but domestic writers often fill gaps before mainstream outlets
+  jurisdictions: Global
+  version: 1
+- id: IN-168
+  name: Prominent figures unknowingly amplifying foreign-origin material
+  definition: Celebrities, officials or other trusted voices are tricked into sharing or appearing in
+    content that serves a foreign influence campaign.
+  areas:
+  - IN
+  typology: Manipulating unsuspecting actors
+  status: verified
+  sources:
+  - title: Tactics of Disinformation
+    publisher: CISA
+    year: '2022'
+    url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+    locator: Manipulate Unsuspecting Actors
+    quote: Disinformation campaigns target prominent individuals and organizations to help amplify their
+      narratives.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Additional tactic: Manipulate Unsuspecting Actors'
+    quote: Foreign nation-state actors deceive prominent individuals into unintentionally amplifying their
+      influence materials.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Celebrity Cameo videos manipulated to spread disinformation (cited by CISA/FBI/ODNI from CNN reporting,
+    Dec 2023)
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - Associate
+  checkable: person
+  lookup_sources:
+  - Original commissioning platform records
+  - The figure's own statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Public figures share content they agree with from many sources
+  - Paid shout-out platforms are widely used for harmless requests
+  jurisdictions: Global
+  version: 1
+- id: IN-169
+  name: Insider-style targeted content aimed at a niche community
+  definition: Accounts build trust inside a specific community (for example military families or a local
+    protest group) before pushing foreign-state messages to it.
+  areas:
+  - IN
+  typology: Spreading targeted content
+  status: verified
+  sources:
+  - title: Tactics of Disinformation
+    publisher: CISA
+    year: '2022'
+    url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+    locator: Spread Targeted Content
+    quote: These actors gain insider status and grow an online following that can make future manipulation
+      efforts more successful.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fake accounts posing as US military families targeting Taiwan; pro-PRC fake accounts calling for protests
+    against a Texas rare-earth facility (CISA/FBI/ODNI)
+  cases:
+  - name: Pro-PRC fake accounts urging protests at a Texas rare-earth facility
+    year: ''
+    jurisdiction: United States
+    what_happened: The joint US guidance describes pro-PRC fake accounts calling for protests against
+      a rare-earth processing facility in Texas.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    source_title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Account creation dates and history
+  - Platform takedown reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Fake community groups are a form of astroturfing.
+    source_url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+  innocent_explanations:
+  - Real community members tailor messages to their group
+  - Activist organisers build followings before calling for action
+  jurisdictions: Global
+  version: 1
+- id: IN-170
+  name: State media content pushed through alternative or less-moderated platforms
+  definition: Foreign state messaging is spread through channels on platforms with weaker moderation,
+    such as Telegram, to reach believers and avoid detection.
+  areas:
+  - IN
+  typology: Leveraging social media platforms
+  status: verified
+  sources:
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: 'Tactic: Leveraging Social Media Platforms'
+    quote: Foreign malign influence actors may leverage certain social media platforms to intensify belief
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Tactics of Disinformation
+    publisher: CISA
+    year: '2022'
+    url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+    locator: Abuse Alternative Platforms
+    quote: Groups on alternative platforms may operate without the scrutiny or detection capabilities
+      that other platforms have.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Russia-linked Telegram channels spreading state media articles and using fake personas to justify
+    the invasion of Ukraine (CISA/FBI/ODNI)
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Channel archives (e.g. Telegram)
+  - EEAS / EUvsDisinfo database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many legitimate users and outlets move to alternative platforms for privacy or to avoid censorship
+  - Telegram is a main news source in some countries
+  jurisdictions: Global
+  version: 1
+- id: IN-171
+  name: Election-related conspiracy theory seeded or amplified by foreign-linked accounts
+  definition: A theory that explains election events as a secret plot is introduced or boosted by accounts
+    tied to a foreign influence effort.
+  areas:
+  - IN
+  typology: Conspiracy theory amplification
+  status: verified
+  sources:
+  - title: Tactics of Disinformation
+    publisher: CISA
+    year: '2022'
+    url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+    locator: Devise or Amplify Conspiracy Theories
+    quote: Conspiracy theories attempt to explain important events as secret plots by powerful actors.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Conspiracy theories about a US Army research facility spread by PRC officials and media (CISA/FBI/ODNI)
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Organization
+  - Event
+  checkable: records
+  lookup_sources:
+  - Earliest-appearance searches
+  - Platform and government attribution reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most conspiracy theories arise and spread domestically without foreign involvement
+  - Distrust grounded in real past wrongdoing can look like conspiracy thinking
+  jurisdictions: Global
+  version: 1
+- id: IN-172
+  name: AI-generated news anchors fronting a fictitious outlet
+  definition: Synthetic presenters read scripted content for a news brand that does not exist, to make
+    influence content look like broadcast news.
+  areas:
+  - IN
+  typology: Synthetic media / proxy media
+  status: verified
+  sources:
+  - title: Tactics of Disinformation
+    publisher: CISA
+    year: '2022'
+    url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+    locator: Create Deepfakes and Synthetic Media
+    quote: Artificial intelligence (AI) tools can make synthetic content nearly indistinguishable from
+      real life.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - PRC-linked AI-generated anchors presenting content for fictitious outlets (CISA/FBI/ODNI 2024)
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Corporate and broadcast licence registries
+  - Reverse image/video search
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Deepfake detection signs apply to synthetic presenters.
+    source_url: https://www.cisa.gov/sites/default/files/publications/tactics-of-disinformation_508.pdf
+  innocent_explanations:
+  - Some legitimate broadcasters openly use AI presenters
+  - Training and demo videos use synthetic avatars
+  jurisdictions: Global
+  version: 1
+- id: IN-173
+  name: Shared technical infrastructure with an already attributed state operation
+  definition: A site or channel shares IP addresses, hosting, domain ownership, backend data or network
+    (ASN) with assets already tied to a foreign state campaign.
+  areas:
+  - IN
+  typology: 'Attribution: technical evidence'
+  status: verified
+  sources:
+  - title: 3rd EEAS Report on FIMI Threats
+    publisher: EEAS
+    year: '2025'
+    url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    locator: p. 17, technical evidence
+    quote: Information related to the digital infrastructure and operational systems behind FIMI activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Behind the curtain: a novel analytical approach to FIMI exposure'
+    publisher: EEAS / EUvsDisinfo
+    year: '2025'
+    url: https://euvsdisinfo.eu/behind-the-curtain-a-novel-analytical-approach-to-fimi-exposure/
+    quote: Technical indicators may include public affiliation (and even self-attribution)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - IP addresses, hosting services, domain ownership, backend data and ASNs listed as technical indicators
+    (EEAS p. 17)
+  cases: []
+  data_needed:
+  - Address
+  - Organization
+  - Company
+  - Ownership
+  - UnknownLink
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Passive DNS and WHOIS history
+  - Hosting and ASN lookups
+  - Shared analytics or ad-tracking IDs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Shared technical infrastructure counts as a high-confidence attribution indicator in the
+      EEAS method
+    threshold_source: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Thousands of unrelated sites share the same cheap hosting provider or IP
+  - Privacy-protected domain registration hides many legitimate owners
+  - Common website templates and plug-ins create look-alike backends
+  jurisdictions: EU methodology, applicable globally
+  version: 1
+- id: IN-174
+  name: 'Repeated playbook: activity matching a known state campaign''s patterns'
+  definition: A new set of accounts or sites behaves in the same way as a previously exposed campaign,
+    such as Doppelgänger, Portal Kombat or False Façade.
+  areas:
+  - IN
+  typology: 'Attribution: behavioural evidence'
+  status: verified
+  sources:
+  - title: 3rd EEAS Report on FIMI Threats
+    publisher: EEAS
+    year: '2025'
+    url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    locator: p. 17, behavioural indicators
+    quote: Repeated playbooks. Activity aligned with known patterns from other campaigns
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - EEAS counted Portal Kombat (200 outlets, 73 incidents) and False Façade (230 websites, 47 incidents)
+  cases:
+  - name: Portal Kombat and False Façade networks
+    year: '2025'
+    jurisdiction: European Union
+    what_happened: The EEAS threat report mapped Portal Kombat at 200 outlets linked to 73 incidents and
+      False Façade at 230 websites linked to 47 incidents.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    source_title: 3rd EEAS Report on FIMI Threats
+  data_needed:
+  - Organization
+  - Document
+  - Event
+  - Note
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - EEAS / EUvsDisinfo database
+  - Platform threat reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Pattern matching builds on coordinated inauthentic behaviour signs.
+    source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  innocent_explanations:
+  - Copycat actors, including domestic ones, imitate publicised techniques
+  - Common marketing tactics look similar across unrelated campaigns
+  jurisdictions: EU methodology, applicable globally
+  version: 1
+- id: IN-175
+  name: State-media content laundered through third-party channels (mirroring, automated translation)
+  definition: Material from official or state-controlled outlets is copied, machine-translated or republished
+    by seemingly unrelated channels without credit.
+  areas:
+  - IN
+  typology: 'Attribution: behavioural evidence'
+  status: verified
+  sources:
+  - title: 'Behind the curtain: a novel analytical approach to FIMI exposure'
+    publisher: EEAS / EUvsDisinfo
+    year: '2025'
+    url: https://euvsdisinfo.eu/behind-the-curtain-a-novel-analytical-approach-to-fimi-exposure/
+    quote: Behavioural evidence may include amplification patterns (e.g. mirroring content, automated
+      translations, republishing).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 3rd EEAS Report on FIMI Threats
+    publisher: EEAS
+    year: '2025'
+    url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    locator: p. 15, state-controlled outlets
+    quote: Media outlets funded, managed, and editorially controlled by state-appointed bodies or the
+      ruling party.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Russia-linked Telegram channels spreading state media articles (CISA/FBI/ODNI)
+  cases: []
+  data_needed:
+  - Document
+  - Organization
+  - Note
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Text-similarity search against state-media archives
+  - Publication timestamps
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Automated republishing networks are covered there; this sign adds the state-media origin.
+    source_url: https://euvsdisinfo.eu/behind-the-curtain-a-novel-analytical-approach-to-fimi-exposure/
+  innocent_explanations:
+  - Aggregators and scraper sites republish everything, including state media
+  - Translators and commentators quote foreign outlets to discuss them critically
+  jurisdictions: EU methodology, applicable globally
+  version: 1
+- id: IN-176
+  name: Official state channels and unattributed channels pushing the same narrative together
+  definition: Government accounts or state media echo the same claim at the same time as anonymous or
+    state-aligned channels, suggesting a joined-up effort across attribution tiers.
+  areas:
+  - IN
+  typology: Attribution grading / cross-tier amplification
+  status: verified
+  sources:
+  - title: 3rd EEAS Report on FIMI Threats
+    publisher: EEAS
+    year: '2025'
+    url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    locator: p. 15, official state channels
+    quote: Official communication channels directly operated by a government and its representatives
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Securing Election Infrastructure Against the Tactics of Foreign Malign Influence Operations
+      (Apr 2024)
+    publisher: CISA, FBI, ODNI FMIC
+    year: '2024'
+    url: https://archive.dni.gov/files/FMIC/documents/products/Securing-Election-Infrastructure-Against-The-Tactics-Of-Foreign-Malign-Influence-Operations-Apr2024.pdf
+    locator: Manufacturing False Evidence (example)
+    quote: Foreign nation-state actors can create and spread false "proof" of cyber or physical incidents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Likely AI-generated Pentagon explosion image amplified by Russian state media (May 2023)
+  - 'EEAS network graph: 2,055 channels with 8,056 connections, 20% Russian-attributed (p. 20)'
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Document
+  - Event
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Timestamps across official and unofficial channels
+  - EEAS / EUvsDisinfo database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Official channels and independent commentators often react to the same breaking news at the same time
+  - Governments routinely repeat claims already circulating online
+  jurisdictions: EU methodology, applicable globally
+  version: 1
+- id: IN-177
+  name: 'Attribution grade: official or high-confidence attribution of an election influence effort to
+    a foreign state'
+  definition: The strength of evidence that a foreign state is behind an operation, from narrative alignment
+    only, through technical and behavioural links, to official attribution or high-confidence evidence
+    such as financial records.
+  areas:
+  - IN
+  typology: Attribution grading
+  status: verified
+  sources:
+  - title: 3rd EEAS Report on FIMI Threats
+    publisher: EEAS
+    year: '2025'
+    url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+    locator: p. 18, confidence levels
+    quote: High-confidence indicators, such as financial records, shared technical infrastructure or direct
+      affiliations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Joint ODNI, FBI, and CISA Statement on Russian Election Influence Efforts (1 Nov 2024)
+    publisher: ODNI, FBI, CISA
+    year: '2024'
+    url: https://www.fbi.gov/news/press-releases/joint-odni-fbi-and-cisa-statement-on-russian-election-influence-efforts
+    quote: information available to the IC and prior activities of other Russian influence actors
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - US Intelligence Community attribution of fabricated Georgia voting video to Russia (Nov 2024)
+  - DOJ naming of SDA, Structura and ANO Dialog as Doppelganger operators (Sept 2024)
+  cases:
+  - name: IC attribution of fabricated election videos to Russia
+    year: '2024'
+    jurisdiction: United States
+    what_happened: ODNI, FBI and CISA stated the Intelligence Community assessed Russian influence actors
+      manufactured election videos, based on IC information and prior activity of Russian actors.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fbi.gov/news/press-releases/joint-odni-fbi-and-cisa-statement-on-russian-election-influence-efforts
+    source_title: Joint ODNI, FBI, and CISA Statement on Russian Election Influence Efforts
+  data_needed:
+  - PublicBody
+  - Organization
+  - Payment
+  - Ownership
+  - Document
+  - CourtCase
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Government attribution statements
+  - Court records and indictments
+  - Sanctions lists (OFAC, EU)
+  - EEAS reports
+  levels:
+    faint: Narrative alignment only (state-aligned, unattributed)
+    strong: Technical or behavioural indicators link the activity to a state channel (state-linked)
+    textbook: Official government attribution, or high-confidence indicators such as financial records,
+      shared technical infrastructure or direct affiliations
+    threshold_source: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Financial records are a high-confidence attribution indicator and overlap with foreign-money
+      checks.
+    source_url: https://www.eeas.europa.eu/sites/default/files/documents/2025/EEAS-3nd-ThreatReport-March-2025-05-Digital-HD.pdf
+  innocent_explanations:
+  - Government attributions can be wrong or politically motivated and often withhold evidence
+  - Shared infrastructure or patterns may reflect common vendors rather than one operator
+  - An indictment is an allegation, not proof
+  jurisdictions: US and EU methods
+  version: 1
 not_reached:
 - Meta Transparency Center Community Standards page on Inauthentic Behavior (page renders only metadata
   via fetch); policy wording on fake accounts, Foreign or Government Interference not quoted
@@ -3127,3 +6064,33 @@ not_reached:
 - SPRITE preprint page gave only a short abstract excerpt; author list beyond 'Heathers et al.' not confirmed.
 - FollowTheMoney explorer (https://followthemoney.tech/explorer/) not opened to confirm UserAccount/Message
   property names.
+- WebSearch budget for this turn was exhausted after the first search attempt, so wider discovery (CHEA/UNESCO
+  degree-mill guidance, Europol/Frontex document-fraud indicators, further paper-mill cases) relied only
+  on direct fetches of known URLs.
+- 'CHEA fact sheet and CHEA/UNESCO degree-mill statement PDFs: fetch errors.'
+- 'Oregon Office of Degree Authorization unaccredited-institutions list: fetch error.'
+- 'US Attorney (E.D. Wash.) press release on US v. Randock (Saint Regis), hosted at hep.uiuc.edu: blocked
+  by robots.txt; case sourced from Wikipedia instead.'
+- 'US DOJ (SDNY) press release on Umair Hamid (Axact): URL not found without search; case sourced from
+  Wikipedia.'
+- 'New York Times Axact reporting (2015): site blocked; summarised via Wikipedia only.'
+- 'BBC 2018 ''Staggering trade in fake degrees revealed'': site blocked.'
+- 'GAO-04-771T: the ''Hamilton University versus Hamilton College'' wording came from the fetch summary
+  and may be a paraphrase rather than an exact quote; verify before publishing.'
+- 'UK Home Office holographic-device quote: the exact ''GENUINE'' hologram sentence was not returned verbatim,
+  so IN-077 quotes the Checklist A line instead.'
+- Hedd home page quote for 243 bogus institutions is a short fragment; the full sentence was not returned.
+- WebSearch budget for this turn was exhausted after the first search, so wider searching (Microsoft MTAC,
+  Meta adversarial threat reports, Google TAG, OpenAI threat reports, Stanford Internet Observatory, Atlantic
+  Council DFRLab) was not done.
+- 'DOJ press release on the RT employees / Tenet Media indictment (Sept 2024): fetch failed at both justice.gov
+  URLs tried.'
+- 'FCC Lingo Telecom settlement and New Hampshire AG pages on the 2024 AI-voice primary robocall: fetch
+  failed.'
+- Romanian Constitutional Court decision annulling the 2024 presidential election first round (ccr.ro
+  blocked by robots.txt).
+- CISA/FBI/CISA joint statement on cisa.gov (fetch failed); the FBI copy was used instead.
+- DISARM Red Framework technique list itself (only the FAQ page was read), so no DISARM technique IDs
+  are mapped.
+- 'Macron Leaks (France 2017) and other European hack-and-leak cases: no primary source reached.'
+- Exact page numbers in the EEAS PDF are approximate (the fetch tool inferred them from layout).

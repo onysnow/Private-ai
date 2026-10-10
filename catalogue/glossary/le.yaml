@@ -465,3 +465,220 @@ terms:
   indicators: []
   areas:
   - LE
+- term: Persuader
+  definition: A consultant or other outside person who, under an arrangement with an employer, works to
+    persuade employees about whether to organise or bargain, directly or through others.
+  examples: []
+  source_url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+  cases: []
+  related:
+  - LM-20
+  - LM-10
+  - Advice exemption
+  indicators: []
+  areas:
+  - LE
+- term: Form LM-10 (Employer Report)
+  definition: Annual report an employer files with OLMS listing persuader agreements and certain payments
+    to consultants, employees or unions; due within 90 days after the employer's fiscal year ends.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-405
+  cases: []
+  related:
+  - LMRDA section 203(a)
+  indicators: []
+  areas:
+  - LE
+- term: Form LM-20 (Agreement and Activities Report)
+  definition: Report a consultant files with OLMS describing a persuader agreement with an employer; due
+    within 30 days of making the agreement.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-406
+  cases: []
+  related:
+  - LM-21
+  indicators: []
+  areas:
+  - LE
+- term: Form LM-21 (Receipts and Disbursements Report)
+  definition: Annual report a consultant who filed an LM-20 makes of money received and spent on labour
+    relations work, due within 90 days of its fiscal year end.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-406
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Advice exemption
+  definition: The rule that a consultant who only gives advice to an employer, without persuading workers,
+    does not have to report.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/433
+  cases: []
+  related:
+  - Section 203(c)
+  indicators: []
+  areas:
+  - LE
+- term: OLMS
+  definition: The US Department of Labor's Office of Labor-Management Standards, which administers union
+    and persuader disclosure reports.
+  examples: []
+  source_url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: LMRDA
+  definition: The Labor-Management Reporting and Disclosure Act of 1959, the federal law that sets the
+    persuader reporting duties in section 203.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/433
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: NLRA
+  definition: The National Labor Relations Act, the US federal law protecting private-sector workers'
+    right to organise and listing employer unfair labour practices in section 8(a).
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/158
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: NLRB
+  definition: The National Labor Relations Board, the federal agency that runs union elections and decides
+    unfair labour practice cases.
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Unfair labour practice (ULP)
+  definition: Conduct the NLRA forbids, such as an employer interfering with, coercing or discriminating
+    against workers for union activity, or refusing to bargain.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/158
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Section 7 / protected concerted activity
+  definition: Workers' legal right to organise, bargain collectively and act together for mutual aid,
+    which section 8(a)(1) protects from employer interference.
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Captive audience meeting
+  definition: A meeting workers must attend, under threat of discipline, where the employer argues against
+    unionising; held unlawful by the NLRB in Amazon.com Services LLC (2024).
+  examples: []
+  source_url: https://www.nlrb.gov/news-outreach/news-story/board-rules-captive-audience-meetings-unlawful
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Cemex bargaining order
+  definition: A 2023 NLRB standard under which an employer that commits election-voiding unfair labour
+    practices is ordered to recognise and bargain with the union rather than hold a rerun.
+  examples: []
+  source_url: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+  cases: []
+  related:
+  - Gissel order
+  indicators: []
+  areas:
+  - LE
+- term: Gissel order
+  definition: An older form of NLRB bargaining order used where employer misconduct makes a fair election
+    unlikely; the Cemex decision ordered bargaining under both Gissel and the new standard.
+  examples: []
+  source_url: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Section 10(j) injunction
+  definition: A court order the NLRB can seek to halt alleged unfair labour practices while its case proceeds;
+    in Starbucks v. McKinney (2024) the Supreme Court said courts must apply the usual four-factor test.
+  examples: []
+  source_url: https://www.law.cornell.edu/supremecourt/text/23-367
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Decertification
+  definition: A process by which workers petition to remove their union; employers may not start or more
+    than minimally support it.
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Company union (employer domination)
+  definition: A workers' organisation that the employer dominates, controls or improperly supports, prohibited
+    by NLRA section 8(a)(2).
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-or-dominating-a-union-section-8a2
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Objectionable conduct
+  definition: Conduct around an NLRB election that can lead the Board to set aside the result, such as
+    mass speeches on company time within 24 hours of the vote.
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: First contract
+  definition: The first collective agreement after a union is certified; research finds many units still
+    have none a year after the election.
+  examples: []
+  source_url: https://files.epi.org/page/-/pdf/bp235.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Union avoidance consultant
+  definition: A consultant or law firm hired to help an employer defeat or avoid unionisation; EPI estimates
+    employer spending on them at roughly $340 million a year.
+  examples: []
+  source_url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Supervisor one-on-ones
+  definition: Individual meetings between supervisors and workers during a campaign, which research found
+    were often used to question workers about the union.
+  examples: []
+  source_url: https://files.epi.org/page/-/pdf/bp235.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE

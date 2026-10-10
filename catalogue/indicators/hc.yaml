@@ -1,0 +1,2815 @@
+key: HC
+name: Health care harm and patient safety
+scope: Medical negligence, dangerous practitioners, unsafe hospital and maternity units, never events,
+  medical device harm, physician sexual misconduct, and cover-ups of public health risks.
+indicators:
+- id: HC-001
+  name: High mortality ratio explained away instead of investigated
+  definition: A hospital's standardised death rate stays well above average for years and the hospital
+    treats the figures as a coding or data problem rather than a sign of unsafe care.
+  areas:
+  - HC
+  typology: Unsafe hospital or unit
+  status: verified
+  sources:
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary (HC
+      947)'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry (Robert Francis QC)
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Summary of findings, para 1.7
+    quote: This can be seen from the way the Trust approached its FT application, its approach to high
+      Hospital Standardised Mortality Ratios (HSMRs) and its inaccurate self declaration of its own performance.
+      It took false assurance from good news, and yet tolerated or sought to explain away bad news.
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-10'
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary (HC
+      947)'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Introduction
+    quote: Why did the regulatory bodies not act sooner to investigate a trust whose mortality rates had
+      been significantly higher than the average since 2003 and whose record in dealing with serious complaints
+      was so poor?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Mid Staffordshire NHS Foundation Trust: mortality significantly above average from 2003; the inquiry
+    found the trust sought to explain away bad news.'
+  cases:
+  - name: Mid Staffordshire NHS Foundation Trust
+    year: '2013'
+    jurisdiction: England
+    what_happened: A public inquiry found the trust tolerated poor standards, prioritised finances and
+      foundation trust status, and explained away high mortality ratios while oversight bodies failed
+      to act.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    source_title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+  data_needed:
+  - PublicBody
+  - Organization
+  - Document
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Published risk-adjusted mortality indicators (e.g. NHS SHMI, HSMR from commercial providers)
+  - Board papers and minutes
+  - Regulator inspection reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine coding or data-quality errors can inflate a ratio
+  - Hospitals serving sicker or more deprived populations, or with hospice or specialist services, can
+    show higher crude and adjusted rates
+  - Small numbers produce random swings
+  jurisdictions: UK (NHS); applies wherever risk-adjusted mortality is published
+  version: 1
+- id: HC-002
+  name: Unit is a statistical outlier for serious harm
+  definition: A unit has a rate of serious-harm incidents or avoidable deaths clearly higher than comparable
+    units, which should prompt outside scrutiny.
+  areas:
+  - HC
+  typology: Unsafe hospital or unit
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation (Dr Bill Kirkup) for UK DHSC, HC 681
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Chapter 1, para 1.114
+    quote: In 2018, it became evident that East Kent maternity services were an outlier because of the
+      rate of occurrence of safety incidents resulting in serious harm.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Foreword / Key Action Area 1
+    quote: They can be used, not to generate meaningless league tables, but to identify results that are
+      genuine outliers.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The Report of the Morecambe Bay Investigation
+    publisher: Morecambe Bay Investigation (Dr Bill Kirkup) for UK DHSC
+    year: '2015'
+    url: https://assets.publishing.service.gov.uk/media/5a7f3d7240f0b62305b85efb/47487_MBI_Accessible_v0.1.pdf
+    locator: Summary, para 5
+    quote: Different clinical care in these cases would have been expected to prevent the outcome in one
+      maternal death and the deaths of 11 babies. This was almost four times the frequency of such failures
+      of care at the Royal Lancaster Infirmary.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - East Kent maternity flagged as outlier by HSIB in 2018
+  - 'Furness General Hospital maternity: serious failures of care almost four times the rate of a sister
+    hospital'
+  cases:
+  - name: East Kent Hospitals University NHS Foundation Trust maternity services
+    year: '2022'
+    jurisdiction: England
+    what_happened: Independent investigation found a clear pattern of suboptimal care causing significant
+      harm from 2009 to 2020, with eight missed opportunities to act.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    source_title: Reading the signals
+  - name: University Hospitals of Morecambe Bay NHS Foundation Trust (Furness General Hospital maternity)
+    year: '2015'
+    jurisdiction: England
+    what_happened: Investigation found 20 instances of significant or major failures of care associated
+      with three maternal deaths and the deaths of 16 babies.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/5a7f3d7240f0b62305b85efb/47487_MBI_Accessible_v0.1.pdf
+    source_title: The Report of the Morecambe Bay Investigation
+  data_needed:
+  - PublicBody
+  - Organization
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - National perinatal mortality surveillance (MBRRACE-UK)
+  - Patient safety investigation body reports (HSIB/HSSIB)
+  - Regulator ratings and inspection reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Units taking higher-risk referrals or tertiary cases see more poor outcomes
+  - A unit with a strong reporting culture records more incidents
+  - Random variation in small units
+  jurisdictions: UK; general
+  version: 1
+- id: HC-003
+  name: Never Event occurred
+  definition: A wholly preventable serious incident on a recognised list (such as wrong-site surgery,
+    a retained foreign object, or wrong-route medication) happened at the provider.
+  areas:
+  - HC
+  typology: Never events and serious reportable events
+  status: verified
+  sources:
+  - title: Revised Never Events policy and framework
+    publisher: NHS Improvement / NHS England
+    url: https://www.england.nhs.uk/wp-content/uploads/2020/11/Revised-Never-Events-policy-and-framework-FINAL.pdf
+    locator: Section 3.1
+    quote: Never Events are defined as Serious Incidents that are wholly preventable because guidance
+      or safety recommendations that provide strong systemic protective barriers are available at a national
+      level and should have been implemented by all healthcare providers.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Factsheet: Never Events (2025)'
+    publisher: The Leapfrog Group
+    year: '2025'
+    url: https://ratings.leapfroggroup.org/sites/default/files/2025-03/2025%20Never%20Events%20Fact%20Sheet.pdf
+    locator: Measure Background
+    quote: Often referred to as “never events,” these include errors such as surgery performed on the
+      wrong body part or on the wrong patient, leaving a foreign object inside a patient after surgery,
+      or death resulting from devices or contaminated drugs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Wrong-site surgery
+  - Retained foreign object after surgery
+  - Death from contaminated drugs or devices
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - NHS England published Never Events data by trust
+  - US state adverse-event reporting programmes (e.g. Minnesota)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Human error can occur despite good systems; a single event does not prove a failing organisation
+  - Providers with honest reporting may appear to have more events than those that under-report
+  jurisdictions: England (NHS Never Events list); US (NQF Serious Reportable Events)
+  version: 1
+- id: HC-004
+  name: Expected response to a never event missing
+  definition: After a never event the provider did not apologise, report it to an outside body in time,
+    carry out a root-cause analysis, or waive the related charges.
+  areas:
+  - HC
+  typology: Never events and serious reportable events
+  status: verified
+  sources:
+  - title: 'Factsheet: Never Events (2025)'
+    publisher: The Leapfrog Group
+    year: '2025'
+    url: https://ratings.leapfroggroup.org/sites/default/files/2025-03/2025%20Never%20Events%20Fact%20Sheet.pdf
+    locator: Leapfrog's Policy on Never Events
+    quote: 'Beginning in 2007, Leapfrog has asked hospitals to commit to five actions if a never event
+      occurs within their facility: 1) apologize to the patient; 2) report the event; 3) perform a root
+      cause analysis; 4) waive costs directly related to the event; 5) provide a copy of the hospital’s
+      policy on never events to patients and payors upon request.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Factsheet: Never Events (2025)'
+    publisher: The Leapfrog Group
+    year: '2025'
+    url: https://ratings.leapfroggroup.org/sites/default/files/2025-03/2025%20Never%20Events%20Fact%20Sheet.pdf
+    locator: Action 2
+    quote: Leapfrog asks that the hospital report to its chosen entity within 15 business days of determining
+      a never event occurred.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Patient billed for corrective surgery after a retained object
+  - No root-cause analysis on file after wrong-site surgery
+  cases: []
+  data_needed:
+  - Organization
+  - Event
+  - Document
+  - Payment
+  - Person
+  checkable: records
+  lookup_sources:
+  - Billing records and explanation-of-benefits documents
+  - State adverse-event reports
+  - Leapfrog Hospital Survey results
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Report not made within 15 business days of determining a never event occurred, or any of
+      the listed actions missing
+    threshold_source: https://ratings.leapfroggroup.org/sites/default/files/2025-03/2025%20Never%20Events%20Fact%20Sheet.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Leapfrog's policy is voluntary; not every hospital has adopted it
+  - Billing may be automated and corrected later
+  - Reports may go to a patient safety organisation that does not publish them
+  jurisdictions: US (Leapfrog policy); comparable duties elsewhere
+  version: 1
+- id: HC-005
+  name: Serious incidents downgraded or not declared
+  definition: Incidents that meet the serious-incident threshold are recorded as lower-level local reviews
+    or not recorded at all, keeping them away from outside scrutiny.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust,
+      for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Summary of findings (governance)
+    quote: In fact, the maternity governance team inappropriately downgraded serious incidents to a local
+      investigation methodology in order to avoid external scrutiny, so that the true scale of serious
+      incidents at the Trust went unknown until this review was undertaken.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Illustrative Case B
+    quote: Also striking are the lack of frankness about what had happened and the failure to report and
+      investigate a serious incident.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Kate Stanton-Davies' death investigated as a High Risk Case Review rather than a Serious Incident
+    (Ockenden)
+  cases:
+  - name: Shrewsbury and Telford Hospital NHS Trust maternity services
+    year: '2022'
+    jurisdiction: England
+    what_happened: Review of 1,592 clinical incidents found the service failed to investigate, learn and
+      improve, and downgraded serious incidents to avoid external scrutiny.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    source_title: Final report of the Ockenden review
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Serious incident logs (e.g. StEIS) obtained by FOI
+  - Board quality committee papers
+  - Coroner prevention-of-future-deaths reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Incident classification frameworks change over time and thresholds are sometimes genuinely unclear
+  - Some cases are properly managed locally when harm was not avoidable
+  jurisdictions: UK; general
+  version: 1
+- id: HC-006
+  name: Deaths treated as expected and kept from the coroner
+  definition: A provider classes catastrophic outcomes as expected or unavoidable and resists referral
+    to the coroner or an inquest.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Missed Opportunity 7, para 1.112
+    quote: It included denying that anything had gone amiss, minimising adverse features, finding reasons
+      to treat deaths and other catastrophic outcomes as expected, and omitting key details in accounts
+      given to families as well as to official bodies. Although we did not find evidence that there was
+      a conscious conspiracy, the effect of these behaviours was to cover up the truth.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Chapter 1a, para 1a.2
+    quote: Within nine months, between May 2008 and March 2009, there were three neonatal deaths of babies
+      that should have led to a systematic review of governance processes, strong actions and learning
+      as well as a coronial inquiry into safety at the Trust.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - East Kent initially refused to refer baby Harry Richford's death to the coroner; a coroner's inquest
+    more than two years later exposed the failings
+  cases:
+  - name: 'East Kent maternity: death of baby Harry Richford'
+    year: '2022'
+    jurisdiction: England
+    what_happened: The investigation found the trust initially refused to refer the death to the coroner
+      and sent incorrect data to the national perinatal audit; the family's persistence led to an inquest.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    source_title: Reading the signals
+  data_needed:
+  - PublicBody
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Coroner inquest records and prevention-of-future-deaths reports
+  - Trust incident records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many deaths are genuinely expected and do not need referral
+  - Referral rules and coroner practice vary by area
+  jurisdictions: England and Wales (coroner system); general
+  version: 1
+- id: HC-007
+  name: Inaccurate data sent to national audits or regulators
+  definition: A provider sends wrong or misleading information about incidents or its own performance
+    to a national audit, regulator or commissioner.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Chapter 5 (baby Harry)
+    quote: The MBRRACE-UK form for Harry dated February 2019 confirmed (among other inaccuracies) that
+      the placenta had been sent for histology, that the case had been discussed with a coroner (although
+      this was only done following pressure from the family) and that there was a final, agreed cause
+      of death following the results of the inquest and all investigations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Recommendation 181
+    quote: On directors of healthcare organisations to be truthful in any information given to a regulator
+      or commissioner.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inaccurate MBRRACE-UK return for a neonatal death (East Kent)
+  - Inaccurate self-declaration of compliance with standards (Mid Staffordshire)
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - National audit returns obtained by FOI or via families
+  - Regulator self-assessment declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clerical error or forms completed before investigations finished
+  - Different definitions between audits
+  jurisdictions: UK; general
+  version: 1
+- id: HC-008
+  name: Families not told the truth about harm
+  definition: Patients or families are not told openly what went wrong, are given partial accounts, or
+    learn key facts only through their own effort.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: 'Regulation 20: Duty of candour'
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-regulation/providers/regulations-service-providers-and-managers/health-social-care-act/regulation-20
+    locator: Background to the duty of candour
+    quote: The duty of candour is a general duty to be open and transparent with people receiving care
+      from you. It applies to every health and social care provider that CQC regulates.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Para 4.63
+    quote: In 2018 an investigation was started without the woman being told an investigation was ongoing
+      or being asked to contribute. This is despite Duty of Candour78 being well embedded nationally and
+      being a legal requirement.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Overview, chapter 7.9 commentary
+    quote: 'Hiding the truth includes not only deliberate concealment but also a lack of candour: the
+      retelling of half-truths such as the “no conclusive proof” line; and failing to tell people about
+      the risks inherent in treatment or the alternatives to that treatment, that they had been tested
+      for infection, or been used in research, or were suffering from a potentially serious and fatal
+      disease.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Investigation run without telling the mother (Shrewsbury and Telford)
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Family accounts and correspondence
+  - Complaint files
+  - Ombudsman decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Facts may be unknown while investigations are ongoing
+  - Staff may delay disclosure on legal advice without intent to conceal
+  jurisdictions: England (statutory duty of candour); general
+  version: 1
+- id: HC-009
+  name: Patients' and families' concerns dismissed
+  definition: Patients' reports of symptoms or problems are repeatedly dismissed or not taken seriously,
+    including labelling women's symptoms as normal.
+  areas:
+  - HC
+  typology: Failure to listen
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Chapter 3, themes from family listening sessions
+    quote: Not listening to women’s concerns or not taking them seriously, resulting in a failure to recognise
+      warning signs or a deteriorating situation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'First Do No Harm: The report of the Independent Medicines and Medical Devices Safety Review'
+    publisher: Independent Medicines and Medical Devices Safety Review (Baroness Cumberlege)
+    year: '2020'
+    url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+    locator: Chapter 1, para 1.18
+    quote: For women there is an added dimension – the widespread and wholly unacceptable labelling of
+      so many symptoms as ‘normal’ and attributable to ‘women’s problems’.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - East Kent families told their concerns were unfounded
+  - Pelvic mesh patients told symptoms were normal (IMMDS review)
+  cases:
+  - name: Pelvic mesh, sodium valproate and Primodos (IMMDS review)
+    year: '2020'
+    jurisdiction: England
+    what_happened: The review found patients affected by these interventions had been dismissed, overlooked
+      and ignored, and that the healthcare system was disjointed, siloed, unresponsive and defensive.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+    source_title: First Do No Harm
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Complaints data
+  - Patient surveys
+  - Family and patient-group testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clinicians often correctly reassure patients whose symptoms are benign
+  - Single complaints may reflect communication problems rather than unsafe care
+  jurisdictions: UK; general
+  version: 1
+- id: HC-010
+  name: Complaints and scrutiny handled as reputation management
+  definition: A provider puts more effort into managing complaints, litigation and press than into learning,
+    and fights regulators' findings line by line.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Para 1.158
+    quote: Throughout the period we have investigated, it was clear that the Trust prioritised reputation
+      management to the detriment of being open and straightforward with families, with regulators and
+      with others.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Para 1.53
+    quote: The task of regulators was made more difficult by the extent to which problems were denied;
+      this denial ran right through the Trust, from clinical staff to Trust Board level.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Trust raised hundreds of challenges to a 2014 CQC report, including grammar and spelling (East Kent,
+    para 1.160)
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Factual-accuracy responses to regulator reports (FOI)
+  - Board minutes
+  - Litigation records (e.g. NHS Resolution claims)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Providers are entitled to correct genuine factual errors in reports
+  - Defending some claims is legitimate
+  jurisdictions: UK; general
+  version: 1
+- id: HC-011
+  name: Critical external or internal reviews shelved
+  definition: A review by a royal college, auditor, peer reviewer or internal investigator finds serious
+    problems but is not acted on, is kept from the board or regulators, or is filed away.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Warning signs, Royal College of Surgeons report
+    quote: The report itself was known at the time only to the Trust and the relevant staff, and the Royal
+      College. It showed a state of affairs which would have been expected to cause serious concern to
+      the public, and any regulator, if known to them.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The Report of the Morecambe Bay Investigation
+    publisher: Morecambe Bay Investigation
+    year: '2015'
+    url: https://assets.publishing.service.gov.uk/media/5a7f3d7240f0b62305b85efb/47487_MBI_Accessible_v0.1.pdf
+    locator: Chapter 1 (Fielding Report)
+    quote: 'He described coming across the Fielding Report in a filing cabinet: “I was appalled, frankly.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC (Bishop Graham James)
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Chapter 1/5
+    quote: 'HEFT’s response to his investigation report in 2004 was inadequate and they did not act on
+      all the information in the report (source: Kennedy Review, 2013). Paterson continued to operate
+      on patients at HEFT for a further seven years.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - RCS 2007 report calling Mid Staffs surgery 'dysfunctional'
+  - Fielding Report at Morecambe Bay
+  - 2004 Wake investigation into Paterson
+  - 2016 RCOG report at East Kent dismissed as hearsay
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Royal college invited-review reports (FOI)
+  - Internal audit reports
+  - Board papers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some reviews are commissioned confidentially and acted on quietly
+  - Recommendations may be superseded by restructuring
+  jurisdictions: UK; general
+  version: 1
+- id: HC-012
+  name: Whistleblower or reforming manager forced out
+  definition: Staff who raise safety concerns or challenge poor behaviour leave, are moved, or are discouraged
+    from speaking, while the behaviour they challenged continues.
+  areas:
+  - HC
+  typology: Culture and whistleblowing
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Paras 1.41 and 1.43
+    quote: It seems to us that the Trust was disposed to replace staff in key managerial roles who identified
+      and challenged poor behaviour. The staff who remained were those who either personified the poor
+      culture or were prepared to live with it rather than question it.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: 'Warning signs: Whistleblowing'
+    quote: It is clear that a staff nurse’s report in 2007 made a serious and substantial allegation about
+      the leadership of A&E. This was not resolved by Trust management.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - East Kent Head of Midwifery resigned in 2015 after challenging bullying
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Employment tribunal judgments
+  - Freedom to Speak Up guardian reports
+  - Staff survey results
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff leave for ordinary career or personal reasons
+  - Some grievances against managers are well founded
+  jurisdictions: UK; general
+  version: 1
+- id: HC-013
+  name: Gagging or non-disparagement clauses limiting safety disclosures
+  definition: Settlement or employment agreements stop staff or patients from speaking about patient-safety
+    concerns.
+  areas:
+  - HC
+  typology: Culture and whistleblowing
+  status: verified
+  sources:
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Para 1.179
+    quote: For example, “gagging” or non-disparagement clauses should not be permitted to limit legitimate
+      disclosure of public interest issues concerning patient safety and care.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Settlement agreement with a departing clinician containing a confidentiality clause covering safety
+    concerns
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Contract
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Annual reports listing special severance payments
+  - FOI on settlement agreements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Confidentiality clauses are common in employment settlements and may not cover safety disclosures
+  - Protected-disclosure law may override such clauses
+  jurisdictions: UK (Francis recommendation); general
+  version: 1
+- id: HC-014
+  name: Tribal or dysfunctional working between professional groups
+  definition: Professional groups such as midwives and obstetricians work as rival camps, with mutual
+    distrust that delays recognising and escalating problems.
+  areas:
+  - HC
+  typology: Culture and whistleblowing
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Paras 1.21-1.22
+    quote: Some staff have acted as if they were responsible for separate fiefdoms, cultivating a culture
+      of tribalism. There have also been problems within obstetrics and within midwifery, with factionalism,
+      lack of mutual trust, and disregard for other points of view.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The Report of the Morecambe Bay Investigation
+    publisher: Morecambe Bay Investigation
+    year: '2015'
+    url: https://assets.publishing.service.gov.uk/media/5a7f3d7240f0b62305b85efb/47487_MBI_Accessible_v0.1.pdf
+    locator: Summary, para 10
+    quote: Many of the reactions of maternity unit staff at this stage were shaped by denial that there
+      was a problem, their rejection of criticism of them that they felt was unjustified (and which, on
+      occasion, turned to hostility) and a strong group mentality amongst midwives characterised as ‘the
+      musketeers’.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Summary of findings (escalation)
+    quote: The review team has also heard directly from staff that there was a culture of ‘them and us’
+      between the midwifery and obstetric staff, which engendered fear amongst midwives to escalate concerns
+      to consultants.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - '''The musketeers'' at Furness General Hospital'
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Employment
+  - Document
+  checkable: person
+  lookup_sources:
+  - Staff survey results
+  - Royal college reviews
+  - Staff interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Professional disagreement about care models is normal and can be healthy
+  - Tension often rises during staff shortages
+  jurisdictions: UK; general
+  version: 1
+- id: HC-015
+  name: Senior clinicians discourage escalation or will not attend
+  definition: Consultants expect juniors to cope alone, discourage being called, or do not come in out
+    of hours, and escalation brings no action.
+  areas:
+  - HC
+  typology: Culture and whistleblowing
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Para 1.24
+    quote: We also found that some obstetric consultants expected junior staff and locum doctors to manage
+      clinical problems themselves, discouraged escalation, and on occasion refused to attend out of hours.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Summary of findings (escalation)
+    quote: The review team has seen evidence within the cases reviewed that there was a lack of action
+      from senior clinicians following escalation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - On-call rotas
+  - Incident reports mentioning delayed attendance
+  - Clinical records timelines
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Senior staff may be busy with simultaneous emergencies
+  - Telephone advice can be clinically appropriate
+  jurisdictions: UK; general
+  version: 1
+- id: HC-016
+  name: Blame placed on juniors, locums or patients
+  definition: When things go wrong the provider attributes the cause to junior or temporary staff, or
+    to the patient, rather than to system problems.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Para 1.40
+    quote: In specific instances where things have gone wrong, the Trust has found it easier to attribute
+      the causes to individual clinical error, usually on the part of more junior staff, or to difficulties
+      with locum medical staff. But we have found that these are symptoms of the problems, not the root
+      causes.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Women blamed for their own outcomes (East Kent para 1.28)
+  cases: []
+  data_needed:
+  - Organization
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - Serious incident investigation reports
+  - Complaint responses
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Individual error does sometimes cause harm
+  - Locum supervision problems can be a genuine cause
+  jurisdictions: UK; general
+  version: 1
+- id: HC-017
+  name: Finances, targets or status prioritised over care
+  definition: Leaders pursue financial balance, access targets or a change of status (such as foundation
+    trust status) while known quality problems go unaddressed, including staff cuts.
+  areas:
+  - HC
+  typology: Governance failure
+  status: verified
+  sources:
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Introduction
+    quote: This failure was in part the consequence of allowing a focus on reaching national access targets,
+      achieving financial balance and seeking foundation trust status to be at the cost of delivering
+      acceptable standards of care.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: 'Warning signs: financial recovery plan'
+    quote: Savings in staff costs were being made in an organisation which was already identified as having
+      serious problems in delivering a service of adequate quality, and complying with minimum standards.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Mid Staffordshire staff cuts during foundation trust application
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Payment
+  - Event
+  checkable: records
+  lookup_sources:
+  - Annual accounts and cost-improvement plans
+  - Board papers
+  - Workforce data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - All providers must manage budgets and meet targets
+  - Savings plans can be designed to protect safety
+  jurisdictions: UK; general
+  version: 1
+- id: HC-018
+  name: Persistent staffing and training gaps
+  definition: A unit runs with staffing or training shortfalls, such as a labour ward coordinator with
+    a full caseload, or staff not trained on equipment, over long periods.
+  areas:
+  - HC
+  typology: Unsafe hospital or unit
+  status: verified
+  sources:
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Summary of findings (workforce)
+    quote: The review team identified how it was widely accepted that the labour ward coordinator did
+      not have supernumerary status, often having their own clinical caseload, preventing them from being
+      readily accessible to junior staff and the wider midwifery team for clinical advice, care planning
+      and support.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Monitoring the Mental Health Act 2022/23: Closed cultures'
+    publisher: Care Quality Commission
+    year: '2023'
+    url: https://cqc.org.uk/publications/monitoring-mental-health-act/2022-2023/closed-cultures
+    locator: Closed cultures
+    quote: Many of the concerns raised in this report, for example around consistent staff shortages and
+      lack of training and supervision of staff, are inherent risk factors and potential warning signs
+      of when closed cultures could be developing.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Shrewsbury and Telford trust convicted in 2022 after failing to train staff on dialysis line safety
+    and bariatric beds
+  cases:
+  - name: Shrewsbury and Telford Hospital NHS Trust (CQC prosecution)
+    year: '2022'
+    jurisdiction: England
+    what_happened: The trust pleaded guilty to failing to provide safe care and treatment to two patients
+      who died, including failure to train staff, and was fined £1,333,334.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://cqc-newsroom.prgloo.com/news/cqc-prosecutes-shrewsbury-and-telford-hospital-nhs-trust-following-two-patient-deaths
+    source_title: CQC prosecutes Shrewsbury and Telford Hospital NHS Trust following two patient deaths
+  data_needed:
+  - PublicBody
+  - Employment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Workforce and vacancy data
+  - Mandatory training compliance in board papers
+  - Regulator inspection reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - National workforce shortages affect most providers
+  - Recruitment difficulties in remote areas
+  jurisdictions: UK; general
+  version: 1
+- id: HC-019
+  name: Poor staff or patient survey results ignored
+  definition: Staff surveys show low morale or fear of reporting, or patient surveys rank the provider
+    among the worst, without action.
+  areas:
+  - HC
+  typology: Governance failure
+  status: verified
+  sources:
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: 'Warning signs: Surveys'
+    quote: The 2007 inpatient survey, while identifying many areas in which the Trust did well or performed
+      satisfactorily, in several areas rated the Trust as being in the worst performing 20% in the country.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Para 1.14
+    quote: Staff did report many incidents which occurred because of short staffing, exhibited poor morale
+      in their responses to staff surveys, and received only ineffective representation of concerns from
+      the RCN.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - NHS Staff Survey results
+  - CQC adult inpatient and maternity surveys
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: In the worst-performing 20% nationally on several areas (as cited for Mid Staffordshire)
+    threshold_source: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Response rates may be low
+  - Morale can dip during reorganisation without affecting safety
+  jurisdictions: UK; general
+  version: 1
+- id: HC-020
+  name: Praise for a low-intervention metric while harm accumulates
+  definition: A unit is praised for a low rate of an intervention, such as caesarean sections, and the
+    focus on that metric or ideology overrides safe care.
+  areas:
+  - HC
+  typology: Unsafe hospital or unit
+  status: verified
+  sources:
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Para 15.10
+    quote: The recognition that Shrewsbury and Telford Hospital NHS Trust had a lower than average caesarean
+      section rate (and was often praised for this) was identified in our first report.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The Report of the Morecambe Bay Investigation
+    publisher: Morecambe Bay Investigation
+    year: '2015'
+    url: https://assets.publishing.service.gov.uk/media/5a7f3d7240f0b62305b85efb/47487_MBI_Accessible_v0.1.pdf
+    locator: Para 1.4
+    quote: Third, midwifery care in the unit became strongly influenced by a small number of dominant
+      individuals whose over-zealous pursuit of the natural childbirth approach led at times to inappropriate
+      and unsafe care.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Shrewsbury and Telford caesarean rate of 14% in 2005 against a UK average of 23.2%, noted by the Healthcare
+    Commission (Ockenden)
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - NHS Maternity Services Data Set
+  - Trust annual reports and awards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Low intervention rates can reflect good care and a low-risk population
+  - Natural birth is beneficial for low-risk women, as the Morecambe Bay report itself notes
+  jurisdictions: UK; general
+  version: 1
+- id: HC-021
+  name: False reassurance from ratings, awards or reviews
+  definition: Good ratings, awards or light-touch reviews are treated as proof of safety while signs of
+    harm and family complaints build up.
+  areas:
+  - HC
+  typology: Regulatory failure
+  status: verified
+  sources:
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Summary
+    quote: The review team is concerned that some of the findings from these reviews gave false reassurance
+      about maternity services at the Trust, despite repeated concerns being raised by families.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Warning signs (list of causes)
+    quote: An institutional culture which ascribed more weight to positive information about the service
+      than to information capable of implying cause for concern
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - East Kent named Trust of the Year in a 2010 hospital guide (Kirkup para 4.129)
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Regulator ratings history
+  - Commissioner quality reviews
+  - Award listings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ratings often reflect genuinely good performance in many areas
+  - Inspections sample only part of a service
+  jurisdictions: UK; general
+  version: 1
+- id: HC-022
+  name: Many oversight bodies, none acting
+  definition: Several regulators and professional bodies hold pieces of concerning information but each
+    assumes another will act, or they do not share it.
+  areas:
+  - HC
+  typology: Regulatory failure
+  status: verified
+  sources:
+  - title: 'Report of the Mid Staffordshire NHS Foundation Trust Public Inquiry: Executive summary'
+    publisher: Mid Staffordshire NHS Foundation Trust Public Inquiry
+    year: '2013'
+    url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+    locator: Warning signs (list of causes)
+    quote: A failure of communication between the many agencies to share their knowledge of concerns;
+      Assumptions that monitoring, performance management or intervention was the responsibility of someone
+      else
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Reading the signals: Maternity and neonatal services in East Kent'
+    publisher: Independent Investigation for UK DHSC
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+    locator: Para 1.50
+    quote: We have found that the Trust was faced with a bewildering array of regulatory and supervisory
+      bodies, but the system as a whole failed to identify the shortcomings early enough and clearly enough
+      to ensure that real improvement followed.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Monitor unaware of Healthcare Commission concerns when it authorised Mid Staffordshire as a foundation
+    trust
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Document
+  - Event
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - FOI to each regulator for correspondence about the provider
+  - Regulator board papers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legal limits on information-sharing between bodies
+  - Bodies have different statutory remits
+  jurisdictions: UK; general
+  version: 1
+- id: HC-023
+  name: Coordinated accounts before an inquest or investigation
+  definition: Staff accounts for an inquest or investigation are aligned or coached, often helped by someone
+    holding conflicting roles such as risk manager and staff representative.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: The Report of the Morecambe Bay Investigation
+    publisher: Morecambe Bay Investigation
+    year: '2015'
+    url: https://assets.publishing.service.gov.uk/media/5a7f3d7240f0b62305b85efb/47487_MBI_Accessible_v0.1.pdf
+    locator: Summary, para 10
+    quote: We also found evidence of inappropriate distortion of the process of preparation for an inquest,
+      with circulation of what we could only describe as ‘model answers’. Central to this was the conflict
+      of roles of one individual who inappropriately combined the functions of senior midwife, maternity
+      risk manager, supervisor of midwives and staff representative.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - '''Model answers'' circulated before an inquest at Furness General Hospital'
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Inquest transcripts and witness statements
+  - Coroner reports (Rule 43 / prevention of future deaths)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff legitimately receive support and legal advice before giving evidence
+  - Similar wording can result from shared training or protocols
+  jurisdictions: UK; general
+  version: 1
+- id: HC-024
+  name: Clinical records missing, destroyed or completed after the event
+  definition: Key clinical records disappear, are destroyed, are filled in after the event, or turn up
+    late in storage.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: The Report of the Morecambe Bay Investigation
+    publisher: Morecambe Bay Investigation
+    year: '2015'
+    url: https://assets.publishing.service.gov.uk/media/5a7f3d7240f0b62305b85efb/47487_MBI_Accessible_v0.1.pdf
+    locator: Chapter 1
+    quote: Although we could not entirely discount the possibility that these instances were coincidental
+      – and clinical records, particularly observation charts, frequently do go missing in hospitals –
+      neither could we escape a significant suspicion that their occurrence was convenient to those involved
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Summary
+    quote: Deliberate destruction of some documents and the loss of others.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Final report of the Ockenden review
+    publisher: Independent Review of Maternity Services at The Shrewsbury and Telford Hospital NHS Trust
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+    locator: Para 2.30
+    quote: In the summer of 2021 we were advised by the Trust that it had located many boxes of documents
+      potentially relating to former patients and staff, which had been stored in an unused accommodation
+      block.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 171 boxes of maternity records found in an unused accommodation block (Ockenden)
+  cases:
+  - name: Infected blood and blood products (UK)
+    year: '2024'
+    jurisdiction: United Kingdom
+    what_happened: The inquiry found the truth was hidden for decades, including deliberate destruction
+      of some documents and loss of others, and use of misleading lines to take.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    source_title: 'Infected Blood Inquiry: The Report, Volume 1'
+  data_needed:
+  - Document
+  - Organization
+  - Event
+  checkable: records
+  lookup_sources:
+  - Subject access requests for medical records
+  - Records retention and destruction policies (FOI)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Records are lawfully destroyed under retention schedules
+  - Records go missing through ordinary error, as the Morecambe Bay report acknowledges
+  jurisdictions: UK; general
+  version: 1
+- id: HC-025
+  name: Unnecessary procedures or treatment outside recognised practice
+  definition: A clinician performs operations or treatments that were not needed or that are not a recognised
+    technique.
+  areas:
+  - HC
+  typology: Dangerous practitioner
+  status: verified
+  sources:
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC (Bishop Graham James)
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Foreword
+    quote: They were initially let down by a consultant surgeon who performed inappropriate or unnecessary
+      procedures and operations.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Chapter 3, Patient accounts
+    quote: The term “cleavage sparing mastectomy” is mentioned in some of the patient accounts. This procedure
+      has no definition and is not a recognised practice.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - '''Cleavage sparing mastectomy'' leaving breast tissue behind (Paterson)'
+  cases:
+  - name: Ian Paterson
+    year: '2017'
+    jurisdiction: England
+    what_happened: Convicted of 17 counts of wounding with intent and three of unlawful wounding relating
+      to private patients treated between 1997 and 2011; sentence increased to 20 years on appeal.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    source_title: Report of the Independent Inquiry into the issues raised by Paterson
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Hospital procedure volumes by consultant
+  - Private insurer claims data
+  - Patient recall reviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The Paterson inquiry records a patient believing unnecessary private procedures were about
+      'organising his future income'; billing for unnecessary procedures overlaps health-care billing
+      fraud.
+    source_url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+  innocent_explanations:
+  - Clinicians legitimately disagree about thresholds for surgery
+  - New techniques are introduced under proper governance
+  jurisdictions: UK; general
+  version: 1
+- id: HC-026
+  name: Clinician acts as sole decision-maker outside team review
+  definition: Treatment decisions that guidance says should go to a multidisciplinary team are made by
+    one clinician, or team meetings exist only on paper.
+  areas:
+  - HC
+  typology: Dangerous practitioner
+  status: verified
+  sources:
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Chapter 4, MDTs (independent sector)
+    quote: We heard that generally Paterson was the sole decision maker about patients’ care and when
+      MDT meetings did take place, they were usually only attended by him and his breast care nurse, and
+      that very often a pathologist or radiologist was not present.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - MDT attendance records and minutes
+  - Regulator inspection reports on independent hospitals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some private patients' cases are discussed at NHS MDTs instead
+  - Small units may share MDTs with other hospitals
+  jurisdictions: UK; general
+  version: 1
+- id: HC-027
+  name: Colleagues' concerns about a practitioner unresolved for years
+  definition: Colleagues raise repeated concerns about a clinician's practice over a long period but the
+    practitioner keeps operating.
+  areas:
+  - HC
+  typology: Dangerous practitioner
+  status: verified
+  sources:
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Chapter 1
+    quote: Clinical colleagues first raised serious questions about his surgical procedures and medical
+      practice in 2003. Ultimately, he was suspended by HEFT in 2011 and Spire suspended his right to
+      practise at its hospitals later that year.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Chapter 7 (governance and culture)
+    quote: Some could have known, while others should have known, and a few must have known.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Six colleagues wrote to the HEFT chief executive in December 2007 about Paterson
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Medical regulator (GMC) fitness-to-practise records
+  - Employer investigation reports
+  - Board minutes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Interpersonal conflict can generate unfounded complaints
+  - Investigations take time to be fair to the clinician
+  jurisdictions: UK; general
+  version: 1
+- id: HC-028
+  name: Practitioner moves on after losing privileges
+  definition: A clinician who loses or gives up privileges at one hospital, or is under investigation
+    there, quickly gains privileges at another, or keeps working in a second sector that is not told.
+  areas:
+  - HC
+  typology: Dangerous practitioner
+  status: verified
+  sources:
+  - title: Duntsch v. State, No. 05-17-00235-CR (dissenting opinion)
+    publisher: Court of Appeals, Fifth District of Texas at Dallas
+    year: '2018'
+    url: https://cases.justia.com/texas/fifth-court-of-appeals/2018-05-17-00235-cr-0.pdf
+    locator: Dissenting opinion, Part I
+    quote: While jurors heard that in the four months between losing privileges at Baylor Plano and gaining
+      privileges at Dallas Medical Center (“DMC”), appellant did not perform any surgeries, the State
+      offered no evidence of the total number of procedures appellant performed during the period that
+      yielded the five negative results prior to his procedure on Ms. Efurd.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Chapter 4, practising privileges
+    quote: They also told us that they would “mirror” suspension of consultants in the NHS, if information
+      was shared with them, but pointed out that this did not always happen.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Christopher Duntsch moved from Baylor Plano to Dallas Medical Center
+  cases:
+  - name: Christopher Duntsch
+    year: '2017'
+    jurisdiction: Texas, US
+    what_happened: A jury convicted the neurosurgeon of intentionally or knowingly causing serious bodily
+      injury to an elderly patient during surgery; the conviction and life sentence were affirmed on appeal
+      in 2018.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://cases.justia.com/texas/fifth-court-of-appeals/2018-05-17-00235-cr-0.pdf
+    source_title: Duntsch v. State (Tex. App. Dallas)
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - Event
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - State medical board licence histories
+  - US National Practitioner Data Bank (restricted access)
+  - GMC register and practising details
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clinicians move hospitals for ordinary career reasons
+  - Privileges may lapse for administrative reasons such as relocation
+  jurisdictions: US; UK (NHS and independent sector)
+  version: 1
+- id: HC-029
+  name: Hospital never reports privilege sanctions
+  definition: A hospital has never, or very rarely, filed the reports to the national practitioner database
+    that the law requires when it restricts or removes a doctor's privileges.
+  areas:
+  - HC
+  typology: Regulatory failure
+  status: verified
+  sources:
+  - title: Hospitals Drop the Ball on Physician Oversight
+    publisher: Public Citizen
+    url: https://www.citizen.org/article/hospitals-drop-the-ball-on-physician-oversight/
+    locator: Summary
+    quote: 49 percent of U.S. hospitals (2,845 of 5,823) have never submitted a clinical privilege sanction
+      report on a physician
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Physician Sexual Misconduct: Report and Recommendations of the FSMB Workgroup on Physician
+      Sexual Misconduct'
+    publisher: Federation of State Medical Boards
+    year: '2020'
+    url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+    locator: Section 5
+    quote: Hospitals should also be required to report to state medical boards instances where employed
+      physicians have been dismissed or are forced to resign due to concerns related to sexual misconduct.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - NPDB Public Use Data File (de-identified)
+  - State medical board disciplinary actions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Never reported a privilege restriction of more than 30 days despite the federal requirement
+    threshold_source: https://www.citizen.org/article/hospitals-drop-the-ball-on-physician-oversight/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small hospitals may genuinely never have restricted anyone
+  - Resignations before formal action may fall outside the reporting rule
+  jurisdictions: US
+  version: 1
+- id: HC-030
+  name: Indemnity cover withdrawn from a practitioner
+  definition: A clinician's medical defence organisation or malpractice insurer withdraws or refuses cover,
+    which can signal serious concerns about practice.
+  areas:
+  - HC
+  typology: Dangerous practitioner
+  status: verified
+  sources:
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Chapter 5
+    quote: In 2013, the Medical Defence Union (MDU), the organisation that provided clinical indemnity
+      cover to Paterson in the independent sector, threatened to withdraw his cover (and eventually did
+      so), meaning that it refused to make money available to compensate patients.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Contract
+  - Event
+  checkable: records
+  lookup_sources:
+  - Civil court filings
+  - Practising-privileges records requiring proof of indemnity
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cover can lapse because of retirement, cost or a change of employer
+  jurisdictions: UK; general
+  version: 1
+- id: HC-031
+  name: Inadequate recall of affected patients
+  definition: After a practitioner or device is found unsafe, the recall of affected patients is slow,
+    incomplete or inconsistent.
+  areas:
+  - HC
+  typology: Dangerous practitioner
+  status: verified
+  sources:
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Foreword
+    quote: The recall of patients did not put their safety and care first, which led many of them to consider
+      the Heart of England NHS Foundation Trust and Spire were primarily concerned for their own reputation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Patient recalled while a relative treated by the same surgeon was not (Paterson patient 218)
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Recall letters and helpline records
+  - Patient testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Identifying every affected patient from old records is genuinely difficult
+  - Some patients move or cannot be traced
+  jurisdictions: UK; general
+  version: 1
+- id: HC-032
+  name: Treatment without informed consent
+  definition: Patients are not told the risks of, or alternatives to, a treatment or device, consent is
+    taken at the last minute, or second opinions are refused.
+  areas:
+  - HC
+  typology: Consent and research ethics
+  status: verified
+  sources:
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Summary
+    quote: Failing to tell people of the risks of treatment and of available alternative treatments, thus
+      treating them without their informed consent.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Report of the Independent Inquiry into the issues raised by Paterson
+    publisher: UK DHSC
+    year: '2020'
+    url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+    locator: Chapter 3, patient 7
+    quote: Paterson also refused patient 7’s request for a second opinion and told her, “mine is the greatest
+      opinion”.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: First Do No Harm
+    publisher: Independent Medicines and Medical Devices Safety Review
+    year: '2020'
+    url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+    locator: Contents, Theme 3
+    quote: 'Theme 3: ‘I was never told’ – the failure of informed consent'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Consent form signed on a trolley on the day of surgery (Paterson patient 7)
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Consent forms in medical records
+  - Patient testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Emergency care can require rapid consent
+  - Patients may not recall consent discussions that did happen
+  jurisdictions: UK; general
+  version: 1
+- id: HC-033
+  name: Patients used in research or tested without being told
+  definition: Patients' samples are tested or patients are enrolled in research without their knowledge
+    or properly informed consent.
+  areas:
+  - HC
+  typology: Consent and research ethics
+  status: verified
+  sources:
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Summary
+    quote: Testing samples (which in most cases patients did not know were to be retained for the purpose)
+      without their knowledge or consent.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Summary
+    quote: Conducting research on people without, in many cases, telling them (or in the case of children,
+      their parents) beforehand, or informing them of the risks and whether the research would enhance
+      their treatment or primarily benefit others, and without obtaining properly informed consent.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Published research papers naming cohorts
+  - Ethics committee approvals
+  - Medical records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Anonymised audit or surveillance can be lawful without individual consent
+  - Consent standards were different in earlier decades
+  jurisdictions: UK; general
+  version: 1
+- id: HC-034
+  name: Patients not told they are infected or harmed
+  definition: Patients found to have an infection or harm from treatment are told late, by insensitive
+    means, or not at all.
+  areas:
+  - HC
+  typology: Concealment and failure to investigate
+  status: verified
+  sources:
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Summary
+    quote: Delaying informing people of their infections by weeks, months and sometimes years.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Summary
+    quote: In some cases, failing to tell people that they were infected and thereby denying them the
+      opportunity to control the progression of their own illness more effectively and to prevent the
+      spread of infection to others close to them.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Medical records showing test dates against notification dates
+  - Patient testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Results may be lost or delayed through administrative error
+  - Patients may have moved and been hard to reach
+  jurisdictions: UK; general
+  version: 1
+- id: HC-035
+  name: Official 'lines to take' that understate a health risk
+  definition: Government or health bodies repeat reassuring statements, such as 'no conclusive proof',
+    that understate a known or likely risk.
+  areas:
+  - HC
+  typology: Public health cover-up
+  status: verified
+  sources:
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Summary
+    quote: Repeated use of inaccurate, misleading and defensive lines to take which cruelly told people
+      that they had received the best treatment available.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Summary
+    quote: Adopting the wrong approach by looking for conclusive proof of what was the cause of AIDS rather
+      than asking if there was a real risk that blood might transmit it.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 1983 'no conclusive proof' line on AIDS and blood products
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Ministerial briefings and parliamentary answers
+  - Archived press statements
+  - National archives releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Early in an emerging risk the evidence genuinely is uncertain
+  - Officials try to avoid causing panic or people stopping needed treatment
+  jurisdictions: UK; general
+  version: 1
+- id: HC-036
+  name: Repeated refusal of a public inquiry or redress
+  definition: Government or a provider refuses for years to hold an inquiry or compensate people harmed
+    by treatment.
+  areas:
+  - HC
+  typology: Public health cover-up
+  status: verified
+  sources:
+  - title: 'Infected Blood Inquiry: The Report, Volume 1'
+    publisher: Infected Blood Inquiry (UK)
+    year: '2024'
+    url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+    locator: Overview
+    quote: the defensiveness of government, through its publication of a self-sufficiency chronology,
+      its repeated use of indefensible lines to take and its refusal over decades to hold a public inquiry.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Parliamentary records (Hansard)
+  - Government responses to petitions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Governments may judge that other reviews or litigation are the right route
+  - Inquiries are costly and can delay redress
+  jurisdictions: UK; general
+  version: 1
+- id: HC-037
+  name: Device deaths recorded as malfunctions or injuries
+  definition: Adverse-event reports describe a patient death in the text but are coded as a malfunction
+    or injury.
+  areas:
+  - HC
+  typology: Medical device harm
+  status: verified
+  sources:
+  - title: 'Algorithms, analysis and adverse events: How ICIJ used machine learning to help find medical
+      device issues'
+    publisher: International Consortium of Investigative Journalists
+    year: '2018'
+    url: https://www.icij.org/investigations/implant-files/algorithms-analysis-and-adverse-events-how-icij-used-machine-learning-to-help-find-medical-device-issues/
+    locator: Methodology
+    quote: ICIJ found 2,100 cases in which patients died, but their deaths were classified as device malfunctions
+      or injuries. Of these, 220 reports indicated that devices may have caused or contributed to the
+      deaths.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Manufacturer and User Facility Device Experience Database - MAUDE
+    publisher: US Food and Drug Administration
+    url: https://www.fda.gov/medical-devices/mandatory-reporting-requirements-manufacturers-importers-and-device-user-facilities/manufacturer-and-user-facility-device-experience-database-maude
+    locator: Limitations of Medical Device Reports (MDRs)
+    quote: The incidence, prevalence, or cause of an event cannot be determined from this reporting system
+      alone due to under-reporting of events, inaccuracies in reports, lack of verification that the device
+      caused the reported event, and lack of information about frequency of device use.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Narrative text such as 'the patient expired' in a report coded as malfunction
+  cases:
+  - name: The Implant Files
+    year: '2018'
+    jurisdiction: International
+    what_happened: ICIJ and partners analysed over 5.4 million MAUDE reports and other records and reported
+      that malfunctioning devices were linked to over 1.7 million injuries and nearly 83,000 deaths in
+      a decade.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.icij.org/investigations/implant-files/algorithms-analysis-and-adverse-events-how-icij-used-machine-learning-to-help-find-medical-device-issues/
+    source_title: Algorithms, analysis and adverse events
+  data_needed:
+  - Company
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - FDA MAUDE database
+  - FDA recall database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - FDA states a report should not be classed as a death unless the reporter believes the device was or
+    may have been a factor
+  - Text may refer to a relative's death or an expired device, which ICIJ had to filter out
+  jurisdictions: US (FDA MAUDE); method transferable
+  version: 1
+- id: HC-038
+  name: Adverse events filed through a non-public channel
+  definition: A manufacturer's adverse-event reports were sent under an exemption or summary programme
+    that kept them out of the public database.
+  areas:
+  - HC
+  typology: Medical device harm
+  status: verified
+  sources:
+  - title: Statement on agency's efforts to increase transparency in medical device reporting
+    publisher: US Food and Drug Administration (Jeff Shuren, CDRH)
+    year: '2019'
+    url: https://www.fda.gov/news-events/press-announcements/statement-agencys-efforts-increase-transparency-medical-device-reporting
+    locator: Statement
+    quote: First, we have formally ended the Alternative Summary Reporting (ASR) Program.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Statement on agency's efforts to increase transparency in medical device reporting
+    publisher: US Food and Drug Administration
+    year: '2019'
+    url: https://www.fda.gov/news-events/press-announcements/statement-agencys-efforts-increase-transparency-medical-device-reporting
+    locator: Statement
+    quote: Today, the agency also posted ASR data submitted to the FDA from 1999 to 2019.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - FDA released ASR data 1999-2019
+  - MAUDE
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The ASR programme was an FDA-granted exemption, so use of it was lawful at the time
+  - Summary reporting was meant for well-understood, routine events
+  jurisdictions: US
+  version: 1
+- id: HC-039
+  name: Device recalls or safety notices in several countries
+  definition: The same device is subject to recalls, safety alerts or field safety notices across several
+    countries.
+  areas:
+  - HC
+  typology: Medical device harm
+  status: verified
+  sources:
+  - title: Algorithms, analysis and adverse events
+    publisher: International Consortium of Investigative Journalists
+    year: '2018'
+    url: https://www.icij.org/investigations/implant-files/algorithms-analysis-and-adverse-events-how-icij-used-machine-learning-to-help-find-medical-device-issues/
+    locator: Methodology
+    quote: ICIJ and its media partners also used device approval datasets, recall notices, “adverse event”
+      reports data available in different countries and U.S. Securities and Exchange Commission corporate
+      filings for its analysis.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - ICIJ International Medical Devices Database
+  - FDA recalls
+  - MHRA field safety notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many recalls are precautionary or about labelling
+  - Widely sold devices accumulate more notices simply through volume
+  jurisdictions: International
+  version: 1
+- id: HC-040
+  name: Patient-reported harm far exceeds official reports
+  definition: Patients and campaigners report many harms from a medicine or device while official adverse-event
+    reports and registries show few or cannot count them.
+  areas:
+  - HC
+  typology: Medical device harm
+  status: verified
+  sources:
+  - title: First Do No Harm
+    publisher: Independent Medicines and Medical Devices Safety Review
+    year: '2020'
+    url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+    locator: Chapter 1, para 1.20
+    quote: But it is clear that there is gross under-reporting, and our complaints systems are both too
+      complex and too diffuse to allow early signal detection.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: First Do No Harm
+    publisher: Independent Medicines and Medical Devices Safety Review
+    year: '2020'
+    url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+    locator: Chapter 1, para 1.16
+    quote: The system does not know, so neither do we, just how many women have been treated for stress
+      urinary incontinence and the repair of pelvic organ prolapse using polypropylene mesh.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Pelvic mesh in England
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Document
+  - Organization
+  checkable: lookups
+  lookup_sources:
+  - MHRA Yellow Card data
+  - FDA MAUDE
+  - Patient group surveys
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Spontaneous reporting systems under-report for all products
+  - Patient groups attract people with bad outcomes
+  jurisdictions: UK; US
+  version: 1
+- id: HC-041
+  name: Clinician has undeclared financial ties to a manufacturer
+  definition: A clinician promoting or using a medicine or device receives payments from its maker that
+    are not declared.
+  areas:
+  - HC
+  typology: Medical device harm
+  status: verified
+  sources:
+  - title: First Do No Harm
+    publisher: Independent Medicines and Medical Devices Safety Review
+    year: '2020'
+    url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+    locator: Chapter 1, para 1.50
+    quote: We have been concerned by conflicts of interest, both potential and real, in the provision
+      of care or treatment, particularly where doctors have financial and other links with the pharmaceutical
+      and medical device companies. Currently there is no central register of clinicians’ financial and
+      non-financial interests.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Employment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - CMS Open Payments (US)
+  - Disclosure UK (ABPI)
+  - Journal conflict-of-interest declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The IMMDS review recommends a statutory register of payments to clinicians like the US Physician
+      Payments Sunshine Act, linking device harm to financial-interest checks.
+    source_url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+  innocent_explanations:
+  - Industry pays clinicians for legitimate research and training
+  - Declarations may be made in places not easily searched
+  jurisdictions: UK; US (Open Payments under the Sunshine Act)
+  version: 1
+- id: HC-042
+  name: Grooming or boundary-crossing behaviour by a clinician
+  definition: A clinician shows behaviours that regulators list as precursors to sexual misconduct, such
+    as gifts, special treatment or 'romantic' contact with a patient.
+  areas:
+  - HC
+  typology: Physician sexual misconduct
+  status: verified
+  sources:
+  - title: 'Physician Sexual Misconduct: Report and Recommendations of the FSMB Workgroup on Physician
+      Sexual Misconduct'
+    publisher: Federation of State Medical Boards
+    year: '2020'
+    url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+    locator: Section 2 (definitions), note on grooming
+    quote: Physician sexual misconduct often takes place along a continuum of escalating severity. This
+      continuum comprises a variety of behaviors, sometimes beginning with “grooming” behaviors which
+      may not necessarily constitute misconduct on their own, but are precursors to other, more severe
+      violations.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Physician Sexual Misconduct: Report and Recommendations of the FSMB Workgroup'
+    publisher: Federation of State Medical Boards
+    year: '2020'
+    url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+    locator: Section 2
+    quote: So-called “romantic” behavior between a physician and a patient is never appropriate, regardless
+      of the appearance of consent on the part of the patient.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - State medical board orders
+  - Docinfo.org
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary kindness and rapport-building are part of good care
+  - FSMB notes such behaviours may not constitute misconduct on their own
+  jurisdictions: US (state medical boards)
+  version: 1
+- id: HC-043
+  name: Intimate examinations without clinical justification or consent
+  definition: Complaints or board findings describe intimate examinations done without a clinical reason,
+    explanation, or informed consent, or in front of others without consent.
+  areas:
+  - HC
+  typology: Physician sexual misconduct
+  status: verified
+  sources:
+  - title: 'Physician Sexual Misconduct: Report and Recommendations of the FSMB Workgroup'
+    publisher: Federation of State Medical Boards
+    year: '2020'
+    url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+    locator: Section 2
+    quote: Additional examples of sexual misconduct involve physical contact, such as performing an intimate
+      examination on a patient with or without gloves and without clinical justification or explanation
+      of its necessity, and without obtaining informed consent.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Addressing Sexual Boundaries: Guidelines for State Medical Boards'
+    publisher: Federation of State Medical Boards (Journal of Medical Regulation)
+    year: '2006'
+    url: https://www.jmronline.org/content/92/2/15
+    locator: Sexual impropriety
+    quote: Sexual impropriety may comprise behavior, gestures, or expressions that are seductive, sexually
+      suggestive, disrespectful of patient privacy, or sexually demeaning to a patient
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases:
+  - name: AJC 'Doctors & Sex Abuse' investigation
+    year: '2016'
+    jurisdiction: United States
+    what_happened: The Atlanta Journal-Constitution analysed more than 100,000 medical board documents
+      and reported that more than 3,100 doctors had faced public accusations of sexual misconduct from
+      1999 to 2015.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://doctors.ajc.com/
+    source_title: Doctors & Sex Abuse
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - State medical board orders
+  - Court records
+  - Docinfo.org
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many intimate examinations are clinically necessary; complaints can stem from poor explanation rather
+    than misconduct
+  jurisdictions: US (state medical boards)
+  version: 1
+- id: HC-044
+  name: Prior complaints or settlements show a pattern
+  definition: A clinician facing a new complaint has earlier complaints, malpractice claims or settlements
+    of a similar kind.
+  areas:
+  - HC
+  typology: Physician sexual misconduct
+  status: verified
+  sources:
+  - title: 'Physician Sexual Misconduct: Report and Recommendations of the FSMB Workgroup'
+    publisher: Federation of State Medical Boards
+    year: '2020'
+    url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+    locator: Section 6, investigations
+    quote: Where permitted by state law, the investigation should include a review of previous complaints
+      to identify any such patterns of behavior, including malpractice claims and settlements.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Payment
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - State court civil dockets
+  - State medical board public profiles
+  - Malpractice payment data where public
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-risk specialties attract more claims
+  - Settlements are often made without admission of fault
+  jurisdictions: US
+  version: 1
+- id: HC-045
+  name: Board resolves misconduct privately or demands corroboration
+  definition: A licensing board handles sexual-misconduct cases through private agreements or warning
+    letters, or will not act without corroboration of the patient's account.
+  areas:
+  - HC
+  typology: Regulatory failure
+  status: verified
+  sources:
+  - title: 'Physician Sexual Misconduct: Report and Recommendations of the FSMB Workgroup'
+    publisher: Federation of State Medical Boards
+    year: '2020'
+    url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+    locator: Section 7, disclosure
+    quote: The use of private agreements or letters of warning in cases involving sexual misconduct is
+      inappropriate because of the importance of disclosure for public protection and data sharing with
+      other state medical boards or medical regulatory authorities from other jurisdictions.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Physician Sexual Misconduct: Report and Recommendations of the FSMB Workgroup'
+    publisher: Federation of State Medical Boards
+    year: '2020'
+    url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+    locator: Initiation of Charges
+    quote: In assessing whether sufficient evidence exists to support a finding that sexual misconduct
+      has occurred, corroboration of a patient’s testimony should not be required. Although establishing
+      a pattern of sexual misconduct may be significant, a single case is sufficient to proceed with a
+      formal hearing.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Person
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - State medical board orders and statutes
+  - FOI/public-records requests for non-public actions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - State law may require some actions to be confidential
+  - Evidence may genuinely be insufficient to proceed
+  jurisdictions: US
+  version: 1
+- id: HC-046
+  name: Unofficial waiting lists or manipulated wait times
+  definition: A health system keeps patients off its official waiting list or alters recorded dates so
+    reported wait times meet performance targets.
+  areas:
+  - HC
+  typology: Veterans and public health-system access
+  status: verified
+  sources:
+  - title: Review of Alleged Patient Deaths, Patient Wait Times, and Scheduling Practices at the Phoenix
+      VA Health Care System
+    publisher: VA Office of Inspector General
+    year: '2014'
+    url: https://www.vaoig.gov/sites/default/files/reports/2014-08/VAOIG-14-02603-267.pdf
+    locator: Executive summary
+    quote: However, as our work progressed, we identified over 3,500 additional veterans, many of whom
+      were on what we determined to be unofficial wait lists, waiting to be scheduled for appointments
+      but not on PVAHCS’s official EWL.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Review of Alleged Patient Deaths, Patient Wait Times, and Scheduling Practices at the Phoenix
+      VA Health Care System
+    publisher: VA Office of Inspector General
+    year: '2014'
+    url: https://www.vaoig.gov/sites/default/files/reports/2014-08/VAOIG-14-02603-267.pdf
+    locator: Prior OIG reports
+    quote: OIG found that it was an accepted past practice at the medical center to alter appointments
+      to avoid wait times greater than 30 days and that some employees still continued that practice.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Phoenix VA unofficial wait lists; 'desired date' manipulation
+  cases:
+  - name: Phoenix VA Health Care System
+    year: '2014'
+    jurisdiction: Arizona, US
+    what_happened: VA OIG found unofficial wait lists and inappropriate scheduling that delayed veterans'
+      care, identified 28 clinically significant delays, and said investigations confirmed wait-time manipulation
+      was prevalent throughout VHA.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.vaoig.gov/sites/default/files/reports/2014-08/VAOIG-14-02603-267.pdf
+    source_title: Review of Alleged Patient Deaths, Patient Wait Times, and Scheduling Practices at the
+      Phoenix VA Health Care System
+  data_needed:
+  - PublicBody
+  - Document
+  - Person
+  - Event
+  checkable: records
+  lookup_sources:
+  - VA OIG reports
+  - Published VA wait-time data
+  - Scheduler interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paper lists are sometimes used during system outages
+  - Patients may legitimately ask for later dates
+  jurisdictions: US (VA); general
+  version: 1
+- id: HC-047
+  name: Patients dying while waiting for care
+  definition: Patients die while on a waiting list for an appointment, and reviews find clinically significant
+    delays.
+  areas:
+  - HC
+  typology: Veterans and public health-system access
+  status: verified
+  sources:
+  - title: Review of Alleged Patient Deaths, Patient Wait Times, and Scheduling Practices at the Phoenix
+      VA Health Care System
+    publisher: VA Office of Inspector General
+    year: '2014'
+    url: https://www.vaoig.gov/sites/default/files/reports/2014-08/VAOIG-14-02603-267.pdf
+    locator: Executive summary
+    quote: From our review of PVAHCS electronic records, we were able to identify 40 patients who died
+      while on the EWL during the period April 2013 through April 2014.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Wait-list extracts by FOI
+  - Death records matched to wait lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - OIG said it could not conclusively assert that delays caused the deaths; many patients on any list
+    die of unrelated causes
+  jurisdictions: US (VA); general
+  version: 1
+- id: HC-048
+  name: Clinical trial site fabricates subjects or visits
+  definition: A trial site records participants, visits or study-drug use that did not happen.
+  areas:
+  - HC
+  typology: Clinical-trial site fraud
+  status: verified
+  sources:
+  - title: Medical Doctor and Study Coordinator Sentenced to Prison for Scheme to Falsify Clinical Trial
+      Data
+    publisher: US Department of Justice
+    year: '2021'
+    url: https://www.justice.gov/opa/pr/medical-doctor-and-study-coordinator-sentenced-prison-scheme-falsify-clinical-trial-data
+    locator: Press release 21-254
+    quote: participated in a scheme to defraud an unnamed pharmaceutical company by fabricating the data
+      and participation of subjects
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Unlimited Medical Research, Miami: paediatric asthma trial'
+  cases:
+  - name: Unlimited Medical Research (Yvelice Villaman Bencosme, Lisett Raventos, Maytee Lledo)
+    year: '2021'
+    jurisdiction: Florida, US
+    what_happened: The principal investigator and site staff pleaded guilty to conspiracy to commit wire
+      fraud for fabricating data and participation in a paediatric asthma drug trial; Bencosme was sentenced
+      to 63 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/medical-doctor-and-study-coordinator-sentenced-prison-scheme-falsify-clinical-trial-data
+    source_title: Medical Doctor and Study Coordinator Sentenced to Prison for Scheme to Falsify Clinical
+      Trial Data
+  data_needed:
+  - Company
+  - Person
+  - Contract
+  - Payment
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - FDA Form 483s and warning letters
+  - FDA debarment list
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: DOJ prosecuted the fabrication as wire fraud against the trial sponsor.
+    source_url: https://www.justice.gov/opa/pr/medical-doctor-and-study-coordinator-sentenced-prison-scheme-falsify-clinical-trial-data
+  innocent_explanations:
+  - Data errors and late entries are common in trials and are usually corrected through monitoring
+  jurisdictions: US
+  version: 1
+- id: HC-049
+  name: Trial site misleads or obstructs an FDA inspection
+  definition: Site staff give false accounts to FDA inspectors about whether a trial was run honestly.
+  areas:
+  - HC
+  typology: Clinical-trial site fraud
+  status: verified
+  sources:
+  - title: Florida Co-Owner of Clinical Trial Company Pleads Guilty to Obstructing FDA Inspection
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/florida-co-owner-clinical-trial-company-pleads-guilty-obstructing-fda-inspection
+    locator: Press release
+    quote: Clinical trials help ensure the safety of new drugs, and falsifying clinical trial data can
+      put the public at risk.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Olga Torres, co-owner of Unlimited Medical Research, admitted lying to an FDA investigator during
+    a 2017 inspection
+  cases:
+  - name: Olga Torres (Unlimited Medical Research)
+    year: '2022'
+    jurisdiction: Florida, US
+    what_happened: The co-owner pleaded guilty to obstructing a 2017 FDA inspection by falsely portraying
+      the paediatric asthma trial as legitimate.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/florida-co-owner-clinical-trial-company-pleads-guilty-obstructing-fda-inspection
+    source_title: Florida Co-Owner of Clinical Trial Company Pleads Guilty to Obstructing FDA Inspection
+  data_needed:
+  - Company
+  - Person
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - FDA inspection classification database
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff may give inaccurate answers through ignorance rather than intent
+  jurisdictions: US
+  version: 1
+- id: HC-050
+  name: Serious FDA inspection findings missing from the published trial
+  definition: An FDA inspection of a trial site was rated Official Action Indicated, but the journal article
+    reporting the trial does not mention the problems.
+  areas:
+  - HC
+  typology: Clinical-trial site fraud
+  status: verified
+  sources:
+  - title: 'Research Misconduct Identified by the US Food and Drug Administration: Out of Sight, Out of
+      Mind, Out of the Peer-Reviewed Literature (JAMA Internal Medicine, Seife)'
+    publisher: JAMA Internal Medicine (copy hosted by American University of Beirut)
+    year: '2015'
+    url: https://www.aub.edu.lb/SHARP/PublishingImages/Pages/publications/Research-Misconduct-Identified-by-the-US-Food-and-Drug-Administration.pdf
+    locator: Abstract, Results
+    quote: Only 3 of the 78 publications (4%) that resulted from trials in which the FDA found significant
+      violations mentioned the objectionable conditions or practices found during the inspection.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Research Misconduct Identified by the US Food and Drug Administration
+    publisher: JAMA Internal Medicine
+    year: '2015'
+    url: https://www.aub.edu.lb/SHARP/PublishingImages/Pages/publications/Research-Misconduct-Identified-by-the-US-Food-and-Drug-Administration.pdf
+    locator: Introduction
+    quote: The most severe classification, official action indicated (OAI), is reserved for cases in which
+      the inspection identified objectionable conditions or practices significant enough to warrant regulatory
+      action.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - FDA inspection classification database
+  - FDA warning letters and clinical inspection summaries
+  - ClinicalTrials.gov
+  - PubMed
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - FDA usually excludes data from an OAI site, so the published result may still be sound
+  - Inspection documents are often redacted, making linkage uncertain
+  jurisdictions: US
+  version: 1
+- id: HC-051
+  name: Care setting with closed-culture risk factors
+  definition: A service where people cannot leave freely, depend on one-to-one care, or are autistic or
+    have a learning disability or mental health condition, combined with poor training, weak leadership
+    and little outside oversight.
+  areas:
+  - HC
+  typology: Closed cultures in care settings
+  status: verified
+  sources:
+  - title: 'Monitoring the Mental Health Act 2022/23: Closed cultures'
+    publisher: Care Quality Commission
+    year: '2023'
+    url: https://cqc.org.uk/publications/monitoring-mental-health-act/2022-2023/closed-cultures
+    locator: Closed cultures
+    quote: We define a closed culture as “a poor culture that can lead to harm, including human rights
+      breaches such as abuse”.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Monitoring the Mental Health Act 2022/23: Closed cultures'
+    publisher: Care Quality Commission
+    year: '2023'
+    url: https://cqc.org.uk/publications/monitoring-mental-health-act/2022-2023/closed-cultures
+    locator: Closed cultures
+    quote: 'We summarise our findings under the 4 indicators of closed cultures identified in our guidance:
+      people may experience poor care, including unlawful restrictions poor skills, training and supervision
+      of staff providing care weak leadership and management lack of external oversight.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Address
+  - Document
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - CQC inspection reports and ratings
+  - Mental Health Act monitoring reports
+  - Local authority safeguarding data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many secure and supported-living services provide good care; the risk factors are inherent to the
+    setting, not proof of abuse
+  jurisdictions: England (CQC); general
+  version: 1
+not_reached:
+- 'Gosport Independent Panel report (2018): could not retrieve a PDF link from the gov.uk landing page;
+  not used (overlaps HO and PD areas)'
+- 'Bristol Royal Infirmary Inquiry (Kennedy, 2001): not opened'
+- 'Infected Blood Inquiry Volumes 6 and 7 (medical records, document destruction detail): only Volume
+  1 (overview and summary) was read'
+- 'CQC ''How CQC identifies and responds to closed cultures'' (2021) guidance itself: only CQC''s 2022/23
+  Mental Health Act monitoring chapter summarising it was read'
+- 'FDA ASR statement: the page shows no release date; 2019 is taken from the statement''s own reference
+  to data ''from 1999 to 2019'''
+- 'Public Citizen ''Hospitals Drop the Ball on Physician Oversight'': the page shows no publication date
+  (data to 31 Dec 2007); the last 12,800 characters were not read'
+- 'AJC ''Doctors & Sex Abuse'' (2016): only the landing page summary was read; individual stories not
+  opened'
+- Seife (JAMA Intern Med 2015) read from a university-hosted copy, not the publisher page
+- FSMB 2006 guideline read from jmronline.org HTML; the 2020 FSMB report was used as the main source
+- Veterans' care beyond Phoenix VA (other OIG facility reports) not researched
+- 'NHS England published Never Events data by trust: identified as a lookup source but not opened'
+- Kirkup's Chapter 6 detail on how to build safety-signal monitoring was not extracted beyond Key Action
+  Area 1

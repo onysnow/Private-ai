@@ -677,3 +677,357 @@ terms:
   indicators: []
   areas:
   - PP
+- term: Administrative resources
+  definition: The staff, money, property, media and other resources a government controls, which incumbents
+    can misuse for campaigning.
+  examples: []
+  source_url: https://www.venice.coe.int/images/GBR_2016_Guidelines_resources_elections.pdf
+  cases: []
+  related:
+  - Misuse of administrative resources
+  indicators: []
+  areas:
+  - PP
+- term: Misuse of administrative resources
+  definition: Using state money, infrastructure or staff for a party's or candidate's campaign.
+  examples:
+  - Public employees doing campaign tasks
+  - Hidden advertising on state TV
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Election fraud
+  definition: Conduct meant to corrupt how ballots are handled, how results are certified or how voters
+    are registered.
+  examples: []
+  source_url: https://www.justice.gov/criminal/file/1029066/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Vote buying
+  definition: Giving or promising money or other benefits to voters so they support a particular party
+    or candidate.
+  examples: []
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Voter intimidation
+  definition: Threats, physical pressure or reprisals aimed at voters, candidates, poll watchers or election
+    officials.
+  examples: []
+  source_url: https://www.justice.gov/criminal/file/1029066/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Patronage
+  definition: Hiring or firing public employees for party-political reasons; DOJ calls a pervasive system
+    a breeding ground for corruption.
+  examples: []
+  source_url: https://www.justice.gov/criminal/file/1029066/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Conduit contribution
+  definition: A political donation passed through other people's names to hide who really gave it.
+  examples: []
+  source_url: https://www.justice.gov/criminal/file/1029066/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Third-party spending
+  definition: Campaign spending by groups other than the party or candidate, which can be used to get
+    around income or spending limits.
+  examples: []
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Dark money
+  definition: Political money that moves through entities, such as US 501(c)(4) groups, that need not
+    disclose their donors.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdoh/pr/former-ohio-house-speaker-sentenced-20-years-prison-leading-racketeering-conspiracy
+  cases: []
+  related:
+  - 501(c)(4)
+  indicators: []
+  areas:
+  - PP
+- term: 501(c)(4)
+  definition: A US tax-exempt 'social welfare' organisation; DOJ said the Householder enterprise exploited
+    the lack of transparency in these entities.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdoh/pr/former-ohio-house-speaker-sentenced-20-years-prison-leading-racketeering-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: In-kind contribution
+  definition: A donation given as goods or services rather than money, such as free services or media
+    discounts.
+  examples: []
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Quid pro quo
+  definition: Something given in exchange for something else; in political finance, a donation given in
+    return for favourable treatment.
+  examples: []
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Anonymous donation
+  definition: A gift whose donor is not identified; many countries ban them or cap the amount.
+  examples: []
+  source_url: https://www.idea.int/sites/default/files/publications/funding-of-political-parties-and-election-campaigns.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Government Defence Integrity Index (GDI)
+  definition: Transparency International's assessment of corruption-risk controls in national defence
+    institutions across political, financial, personnel, operations and procurement risk.
+  examples: []
+  source_url: https://ti-defence.org/gdi/about/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Secret budget (defence)
+  definition: Defence or security spending that is classified and not shown in the public budget.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Off-budget expenditure
+  definition: Military spending that happens outside the approved state budget.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Military-owned business
+  definition: A commercial company in which defence or security institutions hold beneficial ownership.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Offset
+  definition: A side-agreement in an arms deal in which the seller promises investment, work or purchases
+    in the buyer's country.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Agents and intermediaries
+  definition: Middlemen or consultants that companies use in the defence procurement cycle, often paid
+    commission.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Chain of command vs chain of payment
+  definition: Whether the officers who command troops are separate from the system that pays them; when
+    combined, pay can be skimmed.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Certified cost or pricing data
+  definition: Cost facts a US contractor certifies as accurate, complete and current when negotiating
+    a price.
+  examples: []
+  source_url: https://www.acquisition.gov/far/15.407-1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Defective pricing
+  definition: Price inflation caused by cost or pricing data that is inaccurate, incomplete or noncurrent;
+    the US government is entitled to a price reduction.
+  examples: []
+  source_url: https://www.acquisition.gov/far/15.407-1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Labour mischarging / labour substitution
+  definition: Billing staff hours to the wrong contract or billing less-qualified staff at higher rates;
+    listed as a DoD fraud scheme.
+  examples: []
+  source_url: https://www.dodig.mil/Resources/Fraud-Detection-Resources/Fraud-Red-Flags/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Product substitution
+  definition: Delivering goods that differ from the contract specification; listed as a DoD fraud scheme.
+  examples: []
+  source_url: https://www.dodig.mil/Resources/Fraud-Detection-Resources/Fraud-Red-Flags/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Counterfeit (re-marked) part
+  definition: A part altered or marked to look like a genuine or newer part; GAO found parts re-marked
+    to appear authentic.
+  examples: []
+  source_url: https://www.gao.gov/products/gao-12-375
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Progress payment
+  definition: An interim payment to a contractor during a long contract based on costs incurred or work
+    done; misuse is a DoD-listed fraud scheme.
+  examples: []
+  source_url: https://www.dodig.mil/Resources/Fraud-Detection-Resources/Fraud-Red-Flags/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Mandatory disclosure rule
+  definition: US contracting rule under which a contractor can be suspended or debarred for failing to
+    timely disclose credible evidence of fraud, bribery or significant overpayments.
+  examples: []
+  source_url: https://www.acquisition.gov/far/3.1003
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Fraud (Charity Commission definition)
+  definition: Dishonesty by false representation, failing to disclose information or abuse of position,
+    to make a gain or cause a loss.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Restricted funds
+  definition: Charity money given for a specified purpose that may not be used for general costs.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Unrestricted reserves
+  definition: Charity money not tied to a purpose, which still needs proper authorisation to spend.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Segregation of duties
+  definition: Splitting a financial process among different people so no one person controls it start
+    to finish.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Skimming
+  definition: Taking cash before it is recorded, for example from charity collections.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Excess benefit transaction
+  definition: Under US tax law, a deal in which a tax-exempt organisation gives an insider (disqualified
+    person) more economic value than it receives back.
+  examples: []
+  source_url: https://www.irs.gov/charities-non-profits/charitable-organizations/intermediate-sanctions-excess-benefit-transactions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Fiduciary duty
+  definition: The legal duty of a trustee or director to act in the charity's interest; a New York court
+    found it breached in the Trump Foundation case.
+  examples: []
+  source_url: https://ag.ny.gov/press-release/2019/ag-james-secures-court-order-against-donald-j-trump-trump-children-and-trump
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: ODIHR
+  definition: The OSCE Office for Democratic Institutions and Human Rights, which observes elections and
+    co-wrote the administrative-resources guidelines.
+  examples: []
+  source_url: https://www.venice.coe.int/images/GBR_2016_Guidelines_resources_elections.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Venice Commission
+  definition: The Council of Europe's advisory body on constitutional law, co-author of the 2016 guidelines
+    on misuse of administrative resources.
+  examples: []
+  source_url: https://www.venice.coe.int/images/GBR_2016_Guidelines_resources_elections.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP

@@ -753,3 +753,210 @@ terms:
   indicators: []
   areas:
   - SF
+- term: Material support or resources
+  definition: Under US law, any property or service given to terrorists, including lodging, training,
+    expert advice, safehouses, false documents, communications equipment, facilities, weapons, personnel
+    and transportation, but not medicine or religious materials.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339A
+  cases: []
+  related:
+  - 18 U.S.C. 2339A
+  - 18 U.S.C. 2339B
+  indicators: []
+  areas:
+  - SF
+- term: 18 U.S.C. 2339A
+  definition: US crime of providing material support knowing or intending it will be used for one of a
+    list of terrorism offences; up to 15 years, or life if death results.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339A
+  cases: []
+  related:
+  - Material support or resources
+  indicators: []
+  areas:
+  - SF
+- term: 18 U.S.C. 2339B
+  definition: US crime of knowingly providing material support to a designated foreign terrorist organization,
+    knowing it is designated or engages in terrorism; up to 20 years.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339B
+  cases: []
+  related:
+  - Foreign terrorist organization
+  indicators: []
+  areas:
+  - SF
+- term: 18 U.S.C. 2339D
+  definition: US crime of knowingly receiving military-type training from a group designated as a foreign
+    terrorist organization at the time; up to 10 years.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339D
+  cases: []
+  related:
+  - Military-type training
+  indicators: []
+  areas:
+  - SF
+- term: Military-type training
+  definition: Training in ways to kill or seriously injure, destroy property or disrupt critical infrastructure,
+    or in using or making explosives, firearms or other weapons.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339D
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Training (US material support law)
+  definition: Teaching meant to give someone a specific skill, as opposed to general knowledge.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339A
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Expert advice or assistance
+  definition: Help or advice drawing on scientific, technical or other specialised knowledge.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339A
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Personnel
+  definition: One or more people, possibly including oneself, provided to work under a terrorist group's
+    direction or control; people acting entirely independently do not count.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339B
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Service (coordinated vs independent advocacy)
+  definition: In Holder v. Humanitarian Law Project, the Supreme Court treated activity done in concert
+    with or directed by a group as a service, but not independent advocacy.
+  examples: []
+  source_url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+  cases: []
+  related:
+  - Holder v. Humanitarian Law Project
+  indicators: []
+  areas:
+  - SF
+- term: Holder v. Humanitarian Law Project
+  definition: 2010 US Supreme Court ruling (6-3) that the ban on material support to designated groups,
+    including training on international law and advocacy coordinated with the group, was constitutional
+    as applied.
+  examples: []
+  source_url: https://en.wikipedia.org/wiki/Holder_v._Humanitarian_Law_Project
+  cases: []
+  related:
+  - Service (coordinated vs independent advocacy)
+  indicators: []
+  areas:
+  - SF
+- term: Medicine or religious materials exception
+  definition: US law excludes medicine and religious materials from what counts as material support.
+  examples: []
+  source_url: https://www.everycrsreport.com/files/2023-08-15_R41333_7a8d142fd4117745a06c12cedf6d3e27fbda37d8.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Secretary of State approval exception (2339B(j))
+  definition: No prosecution for providing personnel, training or expert advice if the Secretary of State
+    approved it with the Attorney General's agreement, unless it could be used for terrorist activity.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339B
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Foreign terrorist fighter
+  definition: A person who travels to another country to take part in, plan or train for terrorism; UN
+    Security Council Resolution 2178 requires states to stop their recruitment, organisation, transport
+    and equipping.
+  examples: []
+  source_url: https://main.un.org/securitycouncil/en/s/res/2178-%282014%29
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Facilitation network
+  definition: A set of people who help recruits join a terrorist group by paying for tickets, documents,
+    housing, vehicles and transit contacts.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-Recruitment-for-Terrorism.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Safehouse
+  definition: A place used to hide or house members of a group; listed in US law as a form of material
+    support.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2339A
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Mobilization indicators
+  definition: Observable behaviours that US agencies (NCTC, FBI, DHS) list as signs someone may be moving
+    toward violent extremist action; they warn some are lawful and must not be the only basis for action.
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Directive (EU) 2017/541
+  definition: EU law requiring member states to criminalise terrorism offences including recruitment,
+    providing and receiving training, travel for terrorism and facilitating that travel.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32017L0541
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Additional Protocol to the Council of Europe Convention on the Prevention of Terrorism (CETS 217)
+  definition: 2015 treaty requiring parties to criminalise participating in terrorist groups, receiving
+    training, travelling abroad for terrorism, and funding or facilitating such travel.
+  examples: []
+  source_url: https://rm.coe.int/168047c5ea
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Weapons training offence (UK)
+  definition: UK crime of giving or receiving instruction in making or using firearms, explosives, or
+    radioactive, chemical, biological or nuclear weapons.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2000/11/section/54
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Training for terrorism (UK)
+  definition: UK crime of giving or receiving training in listed skills knowing or intending they will
+    be used for terrorism.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2006/11/section/6
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF

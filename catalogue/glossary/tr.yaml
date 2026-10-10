@@ -1,0 +1,206 @@
+area: TR
+terms:
+- term: Transnational repression (TNR)
+  definition: When a government reaches across its borders to silence, coerce, harass or harm members
+    of its diaspora or exiles.
+  examples: []
+  source_url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+  cases: []
+  related:
+  - Coercion-by-proxy
+  - Mobility controls
+  indicators: []
+  areas:
+  - TR
+- term: Coercion-by-proxy
+  definition: Pressuring a person abroad by threatening or punishing their relatives or friends back home.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related:
+  - Transnational repression (TNR)
+  indicators: []
+  areas:
+  - TR
+- term: Direct attacks
+  definition: Freedom House category for tactics that physically reach the target, such as assassination,
+    assault, disappearance and rendition.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Mobility controls
+  definition: Freedom House category for restricting a person's ability to travel, such as passport revocation
+    or denial of consular services.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Co-opting other countries
+  definition: Freedom House category for manipulating another country's police or immigration bodies to
+    harass, detain or transfer a target, including Interpol abuse.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Red Notice
+  definition: An INTERPOL international alert asking police worldwide to locate and provisionally arrest
+    a wanted person; it is not an arrest warrant.
+  examples: []
+  source_url: https://www.interpol.int/en/How-we-work/Notices/Red-Notices
+  cases: []
+  related:
+  - Interpol abuse
+  indicators: []
+  areas:
+  - TR
+- term: Overseas police station
+  definition: An undeclared office abroad operated for a foreign police ministry, used to monitor and
+    pressure diaspora members.
+  examples:
+  - Lower Manhattan MPS station closed in fall 2022
+  source_url: https://www.justice.gov/opa/pr/new-york-resident-pleads-guilty-operating-secret-police-station-chinese-government-lower
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Operation Fox Hunt
+  definition: A PRC government-directed campaign to locate people abroad and pressure them to return to
+    China.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/leader-multi-year-operation-fox-hunt-repatriation-campaign-directed-peoples-republic-china
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Acting as an illegal agent of a foreign government
+  definition: The US offence of acting in the United States at a foreign government's direction without
+    notifying the Attorney General.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/political-operative-sentenced-48-months-federal-prison-acting-covert-agent-peoples-republic
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Murder-for-hire
+  definition: Paying someone to kill a person; in TNR cases, plots funded by state officials through criminal
+    middlemen.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/two-eastern-european-organized-crime-leaders-convicted-murder-hire-targeting-us-based
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: SLAPP (strategic lawsuit against public participation)
+  definition: A legal action brought mainly to harass, intimidate and financially or psychologically exhaust
+    critics.
+  examples: []
+  source_url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Spyware
+  definition: Software secretly installed on a device to monitor its user; commercial spyware sold to
+    governments has been used against dissidents.
+  examples: []
+  source_url: https://www.commerce.gov/news/press-releases/2021/11/commerce-adds-nso-group-and-other-foreign-companies-entity-list
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Entity List
+  definition: A US Commerce Department export-control list of foreign companies and others restricted
+    from receiving US items, used against spyware vendors such as NSO Group.
+  examples: []
+  source_url: https://www.commerce.gov/news/press-releases/2021/11/commerce-adds-nso-group-and-other-foreign-companies-entity-list
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Doxing
+  definition: Publishing someone's personal information, such as identity or address, to expose them to
+    threats.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-iranian-cyber-enabled-psychological-operations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: IRGC
+  definition: Iran's Islamic Revolutionary Guard Corps, whose members directed the plot against journalist
+    Masih Alinejad according to DOJ.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/two-eastern-european-organized-crime-leaders-convicted-murder-hire-targeting-us-based
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: MOIS
+  definition: Iran's Ministry of Intelligence and Security, linked by DOJ to domains used to dox and threaten
+    dissidents.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-iranian-cyber-enabled-psychological-operations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: MSS
+  definition: China's Ministry of State Security, the civilian intelligence service named as handlers
+    in the Wang Shujun indictment.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/us-citizen-and-four-chinese-intelligence-officers-charged-spying-prominent-dissidents-human
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: MPS
+  definition: China's Ministry of Public Security, the police ministry whose Fuzhou branch ran the Manhattan
+    station per DOJ.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/two-arrested-operating-illegal-overseas-police-station-chinese-government
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Bounty (extraterritorial)
+  definition: A public reward offered by a state for information leading to the capture of a person living
+    abroad.
+  examples: []
+  source_url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR
+- term: Police impersonation scam
+  definition: Fraud in which criminals pose as Chinese police and demand money from diaspora members to
+    avoid supposed arrest; it mimics TNR but is extortion by criminals.
+  examples: []
+  source_url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TR

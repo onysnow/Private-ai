@@ -5103,6 +5103,2731 @@ indicators:
   - Cash-heavy businesses such as shops and restaurants
   jurisdictions: US (PCAOB)
   version: 1
+- id: FR-098
+  name: Government benefit or refund payments in names other than the account holder
+  definition: An account receives unemployment, stimulus, emergency or tax-refund payments made out to
+    people who are not the account holder, or several different payees.
+  areas:
+  - FR
+  typology: Benefit and relief fraud; stolen identity refund fraud
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During the Coronavirus Disease 2019 (COVID-19) Pandemic
+      (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, item c
+    quote: UI payments in the name of a person other than the accountholder, or in the names of multiple
+      unemployment payments recipients;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Financial Crimes Targeting COVID-19 Economic Impact Payments
+    publisher: US Treasury FinCEN
+    year: '2021'
+    url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+    locator: Fraudulent, altered, counterfeit, or stolen EIP checks section
+    quote: An existing account receives, or an account holder makes, multiple EIP-related deposits for
+      individuals other than the account holder(s).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A005: Tax Refund Fraud and Related Identity Theft'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+    locator: Identifying Tax Refund Fraud, red flag 1
+    quote: Multiple direct deposit tax refund payments, directed to different individuals
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2017-A007: Fraudulent disaster-related benefits and charity schemes'
+    publisher: US Treasury FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+    locator: Benefits Fraud Red Flags, item 4
+    quote: Opening of a new account with an emergency assistance check, where the name of the potential
+      accountholder is different from that of the depositor of the check.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Operation Cordele Partial: unemployment claims filed with stolen identities and paid onto prepaid
+    cards mailed to Georgia addresses (DOJ, 2025)'
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Organization
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FinCEN's 2012 advisory says refund-fraud accounts are often opened on behalf of the elderly,
+      minors, prisoners, the disabled or recently deceased.
+    source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+  innocent_explanations:
+  - A parent, carer or guardian legitimately receives payments for a dependant
+  - Joint accounts or household members sharing one account
+  - Representative payees or legal agents authorised to receive benefits
+  jurisdictions: United States
+  version: 1
+- id: FR-099
+  name: Unemployment payments from a state the person never lived or worked in, or from several states
+    at once
+  definition: One person's account receives unemployment payments from a state with no link to them, or
+    from several states in the same period.
+  areas:
+  - FR
+  typology: Unemployment insurance fraud
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, item a
+    quote: UI payments from a state other than the state in which the customer reportedly resides or has
+      previously worked;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, item b
+    quote: Multiple state UI payments within the same disbursement timeframe;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Operation Cordele Partial involved claims across more than 20 states' unemployment programmes (DOJ,
+    2025)
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - PublicBody
+  - Address
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Person worked remotely for an employer in another state or moved recently
+  - Legitimate claims carried across a move between states
+  - Benefits paid in error by a state agency
+  version: 1
+- id: FR-100
+  name: Benefit or relief payments far above what similar recipients get
+  definition: An account receives more benefit or stimulus payments in a period than comparable customers
+    or its profile would predict.
+  areas:
+  - FR
+  typology: Benefit and relief fraud
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, item f
+    quote: A higher amount of UI payments in the same timeframe than similarly situated customers received.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Financial Crimes Targeting COVID-19 Economic Impact Payments
+    publisher: US Treasury FinCEN
+    year: '2021'
+    url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+    locator: Fraudulent, altered, counterfeit, or stolen EIP checks section
+    quote: An existing account receives an excessive number of EIPs via U.S. Treasury check or deposits.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Back-payments of benefits delayed by agency backlogs
+  - Large households with many eligible members
+  version: 1
+- id: FR-101
+  name: New or dormant account suddenly receives government benefit or refund deposits
+  definition: A newly opened account, or one that has been inactive, starts receiving many benefit, stimulus
+    or tax-refund deposits.
+  areas:
+  - FR
+  typology: Benefit and relief fraud; money mule accounts
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, unlabeled item 8
+    quote: A newly opened account, or an account that has been inactive for more than thirty days, starts
+      to receive numerous UI deposits.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Financial Crimes Targeting COVID-19 Economic Impact Payments
+    publisher: US Treasury FinCEN
+    year: '2021'
+    url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+    locator: Theft of multiple EIPs section
+    quote: Individual accounts opened after the U.S. government announced the EIP program, receive U.S.
+      Treasury checks or direct deposits from the U.S. Treasury that could indicate multiple EIPs, and
+      for individuals other than the account holder.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A005: Tax Refund Fraud and Related Identity Theft'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+    locator: Identifying Tax Refund Fraud, red flag 8
+    quote: A sudden increase in volume moving through the account of an existing check cashing service
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A new account, or one inactive for more than thirty days, starts receiving numerous UI deposits
+      (FinCEN FIN-2020-A007)
+    threshold_source: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Person opened an account specifically to receive a benefit they just applied for
+  - Previously unbanked people opening accounts during relief programmes
+  - Seasonal workers whose accounts sit idle between jobs
+  version: 1
+- id: FR-102
+  name: Benefit money withdrawn at once or moved abroad, to apps, prepaid cards or crypto
+  definition: Benefit or relief funds are taken out in a lump sum, wired abroad, routed through payment
+    apps, or converted to prepaid cards, gift cards or virtual currency soon after arriving.
+  areas:
+  - FR
+  typology: Benefit and relief fraud; laundering of proceeds
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, unlabeled item 2
+    quote: The customer's UI payments are quickly diverted via wire transfer to foreign accounts, particularly
+      to accounts in countries with weak anti-money laundering controls.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, unlabeled item 1
+    quote: The customer withdraws the disbursed UI funds in a lump sum by cashier's checks, by purchasing
+      a prepaid debit card, or by transferring the funds to out-of-state accounts.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Financial Crimes Targeting COVID-19 Economic Impact Payments
+    publisher: US Treasury FinCEN
+    year: '2021'
+    url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+    locator: Theft of multiple EIPs section
+    quote: Rapid transfers of multiple EIPs into one account could indicate that bad actors are consolidating
+      the payments.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Recipients in hardship spending benefits immediately on rent and bills
+  - Sending money to family abroad
+  - Preference for cash or prepaid cards among people without stable banking
+  version: 1
+- id: FR-103
+  name: Many claims, accounts or credit files share one address, IP, email, phone, device or SSN
+  definition: Separate benefit claims, prepaid cards or credit accounts are tied together by the same
+    contact details, internet address, device or identity number.
+  areas:
+  - FR
+  typology: Benefit fraud; synthetic identity fraud; tax refund fraud
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, unlabeled item 7
+    quote: Multiple accounts receiving UI payments at one or more financial institutions are associated
+      with the same free, web-based email account that may appear in more than one UI application.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A005: Tax Refund Fraud and Related Identity Theft'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+    locator: Identifying Tax Refund Fraud, red flag 6 (also same phone, email or IP)
+    quote: Multiple prepaid cards that are associated with 1) the same physical address
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Financial Crimes Targeting COVID-19 Economic Impact Payments
+    publisher: US Treasury FinCEN
+    year: '2021'
+    url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+    locator: Theft of multiple EIPs section
+    quote: The same Internet Protocol (IP) address is used to transfer funds from several EIP debit cards
+      to a bank account.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Synthetic Identity Fraud Mitigation Toolkit: Detecting a Synthetic Identity'
+    publisher: Federal Reserve (FedPayments Improvement)
+    year: ''
+    url: https://fedpaymentsimprovement.org/resources/synthetic-identity-fraud-mitigation-toolkit/detecting-a-synthetic-identity/
+    locator: Across Accounts (in aggregate)
+    quote: Similar or matching contact information (address, phone, email address, etc.)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Synthetic Identity Fraud Mitigation Toolkit: Detecting a Synthetic Identity'
+    publisher: Federal Reserve (FedPayments Improvement)
+    year: ''
+    url: https://fedpaymentsimprovement.org/resources/synthetic-identity-fraud-mitigation-toolkit/detecting-a-synthetic-identity/
+    locator: Across Accounts (in aggregate)
+    quote: Identical digital footprint
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Qureshi ring: more than 7,000 false identities using more than 1,800 drop addresses (FBI/DOJ, 2013)'
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Payment
+  - Document
+  - UnknownLink
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family members, flatmates or shelter residents sharing an address or device
+  - Shared public Wi-Fi, library or workplace IP addresses
+  - Tax preparers or social workers filing on behalf of many clients
+  version: 1
+- id: FR-104
+  name: Login location or mailing address has no link to the claimant
+  definition: The internet location used to manage a benefit account, or the address where cards and checks
+    are sent, does not match where the claimant lives or has ever lived.
+  areas:
+  - FR
+  typology: Benefit fraud; identity theft
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, unlabeled item 5
+    quote: The IP address associated with logins for an account conducting suspected UI-fraud activities
+      does not map to the general location of stated address in identity documentation for the customer
+      or where the UI payment originated.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, unlabeled item 10
+    quote: does not have a history of living at, or being associated with, the address to which the UI
+      check or UI debit card is sent
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Harvey James: a postal employee supplied route addresses used to receive refund cards and checks
+    (DOJ, 2014)'
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Payment
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Travel, VPN use or mobile carriers that route traffic far away
+  - Mail sent to a relative's or friend's address during housing instability
+  version: 1
+- id: FR-105
+  name: Government payments deposited into a business account, shell company or care facility
+  definition: Benefit, stimulus, refund or emergency checks made out to individuals are paid into a business,
+    front company or nursing home account instead of the payee's own.
+  areas:
+  - FR
+  typology: Benefit fraud; money mules; misappropriation by institutions
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, unlabeled item 6
+    quote: Individuals direct UI-related EFTs, or deposit UI checks into suspected shell/front company
+      accounts, which may be indicative of money mules transferring these funds in and out of the accounts.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2017-A007: Fraudulent disaster-related benefits and charity schemes'
+    publisher: US Treasury FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+    locator: Benefits Fraud Red Flags, item 3
+    quote: Deposits of one or more emergency assistance checks, when the accountholder is a retail business
+      and the payee/endorser is an individual other than the accountholder; and
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A005: Tax Refund Fraud and Related Identity Theft'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+    locator: Identifying Tax Refund Fraud, red flag 4
+    quote: Business accountholders processing third-party tax refund checks
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - FinCEN's EIP advisory flags nursing home or assisted living accounts receiving residents' payments
+    that are never returned to them
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Person
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FinCEN's EIP advisory names care facilities withholding residents' payments.
+    source_url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+  innocent_explanations:
+  - Licensed check-cashing businesses legitimately cash third-party checks
+  - Care homes acting as authorised representative payees for residents
+  jurisdictions: United States
+  version: 1
+- id: FR-106
+  name: Accounts or claims in the names of the elderly, children, prisoners or the dead
+  definition: Benefit or refund accounts are opened or paid in the names of people who are unlikely to
+    apply themselves, such as prisoners, young children or recently deceased people.
+  areas:
+  - FR
+  typology: Stolen identity refund fraud; benefit fraud
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2012-A005: Tax Refund Fraud and Related Identity Theft'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+    locator: Identifying Tax Refund Fraud, red flag 2 (targets include elderly, minors, prisoners, disabled,
+      recently deceased)
+    quote: Suspicious or authorized account opening at a depository institution, on behalf of individuals
+      who are not present
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Advisory on Financial Crimes Targeting COVID-19 Economic Impact Payments
+    publisher: US Treasury FinCEN
+    year: '2021'
+    url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+    locator: Theft of multiple EIPs section
+    quote: The account holder is a child under age 17 at the end of the taxable year, but the account
+      received numerous EIPs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Harvey James used inmate names from Alabama corrections data to file over 1,000 false returns (DOJ,
+    2014)
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - Inmate locators
+  - Death records / obituaries
+  - State benefit agency data via court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Estates legitimately receiving payments due to a person before death
+  - Guardians managing benefits for children or incapacitated adults
+  - Prisoners eligible for certain refunds
+  version: 1
+- id: FR-107
+  name: Identity numbers on applications do not match Social Security records
+  definition: Applications use Social Security numbers that were never issued or that belong to a different
+    name or date of birth.
+  areas:
+  - FR
+  typology: Pandemic relief identity fraud; synthetic identity fraud
+  status: verified
+  sources:
+  - title: 'PRAC Fraud Alert: potential identity fraud in COVID-19 EIDL and PPP'
+    publisher: Pandemic Response Accountability Committee
+    year: '2023'
+    url: https://pandemicoversight.gov/sites/default/files/2023-01/PRAC%20fraud%20alert%20on%20potential%20SSN%20fraud_1.pdf
+    locator: p. 4
+    quote: The PRAC identified $5.4 billion in potential identity fraud associated with 69,323 questionable
+      and unverified SSNs
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'PRAC issues fraud prevention alert: pre-award vetting using data analytics could have prevented
+      over $79 billion'
+    publisher: Pandemic Response Accountability Committee
+    year: '2025'
+    url: https://www.pandemicoversight.gov/news/articles/prac-issues-fraud-prevention-alert-pre-award-vetting-using-data-analytics-could-have-prevented-over-79-billion-in-potentially-fraudulent-pandemic-relief-payments
+    locator: Article body
+    quote: approximately $79 billion of potential identity fraud involving the use of 1.4 million potentially
+      stolen or invalid SSNs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Payment
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Typing errors in SSN, name or date of birth
+  - Name changes after marriage not yet updated at SSA
+  - PRAC notes a flagged SSN does not necessarily mean ineligibility or fraud
+  version: 1
+- id: FR-108
+  name: Forged or incorrect ID documents when a bank asks for proof
+  definition: When a bank queries suspected benefit fraud, the customer supplies identity documents that
+    are wrong or forged.
+  areas:
+  - FR
+  typology: Account takeover; identity theft
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Financial red flag indicators, unlabeled item 9
+    quote: queried individuals provide documents that are incorrect or forged, which may be an indicator
+      of an account takeover or identity theft.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Expired or outdated documents provided in good faith
+  - Clerical errors on genuine documents
+  version: 1
+- id: FR-109
+  name: One account collects several kinds of government payment for other people
+  definition: The same account receives stimulus payments, unemployment payments and tax refunds in names
+    that do not match the account holder.
+  areas:
+  - FR
+  typology: Benefit and refund fraud
+  status: verified
+  sources:
+  - title: Advisory on Financial Crimes Targeting COVID-19 Economic Impact Payments
+    publisher: US Treasury FinCEN
+    year: '2021'
+    url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+    locator: Other frauds and thefts occurring in an account receiving EIPs
+    quote: An account with several EIP deposits also receives numerous tax refunds from federal and state
+      governments
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large household with one shared account
+  - Authorised representative for several relatives
+  version: 1
+- id: FR-110
+  name: Batches of government checks with near-identical amounts or sequential numbers
+  definition: Many refund or emergency-assistance checks with the same or near-same amounts, sequential
+    numbers or out-of-state payees go through one account or person.
+  areas:
+  - FR
+  typology: Tax refund fraud; disaster benefits fraud
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2017-A007: Fraudulent disaster-related benefits and charity schemes'
+    publisher: US Treasury FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+    locator: Benefits Fraud Red Flags, item 2
+    quote: Cashing of multiple emergency assistance checks by the same individual;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2017-A007: Fraudulent disaster-related benefits and charity schemes'
+    publisher: US Treasury FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+    locator: Benefits Fraud Red Flags, item 1
+    quote: or electronic funds transfers into the same bank account, particularly when the amounts of
+      the checks are the same
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A005: Tax Refund Fraud and Related Identity Theft'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+    locator: Identifying Tax Refund Fraud, red flag 5 (same amounts, sequential numbers, out-of-state
+      addresses)
+    quote: conducting transactions inconsistent with normal business practices
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Document
+  - Company
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Disaster aid is often paid in fixed standard amounts
+  - Check-cashers near refund season legitimately handle many refund checks
+  version: 1
+- id: FR-111
+  name: Fictitious employer or invented employees behind benefit or relief claims
+  definition: Claims rest on a made-up company and made-up staff or wage records, or on inflated head
+    counts and payroll.
+  areas:
+  - FR
+  typology: Unemployment insurance fraud; PPP and EIDL fraud
+  status: verified
+  sources:
+  - title: Advisory on Unemployment Insurance Fraud During COVID-19 (FIN-2020-A007)
+    publisher: US Treasury FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+    locator: Fictitious employer-employee fraud description
+    quote: create a fictitious company and supply fictitious employee and wage records to apply for UI
+      payments.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'COVID Relief: Fraud Schemes and Indicators in SBA Pandemic Programs (GAO-23-105331)'
+    publisher: US Government Accountability Office
+    year: '2023'
+    url: https://www.gao.gov/assets/gao-23-105331.pdf
+    locator: p. 29
+    quote: created fictitious employees and inflated employee counts to obtain more funds.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - David T. Hines claimed dozens of employees and millions in monthly payroll on PPP applications (DOJ,
+    2021)
+  - Malcolm Jeffrey and Gerard Towns created fake employers with stolen identities (DOJ, 2025)
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Person
+  - Document
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - State business registries
+  - Payroll/wage records disclosed in court
+  - PPP loan-level data released by SBA
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sole traders and gig workers with informal payroll records
+  - Seasonal head-count swings
+  - Errors by preparers or lenders in loan paperwork
+  version: 1
+- id: FR-112
+  name: Relief borrower whose business may not exist or did not operate as claimed
+  definition: A relief loan or grant went to a business that wage records suggest had no operations, or
+    that was not operating when the programme required.
+  areas:
+  - FR
+  typology: PPP and EIDL fraud
+  status: verified
+  sources:
+  - title: 'COVID Relief: Fraud Schemes and Indicators in SBA Pandemic Programs (GAO-23-105331)'
+    publisher: US Government Accountability Office
+    year: '2023'
+    url: https://www.gao.gov/assets/gao-23-105331.pdf
+    locator: p. 5
+    quote: fraud indicators associated with potential misrepresentations of business operating status
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'COVID Relief: Fraud Schemes and Indicators in SBA Pandemic Programs (GAO-23-105331)'
+    publisher: US Government Accountability Office
+    year: '2023'
+    url: https://www.gao.gov/assets/gao-23-105331.pdf
+    locator: p. 10 (PPP eligibility rule)
+    quote: Business was in operation as of February 15, 2020
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - ContractAward
+  - Payment
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - SBA PPP loan data
+  - State business registries (formation dates)
+  - Street-view / site visits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Home-based or very small businesses with no paid staff
+  - Businesses that closed after receiving funds
+  - GAO states these indicators are not proof of fraud
+  version: 1
+- id: FR-113
+  name: Same applicant receives several relief loans or advances
+  definition: One applicant or identity obtains multiple loans or advances from the same relief programme.
+  areas:
+  - FR
+  typology: PPP and EIDL fraud
+  status: verified
+  sources:
+  - title: 'COVID Relief: Fraud Schemes and Indicators in SBA Pandemic Programs (GAO-23-105331)'
+    publisher: US Government Accountability Office
+    year: '2023'
+    url: https://www.gao.gov/assets/gao-23-105331.pdf
+    locator: p. 5
+    quote: whether applicants received multiple loans or advances
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - David T. Hines submitted multiple PPP applications (DOJ, 2021)
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - ContractAward
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - SBA PPP and EIDL loan data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - PPP allowed second-draw loans to eligible borrowers
+  - Owners of several genuine separate businesses
+  version: 1
+- id: FR-114
+  name: Kickbacks or 'consulting fees' paid back to whoever helped get the relief money
+  definition: Part of relief funds flows back to facilitators, sponsors or preparers, often as cash or
+    vague consulting payments to shell companies.
+  areas:
+  - FR
+  typology: Pandemic relief fraud; programme sponsor fraud
+  status: verified
+  sources:
+  - title: 'COVID Relief: Fraud Schemes and Indicators in SBA Pandemic Programs (GAO-23-105331)'
+    publisher: US Government Accountability Office
+    year: '2023'
+    url: https://www.gao.gov/assets/gao-23-105331.pdf
+    locator: p. 32 (definition of kickbacks)
+    quote: a portion of loan or grant funds paid to individual(s) in exchange for illicit help with loan
+      applications.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Feeding Our Future ringleader sentenced to 500 months
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/feeding-our-future-ringleader-sentenced-500-months
+    locator: Press release body
+    quote: Many of these kickbacks were paid in cash or disguised as "consulting fees" paid to shell companies
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Feeding Our Future (DOJ)
+  - GAO found 24 percent of reviewed defendants were linked to cases alleging kickbacks
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  - Associate
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: DOJ says Feeding Our Future kickbacks were disguised as consulting fees to shell companies.
+    source_url: https://www.justice.gov/opa/pr/feeding-our-future-ringleader-sentenced-500-months
+  innocent_explanations:
+  - Legitimate fees to accountants or consultants for application help
+  - Sponsors are entitled to some administrative fees in federal nutrition programmes
+  jurisdictions: United States
+  version: 1
+- id: FR-115
+  name: Newly formed sites claim to serve huge numbers almost immediately
+  definition: Programme sites or vendors claim very high volumes of service, such as thousands of meals
+    a day, within days or weeks of being set up, backed by rosters.
+  areas:
+  - FR
+  typology: Federal programme fraud (child nutrition)
+  status: verified
+  sources:
+  - title: Feeding Our Future ringleader sentenced to 500 months
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/feeding-our-future-ringleader-sentenced-500-months
+    locator: Press release body
+    quote: fraudulently claimed to be serving meals to thousands of children a day within just days or
+      weeks of being formed.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Feeding Our Future: fake attendance rosters and dozens of shell companies enrolled in the programme
+    (DOJ)'
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - ContractAward
+  - Payment
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - State programme sponsor/site lists
+  - Business formation dates
+  - Site visits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Emergency programmes legitimately scaled up quickly during the pandemic
+  - Existing community groups registering new sites for established services
+  version: 1
+- id: FR-116
+  name: Public programme without basic fraud controls such as data matching
+  definition: A government programme pays out on self-reported information without verifying it against
+    other data, assessing fraud risk or having anyone responsible for fraud control.
+  areas:
+  - FR
+  typology: Programme integrity weakness
+  status: verified
+  sources:
+  - title: A Framework for Managing Fraud Risks in Federal Programs (GAO-15-593SP)
+    publisher: US Government Accountability Office
+    year: '2015'
+    url: https://www.gao.gov/assets/gao-15-593sp.pdf
+    locator: p. 23
+    quote: Conduct data matching to verify key information, including self-reported data.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: A Framework for Managing Fraud Risks in Federal Programs (GAO-15-593SP)
+    publisher: US Government Accountability Office
+    year: '2015'
+    url: https://www.gao.gov/assets/gao-15-593sp.pdf
+    locator: p. 6 (Assess component)
+    quote: Plan regular fraud risk assessments and assess risks to determine a fraud risk profile.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'PRAC issues fraud prevention alert: pre-award vetting using data analytics'
+    publisher: Pandemic Response Accountability Committee
+    year: '2025'
+    url: https://www.pandemicoversight.gov/news/articles/prac-issues-fraud-prevention-alert-pre-award-vetting-using-data-analytics-could-have-prevented-over-79-billion-in-potentially-fraudulent-pandemic-relief-payments
+    locator: Article body
+    quote: approximately $79 billion of potential identity fraud involving the use of 1.4 million potentially
+      stolen or invalid SSNs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Inspector general and GAO audit reports
+  - Programme rules and agency fraud risk assessments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Emergency programmes deliberately relaxed checks to pay people quickly
+  - Legal limits on data sharing between agencies
+  version: 1
+- id: FR-117
+  name: Up-front fees for foreclosure or loan-modification help, often relabelled
+  definition: A company charges distressed homeowners before doing anything, often calling the charge
+    a review, audit, attorney or membership fee.
+  areas:
+  - FR
+  typology: Foreclosure rescue and loan modification scams
+  status: verified
+  sources:
+  - title: Updated Advisory on Fraudulent Loan Modification/Foreclosure Rescue Scams (FIN-2010-A006)
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+    locator: Red Flags Identified by FinCEN's State Regulatory Partners
+    quote: 'many fraud schemes may attempt to characterize the up-front "fee" in other ways, such as:'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 17
+    quote: Request from third party affiliates on behalf of distressed homeowners to pay fees in advance
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Deed theft
+    publisher: Office of the New York State Attorney General
+    year: ''
+    url: https://ag.ny.gov/publications/deed-theft
+    locator: Tips
+    quote: Beware of upfront fees for a loan modification.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Contract
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawyers may lawfully take retainers in some states
+  - Genuine HUD-approved counsellors may charge small permitted fees
+  version: 1
+- id: FR-118
+  name: False claims of non-profit, HUD-approved, government or lender ties
+  definition: A housing-help firm calls itself a non-profit, counselling agency or government-approved,
+    or claims links to lenders or federal programmes, when it is not.
+  areas:
+  - FR
+  typology: Foreclosure rescue and loan modification scams
+  status: verified
+  sources:
+  - title: Updated Advisory on Fraudulent Loan Modification/Foreclosure Rescue Scams (FIN-2010-A006)
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+    locator: Money Services Businesses SARs
+    quote: Perpetrators who falsely claimed they were listed on official/public lists of government-approved
+      credit counselors
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 16
+    quote: may also claim to be associated with legitimate mortgage lenders, the U.S. government, or a
+      U.S. government program
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - HUD list of approved housing counselling agencies
+  - IRS Tax Exempt Organization Search
+  - State licensing databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agency approval lapsed recently or is pending
+  - Genuine partnerships with lenders described loosely in marketing
+  version: 1
+- id: FR-119
+  name: Homeowner signs the house over to a 'rescuer' and rents it back
+  definition: A distressed owner transfers title to a third party on a promise they can stay as a tenant
+    and buy the home back later.
+  areas:
+  - FR
+  typology: Foreclosure rescue (sale-leaseback) fraud; equity theft
+  status: verified
+  sources:
+  - title: Updated Advisory on Fraudulent Loan Modification/Foreclosure Rescue Scams (FIN-2010-A006)
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+    locator: Depository Institution SARs
+    quote: Perpetrators defraud homeowners into turning over ownership of their property and subsequently
+      rent it back to the victim;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Deed theft
+    publisher: Office of the New York State Attorney General
+    year: ''
+    url: https://ag.ny.gov/publications/deed-theft
+    locator: Tips
+    quote: Legitimate organizations will not ask you to transfer your property rights,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'American Equity Group: homeowners became renters, investors bought with inflated loans, and homes
+    went into foreclosure (DOJ SD Ohio, 2013)'
+  cases: []
+  data_needed:
+  - Ownership
+  - Person
+  - Company
+  - Contract
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - County recorder deed records
+  - Court foreclosure dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine family or community sale-leaseback arrangements
+  - Lawful rent-to-own agreements with clear terms
+  version: 1
+- id: FR-120
+  name: False quitclaim deeds or equity loans used to strip or steal a home
+  definition: Quitclaim deeds or new equity lines are recorded to drain a home's equity or take title
+    without the owner's real consent.
+  areas:
+  - FR
+  typology: Equity skimming; deed theft
+  status: verified
+  sources:
+  - title: Updated Advisory on Fraudulent Loan Modification/Foreclosure Rescue Scams (FIN-2010-A006)
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+    locator: Depository Institution SARs
+    quote: Equity lines of credit or false quit claim deeds are used for "equity skimming" or outright
+      property theft; and,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Deed theft
+    publisher: Office of the New York State Attorney General
+    year: ''
+    url: https://ag.ny.gov/publications/deed-theft
+    locator: How deed theft happens
+    quote: A thief fakes a homeowner’s signature on a deed and files it with the county clerk.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Ownership
+  - Document
+  - Person
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - County recorder deed and mortgage records
+  - Notary commission lookups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Quitclaim deeds are routinely used between family members, in divorces and for estate planning
+  version: 1
+- id: FR-121
+  name: Straw borrowers or a rejected loan resubmitted under a company name
+  definition: Someone else's name, or a newly substituted company, appears as borrower to hide who is
+    really behind the deal.
+  areas:
+  - FR
+  typology: Mortgage fraud
+  status: verified
+  sources:
+  - title: Updated Advisory on Fraudulent Loan Modification/Foreclosure Rescue Scams (FIN-2010-A006)
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+    locator: Depository Institution SARs
+    quote: Straw borrowers are often used to hide the identities of the perpetrators;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 13
+    quote: Apparent resubmission of rejected loan application with key borrower/buyer details changed
+      or modified
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Ownership
+  - Contract
+  - Associate
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Investors legitimately buying through an LLC
+  - Co-signers or family members helping a buyer qualify
+  version: 1
+- id: FR-122
+  name: Structured or sequential money orders to a foreclosure-rescue business
+  definition: Homeowners pay a rescue or modification firm with many small or sequential money orders,
+    sometimes because the firm told them to.
+  areas:
+  - FR
+  typology: Foreclosure rescue scams
+  status: verified
+  sources:
+  - title: Updated Advisory on Fraudulent Loan Modification/Foreclosure Rescue Scams (FIN-2010-A006)
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+    locator: Money Services Businesses SARs
+    quote: Perpetrators telling financial institution filers that the structuring of multiple money orders
+      was required by the recipients;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Updated Advisory on Fraudulent Loan Modification/Foreclosure Rescue Scams (FIN-2010-A006)
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+    locator: Money Services Businesses SARs
+    quote: Efforts to "stop payment" by foreclosure rescue scheme victims who paid advance fees, but received
+      no service.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Unbanked customers routinely use money orders for bills
+  version: 1
+- id: FR-123
+  name: Same notary or 'representative' handling near-identical paperwork for many borrowers
+  definition: One notary or agent prepares, signs or collects payment for similar debt-elimination or
+    modification packages for an unusually large number of homeowners.
+  areas:
+  - FR
+  typology: Debt elimination and loan modification fraud
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 2
+    quote: Same notary public and/or other "authorized representative" preparing, signing, and sending
+      packages of nearly identical debt elimination documents for multiple borrowers
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Updated Advisory on Fraudulent Loan Modification/Foreclosure Rescue Scams (FIN-2010-A006)
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+    locator: Red Flags Identified by FinCEN's State Regulatory Partners
+    quote: A number of perpetrators use a notary public as an agent to deliver documents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Payment
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - County recorder records (notary names on recorded instruments)
+  - State notary commission databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Busy notaries at title companies or law firms notarise many documents
+  version: 1
+- id: FR-124
+  name: Invalid documents or fake bank checks used to 'cancel' a mortgage
+  definition: A borrower submits invalid papers, or falsified certified or 'non-cash item' checks drawn
+    on their own account, to claim a mortgage is paid off.
+  areas:
+  - FR
+  typology: Debt elimination schemes
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 1
+    quote: Falsification of certified checks, cashier's checks or "non-cash item checks" drawn against
+      a borrower/buyer's account
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 4
+    quote: Falsification of certified checks, cashier's checks or "non-cash item checks" drawn against
+      a borrower/buyer's account
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Payment
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Homeowners misled by debt-elimination promoters may believe the documents are valid
+  version: 1
+- id: FR-125
+  name: Borrower does not live in the home claimed as primary residence
+  definition: Records show a borrower lives elsewhere, others occupy the home, or a young buyer purchases
+    a 'primary residence' in a seniors-only development.
+  areas:
+  - FR
+  typology: Occupancy fraud
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 6
+    quote: Borrower/buyer of a younger age purchases his or her 'primary residence' in a senior citizen
+      residential development.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 7
+    quote: public and personal documents indicate that the borrower/buyer resides somewhere other than
+      the address
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Ownership
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Homestead exemption records
+  - Voter rolls
+  - Property tax mailing addresses
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Owner moved for work, military service or care after buying
+  - Buying for an elderly parent
+  version: 1
+- id: FR-126
+  name: Short sale to a related buyer, at a low appraisal, with quick resale planned
+  definition: A short sale has a non-arm's-length buyer, a low appraisal, earlier failed fraud attempts
+    or contract language allowing prompt resale.
+  areas:
+  - FR
+  typology: Short-sale and flipping fraud
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 8
+    quote: Language included in a short sale contract indicates the property could be resold promptly.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 10
+    quote: Low appraisal values, non-arms length relationships between short sale buyers and sellers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Contract
+  - Ownership
+  - Person
+  - Family
+  - Associate
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - County deed records (sale dates and prices)
+  - Appraisal documents in court files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Falling markets produce low appraisals
+  - Investors legitimately renovate and resell
+  version: 1
+- id: FR-127
+  name: Borrower hides assets or structures cash to qualify for hardship help
+  definition: A borrower moves or splits cash to look poorer in order to qualify for loan-modification
+    programmes, or has a history of misrepresentation in earlier applications.
+  areas:
+  - FR
+  typology: Mortgage modification fraud by borrowers
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 14
+    quote: attempts to structure currency deposits/withdrawals, or otherwise to hide or disguise the true
+      value of assets
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 12
+    quote: Improper/incomplete file documentation, including borrower/buyer reluctance to provide more
+      information
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Ownership
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FinCEN names structuring as the method used to hide assets in modification applications.
+    source_url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+  innocent_explanations:
+  - Disorganised record-keeping by stressed borrowers
+  - Genuine changes in household finances
+  jurisdictions: United States
+  version: 1
+- id: FR-128
+  name: Unlicensed agent in a mortgage transaction
+  definition: The person acting for the buyer or seller in a mortgage deal does not hold the required
+    licence.
+  areas:
+  - FR
+  typology: Mortgage fraud
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2012-A009: Mortgage Loan Fraud'
+    publisher: US Treasury FinCEN
+    year: '2012'
+    url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+    locator: Red flag 15
+    quote: Agent of the buyer and/or seller in mortgage transaction is unlicensed.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - NMLS Consumer Access
+  - State real estate licence lookups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Same licence-check pattern applied to mortgage agents.
+    source_url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+  innocent_explanations:
+  - Licence renewal lapsed briefly
+  - Licence held under a different name or company
+  jurisdictions: United States
+  version: 1
+- id: FR-129
+  name: Reverse-mortgage money moved into annuities or other products, or never reaches the senior's account
+  definition: A senior's reverse-mortgage proceeds are put into an annuity or similar product, or little
+    of the money appears in their own bank account.
+  areas:
+  - FR
+  typology: Reverse mortgage (HECM) cross-selling fraud
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2010-A005: Home Equity Conversion Mortgage Fraud Schemes'
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+    locator: Cross Selling
+    quote: A senior completes a HECM, but deposits little to no funds into his or her bank account.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Contract
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FinCEN's HECM advisory targets seniors aged 62 and over.
+    source_url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+  innocent_explanations:
+  - Proceeds used to pay off an existing mortgage, as the programme intends
+  - Funds taken as a credit line rather than drawn at once
+  jurisdictions: United States
+  version: 1
+- id: FR-130
+  name: Reverse-mortgage taken as a lump sum, followed by heavy cash withdrawals
+  definition: A senior takes all reverse-mortgage proceeds at closing and then large amounts of cash or
+    unusual spending follow.
+  areas:
+  - FR
+  typology: Reverse mortgage cash-out theft
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2010-A005: Home Equity Conversion Mortgage Fraud Schemes'
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+    locator: Cash-out Theft
+    quote: A senior takes HECM loan proceeds in a lump sum at closing.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2010-A005: Home Equity Conversion Mortgage Fraud Schemes'
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+    locator: Cash-out Theft
+    quote: A HECM borrower withdraws large amounts of cash or has unusual spending activity.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Senior needs the money for medical costs, home repairs or debts
+  - Lump sums are a standard HECM payout option
+  version: 1
+- id: FR-131
+  name: Loan officer moving large cash or co-endorsing big checks
+  definition: A bank loan officer handles cash or large checks out of line with their pay or job, including
+    co-endorsing checks into business or personal accounts.
+  areas:
+  - FR
+  typology: Insider reverse mortgage theft
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2010-A005: Home Equity Conversion Mortgage Fraud Schemes'
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+    locator: Cash-out Theft
+    quote: The loan officer also may be co-endorsing checks for large amounts
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Loan officer has a lawful side business or family wealth
+  version: 1
+- id: FR-132
+  name: Senior says the house came free from a government programme, with dubious appraisal
+  definition: A senior reverse-mortgage borrower says they were given the house by a special programme,
+    the appraisal uses stale or distant comparables, or their credit report does not match the application.
+  areas:
+  - FR
+  typology: Straw-owner property flipping via reverse mortgages
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2010-A005: Home Equity Conversion Mortgage Fraud Schemes'
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+    locator: Straw Owner—Property Flipping
+    quote: A senior homeowner says that he or she received the house free from a special government program.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2010-A005: Home Equity Conversion Mortgage Fraud Schemes'
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+    locator: Straw Owner—Property Flipping
+    quote: An appraisal uses comparable sales that are outdated or outside of the property's neighborhood.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Ownership
+  - Document
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - County deed records (recent transfers)
+  - Appraisal documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine inheritance or gift of a home from family
+  - Rural areas where few recent comparable sales exist
+  version: 1
+- id: FR-133
+  name: Distressed owner deeds home to an older relative who takes a reverse mortgage to pay it off
+  definition: A struggling borrower quitclaims a property to parents or other seniors who take a reverse
+    mortgage that pays off someone else's loan, with statements going elsewhere.
+  areas:
+  - FR
+  typology: Reverse mortgage misuse by distressed non-senior mortgagors
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2010-A005: Home Equity Conversion Mortgage Fraud Schemes'
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+    locator: Distressed Non-senior Mortgagors
+    quote: A distressed mortgagor quit claim deeds his/her property to parents or other seniors
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2010-A005: Home Equity Conversion Mortgage Fraud Schemes'
+    publisher: US Treasury FinCEN
+    year: '2010'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+    locator: Distressed Non-senior Mortgagors
+    quote: Monthly statements and other paperwork associated with the HECM loan are not sent to the senior's
+      address.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Ownership
+  - Family
+  - Person
+  - Contract
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - County deed and mortgage records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Families legitimately consolidating homes for an older parent who moves in
+  - Statements sent to a relative holding valid power of attorney
+  version: 1
+- id: FR-134
+  name: Seller of land or a house will only communicate remotely and won't meet
+  definition: The supposed owner of a vacant or unencumbered property deals only by email, text or internet
+    phone and gives excuses for never appearing in person.
+  areas:
+  - FR
+  typology: Seller impersonation / vacant land title fraud
+  status: verified
+  sources:
+  - title: 'FBI PSA I-061626-PSA: criminals impersonating owners of vacant property'
+    publisher: FBI Internet Crime Complaint Center
+    year: '2026'
+    url: https://www.ic3.gov/PSA/2026/PSA260616
+    locator: 'Tips to Identify the Scam: Unusual Communication Methods'
+    quote: The seller communicates only via email, text, or VoIP numbers and refuses to meet in person
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Red Flags and Tips to Help Prevent Seller Impersonation in Real Estate
+    publisher: American Land Title Association
+    year: '2023'
+    url: https://alta.org/news-and-publications/news/20230509-Red-Flags-and-Tips-to-Help-Prevent-Seller-Impersonation-in-Real-Estate
+    locator: Article body
+    quote: This latest trend involves vacant lots or unencumbered properties.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Marcus Wilcher ring: impostors posed as absentee owners at closings (NY AG, 2024)'
+  cases: []
+  data_needed:
+  - Person
+  - Ownership
+  - Contract
+  - Address
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Owners living abroad, ill or elderly often sell remotely
+  - Remote closings are now common
+  version: 1
+- id: FR-135
+  name: Seller rushes the sale and prices well below market
+  definition: The seller pushes to close quickly and offers the property for less than it is worth.
+  areas:
+  - FR
+  typology: Seller impersonation / deed theft
+  status: verified
+  sources:
+  - title: FBI PSA I-061626-PSA
+    publisher: FBI Internet Crime Complaint Center
+    year: '2026'
+    url: https://www.ic3.gov/PSA/2026/PSA260616
+    locator: 'Tips to Identify the Scam: Pressure to Close Quickly'
+    quote: The seller insists on rushing the process and may offer to sell the property below market value
+      to expedite the sale.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Wilcher ring: homes advertised to investors well below market price for quick sales (NY AG, 2024)'
+  cases: []
+  data_needed:
+  - Contract
+  - Ownership
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Listing history
+  - County sale records and assessed values
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Estates, divorces or debts forcing a quick sale
+  - Owners unaware of local land values
+  version: 1
+- id: FR-136
+  name: Seller knows little about the property and lacks basic papers
+  definition: The supposed owner gives inconsistent details about the property and cannot supply ordinary
+    documents such as surveys or tax information.
+  areas:
+  - FR
+  typology: Seller impersonation
+  status: verified
+  sources:
+  - title: FBI PSA I-061626-PSA
+    publisher: FBI Internet Crime Complaint Center
+    year: '2026'
+    url: https://www.ic3.gov/PSA/2026/PSA260616
+    locator: 'Tips to Identify the Scam: Inconsistent or Missing Information'
+    quote: The seller demonstrates limited knowledge about the property, lacks essential documents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Ownership
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Heirs selling inherited land they have never visited
+  version: 1
+- id: FR-137
+  name: Sale money sent abroad, to another name, or to an out-of-state attorney
+  definition: Proceeds of a property sale are directed by international wire, to an account in a different
+    name or place, or to a lawyer in another state.
+  areas:
+  - FR
+  typology: Seller impersonation
+  status: verified
+  sources:
+  - title: FBI PSA I-061626-PSA
+    publisher: FBI Internet Crime Complaint Center
+    year: '2026'
+    url: https://www.ic3.gov/PSA/2026/PSA260616
+    locator: 'Tips to Identify the Scam: Suspicious Payment Requests'
+    quote: a domestic wire transfer to an account under a different name,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: FBI PSA I-061626-PSA
+    publisher: FBI Internet Crime Complaint Center
+    year: '2026'
+    url: https://www.ic3.gov/PSA/2026/PSA260616
+    locator: 'The Scam: Phase 3 Payment'
+    quote: The criminals request the money from the illegal sale of the property be sent to a co-conspirator
+      attorney
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Wilcher ring moved proceeds through corporate entities and out-of-state banks (NY AG, 2024)
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Owner living abroad
+  - Proceeds paid to an LLC or trust that holds title
+  version: 1
+- id: FR-138
+  name: Deed notarised abroad or other unusual title documents
+  definition: Property documents in a sale are notarised in a foreign country or are otherwise irregular.
+  areas:
+  - FR
+  typology: Seller impersonation; deed theft
+  status: verified
+  sources:
+  - title: FBI PSA I-061626-PSA
+    publisher: FBI Internet Crime Complaint Center
+    year: '2026'
+    url: https://www.ic3.gov/PSA/2026/PSA260616
+    locator: 'Tips to Identify the Scam: Red Flags in Documentation'
+    quote: Be cautious of property deeds notarized in a foreign country
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Ownership
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - County recorder images of deeds
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Irregular notarisation is a document-integrity flag.
+    source_url: https://www.ic3.gov/PSA/2026/PSA260616
+  innocent_explanations:
+  - Owners living overseas legitimately sign before consular officials or foreign notaries
+  jurisdictions: United States
+  version: 1
+- id: FR-139
+  name: 'Property profile that title thieves target: vacant, in foreclosure, liened or with a dead owner'
+  definition: The property is empty, in foreclosure, carries tax or utility liens, or belongs to someone
+    who died without heirs transferring title.
+  areas:
+  - FR
+  typology: Deed theft
+  status: verified
+  sources:
+  - title: Deed theft
+    publisher: Office of the New York State Attorney General
+    year: ''
+    url: https://ag.ny.gov/publications/deed-theft
+    locator: Who is at risk
+    quote: properties where the homeowner is deceased and the heirs do not legally transfer title to the
+      property
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Wilcher ring targeted run-down Queens homes with absentee owners who were elderly, disabled or estates
+    (NY AG, 2024)
+  cases: []
+  data_needed:
+  - Ownership
+  - Address
+  - Person
+  - CourtCase
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - County deed and lien records
+  - Foreclosure dockets
+  - Death records / probate
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many such properties are simply neglected or in slow probate with no fraud
+  version: 1
+- id: FR-140
+  name: Owner stops getting property tax or water bills, or utilities jump
+  definition: The real owner's tax and water bills stop arriving or utility bills rise suddenly, which
+    may mean someone has changed the records.
+  areas:
+  - FR
+  typology: Deed theft
+  status: verified
+  sources:
+  - title: Deed theft
+    publisher: Office of the New York State Attorney General
+    year: ''
+    url: https://ag.ny.gov/publications/deed-theft
+    locator: Tips
+    quote: If you stop receiving your property tax and water bills or if your utility bills increase suddenly
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Ownership
+  - Address
+  - Document
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Postal problems or billing-system changes
+  - Mortgage servicer paying taxes from escrow
+  version: 1
+- id: FR-141
+  name: Credit history that is too young for the person's age, or thickened artificially
+  definition: An applicant's credit file is short for their age or has been inflated, a pattern seen in
+    made-up identities.
+  areas:
+  - FR
+  typology: Synthetic identity fraud
+  status: verified
+  sources:
+  - title: 'Synthetic Identity Fraud Mitigation Toolkit: Detecting a Synthetic Identity'
+    publisher: Federal Reserve (FedPayments Improvement)
+    year: ''
+    url: https://fedpaymentsimprovement.org/resources/synthetic-identity-fraud-mitigation-toolkit/detecting-a-synthetic-identity/
+    locator: Within a Customer Application or Account
+    quote: Mismatch between the accountholder’s age and duration of credit history
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Synthetic Identity Fraud Mitigation Toolkit: Detecting a Synthetic Identity'
+    publisher: Federal Reserve (FedPayments Improvement)
+    year: ''
+    url: https://fedpaymentsimprovement.org/resources/synthetic-identity-fraud-mitigation-toolkit/detecting-a-synthetic-identity/
+    locator: Within a Customer Application or Account
+    quote: Inflation of credit file depth
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Qureshi ring pumped up false identities' credit with false information to the credit bureaus (FBI,
+    2013)
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Recent immigrants, young adults and people who avoided credit have thin files
+  - Authorised-user accounts added by family
+  version: 1
+- id: FR-142
+  name: Many recent credit inquiries and heavy unsecured debt
+  definition: An identity shows a burst of recent credit applications and large unsecured borrowing, consistent
+    with quickly building and then using credit.
+  areas:
+  - FR
+  typology: Synthetic identity fraud; credit bust-out
+  status: verified
+  sources:
+  - title: 'Synthetic Identity Fraud Mitigation Toolkit: Detecting a Synthetic Identity'
+    publisher: Federal Reserve (FedPayments Improvement)
+    year: ''
+    url: https://fedpaymentsimprovement.org/resources/synthetic-identity-fraud-mitigation-toolkit/detecting-a-synthetic-identity/
+    locator: Within a Customer Application or Account
+    quote: High number of recent credit inquiries, which could indicate the fraudster is attempting to
+      quickly build credit
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Synthetic Identity Fraud Mitigation Toolkit: Detecting a Synthetic Identity'
+    publisher: Federal Reserve (FedPayments Improvement)
+    year: ''
+    url: https://fedpaymentsimprovement.org/resources/synthetic-identity-fraud-mitigation-toolkit/detecting-a-synthetic-identity/
+    locator: Within a Customer Application or Account
+    quote: Large amount of unsecured debt (which requires less documentation than a mortgage, for instance)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Qureshi ring: identities borrowed or spent as much as they could and did not repay; more than $200
+    million in losses (FBI, 2013)'
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Credit pumping then maxing out mirrors the bust-out pattern.
+    source_url: https://archives.fbi.gov/archives/newark/press-releases/2013/ten-indicted-in-200-million-international-credit-card-fraud-conspiracy
+  innocent_explanations:
+  - Rate shopping for a car or home loan creates many inquiries
+  - Genuine financial hardship
+  jurisdictions: United States
+  version: 1
+- id: FR-143
+  name: Newly issued contact details or a suspicious mailing address on an application
+  definition: An applicant's phone, email or address is very new, or the mailing address looks like a
+    drop address.
+  areas:
+  - FR
+  typology: Synthetic identity fraud
+  status: verified
+  sources:
+  - title: 'Synthetic Identity Fraud Mitigation Toolkit: Detecting a Synthetic Identity'
+    publisher: Federal Reserve (FedPayments Improvement)
+    year: ''
+    url: https://fedpaymentsimprovement.org/resources/synthetic-identity-fraud-mitigation-toolkit/detecting-a-synthetic-identity/
+    locator: Within a Customer Application or Account
+    quote: Recently issued contact information
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Ten Indicted in $200 Million International Credit Card Fraud Conspiracy
+    publisher: FBI Newark / US Attorney District of New Jersey
+    year: '2013'
+    url: https://archives.fbi.gov/archives/newark/press-releases/2013/ten-indicted-in-200-million-international-credit-card-fraud-conspiracy
+    locator: Press release body
+    quote: more than 1,800 "drop addresses," including houses, apartments, and post office boxes
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Address type lookups (commercial mail receiving agencies, PO boxes)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - People who recently moved or changed phone numbers
+  - PO boxes used by rural residents or for privacy
+  version: 1
+- id: FR-144
+  name: Disaster claim for property outside the disaster zone
+  definition: An insurance or aid claim is made for a home, business or vehicle located away from the
+    area the disaster actually hit.
+  areas:
+  - FR
+  typology: Disaster-related insurance fraud
+  status: verified
+  sources:
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Wildfire-Related Claim Fraud Indicators
+    quote: Claim location is outside the known wildfire catastrophe zone
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Commercial / vehicle fraud indicators
+    quote: The burned vehicle was located well outside of the wildfire impact zone
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Address
+  - Event
+  - Document
+  - Vehicle
+  checkable: lookups
+  lookup_sources:
+  - Official fire perimeter and disaster declaration maps
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Smoke, ash and evacuation losses occur outside burn perimeters
+  - Vehicles moved during evacuation
+  version: 1
+- id: FR-145
+  name: Insurance raised sharply or property over-insured shortly before the loss
+  definition: Cover was added or substantially increased just before or during a disaster, or the property
+    was insured far above its value.
+  areas:
+  - FR
+  - HO
+  typology: Arson for profit; disaster claim fraud
+  status: verified
+  sources:
+  - title: What insurance claims people should know about arson
+    publisher: Illinois Advisory Committee on Arson Prevention (NCJRS archive)
+    year: c. 1979
+    url: https://www.ojp.gov/pdffiles1/Digitization/54514NCJRS.pdf
+    locator: Insurance indicators
+    quote: Property is grossly over-insured, or insurance on it has recently been substantially increased.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Wildfire-Related Claim Fraud Indicators (also lists coverage added or increased after the
+      wildfire began)
+    quote: Claim exhibits false or exaggerated values outside of expected norms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Contract
+  - Ownership
+  - Event
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Same over-insurance motive feeds arson-for-profit fires.
+    source_url: https://www.ojp.gov/pdffiles1/Digitization/54514NCJRS.pdf
+  innocent_explanations:
+  - Owners buy or raise cover when they see a threat approaching or after renovations
+  - Insurer-driven reappraisals raise sums insured
+  jurisdictions: United States
+  version: 1
+- id: FR-146
+  name: Owner in financial trouble or unable to sell before a fire
+  definition: Before a fire, the owner was failing to meet debts, needed cash urgently, wanted out of
+    the business or could not sell the property.
+  areas:
+  - FR
+  - HO
+  typology: Arson for profit
+  status: verified
+  sources:
+  - title: What insurance claims people should know about arson
+    publisher: Illinois Advisory Committee on Arson Prevention (NCJRS archive)
+    year: c. 1979
+    url: https://www.ojp.gov/pdffiles1/Digitization/54514NCJRS.pdf
+    locator: Financial indicators
+    quote: The business owner is unable to meet certain financial obligations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What insurance claims people should know about arson
+    publisher: Illinois Advisory Committee on Arson Prevention (NCJRS archive)
+    year: c. 1979
+    url: https://www.ojp.gov/pdffiles1/Digitization/54514NCJRS.pdf
+    locator: Property indicators
+    quote: Owner no longer wants the property and can't sell it.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Demetrios Stavrakis: Adcor Industries defaulted on loans and ran heavy losses before he conspired
+    to burn its building; insurer paid about $15 million (DOJ, 2020)'
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - CourtCase
+  - Ownership
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Court dockets (liens, judgments, foreclosures)
+  - UCC filings
+  - Property listings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Financial-distress motive is the core of arson for profit.
+    source_url: https://www.justice.gov/usao-md/pr/baltimore-business-owner-sentenced-15-years-federal-prison-conspiring-burn-down-his
+  innocent_explanations:
+  - Many struggling businesses suffer genuine accidental fires
+  - Older, poorly maintained buildings are both harder to sell and more fire-prone
+  jurisdictions: United States
+  version: 1
+- id: FR-147
+  name: Premises shut, vacated or emptied before the fire
+  definition: The business had closed or moved out, or contents had been removed, before the fire or disaster
+    struck.
+  areas:
+  - FR
+  - HO
+  typology: Arson for profit; disaster claim fraud
+  status: verified
+  sources:
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Property-Related Claim Indicators of Fraud
+    quote: Business was shut down or vacated prior to the wildfire outbreak
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: General Indicators of Fraud
+    quote: Rental property sits vacant but is claimed to be primary residence
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - Business registry status
+  - Utility shut-off or permit records
+  - Archived street imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Seasonal closures
+  - Evacuation orders emptied premises before the fire arrived
+  version: 1
+- id: FR-148
+  name: Repeated earlier fire, theft or burglary claims
+  definition: The claimant has a history of previous fires or questionable fire, theft or burglary claims.
+  areas:
+  - FR
+  - HO
+  typology: Insurance fraud; arson for profit
+  status: verified
+  sources:
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Wildfire-Related Claim Fraud Indicators
+    quote: Multiple previous fire, theft, or burglary claims
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What insurance claims people should know about arson
+    publisher: Illinois Advisory Committee on Arson Prevention (NCJRS archive)
+    year: c. 1979
+    url: https://www.ojp.gov/pdffiles1/Digitization/54514NCJRS.pdf
+    locator: Insurance indicators
+    quote: Homeowner has a history of fires in other residences.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - CourtCase
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Fire department incident reports
+  - Court records of past insurance disputes
+  - Local news archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Living in high-risk areas for fire or crime
+  - Landlords with many properties naturally file more claims
+  version: 1
+- id: FR-149
+  name: Claimed contents that cannot be proven or physically could not have fitted
+  definition: A loss inventory lists valuables or cash with no proof, recent purchases bunched after the
+    event, or items too large to fit the space.
+  areas:
+  - FR
+  typology: Inflated insurance claims
+  status: verified
+  sources:
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: General Indicators of Fraud
+    quote: The size of items claimed cannot physically fit in existing floor space
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Property-Related Claim Indicators of Fraud
+    quote: Claiming the loss of large quantities of cash/valuables but lacking evidence of these items
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: General Indicators of Fraud
+    quote: Digital images of property or valuables are not available or appear altered
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Note
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: These are disaster-specific forms of the inflated claim.
+    source_url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+  innocent_explanations:
+  - Receipts and photos genuinely destroyed in the fire
+  - Trauma affecting memory of purchases
+  jurisdictions: United States
+  version: 1
+- id: FR-150
+  name: Burned vehicle with signs of a set fire
+  definition: A vehicle claimed as a disaster loss shows several separate burn points, accelerant containers,
+    a missing gas cap or engine parts, or altered identification numbers.
+  areas:
+  - FR
+  - HO
+  typology: Vehicle arson and owner give-up fraud
+  status: verified
+  sources:
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Commercial / vehicle fraud indicators
+    quote: The vehicle exhibits multiple interior burn locations and is not a total burn
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Commercial / vehicle fraud indicators
+    quote: Flammable liquid containers were recovered or detected from the vehicle or at the scene
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: Commercial / vehicle fraud indicators
+    quote: Engine or transmission number is missing or altered
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Vehicle
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Accelerant signs point to a set fire.
+    source_url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+  innocent_explanations:
+  - Fuel tanks and plastics can produce odd burn patterns in wildfires
+  - Fuel cans legitimately carried by rural or work vehicles
+  jurisdictions: United States
+  version: 1
+- id: FR-151
+  name: Firms that handle only smoke-and-ash claims, in unusual volume
+  definition: A public adjuster, cleaning company or law office works only on smoke and ash claims and
+    files an unusually large number of them.
+  areas:
+  - FR
+  typology: Disaster claim mills
+  status: verified
+  sources:
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: 'Smoke & Ash Claim Indicators: Damage Indicators (Initial)'
+    quote: Public adjuster, cleaning company, law office, etc. only works on smoke and ash claims
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: 'Smoke & Ash Claim Indicators: Damage Indicators (Initial)'
+    quote: High incidence of smoke and ash claims from a specific firm
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Contract
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - State public adjuster licence lookups
+  - Court filings by firm name
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Specialist restoration firms legitimately focus on smoke damage after big fires
+  version: 1
+- id: FR-152
+  name: Smoke or ash damage that testing or the pattern does not support, or work never done
+  definition: Ash findings are inconsistent or unnatural, lab tests find little ash, contractors skip
+    testing, or paid-for remediation never happens.
+  areas:
+  - FR
+  typology: Disaster claim fraud
+  status: verified
+  sources:
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: 'Smoke & Ash Claim Indicators: Attorney/Public Adjuster Indicators (Subsequent)'
+    quote: Laboratory testing of residence and/or possessions shows no or little presence of ash or soot
+      or other storm/event damage
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indicators of Wildfire-Related Fraud
+    publisher: National Insurance Crime Bureau (via Arizona DIFI)
+    year: '2025'
+    url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+    locator: 'Smoke & Ash Claim Indicators: Damage Indicators (Subsequent)'
+    quote: Work to remediate the smoke and ash damage is never performed by the cleaning company
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Payment
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ash deposition is genuinely patchy with wind
+  - Testing methods vary between labs
+  version: 1
+- id: FR-153
+  name: Disaster charity with a look-alike name or collecting by money transfer
+  definition: A charity soliciting after a disaster uses a name close to a well-known charity or asks
+    for donations through money transfer services.
+  areas:
+  - FR
+  typology: Disaster charity fraud
+  status: verified
+  sources:
+  - title: 'Advisory FIN-2017-A007: Fraudulent disaster-related benefits and charity schemes'
+    publisher: US Treasury FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+    locator: Charities Fraud Red Flags, item 1
+    quote: is similar to, but not exactly the same as, those of reputable charities; or
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Advisory FIN-2017-A007: Fraudulent disaster-related benefits and charity schemes'
+    publisher: US Treasury FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+    locator: Charities Fraud Red Flags, item 2
+    quote: generally, legitimate charities do not solicit donations via money transfer services.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - IRS Tax Exempt Organization Search
+  - State charity registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Look-alike charity names parallel cloned company names.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+  innocent_explanations:
+  - Small local groups with similar generic names
+  - Diaspora communities using remittance services to collect informally
+  jurisdictions: United States
+  version: 1
 not_reached:
 - investor.gov /pyramid-scheme (singular URL) failed; used /pyramid-schemes and 2013 alert instead
 - 'justice.gov/ust/bankruptcy-fraud and /ust/criminal-enforcement: fetch errors; used FY2014 USTP criminal
@@ -5135,3 +7860,24 @@ not_reached:
 - Some FinCEN quotes reached me cut short by the fetch tool (FinCEN elder advisory, check alert, timeshare
   notice). The quoted text matches the start of each red flag but is not the full sentence. Re-check the
   full wording against the PDFs before publishing.
+- GAO-15-593SP landing page did not list the four components; taken instead from the full PDF (pp. 5-6,
+  13, 21-24).
+- ALTA seller-impersonation handout (the actual red-flag list) was not in the fetched page; only the description
+  was quoted. Red flags taken from FBI IC3 PSA I-061626-PSA instead.
+- Justice.gov Feeding Our Future case page (usao-mn/feeding-our-future) failed to load; DOJ OPA sentencing
+  release used. The verdict date and number of co-defendants convicted were not confirmed from a primary
+  source (press reports indicate a March 2025 verdict and May 2026 sentencing).
+- FinCEN EIP advisory number (FIN-2021-A002 expected) not confirmed on the fetched PDF; cited by title
+  and URL.
+- PRAC SSN fraud alert publication date not stated in the PDF (URL path suggests January 2023).
+- Federal Reserve synthetic identity definition press release has no visible date; toolkit page also undated.
+- 'NICB wildfire indicators: several items (coverage increased after the fire began, inflated additional
+  living expenses, recent purchases on inventory) were paraphrased in the fetched text and so are not
+  quoted verbatim.'
+- No modern primary arson-for-profit indicator list (e.g., USFA, NFPA 921, ATF) was fetched; the Illinois
+  1979 pamphlet in the NCJRS archive was used for financial-motive indicators.
+- SBA OIG pandemic reports (e.g., Report 23-09 and white paper 23-10) were found but not opened.
+- No court or regulator case found and fetched for seller impersonation of vacant land, disaster-aid (FEMA)
+  benefit fraud, reverse-mortgage fraud or a smoke-and-ash claim mill.
+- GAO-23-105331 does not list shared addresses/IPs or business formation date as indicators; those were
+  not attributed to it.

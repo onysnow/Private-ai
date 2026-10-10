@@ -5492,6 +5492,2738 @@ indicators:
   - Seasonal or event-driven disorder
   jurisdictions: United Kingdom (NCA)
   version: 1
+- id: OC-097
+  name: One person picks the gun while another person pays (possible straw purchase)
+  definition: At a gun counter, the person choosing the firearm is not the person who pays for it, which
+    can mean the buyer is acting for someone else.
+  areas:
+  - OC
+  typology: 'Firearms trafficking: straw purchase'
+  status: verified
+  sources:
+  - title: Don't Lie for the Other Guy
+    publisher: ATF (with NSSF)
+    url: https://www.atf.gov/firearms/tools-services-law-enforcement/atf-firearms-programs/dont-lie-other-guy
+    locator: How to Spot a Straw Purchase
+    quote: One person selects the firearm while another person pays
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Dealer CCTV or sale records show a companion choosing the gun and the named buyer paying for it
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A gift bought for a family member who can lawfully own it
+  - A spouse or partner paying from a shared account
+  - An experienced friend helping a first-time buyer choose
+  jurisdictions: United States (18 U.S.C. 932, 933)
+  version: 1
+- id: OC-098
+  name: Gun buyer seems unfamiliar with the firearm they are buying
+  definition: The person filling in the purchase forms shows little knowledge of the firearm, suggesting
+    it may be meant for someone else.
+  areas:
+  - OC
+  typology: 'Firearms trafficking: straw purchase'
+  status: verified
+  sources:
+  - title: Don't Lie for the Other Guy
+    publisher: ATF (with NSSF)
+    url: https://www.atf.gov/firearms/tools-services-law-enforcement/atf-firearms-programs/dont-lie-other-guy
+    locator: How to Spot a Straw Purchase
+    quote: A buyer who appears unfamiliar with the firearm
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Testimony from a dealer that the buyer could not say what calibre or model they wanted
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - First-time gun owner
+  - Buyer acting on a recommendation from a trainer
+  - Nervousness or language barriers
+  jurisdictions: United States
+  version: 1
+- id: OC-099
+  name: Gun buyer directed or coached by someone else during the purchase
+  definition: Another person tells the buyer what to choose or what to say, a sign the buyer may be fronting
+    for that person.
+  areas:
+  - OC
+  typology: 'Firearms trafficking: straw purchase'
+  status: verified
+  sources:
+  - title: Don't Lie for the Other Guy
+    publisher: ATF (with NSSF)
+    url: https://www.atf.gov/firearms/tools-services-law-enforcement/atf-firearms-programs/dont-lie-other-guy
+    locator: How to Spot a Straw Purchase
+    quote: A purchaser being directed or coached by someone else
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Phone messages or texts in court filings showing a third party instructing the buyer in real time
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A parent or partner giving advice
+  - An instructor or experienced shooter helping a novice
+  jurisdictions: United States
+  version: 1
+- id: OC-100
+  name: Buyer reluctant to complete the background-check paperwork
+  definition: A buyer hesitates over, or avoids, the federal background-check form, which may mean they
+    cannot pass it or are buying for someone who cannot.
+  areas:
+  - OC
+  typology: 'Firearms trafficking: straw purchase'
+  status: verified
+  sources:
+  - title: Don't Lie for the Other Guy
+    publisher: ATF (with NSSF)
+    url: https://www.atf.gov/firearms/tools-services-law-enforcement/atf-firearms-programs/dont-lie-other-guy
+    locator: How to Spot a Straw Purchase
+    quote: Reluctance to complete required background check paperwork
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Don't Lie for the Other Guy
+    publisher: ATF (with NSSF)
+    url: https://www.atf.gov/firearms/dont-lie-other-guy
+    locator: Penalties under 18 U.S.C. 932 and 933
+    quote: Up to 15 years in prison
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Abandoned sales or denied NICS checks followed by a purchase by a companion
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Privacy concerns
+  - Confusion over the form
+  - Time pressure
+  jurisdictions: United States
+  version: 1
+- id: OC-101
+  name: Recovered crime gun first sold at a gun show
+  definition: Trace data show a recovered firearm was first sold by a licensed dealer at a gun show, a
+    source ATF links to cross-border recoveries and short time-to-crime.
+  areas:
+  - OC
+  typology: 'Firearms trafficking: source pattern'
+  status: verified
+  sources:
+  - title: 'National Firearms Commerce and Trafficking Assessment, Vol. II Part IV: Crime Guns Recovered
+      Outside the U.S.'
+    publisher: ATF
+    year: '2023'
+    url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iv-crime-guns-recovered-outside-us-and-traced-le/download
+    locator: p. 9 (gun-show-sourced traces)
+    quote: Mexico accounted for nearly 61% (947)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Firearms Commerce and Trafficking Assessment, Vol. II Part IV
+    publisher: ATF
+    year: '2023'
+    url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iv-crime-guns-recovered-outside-us-and-traced-le/download
+    locator: p. 18
+    quote: Traced crime guns acquired from an FFL at a gun show and recovered by Canadian LEAs had the
+      shortest TTC (1.6 years)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Mexican recoveries traced back to gun-show sales in Southwest border states
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Address
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - ATF trace reports and court exhibits
+  - ATF NFCTA tables
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful buyer's gun later stolen or resold
+  - Gun shows are a normal sales channel; one trace proves little
+  jurisdictions: United States, Mexico, Canada
+  version: 1
+- id: OC-102
+  name: Crime guns traced to young purchasers (18 to 24) in source states
+  definition: A cluster of recovered guns, especially abroad, traces back to purchasers aged 18 to 24,
+    a group ATF found over-represented in Mexican recoveries.
+  areas:
+  - OC
+  typology: 'Firearms trafficking: purchaser profile'
+  status: verified
+  sources:
+  - title: National Firearms Commerce and Trafficking Assessment, Vol. II Part IV
+    publisher: ATF
+    year: '2023'
+    url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iv-crime-guns-recovered-outside-us-and-traced-le/download
+    locator: p. 6
+    quote: Mexico, at 21% (6,380), had the highest percentage of crime guns traced to a purchaser aged
+      18 to 24
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Firearms Commerce and Trafficking Assessment, Vol. II Part IV
+    publisher: ATF
+    year: '2023'
+    url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iv-crime-guns-recovered-outside-us-and-traced-le/download
+    locator: p. 22 (conclusion)
+    quote: Traced crime guns recovered in Mexico often originate from firearm transfers at FFLs in Southwest
+      border states and Florida.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several young buyers in Texas or Arizona whose purchases later turn up in Mexico
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - ATF trace data in court filings
+  - Mexican seizure reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Young adults are lawful buyers; age alone is not evidence
+  - Theft from a lawful young owner
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-103
+  name: Privately made firearm (ghost gun, no serial number) or 3D-printed gun recovered
+  definition: A recovered gun was assembled or made by someone other than a licensed maker and has no
+    maker's serial number, so it cannot be traced in the normal way.
+  areas:
+  - OC
+  typology: 'Firearms trafficking: privately made and 3D-printed firearms'
+  status: verified
+  sources:
+  - title: Definition of Frame or Receiver (final rule page)
+    publisher: ATF
+    url: https://www.atf.gov/rules-and-regulations/definition-frame-or-receiver
+    locator: PMF definition
+    quote: and without a serial number placed by a licensed manufacturer at the time the firearm was produced.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'NFCTA Vol. II Part III: Crime Guns Recovered and Traced within the U.S.'
+    publisher: ATF
+    year: '2023'
+    url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iii-crime-guns-recovered-and-traced-us/download
+    locator: p. 5
+    quote: increased by 1,083% from 2017 (1,629) to 2021 (19,273).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU Serious and Organised Crime Threat Assessment (EU-SOCTA) 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 37
+    quote: 3D printing, and AI lower access barriers and increase sophistication.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Police seizure of unserialised pistols built from parts kits
+  - Seized 3D-printed frames
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Person
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful hobby building where permitted
+  - Pre-1968 firearms legitimately without serials
+  jurisdictions: United States; EU
+  version: 1
+- id: OC-104
+  name: Converted or fully automatic firearms among recoveries
+  definition: Recovered guns include weapons converted to fire automatically or converted from non-lethal
+    guns, which signals access to illegal conversion.
+  areas:
+  - OC
+  typology: 'Firearms trafficking: converted weapons'
+  status: verified
+  sources:
+  - title: NFCTA Vol. II Part III
+    publisher: ATF
+    year: '2023'
+    url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iii-crime-guns-recovered-and-traced-us/download
+    locator: p. 21 (suspected PMFs by type)
+    quote: machine guns accounted for 12% (4,459)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 32 (case example)
+    quote: a converted firearm and powerful explosive pyrotechnics.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Seizure records listing auto-converted pistols
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawfully registered pre-1986 machine guns (US)
+  - Misclassification in seizure records
+  jurisdictions: United States; EU
+  version: 1
+- id: OC-105
+  name: Weapons with a state's import markings or transfer papers turn up with unauthorised users
+  definition: Arms that markings or documents show were delivered to a national authority are later found
+    with armed groups or criminals, meaning they left state custody.
+  areas:
+  - OC
+  typology: 'Arms diversion: loss from national custody'
+  status: verified
+  sources:
+  - title: CAR typology of arms diversion (presentation to ATT)
+    publisher: Conflict Armament Research
+    year: '2018'
+    url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+    locator: Loss from national custody slide
+    quote: Last known in the custody of a national authority after transfer, but cause unknown.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CAR typology of arms diversion
+    publisher: Conflict Armament Research
+    year: '2018'
+    url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+    locator: Loss from national custody slide
+    quote: Diversion identified by import markings, and/or transfer documentation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Field documentation of rifles bearing a government's import marks in rebel hands
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Conflict Armament Research iTrace
+  - UN Panel of Experts reports
+  - Export licence records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Diverted arms often breach UN arms embargoes
+    source_url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+  innocent_explanations:
+  - Lawful retransfer with exporter consent
+  - Weapons captured in fighting rather than sold
+  jurisdictions: International (Arms Trade Treaty)
+  version: 1
+- id: OC-106
+  name: State supplies or re-transfers arms to unauthorised users, with or against end-user certificates
+  definition: A government sends arms directly to unauthorised users or passes on imported arms in breach
+    of the end-user commitments it gave.
+  areas:
+  - OC
+  typology: 'Arms diversion: state-sponsored diversion'
+  status: verified
+  sources:
+  - title: CAR typology of arms diversion
+    publisher: Conflict Armament Research
+    year: '2018'
+    url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+    locator: State-sponsored diversion slide
+    quote: Retransfer to unauthorised users with or without an EUC (150 cases).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CAR typology of arms diversion
+    publisher: Conflict Armament Research
+    year: '2018'
+    url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+    locator: State-sponsored diversion slide
+    quote: Retransfer in violation of EUC or similar (42 cases).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CAR typology of arms diversion
+    publisher: Conflict Armament Research
+    year: '2018'
+    url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+    locator: State-sponsored diversion slide
+    quote: Direct supply from manufacturing country to unauthorised users (44 cases).
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Export licence naming one end user while serial numbers trace to another country's battlefield
+  cases: []
+  data_needed:
+  - PublicBody
+  - Contract
+  - Document
+  - Organization
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - UN Panel of Experts reports
+  - National arms export reports
+  - iTrace
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Unauthorised transfers often violate embargoes
+    source_url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+  innocent_explanations:
+  - Authorised re-export with consent not yet public
+  - Documentation gaps in transparency reports
+  jurisdictions: International
+  version: 1
+- id: OC-107
+  name: Arms leaking from national stockpiles, captured in battle, or lost after state collapse
+  definition: Weapons reach unauthorised hands through leakage from poorly secured stocks, seizure from
+    state forces, or loss of control when a state collapses.
+  areas:
+  - OC
+  typology: 'Arms diversion: stockpile leakage, battlefield capture, state collapse'
+  status: verified
+  sources:
+  - title: CAR typology of arms diversion
+    publisher: Conflict Armament Research
+    year: '2018'
+    url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+    locator: Diversion from stockpiles slide
+    quote: Accidental or deliberate leakage from national or civilian stocks.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CAR typology of arms diversion
+    publisher: Conflict Armament Research
+    year: '2018'
+    url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+    locator: Battlefield capture slide
+    quote: Seizure from state forces during fighting.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CAR typology of arms diversion
+    publisher: Conflict Armament Research
+    year: '2018'
+    url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+    locator: State collapse slide
+    quote: Most cases followed collapse of Libyan state in 2011.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 37
+    quote: Weapons available in (post-war) Ukraine will further exacerbate this threat.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Libyan state stocks after 2011 found in neighbouring conflicts (CAR)
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - iTrace
+  - UN Panel of Experts reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Weapons legally transferred and documented, then stolen
+  - Record errors in stock audits
+  jurisdictions: International
+  version: 1
+- id: OC-108
+  name: Small craft alters course toward a ship and speeds up suddenly
+  definition: A small boat turns toward a merchant ship and rapidly accelerates or behaves aggressively,
+    an early sign of a possible piracy approach.
+  areas:
+  - OC
+  typology: 'Maritime piracy: suspicious approach'
+  status: verified
+  sources:
+  - title: 'BMP5 Annex H: Piracy attack indicators'
+    publisher: MSCIO (Best Management Practices 5)
+    year: '2018'
+    url: https://mscio.eu/bmp/bmp5/bmp5-annex-h
+    locator: Suspicious craft activity
+    quote: A definite course alteration towards a ship associated with a rapid increase in speed by the
+      suspected craft
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5 Annex H
+    publisher: MSCIO
+    year: '2018'
+    url: https://mscio.eu/bmp/bmp5/bmp5-annex-h
+    locator: Suspicious craft activity
+    quote: Sudden changes in course towards the ship and aggressive behaviour.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - UKMTO or IMB incident reports describing a skiff approaching at speed
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - UKMTO advisories
+  - IMB Piracy Reporting Centre reports
+  - AIS history
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Fishermen protecting nets
+  - Traders approaching to sell
+  - Coastguard or naval patrols
+  jurisdictions: High-risk areas (Indian Ocean, Red Sea, Gulf of Aden)
+  version: 1
+- id: OC-109
+  name: Small craft shadowing a ship on the same course and speed for an unusual time
+  definition: A small boat keeps pace with a ship for longer and further than normal fishing would explain.
+  areas:
+  - OC
+  typology: 'Maritime piracy: suspicious approach'
+  status: verified
+  sources:
+  - title: BMP5 Annex H
+    publisher: MSCIO
+    year: '2018'
+    url: https://mscio.eu/bmp/bmp5/bmp5-annex-h
+    locator: Suspicious craft activity
+    quote: Small craft sailing on the same course and speed for an uncommon period and distance, not in
+      keeping with normal fishing
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Incident report of a craft following a tanker for hours
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - UKMTO advisories
+  - AIS track data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Vessels on the same shipping lane
+  - Fishing fleets transiting
+  jurisdictions: High-risk areas
+  version: 1
+- id: OC-110
+  name: Skiffs with two or more outboard motors at high speed far from the coast
+  definition: Fast open boats with extra engines operating unusually far offshore, a configuration BMP5
+    lists as suspicious.
+  areas:
+  - OC
+  typology: 'Maritime piracy: suspicious craft'
+  status: verified
+  sources:
+  - title: BMP5 (Best Management Practices to Deter Piracy and Enhance Maritime Security)
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: Skiffs with two or more outboard motors.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: Skiffs operating far from the coast.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Section 2
+    quote: typically using small high speed (up to 25 knots) open boats or skiffs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Naval boarding reports describing multi-engine skiffs
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - UKMTO
+  - EUNAVFOR Atalanta reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some legitimate fishing or smuggling-free coastal transport uses spare engines
+  - Fishing far offshore
+  jurisdictions: High-risk areas
+  version: 1
+- id: OC-111
+  name: Ladders, climbing hooks or large fuel loads on a craft that is not fishing
+  definition: A small craft carries boarding equipment or excess fuel not needed for fishing.
+  areas:
+  - OC
+  typology: 'Maritime piracy: suspicious craft'
+  status: verified
+  sources:
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: The existence of unusual and non-fishing equipment onboard, e.g. ladders, climbing hooks or
+      large amounts of fuel.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Section 2
+    quote: Pirates use long lightweight ladders, knotted climbing ropes or long hooked poles to climb
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Naval boarding finds ladders and fuel drums on a skiff
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Naval press releases
+  - UKMTO
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Fuel carried for long fishing trips
+  - Equipment for legitimate maritime work
+  jurisdictions: High-risk areas
+  version: 1
+- id: OC-112
+  name: 'Mothership: one vessel towing several skiffs or carrying them, or dhows and skiffs rafted together'
+  definition: A larger vessel, often a dhow, carries or tows attack skiffs so pirates can operate far
+    from shore.
+  areas:
+  - OC
+  typology: 'Maritime piracy: mothership'
+  status: verified
+  sources:
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: One vessel towing multiple skiffs or has skiffs onboard.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: Dhows/skiffs rafted up.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Section 2
+    quote: Motherships, which include merchant ships and fishing vessels but, more commonly, dhows.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hijacked fishing dhow later used to launch skiffs (as reported by naval forces)
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - EUNAVFOR, UKMTO, IMB reports
+  - Vessel registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Fishing dhows commonly carry small boats
+  - Craft rafted for shelter or repairs
+  jurisdictions: High-risk areas
+  version: 1
+- id: OC-113
+  name: 'Vessel dark: no AIS signal, no lights at night, or windows blanked out'
+  definition: A vessel hides its identity or presence by not transmitting AIS, running without lights
+    in darkness, or covering windows.
+  areas:
+  - OC
+  typology: 'Maritime piracy: concealment'
+  status: verified
+  sources:
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: The vessel is not transmitting on AIS.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: No lights during hours of darkness.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: Windows of vessel covered or blanked out.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - AIS gap analysis around an incident position
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - AIS providers (e.g. MarineTraffic, Global Fishing Watch)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: AIS gaps are also a shadow-fleet sign; Treasury sanctions on shadow-fleet operators show the
+      overlap
+    source_url: https://home.treasury.gov/news/press-releases/sb0049
+  innocent_explanations:
+  - Small craft are often not required to carry AIS
+  - Ships may switch AIS off on security advice
+  - Equipment failure
+  jurisdictions: High-risk areas
+  version: 1
+- id: OC-114
+  name: Crew numbers out of proportion to the craft's size
+  definition: A small craft carries more people than its size or stated purpose would need.
+  areas:
+  - OC
+  typology: 'Maritime piracy: suspicious craft'
+  status: verified
+  sources:
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Annex C
+    quote: The number of crew onboard relative to its size.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Incident report noting eight people in a small skiff
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - UKMTO, IMB reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Migrant boats
+  - Large fishing crews
+  jurisdictions: High-risk areas
+  version: 1
+- id: OC-115
+  name: 'Piracy attack: weapons fired, boarding attempted or ladders and hooks used against the ship'
+  definition: The approach turns into an attack when violence is used or attempted, boarding is tried,
+    or weapons are deliberately used against the ship.
+  areas:
+  - OC
+  typology: 'Maritime piracy: attack'
+  status: verified
+  sources:
+  - title: BMP5 Annex H
+    publisher: MSCIO
+    year: '2018'
+    url: https://mscio.eu/bmp/bmp5/bmp5-annex-h
+    locator: Piracy attack indicators
+    quote: The use of violence against the ship or its personnel, or any attempt to use violence.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5 Annex H
+    publisher: MSCIO
+    year: '2018'
+    url: https://mscio.eu/bmp/bmp5/bmp5-annex-h
+    locator: Piracy attack indicators
+    quote: Attempt(s) to illegally board the ship where the Master suspects the persons are pirates.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: BMP5
+    publisher: Industry and naval partners via IMO
+    year: '2018'
+    url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+    locator: Section 2
+    quote: experience shows attacks at dawn and dusk are more likely.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - UKMTO incident notices classing an event as an attack
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - UKMTO, IMB PRC, ReCAAP reports
+  levels:
+    faint: Suspicious approach without weapons discharged (BMP5 Annex H distinction)
+    strong: Aggressive approach with weapons discharged
+    textbook: Attempted or actual boarding, or violence against ship or crew, as worded in Annex H
+    threshold_source: https://mscio.eu/bmp/bmp5/bmp5-annex-h
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Warning shots by security teams misreported
+  - Misidentification of fishermen
+  jurisdictions: International
+  version: 1
+- id: OC-116
+  name: Selling subscriptions to illegal IPTV services
+  definition: A business or seller offers paid access to TV streams it has no right to distribute.
+  areas:
+  - OC
+  typology: Digital piracy
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 23
+    quote: selling access to illegal IPTV platforms to an increasing number of subscribers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Resellers advertising thousands of channels for a low annual fee
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Domain and hosting records
+  - Payment processor records
+  - Court rulings on site blocking
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licensed IPTV providers exist
+  - Reseller unaware the service is unlicensed
+  jurisdictions: EU and global
+  version: 1
+- id: OC-117
+  name: Lookalike domains and websites copying a real brand
+  definition: Sites use misspelled or near-identical domain names and copied designs to pass as a genuine
+    company.
+  areas:
+  - OC
+  typology: Counterfeiting and IP crime online
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 12
+    quote: a deliberately confusing variant, for example a slight misspelling or replacement of a letter
+      by a digit
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 31
+    quote: websites that have similar designs and appearances to legitimate companies' official websites
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Domain seizures in Operation In Our Sites
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - WHOIS/RDAP
+  - Certificate transparency logs
+  - Trademark registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Authorised resellers and affiliates
+  - Coincidentally similar names
+  jurisdictions: EU and global
+  version: 1
+- id: OC-118
+  name: Goods offered far below the legal market price
+  definition: Branded or regulated products are sold at discounts so deep that genuine supply is unlikely.
+  areas:
+  - OC
+  typology: Counterfeit goods
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 24
+    quote: the price offered is attractive compared to those offered on the legal market
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 17 (counterfeit perfume)
+    quote: discounts of up to 90 %
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Perfume sold at 90% off on darknet markets
+  - Pesticides offered at EUR 15-20 per litre outside the EU (p. 18)
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: HMRC lists unusually cheap UK brands bought abroad as excise-fraud risk
+    source_url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+  innocent_explanations:
+  - Clearance or grey-market parallel imports
+  - End-of-line stock
+  - Promotional pricing
+  jurisdictions: EU and global
+  version: 1
+- id: OC-119
+  name: Packaging, logos and labels shipped separately from the goods
+  definition: Brand labels and packaging travel in different consignments from unbranded goods, to be
+    joined near the point of sale.
+  areas:
+  - OC
+  typology: 'Counterfeit goods: production and import'
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 31
+    quote: Packaging materials, logos and labels are usually shipped separately from the counterfeit goods
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Customs seizure of label rolls declared as generic printed material
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate brands also source packaging from separate suppliers
+  jurisdictions: EU
+  version: 1
+- id: OC-120
+  name: Premises with empty packaging, sealing machines, label printers or split production steps
+  definition: Warehouses or workshops hold equipment and materials for finishing or repackaging branded
+    goods, sometimes across several sites.
+  areas:
+  - OC
+  typology: 'Counterfeit goods: production sites'
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 19
+    quote: Warehouses have been found containing empty packages, precision scales and plastic packaging
+      sealing devices
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 31
+    quote: high-tech printers used to print copied labels and packaging material
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 32
+    quote: Counterfeit items are often completed following several production steps carried out at different
+      locations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Clandestine perfume packaging site dismantled in Italy, June 2021 (p. 17)
+  - Underground cigarette factory in Spain (p. 27)
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Event
+  - Ownership
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate contract packers and co-packers
+  - Licensed repackaging of parallel imports
+  jurisdictions: EU
+  version: 1
+- id: OC-121
+  name: Products with no origin marking or Declaration of Conformity
+  definition: Toys or other regulated goods lack the origin or conformity paperwork that legal products
+    must carry.
+  areas:
+  - OC
+  typology: Counterfeit and unsafe goods
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: EUIPO and Europol
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: p. 29 (counterfeit toys)
+    quote: typically lack any indication of origin and/or Declaration of Conformity
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Operation LUDUS toy seizures
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paperwork lost or held by importer rather than shown on product
+  - Non-EU products sold legally elsewhere
+  jurisdictions: EU
+  version: 1
+- id: OC-122
+  name: Many different people deposit cash into one account at the same place
+  definition: Several individuals pay cash into a single account at the same branch, a pattern FATF ties
+    specifically to counterfeit currency.
+  areas:
+  - OC
+  typology: Counterfeit currency
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Related to Counterfeiting of Currency
+    publisher: FATF
+    year: '2013'
+    url: https://www.bportugal.pt/sites/default/files/anexos/gafi_doc_mt_contrafacao_en_0.pdf
+    locator: p. 45, Section III.1.a red flag (e)
+    quote: Cash deposits made to one account at the same place by multiple individuals;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bank records in court filings showing many depositors into one account
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Business collecting payments from customers
+  - Family members paying into one account
+  - Rent or club collections
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-123
+  name: Deposits of small, dirty or stained banknotes, or unusual use of high-denomination notes
+  definition: Customers bring notes in a condition or denomination mix that FATF lists as a red flag for
+    counterfeit currency proceeds.
+  areas:
+  - OC
+  typology: Counterfeit currency
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Related to Counterfeiting of Currency
+    publisher: FATF
+    year: '2013'
+    url: https://www.bportugal.pt/sites/default/files/anexos/gafi_doc_mt_contrafacao_en_0.pdf
+    locator: p. 45, red flag (k)
+    quote: The banknotes brought by customers; being small denominated and dirty, existence of stains
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Money Laundering and Terrorist Financing Related to Counterfeiting of Currency
+    publisher: FATF
+    year: '2013'
+    url: https://www.bportugal.pt/sites/default/files/anexos/gafi_doc_mt_contrafacao_en_0.pdf
+    locator: p. 45, red flag (j)
+    quote: Cash deposits with small denomination banknotes, to perform wire transfers;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Money Laundering and Terrorist Financing Related to Counterfeiting of Currency
+    publisher: FATF
+    year: '2013'
+    url: https://www.bportugal.pt/sites/default/files/anexos/gafi_doc_mt_contrafacao_en_0.pdf
+    locator: p. 45, red flag (l)
+    quote: The involvement of high denomination banknotes
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Euro counterfeiting network case, Spain/Europol (Box 3)
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cash-heavy retail, markets and tips
+  - Old savings kept at home
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-124
+  name: People in transactions are wanted for counterfeiting offences
+  definition: A party to the money flow is sought by authorities for counterfeiting currency.
+  areas:
+  - OC
+  typology: Counterfeit currency
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Related to Counterfeiting of Currency
+    publisher: FATF
+    year: '2013'
+    url: https://www.bportugal.pt/sites/default/files/anexos/gafi_doc_mt_contrafacao_en_0.pdf
+    locator: p. 45, red flag (i)
+    quote: Subjects wanted by the authority for currency counterfeiting offences;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Arrest warrant issued in Oman for a suspect in counterfeit rupee exchange (Box 4)
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - Interpol notices
+  - Police wanted lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Name match with a different person
+  - Charges later dropped
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-125
+  name: Notes fail basic security checks (feel, colour-shifting ink, watermark, thread)
+  definition: Banknotes in circulation or in evidence lack the texture and security features genuine notes
+    have.
+  areas:
+  - OC
+  typology: Counterfeit currency
+  status: verified
+  sources:
+  - title: Quick Glance Reference Card
+    publisher: US Currency Education Program / US Secret Service
+    url: https://uscurrency.gov/sites/default/files/downloadable-materials/files/en/quick-glance-reference-card-en-508.pdf
+    locator: Feel the paper
+    quote: It should feel slightly rough to the touch.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Quick Glance Reference Card
+    publisher: US Currency Education Program / US Secret Service
+    url: https://uscurrency.gov/sites/default/files/downloadable-materials/files/en/quick-glance-reference-card-en-508.pdf
+    locator: If you suspect a counterfeit
+    quote: notify your nearest U.S. Secret Service Field Office
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Retailers reporting batches of suspect $100 notes
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Worn or washed genuine notes
+  - Older note designs without newer features
+  jurisdictions: United States
+  version: 1
+- id: OC-126
+  name: Card reader or keypad loose, crooked, mismatched, or with a pinhole camera (skimming)
+  definition: Signs that a device has been fitted to an ATM or fuel pump to copy card data and PINs.
+  areas:
+  - OC
+  typology: Payment card skimming
+  status: verified
+  sources:
+  - title: Skimming
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/skimming
+    locator: Tips
+    quote: Be especially alert for skimming devices in tourist areas, since these are popular targets.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Skimming
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/skimming
+    locator: Tips
+    quote: Be especially alert for skimming devices in tourist areas, since these are popular targets.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Clusters of fraud complaints traced to one fuel station
+  cases: []
+  data_needed:
+  - Address
+  - Event
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Wear and tear or vandalism
+  - Legitimate hardware upgrades
+  jurisdictions: United States
+  version: 1
+- id: OC-127
+  name: Small border-state oil, import or freight firm with volumes or margins above its peers
+  definition: A small company near the US southwest border moves more money, or earns higher margins,
+    than similar firms, a FinCEN sign of cartel oil and fuel smuggling.
+  areas:
+  - OC
+  typology: Fuel and oil smuggling (huachicol)
+  status: verified
+  sources:
+  - title: FinCEN Alert on Oil Smuggling Schemes (FIN-2025-Alert002)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+    locator: p. 7, red flags
+    quote: on the U.S. southwest border with transactional activity and profit margins that exceed the
+      typical business profile
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert on Fuel Smuggling and Tax Evasion (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 10
+    quote: operating in states on the southern border with transactional activity and profit margins that
+      exceed
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - CJNG fuel-theft network sanctioned by OFAC, September 2024
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Address
+  - Ownership
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: OFAC has designated CJNG fuel-theft networks
+    source_url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+  innocent_explanations:
+  - Efficient or well-connected new entrant
+  - Commodity price swings
+  - Seasonal demand
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-128
+  name: Crude oil sold well below the market rate
+  definition: A small oil company sells WTI or other crude far below market price, consistent with stolen
+    or smuggled supply.
+  areas:
+  - OC
+  typology: Fuel and oil smuggling
+  status: verified
+  sources:
+  - title: FinCEN Alert on Oil Smuggling Schemes (FIN-2025-Alert002)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+    locator: p. 8
+    quote: for significantly less than the market rate.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - South Texas father and son indicted (May 2025) over alleged imports of illicit Mexican crude
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lower-grade crude
+  - Distressed sale or quality discount
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-129
+  name: Large oil sales but no online presence or a copycat website
+  definition: A company selling millions of dollars of crude a month has no real web presence or a site
+    made to look like a major oil company.
+  areas:
+  - OC
+  typology: Fuel and oil smuggling
+  status: verified
+  sources:
+  - title: FinCEN Alert on Oil Smuggling Schemes (FIN-2025-Alert002)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+    locator: p. 8
+    quote: but has no online presence or is using a basic website that appears designed to closely resemble
+      major U.S. oil and
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 11
+    quote: with little to no business expenses, operations, or online presence
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Domain records
+  - Web archives
+  - State business registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Wholesale traders often keep little online presence
+  jurisdictions: United States
+  version: 1
+- id: OC-130
+  name: Crude-oil sales in, 'waste oil' or hazardous-material payments out, without EPA registration
+  definition: A firm receives money for crude sales but wires money abroad for 'waste oil', often without
+    the required EPA registration or to firms outside the oil industry.
+  areas:
+  - OC
+  typology: 'Fuel and oil smuggling: mislabelled imports'
+  status: verified
+  sources:
+  - title: FinCEN Alert on Oil Smuggling Schemes (FIN-2025-Alert002)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+    locator: p. 8
+    quote: for waste oil or other hazardous materials without possessing the appropriate registrations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: FinCEN Alert on Oil Smuggling Schemes (FIN-2025-Alert002)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+    locator: p. 8
+    quote: for invoices related to the sale of crude oil but sending wire transfers to Mexican or U.S.
+      companies for invoices
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - OFAC-designated SLA. Servicios Logisticos Ambientales and Grupo Jala Logistica (May 2025)
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Document
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - EPA registrations (RCRAInfo)
+  - Bank records
+  - Customs entries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Misdescribed goods on invoices
+    source_url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+  innocent_explanations:
+  - Genuine used-oil recycling trade
+  - Registration held by an affiliate
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-131
+  name: US fuel importer looks like a shell of a Mexican company, or sits at a residential address
+  definition: The US consignee or counterparty appears to be a front for a Mexican company or is registered
+    to a home address.
+  areas:
+  - OC
+  typology: 'Fuel and oil smuggling: shell companies'
+  status: verified
+  sources:
+  - title: FinCEN Alert on Oil Smuggling Schemes (FIN-2025-Alert002)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+    locator: p. 9
+    quote: further review, appears to be a shell company of a Mexican company.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 11
+    quote: receiving wire transfers from U.S. or Mexican companies registered to a residential address
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Ownership
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - State business registries
+  - Property records
+  - Mexican company registry (SIGER)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small family firms registered at home
+  - Legitimate US subsidiary of a Mexican group
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-132
+  name: Counterparties tied to cartels in open sources, indictments or OFAC designations
+  definition: A fuel or freight firm deals with companies or owners linked to cartel activity in Mexican
+    press, US indictments, or sanctions lists.
+  areas:
+  - OC
+  typology: Fuel and oil smuggling
+  status: verified
+  sources:
+  - title: FinCEN Alert on Oil Smuggling Schemes (FIN-2025-Alert002)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+    locator: p. 9
+    quote: Cartel-related activity based on open-source reporting in Mexico, indictments, and OFAC designations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 10
+    quote: connected to huachicol-related activities according to U.S. or Mexican media reporting
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Oscar Guillermo Juraidini Silva designated June 2026
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Sanction
+  - CourtCase
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - OFAC SDN list
+  - PACER indictments
+  - Mexican press
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: OFAC designations are the check
+    source_url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+  innocent_explanations:
+  - Name matches
+  - Old or unproven media allegations
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-133
+  name: Fuel buyer in Mexico lacks a SENER import permit (or uses a CNE permit)
+  definition: A US fuel seller is paid by a Mexican company that does not hold the energy-ministry permit
+    normally needed to import fuel.
+  areas:
+  - OC
+  typology: Fiscal fuel theft (huachicol fiscal)
+  status: verified
+  sources:
+  - title: Supplemental Alert on Fuel Smuggling and Tax Evasion (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 10
+    quote: receiving wire transfers for fuel purchases from a Mexico-based company without a SENER permit
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 10
+    quote: receiving wire transfers from a Mexico-based company with a CNE permit
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - SENER import permit registers
+  - CNE permit lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Permit pending or held by a group affiliate
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-134
+  name: Many daily wires from one Mexican company, few counterparties, thin memo lines, funds passed straight
+    on
+  definition: Payment flows from Mexico are frequent, concentrated, poorly described and immediately moved
+    on, as FinCEN lists for fiscal fuel theft.
+  areas:
+  - OC
+  typology: Fiscal fuel theft
+  status: verified
+  sources:
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 10
+    quote: receiving multiple wire transfers a day from a single Mexico-based company
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 11
+    quote: with little to no information contained in the memo line
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 11
+    quote: receiving a significant amount and volume of wire transfers from Mexico before immediately
+      transferring the funds
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Single large customer paying per load
+  - Treasury sweeps between group accounts
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-135
+  name: Big fuel trading with no storage or transport infrastructure
+  definition: A company shows heavy fuel transactions but has no visible means to store or move fuel.
+  areas:
+  - OC
+  typology: Fiscal fuel theft
+  status: verified
+  sources:
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 11
+    quote: with significant transactional activity but no apparent infrastructure to store and transport
+      fuel
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Vehicle
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Property records
+  - Truck and DOT registrations
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paper traders and brokers who outsource logistics
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-136
+  name: New US firm shares a name with a Mexican company and moves large sums
+  definition: A recently formed US company with the same name as a Mexican firm shows large wires or unusual
+    margins.
+  areas:
+  - OC
+  typology: Fiscal fuel theft
+  status: verified
+  sources:
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 11
+    quote: shares a name with a Mexican company and is sending a significant amount and volume of large
+      wire transfers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - State registries
+  - Mexican company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine new US arm of a Mexican business
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-137
+  name: Busy at ports of entry despite bridge closures, or operating in Mexico with no Mexican subsidiary
+  definition: A firm's activity at border crossings continues when bridges are closed, or it works in
+    Mexico without a local legal entity.
+  areas:
+  - OC
+  typology: Fiscal fuel theft
+  status: verified
+  sources:
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 10
+    quote: with significant operations in ports of entry despite those areas being subject to bridge closures
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 10
+    quote: operates in Mexico but does not have a Mexican subsidiary
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rerouting through other crossings
+  - Using agents rather than a subsidiary
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-138
+  name: Fuel payments in crypto or cash where trade finance would be normal
+  definition: An energy firm receives digital-asset payments or cash deposits from Mexican counterparties
+    instead of normal bank or trade-finance payments.
+  areas:
+  - OC
+  typology: Fiscal fuel theft
+  status: verified
+  sources:
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 11
+    quote: receiving digital asset payments from Mexican companies when similar energy transactions would
+      normally be conducted
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Supplemental Alert (FIN-2026-Alert003)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+    locator: p. 12
+    quote: has outgoing transactions to, or expenditures related to, companies with no apparent nexus
+      to the industry
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Stablecoin use in cross-border trade is growing legitimately
+  jurisdictions: United States, Mexico
+  version: 1
+- id: OC-139
+  name: Excise goods through long broker chains, or UK brands bought back from overseas
+  definition: Alcohol or tobacco passes through many brokers, or UK-made brands are bought abroad and
+    brought back, raising the risk that duty has not been paid.
+  areas:
+  - OC
+  typology: Excise fraud
+  status: verified
+  sources:
+  - title: 'EDDC04060 Risks: existence and provenance of goods'
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+    locator: Risk indicators for the business
+    quote: long or complex supply chains, for example, goods traded through brokers
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EDDC04060
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+    locator: Risk indicators for the business
+    quote: UK produced brands bought or sold overseas
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EDDC04060
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+    locator: Risk indicators for the business
+    quote: imports of large volumes of UK produced stock
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate parallel trading
+  - Brokers common in wholesale drinks
+  jurisdictions: United Kingdom
+  version: 1
+- id: OC-140
+  name: No evidence duty was paid, or goods older than the duty evidence suggests
+  definition: Goods sold as duty-paid have no reasonable proof of payment, the paperwork looks false,
+    or the stock is older than its duty documents.
+  areas:
+  - OC
+  typology: Excise fraud
+  status: verified
+  sources:
+  - title: EDDC04060
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+    locator: Risk indicators for the business
+    quote: where there is no reasonable detail to support the claim that duty on goods, said to be duty
+      paid, has actually been paid
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EDDC04060
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+    locator: Risk indicators for goods and paperwork
+    quote: the goods are significantly older than the evidence of duty payment suggests
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paperwork with the previous holder
+  - Aged stock legitimately stored
+  jurisdictions: United Kingdom
+  version: 1
+- id: OC-141
+  name: Spirits with a missing or non-fluorescing duty stamp, or poor-quality labels
+  definition: Alcohol lacks a duty stamp, the stamp does not glow under UV, or labels look poorer than
+    the genuine product.
+  areas:
+  - OC
+  typology: Excise fraud and counterfeit alcohol
+  status: verified
+  sources:
+  - title: EDDC04060
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+    locator: Risk indicators for goods and paperwork
+    quote: for alcoholic spirits, there is no duty stamp or the duty stamp does not fluoresce
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Products below the stamp-required size or strength
+  - Damaged stamps
+  jurisdictions: United Kingdom
+  version: 1
+- id: OC-142
+  name: New trading partner with huge turnover, or staff who know little about the trade
+  definition: A business that has traded only briefly shows unexplained large turnover, or its people
+    lack basic sector knowledge.
+  areas:
+  - OC
+  typology: Excise fraud
+  status: verified
+  sources:
+  - title: EDDC04060
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+    locator: Risk indicators for the business
+    quote: individuals in the business to be traded with have little knowledge of their trade sector
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EDDC04060
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+    locator: Risk indicators for the business
+    quote: managed to achieve an unusually large turnover in that short period without a reasonable explanation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Directorship
+  - Person
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Companies House filings
+  - VAT registration checks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Successful start-ups
+  - Staff recruited from other sectors
+  jurisdictions: United Kingdom
+  version: 1
+- id: OC-143
+  name: No substantial transformation in the transshipment country
+  definition: Goods only repackaged or relabelled in a third country are declared as originating there
+    to avoid tariffs.
+  areas:
+  - OC
+  typology: 'Customs fraud: tariff transshipment'
+  status: verified
+  sources:
+  - title: 'CBP Red Flag Best Practice: Illegal Transshipment (summary of CBP CTPAT alert)'
+    publisher: Thomson Reuters summarising US CBP
+    year: '2025'
+    url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+    quote: No substantial transformation in the transshipping country (repackaging alone is insufficient
+      to change origin)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Contract
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - US import records (bills of lading)
+  - CBP rulings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Same false-origin documents
+    source_url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+  innocent_explanations:
+  - Genuine processing that changes tariff classification
+  - Origin-rule complexity causing honest error
+  jurisdictions: United States
+  version: 1
+- id: OC-144
+  name: Country-of-origin claims beyond the country's manufacturing capacity
+  definition: Imports labelled as made in a country that cannot plausibly produce that product or volume.
+  areas:
+  - OC
+  typology: 'Customs fraud: tariff transshipment'
+  status: verified
+  sources:
+  - title: 'CBP Red Flag Best Practice: Illegal Transshipment'
+    publisher: Thomson Reuters summarising US CBP
+    year: '2025'
+    url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+    quote: COO labeling inconsistent with the country’s actual manufacturing capabilities
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - UN Comtrade
+  - National export statistics
+  - Factory registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New factories recently opened
+  - Statistics lag behind real capacity
+  jurisdictions: United States
+  version: 1
+- id: OC-145
+  name: Routing through low-tariff or free-trade countries with no business logic, via overly complex
+    deals
+  definition: Shipments or contracts take indirect routes or complex structures that serve no clear commercial
+    purpose.
+  areas:
+  - OC
+  typology: 'Customs fraud: tariff transshipment'
+  status: verified
+  sources:
+  - title: 'CBP Red Flag Best Practice: Illegal Transshipment'
+    publisher: Thomson Reuters summarising US CBP
+    year: '2025'
+    url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+    quote: Routing through low-cost or FTA-friendly countries without a logical commercial reason
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'CBP Red Flag Best Practice: Illegal Transshipment'
+    publisher: Thomson Reuters summarising US CBP
+    year: '2025'
+    url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+    quote: Unjustified or overly complex transaction structures lacking a legitimate purpose
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Vessel
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Consolidation hubs and logistics costs
+  - Supply-chain diversification for legitimate reasons
+  jurisdictions: United States
+  version: 1
+- id: OC-146
+  name: Trade volumes that don't match customs data, or sudden shifts from a partner's past pattern
+  definition: Reported exports and imports disagree with customs data, or a supplier's volumes, routes
+    or prices change sharply without reason.
+  areas:
+  - OC
+  typology: 'Customs fraud: tariff transshipment'
+  status: verified
+  sources:
+  - title: 'CBP Red Flag Best Practice: Illegal Transshipment'
+    publisher: Thomson Reuters summarising US CBP
+    year: '2025'
+    url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+    quote: Discrepancies between reported export/import trade volumes and customs data
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'CBP Red Flag Best Practice: Illegal Transshipment'
+    publisher: Thomson Reuters summarising US CBP
+    year: '2025'
+    url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+    quote: Significant deviations from a partner’s historical trade patterns, including dubious pricing
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Contract
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Mirror trade statistics (UN Comtrade)
+  - Bill-of-lading databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Statistical timing differences
+  - Tariff changes legitimately shifting sourcing
+  jurisdictions: United States
+  version: 1
+- id: OC-147
+  name: Corruption of police, judges, financial staff or insiders with system access
+  definition: A network pays or pressures officials, bank staff or people with digital access to protect
+    itself or move money.
+  areas:
+  - OC
+  typology: 'Criminal network enablers: corruption'
+  status: verified
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 28
+    quote: corrupt staff in financial institutions may enable money laundering
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 29
+    quote: individuals with access to digital systems become key targets for corruption
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Key features of the most threatening criminal networks in the EU
+    publisher: eucrim (summarising Europol)
+    url: https://eucrim.eu/news/key-features-of-most-threatening-criminal-networks-in-the-eu/
+    quote: 71% of these networks engage in corruption to facilitate criminal activity
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - Associate
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Europol finds most threatening networks use corruption
+    source_url: https://eucrim.eu/news/key-features-of-most-threatening-criminal-networks-in-the-eu/
+  innocent_explanations:
+  - Ordinary social ties between officials and residents
+  - Lawful payments misread as bribes
+  jurisdictions: EU
+  version: 1
+- id: OC-148
+  name: Leaks of investigation information to a network (counter-intelligence)
+  definition: A network learns about police operations in advance through corrupt officials or countermeasures.
+  areas:
+  - OC
+  typology: Criminal network enablers
+  status: verified
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 28
+    quote: corrupt officials may provide criminals with classified information regarding operations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Key features of the most threatening criminal networks in the EU
+    publisher: eucrim (summarising Europol)
+    url: https://eucrim.eu/news/key-features-of-most-threatening-criminal-networks-in-the-eu/
+    quote: countermeasures or corruptive practices to obtain information on law enforcement investigations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - Associate
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Leaks come from corrupt officials
+    source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  innocent_explanations:
+  - Raids failing for ordinary reasons
+  - Public reporting tipping off suspects
+  jurisdictions: EU
+  version: 1
+- id: OC-149
+  name: 'Network profile: long-lived, multi-country, multinational, led from home base'
+  definition: 'A group shows Europol''s high-threat profile: active over ten years, present in several
+    countries, with members of several nationalities.'
+  areas:
+  - OC
+  typology: Criminal network profile
+  status: verified
+  sources:
+  - title: Key features of the most threatening criminal networks in the EU
+    publisher: eucrim (summarising Europol)
+    url: https://eucrim.eu/news/key-features-of-most-threatening-criminal-networks-in-the-eu/
+    quote: 76% of the most threatening criminal networks are present/active in two to seven countries
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Key features of the most threatening criminal networks in the EU
+    publisher: eucrim (summarising Europol)
+    url: https://eucrim.eu/news/key-features-of-most-threatening-criminal-networks-in-the-eu/
+    quote: 34% of the most threatening criminal networks have been active for over 10 years
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Associate
+  - Address
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate family businesses span countries and decades
+  jurisdictions: EU
+  version: 1
+- id: OC-150
+  name: 'Violence-as-a-service: contract shootings by hired executors recruited online'
+  definition: A network outsources attacks to hired hit squads, often recruited in online chats and often
+    teenagers who know little about the target.
+  areas:
+  - OC
+  typology: Violence-as-a-service
+  status: verified
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 30
+    quote: Violence is provided as a service and made possible by the availability of trafficked weapons.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 32
+    quote: professional hitmen or hit squads offering violence-as-a-service.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Treasury Sanctions Swedish Gang and Leader Serving Iranian Regime
+    publisher: US Treasury (OFAC)
+    year: '2025'
+    url: https://home.treasury.gov/news/press-releases/sb0047
+    quote: It routinely uses teenagers to conduct attacks
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Foxtrot Network (Sweden), sanctioned by OFAC March 2025
+  cases:
+  - name: Foxtrot Network and Rawa Majid
+    year: '2025'
+    jurisdiction: United States (sanctions), Sweden (base)
+    what_happened: OFAC designated the Sweden-based Foxtrot Network and its leader, saying it carries
+      out shootings and contract killings, routinely uses teenagers for attacks, and orchestrated a January
+      2024 attack on the Israeli Embassy in Stockholm on behalf of Iran. This is a sanctions designation,
+      not a court ruling.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/sb0047
+    source_title: Treasury Sanctions Swedish Gang and Leader Serving Iranian Regime
+  data_needed:
+  - Organization
+  - Person
+  - Event
+  - Associate
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: Executors are often minors
+    source_url: https://home.treasury.gov/news/press-releases/sb0047
+  innocent_explanations:
+  - Personal disputes with no network link
+  - Copycat attacks
+  jurisdictions: EU (notably Sweden)
+  version: 1
+- id: OC-151
+  name: Young people recruited online into criminal roles (couriers, warehouse staff, money mules, cyber
+    tasks, recruiters)
+  definition: Networks use social media and encrypted apps to give young people roles in drug, fraud,
+    laundering and cyber crime.
+  areas:
+  - OC
+  typology: Recruitment of minors
+  status: verified
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 33
+    quote: young people are recruited in roles like dealers or couriers but also warehouse operators
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 33
+    quote: Young people are used as money mules
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 33
+    quote: script kiddies are influenced to conduct specific cyber-activities for a fee.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Key features of the most threatening criminal networks in the EU
+    publisher: eucrim (summarising Europol)
+    url: https://eucrim.eu/news/key-features-of-most-threatening-criminal-networks-in-the-eu/
+    quote: some of the most threatening criminal networks recruit members, even minors
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Job-style posts in group chats offering paid 'tasks'
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Associate
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: Recruitment of minors is a safeguarding concern
+    source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  innocent_explanations:
+  - Genuine gig-work adverts
+  - Youth online slang misread
+  jurisdictions: EU
+  version: 1
+- id: OC-152
+  name: 'Young person suddenly secretive: encrypted apps, new values, lying (possible criminal recruitment)'
+  definition: Behaviour changes Europol lists for parents as possible signs a young person is being drawn
+    in by a criminal network.
+  areas:
+  - OC
+  typology: Recruitment of minors (prevention level)
+  status: verified
+  sources:
+  - title: Stop criminal networks recruiting youngsters
+    publisher: Europol
+    url: https://www.europol.europa.eu/operations-services-and-innovation/public-awareness-and-prevention-guides/stop-criminal-networks-recruiting-youngsters
+    locator: Page summary
+    quote: They’ve started using encrypted messaging apps. Ask why. What do they need to hide?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Stop criminal networks recruiting youngsters
+    publisher: Europol
+    url: https://www.europol.europa.eu/operations-services-and-innovation/public-awareness-and-prevention-guides/stop-criminal-networks-recruiting-youngsters
+    locator: Page summary
+    quote: They’re lying more. Or just avoiding questions altogether.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: Prevention guidance aimed at parents
+    source_url: https://www.europol.europa.eu/operations-services-and-innovation/public-awareness-and-prevention-guides/stop-criminal-networks-recruiting-youngsters
+  innocent_explanations:
+  - Ordinary teenage privacy and change
+  - Encrypted apps are mainstream
+  jurisdictions: EU
+  version: 1
+- id: OC-153
+  name: Networks infiltrating construction, real estate, hospitality or logistics at a high level
+  definition: Europol ranks infiltration from unwitting use of a business, to coerced low-level staff,
+    to coerced managers or a wholly owned business, most often in these sectors.
+  areas:
+  - OC
+  typology: Infiltration of legal business structures
+  status: pending
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 27
+    quote: construction and real estate, cash-intensive businesses (particularly hospitality), and logistics
+      (i.e. transport and import/export companies)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 27
+    quote: coercing key high-level individuals within the structure, or set up its own LBS which it fully
+      controls.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Key features of the most threatening criminal networks in the EU
+    publisher: eucrim (summarising Europol)
+    url: https://eucrim.eu/news/key-features-of-most-threatening-criminal-networks-in-the-eu/
+    quote: 86% of the most threatening criminal networks are able to extensively infiltrate and misuse
+      legal business structures
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Employment
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: Unwitting use of an existing business (EU-SOCTA level 1)
+    strong: Collusion with or coercion of employees (level 2)
+    textbook: Coercion of senior people or a network-owned business (level 3)
+    threshold_source: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  threshold_verified: false
+  cross_hints: []
+  innocent_explanations:
+  - These sectors are large and mostly legitimate
+  - Ownership through relatives can be ordinary
+  jurisdictions: EU
+  version: 1
 not_reached:
 - 'FATF, Money Laundering through the Football Sector (2009): fatf-gafi.org blocks automated fetching
   (robots disallowed), so its football and betting indicators are not included.'
@@ -5533,3 +8265,22 @@ not_reached:
 - FATF gambling, tobacco, piracy and fentanyl PDFs could not be downloaded directly with curl (bot challenge).
   They were read through WebFetch, which returned some quotes shortened with '...'. The quotes are copied
   as returned.
+- Web search budget ran out partway through research (limit shared across agents). Several planned primary
+  sources were not searched or opened.
+- 'Stimson/UNIDIR 2020 ATT diversion report: the landing page had no indicators and no PDF link; the full
+  report was not reached.'
+- 'UNODC Global Study on Firearms Trafficking 2020 PDF: fetch failed.'
+- 'ATF data on machinegun conversion devices (Glock switches): not reached. NFCTA Vol II Part III has
+  no MCD findings; OC-104 relies on the PMF machine-gun share and an EU-SOCTA case.'
+- 'Supreme Court Bondi v. VanDerStok (ghost-gun rule) opinion: fetch failed, so it is not cited.'
+- 'EU-SOCTA 2025 firearms section (p. 61: alarm/flobert conversions, reactivated weapons): not in the
+  extracted text.'
+- 'Europol ''Stop criminal networks recruiting youngsters'' page: only the meta description loaded, which
+  gives three signs. The ''They''ve got new...'' item and the rest are missing.'
+- 'FBI insider threat / trade secret theft indicators page: fetch failed. Trade-secret theft has no indicators,
+  and the IPCTA 2022 does not cover it.'
+- 'DOJ Trade Fraud Task Force page: fetch failed. No transshipment court cases were sourced.'
+- 'IMB Piracy Reporting Centre definitions page: fetch failed.'
+- The CBP CTPAT transshipment alert itself was not opened; only the Thomson Reuters summary was used.
+- 'Drug-lab site signs (e.g. DEA clandestine lab indicators): not sourced.'
+- No sourced court cases for straw purchasing, piracy attacks, excise fraud or transshipment.

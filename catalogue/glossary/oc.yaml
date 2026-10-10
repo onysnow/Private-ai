@@ -823,3 +823,261 @@ terms:
   indicators: []
   areas:
   - OC
+- term: Straw purchase
+  definition: Buying a gun for someone who is not allowed to buy or own one.
+  examples: []
+  source_url: https://www.atf.gov/firearms/tools-services-law-enforcement/atf-firearms-programs/dont-lie-other-guy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Privately made firearm (PMF, 'ghost gun')
+  definition: A gun made or assembled by someone other than a licensed manufacturer, with no maker's serial
+    number.
+  examples: []
+  source_url: https://www.atf.gov/rules-and-regulations/definition-frame-or-receiver
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: FFL
+  definition: Federal Firearms Licensee, a licensed US gun dealer or maker.
+  examples: []
+  source_url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iv-crime-guns-recovered-outside-us-and-traced-le/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Time-to-crime (TTC)
+  definition: Time between a gun's first retail sale and its recovery by police; short times suggest trafficking.
+  examples: []
+  source_url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iv-crime-guns-recovered-outside-us-and-traced-le/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Form 4473 and NICS
+  definition: The US gun-purchase form and the federal background-check system a dealer runs before a
+    sale.
+  examples: []
+  source_url: https://www.atf.gov/rules-and-regulations/definition-frame-or-receiver
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Arms diversion
+  definition: Arms ending up with users not authorised to have them, through theft, leakage, unauthorised
+    re-transfer, capture or state collapse.
+  examples: []
+  source_url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: End-user certificate (EUC)
+  definition: A document in which an arms importer states who will use the weapons, often with a promise
+    not to re-transfer them; CAR uses the abbreviation without defining it.
+  examples: []
+  source_url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: BMP5
+  definition: Best Management Practices 5, industry and naval guidance for ships on deterring piracy in
+    high-risk areas.
+  examples: []
+  source_url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Skiff
+  definition: A small, fast open boat; BMP5 says pirates typically use them.
+  examples: []
+  source_url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Mothership
+  definition: A larger vessel, often a dhow, used to carry or tow pirate skiffs far out to sea.
+  examples: []
+  source_url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: AIS
+  definition: Automatic Identification System, the radio transponder ships use to broadcast identity and
+    position.
+  examples: []
+  source_url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Suspicious approach vs attack
+  definition: BMP5 separates an aggressive approach from an attack, where weapons are discharged or boarding
+    is attempted.
+  examples: []
+  source_url: https://mscio.eu/bmp/bmp5/bmp5-annex-h
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Illegal IPTV
+  definition: Internet TV services that sell access to channels without the rights to distribute them.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Cybersquatting
+  definition: Registering a domain that copies or slightly misspells a brand to mislead buyers.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Declaration of Conformity
+  definition: A maker's statement that a product such as a toy meets EU safety rules; counterfeit toys
+    often lack one.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Currency counterfeiting
+  definition: Fraudulently making or altering money, by any means (1929 Counterfeiting Convention, as
+    quoted by FATF).
+  examples: []
+  source_url: https://www.bportugal.pt/sites/default/files/anexos/gafi_doc_mt_contrafacao_en_0.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Skimming
+  definition: Copying payment card data, and often PINs, with devices fitted to ATMs or fuel pumps.
+  examples: []
+  source_url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/skimming
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Huachicol
+  definition: Mexican term for theft, adulteration or smuggling of fuel and oil, often by cartel-linked
+    thieves (huachicoleros).
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Fiscal fuel theft (huachicol fiscal)
+  definition: Dodging Mexican fuel taxes by smuggling or misdeclaring fuel imported from the United States.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: SENER and CNE permits
+  definition: Mexican energy-ministry (SENER) and energy-commission (CNE) permits; FinCEN treats paying
+    parties lacking a SENER import permit as a red flag.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: OFAC designation
+  definition: Placement of a person or company on the US Treasury sanctions list, freezing their US assets.
+  examples: []
+  source_url: https://home.treasury.gov/news/press-releases/sb0047
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Excise duty stamp
+  definition: A UK stamp on spirits showing duty was paid; a missing or non-fluorescing stamp is an HMRC
+    risk sign.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Transshipment (illegal)
+  definition: Routing goods through a third country and falsely claiming that country as origin to avoid
+    tariffs.
+  examples: []
+  source_url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Substantial transformation
+  definition: Processing that turns goods into a new product and so can change their country of origin;
+    repackaging alone does not.
+  examples: []
+  source_url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Legal business structure (LBS)
+  definition: Europol's term for a lawful company that criminals use, infiltrate or own.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Violence-as-a-service
+  definition: Hiring out shootings, killings or intimidation to paid executors, often young and recruited
+    online.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Script kiddies
+  definition: Low-skill hackers whom networks pay to carry out set cyber tasks.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC

@@ -2214,6 +2214,1722 @@ indicators:
   - Cash-heavy legitimate side income.
   jurisdictions: United States (case-derived; not on an official checklist)
   version: 1
+- id: ES-043
+  name: Small paid 'one-off' tasks offered by unknown contacts (photograph a site, share details, minor
+    damage)
+  definition: Someone is offered money or other incentives by an unknown or online contact for quick,
+    simple jobs such as photographing a building or person, passing on information or damaging property,
+    which is the published entry route for state proxy recruitment.
+  areas:
+  - ES
+  typology: State proxy sabotage and hostile-state tasking
+  status: verified
+  sources:
+  - title: State threats proxy partner pack
+    publisher: UK Home Office (State Threats)
+    url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+    locator: Key messages - general messages to partners
+    quote: quick, simple, or one-off jobs
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 15, hybrid threats
+    quote: Hybrid threat actors now have enhanced capabilities to recruit supporters to commit criminal
+      acts,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Offers to pay for photographs of a warehouse, office or person's home
+  - Requests to pass on details about a place or a person
+  - Payment offered for spraying graffiti or damaging property
+  cases:
+  - name: R v Earl and others (Leyton warehouse arson for the Wagner Group)
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: Dylan Earl commissioned an arson on a Ukrainian-linked warehouse in Leyton on 20 March
+      2024 on behalf of the Wagner Group; he pleaded guilty to preparatory conduct under s.18 National
+      Security Act 2023 and aggravated arson and received 17 years; co-defendants were convicted of aggravated
+      arson.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    source_title: How the CPS used new National Security Act legislation to prosecute the plot to sabotage
+      Ukrainian aid warehouses
+  data_needed:
+  - Person
+  - Payment
+  - Event
+  - Address
+  - Document
+  - UnknownLink
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Europol describes violence outsourced to young perpetrators and assorted criminals.
+    source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  innocent_explanations:
+  - Genuine gig work, delivery or photography commissions
+  - Legitimate market research or property surveys
+  - Ordinary acquaintances asking favours
+  jurisdictions: UK, EU
+  version: 1
+- id: ES-044
+  name: Approach through social media, encrypted apps or anonymous online contact
+  definition: Recruitment or tasking arrives through social media, messaging apps or anonymous online
+    accounts, so the person may never meet or identify who is directing them.
+  areas:
+  - ES
+  typology: State proxy sabotage and hostile-state tasking
+  status: verified
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 33
+    quote: Recruitment of young perpetrators primarily takes place on social media and messaging apps,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: State threats proxy partner pack
+    publisher: UK Home Office (State Threats)
+    url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+    locator: What might increase an individual's risk of being approached?
+    quote: The direct involvement of a state may not be immediately obvious.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Safeguarding Academia: guidance for researchers'
+    publisher: US NCSC / ODNI
+    year: '2025'
+    url: https://archive.dni.gov/files/NCSC/documents/products/08222025_Researchers-Safeguarding-Academia.pdf
+    locator: Indicators
+    quote: Unsolicited contacts, especially from foreign entities via social media or academic platforms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Telegram channel offering 'missions'
+  - Anonymous account messaging a teenager with a paid job
+  - Unsolicited LinkedIn or academic-platform approach from a foreign entity
+  cases:
+  - name: R v Earl and others
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: CPS states Earl contacted the Wagner Group via Telegram and expressed willingness to
+      undertake missions, and later discussed a further plot with Ashton Evans via Signal.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    source_title: CPS news
+  data_needed:
+  - Person
+  - Note
+  - Document
+  - Event
+  - UnknownLink
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most online job offers and academic contacts are legitimate
+  - Encrypted apps are widely used for ordinary privacy reasons
+  - Recruiters routinely approach researchers on professional networks
+  jurisdictions: UK, EU
+  version: 1
+- id: ES-045
+  name: Self-offering services to a foreign state or its proxy group
+  definition: A person volunteers, unprompted, to carry out work for a foreign intelligence service or
+    state-linked group, which UK law treats as possible assistance even before any tasking.
+  areas:
+  - ES
+  typology: Hostile-state tasking
+  status: verified
+  sources:
+  - title: 'CPS: plot to sabotage Ukrainian aid warehouses'
+    publisher: Crown Prosecution Service
+    year: '2025'
+    url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    quote: contacted the Wagner Group via the social media application Telegram and expressed a willingness
+      to undertake missions
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The National Security Act in 2024
+    publisher: Independent Reviewer of State Threats Legislation (Jonathan Hall KC)
+    url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    locator: para 2.22
+    quote: 'there are two ways of satisfying the foreign power: tasked and untasked.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Messaging a state-linked channel offering to do jobs
+  - Offering information to a foreign service before being asked
+  cases:
+  - name: Daniel Khalife (offered to spy for Iran)
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: The Independent Reviewer cites Khalife as a person who offered to spy for Iran and
+      was later tasked; sentencing remarks were given at Woolwich Crown Court on 25 January 2025 (prosecuted
+      under earlier legislation).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    source_title: The National Security Act in 2024, para 2.22 fn 80
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Note
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Joking or bravado online without intent
+  - Contact with foreign governments for legitimate jobs, journalism or research
+  jurisdictions: UK
+  version: 1
+- id: ES-046
+  name: Recruitment chains where those doing the act do not know who they work for
+  definition: A middleman recruits others to carry out an attack or task without telling them a foreign
+    state is behind it, creating layers between the state and the people acting.
+  areas:
+  - ES
+  typology: Proxies and cut-outs
+  status: verified
+  sources:
+  - title: 'CPS: plot to sabotage Ukrainian aid warehouses'
+    publisher: Crown Prosecution Service
+    year: '2025'
+    url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    quote: Acting under Earl's direction, Reeves then recruited Nii Mensah, Jakeem Rose and Ugnius Asmena
+      to attack the warehouse
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The National Security Act in 2024
+    publisher: Independent Reviewer (Jonathan Hall KC)
+    url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    locator: para 2.56
+    quote: foreign powers are crafty, will mask their involvement by use of proxies or cut-outs and may
+      target dupes.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Local criminals hired by an intermediary for an arson
+  - Teenagers paid by an older recruiter who takes instructions online
+  cases:
+  - name: R v Earl and others
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: Reeves recruited three men who did not know they were working for the Wagner Group;
+      Mensah, Rose and Asmena were convicted of aggravated arson.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    source_title: CPS news
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  - Event
+  - UnknownLink
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Europol says hybrid threat actors exploit criminal networks for deniability.
+    source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  innocent_explanations:
+  - Ordinary criminal subcontracting with no state link
+  - Personal or business disputes using hired criminals
+  jurisdictions: UK, EU
+  version: 1
+- id: ES-047
+  name: Young people or people on the edge of crime used for state-linked attacks
+  definition: Teenagers, young adults or people with criminal histories or links to criminal networks
+    are recruited for state-linked violence or sabotage because they are cheap and deniable.
+  areas:
+  - ES
+  typology: State proxy sabotage
+  status: verified
+  sources:
+  - title: State threats proxy partner pack
+    publisher: UK Home Office (State Threats)
+    url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+    locator: What might increase an individual's risk of being approached?
+    quote: Foreign states often target those with criminal histories, or with connections to networks
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 41
+    quote: Tech-savvy adolescents and young adults are especially susceptible to recruitment by criminal
+      networks.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 23
+    quote: they serve as low-risk assets for criminal networks.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Teenagers involved in shootings near Israeli-linked sites in Sweden and Denmark (Home Office pack
+    case study)
+  cases:
+  - name: Shootings and attacks near Israeli-linked sites in Gothenburg, Stockholm and Copenhagen
+    year: '2024'
+    jurisdiction: Sweden, Denmark
+    what_happened: The Home Office pack reports teenagers aged 13, 16 and 19 were involved and that Iran
+      is suspected of using criminal networks to recruit young people.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+    source_title: State threats proxy partner pack, case studies - Europe
+  data_needed:
+  - Person
+  - CourtCase
+  - Associate
+  - Event
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most youth or gang violence has no state link
+  - Criminal history alone says nothing about foreign tasking
+  jurisdictions: UK, EU
+  version: 1
+- id: ES-048
+  name: Financially motivated or indebted person taking on unexplained tasks
+  definition: A person in financial difficulty or driven by money is doing paid tasks whose purpose or
+    paymaster is unclear, a vulnerability the Home Office lists for proxy recruitment.
+  areas:
+  - ES
+  typology: State proxy sabotage
+  status: verified
+  sources:
+  - title: State threats proxy partner pack
+    publisher: UK Home Office (State Threats)
+    url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+    locator: What might increase an individual's risk of being approached?
+    quote: Individuals who are either in financial difficulty or motivated by money can be more susceptible
+      to these taskings.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sudden cash for 'favours' while in debt
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary side jobs and gig work
+  - Cash-in-hand informal labour
+  jurisdictions: UK
+  version: 1
+- id: ES-049
+  name: Targets aligned with a foreign state's enemies (Ukraine-linked, dissidents, Jewish or Israeli
+    sites, critics)
+  definition: Arson, vandalism, surveillance or attacks hit businesses, people or places linked to a cause
+    or critic opposed by a particular foreign state, which suggests a possible state motive behind apparently
+    ordinary crime.
+  areas:
+  - ES
+  typology: State proxy sabotage and transnational repression
+  status: verified
+  sources:
+  - title: 'CPS: Russian spy ring jailed'
+    publisher: Crown Prosecution Service
+    year: '2025'
+    url: https://www.cps.gov.uk/cps/news/updated-sentence-members-russian-spy-ring-jailed-more-50-years-total
+    quote: prominent individuals and locations on behalf of Russia
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: State threats proxy partner pack
+    publisher: UK Home Office (State Threats)
+    url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+    locator: Key messages - specific messages
+    quote: In this context, 'proxy' means an individual being used by foreign states to carry out tasks
+      for them.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fire at a warehouse holding aid for Ukraine
+  - Following investigative journalists critical of Russia
+  - Graffiti at a Holocaust memorial attributed to state-linked organisers
+  cases:
+  - name: R v Roussev and others (Bulgarian spy ring)
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: Six members of a ring directed via Jan Marsalek spied for Russia between 2020 and 2023,
+      following journalists Christo Grozev and Roman Dobrokhotov; sentenced at the Old Bailey on 12 May
+      2025 to more than 50 years in total.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-members-russian-spy-ring-jailed-more-50-years-total
+    source_title: 'UPDATED WITH SENTENCE: Members of Russian spy ring jailed for more than 50 years in
+      total'
+  - name: Red handprints on the Wall of the Righteous, Shoah Memorial, Paris
+    year: '2024'
+    jurisdiction: France
+    what_happened: The Home Office pack states three Bulgarian men recruited through informal criminal
+      networks acted under instruction from organisers linked to Russian intelligence.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.sefton.gov.uk/media/zilfnjpr/proxy-partner-pack.pdf
+    source_title: State threats proxy partner pack, case studies - Europe
+  data_needed:
+  - Event
+  - Address
+  - Company
+  - Organization
+  - Person
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: The Roussev ring surveilled journalists and discussed kidnap.
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-members-russian-spy-ring-jailed-more-50-years-total
+  innocent_explanations:
+  - Ordinary hate crime or local disputes
+  - Insurance fraud or commercial arson
+  - Coincidence of target choice
+  jurisdictions: UK, EU
+  version: 1
+- id: ES-050
+  name: Repeated minor sabotage incidents that look isolated ('woodpecker' pattern)
+  definition: A run of small, seemingly unconnected incidents such as arson, vandalism or infrastructure
+    damage that, taken together, may be a coordinated hybrid-threat campaign.
+  areas:
+  - ES
+  typology: Hybrid threats
+  status: verified
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 15
+    quote: Much like a woodpecker weakens a tree over time through repeated strikes, hybrid threat actors
+      engage in ongoing,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 15
+    quote: seemingly minor actions that collectively erode stability, security, and trust in institutions.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cluster of arsons at logistics sites in several countries
+  - Repeated damage to water or energy infrastructure
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Company
+  - PublicBody
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Europol links these networks to propaganda campaigns using fake accounts and manipulated news.
+    source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  innocent_explanations:
+  - Accidental fires and equipment failure
+  - Copycat vandalism
+  - Seasonal clustering of ordinary crime
+  jurisdictions: EU
+  version: 1
+- id: ES-051
+  name: Sabotage of critical infrastructure (water, energy, digital)
+  definition: Physical or digital damage to essential services, which Europol lists as a hybrid-threat
+    tactic and UK law covers as sabotage when linked to a foreign power.
+  areas:
+  - ES
+  typology: Hybrid threats / sabotage
+  status: verified
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 15
+    quote: such as sabotage of critical infrastructure (water or energy supply, for example), arson, intimidation,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Security Act 2023, section 12
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2023/32/section/12
+    locator: s.12(1)
+    quote: the person engages in conduct that results in damage to any asset,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cut undersea cables
+  - Arson at a power or water facility
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - PublicBody
+  - Company
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accidents, weather and ageing infrastructure
+  - Ordinary metal theft
+  - Shipping accidents (anchor drags)
+  jurisdictions: UK, EU
+  version: 1
+- id: ES-052
+  name: Cyber-attacks done for payment on behalf of external actors
+  definition: Criminal hackers carry out attacks for a state or other external actor in return for payment,
+    often in cryptocurrency, letting the state deny involvement.
+  areas:
+  - ES
+  typology: Hybrid threats
+  status: verified
+  sources:
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 15
+    quote: Cyber-attacks are now carried out against payment in service of external threat actors,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EU-SOCTA 2025
+    publisher: Europol
+    year: '2025'
+    url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+    locator: p. 14
+    quote: Some states provide safe havens for criminals in exchange for their services,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Ransomware group operating untouched from a state that benefits from its targets
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Payment
+  - Event
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Sanctions lists (OFAC, UK, EU)
+  - Law-enforcement indictments and advisories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Financially motivated cybercrime with no state link
+  - Attribution errors
+  jurisdictions: EU
+  version: 1
+- id: ES-053
+  name: Attack filmed or livestreamed back to an organiser as proof
+  definition: Those carrying out an attack record or stream it to the person who commissioned it, which
+    in the Leyton case showed a chain of tasking and reporting.
+  areas:
+  - ES
+  typology: State proxy sabotage
+  status: verified
+  sources:
+  - title: 'CPS: plot to sabotage Ukrainian aid warehouses'
+    publisher: Crown Prosecution Service
+    year: '2025'
+    url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    quote: Mensah filmed the attack and livestreamed the footage to Earl.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Phone footage of an arson sent to a contact
+  cases:
+  - name: R v Earl and others
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: CCTV and phone evidence showed the attack filmed and livestreamed to Earl, who drove
+      the attackers to and from the site.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    source_title: CPS news
+  data_needed:
+  - Document
+  - Event
+  - Person
+  - Associate
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Bystander or social-media filming of incidents
+  - Bravado filming in ordinary crime
+  jurisdictions: UK
+  version: 1
+- id: ES-054
+  name: Covert surveillance of people or sites using concealed devices and cover stories
+  definition: Individuals follow or watch people or places using recording devices hidden in everyday
+    objects, false identities or cover stories, as in the Russian-tasked spy ring prosecuted in London.
+  areas:
+  - ES
+  typology: Hostile reconnaissance
+  status: verified
+  sources:
+  - title: 'CPS: Russian spy ring jailed'
+    publisher: Crown Prosecution Service
+    year: '2025'
+    url: https://www.cps.gov.uk/cps/news/updated-sentence-members-russian-spy-ring-jailed-more-50-years-total
+    quote: advanced technology to acquire information
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The National Security Act in 2024
+    publisher: Independent Reviewer (Jonathan Hall KC)
+    url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    locator: para 1.9 fn 15
+    quote: hostile reconnaissance for the benefit of Iran
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cameras disguised as rocks, toys or car keys
+  - Recording glasses
+  - A parked car with a fake NHS sign as cover outside a target's home
+  cases:
+  - name: R v Roussev and others
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: Police found surveillance devices disguised as everyday objects; Stoyanov, challenged
+      outside a target's home, gave a hospital cover story and displayed an NHS sign.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-members-russian-spy-ring-jailed-more-50-years-total
+    source_title: CPS news
+  data_needed:
+  - Person
+  - Vehicle
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Private investigators doing lawful work
+  - Journalists and photographers
+  - Hobby use of spy gadgets
+  jurisdictions: UK
+  version: 1
+- id: ES-055
+  name: False identity documents held with improper intention
+  definition: Possession of fake or multiple identity documents by someone linked to state-directed activity,
+    one of the offences proved in the Bulgarian spy ring case.
+  areas:
+  - ES
+  typology: Hostile-state tradecraft
+  status: verified
+  sources:
+  - title: 'CPS: Russian spy ring jailed'
+    publisher: Crown Prosecution Service
+    year: '2025'
+    url: https://www.cps.gov.uk/cps/news/updated-sentence-members-russian-spy-ring-jailed-more-50-years-total
+    quote: possession of an identity document with improper intention
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several passports or ID cards in different names found in a search
+  cases:
+  - name: R v Roussev and others (Katrin Ivanova)
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: Ivanova was convicted of conspiracy to spy and of possessing an identity document with
+      improper intention under the Identity Documents Act 2010.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-members-russian-spy-ring-jailed-more-50-years-total
+    source_title: CPS news
+  data_needed:
+  - Person
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate dual nationality with two passports
+  - Name changes after marriage
+  jurisdictions: UK
+  version: 1
+- id: ES-056
+  name: Requests to rent property, find flats or provide logistics for foreign officials or unknown principals
+  definition: Seemingly harmless help such as renting a house or finding a flat for an embassy official
+    can be cover for a safehouse or covert activity, according to the Independent Reviewer.
+  areas:
+  - ES
+  typology: Assistance to foreign intelligence services
+  status: verified
+  sources:
+  - title: The National Security Act in 2024
+    publisher: Independent Reviewer (Jonathan Hall KC)
+    url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    locator: para 3.44
+    quote: renting a house, which is in fact a safehouse
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The National Security Act in 2024
+    publisher: Independent Reviewer (Jonathan Hall KC)
+    url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    locator: para 2.56
+    quote: was a red flag for covert activity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Security Act 2023, section 3
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2023/32/section/3
+    locator: s.3(2)
+    quote: engages in conduct that is likely to materially assist a foreign intelligence service
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Letting agent asked to rent a flat in a third party's name for an embassy contact
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Contract
+  - Payment
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Diplomats routinely rent housing through agents
+  - Relocation services for foreign staff
+  jurisdictions: UK
+  version: 1
+- id: ES-057
+  name: Foreign-state activity hidden behind companies, NGOs or professional cover
+  definition: A foreign power acts through companies it controls, NGOs, or people posing as journalists
+    or lawyers, so the state link is indirect.
+  areas:
+  - ES
+  typology: Proxies and cut-outs
+  status: verified
+  sources:
+  - title: The National Security Act in 2024
+    publisher: Independent Reviewer (Jonathan Hall KC)
+    url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    locator: para 2.29
+    quote: foreign powers may well act or communicate their wishes through companies that they control.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The National Security Act in 2024
+    publisher: Independent Reviewer (Jonathan Hall KC)
+    url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    locator: para 2.26
+    quote: foreign intelligence officers or agents may use NGO cover.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Security Act 2023, section 31
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2023/32/section/31
+    locator: s.31(3)
+    quote: an indirect relationship through one or more companies
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Consultancy owned by a state enterprise commissioning research on dissidents
+  - NGO funded by a foreign ministry gathering information
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Ownership
+  - Directorship
+  - PublicBody
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Company registries and beneficial-ownership registers
+  - Foreign influence registration schemes (FIRS, FARA)
+  - Charity registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: The foreign power condition can be met through an indirect relationship via companies.
+    source_url: https://www.legislation.gov.uk/ukpga/2023/32/section/31
+  innocent_explanations:
+  - State-owned companies doing ordinary commercial business
+  - Legitimately foreign-funded NGOs
+  - Real journalists and lawyers working for foreign clients
+  jurisdictions: UK
+  version: 1
+- id: ES-058
+  name: Taking money or other benefits from a foreign intelligence service, directly or through layers
+  definition: A person obtains, accepts or agrees to accept money, anything convertible to money, or information
+    from a foreign intelligence service, often through layered payments that hide the source.
+  areas:
+  - ES
+  typology: Hostile-state tasking
+  status: verified
+  sources:
+  - title: National Security Act 2023, section 17
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2023/32/section/17
+    locator: s.17(3)
+    quote: Material benefits may include financial benefits, anything which has the potential to result
+      in a financial benefit,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The National Security Act in 2024
+    publisher: Independent Reviewer (Jonathan Hall KC)
+    url: https://assets.publishing.service.gov.uk/media/69411a3eadb5707d9f33d7e8/E03512978_-_Un-Act_The_National_Security_Act_in_2024_Accessible.pdf
+    locator: para 3.61
+    quote: recognising the obfuscated layering likely to be employed by FIS in getting payments to agents.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Payments routed through intermediaries to someone doing unexplained tasks
+  cases:
+  - name: R v Earl and others (Jake Reeves)
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: Reeves pleaded guilty to agreeing to accept a material benefit from a foreign intelligence
+      service (s.17(2)) and aggravated arson; sentenced to 12 years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    source_title: CPS news
+  data_needed:
+  - Person
+  - Payment
+  - Organization
+  - PublicBody
+  - UnknownLink
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: https://www.legislation.gov.uk/ukpga/2023/32/section/17
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Payment as reasonable consideration for lawful goods or services (s.17(4) excluded benefit)
+  - Ordinary remittances from family abroad
+  jurisdictions: UK
+  version: 1
+- id: ES-059
+  name: Knowledge of a planned state-linked attack not reported
+  definition: Someone knows about planned state-directed violence or treason and does not tell the authorities,
+    which can itself be an offence (failing to disclose information about terrorism in the UK; misprision
+    of treason in the US).
+  areas:
+  - ES
+  typology: Concealment
+  status: verified
+  sources:
+  - title: 18 U.S.C. 2382 Misprision of treason
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/18/2382
+    quote: conceals and does not, as soon as may be, disclose and make known the same
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'CPS: plot to sabotage Ukrainian aid warehouses'
+    publisher: Crown Prosecution Service
+    year: '2025'
+    url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    quote: Convicted of one count of failing to disclose information about terrorist acts
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Associate who discussed a planned arson in messages and did nothing
+  cases:
+  - name: R v Earl and others (Ashton Evans)
+    year: '2025'
+    jurisdiction: England and Wales
+    what_happened: Evans discussed with Earl via Signal a plot to set fire to Mayfair businesses and kidnap
+      their owner, a critic of the Russian state; convicted of failing to disclose information about terrorist
+      acts, sentenced to nine years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.cps.gov.uk/cps/news/updated-sentence-how-cps-used-new-national-security-act-legislation-prosecute-plot
+    source_title: CPS news
+  data_needed:
+  - Person
+  - Associate
+  - Note
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Person did not believe the talk was serious
+  - Fear of reprisal
+  - Lack of knowledge of the plot's details
+  jurisdictions: UK, US
+  version: 1
+- id: ES-060
+  name: Solicitation by foreign talent recruitment programmes offering unusually lucrative incentives
+  definition: A researcher is approached by a foreign recruitment programme offering pay, funding or perks
+    well above normal, which US counterintelligence lists as a warning sign.
+  areas:
+  - ES
+  typology: Research security / talent programmes
+  status: verified
+  sources:
+  - title: 'Safeguarding Academia: guidance for researchers'
+    publisher: US NCSC / ODNI
+    year: '2025'
+    url: https://archive.dni.gov/files/NCSC/documents/products/08222025_Researchers-Safeguarding-Academia.pdf
+    locator: Indicators
+    quote: Solicitation by foreign recruitment programs offering unusually lucrative incentives
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'China: The Risk to Academia'
+    publisher: FBI
+    year: '2019'
+    url: https://www.fbi.gov/file-repository/china-risk-to-academia-2019.pdf
+    quote: Association with talent recruitment plans by itself is not illegal
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Offer of a large monthly salary, living expenses and lab set-up funds abroad
+  cases:
+  - name: United States v. Charles Lieber
+    year: '2021'
+    jurisdiction: US (D. Mass.)
+    what_happened: A jury convicted the former Harvard chemistry chair of false statements, false tax
+      returns and failing to file FBARs relating to his Thousand Talents contract with Wuhan University
+      of Technology, which offered up to $50,000 a month salary and over $1.5 million for a lab.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/harvard-university-professor-convicted-making-false-statements-and-tax-offenses
+    source_title: Harvard University Professor Convicted of Making False Statements and Tax Offenses
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Contract
+  - Payment
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Competitive international hiring is normal in science
+  - Honorary appointments and visiting professorships
+  - Disclosed and approved collaborations
+  jurisdictions: US
+  version: 1
+- id: ES-061
+  name: Being told to hide or not report a foreign affiliation or contact
+  definition: A researcher is advised or contractually required not to disclose a foreign programme, affiliation
+    or contact to their institution or funder.
+  areas:
+  - ES
+  typology: Research security / talent programmes
+  status: verified
+  sources:
+  - title: 'Safeguarding Academia: guidance for researchers'
+    publisher: US NCSC / ODNI
+    year: '2025'
+    url: https://archive.dni.gov/files/NCSC/documents/products/08222025_Researchers-Safeguarding-Academia.pdf
+    locator: Indicators
+    quote: Guidance to obscure or not report contact or affiliation with a foreign entity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 U.S.C. 19237(4) definition of malign foreign talent recruitment program
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/42/19237
+    locator: para (4)(A)(viii)
+    quote: being required to not disclose to the Federal research agency or employing institution
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Contract clause requiring confidentiality about the appointment
+  cases: []
+  data_needed:
+  - Person
+  - Contract
+  - Organization
+  - Employment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the statutory definition in 42 U.S.C. 19237(4)(A)(viii) together with sponsorship
+      criteria in (4)(B)
+    threshold_source: https://www.law.cornell.edu/uscode/text/42/19237
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary commercial confidentiality clauses
+  - Misunderstanding of disclosure rules
+  jurisdictions: US
+  version: 1
+- id: ES-062
+  name: Talent contract terms of the 'malign' kind (must recruit trainees, cannot terminate, must omit
+    home-institution credit, must win foreign grants)
+  definition: A foreign contract imposes obligations that US law lists as marks of a malign foreign talent
+    recruitment programme, such as recruiting others, being unable to exit, or dropping acknowledgement
+    of the home institution.
+  areas:
+  - ES
+  typology: Research security / talent programmes
+  status: verified
+  sources:
+  - title: 42 U.S.C. 19237(4) definition of malign foreign talent recruitment program
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/42/19237
+    locator: para (4)(A)(ii)
+    quote: being required to recruit trainees or researchers to enroll in such program, position, or activity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 U.S.C. 19237(4)
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/42/19237
+    locator: para (4)(A)(iv)
+    quote: being unable to terminate the foreign talent recruitment program contract
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 U.S.C. 19237(4)
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/42/19237
+    locator: para (4)(A)(vii)
+    quote: being required to omit acknowledgment of the recipient institution
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 U.S.C. 19237(4)
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/42/19237
+    locator: para (4)(A)(vi)
+    quote: being required to apply for and successfully receive funding from the sponsoring foreign government's
+      funding agencies
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Contract obliging the researcher to bring students into the programme
+  - Penalty clauses preventing exit
+  cases: []
+  data_needed:
+  - Contract
+  - Person
+  - Organization
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the statutory definition in 42 U.S.C. 19237(4): compensation in exchange for a listed
+      activity, sponsored by a foreign country of concern or listed institution or programme'
+    threshold_source: https://www.law.cornell.edu/uscode/text/42/19237
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary visiting appointments with standard terms
+  - Programmes from countries not of concern
+  jurisdictions: US
+  version: 1
+- id: ES-063
+  name: Undisclosed foreign appointment, parallel ('shadow') lab or overlapping foreign grants
+  definition: A funded researcher holds an undeclared job or runs a lab abroad, or gets foreign grants
+    for the same or overlapping work, without telling the funder or employer.
+  areas:
+  - ES
+  typology: Research security / undisclosed affiliation
+  status: verified
+  sources:
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: 'Case 1: Duplicative Funding'
+    quote: The scientist has a fully functioning lab in the foreign university.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: Case 4
+    quote: None of the foreign grants have been mentioned in any NIH grant document.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 U.S.C. 19237(4)
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/42/19237
+    locator: para (4)(A)(iii)
+    quote: establishing a laboratory or company, accepting a faculty position
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Grant proposal translated and submitted to a foreign funding agency
+  - Researcher checks 'No' for outside activities while holding a foreign contract
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - Contract
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Grant databases (NIH RePORTER, NSF awards, foreign funder databases)
+  - Publication affiliation records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Disclosed and approved dual appointments
+  - Errors in grant paperwork
+  - Collaborations that are listed elsewhere
+  jurisdictions: US
+  version: 1
+- id: ES-064
+  name: Foreign affiliation shown in publications but denied or missing in grant and employer records
+  definition: Papers list a foreign university affiliation that the researcher's disclosures omit or that
+    they deny when asked.
+  areas:
+  - ES
+  typology: Research security / undisclosed affiliation
+  status: verified
+  sources:
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: 'Case 5: Comfort Letters and Dishonesty'
+    quote: NIH identifies three publications where the scientist listed a foreign university
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: Case 5
+    quote: The scientist denied any formal affiliation, appointment, or Talent Program contract.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bylines carrying a foreign university that is absent from biosketches
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Organization
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Bibliographic databases (PubMed, Scopus, OpenAlex)
+  - Grant biosketches and disclosure records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Affiliation from a short visit or past post
+  - Co-authors adding affiliations without consent
+  - Journal errors
+  jurisdictions: US
+  version: 1
+- id: ES-065
+  name: Minimising or explaining away foreign appointments after the fact (comfort letters, 'just an honour')
+  definition: When questioned, the researcher calls a foreign talent award an honour, claims grants were
+    written without permission, or produces letters saying there was no contract.
+  areas:
+  - ES
+  typology: Research security / dishonesty
+  status: verified
+  sources:
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: 'Case 3: Dishonesty After-the-Fact'
+    quote: He says that the Talents award is “just an honor, nothing more.”
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: Case 3
+    quote: He says that any foreign grants were written by others without his permission.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Letter from the foreign university stating there was no contract, contradicted by other records
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Organization
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some awards are genuinely honorary
+  - Others may have used a name without consent
+  jurisdictions: US
+  version: 1
+- id: ES-066
+  name: 'Over-commitment: foreign work time or time away from campus beyond what rules allow'
+  definition: A researcher commits months a year to foreign grants or spends far more time away than outside-activity
+    rules permit, while also funded at home.
+  areas:
+  - ES
+  typology: Research security / conflict of commitment
+  status: verified
+  sources:
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: Case 4
+    quote: he spent an inordinate amount of time away from campus, far more than allowed under outside
+      activity rules.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 U.S.C. 19237(4)
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/42/19237
+    locator: para (4)(A)(ix)
+    quote: having a conflict of interest or conflict of commitment contrary to the standard terms and
+      conditions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Committing nine calendar months a year to foreign grants while holding a full-time US post
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Contract
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Approved sabbatical or leave
+  - Fieldwork abroad
+  jurisdictions: US
+  version: 1
+- id: ES-067
+  name: Undisclosed foreign company equity or foreign start-up founded while employed
+  definition: A researcher or engineer holds significant undeclared equity in, or founds or takes a senior
+    role at, a foreign company in the same field while still employed and funded at home.
+  areas:
+  - ES
+  typology: Trade-secret theft / research security
+  status: verified
+  sources:
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: 'Case 2: Conflict of Interest'
+    quote: He owns majority equity interest in a foreign company valued at $20 million.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Former Google engineer found guilty of economic espionage
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/former-google-engineer-found-guilty-economic-espionage-and-theft-confidential-ai-technology
+    quote: help China to have computing power infrastructure capabilities that are on par with the international
+      level
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Employee acting as CEO of a foreign AI company while at a US tech firm
+  cases:
+  - name: United States v. Linwei Ding
+    year: '2026'
+    jurisdiction: US (N.D. Cal.)
+    what_happened: A jury convicted the former Google engineer on seven counts of economic espionage and
+      seven of trade-secret theft; while employed he uploaded confidential AI files to a personal cloud
+      account, founded a PRC AI company and applied to a Shanghai talent plan.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-google-engineer-found-guilty-economic-espionage-and-theft-confidential-ai-technology
+    source_title: DOJ press release
+  data_needed:
+  - Person
+  - Company
+  - Ownership
+  - Directorship
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Foreign company registries
+  - Investor and start-up databases
+  - Conflict-of-interest disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Disclosed and approved spin-outs
+  - Inherited or passive shareholdings
+  jurisdictions: US
+  version: 1
+- id: ES-068
+  name: Undeclared foreign income or foreign bank account tied to a foreign institution
+  definition: A person receives salary from a foreign institution into a foreign bank account they do
+    not declare to tax authorities or their employer.
+  areas:
+  - ES
+  typology: Research security / financial concealment
+  status: verified
+  sources:
+  - title: Harvard professor convicted
+    publisher: US Department of Justice
+    year: '2021'
+    url: https://www.justice.gov/opa/pr/harvard-university-professor-convicted-making-false-statements-and-tax-offenses
+    quote: two counts of failing to file reports of foreign bank and financial accounts (FBAR)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: NIH foreign interference case studies
+    publisher: National Institutes of Health
+    url: https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/case-studies
+    locator: Case 5
+    quote: The scientist received over $100,000 in monies paid directly to him
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Account opened at a foreign bank during a visit, receiving salary
+  cases:
+  - name: United States v. Charles Lieber
+    year: '2021'
+    jurisdiction: US (D. Mass.)
+    what_happened: Wuhan University of Technology paid part of his salary into a Chinese bank account
+      he did not report; convicted of FBAR and tax offences.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/harvard-university-professor-convicted-making-false-statements-and-tax-offenses
+    source_title: DOJ press release
+  data_needed:
+  - Person
+  - Payment
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Lieber was convicted of false tax returns and FBAR failures.
+    source_url: https://www.justice.gov/opa/pr/harvard-university-professor-convicted-making-false-statements-and-tax-offenses
+  innocent_explanations:
+  - Legitimate accounts for disclosed foreign work
+  - Late or mistaken filings
+  jurisdictions: US
+  version: 1
+- id: ES-069
+  name: Paid invitations to give presentations abroad used to recruit employees
+  definition: Engineers or researchers are invited to foreign universities to present, with travel and
+    stipends paid, as a cover for extracting proprietary information.
+  areas:
+  - ES
+  typology: Economic espionage
+  status: verified
+  sources:
+  - title: Chinese government intelligence officer sentenced to 20 years
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/chinese-government-intelligence-officer-sentenced-20-years-prison-espionage-crimes-attempting
+    quote: Xu and others paid the individuals stipends on top of covering travel costs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - All-expenses-paid trip to give a university talk, followed by technical questions about the employer's
+    products
+  cases:
+  - name: United States v. Yanjun Xu
+    year: '2022'
+    jurisdiction: US (S.D. Ohio, Cincinnati)
+    what_happened: An MSS officer convicted in 2021 of conspiracy to commit economic espionage and attempted
+      trade-secret theft, targeting GE Aviation's composite fan technology; sentenced to 20 years in November
+      2022.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/chinese-government-intelligence-officer-sentenced-20-years-prison-espionage-crimes-attempting
+    source_title: DOJ press release
+  data_needed:
+  - Person
+  - Payment
+  - Event
+  - Organization
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary academic and conference invitations with honoraria
+  - Employer-approved speaking engagements
+  jurisdictions: US
+  version: 1
+- id: ES-070
+  name: Trade secrets taken for the benefit of a foreign government, instrumentality or agent
+  definition: Confidential business information is stolen or passed on where the beneficiary is a foreign
+    government or an entity it substantially controls, which distinguishes economic espionage from ordinary
+    trade-secret theft.
+  areas:
+  - ES
+  typology: Economic espionage
+  status: verified
+  sources:
+  - title: 18 U.S.C. 1831 Economic espionage
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/18/1831
+    quote: intending or knowing that the offense will benefit any foreign government
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 18 U.S.C. 1839 Definitions
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/18/1839
+    quote: substantially owned, controlled, sponsored, commanded, managed, or dominated by a foreign government
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Turbine designs sent to China-based companies and universities
+  cases:
+  - name: United States v. Xiaoqing Zheng
+    year: '2022'
+    jurisdiction: US (N.D.N.Y.)
+    what_happened: A former GE engineer and Thousand Talents Program member convicted of conspiracy to
+      commit economic espionage over turbine trade secrets that benefited China-based companies and universities;
+      sentenced to 24 months in January 2023.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-ge-power-engineer-sentenced-conspiracy-commit-economic-espionage
+    source_title: DOJ press release
+  data_needed:
+  - Person
+  - Company
+  - PublicBody
+  - Ownership
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the statutory elements of 18 U.S.C. 1831
+    threshold_source: https://www.law.cornell.edu/uscode/text/18/1831
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Publicly available information wrongly treated as secret
+  - Authorised technology transfer or licensing
+  - Recipient is a private firm with no state control (then 18 U.S.C. 1832 applies)
+  jurisdictions: US
+  version: 1
+- id: ES-071
+  name: Unauthorised requests to access sensitive or government-funded research
+  definition: Someone without a need or authorisation asks for access to restricted or publicly funded
+    research, data or materials.
+  areas:
+  - ES
+  typology: Research security
+  status: verified
+  sources:
+  - title: 'Safeguarding Academia: guidance for researchers'
+    publisher: US NCSC / ODNI
+    year: '2025'
+    url: https://archive.dni.gov/files/NCSC/documents/products/08222025_Researchers-Safeguarding-Academia.pdf
+    locator: Indicators
+    quote: Unauthorized requests to access sensitive or U.S. government-funded research
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 U.S.C. 19237(4)
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/42/19237
+    locator: para (4)(A)(i)
+    quote: engaging in the unauthorized transfer of intellectual property, materials, data products, or
+      other nonpublic information
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Visiting scholar asking for data outside the agreed project
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - Organization
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Normal requests for data sharing under open-science rules
+  - Collaborators unaware of restrictions
+  jurisdictions: US
+  version: 1
+- id: ES-072
+  name: Insisting on working in private, rummaging in others' desks, or showing interest in covert activity
+  definition: 'Behaviours the FBI lists for academic insiders: wanting to work unobserved, searching colleagues''
+    offices, and talking about covert activity.'
+  areas:
+  - ES
+  typology: Insider economic espionage
+  status: verified
+  sources:
+  - title: 'China: The Risk to Academia'
+    publisher: FBI
+    year: '2019'
+    url: https://www.fbi.gov/file-repository/china-risk-to-academia-2019.pdf
+    quote: Rummages through offices or desks of others
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'China: The Risk to Academia'
+    publisher: FBI
+    year: '2019'
+    url: https://www.fbi.gov/file-repository/china-risk-to-academia-2019.pdf
+    quote: Expresses an interest in covert activity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'China: The Risk to Academia'
+    publisher: FBI
+    year: '2019'
+    url: https://www.fbi.gov/file-repository/china-risk-to-academia-2019.pdf
+    quote: Insists on working in private
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Colleague found in others' labs after hours going through notebooks
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Preference for quiet work
+  - Looking for shared equipment or supplies
+  - Interest in spy fiction or history
+  jurisdictions: US
+  version: 1
+- id: ES-073
+  name: Conduct that may meet the elements of treason (levying war, adhering to enemies, giving aid and
+    comfort)
+  definition: Someone who owes allegiance to a country wages war against it or helps its enemies, which
+    the US Constitution and UK Treason Act define as treason and which requires strict proof.
+  areas:
+  - ES
+  typology: Treason and aiding an enemy
+  status: verified
+  sources:
+  - title: US Constitution Article III, Section 3
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/constitution/articleiii
+    quote: No person shall be convicted of treason unless on the testimony of two witnesses to the same
+      overt act, or on confession in open court.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 18 U.S.C. 2381 Treason
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/uscode/text/18/2381
+    quote: owing allegiance to the United States, levies war against them or adheres to their enemies
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Treason Act 1351
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/aep/Edw3Stat5/25/2
+    quote: be adherent to the King’s Enemies in his Realm, giving to them Aid and Comfort in the Realm,
+      or elsewhere
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A citizen fighting for, or supplying, a state at war with their own country
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the statutory and constitutional definition, including (US) two witnesses to the same
+      overt act
+    threshold_source: https://www.law.cornell.edu/constitution/articleiii
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful political speech or protest
+  - Humanitarian aid
+  - Contact with a foreign state that is not a legal 'enemy'
+  jurisdictions: US, UK
+  version: 1
 not_reached:
 - 'FBI brochure ''The Insider Threat: An Introduction to Detecting and Deterring an Insider Spy'' (fbi.gov/file-repository/insider_threat_brochure.pdf):
   WebFetch returned no indicator text, so its personal and organisational factor lists were not used.'
@@ -2237,3 +3953,22 @@ not_reached:
   (non-US coverage gap).
 - The PERSEREC finding that about one-fourth of spies had a personal crisis beforehand (ES-040) is paraphrased
   from WebFetch output and not quoted exactly.
+- 'FBI Insider Threat brochure (https://www.fbi.gov/file-repository/insider_threat_brochure.pdf): fetch
+  returned a generic FBI page, not the brochure.'
+- 18 U.S.C. Chapter 115 index page not fetched separately; sections 2381 and 2382 and Article III were
+  read instead. Sections 2383 to 2390 (rebellion, seditious conspiracy and others) not reviewed.
+- 'NSPM-33 implementation guidance (whitehouse.gov PDF): fetch error.'
+- 'UK NPSA Trusted Research guidance for academia: fetch error; the overview page has no indicators.'
+- 'MI5 Director General threat-update speeches: fetch errors.'
+- 'UK National Security Act 2023 factsheets on gov.uk: fetch error.'
+- 'US NCSC talent-recruitment fact sheet: URL guessed, fetch error.'
+- 'DOJ Oath Keepers seditious conspiracy release: fetch error.'
+- 'Web search budget ran out partway through, so no further European sabotage cases were sourced: German,
+  Polish and Lithuanian arson and sabotage prosecutions, and a final outcome for the Paris Shoah Memorial
+  case.'
+- 'Wimbledon stabbing of Pouria Zeraati: the Home Office pack mentions it, but no court outcome was verified,
+  so it was left out.'
+- 'Shahsavani and Farasati (charged under NSA s.3(2), Iran): charge only and the CPS warns against comment,
+  so they were left out of the cases.'
+- 'Hall KC report: the extracts read gave no Telegram, crypto or 2024-arrest detail; a full read of the
+  case chapter may hold more.'

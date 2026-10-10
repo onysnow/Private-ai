@@ -1,0 +1,1778 @@
+key: AG
+name: Aggression, coups, insurrection and unlawful militias
+scope: The crime of aggression, including deniable proxy and mercenary forces; signs of an invasion build-up;
+  coups and self-coups by incumbents; seditious conspiracy; private armed militias.
+indicators:
+- id: AG-001
+  name: Invasion, occupation or annexation of another state's territory by armed forces
+  definition: A state's armed forces cross into, occupy or annex all or part of another state's territory.
+  areas:
+  - AG
+  typology: Crime of aggression
+  status: verified
+  sources:
+  - title: Definition of Aggression, UNGA Resolution 3314 (XXIX), Art 3(a)
+    publisher: UN General Assembly (via University of Minnesota Human Rights Library)
+    year: '1974'
+    url: https://hrlibrary.umn.edu/instree/GAres3314.html
+    locator: Article 3(a)
+    quote: The invasion or attack by the armed forces of a State of the territory of another State, or
+      any military occupation, however temporary, resulting from such invasion or attack, or any annexation
+      by the use of force of the territory of another State or part thereof
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: General Assembly resolution ES-11/1 (press summary GA/12407)
+    publisher: UN General Assembly
+    year: '2022'
+    url: https://press.un.org/en/2022/ga12407.doc.htm
+    locator: Resolution summary
+    quote: Deploring in the strongest terms its aggression against Ukraine in violation of the Charter
+      of the United Nations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Russian full-scale invasion of Ukraine, February 2022 (UNGA ES-11/1)
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - UN General Assembly and Security Council records
+  - Satellite imagery providers
+  - Official government statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Forces present with the host state's valid consent
+  - Lawful collective or individual self-defence or UN Security Council authorisation
+  - Disputed or undemarcated borders where both sides claim the area
+  - Border incidents too minor to reach the gravity threshold (UNGA 3314 Art 2)
+  jurisdictions: International (UN Charter; Rome Statute Art 8 bis)
+  version: 1
+- id: AG-002
+  name: Bombardment or weapons use against another state's territory
+  definition: A state's armed forces bombard or use any weapons against the territory of another state.
+  areas:
+  - AG
+  typology: Crime of aggression
+  status: verified
+  sources:
+  - title: Definition of Aggression, UNGA Resolution 3314, Art 3(b)
+    publisher: UN General Assembly
+    year: '1974'
+    url: https://hrlibrary.umn.edu/instree/GAres3314.html
+    locator: Article 3(b)
+    quote: Bombardment by the armed forces of a State against the territory of another State or the use
+      of any weapons by a State against the territory of another State
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - UN Security Council records
+  - Conflict-event datasets
+  - Open-source imagery and munitions analysis
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Self-defence against an armed attack
+  - Strike authorised by the UN Security Council
+  - Accidental or stray fire, misattributed origin
+  jurisdictions: International
+  version: 1
+- id: AG-003
+  name: Naval blockade of another state's ports or coasts
+  definition: A state uses its armed forces to block another state's ports or coastline.
+  areas:
+  - AG
+  typology: Crime of aggression
+  status: verified
+  sources:
+  - title: Definition of Aggression, UNGA Resolution 3314, Art 3(c)
+    publisher: UN General Assembly
+    year: '1974'
+    url: https://hrlibrary.umn.edu/instree/GAres3314.html
+    locator: Article 3(c)
+    quote: The blockade of the ports or coasts of a State by the armed forces of another State
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Vessel
+  - Event
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - AIS ship-tracking data
+  - Notices to mariners
+  - UN records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Naval exercises announced in advance
+  - Security Council-authorised interdiction
+  - Navigation closures for safety
+  jurisdictions: International
+  version: 1
+- id: AG-004
+  name: Attack on another state's armed forces or fleets
+  definition: A state's armed forces attack the land, sea or air forces, or the marine or air fleets,
+    of another state.
+  areas:
+  - AG
+  typology: Crime of aggression
+  status: verified
+  sources:
+  - title: Definition of Aggression, UNGA Resolution 3314, Art 3(d)
+    publisher: UN General Assembly
+    year: '1974'
+    url: https://hrlibrary.umn.edu/instree/GAres3314.html
+    locator: Article 3(d)
+    quote: An attack by the armed forces of a State on the land, sea or air forces, or marine and air
+      fleets of another State
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Vessel
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Official defence ministry statements
+  - UN Security Council records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Self-defence
+  - Misidentification incident
+  - Low-gravity skirmish below the threshold
+  jurisdictions: International
+  version: 1
+- id: AG-005
+  name: Stationed foreign forces used outside the agreement or kept past its end
+  definition: Troops based in another state by agreement are used against the terms of that agreement
+    or stay after it ends.
+  areas:
+  - AG
+  typology: Crime of aggression
+  status: verified
+  sources:
+  - title: Definition of Aggression, UNGA Resolution 3314, Art 3(e)
+    publisher: UN General Assembly
+    year: '1974'
+    url: https://hrlibrary.umn.edu/instree/GAres3314.html
+    locator: Article 3(e)
+    quote: The use of armed forces of one State which are within the territory of another State with the
+      agreement of the receiving State, in contravention of the conditions provided for in the agreement
+      or any extension of their presence in such territory beyond the termination of the agreement
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Contract
+  - Document
+  - Event
+  - Address
+  checkable: records
+  lookup_sources:
+  - Status-of-forces and basing agreements
+  - Treaty registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agreement renewed or amended but not published
+  - Withdrawal delayed by logistics with host consent
+  jurisdictions: International
+  version: 1
+- id: AG-006
+  name: State lets its territory be used by another state for aggression
+  definition: A state puts its territory at another state's disposal and allows it to be used to attack
+    a third state.
+  areas:
+  - AG
+  typology: Crime of aggression
+  status: verified
+  sources:
+  - title: Definition of Aggression, UNGA Resolution 3314, Art 3(f)
+    publisher: UN General Assembly
+    year: '1974'
+    url: https://hrlibrary.umn.edu/instree/GAres3314.html
+    locator: Article 3(f)
+    quote: The action of a State in allowing its temtory, which it has placed at the disposal of another
+      State, to be used by that other State for perpetrating an act of aggression against a third State
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: General Assembly resolution ES-11/1 (press summary)
+    publisher: UN General Assembly
+    year: '2022'
+    url: https://press.un.org/en/2022/ga12407.doc.htm
+    locator: Resolution summary
+    quote: deploring Belarus' involvement in this illegal action
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Belarus's role in the 2022 invasion of Ukraine, as deplored by UNGA ES-11/1
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - UN records
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Joint exercises with no follow-on attack
+  - Transit for lawful purposes
+  jurisdictions: International
+  version: 1
+- id: AG-007
+  name: Sending armed bands, irregulars or mercenaries (deniable proxy forces)
+  definition: A state sends, or is substantially involved in, armed groups, irregulars or mercenaries
+    who use force against another state at the level of an invasion or attack.
+  areas:
+  - AG
+  typology: Crime of aggression / proxy forces
+  status: verified
+  sources:
+  - title: Definition of Aggression, UNGA Resolution 3314, Art 3(g)
+    publisher: UN General Assembly
+    year: '1974'
+    url: https://hrlibrary.umn.edu/instree/GAres3314.html
+    locator: Article 3(g)
+    quote: The sending by or on behalf of a State of armed bands, groups, irregulars or mercenaries, which
+      carry out acts of armed force against another State of such gravity as to amount to the acts listed
+      above, or its substantial involvement therein.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Military and Paramilitary Activities in and against Nicaragua (Nicaragua v. United States of
+      America)
+    publisher: International Court of Justice
+    year: '1986'
+    url: https://www.icj-cij.org/case/70
+    locator: Overview of the case, judgment of 27 June 1986
+    quote: not to intervene in the affairs of another State
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - ICJ Nicaragua v. United States (1986)
+  - Wagner Group deployments (see AG-023)
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Company
+  - Payment
+  - Person
+  - Event
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Sanctions lists
+  - Corporate registries
+  - UN Panel of Experts reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Volunteers acting without state direction
+  - Lawful security assistance to a recognised government with its consent
+  - Armed group's ties to a state are historical, not current
+  jurisdictions: International
+  version: 1
+- id: AG-008
+  name: First use of armed force in breach of the UN Charter
+  definition: A state is the first to use armed force against another in a way the Charter does not allow,
+    which is prima facie evidence of aggression.
+  areas:
+  - AG
+  typology: Crime of aggression
+  status: verified
+  sources:
+  - title: Definition of Aggression, UNGA Resolution 3314, Art 2
+    publisher: UN General Assembly
+    year: '1974'
+    url: https://hrlibrary.umn.edu/instree/GAres3314.html
+    locator: Article 2
+    quote: The First use of armed force by a State in contravention of the Charter shall constitute prima
+      facie evidence of an act of aggression
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - UN Security Council records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Security Council may find acts not of sufficient gravity (Art 2)
+  - Contested facts about who fired first
+  jurisdictions: International
+  version: 1
+- id: AG-009
+  name: Leadership-level planning or preparation of a manifest Charter violation
+  definition: A person who effectively controls or directs a state's political or military action plans,
+    prepares, starts or carries out an act of aggression of manifest character, gravity and scale.
+  areas:
+  - AG
+  typology: Crime of aggression (individual liability)
+  status: verified
+  sources:
+  - title: Amendments on the crime of aggression to the Rome Statute (Article 8 bis), depositary notification
+      C.N.651.2010
+    publisher: United Nations Treaty Collection
+    year: '2010'
+    url: https://treaties.un.org/doc/Publication/CN/2010/CN.651.2010-Eng.pdf
+    locator: Article 8 bis, paragraph 1
+    quote: by a person in a position effectively to exercise control over or to direct the political or
+      military action of a State
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Employment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Government gazettes
+  - Official decrees and orders
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Official has a title but no effective control over the decision
+  - Contingency planning that is routine for any military
+  jurisdictions: ICC States Parties; Special Tribunal for the Crime of Aggression against Ukraine
+  version: 1
+- id: AG-010
+  name: Large, gradual force build-up near a border
+  definition: Troops build up gradually along another state's border to the largest concentration seen
+    in years.
+  areas:
+  - AG
+  typology: Pre-invasion warning
+  status: verified
+  sources:
+  - title: 'Intelligence and the War in Ukraine: Part 1'
+    publisher: War on the Rocks
+    year: '2022'
+    url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+    quote: We're now seeing the largest concentration of Russian forces on Ukraine's borders since 2014.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Russian build-up around Ukraine, 2021-2022: US officials said Russia had deployed 70,000 troops and
+    could reach 175,000 in 100 battalion tactical groups'
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Address
+  - Vehicle
+  checkable: lookups
+  lookup_sources:
+  - Commercial satellite imagery
+  - Rail and road movement OSINT
+  - Government intelligence statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Announced exercises
+  - Coercive signalling without intent to attack
+  - Internal redeployments or rotations
+  jurisdictions: International
+  version: 1
+- id: AG-011
+  name: Sustainment and support units deployed forward
+  definition: The support units an invasion needs (logistics, sustainment) deploy alongside combat troops.
+  areas:
+  - AG
+  typology: Pre-invasion warning
+  status: verified
+  sources:
+  - title: 'Intelligence and the War in Ukraine: Part 1'
+    publisher: War on the Rocks
+    year: '2022'
+    url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+    quote: the deployment of supporting units needed to sustain an invasion
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - UK officials' satellite imagery before February 2022
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Address
+  - Vehicle
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - Government intelligence statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large-scale exercise that also tests logistics
+  jurisdictions: International
+  version: 1
+- id: AG-012
+  name: Medical supplies moved forward
+  definition: Medical supplies are distributed to forces near a border ahead of possible combat.
+  areas:
+  - AG
+  typology: Pre-invasion warning
+  status: verified
+  sources:
+  - title: 'Intelligence and the War in Ukraine: Part 1'
+    publisher: War on the Rocks
+    year: '2022'
+    url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+    quote: the distribution of medical supplies
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - US officials' concern before February 2022
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Government intelligence statements
+  - OSINT
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Exercise realism
+  - Disaster or pandemic preparedness
+  jurisdictions: International
+  version: 1
+- id: AG-013
+  name: Exercise forces and ammunition stay after the exercise ends
+  definition: Units sent for an exercise near a border do not return home and ammunition stockpiles remain.
+  areas:
+  - AG
+  typology: Pre-invasion warning
+  status: verified
+  sources:
+  - title: 'Intelligence and the War in Ukraine: Part 1'
+    publisher: War on the Rocks
+    year: '2022'
+    url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+    quote: remained in Belarus, along with large ammunition stockpiles
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Units deployed for Zapad-21 remaining in Belarus
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - Rail-movement OSINT
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agreed basing extension
+  - Slow return logistics
+  jurisdictions: International
+  version: 1
+- id: AG-014
+  name: Surprise readiness checks near a neighbour
+  definition: A military holds snap 'surprise check' readiness tests on fronts facing another state.
+  areas:
+  - AG
+  typology: Pre-invasion warning
+  status: verified
+  sources:
+  - title: 'Intelligence and the War in Ukraine: Part 1'
+    publisher: War on the Rocks
+    year: '2022'
+    url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+    quote: a 'surprise check' of its southern and western fronts
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Russia, April 2021
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Defence ministry announcements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Routine readiness testing practised by many militaries
+  jurisdictions: International
+  version: 1
+- id: AG-015
+  name: Announced pull-back not matched by withdrawal; deployments designed to obscure intent
+  definition: Forces stay at the border despite claims of de-escalation, and moves appear designed to
+    hide intentions and create uncertainty.
+  areas:
+  - AG
+  typology: Pre-invasion warning / deception
+  status: verified
+  sources:
+  - title: 'Intelligence and the War in Ukraine: Part 1'
+    publisher: War on the Rocks
+    year: '2022'
+    url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+    quote: We have not seen evidence that Russia has withdrawn forces from Ukraine's borders.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Intelligence and the War in Ukraine: Part 1'
+    publisher: War on the Rocks
+    year: '2022'
+    url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+    quote: obfuscate intentions and to create uncertainty
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Statements by the UK Chief of Defence Intelligence and US officials, early 2022
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - Official statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Withdrawal under way but not yet visible
+  - Imagery gaps
+  jurisdictions: International
+  version: 1
+- id: AG-016
+  name: Foreign intelligence recruiting officials of the target state
+  definition: A state's intelligence services are directed to recruit current and former officials of
+    the state it may attack.
+  areas:
+  - AG
+  typology: Pre-invasion subversion
+  status: verified
+  sources:
+  - title: 'Intelligence and the War in Ukraine: Part 1'
+    publisher: War on the Rocks
+    year: '2022'
+    url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+    quote: Russia has directed its intelligence services to recruit current and former Ukrainian government
+      officials
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - US reporting on Russia and Ukraine before February 2022
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Associate
+  - Employment
+  - UnknownLink
+  checkable: person
+  lookup_sources:
+  - Official intelligence statements
+  - Court records for espionage cases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary diplomatic or business contacts
+  - Disinformation designed to discredit officials
+  jurisdictions: International
+  version: 1
+- id: AG-017
+  name: Specially recruited foreign fighters paid well above regular soldiers
+  definition: Fighters who are not nationals or residents of a party are specially recruited for an armed
+    conflict mainly for private gain and promised pay well above local soldiers of similar rank.
+  areas:
+  - AG
+  typology: Mercenarism
+  status: verified
+  sources:
+  - title: International Convention against the Recruitment, Use, Financing and Training of Mercenaries,
+      Art 1(1)
+    publisher: UN OHCHR
+    year: '1989'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-against-recruitment-use-financing-and
+    locator: Article 1, paragraph 1
+    quote: Is specially recruited locally or abroad in order to fight in an armed conflict
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: International Convention against the Recruitment, Use, Financing and Training of Mercenaries,
+      Art 1(1)(b)
+    publisher: UN OHCHR
+    year: '1989'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-against-recruitment-use-financing-and
+    locator: Article 1(1)(b)
+    quote: material compensation substantially in excess of that promised or paid to combatants of similar
+      rank and functions in the armed forces of that party
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Company
+  - Payment
+  - Employment
+  - Contract
+  checkable: records
+  lookup_sources:
+  - Recruitment adverts
+  - Corporate registries
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets all five cumulative criteria in Article 1(1) of the Convention
+    threshold_source: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-against-recruitment-use-financing-and
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Members of a state's own armed forces, or sent on official duty, are excluded
+  - Foreign volunteers in national forces (e.g. legions) who are members of the armed forces
+  - Lawful security contractors not taking part in hostilities
+  jurisdictions: States Parties to the 1989 UN Mercenaries Convention
+  version: 1
+- id: AG-018
+  name: Recruitment for concerted violence to overthrow a government or break up a state
+  definition: People are specially recruited, for significant private gain, to take part in concerted
+    violence aimed at overthrowing a government, undermining its constitutional order or its territorial
+    integrity.
+  areas:
+  - AG
+  typology: Mercenarism / coup
+  status: verified
+  sources:
+  - title: International Convention against the Recruitment, Use, Financing and Training of Mercenaries,
+      Art 1(2)
+    publisher: UN OHCHR
+    year: '1989'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-against-recruitment-use-financing-and
+    locator: Article 1(2)(a)(i)
+    quote: Overthrowing a Government or otherwise undermining the constitutional order of a State
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Company
+  - Payment
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Corporate registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets all five cumulative criteria in Article 1(2) of the Convention
+    threshold_source: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-against-recruitment-use-financing-and
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate private security recruitment
+  - Nationals or residents of the targeted state are excluded by the definition
+  jurisdictions: States Parties to the 1989 UN Mercenaries Convention
+  version: 1
+- id: AG-019
+  name: Private military or security company with a record of serious crime or IHL violations
+  definition: A PMSC hired by a state has a reliably attested record of serious crime, including violations
+    of international humanitarian law.
+  areas:
+  - AG
+  typology: High-risk private military companies
+  status: verified
+  sources:
+  - title: The Montreux Document, Part Two, Good Practice 6
+    publisher: Swiss FDFA and ICRC
+    year: '2008'
+    url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+    locator: Part Two, Good Practice 6
+    quote: no reliably attested record of involvement in serious crime
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Wagner Group (see AG-023, AG-024)
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Contract
+  - ContractAward
+  - CourtCase
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Sanctions lists
+  - Court records
+  - UN Working Group on mercenaries reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Allegations unproven or relate to a different company with a similar name
+  - Company has since changed ownership and remedied
+  jurisdictions: Montreux Document participants
+  version: 1
+- id: AG-020
+  name: PMSC with opaque ownership, subsidiaries or subcontractors
+  definition: A PMSC's ownership structure and its ties to subcontractors, subsidiaries and ventures are
+    unclear or unchecked.
+  areas:
+  - AG
+  typology: High-risk private military companies
+  status: verified
+  sources:
+  - title: The Montreux Document, Part Two, Good Practice 2
+    publisher: Swiss FDFA and ICRC
+    year: '2008'
+    url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+    locator: Part Two, Good Practice 2
+    quote: relations with subcontractors, subsidiary corporations and ventures
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'CAR: Experts alarmed by government''s use of ''Russian trainers'', close contacts with UN
+      peacekeepers'
+    publisher: UN OHCHR (Working Group on the use of mercenaries)
+    year: '2021'
+    url: https://www.ohchr.org/en/press-releases/2021/03/car-experts-alarmed-governments-use-russian-trainers-close-contacts-un
+    quote: increased recruitment and use of private military and foreign security contractors
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - UN experts named Sewa Security Services, Russian-owned Lobaye Invest SARLU and the Wagner Group in
+    CAR (2021)
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Person
+  - Contract
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Corporate registries
+  - OpenCorporates
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Normal group structures for tax or local-licensing reasons
+  - Registries in some countries do not publish owners
+  jurisdictions: Montreux Document participants
+  version: 1
+- id: AG-021
+  name: PMSC hired for combat or state-only functions
+  definition: A state contracts a PMSC for services that could involve direct participation in hostilities,
+    or for functions international humanitarian law reserves to state agents.
+  areas:
+  - AG
+  typology: High-risk private military companies
+  status: verified
+  sources:
+  - title: The Montreux Document, Part Two, Good Practice 1
+    publisher: Swiss FDFA and ICRC
+    year: '2008'
+    url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+    locator: Part Two, Good Practice 1
+    quote: could cause PMSC personnel to become involved in direct participation in hostilities
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The Montreux Document, Part One, statement 2
+    publisher: Swiss FDFA and ICRC
+    year: '2008'
+    url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+    locator: Part One, para 2
+    quote: activities that international humanitarian law explicitly assigns to a State agent or authority
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - PublicBody
+  - Company
+  - Contract
+  - ContractAward
+  - Document
+  checkable: records
+  lookup_sources:
+  - Procurement records
+  - Contract registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Contract covers guarding, training or logistics only
+  - Contract language is broad but practice is limited
+  jurisdictions: Montreux Document participants
+  version: 1
+- id: AG-022
+  name: PMSC lacking licences, records, training or lawfully acquired weapons
+  definition: A PMSC cannot show required licences, accurate personnel and property records, adequate
+    training, or lawful acquisition of its weapons.
+  areas:
+  - AG
+  typology: High-risk private military companies
+  status: verified
+  sources:
+  - title: The Montreux Document, Part Two, Good Practices 8-11
+    publisher: Swiss FDFA and ICRC
+    year: '2008'
+    url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+    locator: Part Two, Good Practice 9
+    quote: accurate and up-to-date personnel and property records
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The Montreux Document, Part Two, Good Practice 7
+    publisher: Swiss FDFA and ICRC
+    year: '2008'
+    url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+    locator: Part Two, Good Practice 7
+    quote: the financial and economic capacity of the PMSC
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Contract
+  - Employment
+  checkable: records
+  lookup_sources:
+  - National PMSC licensing registers
+  - Arms export licences
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licence application pending (Montreux allows 'in the process of obtaining')
+  - Small new firm with thin records
+  jurisdictions: Montreux Document participants
+  version: 1
+- id: AG-023
+  name: Private military force paid in or controlling natural resources
+  definition: A private military group controls or extorts mines and natural resources in the countries
+    where it operates.
+  areas:
+  - AG
+  typology: Proxy / mercenary forces
+  status: verified
+  sources:
+  - title: Treasury Sanctions Russian Proxy Wagner Group as a Transnational Criminal Organization (press
+      release jy1220)
+    publisher: US Department of the Treasury
+    year: '2023'
+    url: https://home.treasury.gov/news/press-releases/jy1220
+    quote: the Wagner Group controls numerous gold and diamond mines in CAR
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Wagner Group in the Central African Republic
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Ownership
+  - Contract
+  - Payment
+  - Sanction
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Mining cadastres
+  - Corporate registries
+  - OFAC and EU sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary mining concession held by an unrelated company
+  - Security contract to guard a mine without ownership
+  jurisdictions: US (EO 13581); international
+  version: 1
+- id: AG-024
+  name: Foreign 'trainers' or contractors blurring civilian, military and peacekeeping roles
+  definition: Foreign contractors described as trainers act alongside government forces and near peacekeepers,
+    blurring who is a combatant.
+  areas:
+  - AG
+  typology: Proxy / mercenary forces
+  status: verified
+  sources:
+  - title: 'CAR: Experts alarmed by government''s use of ''Russian trainers'', close contacts with UN
+      peacekeepers'
+    publisher: UN OHCHR
+    year: '2021'
+    url: https://www.ohchr.org/en/press-releases/2021/03/car-experts-alarmed-governments-use-russian-trainers-close-contacts-un
+    quote: This blurring of the lines between civil, military and peacekeeping operations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'CAR, 2021: medical evacuations of wounded ''Russian trainers'' to MINUSCA bases'
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - PublicBody
+  - Event
+  - Address
+  checkable: records
+  lookup_sources:
+  - UN Panel of Experts and Working Group reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine training missions under bilateral agreements
+  jurisdictions: International
+  version: 1
+- id: AG-025
+  name: No investigation of abuses by contractors or proxy forces
+  definition: Reported serious abuses by contractors or proxy forces are not investigated and no one is
+    held to account.
+  areas:
+  - AG
+  typology: Proxy / mercenary forces
+  status: verified
+  sources:
+  - title: 'CAR: Experts alarmed by government''s use of ''Russian trainers'''
+    publisher: UN OHCHR
+    year: '2021'
+    url: https://www.ohchr.org/en/press-releases/2021/03/car-experts-alarmed-governments-use-russian-trainers-close-contacts-un
+    quote: Unacceptably, there seem to be no investigations and no accountability for these abuses
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - CAR, 2021
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Prosecutor statements
+  - UN reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Investigations exist but are confidential
+  - State lacks judicial capacity in conflict zones
+  jurisdictions: International
+  version: 1
+- id: AG-026
+  name: Organised, illegal effort to seize, remove or neutralise national leaders (coup)
+  definition: An organised group uses illegal or irregular means that credibly threaten to seize, remove
+    or disempower people who control national policy.
+  areas:
+  - AG
+  typology: Coup d'etat
+  status: verified
+  sources:
+  - title: Statement on the January 6 attempted coup (Coup d'Etat Project)
+    publisher: Cline Center for Advanced Social Research, University of Illinois
+    year: '2022'
+    url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+    locator: Coup criteria
+    quote: Illegal or irregular means must be used to seize, remove, or render powerless the target of
+      the coup.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Statement on the January 6 attempted coup
+    publisher: Cline Center, University of Illinois
+    year: '2022'
+    url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+    locator: Coup criteria
+    quote: There must be a credible threat to the leaders' hold on power.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cline Center classed 6 January 2021 as an attempted coup
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Event
+  - Associate
+  - Document
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Official inquiry reports
+  - Coup datasets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets all five Cline Center criteria: an initiator, a target with meaningful control over
+      national policy, a credible threat, illegal or irregular means, an organised effort'
+    threshold_source: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful impeachment, no-confidence vote or court ruling
+  - Spontaneous unorganised unrest
+  - Peaceful protest
+  jurisdictions: All
+  version: 1
+- id: AG-027
+  name: 'Self-coup: incumbent takes extraordinary powers or disables other branches'
+  definition: A sitting chief executive uses illegal or extra-legal means to assume extraordinary powers
+    or render the legislature or courts powerless.
+  areas:
+  - AG
+  typology: Auto-coup
+  status: verified
+  sources:
+  - title: Statement on the January 6 attempted coup
+    publisher: Cline Center, University of Illinois
+    year: '2022'
+    url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+    locator: Coup types
+    quote: the incumbent chief executive uses illegal or extra-legal means to assume extraordinary powers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cline Center classed 6 January 2021 as, in part, an attempted auto-coup
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Official gazettes and decrees
+  - Constitutional court rulings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Constitutionally authorised emergency powers with legislative oversight
+  - Court-validated dissolution under the constitution
+  jurisdictions: All
+  version: 1
+- id: AG-028
+  name: Dissident coup by a small group of discontents
+  definition: A small group outside the top of government, which may include former officials, religious
+    or business figures or civilians, initiates a coup.
+  areas:
+  - AG
+  typology: Dissident coup
+  status: verified
+  sources:
+  - title: Statement on the January 6 attempted coup
+    publisher: Cline Center, University of Illinois
+    year: '2022'
+    url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+    locator: Coup types
+    quote: initiated by a small group of discontents that can include former government officials, religious
+      leaders, business owners, or civilians
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 6 January 2021 (Cline Center classification)
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Associate
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful opposition organising or protest
+  jurisdictions: All
+  version: 1
+- id: AG-029
+  name: 'Coup conspiracy: thwarted plan with a shadow government ready'
+  definition: A plan to take power is stopped before action, often with a ready-made 'government' body
+    and planned ministries.
+  areas:
+  - AG
+  typology: Coup conspiracy
+  status: verified
+  sources:
+  - title: Statement on the January 6 attempted coup
+    publisher: Cline Center, University of Illinois
+    year: '2022'
+    url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+    locator: Definitions
+    quote: Coups that are planned but thwarted before action is taken are coup conspiracies.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Press release of 7 December 2022 (Reichsbürger arrests)
+    publisher: Federal Public Prosecutor General of Germany (Generalbundesanwalt)
+    year: '2022'
+    url: https://www.generalbundesanwalt.de/SharedDocs/Pressemitteilungen/EN/2022/Pressemitteilung-vom-07-12-2022-Englisch.html
+    quote: This organisation set itself the goal to overthrow the existing state order in Germany
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - German 'Reichsbürger' group arrested December 2022, with a planned 'Council' and departments such
+    as 'Justice', 'Foreign' and 'Health'
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Associate
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Prosecutor press releases
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Fantasy role-play or online talk with no preparation
+  - Lawful political organising for elections
+  jurisdictions: All
+  version: 1
+- id: AG-030
+  name: Plotters recruit serving soldiers and police and scout military sites
+  definition: A group planning to take power focuses recruitment on serving soldiers and police and scouts
+    barracks or other sites for its forces.
+  areas:
+  - AG
+  typology: Coup conspiracy / armed wing
+  status: verified
+  sources:
+  - title: Press release of 7 December 2022 (Reichsbürger arrests)
+    publisher: Generalbundesanwalt
+    year: '2022'
+    url: https://www.generalbundesanwalt.de/SharedDocs/Pressemitteilungen/EN/2022/Pressemitteilung-vom-07-12-2022-Englisch.html
+    quote: individual members of the organisation made concrete preparations to forcibly gain access to
+      the German Parliament
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Reichsbürger group: ''military branch'', recruitment focused on Bundeswehr and police, visits to
+    barracks (2022, suspected)'
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Associate
+  - Address
+  - Event
+  checkable: person
+  lookup_sources:
+  - Prosecutor statements
+  - Military disciplinary records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Veterans' associations and social clubs
+  - Members' service is incidental to the group
+  jurisdictions: All
+  version: 1
+- id: AG-031
+  name: Leader rejects the democratic rules of the game
+  definition: A politician rejects, in words or action, democratic rules such as accepting election results.
+  areas:
+  - AG
+  typology: Authoritarian warning signs
+  status: verified
+  sources:
+  - title: Review of How Democracies Die (Levitsky and Ziblatt)
+    publisher: The Independent Review
+    year: '2018'
+    url: https://www.independent.org/tir/2018-fall/how-democracies-die/
+    quote: the rejection, in words or action, of the democratic rules of the game
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Speeches, posts and official statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful legal challenges to results through courts
+  - Rhetorical hyperbole not followed by action
+  jurisdictions: All
+  version: 1
+- id: AG-032
+  name: Leader denies opponents' legitimacy
+  definition: A politician treats political opponents as illegitimate rather than as rivals.
+  areas:
+  - AG
+  typology: Authoritarian warning signs
+  status: verified
+  sources:
+  - title: Review of How Democracies Die
+    publisher: The Independent Review
+    year: '2018'
+    url: https://www.independent.org/tir/2018-fall/how-democracies-die/
+    quote: the denial of the legitimacy of political opponents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  checkable: records
+  lookup_sources:
+  - Speeches and posts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary harsh campaign rhetoric
+  - Opponent genuinely barred by a court
+  jurisdictions: All
+  version: 1
+- id: AG-033
+  name: Leader tolerates or encourages political violence
+  definition: A politician tolerates or encourages violence by supporters.
+  areas:
+  - AG
+  typology: Authoritarian warning signs
+  status: verified
+  sources:
+  - title: Review of How Democracies Die
+    publisher: The Independent Review
+    year: '2018'
+    url: https://www.independent.org/tir/2018-fall/how-democracies-die/
+    quote: toleration or encouragement of violence
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Associate
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Speeches and posts
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Statements taken out of context
+  - Leader condemned the violence in other statements
+  jurisdictions: All
+  version: 1
+- id: AG-034
+  name: Leader willing to curtail opponents' and the media's civil liberties
+  definition: A politician shows willingness to restrict the civil liberties of opponents, including the
+    press.
+  areas:
+  - AG
+  typology: Authoritarian warning signs
+  status: verified
+  sources:
+  - title: Review of How Democracies Die
+    publisher: The Independent Review
+    year: '2018'
+    url: https://www.independent.org/tir/2018-fall/how-democracies-die/
+    quote: a willingness to curtail civil liberties of opponents, including the media
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Laws and decrees
+  - Press freedom monitors
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary defamation litigation
+  - Lawful regulation applied evenly
+  jurisdictions: All
+  version: 1
+- id: AG-035
+  name: Conspiracy to oppose by force the lawful transfer of power or government authority
+  definition: Two or more people agree to use force to overthrow the government, levy war against it,
+    or oppose its authority, such as blocking the transfer of presidential power.
+  areas:
+  - AG
+  typology: Seditious conspiracy
+  status: verified
+  sources:
+  - title: 18 U.S. Code 2384 - Seditious conspiracy
+    publisher: Cornell Legal Information Institute
+    url: https://www.law.cornell.edu/uscode/text/18/2384
+    quote: conspire to overthrow, put down, or to destroy by force the Government of the United States
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Jury Convicts Four Leaders of the Proud Boys of Seditious Conspiracy Related to U.S. Capitol
+      Breach
+    publisher: US Department of Justice
+    year: '2023'
+    url: https://www.justice.gov/opa/pr/jury-convicts-four-leaders-proud-boys-seditious-conspiracy-related-us-capitol-breach
+    quote: oppose by force the lawful transfer of presidential power
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Oath Keepers and Proud Boys leaders convicted, 2022-2023
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Associate
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - PACER court dockets
+  - DOJ press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Protected political speech and protest without agreement to use force
+  - Bluster in group chats with no steps taken
+  jurisdictions: United States (18 U.S.C. 2384)
+  version: 1
+- id: AG-036
+  name: Weapons staged near the target as a 'quick reaction force'
+  definition: A group stages weapons and armed teams just outside a city, ready to bring them in quickly.
+  areas:
+  - AG
+  typology: Seditious conspiracy / armed groups
+  status: verified
+  sources:
+  - title: Court Sentences Two Oath Keepers Leaders on Seditious Conspiracy and Other Charges Related
+      to U.S. Capitol Breach
+    publisher: US Department of Justice
+    year: '2023'
+    url: https://www.justice.gov/opa/pr/court-sentences-two-oath-keepers-leaders-seditious-conspiracy-and-other-charges-related-us
+    quote: prepared to rapidly transport firearms and other weapons into Washington, D.C.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Oath Keepers QRF outside Washington, January 2021
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Address
+  - Vehicle
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court exhibits
+  - Hotel or venue records cited in court
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful firearms storage by travellers
+  - Licensed security for an event
+  jurisdictions: United States
+  version: 1
+- id: AG-037
+  name: Paramilitary gear and weapons brought to a political event
+  definition: Members bring paramilitary gear, weapons and supplies to a political event or government
+    site.
+  areas:
+  - AG
+  typology: Seditious conspiracy / armed groups
+  status: verified
+  sources:
+  - title: Court Sentences Two Oath Keepers Leaders on Seditious Conspiracy
+    publisher: US Department of Justice
+    year: '2023'
+    url: https://www.justice.gov/opa/pr/court-sentences-two-oath-keepers-leaders-seditious-conspiracy-and-other-charges-related-us
+    quote: paramilitary gear, weapons, and supplies – including knives, batons
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Oath Keepers, 6 January 2021
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Address
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Event video
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful open carry where permitted
+  - Protective gear for self-defence at volatile protests
+  jurisdictions: United States
+  version: 1
+- id: AG-038
+  name: Group drills or parades with arms as a military unit without state authority
+  definition: A group other than the state militia, armed forces or veterans' bodies organises as a military
+    company and drills or parades with weapons.
+  areas:
+  - AG
+  typology: Unlawful private militias
+  status: verified
+  sources:
+  - title: 'Prohibiting Private Armies at Public Rallies: Illinois fact sheet'
+    publisher: Georgetown Law Institute for Constitutional Advocacy and Protection
+    year: '2020'
+    url: https://www.law.georgetown.edu/icap/wp-content/uploads/sites/32/2020/09/Illinois.pdf
+    locator: Unauthorized military organizations
+    quote: associate themselves together as a military company or organization, to drill or parade with
+      arms in this State
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Event
+  - Address
+  checkable: records
+  lookup_sources:
+  - State statutes
+  - Social media and event footage
+  - Business and nonprofit registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shooting clubs or hunting groups
+  - Veterans' organisations and historical re-enactors
+  - Units organised with the governor's consent
+  jurisdictions: 'US states (example: Illinois 20 ILCS 1805/94-95; similar laws in all states per ICAP)'
+  version: 1
+- id: AG-039
+  name: Paramilitary training aimed at civil disorder
+  definition: People teach or train together in weapons, explosives or techniques that can kill or injure,
+    knowing or intending the training will be used in a civil disorder.
+  areas:
+  - AG
+  typology: Unlawful private militias
+  status: verified
+  sources:
+  - title: 'Prohibiting Private Armies at Public Rallies: Illinois fact sheet'
+    publisher: Georgetown ICAP
+    year: '2020'
+    url: https://www.law.georgetown.edu/icap/wp-content/uploads/sites/32/2020/09/Illinois.pdf
+    locator: Paramilitary training
+    quote: any firearm, explosive, incendiary device or technique capable of causing injury or death to
+      persons
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Event
+  - Address
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Training venue records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful firearms or self-defence courses with no civil-disorder purpose
+  - Licensed security training
+  jurisdictions: 'US states (example: Illinois 20 ILCS 1805/94a)'
+  version: 1
+- id: AG-040
+  name: Armed group claims law-enforcement or military authority without being called up
+  definition: An armed group acts as police or soldiers, often in uniforms and insignia, without being
+    called up by a governor or the federal government and without answering to any authority.
+  areas:
+  - AG
+  typology: Unlawful private militias
+  status: verified
+  sources:
+  - title: 'Prohibiting Private Armies at Public Rallies: Illinois fact sheet'
+    publisher: Georgetown ICAP
+    year: '2020'
+    url: https://www.law.georgetown.edu/icap/wp-content/uploads/sites/32/2020/09/Illinois.pdf
+    locator: General principles
+    quote: paramilitary activity or law enforcement functions without being called
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Prohibiting Private Armies at Public Rallies: Illinois fact sheet'
+    publisher: Georgetown ICAP
+    year: '2020'
+    url: https://www.law.georgetown.edu/icap/wp-content/uploads/sites/32/2020/09/Illinois.pdf
+    locator: Constitutional provision (Ill. Const. art. XII, s 2)
+    quote: '[t]he military shall be in strict subordination to the civil power.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Event
+  - Address
+  checkable: records
+  lookup_sources:
+  - State statutes
+  - Event footage
+  - Security licensing registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licensed private security hired by an event organiser
+  - Neighbourhood watch that does not carry arms or claim authority
+  jurisdictions: US states
+  version: 1
+not_reached:
+- WebSearch budget for this turn was exhausted early (shared 200-search limit), so widening beyond the
+  given lists relied on direct fetches of known URLs only.
+- 'Protocol I Art 47 (mercenaries), ICRC IHL database: page requires JavaScript, text not readable.'
+- 'ICC Rome Statute PDF (icc-cpi.int) and ASP resolution RC/Res.6: fetch errors; Article 8 bis taken from
+  the UN Treaty Collection depositary notification instead.'
+- 'Council of Europe announcement of the Special Tribunal for the Crime of Aggression against Ukraine:
+  fetch error; not used.'
+- 'DOJ (W.D. Mich.) Whitmer kidnapping plot sentencing release: fetch error; case not included.'
+- 'OHCHR report on Moura, Mali (2022 killings with foreign military personnel): fetch error; not included.'
+- 'OAS statement on Peru (Castillo, December 2022 dissolution of Congress): fetch error; not included.'
+- 'UN Security Council statement on Myanmar 2021 coup: guessed URL was wrong page; not included.'
+- 'January 6th Select Committee Final Report (House Report 117-663) on GovInfo: landing page had no text;
+  not used as a source.'
+- 'Georgetown ICAP model anti-paramilitary bill PDF and its 50-state fact sheet index: not opened (the
+  site has moved to icap.law.georgetown.edu); only the Illinois fact sheet used. ICAP militia litigation
+  (e.g. Charlottesville) not found on the cases page.'
+- 'ICJ Nicaragua v. USA full judgment: only the case overview was read; findings on training and arming
+  the contras not quoted.'
+- 'Brazil Supreme Federal Court coup-attempt case, militias at polling places (federal voter-intimidation
+  law), and the remaining 10% of the Montreux Document: not reached.'

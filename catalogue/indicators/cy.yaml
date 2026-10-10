@@ -3651,6 +3651,994 @@ indicators:
   - Shared hosting makes unrelated sites look linked
   jurisdictions: Global (INTERPOL)
   version: 1
+- id: CY-071
+  name: Breach reported to the regulator more than 72 hours after the company became aware of it
+  definition: A company tells the data protection regulator about a personal data breach later than the
+    72-hour window that starts when it was reasonably certain a breach happened.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.A.1, para. 29
+    quote: not later than 72 hours after having become aware of it
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.A.2, para. 31 (when the controller becomes 'aware')
+    quote: has a reasonable degree of certainty that a security incident has occurred
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Personal data breaches: a guide'
+    publisher: UK Information Commissioner's Office
+    url: https://ico.org.uk/for-organisations/report-a-breach/personal-data-breach/personal-data-breaches-a-guide/
+    locator: Reporting section (deadline for notifiable breaches)
+    quote: 72 hours
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Data Protection Commission announces decision in Twitter inquiry
+    publisher: Data Protection Commission (Ireland)
+    year: '2020'
+    url: https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry
+    quote: a failure to notify the breach on time to the DPC
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Twitter International: Irish DPC found late notification under Art. 33(1) and fined EUR 450,000 (2020).'
+  cases:
+  - name: Twitter International Company (DPC inquiry)
+    year: '2020'
+    jurisdiction: Ireland / EU
+    what_happened: The Irish DPC found Twitter failed to notify a breach to the DPC on time and failed
+      to document it adequately, infringing GDPR Art. 33(1) and 33(5).
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry
+    source_title: Data Protection Commission announces decision in Twitter inquiry
+  data_needed:
+  - Company
+  - Event
+  - Document
+  - PublicBody
+  - Note
+  checkable: records
+  lookup_sources:
+  - Data protection authority decisions and annual reports
+  - Company breach statements and press releases
+  - Court filings
+  levels:
+    faint: Company's own timeline shows a gap between discovery and notification but exact dates are unclear
+    strong: Dated records show notification after 72 hours
+    textbook: Notification made more than 72 hours after awareness (regulator finding of Art. 33(1) breach)
+    threshold_source: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Awareness legitimately began later than the first suspicion, after a short investigation to establish
+    a breach had occurred
+  - Breach judged unlikely to result in risk, so no notification was required
+  - Late notice was made with documented reasons for the delay, which GDPR permits
+  - Processor told the controller late
+  jurisdictions: EU/EEA and UK (GDPR / UK GDPR)
+  version: 1
+- id: CY-072
+  name: Late breach notification with no stated reasons for the delay
+  definition: A breach notice is filed after the deadline but does not explain why it was late, which
+    the rules require.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.A.1
+    quote: it shall be accompanied by reasons for the delay.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Regulator decisions
+  - Freedom-of-information requests to the data protection authority
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reasons were given to the regulator but are not public
+  - Notification was made in phases, with the first phase on time
+  jurisdictions: EU/EEA and UK (GDPR / UK GDPR)
+  version: 1
+- id: CY-073
+  name: Breach not recorded in the company's internal breach register
+  definition: A company fails to keep a written record of a breach, its effects and what it did about
+    it, even though every breach must be documented whether or not it is reported.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section V.A, para. 121 (quoting Art. 33(5))
+    quote: The controller shall document any personal data breaches
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Personal data breaches: a guide'
+    publisher: UK Information Commissioner's Office
+    url: https://ico.org.uk/for-organisations/report-a-breach/personal-data-breach/personal-data-breaches-a-guide/
+    locator: Record-keeping section (wording as returned by the page reader; check before publication)
+    quote: You must also keep a record of any personal data breaches, regardless of whether you are required
+      to notify.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Data Protection Commission announces decision in Twitter inquiry
+    publisher: Data Protection Commission (Ireland)
+    year: '2020'
+    url: https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry
+    quote: a failure to adequately document the breach
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Twitter International: Art. 33(5) documentation failure found by the Irish DPC (2020).'
+  cases:
+  - name: Twitter International Company (DPC inquiry)
+    year: '2020'
+    jurisdiction: Ireland / EU
+    what_happened: DPC found failure to adequately document the breach (Art. 33(5)).
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry
+    source_title: Data Protection Commission announces decision in Twitter inquiry
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: person
+  lookup_sources:
+  - Regulator decisions
+  - Whistleblower or insider documents
+  - Litigation discovery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Record exists but was not disclosed to the journalist
+  - Incident was judged not to involve personal data
+  jurisdictions: EU/EEA and UK (GDPR / UK GDPR)
+  version: 1
+- id: CY-074
+  name: People put at high risk by a breach are not told
+  definition: A breach is likely to cause serious harm to the people whose data was exposed, but the company
+    does not tell them promptly.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section III.A, para. 81 (quoting Art. 34(1))
+    quote: the controller shall communicate the personal data breach to the data subject without undue
+      delay.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section I.B.3, para. 28
+    quote: failure to report a breach to either an individual or a supervisory authority
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Uber: FTC said Uber kept a 2016 breach from consumers until November 2017.'
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Affected people's accounts
+  - Regulator decisions
+  - Company notices to customers
+  levels:
+    faint: Sensitive data reported exposed, no customer notice found
+    strong: Regulator or court record shows high-risk breach without notice to individuals
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Data was securely encrypted, so risk to people was low
+  - Company took steps that removed the high risk
+  - Individual notice was replaced by a public announcement because direct contact was disproportionate
+  jurisdictions: EU/EEA and UK (GDPR Art. 34); comparable duties in US sector laws
+  version: 1
+- id: CY-075
+  name: Supplier or processor sits on a breach before telling its client
+  definition: A service provider handling data for another organisation learns of a breach but delays
+    telling that organisation.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.A.4, para. 44 (quoting Art. 33(2))
+    quote: must notify the controller “without undue delay”
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Contracts and data processing agreements
+  - Client breach notices naming a vendor
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Processor needed time to confirm whose data was affected
+  - Contract set a specific reporting route that was followed
+  jurisdictions: EU/EEA and UK (GDPR Art. 33(2))
+  version: 1
+- id: CY-076
+  name: Payment to attackers booked as a bug bounty, tied to a non-disclosure agreement
+  definition: A company pays the people who stole its data through a vulnerability-reward programme or
+    similar, and gets them to sign a confidentiality agreement, instead of reporting the breach.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Uber Agrees to Expanded Settlement with FTC Related to Privacy, Security Claims
+    publisher: US Federal Trade Commission
+    year: '2018'
+    url: https://www.ftc.gov/news-events/news/press-releases/2018/04/uber-agrees-expanded-settlement-ftc-related-privacy-security-claims
+    quote: paid the intruders $100,000 through its third-party “bug bounty” program
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Former Chief Security Officer Of Uber Convicted Of Federal Charges For Covering Up Data Breach
+    publisher: US Attorney's Office, Northern District of California
+    year: '2022'
+    url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+    quote: contained the false representation that the hackers did not take or store any data in their
+      hack
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Uber 2016 breach: USD 100,000 paid via bug bounty; NDAs falsely stated no data was taken.'
+  cases:
+  - name: United States v. Joseph Sullivan (Uber)
+    year: '2022'
+    jurisdiction: US, N.D. California
+    what_happened: Uber's former chief security officer was convicted of obstructing an FTC proceeding
+      and misprision of felony for concealing the 2016 breach, including paying hackers under NDAs falsely
+      stating no data was taken.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+    source_title: Former Chief Security Officer Of Uber Convicted Of Federal Charges For Covering Up Data
+      Breach
+  - name: FTC v. Uber (expanded settlement)
+    year: '2018'
+    jurisdiction: US
+    what_happened: FTC said Uber failed to tell the Commission of a 2016 breach and paid intruders USD
+      100,000 through its bug bounty programme; revised settlement requires reporting of future incidents.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.ftc.gov/news-events/news/press-releases/2018/04/uber-agrees-expanded-settlement-ftc-related-privacy-security-claims
+    source_title: Uber Agrees to Expanded Settlement with FTC Related to Privacy, Security Claims
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Bug bounty platform disclosures
+  - Court records
+  - Regulator settlements
+  levels:
+    faint: Unusually large bug bounty payout with no published vulnerability report
+    strong: Bounty recipient is shown to have taken data rather than only reported a flaw
+    textbook: Payment to intruders who took data, with an NDA and no breach notice
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine bug bounty for a researcher who reported a flaw responsibly
+  - Large bounties are normal for critical vulnerabilities
+  jurisdictions: US (federal)
+  version: 1
+- id: CY-077
+  name: Breach kept from a regulator that is already investigating the company's security
+  definition: While a regulator is examining the company's data security, the company suffers a new breach
+    and does not tell that regulator.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Uber Agrees to Expanded Settlement with FTC Related to Privacy, Security Claims
+    publisher: US Federal Trade Commission
+    year: '2018'
+    url: https://www.ftc.gov/news-events/news/press-releases/2018/04/uber-agrees-expanded-settlement-ftc-related-privacy-security-claims
+    quote: compounded its misconduct by failing to inform the Commission that it suffered another data
+      breach in 2016
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Former Chief Security Officer Of Uber Convicted Of Federal Charges For Covering Up Data Breach
+    publisher: US Attorney's Office, Northern District of California
+    year: '2022'
+    url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+    quote: never mentioned the incident to them
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Uber: breach of November 2016 withheld from the FTC during its ongoing inquiry.'
+  cases:
+  - name: United States v. Joseph Sullivan (Uber)
+    year: '2022'
+    jurisdiction: US, N.D. California
+    what_happened: Convicted of obstructing the FTC proceeding by concealing the 2016 breach from it.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+  data_needed:
+  - Company
+  - PublicBody
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Regulator dockets and consent orders
+  - Court records
+  levels:
+    faint: Breach date falls inside an open regulator inquiry
+    strong: Regulator later says it was not told
+    textbook: Court or regulator finding that the breach was withheld from the inquiry
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Incident was unrelated to the inquiry's scope and disclosed through another route
+  - Company was still confirming the incident
+  jurisdictions: US (federal)
+  version: 1
+- id: CY-078
+  name: Internal instructions to keep a breach secret or treat the investigation as non-existent
+  definition: Staff are told to restrict knowledge of a breach, or to say no investigation exists, in
+    communications or records.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Former Chief Security Officer Of Uber Convicted Of Federal Charges For Covering Up Data Breach
+    publisher: US Attorney's Office, Northern District of California
+    year: '2022'
+    url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+    quote: this investigation does not exist
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Uber: CSO said the breach information needed to be ''tightly controlled''.'
+  cases:
+  - name: United States v. Joseph Sullivan (Uber)
+    year: '2022'
+    jurisdiction: US, N.D. California
+    what_happened: Evidence at trial included instructions that the breach 'can't let this get out' and
+      that the investigation 'does not exist'; jury convicted.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Employment
+  - Event
+  checkable: person
+  lookup_sources:
+  - Leaked or disclosed internal communications
+  - Trial exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Need-to-know limits are normal during live incident response and law-enforcement cooperation
+  - Legal privilege procedures restrict circulation
+  jurisdictions: US
+  version: 1
+- id: CY-079
+  name: Investor filings call cyber risk hypothetical after a known breach
+  definition: A listed company's risk disclosures describe breaches only as something that might happen,
+    when the company already knows one has happened.
+  areas:
+  - CY
+  typology: Misleading breach disclosure to investors
+  status: verified
+  sources:
+  - title: Altaba, Formerly Known as Yahoo!, Charged With Failing to Disclose Massive Cybersecurity Breach;
+      Agrees To Pay $35 Million
+    publisher: US Securities and Exchange Commission
+    year: '2018'
+    url: https://www.sec.gov/newsroom/press-releases/2018-71
+    quote: SEC filings stated that it faced only the risk of, and negative effects that might flow from,
+      data breaches
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: SEC Charges Four Companies With Misleading Cyber Disclosures
+    publisher: US Securities and Exchange Commission
+    year: '2024'
+    url: https://www.sec.gov/newsroom/press-releases/2024-174
+    quote: Downplaying the extent of a material cybersecurity breach is a bad strategy
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Yahoo/Altaba: hypothetical risk language while a 2014 breach was known (USD 35m penalty).'
+  - 'Unisys: described risks as ''hypothetical'' despite two SolarWinds-related intrusions with data exfiltration
+    (USD 4m).'
+  cases:
+  - name: Altaba Inc. (formerly Yahoo!)
+    year: '2018'
+    jurisdiction: US
+    what_happened: SEC found Yahoo failed to disclose a December 2014 breach for over two years while
+      filings described breaches as only a risk; settled without admitting or denying.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2018-71
+    source_title: SEC press release 2018-71
+  - name: Unisys Corp.
+    year: '2024'
+    jurisdiction: US
+    what_happened: SEC charged Unisys with describing cyber risks as hypothetical despite known intrusions;
+      USD 4 million civil penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+    source_title: SEC press release 2024-174
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR (10-K risk factors, 8-K)
+  - SEC enforcement releases
+  levels:
+    faint: Risk-factor text unchanged across years spanning a reported incident
+    strong: Later disclosure shows the company knew of the breach when the hypothetical language was filed
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: SEC treats misleading cyber risk factors as securities-law half-truths
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  innocent_explanations:
+  - Incident was judged immaterial at the time in good faith
+  - Company did not yet know of the breach when filing
+  jurisdictions: US (SEC)
+  version: 1
+- id: CY-080
+  name: Public breach statement understates scope or describes it in generic terms
+  definition: A company discloses a breach but minimises what was taken, how much was accessed, or describes
+    it only vaguely, when it knows more.
+  areas:
+  - CY
+  typology: Misleading breach disclosure to investors
+  status: verified
+  sources:
+  - title: SEC Charges Four Companies With Misleading Cyber Disclosures
+    publisher: US Securities and Exchange Commission
+    year: '2024'
+    url: https://www.sec.gov/newsroom/press-releases/2024-174
+    locator: Avaya findings
+    quote: limited number of [the] Company's email messages
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: SEC Charges Four Companies With Misleading Cyber Disclosures
+    publisher: US Securities and Exchange Commission
+    year: '2024'
+    url: https://www.sec.gov/newsroom/press-releases/2024-174
+    locator: Check Point findings
+    quote: generic terms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Avaya said 'limited' emails while knowing at least 145 cloud files were accessed.
+  - Mimecast did not disclose the nature of code taken or number of encrypted credentials accessed.
+  cases:
+  - name: Avaya Holdings Corp.
+    year: '2024'
+    jurisdiction: US
+    what_happened: SEC charged misleading disclosure understating accessed material; USD 1 million penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  - name: Check Point Software Technologies
+    year: '2024'
+    jurisdiction: US
+    what_happened: SEC said intrusion and risks described in generic terms; USD 995,000 penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  - name: Mimecast Limited
+    year: '2024'
+    jurisdiction: US
+    what_happened: SEC said it omitted the nature of code taken and number of credentials accessed; USD
+      990,000 penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR
+  - Company press releases
+  - Later regulator findings or court filings
+  levels:
+    faint: Successive statements keep enlarging the affected numbers
+    strong: Internal or forensic records show the company knew a larger scope at the time of the statement
+    textbook: Regulator finding of materially misleading understatement
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Charged as misleading statements to investors
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  innocent_explanations:
+  - Forensic investigation was ongoing and early figures were best estimates
+  - Details withheld at law enforcement request or to avoid helping attackers
+  jurisdictions: US (SEC); general
+  version: 1
+- id: CY-081
+  name: Senior management and lawyers knew of a breach but no disclosure assessment followed
+  definition: A breach is reported up to executives or the legal department, yet the company does not
+    properly investigate it or consider whether it must be disclosed.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Altaba, Formerly Known as Yahoo!, Charged With Failing to Disclose Massive Cybersecurity Breach
+    publisher: US Securities and Exchange Commission
+    year: '2018'
+    url: https://www.sec.gov/newsroom/press-releases/2018-71
+    quote: information relating to the breach was reported to members of Yahoo's senior management and
+      legal department
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Yahoo 2014 breach known to senior management within days.
+  cases:
+  - name: Altaba Inc. (formerly Yahoo!)
+    year: '2018'
+    jurisdiction: US
+    what_happened: SEC found senior management and legal knew but the company did not properly investigate
+      or assess disclosure.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2018-71
+  data_needed:
+  - Company
+  - Person
+  - Employment
+  - Directorship
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Regulator findings
+  - Board minutes in litigation
+  - Insider sources
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Assessment happened but concluded, reasonably, the incident was immaterial
+  - Records of the assessment are privileged and not public
+  jurisdictions: US (SEC)
+  version: 1
+- id: CY-082
+  name: Old breach disclosed only when a sale, merger or other deal forces it
+  definition: A breach that happened long before comes to light only as the company is being sold or doing
+    a major transaction.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Altaba, Formerly Known as Yahoo!, Charged With Failing to Disclose Massive Cybersecurity Breach
+    publisher: US Securities and Exchange Commission
+    year: '2018'
+    url: https://www.sec.gov/newsroom/press-releases/2018-71
+    locator: 'Press release (as summarised by page reader: breach disclosed in 2016 as the Verizon sale
+      was closing; verify exact wording)'
+    quote: in the process of closing the acquisition of its operating business by Verizon
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Yahoo disclosed its December 2014 breach in 2016 during the Verizon deal.
+  cases:
+  - name: Altaba Inc. (formerly Yahoo!)
+    year: '2018'
+    jurisdiction: US
+    what_happened: Breach not disclosed for more than two years, until the Verizon transaction.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2018-71
+  data_needed:
+  - Company
+  - Ownership
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR merger filings
+  - Deal announcements
+  levels:
+    faint: Breach disclosure coincides with due diligence on a deal
+    strong: Breach date is years before disclosure
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Buyer's due diligence genuinely discovered a breach the company had not detected
+  jurisdictions: US (SEC); general
+  version: 1
+- id: CY-083
+  name: Material cyber incident not disclosed on Form 8-K within four business days
+  definition: A US-listed company decides, or should decide, an incident is material but does not file
+    the required Item 1.05 report within four business days.
+  areas:
+  - CY
+  typology: Misleading breach disclosure to investors
+  status: verified
+  sources:
+  - title: SEC Adopts Rules on Cybersecurity Risk Management, Strategy, Governance, and Incident Disclosure
+      by Public Companies
+    publisher: US Securities and Exchange Commission
+    year: '2023'
+    url: https://www.sec.gov/newsroom/press-releases/2023-139
+    quote: will generally be due four business days after a registrant determines that a cybersecurity
+      incident is material
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR full-text search for Item 1.05 and 8.01 filings
+  levels:
+    faint: Incident reported in press with no 8-K
+    strong: Company statements show it regarded incident as significant yet no Item 1.05 filing
+    textbook: Item 1.05 filed more than four business days after materiality determination
+    threshold_source: https://www.sec.gov/newsroom/press-releases/2023-139
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: SEC disclosure rule
+    source_url: https://www.sec.gov/newsroom/press-releases/2023-139
+  innocent_explanations:
+  - Incident not material, so voluntary Item 8.01 or no filing was used
+  - Attorney General authorised delay for national security or public safety
+  - Materiality determination took time
+  jurisdictions: US (SEC)
+  version: 1
+- id: CY-084
+  name: Ransomware attack or lost unencrypted device treated as not reportable
+  definition: A company decides not to report a ransomware incident or a lost device, although the data
+    was unprotected or unavailable in a way the guidance says can require notice.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.D, para. 80 (encryption shown to be inadequate)
+    quote: a failure to comply with Article 33 GDPR will exist where a controller does not notify
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section I.B.2, para. 23 (ransomware as availability breach)
+    quote: could lead to a temporary loss of availability if the data can be restored from backup
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Ransomware leak-site listings
+  - Regulator breach statistics
+  - Company statements
+  levels:
+    faint: Company named on a leak site but says no personal data affected
+    strong: Leaked material shows personal data, no notification found
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Links to ransomware payment indicators CY-001 to CY-005
+    source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  innocent_explanations:
+  - Device was securely encrypted, which can mean no notice is required
+  - Data restored quickly from backup with no risk to people
+  - Systems hit held no personal data
+  jurisdictions: EU/EEA and UK (GDPR)
+  version: 1
+- id: CY-085
+  name: US health data breach not reported to patients, HHS or media within 60 days
+  definition: A healthcare body covered by HIPAA does not give the required notices within 60 days of
+    discovering a breach of health information, or treats an incident as non-reportable without a risk
+    assessment.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Breach Notification Rule
+    publisher: US Department of Health and Human Services
+    url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+    locator: Individual notice
+    quote: in no case later than 60 days following the discovery of a breach
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Breach Notification Rule
+    publisher: US Department of Health and Human Services
+    url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+    locator: Definition of breach / risk assessment
+    quote: presumed to be a breach unless
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Breach Notification Rule
+    publisher: US Department of Health and Human Services
+    url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+    locator: Media notice
+    quote: more than 500 residents of a State or jurisdiction
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Event
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - HHS OCR breach portal (breaches of 500 or more)
+  - State attorney general breach notice databases
+  levels:
+    faint: Incident reported in news but absent from HHS breach portal
+    strong: Gap between discovery and notice approaches 60 days
+    textbook: Notice given more than 60 days after discovery
+    threshold_source: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: HIPAA covered entities are healthcare providers, plans and clearinghouses
+    source_url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+  innocent_explanations:
+  - Fewer than 500 people affected, so HHS can be told annually
+  - Documented risk assessment showed low probability of compromise
+  - Law enforcement requested delay
+  jurisdictions: US (HIPAA)
+  version: 1
+- id: CY-086
+  name: Communications intercepted without lawful authority
+  definition: Someone intentionally listens to, records or captures phone calls, voicemail, email or other
+    communications in transit without a warrant, consent or other legal authority.
+  areas:
+  - CY
+  typology: Unlawful interception
+  status: verified
+  sources:
+  - title: 18 U.S. Code § 2511
+    publisher: Legal Information Institute (Cornell) reproducing US Code
+    url: https://www.law.cornell.edu/uscode/text/18/2511
+    locator: §2511(1)(a)
+    quote: intentionally intercepts, endeavors to intercept, or procures any other person to intercept
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Investigatory Powers Act 2016, section 3
+    publisher: UK legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2016/25/section/3
+    locator: s.3(1)(c)
+    quote: the person does not have lawful authority to carry out the interception.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Criminal court records
+  - Telecom provider statements
+  - Civil suits under 18 U.S.C. 2520
+  levels:
+    faint: Third party shows knowledge only obtainable from private communications
+    strong: Technical or documentary evidence of capture without warrant or consent
+    textbook: Conviction or finding under the interception statute
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful warrant or court order existed
+  - One party consented (US one-party-consent rules)
+  - Operator of a private system intercepted its own system, which UK s.3(2) exempts
+  jurisdictions: US (18 U.S.C. 2511); UK (Investigatory Powers Act 2016 s.3)
+  version: 1
+- id: CY-087
+  name: Using or passing on the contents of intercepted communications
+  definition: A person uses or discloses what was in a call or message while knowing, or having reason
+    to know, it was illegally intercepted.
+  areas:
+  - CY
+  typology: Unlawful interception
+  status: verified
+  sources:
+  - title: 18 U.S. Code § 2511
+    publisher: Legal Information Institute (Cornell) reproducing US Code
+    url: https://www.law.cornell.edu/uscode/text/18/2511
+    locator: §2511(1)(d)
+    quote: knowing or having reason to know that the information was obtained through the interception
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Published material whose provenance is in question
+  levels:
+    faint: Published story relies on private message content with unexplained provenance
+    strong: Evidence the publisher or user knew the source was an interception
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Content came from a participant who lawfully shared it
+  - Material was lawfully obtained and published (some US courts protect publication of lawfully obtained
+    information of public concern)
+  jurisdictions: US (18 U.S.C. 2511(1)(c)-(d))
+  version: 1
+- id: CY-088
+  name: Possession or use of a device to intercept oral or wire communications
+  definition: Someone uses a bug, wiretap, or other device to capture conversations or calls without authority.
+  areas:
+  - CY
+  typology: Unlawful interception
+  status: verified
+  sources:
+  - title: 18 U.S. Code § 2511
+    publisher: Legal Information Institute (Cornell) reproducing US Code
+    url: https://www.law.cornell.edu/uscode/text/18/2511
+    locator: §2511(1)(b)
+    quote: or endeavor to use any electronic, mechanical, or other device to intercept any oral communication
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 18 U.S. Code § 2511
+    publisher: Legal Information Institute (Cornell) reproducing US Code
+    url: https://www.law.cornell.edu/uscode/text/18/2511
+    locator: §2511(4)(a)
+    quote: or imprisoned not more than five years, or both.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Purchase records for surveillance equipment
+  - Private investigator invoices
+  levels:
+    faint: Payments to private investigators or surveillance-equipment sellers with no clear lawful purpose
+    strong: Device found or admitted
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful security monitoring of one's own premises with notice
+  - Authorised law-enforcement use
+  - Recording with consent of a party where permitted
+  jurisdictions: US (18 U.S.C. 2511(1)(b))
+  version: 1
 not_reached:
 - 'FATF ''Countering Ransomware Financing'' (March 2023) report and its risk-indicator annex: fatf-gafi.org
   blocked automated fetching (robots / HTML returned instead of PDF)'
@@ -3682,3 +4670,15 @@ not_reached:
   to CY-066 have no case.'
 - Further searches for 2025–2026 DPRK IT worker advisories (for example later IC3 alerts on laptop farms)
   were not possible because the search budget was used up.
+- 'NIS2 Directive (EU) 2022/2555 Article 23 (24-hour early warning / 72-hour / one-month timings): EUR-Lex
+  page returned no article text'
+- 'Leveson Inquiry report volumes (phone hacking findings): PDFs located at assets.publishing.service.gov.uk
+  but not read or quoted'
+- 'R v Coulson and others sentencing remarks (judiciary.uk): fetch failed, so no phone-hacking conviction
+  case included'
+- 'ICO ''What price privacy?'' (Operation Motorman, illegal trade in personal data): fetch failed'
+- 'SEC v. SolarWinds and Timothy Brown (2023): complaint press release read, but later court rulings (reported
+  partial dismissal in 2024 and SEC''s later withdrawal) not verified, so case left out'
+- 'US CIRCIA, US state breach-notification laws, SEC v. Pearson (2021), FTC Health Breach Notification
+  Rule: not reached'
+- WebSearch budget was exhausted mid-task, so further widening to other primary sources was not possible
