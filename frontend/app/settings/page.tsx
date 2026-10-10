@@ -11,6 +11,7 @@ import type {InvestigationDeletionPreview, SettingsStatusOut} from '../../lib/ge
 import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
 import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
+import {AppearancePanel} from '../../features/appearance/appearance-panel';
 
 // Phase 1 scope: the bearer-token API access card only, reusing the shared
 // `api` singleton (lib/api-instance.ts) so a token entered here is the same
@@ -185,7 +186,7 @@ function Settings(): ReactElement {
   };
 
   return (
-    <div className="mx-auto max-w-[920px] px-6 py-14">
+    <div className="mx-auto max-w-[1180px] px-6 py-14">
       <h1 className="text-3xl font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
         Settings
       </h1>
@@ -196,6 +197,7 @@ function Settings(): ReactElement {
         </Link>
         .
       </p>
+      <div className="mt-8"><AppearancePanel/></div>
 
       {/* API access and the operator console are both short, self-contained
           cards -- pairing them in a 2-column grid on desktop instead of

@@ -26,7 +26,7 @@ describe('Workbench page frame', () => {
     render(<StageRail investigationName="Demo Investigation" standing={standing}/>);
     const rail = screen.getByRole('navigation', {name: 'Parts of the investigation'});
     expect(within(rail).getAllByRole('link').filter(a => a.getAttribute('href')?.startsWith('#stage-')).map(a => a.textContent))
-      .toEqual(['1Collect', '2Verify', '3Map', '4Report', '5Keep']);
+      .toEqual(['1Bring in', '2Check', '3See', '4Act', '5Keep']);
     expect(within(rail).getByRole('link', {name: /^Sources & evidence\s*2 · 4$/})).toHaveAttribute('href', '#source-capture');
     expect(within(rail).getByRole('link', {name: /^Relationships\s*6 · 5$/})).toHaveAttribute('href', '#relationship-graph');
     expect(within(rail).getByRole('link', {name: /^Leads\s*3$/})).toHaveAttribute('href', '#leads');
@@ -44,7 +44,7 @@ describe('Workbench page frame', () => {
 
   it('numbers each stage section and states what it is for', () => {
     render(<StageSection stage="verify"><p>body</p></StageSection>);
-    expect(screen.getByRole('heading', {level: 2, name: 'Verify'})).toBeInTheDocument();
+    expect(screen.getByRole('heading', {level: 2, name: 'Check'})).toBeInTheDocument();
     expect(screen.getByText(/Decide what the evidence shows/)).toBeInTheDocument();
   });
 });

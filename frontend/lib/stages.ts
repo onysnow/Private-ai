@@ -11,25 +11,25 @@ export type StagePart = {label: string; anchor: string};
 export type Stage = {key: StageKey; n: number; name: string; line: string; colour: string; parts: StagePart[]};
 
 export const STAGES: Stage[] = [
-  {key: 'collect', n: 1, name: 'Collect', line: 'Bring material in. Nothing here is a finding until it is reviewed.', colour: SWATCH.steelBlue, parts: [
+  {key: 'collect', n: 1, name: 'Bring in', line: 'Bring material in. Nothing here is a finding until it is reviewed.', colour: SWATCH.steelBlue, parts: [
     {label: 'Search', anchor: 'investigation-search'},
     {label: 'Documents', anchor: 'document-ingestion'},
     {label: 'Sources & evidence', anchor: 'source-capture'},
     {label: 'Connectors', anchor: 'connectors'},
     {label: 'OpenAleph corpus', anchor: 'corpus'},
   ]},
-  {key: 'verify', n: 2, name: 'Verify', line: 'Decide what the evidence shows. Colour here is always how sure: green supported, red disputed, brown not yet shown.', colour: SWATCH.sage, parts: [
+  {key: 'verify', n: 2, name: 'Check', line: 'Decide what the evidence shows. Colour here is always how sure: green supported, red disputed, brown not yet shown.', colour: SWATCH.sage, parts: [
     {label: 'Claims', anchor: 'claim-verification'},
     {label: 'To check', anchor: 'to-check'},
     {label: 'Connector findings', anchor: 'review-queue'},
   ]},
-  {key: 'map', n: 3, name: 'Map', line: 'The reviewed records drawn four ways. Each chart says its rule and has its own key.', colour: SWATCH.amber, parts: [
+  {key: 'map', n: 3, name: 'See', line: 'The reviewed records drawn four ways. Each chart says its rule and has its own key.', colour: SWATCH.amber, parts: [
     {label: 'Relationships', anchor: 'relationship-graph'},
     {label: 'Timeline', anchor: 'timeline'},
     {label: 'Money', anchor: 'money-flows'},
     {label: 'Places', anchor: 'places'},
   ]},
-  {key: 'report', n: 4, name: 'Report', line: 'What to chase next, and what to publish from.', colour: SWATCH.copper, parts: [
+  {key: 'report', n: 4, name: 'Act', line: 'What to chase next, and what to publish from.', colour: SWATCH.copper, parts: [
     {label: 'Red Flags', anchor: 'red-flags'},
     {label: 'Leads', anchor: 'leads'},
     {label: 'Charts', anchor: 'chart-builder'},

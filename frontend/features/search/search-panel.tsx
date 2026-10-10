@@ -16,6 +16,7 @@ import {peekAtRecordOptions, searchWorkbenchOptions} from '../../lib/generated/@
 import type {SearchHitOut, SearchWorkbenchData} from '../../lib/generated/types.gen';
 import {KIND, KIND_ORDER, SURE, SURE_ORDER, TYPE_LABEL} from '../../lib/record-kinds';
 import type {RecordKind, Sure} from '../../lib/record-kinds';
+import {SEARCH_EVENT, takePendingSearch} from '../../lib/search-handoff';
 import {PARTY, PARTY_ORDER, partyKind} from '../../lib/viz-tokens';
 import type {PartyKind} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -198,14 +199,19 @@ export function SearchPanel({investigationId}: Props): ReactElement {
   // Results belong to the case they were searched in.
   useEffect(() => { setSubmitted(null); setFilters({}); setSelected(null); }, [investigationId]);
 
-  // ⌘K / Ctrl+K opens search from anywhere on the page.
+  // The command palette (⌘K, components/frame) hands a query to this panel: run it here and put the cursor in the box.
   useEffect(() => {
-    const onKey = (event: globalThis.KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); inputRef.current?.focus(); }
+    const run = (q: string) => {
+      setDraft(q);
+      if (q.trim()) { setSubmitted({q: q.trim(), investigationId, includeReconciledDuplicates}); setSelected(null); }
+      inputRef.current?.focus();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
+    const pending = takePendingSearch();
+    if (pending !== null) run(pending);
+    const onSearch = (event: Event) => run((event as CustomEvent<string>).detail ?? '');
+    window.addEventListener(SEARCH_EVENT, onSearch);
+    return () => window.removeEventListener(SEARCH_EVENT, onSearch);
+  }, [investigationId, includeReconciledDuplicates]);
 
   const submit = () => {
     const q = draft.trim();
