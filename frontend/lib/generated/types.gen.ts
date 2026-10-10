@@ -1455,6 +1455,10 @@ export type CatalogueAreaOut = {
    */
   scope: string;
   /**
+   * Summary
+   */
+  summary: string;
+  /**
    * Terms
    */
   terms: number;
@@ -7976,6 +7980,10 @@ export type InvestigationTypeOut = {
    * Set By
    */
   set_by: 'app' | 'reporter';
+  /**
+   * Suggested
+   */
+  suggested: Array<TypeAreaOut>;
 };
 
 /**

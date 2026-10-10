@@ -21,7 +21,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.catalogue.loader import Catalogue, load
-from app.catalogue.models import Indicator
+from app.catalogue.models import AREA_SUMMARIES, Indicator
 from app.core.time import utcnow_naive
 from app.models.domain import Investigation, Lead, PatternFlag
 from app.patterns import graph as case_graph
@@ -73,9 +73,9 @@ def catalogue_areas() -> list[dict[str, Any]]:
     for t in _glossary():
         for a in t["areas"]:
             terms[a] = terms.get(a, 0) + 1
-    areas = [{"key": a.key, "name": a.name, "scope": a.scope, "indicators": len(a.indicators),
+    areas = [{"key": a.key, "name": a.name, "scope": a.scope, "summary": AREA_SUMMARIES.get(a.key, ""), "indicators": len(a.indicators),
               "verified": sum(i.status.value == "verified" for i in a.indicators), "terms": terms.get(a.key, 0)} for a in cat.areas]
-    return areas + [{"key": k, "name": n, "scope": s, "indicators": 0, "verified": 0, "terms": terms.get(k, 0)}
+    return areas + [{"key": k, "name": n, "scope": s, "summary": s, "indicators": 0, "verified": 0, "terms": terms.get(k, 0)}
                     for k, (n, s) in GLOSSARY_ONLY.items() if terms.get(k)]
 
 
@@ -211,7 +211,7 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
         "rules": [{"indicator_id": r.INDICATOR, "version": r.VERSION, "name": _name(r.INDICATOR)} for r in RULES],
         "flags": [serialize(db, r, names) for r in current],
         "gone": [serialize(db, r, names) for r in gone],
-        "investigation_type": investigation_type.current(db, inv) if inv else {"set_by": "app", "areas": []},
+        "investigation_type": investigation_type.current(db, inv) if inv else {"set_by": "app", "areas": [], "suggested": []},
     }
 
 

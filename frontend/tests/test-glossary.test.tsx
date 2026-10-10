@@ -23,7 +23,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 describe('Glossary page', () => {
   it('searches, filters by area, and opens an indicator from a term', async () => {
     const api = mockApi({
-      'GET /api/catalogue/areas': [{key: 'BO', name: 'Hidden ownership', scope: 'Shells', indicators: 63, verified: 63, terms: 58}],
+      'GET /api/catalogue/areas': [{key: 'BO', name: 'Hidden ownership', scope: 'Shells', summary: 'Hiding who owns a company.', indicators: 63, verified: 63, terms: 58}],
       'GET /api/catalogue/glossary': {total: 1, terms: [term]},
       'GET /api/catalogue/indicators/BO-001': indicator,
     });

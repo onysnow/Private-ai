@@ -54,6 +54,33 @@ AREAS: dict[str, str] = {
     "PM": "Police misconduct and state violence", "CA": "Child sexual abuse in institutions",
 }
 
+# One plain line per area for people choosing an investigation's type (the
+# area files' "scope" is the research brief, not written for readers).
+AREA_SUMMARIES: dict[str, str] = {
+    "ML": "Moving criminal money so it looks clean: through trade, property, cash businesses or crypto.",
+    "BO": "Hiding who really owns or controls a company, trust or asset: shells, nominees, formation agents.",
+    "SF": "Paying for terrorism or weapons programmes, and getting round sanctions on land and at sea.",
+    "FR": "Tax evasion, investment and Ponzi schemes, and insurance, healthcare and bankruptcy fraud.",
+    "CO": "Bribes, kickbacks, conflicts of interest, lobbying, foreign influence and politically exposed people.",
+    "PP": "Rigged tenders and contracts, misused non-profits, and election and campaign-finance fraud.",
+    "HT": "Human trafficking, forced labour, migrant smuggling and child labour.",
+    "HR": "Human rights abuses and war crimes, conflict resources, and trafficking of cultural property.",
+    "OC": "Crime groups and their trades: drugs, arms, counterfeit goods, match-fixing and front businesses.",
+    "EN": "Wildlife trafficking, illegal fishing, logging and mining, waste trafficking and carbon-market fraud.",
+    "IN": "Disinformation and influence operations, fake accounts, and forged or manipulated documents.",
+    "CY": "Ransomware, online fraud and scam compounds, business email compromise and crypto fraud.",
+    "SA": "Danger to the people doing or helping an investigation.",
+    "VE": "Signs that someone is moving toward ideologically motivated or hate-motivated violence.",
+    "ES": "Spying and insider threats in organisations that hold national-security information.",
+    "EF": "Taking money or property from older people, often by carers, relatives or scammers.",
+    "MA": "Market manipulation and insider trading in shares and other securities.",
+    "AF": "Companies misstating their accounts: inflated sales, hidden costs, managed earnings.",
+    "PD": "Prescription drugs diverted to illegal use: pill mills, careless prescribing, stolen stock.",
+    "LE": "Underpaying or cheating workers short of forced labour, such as wage theft.",
+    "PM": "Misconduct and violence by police and other state officers.",
+    "CA": "Child sexual abuse in churches, schools, sport and care, and how institutions respond.",
+}
+
 
 class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid")

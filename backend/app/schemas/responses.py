@@ -3944,6 +3944,7 @@ class InvestigationTypeOut(ResponseModel):
     reasons) or by the reporter."""
     set_by: Literal["app", "reporter"]
     areas: list[TypeAreaOut]
+    suggested: list[TypeAreaOut]  # what the app would choose, with its reasons, whoever chose
 
 
 class RedFlagsOut(ResponseModel):
@@ -3963,6 +3964,7 @@ class CatalogueAreaOut(ResponseModel):
     key: str
     name: str
     scope: str
+    summary: str
     indicators: int
     verified: int
     terms: int

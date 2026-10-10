@@ -610,6 +610,7 @@ export const zCatalogueAreaOut = z.object({
   key: z.string(),
   name: z.string(),
   scope: z.string(),
+  summary: z.string(),
   terms: z.number().int(),
   verified: z.number().int(),
 });
@@ -6041,6 +6042,7 @@ export const zTypeAreaOut = z.object({
 export const zInvestigationTypeOut = z.object({
   areas: z.array(zTypeAreaOut),
   set_by: z.enum(['app', 'reporter']),
+  suggested: z.array(zTypeAreaOut),
 });
 
 /**

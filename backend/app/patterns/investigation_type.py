@@ -102,10 +102,11 @@ def suggested(db: Session, investigation_id: str) -> list[dict[str, Any]]:
 
 def current(db: Session, investigation: Investigation) -> dict[str, Any]:
     _, _, names = _needs()
+    picks = suggested(db, investigation.id)
     if investigation.type_areas is not None:
-        return {"set_by": "reporter", "areas": [{"key": a, "name": names.get(a, a), "reasons": ["Chosen by the reporter"]}
-                                                 for a in investigation.type_areas]}
-    return {"set_by": "app", "areas": suggested(db, investigation.id)}
+        return {"set_by": "reporter", "suggested": picks,
+                "areas": [{"key": a, "name": names.get(a, a), "reasons": ["Chosen by the reporter"]} for a in investigation.type_areas]}
+    return {"set_by": "app", "areas": picks, "suggested": picks}
 
 
 def set_areas(db: Session, investigation: Investigation, areas: list[str] | None) -> None:

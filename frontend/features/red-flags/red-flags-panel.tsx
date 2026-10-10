@@ -82,28 +82,64 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
   </article>;
 }
 
-/** The investigation's type: catalogue areas, chosen by the app with its reasons, or by the reporter (indicators.md). */
-function InvestigationType({kind, onSet}: {kind: InvestigationTypeOut; onSet: (areas: string[] | null) => Promise<void>}): ReactElement {
+/** The investigation's type: catalogue areas, chosen by the app with its reasons, or by the reporter (indicators.md).
+ * Closed, it is one line of area names. Open, the app's suggestions come first with why, then every other area
+ * as a card with a one-line summary, searchable. The safety area (SA) is the reporter's safety, not a type. */
+function InvestigationType({kind, flagsByArea, onSet}: {kind: InvestigationTypeOut; flagsByArea: Record<string, number>;
+  onSet: (areas: string[] | null) => Promise<void>}): ReactElement {
   const [editing, setEditing] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
-  const all = useQuery({...listAreasOptions(), enabled: editing}).data?.filter(a => a.indicators > 0 && a.key !== 'SA') ?? [];  // SA is the reporter's safety, not a type
-  const start = () => { setPicked(kind.areas.map(a => a.key)); setEditing(true); };
+  const [find, setFind] = useState('');
+  const all = (useQuery({...listAreasOptions(), enabled: editing}).data ?? []).filter(a => a.indicators > 0 && a.key !== 'SA');
+  const byKey = Object.fromEntries(all.map(a => [a.key, a]));
+  const suggestedKeys = kind.suggested.map(a => a.key);
+  const words = find.toLowerCase().split(/\s+/).filter(Boolean);
+  const others = all.filter(a => !suggestedKeys.includes(a.key))
+    .filter(a => words.every(w => `${a.name} ${a.summary}`.toLowerCase().includes(w)))
+    .sort((x, y) => x.name.localeCompare(y.name));
+  const start = () => { setPicked(kind.areas.map(a => a.key)); setFind(''); setEditing(true); };
   const toggle = (key: string) => setPicked(p => (p.includes(key) ? p.filter(k => k !== key) : [...p, key]));
-  return <div className="rf-type" role="group" aria-label="Type of investigation">
-    <span className="rf-type-label">Type of investigation</span>
-    {!editing && <>
-      {kind.areas.length ? kind.areas.map(a => <span key={a.key} className="rf-type-area" title={a.reasons.join('\n')}>{a.name}
-        <small>{a.reasons.join('; ')}</small></span>) : <span className="sv-muted">Not known yet: the records don&apos;t point to an area.</span>}
-      <span className="sv-muted">{kind.set_by === 'app' ? 'Chosen by the app' : 'Chosen by you'}</span>
+  const flagLine = (key: string) => (flagsByArea[key] ? `${flagsByArea[key]} Red Flag${flagsByArea[key] === 1 ? '' : 's'} fired here` : null);
+
+  if (!editing) {
+    return <div className="rf-type" role="group" aria-label="Type of investigation">
+      <span className="rf-type-label">Type</span>
+      <span className="rf-type-names">{kind.areas.length ? kind.areas.map(a => a.name).join(' · ') : 'Not known yet'}</span>
+      <span className="sv-muted">{kind.set_by === 'app' ? 'chosen by the app' : 'chosen by you'}</span>
       <button type="button" className="sv-btn" onClick={start}>Change</button>
-      {kind.set_by === 'reporter' && <button type="button" className="sv-btn" onClick={() => void onSet(null)}>Let the app choose</button>}
-    </>}
-    {editing && <>
-      <div className="gl-areas">{all.map(a => <button type="button" key={a.key} className="cf-chip" aria-pressed={picked.includes(a.key)} title={a.scope}
-        onClick={() => toggle(a.key)}>{a.name}</button>)}</div>
-      <button type="button" className="sv-btn p" onClick={() => void onSet(picked).then(() => setEditing(false))}>Save</button>
+    </div>;
+  }
+  return <div className="rf-type editing" role="group" aria-label="Type of investigation">
+    <div className="tp-head"><span className="rf-type-label">Type of investigation</span>
+      <span className="sv-muted">{kind.set_by === 'app' ? 'Chosen by the app' : 'Chosen by you'}</span></div>
+    {kind.suggested.length > 0 && <section aria-label="Suggested">
+      <h5 className="tp-sub">Suggested</h5>
+      <div className="tp-grid wide">{kind.suggested.map(s => <button type="button" key={s.key} className="tp-card" aria-pressed={picked.includes(s.key)}
+        onClick={() => toggle(s.key)}>
+        <span className="tp-name">{s.name}</span>
+        <ul className="tp-why">{s.reasons.map(r => <li key={r}>{r.replace(/^Red Flag: /, '')}</li>)}</ul>
+        {byKey[s.key] && <span className="tp-meta">{byKey[s.key].indicators} indicators</span>}
+      </button>)}</div>
+    </section>}
+    <section aria-label="Other areas">
+      <div className="tp-subrow"><h5 className="tp-sub">{kind.suggested.length ? 'Add another area' : 'Areas'}</h5>
+        <label className="sv-sbox tp-find"><input value={find} placeholder="Search areas…" aria-label="Search areas"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setFind(e.target.value)}/></label></div>
+      <div className="tp-grid">{others.map(a => <button type="button" key={a.key} className="tp-card" aria-pressed={picked.includes(a.key)} title={a.summary}
+        onClick={() => toggle(a.key)}>
+        <span className="tp-name">{a.name}</span>
+        <span className="tp-sum">{a.summary}</span>
+        <span className="tp-meta">{a.indicators} indicators{flagLine(a.key) ? ` · ${flagLine(a.key)}` : ''}</span>
+      </button>)}
+      {all.length > 0 && !others.length && <p className="sv-muted">No area matches.</p>}</div>
+    </section>
+    <div className="tp-actions">
+      {kind.set_by === 'reporter' && <button type="button" className="sv-btn" onClick={() => void onSet(null).then(() => setEditing(false))}>Let the app choose</button>}
+      <span className="tp-gap"/>
+      {!picked.length && <span className="sv-muted">Pick at least one area, or let the app choose.</span>}
       <button type="button" className="sv-btn" onClick={() => setEditing(false)}>Cancel</button>
-    </>}
+      <button type="button" className="sv-btn p" disabled={!picked.length} onClick={() => void onSet(picked).then(() => setEditing(false))}>Save</button>
+    </div>
   </div>;
 }
 
@@ -142,7 +178,8 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
     <h3 id="red-flags-title">Red Flags</h3>
     <p className="sv-psub">Patterns from published cases found in this investigation&apos;s records. Each is a lead, not a finding: it says why it matters,
       where it was documented, and the innocent explanations. {rules.length} rules run now: {rules.map(r => r.name).join('; ')}.</p>
-    {kind && <InvestigationType kind={kind} onSet={areas => attempt(async () => {
+    {kind && <InvestigationType kind={kind} flagsByArea={flags.reduce<Record<string, number>>((m, f) => {
+      if (f.indicator) m[f.indicator.area] = (m[f.indicator.area] ?? 0) + 1; return m; }, {})} onSet={areas => attempt(async () => {
       await setType.mutateAsync({path, body: {areas}}); await queryClient.invalidateQueries({queryKey: key}); }, 'Could not change the type')}/>}
     {query.isError && <p className="sv-error">{errorMessage(query.error, 'Could not run the rules')}</p>}
     {problem && <p className="sv-error" role="alert">{problem}</p>}

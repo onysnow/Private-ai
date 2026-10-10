@@ -2468,6 +2468,10 @@
             "title": "Scope",
             "type": "string"
           },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
           "terms": {
             "title": "Terms",
             "type": "integer"
@@ -2481,6 +2485,7 @@
           "key",
           "name",
           "scope",
+          "summary",
           "indicators",
           "verified",
           "terms"
@@ -17770,11 +17775,19 @@
             ],
             "title": "Set By",
             "type": "string"
+          },
+          "suggested": {
+            "items": {
+              "$ref": "#/components/schemas/TypeAreaOut"
+            },
+            "title": "Suggested",
+            "type": "array"
           }
         },
         "required": [
           "set_by",
-          "areas"
+          "areas",
+          "suggested"
         ],
         "title": "InvestigationTypeOut",
         "type": "object"

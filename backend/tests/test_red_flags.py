@@ -168,9 +168,10 @@ def test_the_investigation_type_comes_from_flags_and_records_and_the_reporter_ca
     assert not any("Company" in r or "Ownership" in r for x in kind["areas"] for r in x["reasons"]), "kinds most areas need point nowhere"
 
     chosen = ok(client.put(f"/api/investigations/{inv}/type", json={"areas": ["OC", "ML", "OC"]}))
+    assert chosen.pop("suggested") == kind["suggested"], "the app's picks stay on offer"
     assert chosen == {"set_by": "reporter", "areas": [{"key": "OC", "name": "Organised crime and illicit goods", "reasons": ["Chosen by the reporter"]},
                                                        {"key": "ML", "name": "Money laundering", "reasons": ["Chosen by the reporter"]}]}
-    assert _flags(inv)["investigation_type"] == chosen
+    assert {k: v for k, v in _flags(inv)["investigation_type"].items() if k != "suggested"} == chosen
     with SessionLocal() as db:
         assert collect_investigation_records(db, inv)["investigations"][0]["type_areas"] == ["OC", "ML"], "it travels in a backup"
     assert client.put(f"/api/investigations/{inv}/type", json={"areas": ["XX"]}).status_code == 400
