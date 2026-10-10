@@ -34,6 +34,7 @@ const WORKBENCH_SECTIONS: {label: string; href: string}[] = [
 const PRIMARY_LINKS: {label: string; href: string}[] = [
   {label: 'Dashboard', href: '/dashboard'},
   {label: 'Workbench', href: '/'},
+  {label: 'Glossary', href: '/glossary'},
   {label: 'Settings', href: '/settings'},
   {label: 'About', href: '/about'}
 ];
@@ -109,6 +110,7 @@ export function Navbar(): ReactElement {
               </DropdownMenuSub>
             </DropdownMenuContent>
           </DropdownMenu>
+          <NavLink href="/glossary" label="Glossary" />
           <NavLink href="/settings" label="Settings" />
           <NavLink href="/about" label="About" />
         </nav>

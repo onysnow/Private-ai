@@ -40,7 +40,7 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
     <header className="rf-head">
       <span className="rf-rank">{rank}</span>
       <div>
-        <h4>{ind?.name ?? flag.indicator_id}</h4>
+        <h4>{ind ? <a className="rf-ind" href={`/glossary?indicator=${encodeURIComponent(ind.id)}`}>{ind.name}</a> : flag.indicator_id}</h4>
         <small>{flag.level === 'faint' ? `Faint · ${LEVEL.faint.meaning} · ` : ''}{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}</small>
       </div>
     </header>
