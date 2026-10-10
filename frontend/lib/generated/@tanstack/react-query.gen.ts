@@ -50,6 +50,7 @@ import {
   deleteInvestigationMembership,
   deleteWriteupEndpoint,
   dismissHit,
+  dismissRedFlag,
   editCollection,
   editNote,
   editTag,
@@ -112,6 +113,7 @@ import {
   getOwnershipChain,
   getRecordMarks,
   getRecordProvenanceTrace,
+  getRedFlags,
   getSecurityAlerts,
   getSecurityAudit,
   getSecurityAuditRetentionPreview,
@@ -176,6 +178,7 @@ import {
   listWriteupsEndpoint,
   makeLeadFromHit,
   makeLeadFromNote,
+  makeLeadFromRedFlag,
   openalephIntegrationStatus,
   type Options,
   peekAtRecord,
@@ -196,6 +199,7 @@ import {
   removeNote,
   removeTag,
   removeWatchlistEntry,
+  reopenRedFlag,
   resolveFinding,
   restoreBackup,
   retryJobEndpoint,
@@ -350,6 +354,9 @@ import type {
   DismissHitData,
   DismissHitError,
   DismissHitResponse,
+  DismissRedFlagData,
+  DismissRedFlagError,
+  DismissRedFlagResponse,
   EditCollectionData,
   EditCollectionError,
   EditCollectionResponse,
@@ -536,6 +543,9 @@ import type {
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceError,
   GetRecordProvenanceTraceResponse,
+  GetRedFlagsData,
+  GetRedFlagsError,
+  GetRedFlagsResponse,
   GetSecurityAlertsData,
   GetSecurityAlertsError,
   GetSecurityAlertsResponse,
@@ -728,6 +738,9 @@ import type {
   MakeLeadFromNoteData,
   MakeLeadFromNoteError,
   MakeLeadFromNoteResponse,
+  MakeLeadFromRedFlagData,
+  MakeLeadFromRedFlagError,
+  MakeLeadFromRedFlagResponse,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
@@ -785,6 +798,9 @@ import type {
   RemoveWatchlistEntryData,
   RemoveWatchlistEntryError,
   RemoveWatchlistEntryResponse,
+  ReopenRedFlagData,
+  ReopenRedFlagError,
+  ReopenRedFlagResponse,
   ResolveFindingData,
   ResolveFindingError,
   ResolveFindingResponse,
@@ -5516,6 +5532,33 @@ export const tagARecordMutation = (
   return mutationOptions;
 };
 
+export const getRedFlagsQueryKey = (options: Options<GetRedFlagsData>) =>
+  createQueryKey('getRedFlags', options);
+
+/**
+ * Get Red Flags
+ *
+ * Runs every rule on the investigation's records now, then lists the flags.
+ */
+export const getRedFlagsOptions = (options: Options<GetRedFlagsData>) =>
+  queryOptions<
+    GetRedFlagsResponse,
+    GetRedFlagsError,
+    GetRedFlagsResponse,
+    ReturnType<typeof getRedFlagsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getRedFlags({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getRedFlagsQueryKey(options),
+  });
+
 export const listInvestigationRelationshipsQueryKey = (
   options: Options<ListInvestigationRelationshipsData>,
 ) => createQueryKey('listInvestigationRelationships', options);
@@ -6533,6 +6576,91 @@ export const getRecordProvenanceTraceOptions = (
     },
     queryKey: getRecordProvenanceTraceQueryKey(options),
   });
+
+/**
+ * Dismiss Red Flag
+ *
+ * Not relevant: the flag stays dismissed while it keeps firing on the same records.
+ */
+export const dismissRedFlagMutation = (
+  options?: Partial<Options<DismissRedFlagData>>,
+): UseMutationOptions<
+  DismissRedFlagResponse,
+  DismissRedFlagError,
+  Options<DismissRedFlagData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DismissRedFlagResponse,
+    DismissRedFlagError,
+    Options<DismissRedFlagData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await dismissRedFlag({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Make Lead From Red Flag
+ *
+ * The flag as a lead, linked to its parties and links.
+ */
+export const makeLeadFromRedFlagMutation = (
+  options?: Partial<Options<MakeLeadFromRedFlagData>>,
+): UseMutationOptions<
+  MakeLeadFromRedFlagResponse,
+  MakeLeadFromRedFlagError,
+  Options<MakeLeadFromRedFlagData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeLeadFromRedFlagResponse,
+    MakeLeadFromRedFlagError,
+    Options<MakeLeadFromRedFlagData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeLeadFromRedFlag({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Reopen Red Flag
+ */
+export const reopenRedFlagMutation = (
+  options?: Partial<Options<ReopenRedFlagData>>,
+): UseMutationOptions<
+  ReopenRedFlagResponse,
+  ReopenRedFlagError,
+  Options<ReopenRedFlagData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ReopenRedFlagResponse,
+    ReopenRedFlagError,
+    Options<ReopenRedFlagData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await reopenRedFlag({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const relationshipSchemasQueryKey = (
   options?: Options<RelationshipSchemasData>,

@@ -6755,6 +6755,147 @@ export type FindingReviewRequest = {
 };
 
 /**
+ * FlagCrossHintOut
+ */
+export type FlagCrossHintOut = {
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Source Url
+   */
+  source_url: string;
+  /**
+   * Target Area
+   */
+  target_area: string;
+};
+
+/**
+ * FlagDismiss
+ */
+export type FlagDismiss = {
+  /**
+   * Reason
+   *
+   * Why the flag is not relevant; it stays with the flag.
+   */
+  reason: string;
+};
+
+/**
+ * FlagIndicatorOut
+ *
+ * The catalogue indicator the flag's rule computes (catalogue/indicators*.yaml).
+ */
+export type FlagIndicatorOut = {
+  /**
+   * Area
+   */
+  area: string;
+  /**
+   * Area Name
+   */
+  area_name: string;
+  /**
+   * Cross Hints
+   */
+  cross_hints: Array<FlagCrossHintOut>;
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Innocent Explanations
+   */
+  innocent_explanations: Array<string>;
+  levels: FlagLevelsOut;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Sources
+   */
+  sources: Array<FlagSourceOut>;
+  /**
+   * Version
+   */
+  version: number;
+};
+
+/**
+ * FlagLevelsOut
+ */
+export type FlagLevelsOut = {
+  /**
+   * Faint
+   */
+  faint: string;
+  /**
+   * Strong
+   */
+  strong: string;
+  /**
+   * Textbook
+   */
+  textbook: string;
+  /**
+   * Threshold Source
+   */
+  threshold_source: string;
+};
+
+/**
+ * FlagPartyOut
+ */
+export type FlagPartyOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * FlagSourceOut
+ */
+export type FlagSourceOut = {
+  /**
+   * Locator
+   */
+  locator: string | null;
+  /**
+   * Publisher
+   */
+  publisher: string;
+  /**
+   * Quote
+   */
+  quote: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
  * FontPairOut
  *
  * A heading and body font; empty names mean "keep the theme's own".
@@ -10200,6 +10341,110 @@ export type RecordTagsOut = {
 };
 
 /**
+ * RedFlagOut
+ *
+ * One occurrence of a pattern. A flag is a lead, not a finding.
+ */
+export type RedFlagOut = {
+  /**
+   * Dismissed Reason
+   */
+  dismissed_reason: string | null;
+  /**
+   * Facts
+   */
+  facts: {
+    [key: string]: unknown;
+  };
+  /**
+   * First Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  first_seen_at: string;
+  /**
+   * Gone At
+   */
+  gone_at: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  indicator: FlagIndicatorOut | null;
+  /**
+   * Indicator Id
+   */
+  indicator_id: string;
+  /**
+   * Last Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  last_seen_at: string;
+  /**
+   * Lead Id
+   */
+  lead_id: string | null;
+  /**
+   * Level
+   */
+  level: 'faint' | 'strong' | 'textbook';
+  /**
+   * Links
+   */
+  links: Array<string>;
+  /**
+   * Parties
+   */
+  parties: Array<FlagPartyOut>;
+  /**
+   * Rule Version
+   */
+  rule_version: number;
+  /**
+   * Status
+   */
+  status: 'open' | 'dismissed' | 'made_lead';
+  /**
+   * Summary
+   */
+  summary: string;
+  /**
+   * Weight
+   */
+  weight: number;
+  /**
+   * Weight Parts
+   */
+  weight_parts: Array<WeightPartOut>;
+};
+
+/**
+ * RedFlagsOut
+ *
+ * Every rule that ran, the flags that fire now (highest weight first),
+ * and those that no longer fire.
+ */
+export type RedFlagsOut = {
+  /**
+   * Flags
+   */
+  flags: Array<RedFlagOut>;
+  /**
+   * Gone
+   */
+  gone: Array<RedFlagOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Rules
+   */
+  rules: Array<RuleOut>;
+};
+
+/**
  * RelationshipAdvisoryOut
  *
  * What the review layer says about one relationship record: the claims
@@ -10919,6 +11164,24 @@ export type RetrievalSummaryOut = {
    * Total Matches
    */
   total_matches: number;
+};
+
+/**
+ * RuleOut
+ */
+export type RuleOut = {
+  /**
+   * Indicator Id
+   */
+  indicator_id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Version
+   */
+  version: number;
 };
 
 /**
@@ -13549,6 +13812,20 @@ export type WatchlistOut = {
    * Investigation Id
    */
   investigation_id: string;
+};
+
+/**
+ * WeightPartOut
+ */
+export type WeightPartOut = {
+  /**
+   * Value
+   */
+  value: number;
+  /**
+   * Why
+   */
+  why: string;
 };
 
 /**
@@ -19214,6 +19491,41 @@ export type TagARecordResponses = {
 
 export type TagARecordResponse = TagARecordResponses[keyof TagARecordResponses];
 
+export type GetRedFlagsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/red-flags';
+};
+
+export type GetRedFlagsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetRedFlagsError = GetRedFlagsErrors[keyof GetRedFlagsErrors];
+
+export type GetRedFlagsResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedFlagsOut;
+};
+
+export type GetRedFlagsResponse =
+  GetRedFlagsResponses[keyof GetRedFlagsResponses];
+
 export type ListInvestigationRelationshipsData = {
   body?: never;
   path: {
@@ -20334,6 +20646,113 @@ export type GetRecordProvenanceTraceResponses = {
 
 export type GetRecordProvenanceTraceResponse =
   GetRecordProvenanceTraceResponses[keyof GetRecordProvenanceTraceResponses];
+
+export type DismissRedFlagData = {
+  body: FlagDismiss;
+  path: {
+    /**
+     * Flag Id
+     */
+    flag_id: string;
+  };
+  query?: never;
+  url: '/api/red-flags/{flag_id}/dismiss';
+};
+
+export type DismissRedFlagErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DismissRedFlagError =
+  DismissRedFlagErrors[keyof DismissRedFlagErrors];
+
+export type DismissRedFlagResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedFlagsOut;
+};
+
+export type DismissRedFlagResponse =
+  DismissRedFlagResponses[keyof DismissRedFlagResponses];
+
+export type MakeLeadFromRedFlagData = {
+  body?: never;
+  path: {
+    /**
+     * Flag Id
+     */
+    flag_id: string;
+  };
+  query?: never;
+  url: '/api/red-flags/{flag_id}/lead';
+};
+
+export type MakeLeadFromRedFlagErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeLeadFromRedFlagError =
+  MakeLeadFromRedFlagErrors[keyof MakeLeadFromRedFlagErrors];
+
+export type MakeLeadFromRedFlagResponses = {
+  /**
+   * Successful Response
+   */
+  200: LeadOut;
+};
+
+export type MakeLeadFromRedFlagResponse =
+  MakeLeadFromRedFlagResponses[keyof MakeLeadFromRedFlagResponses];
+
+export type ReopenRedFlagData = {
+  body?: never;
+  path: {
+    /**
+     * Flag Id
+     */
+    flag_id: string;
+  };
+  query?: never;
+  url: '/api/red-flags/{flag_id}/reopen';
+};
+
+export type ReopenRedFlagErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ReopenRedFlagError = ReopenRedFlagErrors[keyof ReopenRedFlagErrors];
+
+export type ReopenRedFlagResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedFlagsOut;
+};
+
+export type ReopenRedFlagResponse =
+  ReopenRedFlagResponses[keyof ReopenRedFlagResponses];
 
 export type RelationshipSchemasData = {
   body?: never;

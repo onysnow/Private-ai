@@ -70,6 +70,9 @@ from app.models.watchlists import (
     WatchlistEntry,
     WatchlistHit,
 )
+from app.models.patterns import (
+    PatternFlag,
+)
 from app.models.annotations import (
     Collection,
     CollectionItem,
@@ -152,6 +155,7 @@ __all__ = [
     "Note",
     "Collection",
     "CollectionItem",
+    "PatternFlag",
     "AIAnalysisCandidate",
     "Writeup",
     "Deck",

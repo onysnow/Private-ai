@@ -541,3 +541,7 @@ class CollectionItemCreate(BaseModel):
     record_type: RecordType
     record_id: str
     position: int | None = Field(default=None, ge=0, description="Where in the list; the end when left out. A record already in the collection moves.")
+
+
+class FlagDismiss(BaseModel):
+    reason: str = Field(min_length=1, max_length=2000, description="Why the flag is not relevant; it stays with the flag.")

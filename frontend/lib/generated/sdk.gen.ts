@@ -135,6 +135,9 @@ import type {
   DismissHitData,
   DismissHitErrors,
   DismissHitResponses,
+  DismissRedFlagData,
+  DismissRedFlagErrors,
+  DismissRedFlagResponses,
   EditCollectionData,
   EditCollectionErrors,
   EditCollectionResponses,
@@ -321,6 +324,9 @@ import type {
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceErrors,
   GetRecordProvenanceTraceResponses,
+  GetRedFlagsData,
+  GetRedFlagsErrors,
+  GetRedFlagsResponses,
   GetSecurityAlertsData,
   GetSecurityAlertsErrors,
   GetSecurityAlertsResponses,
@@ -513,6 +519,9 @@ import type {
   MakeLeadFromNoteData,
   MakeLeadFromNoteErrors,
   MakeLeadFromNoteResponses,
+  MakeLeadFromRedFlagData,
+  MakeLeadFromRedFlagErrors,
+  MakeLeadFromRedFlagResponses,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
@@ -570,6 +579,9 @@ import type {
   RemoveWatchlistEntryData,
   RemoveWatchlistEntryErrors,
   RemoveWatchlistEntryResponses,
+  ReopenRedFlagData,
+  ReopenRedFlagErrors,
+  ReopenRedFlagResponses,
   ResolveFindingData,
   ResolveFindingErrors,
   ResolveFindingResponses,
@@ -758,6 +770,9 @@ import {
   zDeleteWriteupEndpointResponse,
   zDismissHitPath,
   zDismissHitResponse,
+  zDismissRedFlagBody,
+  zDismissRedFlagPath,
+  zDismissRedFlagResponse,
   zEditCollectionBody,
   zEditCollectionPath,
   zEditCollectionResponse,
@@ -890,6 +905,8 @@ import {
   zGetRecordMarksResponse,
   zGetRecordProvenanceTraceQuery,
   zGetRecordProvenanceTraceResponse,
+  zGetRedFlagsPath,
+  zGetRedFlagsResponse,
   zGetSecurityAlertsQuery,
   zGetSecurityAlertsResponse,
   zGetSecurityAuditQuery,
@@ -1040,6 +1057,8 @@ import {
   zMakeLeadFromHitResponse,
   zMakeLeadFromNotePath,
   zMakeLeadFromNoteResponse,
+  zMakeLeadFromRedFlagPath,
+  zMakeLeadFromRedFlagResponse,
   zOpenalephIntegrationStatusResponse,
   zPeekAtRecordPath,
   zPeekAtRecordQuery,
@@ -1083,6 +1102,8 @@ import {
   zRemoveTagResponse,
   zRemoveWatchlistEntryPath,
   zRemoveWatchlistEntryResponse,
+  zReopenRedFlagPath,
+  zReopenRedFlagResponse,
   zResolveFindingBody,
   zResolveFindingPath,
   zResolveFindingResponse,
@@ -5613,6 +5634,33 @@ export const tagARecord = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Red Flags
+ *
+ * Runs every rule on the investigation's records now, then lists the flags.
+ */
+export const getRedFlags = <ThrowOnError extends boolean = false>(
+  options: Options<GetRedFlagsData, ThrowOnError>,
+): RequestResult<GetRedFlagsResponses, GetRedFlagsErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetRedFlagsResponses,
+    GetRedFlagsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetRedFlagsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRedFlagsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/red-flags',
+    ...options,
+  });
+
+/**
  * List Investigation Relationships
  */
 export const listInvestigationRelationships = <
@@ -6480,6 +6528,93 @@ export const getRecordProvenanceTrace = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetRecordProvenanceTraceResponse.parseAsync(data),
     url: '/api/provenance/trace',
+    ...options,
+  });
+
+/**
+ * Dismiss Red Flag
+ *
+ * Not relevant: the flag stays dismissed while it keeps firing on the same records.
+ */
+export const dismissRedFlag = <ThrowOnError extends boolean = false>(
+  options: Options<DismissRedFlagData, ThrowOnError>,
+): RequestResult<DismissRedFlagResponses, DismissRedFlagErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    DismissRedFlagResponses,
+    DismissRedFlagErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDismissRedFlagBody,
+          path: zDismissRedFlagPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDismissRedFlagResponse.parseAsync(data),
+    url: '/api/red-flags/{flag_id}/dismiss',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Make Lead From Red Flag
+ *
+ * The flag as a lead, linked to its parties and links.
+ */
+export const makeLeadFromRedFlag = <ThrowOnError extends boolean = false>(
+  options: Options<MakeLeadFromRedFlagData, ThrowOnError>,
+): RequestResult<
+  MakeLeadFromRedFlagResponses,
+  MakeLeadFromRedFlagErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MakeLeadFromRedFlagResponses,
+    MakeLeadFromRedFlagErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zMakeLeadFromRedFlagPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakeLeadFromRedFlagResponse.parseAsync(data),
+    url: '/api/red-flags/{flag_id}/lead',
+    ...options,
+  });
+
+/**
+ * Reopen Red Flag
+ */
+export const reopenRedFlag = <ThrowOnError extends boolean = false>(
+  options: Options<ReopenRedFlagData, ThrowOnError>,
+): RequestResult<ReopenRedFlagResponses, ReopenRedFlagErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    ReopenRedFlagResponses,
+    ReopenRedFlagErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zReopenRedFlagPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zReopenRedFlagResponse.parseAsync(data),
+    url: '/api/red-flags/{flag_id}/reopen',
     ...options,
   });
 

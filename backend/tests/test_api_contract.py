@@ -282,6 +282,15 @@ def _cross_reference(investigation_id: str, entity_id: str) -> str:
         return row.id
 
 
+def _red_flag(client: TestClient, inv: str) -> str:
+    """A Red Flag: a payment with no stated purpose (BO-033) added to the demo investigation."""
+    parties = {row["caption"]: row["id"] for row in client.get(f"/api/investigations/{inv}/entities").json()}
+    client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": parties["Meridian Holdings Ltd"],
+                                            "target_entity_id": parties["Bellcastle Trading Group"], "properties": {"amount": ["1000"], "currency": ["USD"]}})
+    flags = client.get(f"/api/investigations/{inv}/red-flags").json()["flags"]
+    return next(f["id"] for f in flags if f["indicator_id"] == "BO-033")
+
+
 def _watchlist_hit(entry_id: str, document_id: str) -> str:
     """A document a watched name was found in, as a check keeps it
     (app/services/watchlists.py check_entry); the demo investigation is never
@@ -411,7 +420,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
-            "tag_id": tag, "note_id": note, "collection_id": marked,
+            "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={

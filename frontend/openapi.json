@@ -15792,6 +15792,45 @@
         "title": "FindingReviewRequest",
         "type": "object"
       },
+      "FlagCrossHintOut": {
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "target_area": {
+            "title": "Target Area",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_area",
+          "reason",
+          "source_url"
+        ],
+        "title": "FlagCrossHintOut",
+        "type": "object"
+      },
+      "FlagDismiss": {
+        "properties": {
+          "reason": {
+            "description": "Why the flag is not relevant; it stays with the flag.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "FlagDismiss",
+        "type": "object"
+      },
       "FlagIn": {
         "properties": {
           "confirm": {
@@ -15808,6 +15847,164 @@
           "confirm"
         ],
         "title": "FlagIn",
+        "type": "object"
+      },
+      "FlagIndicatorOut": {
+        "description": "The catalogue indicator the flag's rule computes (catalogue/indicators/*.yaml).",
+        "properties": {
+          "area": {
+            "title": "Area",
+            "type": "string"
+          },
+          "area_name": {
+            "title": "Area Name",
+            "type": "string"
+          },
+          "cross_hints": {
+            "items": {
+              "$ref": "#/components/schemas/FlagCrossHintOut"
+            },
+            "title": "Cross Hints",
+            "type": "array"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "innocent_explanations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Innocent Explanations",
+            "type": "array"
+          },
+          "levels": {
+            "$ref": "#/components/schemas/FlagLevelsOut"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/FlagSourceOut"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "definition",
+          "area",
+          "area_name",
+          "levels",
+          "sources",
+          "innocent_explanations",
+          "cross_hints",
+          "version"
+        ],
+        "title": "FlagIndicatorOut",
+        "type": "object"
+      },
+      "FlagLevelsOut": {
+        "properties": {
+          "faint": {
+            "title": "Faint",
+            "type": "string"
+          },
+          "strong": {
+            "title": "Strong",
+            "type": "string"
+          },
+          "textbook": {
+            "title": "Textbook",
+            "type": "string"
+          },
+          "threshold_source": {
+            "title": "Threshold Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "faint",
+          "strong",
+          "textbook",
+          "threshold_source"
+        ],
+        "title": "FlagLevelsOut",
+        "type": "object"
+      },
+      "FlagPartyOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "schema"
+        ],
+        "title": "FlagPartyOut",
+        "type": "object"
+      },
+      "FlagSourceOut": {
+        "properties": {
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "publisher": {
+            "title": "Publisher",
+            "type": "string"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "publisher",
+          "url",
+          "locator",
+          "quote"
+        ],
+        "title": "FlagSourceOut",
         "type": "object"
       },
       "FontPairOut": {
@@ -21426,6 +21623,191 @@
         "title": "RecordTagsOut",
         "type": "object"
       },
+      "RedFlagOut": {
+        "description": "One occurrence of a pattern. A flag is a lead, not a finding.",
+        "properties": {
+          "dismissed_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dismissed Reason"
+          },
+          "facts": {
+            "additionalProperties": true,
+            "title": "Facts",
+            "type": "object"
+          },
+          "first_seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "First Seen At",
+            "type": "string"
+          },
+          "gone_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gone At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "indicator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FlagIndicatorOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "indicator_id": {
+            "title": "Indicator Id",
+            "type": "string"
+          },
+          "last_seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Last Seen At",
+            "type": "string"
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
+          },
+          "level": {
+            "enum": [
+              "faint",
+              "strong",
+              "textbook"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "links": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/FlagPartyOut"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "rule_version": {
+            "title": "Rule Version",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "dismissed",
+              "made_lead"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          },
+          "weight_parts": {
+            "items": {
+              "$ref": "#/components/schemas/WeightPartOut"
+            },
+            "title": "Weight Parts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "indicator_id",
+          "rule_version",
+          "level",
+          "status",
+          "dismissed_reason",
+          "lead_id",
+          "weight",
+          "weight_parts",
+          "parties",
+          "links",
+          "facts",
+          "summary",
+          "first_seen_at",
+          "last_seen_at",
+          "gone_at",
+          "indicator"
+        ],
+        "title": "RedFlagOut",
+        "type": "object"
+      },
+      "RedFlagsOut": {
+        "description": "Every rule that ran, the flags that fire now (highest weight first),\nand those that no longer fire.",
+        "properties": {
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/RedFlagOut"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "gone": {
+            "items": {
+              "$ref": "#/components/schemas/RedFlagOut"
+            },
+            "title": "Gone",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RuleOut"
+            },
+            "title": "Rules",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "rules",
+          "flags",
+          "gone"
+        ],
+        "title": "RedFlagsOut",
+        "type": "object"
+      },
       "RelationshipAdvisoryOut": {
         "description": "What the review layer says about one relationship record: the claims\nthat rest on its attached evidence, and how its evidence was reviewed.",
         "properties": {
@@ -22679,6 +23061,29 @@
           "confirm"
         ],
         "title": "RolesIn",
+        "type": "object"
+      },
+      "RuleOut": {
+        "properties": {
+          "indicator_id": {
+            "title": "Indicator Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "indicator_id",
+          "version",
+          "name"
+        ],
+        "title": "RuleOut",
         "type": "object"
       },
       "SavedIn": {
@@ -27129,6 +27534,24 @@
           "entries"
         ],
         "title": "WatchlistOut",
+        "type": "object"
+      },
+      "WeightPartOut": {
+        "properties": {
+          "value": {
+            "title": "Value",
+            "type": "number"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "why",
+          "value"
+        ],
+        "title": "WeightPartOut",
         "type": "object"
       },
       "WriteupCreate": {
@@ -43137,6 +43560,56 @@
         "summary": "Tag A Record"
       }
     },
+    "/api/investigations/{investigation_id}/red-flags": {
+      "get": {
+        "description": "Runs every rule on the investigation's records now, then lists the flags.",
+        "operationId": "get_red_flags",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedFlagsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Red Flags"
+      }
+    },
     "/api/investigations/{investigation_id}/relationships": {
       "get": {
         "operationId": "list_investigation_relationships",
@@ -44944,6 +45417,165 @@
           }
         },
         "summary": "Get Record Provenance Trace"
+      }
+    },
+    "/api/red-flags/{flag_id}/dismiss": {
+      "post": {
+        "description": "Not relevant: the flag stays dismissed while it keeps firing on the same records.",
+        "operationId": "dismiss_red_flag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "flag_id",
+            "required": true,
+            "schema": {
+              "title": "Flag Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlagDismiss"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedFlagsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Dismiss Red Flag"
+      }
+    },
+    "/api/red-flags/{flag_id}/lead": {
+      "post": {
+        "description": "The flag as a lead, linked to its parties and links.",
+        "operationId": "make_lead_from_red_flag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "flag_id",
+            "required": true,
+            "schema": {
+              "title": "Flag Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Make Lead From Red Flag"
+      }
+    },
+    "/api/red-flags/{flag_id}/reopen": {
+      "post": {
+        "operationId": "reopen_red_flag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "flag_id",
+            "required": true,
+            "schema": {
+              "title": "Flag Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedFlagsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Reopen Red Flag"
       }
     },
     "/api/relationship-schemas": {

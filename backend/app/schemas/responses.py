@@ -3850,3 +3850,89 @@ class RecordTagsOut(ResponseModel):
     """Every tag on every record of the investigation: what the network's tag layer draws."""
     investigation_id: str
     rows: list[RecordTagRowOut]
+
+
+# --- Red Flags (app/patterns/engine.py) -------------------------------------------
+
+class FlagPartyOut(ResponseModel):
+    id: str
+    name: str
+    schema_: str = Field(alias="schema")
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class WeightPartOut(ResponseModel):
+    why: str
+    value: float
+
+
+class FlagSourceOut(ResponseModel):
+    title: str
+    publisher: str
+    url: str
+    locator: str | None
+    quote: str
+
+
+class FlagLevelsOut(ResponseModel):
+    faint: str
+    strong: str
+    textbook: str
+    threshold_source: str
+
+
+class FlagCrossHintOut(ResponseModel):
+    target_area: str
+    reason: str
+    source_url: str
+
+
+class FlagIndicatorOut(ResponseModel):
+    """The catalogue indicator the flag's rule computes (catalogue/indicators/*.yaml)."""
+    id: str
+    name: str
+    definition: str
+    area: str
+    area_name: str
+    levels: FlagLevelsOut
+    sources: list[FlagSourceOut]
+    innocent_explanations: list[str]
+    cross_hints: list[FlagCrossHintOut]
+    version: int
+
+
+class RedFlagOut(ResponseModel):
+    """One occurrence of a pattern. A flag is a lead, not a finding."""
+    id: str
+    indicator_id: str
+    rule_version: int
+    level: Literal["faint", "strong", "textbook"]
+    status: Literal["open", "dismissed", "made_lead"]
+    dismissed_reason: str | None
+    lead_id: str | None
+    weight: float
+    weight_parts: list[WeightPartOut]
+    parties: list[FlagPartyOut]
+    links: list[str]
+    facts: dict[str, Any]
+    summary: str
+    first_seen_at: Timestamp
+    last_seen_at: Timestamp
+    gone_at: Timestamp | None
+    indicator: FlagIndicatorOut | None
+
+
+class RuleOut(ResponseModel):
+    indicator_id: str
+    version: int
+    name: str
+
+
+class RedFlagsOut(ResponseModel):
+    """Every rule that ran, the flags that fire now (highest weight first),
+    and those that no longer fire."""
+    investigation_id: str
+    rules: list[RuleOut]
+    flags: list[RedFlagOut]
+    gone: list[RedFlagOut]

@@ -2611,6 +2611,70 @@ export const zFindingReviewRequest = z.object({
 });
 
 /**
+ * FlagCrossHintOut
+ */
+export const zFlagCrossHintOut = z.object({
+  reason: z.string(),
+  source_url: z.string(),
+  target_area: z.string(),
+});
+
+/**
+ * FlagDismiss
+ */
+export const zFlagDismiss = z.object({
+  reason: z.string().min(1).max(2000),
+});
+
+/**
+ * FlagLevelsOut
+ */
+export const zFlagLevelsOut = z.object({
+  faint: z.string(),
+  strong: z.string(),
+  textbook: z.string(),
+  threshold_source: z.string(),
+});
+
+/**
+ * FlagPartyOut
+ */
+export const zFlagPartyOut = z.object({
+  id: z.string(),
+  name: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * FlagSourceOut
+ */
+export const zFlagSourceOut = z.object({
+  locator: z.string().nullable(),
+  publisher: z.string(),
+  quote: z.string(),
+  title: z.string(),
+  url: z.string(),
+});
+
+/**
+ * FlagIndicatorOut
+ *
+ * The catalogue indicator the flag's rule computes (catalogue/indicators*.yaml).
+ */
+export const zFlagIndicatorOut = z.object({
+  area: z.string(),
+  area_name: z.string(),
+  cross_hints: z.array(zFlagCrossHintOut),
+  definition: z.string(),
+  id: z.string(),
+  innocent_explanations: z.array(z.string()),
+  levels: zFlagLevelsOut,
+  name: z.string(),
+  sources: z.array(zFlagSourceOut),
+  version: z.number().int(),
+});
+
+/**
  * FontPairOut
  *
  * A heading and body font; empty names mean "keep the theme's own".
@@ -4638,6 +4702,15 @@ export const zQuestionContextOut = z.object({
 });
 
 /**
+ * RuleOut
+ */
+export const zRuleOut = z.object({
+  indicator_id: z.string(),
+  name: z.string(),
+  version: z.number().int(),
+});
+
+/**
  * Scale
  */
 export const zScale = z.enum(['linear', 'log']);
@@ -6422,6 +6495,65 @@ export const zWatchlistOut = z.object({
 });
 
 /**
+ * WeightPartOut
+ */
+export const zWeightPartOut = z.object({
+  value: z.number(),
+  why: z.string(),
+});
+
+/**
+ * RedFlagOut
+ *
+ * One occurrence of a pattern. A flag is a lead, not a finding.
+ */
+export const zRedFlagOut = z.object({
+  dismissed_reason: z.string().nullable(),
+  facts: z.record(z.unknown()),
+  first_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  gone_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  id: z.string(),
+  indicator: zFlagIndicatorOut.nullable(),
+  indicator_id: z.string(),
+  last_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  lead_id: z.string().nullable(),
+  level: z.enum(['faint', 'strong', 'textbook']),
+  links: z.array(z.string()),
+  parties: z.array(zFlagPartyOut),
+  rule_version: z.number().int(),
+  status: z.enum(['open', 'dismissed', 'made_lead']),
+  summary: z.string(),
+  weight: z.number(),
+  weight_parts: z.array(zWeightPartOut),
+});
+
+/**
+ * RedFlagsOut
+ *
+ * Every rule that ran, the flags that fire now (highest weight first),
+ * and those that no longer fire.
+ */
+export const zRedFlagsOut = z.object({
+  flags: z.array(zRedFlagOut),
+  gone: z.array(zRedFlagOut),
+  investigation_id: z.string(),
+  rules: z.array(zRuleOut),
+});
+
+/**
  * WriteupCreate
  */
 export const zWriteupCreate = z.object({
@@ -8106,6 +8238,15 @@ export const zTagARecordPath = z.object({
  */
 export const zTagARecordResponse = zRecordMarksOut;
 
+export const zGetRedFlagsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetRedFlagsResponse = zRedFlagsOut;
+
 export const zListInvestigationRelationshipsPath = z.object({
   investigation_id: z.string(),
 });
@@ -8426,6 +8567,35 @@ export const zGetRecordProvenanceTraceQuery = z.object({
  * Successful Response
  */
 export const zGetRecordProvenanceTraceResponse = zProvenanceTraceOut;
+
+export const zDismissRedFlagBody = zFlagDismiss;
+
+export const zDismissRedFlagPath = z.object({
+  flag_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDismissRedFlagResponse = zRedFlagsOut;
+
+export const zMakeLeadFromRedFlagPath = z.object({
+  flag_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeLeadFromRedFlagResponse = zLeadOut;
+
+export const zReopenRedFlagPath = z.object({
+  flag_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zReopenRedFlagResponse = zRedFlagsOut;
 
 /**
  * Successful Response
