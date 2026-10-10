@@ -231,6 +231,7 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
   const opened = flags.find(f => f.id === openId);
   const gone = query.data?.gone ?? [];
   const rules = query.data?.rules ?? [];
+  const cannot = query.data?.cannot_run ?? [];
   // Grouped by the indicator's area: the investigation's own areas first, then
   // every other area under "This may also point to" (indicators.md).
   const kind = query.data?.investigation_type;
@@ -244,7 +245,9 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
   return <section className="card rf" id="red-flags" aria-labelledby="red-flags-title">
     <h3 id="red-flags-title">Red Flags</h3>
     <p className="sv-psub">Patterns from published cases found in this investigation&apos;s records. Each is a lead, not a finding.{' '}
-      <span className="rf-rules" title={rules.map(r => r.name).join('\n')}>{rules.length} rules run</span>.</p>
+      <span className="rf-rules" title={rules.map(r => r.name).join('\n')}>{rules.length - cannot.length} of {rules.length} checks ran</span>.</p>
+    {cannot.length > 0 && <details className="rf-cannot"><summary>{cannot.length} could not run on these records</summary>
+      <ul>{cannot.map(c => <li key={c.indicator_id}><b>{c.name}</b>: {c.reason}</li>)}</ul></details>}
     {kind && <InvestigationType kind={kind} flagsByArea={flags.reduce<Record<string, number>>((m, f) => {
       if (f.indicator) m[f.indicator.area] = (m[f.indicator.area] ?? 0) + 1; return m; }, {})} onSet={areas => attempt(async () => {
       await setType.mutateAsync({path, body: {areas}}); await queryClient.invalidateQueries({queryKey: key}); }, 'Could not change the type')}/>}

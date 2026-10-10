@@ -26,11 +26,8 @@ from app.core.time import utcnow_naive
 from app.models.domain import Investigation, Lead, PatternFlag
 from app.patterns import graph as case_graph
 from app.patterns import investigation_type
-from app.patterns.rules import (
-    circular_ownership, circular_payments, ownership_layers, payment_no_purpose, shared_contact, shared_owner_dealings, structuring,
-)
+from app.patterns import specs as detection
 
-RULES = [circular_ownership, ownership_layers, circular_payments, payment_no_purpose, shared_contact, structuring, shared_owner_dealings]
 LEVELS = ("faint", "strong", "textbook")
 
 
@@ -124,30 +121,40 @@ def _fingerprint(indicator_id: str, parties: list[str], links: list[str]) -> str
     return hashlib.sha256(raw.encode()).hexdigest()[:32]
 
 
-def recompute(db: Session, investigation_id: str) -> None:
+def recompute(db: Session, investigation_id: str) -> list[dict[str, str]]:
+    """Runs every detection spec (catalogue/detection/) on the case and keeps the
+    flags; returns the specs that could not run, each with its reason."""
     graph = case_graph.build(db, investigation_id)
     certainty = {link.id: link.certainty for link in graph.links}
     now = utcnow_naive()
     existing = {f.fingerprint: f for f in db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id))}
     seen: set[str] = set()
-    for rule in RULES:
-        for occ in rule.run(graph):
-            fp = _fingerprint(rule.INDICATOR, occ.parties, occ.links)
+    cannot: list[dict[str, str]] = []
+    for spec in detection.load():
+        results = detection.run(spec, graph)
+        if isinstance(results, str):
+            cannot.append({"indicator_id": spec.indicator, "name": _name(spec.indicator), "reason": results})
+            continue
+        family = spec.family_module()
+        for res in results:
+            fp = _fingerprint(spec.indicator, res.parties, res.links)
             seen.add(fp)
-            facts = {**occ.facts, "summary": occ.summary, "weak": rule.WEAK, "not_shown": occ.not_shown,
-                     "unreviewed_links": [l for l in occ.links if certainty.get(l) != "supported"]}
+            facts = {**res.facts, "summary": res.summary, "weak": spec.weak, "not_shown": spec.not_shown, "band_reason": res.band_reason,
+                     "family": spec.family, "family_version": family.VERSION,
+                     "unreviewed_links": [l for l in res.links if certainty.get(l) != "supported"]}
             row = existing.get(fp)
             if row is None:
-                row = PatternFlag(investigation_id=investigation_id, indicator_id=rule.INDICATOR, fingerprint=fp, first_seen_at=now, status="open")
+                row = PatternFlag(investigation_id=investigation_id, indicator_id=spec.indicator, fingerprint=fp, first_seen_at=now, status="open")
                 db.add(row)
                 existing[fp] = row
-            row.rule_version, row.level, row.parties, row.links, row.facts = rule.VERSION, occ.level, occ.parties, occ.links, facts
+            row.rule_version, row.level, row.parties, row.links, row.facts = spec.version, res.level, res.parties, res.links, facts
             row.last_seen_at, row.gone_at = now, None
     for fp, row in existing.items():
         if fp not in seen and row.gone_at is None:
             row.gone_at = now
     _rank([r for r in existing.values() if r.gone_at is None])
     db.commit()
+    return cannot
 
 
 def _rank(rows: list[PatternFlag]) -> None:
@@ -194,12 +201,16 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
 
     from app.core.authorization import InvestigationAuthorizationError
 
+    cannot: list[dict[str, str]] = []
     if refresh:
         try:
-            recompute(db, investigation_id)
+            cannot = recompute(db, investigation_id)
         except InvestigationAuthorizationError:
             # A reader without write access sees the flags as last computed.
             db.rollback()
+            graph = case_graph.build(db, investigation_id)
+            cannot = [{"indicator_id": s.indicator, "name": _name(s.indicator), "reason": r}
+                      for s in detection.load() if isinstance(r := detection.run(s, graph), str)]
     rows = list(db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id)))
     party_ids = {p for r in rows for p in r.parties}
     names = {e.id: (e.caption or e.id, e.schema) for e in db.scalars(select(Entity).where(Entity.id.in_(party_ids)))} if party_ids else {}
@@ -208,7 +219,8 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
     inv = db.get(Investigation, investigation_id)
     return {
         "investigation_id": investigation_id,
-        "rules": [{"indicator_id": r.INDICATOR, "version": r.VERSION, "name": _name(r.INDICATOR)} for r in RULES],
+        "rules": [{"indicator_id": s.indicator, "version": s.version, "name": _name(s.indicator)} for s in detection.load()],
+        "cannot_run": cannot,
         "flags": [serialize(db, r, names) for r in current],
         "gone": [serialize(db, r, names) for r in gone],
         "investigation_type": investigation_type.current(db, inv) if inv else {"set_by": "app", "areas": [], "suggested": []},

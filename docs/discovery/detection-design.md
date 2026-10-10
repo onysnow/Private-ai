@@ -154,6 +154,20 @@ a person's work with the app's help.
   (family 9 and 10) and **checklist items** (family 11), each opening in the
   drawer.
 
+## Built (10 October 2026)
+
+- `backend/app/patterns/detectors/`: the first nine families (cycle,
+  path_length, missing_property, shared_property, count_in_band,
+  shared_holder_link, property_threshold, count_in_window, sequence_within).
+- `backend/app/patterns/specs.py`: specs load from `catalogue/detection/*.yaml`,
+  pass the applicability gate or say why they cannot run, turn values into
+  levels through their bands, and are linted.
+- The seven hand-written rules are now specs (`catalogue/detection/bo.yaml`,
+  `ml.yaml`) with their examples; the old rule modules are gone.
+- Red Flags says how many checks ran and lists the ones that could not, with
+  the reason.
+- `backend/tests/test_detection_specs.py` runs every spec's examples and the lint.
+
 ## Decided (Ony, 10 October 2026)
 
 1. **Spec format: settings only.** Each spec picks a family and fills in its

@@ -3933,6 +3933,13 @@ class RuleOut(ResponseModel):
     name: str
 
 
+class CannotRunOut(ResponseModel):
+    """A check that did not run on this case, and why (it needs records the case does not hold yet)."""
+    indicator_id: str
+    name: str
+    reason: str
+
+
 class TypeAreaOut(ResponseModel):
     key: str
     name: str
@@ -3953,6 +3960,7 @@ class RedFlagsOut(ResponseModel):
     are listed first."""
     investigation_id: str
     rules: list[RuleOut]
+    cannot_run: list[CannotRunOut]
     flags: list[RedFlagOut]
     gone: list[RedFlagOut]
     investigation_type: InvestigationTypeOut

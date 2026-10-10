@@ -1102,6 +1102,26 @@ export type BodyUploadDocument = {
 };
 
 /**
+ * CannotRunOut
+ *
+ * A check that did not run on this case, and why (it needs records the case does not hold yet).
+ */
+export type CannotRunOut = {
+  /**
+   * Indicator Id
+   */
+  indicator_id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Reason
+   */
+  reason: string;
+};
+
+/**
  * CanonicalDecisionSummaryOut
  *
  * The latest reporter decision on a duplicate pair (`created_at` as the
@@ -10757,6 +10777,10 @@ export type RedFlagOut = {
  * are listed first.
  */
 export type RedFlagsOut = {
+  /**
+   * Cannot Run
+   */
+  cannot_run: Array<CannotRunOut>;
   /**
    * Flags
    */

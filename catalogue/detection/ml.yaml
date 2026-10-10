@@ -1,0 +1,33 @@
+# Detection specs for the ML area (money laundering). See bo.yaml.
+
+- indicator: ML-021
+  family: count_in_band
+  params: {link: Payment, property: amount, currency: USD, low: 9000, high: 10000, by: source}
+  bands:
+    - {level: faint, from: 2, reason: "Two or more payments by the same payer between $9,000 and $10,000, the band US Treasury reports show in past structuring cases (not a rule)"}
+  summary: "{party} made {count} payments between $9,000 and $10,000 (${total_text} in all){period}, each just under the $10,000 reporting threshold."
+  not_shown: ["whether the money was cash", "whether it was split to avoid the report"]
+  examples:
+    - name: two payments in the band
+      parties: [{id: p, schema: Person}, {id: b, schema: Company}]
+      links: [{schema: Payment, source: p, target: b, properties: {amount: ["9,500"], currency: ["USD"]}}, {schema: Payment, source: p, target: b, properties: {amount: ["9900"], currency: ["usd"]}}]
+      expect: faint
+    - name: one in the band, one at the threshold
+      parties: [{id: p, schema: Person}, {id: b, schema: Company}]
+      links: [{schema: Payment, source: p, target: b, properties: {amount: ["9500"], currency: ["USD"]}}, {schema: Payment, source: p, target: b, properties: {amount: ["10000"], currency: ["USD"]}}]
+      expect: null
+
+- indicator: ML-023
+  family: cycle
+  params: {link: Payment, min_parties: 2}
+  level: textbook   # money that leaves and comes back meets the definition as worded
+  summary: "Money goes round and back: {path}."
+  examples:
+    - name: there and back
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Payment, source: a, target: b}, {schema: Payment, source: b, target: a}]
+      expect: textbook
+    - name: one way
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Payment, source: a, target: b}]
+      expect: null

@@ -38,13 +38,16 @@ const flag = {
 const boPick = {key: 'BO', name: 'Hidden ownership and shell companies', reasons: ['Red Flag: Circular ownership (BO-001)']};
 const appType = {set_by: 'app', areas: [boPick], suggested: [boPick]};
 const body = (flags: unknown[], investigation_type: unknown = appType) =>
-  ({investigation_id: 'inv-1', rules: [{indicator_id: 'BO-001', version: 1, name: 'Circular ownership'}], flags, gone: [], investigation_type});
+  ({investigation_id: 'inv-1', rules: [{indicator_id: 'BO-001', version: 1, name: 'Circular ownership'}, {indicator_id: 'ML-021', version: 1, name: 'Structuring'}],
+    cannot_run: [{indicator_id: 'ML-021', name: 'Structuring', reason: 'Needs Payment records; none in this case yet.'}], flags, gone: [], investigation_type});
 
 describe('RedFlagsPanel', () => {
   it('keeps the card to what is needed and opens the rest in a drawer, innocent explanations first', async () => {
     mockApi({'GET /api/investigations/inv-1/red-flags': body([flag])});
     wrap(<RedFlagsPanel investigationId="inv-1"/>);
     const card = await screen.findByRole('article', {name: 'Red Flag: Circular ownership'});
+    expect(screen.getByText('1 of 2 checks ran')).toBeInTheDocument();
+    expect(screen.getByText(/Needs Payment records; none in this case yet\./)).toBeInTheDocument();
     expect(within(card).getByText('Textbook · it meets the published definition or threshold')).toBeInTheDocument();
     expect(card).toHaveClass('level-textbook');
     expect(within(card).getByText(/Group cross-holdings or treasury shares/)).toBeInTheDocument();

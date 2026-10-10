@@ -232,6 +232,9 @@ are added to the generated client (`lib/generated`), as the repo requires.
 
 ### 3.3 Pattern engine
 
+(Superseded in part by `detection-design.md`, 10 October 2026: rules are now
+specs for detector families, kept as data in `catalogue/detection/`.)
+
 - **Rules are plain Python modules** in `app/patterns/rules/`, each
   declaring:
   - `id` and `version`

@@ -482,6 +482,17 @@ export const zBodyUploadDocument = z.object({
 });
 
 /**
+ * CannotRunOut
+ *
+ * A check that did not run on this case, and why (it needs records the case does not hold yet).
+ */
+export const zCannotRunOut = z.object({
+  indicator_id: z.string(),
+  name: z.string(),
+  reason: z.string(),
+});
+
+/**
  * CanonicalDecisionSummaryOut
  *
  * The latest reporter decision on a duplicate pair (`created_at` as the
@@ -6688,6 +6699,7 @@ export const zRedFlagOut = z.object({
  * are listed first.
  */
 export const zRedFlagsOut = z.object({
+  cannot_run: z.array(zCannotRunOut),
   flags: z.array(zRedFlagOut),
   gone: z.array(zRedFlagOut),
   investigation_id: z.string(),
