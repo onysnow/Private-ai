@@ -1,11 +1,11 @@
 'use client';
 // Red Flags (docs/discovery/indicators.md; backend app/patterns/): patterns
 // from the indicator catalogue found in this investigation's records. A flag
-// is a lead, not a finding: each card says what the pattern is, the
-// innocent explanations first, then why it matters with its source, how it
-// ranks and why, and what it may also point to. The reporter makes it a
-// lead or sets it aside with a reason; pointing at a party lights it in
-// every chart.
+// is a lead, not a finding. A slim card in the list says what was found and
+// the first innocent explanation; Details opens the rest in a drawer, innocent
+// explanations first, then why it matters, the source and the ranking. The
+// reporter adds it to leads or sets it aside with a reason; pointing at a
+// party lights it in every chart.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
@@ -18,6 +18,7 @@ import {
 import type {InvestigationTypeOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {GlossaryText} from '../glossary/glossary-text';
+import {Tabs, TabsContent, TabsList, TabsTrigger} from '../../components/ui/tabs';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 export const LEVEL: Record<string, {name: string; meaning: string}> = {
@@ -26,50 +27,18 @@ export const LEVEL: Record<string, {name: string; meaning: string}> = {
   textbook: {name: 'Textbook', meaning: 'it meets the published definition or threshold'},
 };
 
-function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; rank: number; onLead: () => Promise<void>;
-  onDismiss: (reason: string) => Promise<void>; onReopen: () => Promise<void>}): ReactElement {
-  const setPointed = useWorkbenchStore(state => state.setPointedParty);
+type FlagActions = {onLead: () => Promise<void>; onDismiss: (reason: string) => Promise<void>; onReopen: () => Promise<void>};
+const PARTIES_SHOWN = 4;
+const plain = (t: string) => t.replace(/[.;]\s*$/, '');
+
+/** Add to leads, Not relevant (with a reason), Open it again: the same on the card and in the drawer. */
+function FlagActionsRow({flag, onLead, onDismiss, onReopen}: {flag: RedFlagOut} & FlagActions): ReactElement {
   const [reason, setReason] = useState('');
   const [asking, setAsking] = useState(false);
-  const ind = flag.indicator;
-  const source = ind?.sources[0];
-  const max = Math.max(1.5, flag.weight);
-  // The whole card rises with the level (Ony, 10 Oct 2026): Faint is a quiet card;
-  // Strong gets a thicker edge and a tinted band; Textbook a brick frame on every side,
-  // a red band saying it meets the published definition, and more room.
-  return <article className={`rf-card level-${flag.level}${flag.status !== 'open' ? ' decided' : ''}`} aria-label={`Red Flag: ${ind?.name ?? flag.indicator_id}`}>
-    {flag.level !== 'faint' && <div className="rf-band"><GlossaryText text={`${LEVEL[flag.level].name} · ${LEVEL[flag.level].meaning}`}/></div>}
-    <header className="rf-head">
-      <span className="rf-rank">{rank}</span>
-      <div>
-        <h4>{ind ? <a className="rf-ind" href={`/glossary?indicator=${encodeURIComponent(ind.id)}`}>{ind.name}</a> : flag.indicator_id}</h4>
-        <small>{flag.level === 'faint' ? `Faint · ${LEVEL.faint.meaning} · ` : ''}{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}</small>
-      </div>
-    </header>
-    <div className="rf-who">{flag.parties.map(p => <button type="button" key={p.id} className="sv-pd rf-party"
-      onMouseEnter={() => setPointed(p.id)} onMouseLeave={() => setPointed(null)} onFocus={() => setPointed(p.id)} onBlur={() => setPointed(null)}>
-      <i style={{borderColor: PARTY[partyKind(p.schema)].ring}}/>{p.name}</button>)}</div>
-    <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
-    {flag.not_shown.length > 0 && <div className="rf-row rf-unknown"><b>The records can&apos;t show.</b> {flag.not_shown.join('; ')}. A person decides that.</div>}
-    {ind && <>
-      <div className="rf-row"><b>Could be innocent.</b> <GlossaryText text={`${ind.innocent_explanations.map(t => t.replace(/[.;]\s*$/, '')).join('; ')}.`}/></div>
-      <div className="rf-row"><b>The pattern.</b> <GlossaryText text={ind.definition}/></div>
-      {source && <div className="rf-row"><b>Documented in.</b> <a href={source.url} target="_blank" rel="noreferrer">{source.publisher}, {source.title}</a>
-        {source.locator ? `, ${source.locator}` : ''}: “{source.quote}”</div>}
-      <div className="rf-row"><b>This level.</b> <GlossaryText text={`${LEVEL[flag.level].name}: ${ind.levels[flag.level as 'faint' | 'strong' | 'textbook']}`}/></div>
-      {ind.levels.threshold_note && <div className="rf-row rf-note"><b>About the numbers.</b> {ind.levels.threshold_note}</div>}
-      {ind.cross_hints.length > 0 && <div className="rf-row"><b>This may also point to.</b> {ind.cross_hints.map((h, i) => <span key={i}>
-        {i > 0 && ' '}<a href={h.source_url} target="_blank" rel="noreferrer">{h.target_area}</a>: <GlossaryText text={h.reason}/></span>)}</div>}
-    </>}
-    <div className="rf-weight" aria-label={`Weight ${flag.weight}`}>
-      <span>weight</span>
-      <span className="rf-track"><i style={{width: `${Math.max(4, 100 * Math.max(0, flag.weight) / max)}%`}}/></span>
-      <span>{flag.weight} · {flag.weight_parts.map(p => `${p.value > 0 ? '+' : ''}${p.value} ${p.why}`).join(' · ')}</span>
-    </div>
-    {flag.status === 'dismissed' && <p className="rf-row"><b>Set aside.</b> {flag.dismissed_reason}</p>}
+  return <>
     <div className="rf-actions">
-      {flag.status === 'made_lead' ? <span className="sv-muted">Made a lead</span>
-        : <button type="button" className="sv-btn p" onClick={onLead}>Make it a lead</button>}
+      {flag.status === 'made_lead' ? <span className="sv-muted">In leads</span>
+        : <button type="button" className="sv-btn p" onClick={onLead}>Add to leads</button>}
       {flag.status === 'open' && !asking && <button type="button" className="sv-btn" onClick={() => setAsking(true)}>Not relevant</button>}
       {flag.status === 'dismissed' && <button type="button" className="sv-btn" onClick={onReopen}>Open it again</button>}
     </div>
@@ -79,7 +48,97 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
       <button type="submit" className="sv-btn" disabled={!reason.trim()}>Set aside</button>
       <button type="button" className="sv-btn" onClick={() => setAsking(false)}>Cancel</button>
     </form>}
+  </>;
+}
+
+function PartyButtons({parties, limit}: {parties: RedFlagOut['parties']; limit?: number}): ReactElement {
+  const setPointed = useWorkbenchStore(state => state.setPointedParty);
+  const shown = limit ? parties.slice(0, limit) : parties;
+  return <div className="rf-who">{shown.map(p => <button type="button" key={p.id} className="sv-pd rf-party"
+    onMouseEnter={() => setPointed(p.id)} onMouseLeave={() => setPointed(null)} onFocus={() => setPointed(p.id)} onBlur={() => setPointed(null)}>
+    <i style={{borderColor: PARTY[partyKind(p.schema)].ring}}/>{p.name}</button>)}
+    {shown.length < parties.length && <span className="sv-muted">+{parties.length - shown.length} more</span>}</div>;
+}
+
+/** The card in the list: what is needed to decide whether to open it (Ony, 10 Oct 2026: "only the necessary text
+ * before you click"). The level, the pattern, who, what was found, the first innocent explanation, what the records
+ * can't show, and the actions. Everything else is in the drawer. The whole card rises with the level: Faint is quiet;
+ * Strong a thicker edge and a tinted band; Textbook a brick frame and a red band. */
+function FlagCard({flag, rank, open, onOpen, ...actions}: {flag: RedFlagOut; rank: number; open: boolean; onOpen: () => void} & FlagActions): ReactElement {
+  const ind = flag.indicator;
+  const innocent = ind?.innocent_explanations ?? [];
+  const name = ind?.name ?? flag.indicator_id;
+  return <article className={`rf-card level-${flag.level}${flag.status !== 'open' ? ' decided' : ''}${open ? ' open' : ''}`} aria-label={`Red Flag: ${name}`}>
+    {flag.level !== 'faint' && <div className="rf-band"><GlossaryText text={`${LEVEL[flag.level].name} · ${LEVEL[flag.level].meaning}`}/></div>}
+    <header className="rf-head">
+      <span className="rf-rank">{rank}</span>
+      <div>
+        <h4><button type="button" className="rf-open" onClick={onOpen} aria-expanded={open} aria-controls="rf-drawer">{name}</button></h4>
+        <small>{flag.level === 'faint' ? `Faint · ${LEVEL.faint.meaning} · ` : ''}{flag.indicator_id}</small>
+      </div>
+    </header>
+    <PartyButtons parties={flag.parties} limit={PARTIES_SHOWN}/>
+    <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
+    {innocent.length > 0 && <p className="rf-line"><b>Could be innocent:</b> {plain(innocent[0])}{innocent.length > 1 ? `, +${innocent.length - 1} more` : ''}</p>}
+    {flag.not_shown.length > 0 && <p className="rf-line"><b>Records can&apos;t show:</b> {flag.not_shown.join('; ')}</p>}
+    {flag.status === 'dismissed' && <p className="rf-line"><b>Set aside:</b> {flag.dismissed_reason}</p>}
+    <div className="rf-foot">
+      <FlagActionsRow flag={flag} {...actions}/>
+      <button type="button" className="sv-btn rf-more" onClick={onOpen} aria-label={`Details: ${name}`}>Details</button>
+    </div>
   </article>;
+}
+
+/** Everything about one flag, beside the list: innocent explanations first (indicators.md), then why it matters,
+ * where it was documented, and how it ranks. */
+function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () => void} & FlagActions): ReactElement {
+  const ind = flag.indicator;
+  const max = Math.max(1.5, flag.weight);
+  const name = ind?.name ?? flag.indicator_id;
+  return <aside id="rf-drawer" className={`wb-drawer rf-drawer level-${flag.level}`} aria-label={`Red Flag details: ${name}`}
+    onKeyDown={e => { if (e.key === 'Escape') onClose(); }}>
+    <button type="button" className="wb-drawer-close" onClick={onClose} aria-label="Close the details">×</button>
+    <p className="rf-drawer-level">{LEVEL[flag.level].name} · {LEVEL[flag.level].meaning}</p>
+    <h3>{name}</h3>
+    <p className="sv-muted">{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}{ind && <> · <a href={`/glossary?indicator=${encodeURIComponent(ind.id)}`}>Full entry in the glossary</a></>}</p>
+    <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
+    <PartyButtons parties={flag.parties}/>
+    <Tabs defaultValue="innocent" className="rf-tabs">
+      <TabsList aria-label="About this flag">
+        <TabsTrigger value="innocent">Could be innocent</TabsTrigger>
+        <TabsTrigger value="why">Why it matters</TabsTrigger>
+        <TabsTrigger value="source">Source</TabsTrigger>
+        <TabsTrigger value="rank">Ranking</TabsTrigger>
+      </TabsList>
+      <TabsContent value="innocent">
+        <ul className="rf-list">{(ind?.innocent_explanations ?? []).map(t => <li key={t}><GlossaryText text={t}/></li>)}</ul>
+        {flag.not_shown.length > 0 && <div className="rf-row rf-unknown"><b>The records can&apos;t show.</b> {flag.not_shown.join('; ')}. A person decides that.</div>}
+      </TabsContent>
+      <TabsContent value="why">
+        {ind && <>
+          <h5>The pattern</h5><p><GlossaryText text={ind.definition}/></p>
+          <h5>This level</h5><p><GlossaryText text={`${LEVEL[flag.level].name}: ${ind.levels[flag.level as 'faint' | 'strong' | 'textbook']}`}/></p>
+          {ind.levels.threshold_note && <><h5>About the numbers</h5><p className="rf-note-text">{ind.levels.threshold_note}</p></>}
+          {ind.cross_hints.length > 0 && <><h5>This may also point to</h5><ul className="rf-list">{ind.cross_hints.map((h, i) => <li key={i}>
+            <a href={h.source_url} target="_blank" rel="noreferrer">{h.target_area}</a>: <GlossaryText text={h.reason}/></li>)}</ul></>}
+        </>}
+      </TabsContent>
+      <TabsContent value="source">
+        {(ind?.sources ?? []).map((src, i) => <div key={i} className="rf-source">
+          <a href={src.url} target="_blank" rel="noreferrer">{src.publisher}, {src.title}</a>{src.locator ? `, ${src.locator}` : ''}
+          <blockquote>“{src.quote}”</blockquote></div>)}
+      </TabsContent>
+      <TabsContent value="rank">
+        <div className="rf-weight" aria-label={`Weight ${flag.weight}`}>
+          <span>weight {flag.weight}</span>
+          <span className="rf-track"><i style={{width: `${Math.max(4, 100 * Math.max(0, flag.weight) / max)}%`}}/></span>
+        </div>
+        <ul className="rf-list">{flag.weight_parts.map(p => <li key={p.why}>{p.value > 0 ? '+' : ''}{p.value} {p.why}</li>)}</ul>
+      </TabsContent>
+    </Tabs>
+    {flag.status === 'dismissed' && <p className="rf-row"><b>Set aside.</b> {flag.dismissed_reason}</p>}
+    <FlagActionsRow flag={flag} {...actions}/>
+  </aside>;
 }
 
 /** The investigation's type: catalogue areas, chosen by the app with its reasons, or by the reporter (indicators.md).
@@ -156,12 +215,21 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
   const lead = useMutation({...makeLeadFromRedFlagMutation()});
   const setType = useMutation({...setInvestigationTypeMutation()});
   const [problem, setProblem] = useState('');
+  const [openId, setOpenId] = useState<string | null>(null);
   const key = getRedFlagsQueryKey({path});
   const attempt = async (work: () => Promise<unknown>, failed: string) => {
     try { await work(); setProblem(''); } catch (error) { setProblem(errorMessage(error, failed)); }
   };
 
+  const actionsFor = (f: RedFlagOut): FlagActions => ({
+    onLead: () => attempt(async () => { await lead.mutateAsync({path: {flag_id: f.id}}); await Promise.all([
+      queryClient.invalidateQueries({queryKey: key}), queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})})]); }, 'Could not add it to leads'),
+    onDismiss: reason => attempt(async () => { queryClient.setQueryData(key, await dismiss.mutateAsync({path: {flag_id: f.id}, body: {reason}})); }, 'Could not set it aside'),
+    onReopen: () => attempt(async () => { queryClient.setQueryData(key, await reopen.mutateAsync({path: {flag_id: f.id}})); }, 'Could not open it again'),
+  });
+
   const flags = query.data?.flags ?? [];
+  const opened = flags.find(f => f.id === openId);
   const gone = query.data?.gone ?? [];
   const rules = query.data?.rules ?? [];
   // Grouped by the indicator's area: the investigation's own areas first, then
@@ -176,8 +244,8 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
 
   return <section className="card rf" id="red-flags" aria-labelledby="red-flags-title">
     <h3 id="red-flags-title">Red Flags</h3>
-    <p className="sv-psub">Patterns from published cases found in this investigation&apos;s records. Each is a lead, not a finding: it says why it matters,
-      where it was documented, and the innocent explanations. {rules.length} rules run now: {rules.map(r => r.name).join('; ')}.</p>
+    <p className="sv-psub">Patterns from published cases found in this investigation&apos;s records. Each is a lead, not a finding.{' '}
+      <span className="rf-rules" title={rules.map(r => r.name).join('\n')}>{rules.length} rules run</span>.</p>
     {kind && <InvestigationType kind={kind} flagsByArea={flags.reduce<Record<string, number>>((m, f) => {
       if (f.indicator) m[f.indicator.area] = (m[f.indicator.area] ?? 0) + 1; return m; }, {})} onSet={areas => attempt(async () => {
       await setType.mutateAsync({path, body: {areas}}); await queryClient.invalidateQueries({queryKey: key}); }, 'Could not change the type')}/>}
@@ -188,11 +256,9 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
       {own.length > 0 && area === others[0] && <h3 className="rf-also">This may also point to</h3>}
       <h4 className="rf-area">{area}</h4>
       {flags.filter(f => (f.indicator?.area_name ?? 'Other') === area).sort(byLevel).map(f => { rank += 1; return <FlagCard key={f.id} flag={f} rank={rank}
-        onLead={() => attempt(async () => { await lead.mutateAsync({path: {flag_id: f.id}}); await Promise.all([
-          queryClient.invalidateQueries({queryKey: key}), queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})})]); }, 'Could not make the lead')}
-        onDismiss={reason => attempt(async () => { queryClient.setQueryData(key, await dismiss.mutateAsync({path: {flag_id: f.id}, body: {reason}})); }, 'Could not set it aside')}
-        onReopen={() => attempt(async () => { queryClient.setQueryData(key, await reopen.mutateAsync({path: {flag_id: f.id}})); }, 'Could not open it again')}/>; })}
+        open={openId === f.id} onOpen={() => setOpenId(openId === f.id ? null : f.id)} {...actionsFor(f)}/>; })}
     </div>)}
+    {opened && <FlagDrawer key={opened.id} flag={opened} onClose={() => setOpenId(null)} {...actionsFor(opened)}/>}
     {gone.length > 0 && <details className="rf-gone"><summary>No longer fire ({gone.length})</summary>
       <ul>{gone.map(f => <li key={f.id}><b>{f.indicator?.name ?? f.indicator_id}</b>: {f.summary} <small>The records changed so the pattern no longer holds.</small></li>)}</ul>
     </details>}

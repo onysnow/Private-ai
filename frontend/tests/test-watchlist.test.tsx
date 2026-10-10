@@ -80,9 +80,9 @@ describe('Watchlist', () => {
     wrap(<Watchlist investigationId="inv-1"/>);
     const user = userEvent.setup();
     const where = within(await screen.findByRole('list', {name: 'Where “Zanzibar Trading” was found'}));
-    await user.click(where.getAllByRole('button', {name: 'Make a lead'})[0]);
-    expect(await screen.findByText('““Zanzibar Trading” in memo.txt” is now a lead.')).toBeInTheDocument();
-    expect(await screen.findByText('Made a lead')).toBeInTheDocument();
+    await user.click(where.getAllByRole('button', {name: 'Add to leads'})[0]);
+    expect(await screen.findByText('““Zanzibar Trading” in memo.txt” was added to leads.')).toBeInTheDocument();
+    expect(await screen.findByText('In leads')).toBeInTheDocument();
     expect(api.calls(LIST)).toHaveLength(2);
 
     await user.click(screen.getByRole('button', {name: 'Dismiss'}));

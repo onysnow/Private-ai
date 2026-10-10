@@ -525,3 +525,27 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
 .tp-actions { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #2c3236; }
 .tp-gap { flex: 1; }
 .rf-also { margin: 22px 0 6px; font-size: 15px; color: #d4a152; }
+
+/* Red Flags: slim cards and the details drawer (Ony, 10 Oct 2026). */
+.rf-open { all: unset; cursor: pointer; } .rf-open:hover { text-decoration: underline; } .rf-open:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; border-radius: 3px; }
+.rf-card.open { box-shadow: 0 0 0 2px #d4a152, 0 6px 18px rgba(0,0,0,.35); }
+.rf-line { margin: 4px 0; font-size: 12.5px; line-height: 1.45; color: #a8998a; } .rf-line b { color: #caaf9c; font-weight: 600; }
+.rf-foot { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; margin-top: 8px; } .rf-foot .rf-actions { margin-top: 0; }
+.rf-more { margin-left: auto; }
+.rf-rules { text-decoration: underline dotted; cursor: help; }
+.rf-drawer { padding: 22px 24px; color: #caaf9c; font-size: 13.5px; }
+.rf-drawer h3 { margin: 4px 40px 4px 0; font-size: 20px; color: #f3e9d7; }
+.rf-drawer h5 { margin: 14px 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #d4a152; }
+.rf-drawer a { color: #d9b67a; }
+.rf-drawer-level { display: inline-block; margin: 0; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: #f3e9d7; background: #3a3a40; }
+.rf-drawer.level-strong .rf-drawer-level { background: #4a2c55; } .rf-drawer.level-textbook .rf-drawer-level { background: #9f3632; }
+.rf-drawer.level-textbook { border-left: 4px solid #9f3632; } .rf-drawer.level-strong { border-left: 4px solid #9a83a8; }
+.rf-tabs { margin-top: 14px; }
+.rf-list { margin: 6px 0; padding-left: 18px; line-height: 1.5; } .rf-list li { margin: 3px 0; }
+.rf-note-text { font-size: 12.5px; color: #a8998a; }
+.rf-source { margin: 8px 0 12px; } .rf-source blockquote { margin: 6px 0 0; padding-left: 10px; border-left: 2px solid #4e4234; color: #a8998a; }
+.rf-drawer .rf-actions { margin-top: 18px; padding-top: 12px; border-top: 1px solid #2c3236; }
+.rf-drawer .rf-summary { margin: 12px 0 8px; font-size: 14px; }
+.rf-list { list-style: disc; }
+.rf-tabs [role="tablist"] { background: #1b2429; border: 1px solid #2c3236; }
+.rf-tabs [role="tab"] { color: #a8998a; } .rf-tabs [role="tab"][data-state="active"] { background: #2a2418; color: #f0d9a8; box-shadow: inset 0 -2px 0 #d4a152; }

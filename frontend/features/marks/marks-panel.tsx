@@ -36,7 +36,7 @@ function NoteItem({note, onSave, onDelete, onLead}: {note: NoteOut; onSave: (tex
         {note.caption && <small>On {note.caption}</small>}
         <div className="sv-row">
           <button type="button" className="sv-btn" onClick={() => setEditing(true)}>Edit</button>
-          {note.lead_id ? <small>Made a lead</small> : <button type="button" className="sv-btn" onClick={onLead}>Make it a lead</button>}
+          {note.lead_id ? <small>In leads</small> : <button type="button" className="sv-btn" onClick={onLead}>Add to leads</button>}
           <button type="button" className="sv-btn danger" onClick={onDelete}>Delete</button>
         </div>
       </>}

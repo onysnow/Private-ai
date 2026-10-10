@@ -51,8 +51,8 @@ describe('CorpusInsights', () => {
     await user.click(within(screen.getByRole('list', {name: 'Companies'})).getByRole('button', {name: 'Open dossier'}));
     expect(useWorkbenchStore.getState().entityId).toBe('ent-1');
 
-    await user.click(people.getByRole('button', {name: 'Make a lead'}));
-    expect(await screen.findByText('“Alaric Voss” is now a lead.')).toBeInTheDocument();
+    await user.click(people.getByRole('button', {name: 'Add to leads'}));
+    expect(await screen.findByText('“Alaric Voss” was added to leads.')).toBeInTheDocument();
     expect(api.lastBody('POST /api/leads')).toEqual({investigation_id: 'inv-1', title: 'Alaric Voss', provider: 'openaleph',
       provider_record_id: 'discover:people:alaric voss',
       detail: "OpenAleph's analysis found “Alaric Voss” in 4 document(s) of this investigation's corpus, most often alongside Meridian Holdings Ltd, Limassol."});

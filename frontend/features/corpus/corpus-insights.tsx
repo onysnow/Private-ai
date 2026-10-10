@@ -38,7 +38,7 @@ export function CorpusInsights({investigationId}: {investigationId: string}): Re
     try {
       await createLead.mutateAsync({body: {investigation_id: investigationId, title: term.name, detail: leadDetail(term),
         provider: 'openaleph', provider_record_id: term.lead_key}});
-      setStatus(`“${term.name}” is now a lead.`);
+      setStatus(`“${term.name}” was added to leads.`);
       await Promise.all([
         queryClient.invalidateQueries({queryKey: getCorpusInsightsQueryKey({path})}),
         queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})}),
@@ -66,7 +66,7 @@ export function CorpusInsights({investigationId}: {investigationId: string}): Re
               {term.record_id
                 ? <Button variant="link" onClick={() => openDossier(term.record_id as string)}>Open dossier</Button>
                 : term.lead_id ? <small>Already a lead</small>
-                : <Button size="sm" variant="outline" onClick={() => void makeLead(term)} disabled={createLead.isPending}>Make a lead</Button>}
+                : <Button size="sm" variant="outline" onClick={() => void makeLead(term)} disabled={createLead.isPending}>Add to leads</Button>}
             </div>
           </li>)}
         </ul>

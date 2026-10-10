@@ -42,9 +42,9 @@ function Hit({hit, onOpen, onLead, onDismiss, busy}: {hit: WatchlistHitOut; onOp
     <div className="actions">
       {hit.document_id && <Button variant="link" onClick={onOpen}>Open document</Button>}
       {hit.status === 'new' ? <>
-        <Button size="sm" variant="outline" onClick={onLead} disabled={busy}>Make a lead</Button>
+        <Button size="sm" variant="outline" onClick={onLead} disabled={busy}>Add to leads</Button>
         <Button size="sm" variant="ghost" onClick={onDismiss} disabled={busy}>Dismiss</Button>
-      </> : <small>{hit.status === 'lead' ? 'Made a lead' : 'Dismissed'}</small>}
+      </> : <small>{hit.status === 'lead' ? 'In leads' : 'Dismissed'}</small>}
     </div>
   </li>;
 }
@@ -93,7 +93,7 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
   const makeLead = (hit: WatchlistHitOut) => attempt(async () => {
     const made = await lead.mutateAsync({path: {hit_id: hit.id}});
     await Promise.all([queryClient.invalidateQueries({queryKey: key}), queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})})]);
-    return `“${made.title}” is now a lead.`;
+    return `“${made.title}” was added to leads.`;
   }, 'Could not make the lead');
   const dismissHit = (hit: WatchlistHitOut) => attempt(async () => {
     keep(await dismiss.mutateAsync({path: {hit_id: hit.id}}));

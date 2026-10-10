@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Red Flags (features/red-flags/red-flags-panel.tsx): each card puts the
 // innocent explanations first, cites where the pattern was documented, shows
-// how it ranks and why, and lets the reporter make it a lead or set it aside
+// how it ranks and why, and lets the reporter add it to leads or set it aside
 // with a reason. Pointing at a party lights it in every chart.
 import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -41,23 +41,36 @@ const body = (flags: unknown[], investigation_type: unknown = appType) =>
   ({investigation_id: 'inv-1', rules: [{indicator_id: 'BO-001', version: 1, name: 'Circular ownership'}], flags, gone: [], investigation_type});
 
 describe('RedFlagsPanel', () => {
-  it('shows the flag with its innocent explanations, source, level and ranking, and lights a party when pointed at', async () => {
+  it('keeps the card to what is needed and opens the rest in a drawer, innocent explanations first', async () => {
     mockApi({'GET /api/investigations/inv-1/red-flags': body([flag])});
     wrap(<RedFlagsPanel investigationId="inv-1"/>);
     const card = await screen.findByRole('article', {name: 'Red Flag: Circular ownership'});
     expect(within(card).getByText('Textbook · it meets the published definition or threshold')).toBeInTheDocument();
     expect(card).toHaveClass('level-textbook');
-    expect(within(card).getByText(/Group cross-holdings/)).toBeInTheDocument();
-    expect(within(card).getByRole('link', {name: /FATF and Egmont Group/})).toHaveAttribute('href', 'https://example.test/fatf');
-    expect(within(card).getByText(/-0.3 rests on a link not yet supported/)).toBeInTheDocument();
-    expect(within(card).getByText('Applies in the UK only.')).toBeInTheDocument();
-    expect(within(card).getByText(/whether there was a business reason\. A person decides that\./)).toBeInTheDocument();
+    expect(within(card).getByText(/Group cross-holdings or treasury shares/)).toBeInTheDocument();
+    expect(within(card).getByText(/whether there was a business reason/)).toBeInTheDocument();
+    expect(within(card).queryByRole('link', {name: /FATF and Egmont Group/})).toBeNull();
+    expect(within(card).queryByText('Applies in the UK only.')).toBeNull();
     expect(screen.getByRole('heading', {level: 4, name: 'Hidden ownership and shell companies'})).toBeInTheDocument();
-    await userEvent.setup().hover(within(card).getByRole('button', {name: 'A Ltd'}));
+    const user = userEvent.setup();
+    await user.hover(within(card).getByRole('button', {name: 'A Ltd'}));
     expect(useWorkbenchStore.getState().pointedParty).toBe('a');
+
+    await user.click(within(card).getByRole('button', {name: 'Details: Circular ownership'}));
+    const drawer = screen.getByRole('complementary', {name: 'Red Flag details: Circular ownership'});
+    expect(within(drawer).getByRole('tab', {name: 'Could be innocent'})).toHaveAttribute('aria-selected', 'true');
+    expect(within(drawer).getByText(/whether there was a business reason\. A person decides that\./)).toBeInTheDocument();
+    await user.click(within(drawer).getByRole('tab', {name: 'Why it matters'}));
+    expect(within(drawer).getByText('Applies in the UK only.')).toBeInTheDocument();
+    await user.click(within(drawer).getByRole('tab', {name: 'Source'}));
+    expect(within(drawer).getByRole('link', {name: /FATF and Egmont Group/})).toHaveAttribute('href', 'https://example.test/fatf');
+    await user.click(within(drawer).getByRole('tab', {name: 'Ranking'}));
+    expect(within(drawer).getByText(/-0.3 rests on a link not yet supported/)).toBeInTheDocument();
+    await user.click(within(drawer).getByRole('button', {name: 'Close the details'}));
+    expect(screen.queryByRole('complementary')).toBeNull();
   });
 
-  it('sets a flag aside only with a reason, and makes one a lead', async () => {
+  it('sets a flag aside only with a reason, and adds one to leads', async () => {
     const api = mockApi({
       'GET /api/investigations/inv-1/red-flags': body([flag]),
       'POST /api/red-flags/f-1/dismiss': body([{...flag, status: 'dismissed', dismissed_reason: 'Known group structure'}]),
@@ -71,7 +84,7 @@ describe('RedFlagsPanel', () => {
     await user.click(screen.getByRole('button', {name: 'Set aside'}));
     await waitFor(() => expect(api.lastBody('POST /api/red-flags/f-1/dismiss')).toEqual({reason: 'Known group structure'}));
     expect(await screen.findByText('Known group structure')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', {name: 'Make it a lead'}));
+    await user.click(screen.getByRole('button', {name: 'Add to leads'}));
     await waitFor(() => expect(api.calls('POST /api/red-flags/f-1/lead')).toHaveLength(1));
   });
 
