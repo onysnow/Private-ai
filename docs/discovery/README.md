@@ -278,6 +278,14 @@ Still open: the chart rules question (Ony asked where the rules come from), undo
 
 Each step: tests, the full check gate, screenshots to Ony.
 
+Before several people can work on one investigation: **polish the entire app
+and make sure everything works** (Ony, 10 October 2026).
+
+**Timeline, to be designed with Ony** (10 October 2026): a very dynamic
+timeline. The reporter changes how it is viewed, chooses what items make it
+up, and can build their own timeline by dragging and dropping event entities
+or placing named placeholders.
+
 After these steps are built and tested, and after several people can work on
 one investigation (planned, 8 October), the next item is **admin tools and
 project-management tooling for the app's own teams** (Ony, 10 October 2026).
