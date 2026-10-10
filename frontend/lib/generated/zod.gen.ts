@@ -2755,6 +2755,24 @@ export const zFontPairOut = z.object({
 });
 
 /**
+ * GlossaryNameOut
+ */
+export const zGlossaryNameOut = z.object({
+  exact: z.boolean(),
+  text: z.string(),
+});
+
+/**
+ * GlossaryHintOut
+ */
+export const zGlossaryHintOut = z.object({
+  areas: z.array(z.string()),
+  definition: z.string(),
+  names: z.array(zGlossaryNameOut),
+  term: z.string(),
+});
+
+/**
  * GlossaryTermOut
  */
 export const zGlossaryTermOut = z.object({
@@ -6841,7 +6859,7 @@ export const zSearchGlossaryQuery = z.object({
   q: z.string().max(200).optional().default(''),
   area: z
     .string()
-    .regex(/^[A-Z]{2}$/)
+    .regex(/^[A-Z]{2,3}$/)
     .nullish(),
   limit: z.number().int().gte(1).lte(500).optional().default(100),
   offset: z.number().int().gte(0).optional().default(0),
@@ -6860,6 +6878,13 @@ export const zGetIndicatorPath = z.object({
  * Successful Response
  */
 export const zGetIndicatorResponse = zCatalogueIndicatorOut;
+
+/**
+ * Response List Term Hints
+ *
+ * Successful Response
+ */
+export const zListTermHintsResponse = z.array(zGlossaryHintOut);
 
 export const zCreateClaimEndpointBody = zClaimCreate;
 

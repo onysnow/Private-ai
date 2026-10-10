@@ -8,8 +8,8 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 
-from app.patterns.engine import catalogue_areas, catalogue_glossary, indicator
-from app.schemas.responses import CatalogueAreaOut, CatalogueIndicatorOut, GlossaryPageOut
+from app.patterns.engine import catalogue_areas, catalogue_glossary, catalogue_term_hints, indicator
+from app.schemas.responses import CatalogueAreaOut, CatalogueIndicatorOut, GlossaryHintOut, GlossaryPageOut
 
 router = APIRouter(prefix="/api/catalogue")
 
@@ -21,7 +21,7 @@ def list_areas() -> Any:
 
 
 @router.get("/glossary", response_model=GlossaryPageOut)
-def search_glossary(q: str = Query("", max_length=200), area: str | None = Query(None, pattern=r"^[A-Z]{2}$"),
+def search_glossary(q: str = Query("", max_length=200), area: str | None = Query(None, pattern=r"^[A-Z]{2,3}$"),
                     limit: int = Query(100, ge=1, le=500), offset: int = Query(0, ge=0)) -> Any:
     """Terms whose name or definition holds the words, names first; one area or all."""
     terms = catalogue_glossary()
@@ -36,6 +36,12 @@ def search_glossary(q: str = Query("", max_length=200), area: str | None = Query
                 scored.append((0 if all(w in name for w in words) else 1, t["term"].lower(), t))
         terms = [t for _, _, t in sorted(scored, key=lambda x: (x[0], x[1]))]
     return {"total": len(terms), "terms": terms[offset:offset + limit]}
+
+
+@router.get("/terms", response_model=list[GlossaryHintOut])
+def list_term_hints() -> Any:
+    """Every term, its definition and the names it is found by in text: what a hover card needs."""
+    return catalogue_term_hints()
 
 
 @router.get("/indicators/{indicator_id}", response_model=CatalogueIndicatorOut)

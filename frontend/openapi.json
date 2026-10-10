@@ -16354,6 +16354,58 @@
         "title": "FontPairOut",
         "type": "object"
       },
+      "GlossaryHintOut": {
+        "properties": {
+          "areas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "names": {
+            "items": {
+              "$ref": "#/components/schemas/GlossaryNameOut"
+            },
+            "title": "Names",
+            "type": "array"
+          },
+          "term": {
+            "title": "Term",
+            "type": "string"
+          }
+        },
+        "required": [
+          "term",
+          "definition",
+          "areas",
+          "names"
+        ],
+        "title": "GlossaryHintOut",
+        "type": "object"
+      },
+      "GlossaryNameOut": {
+        "properties": {
+          "exact": {
+            "title": "Exact",
+            "type": "boolean"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "exact"
+        ],
+        "title": "GlossaryNameOut",
+        "type": "object"
+      },
       "GlossaryPageOut": {
         "properties": {
           "terms": {
@@ -29031,7 +29083,7 @@
             "schema": {
               "anyOf": [
                 {
-                  "pattern": "^[A-Z]{2}$",
+                  "pattern": "^[A-Z]{2,3}$",
                   "type": "string"
                 },
                 {
@@ -29148,6 +29200,49 @@
           }
         },
         "summary": "Get Indicator"
+      }
+    },
+    "/api/catalogue/terms": {
+      "get": {
+        "description": "Every term, its definition and the names it is found by in text: what a hover card needs.",
+        "operationId": "list_term_hints",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GlossaryHintOut"
+                  },
+                  "title": "Response List Term Hints",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Term Hints"
       }
     },
     "/api/claims": {

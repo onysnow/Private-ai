@@ -490,3 +490,11 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
   .gl-outcome { font-size: 11.5px; font-weight: 700; padding: 0 6px; border-radius: 999px; background: #3a5c52; color: #f3e9d7; }
   .gl-outcome.alleged_in_reporting { background: #312237; border: 1px solid #9a83a8; }
 }
+
+/* Glossary hover cards (features/glossary/glossary-text.tsx). */
+.gt-term { color: inherit; text-decoration: underline dotted #d4a152; text-underline-offset: 3px; cursor: help; }
+.gt-term:hover, .gt-term:focus-visible { color: #f0d9a8; }
+.gt-card { position: fixed; z-index: 60; width: 320px; padding: 10px 12px; background: #10161a; border: 1px solid #8d692b; border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.45); color: #caaf9c; font-size: 13px; line-height: 1.45; pointer-events: none; }
+.gt-card[hidden] { display: none; }
+.gt-card b { color: #f0d9a8; } .gt-card small { display: block; margin-top: 6px; color: #8f8478; }

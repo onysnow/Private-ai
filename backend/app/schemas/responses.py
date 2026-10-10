@@ -3960,6 +3960,18 @@ class GlossaryTermOut(ResponseModel):
     areas: list[str]
 
 
+class GlossaryNameOut(ResponseModel):
+    text: str
+    exact: bool
+
+
+class GlossaryHintOut(ResponseModel):
+    term: str
+    definition: str
+    areas: list[str]
+    names: list[GlossaryNameOut]
+
+
 class GlossaryPageOut(ResponseModel):
     total: int
     terms: list[GlossaryTermOut]

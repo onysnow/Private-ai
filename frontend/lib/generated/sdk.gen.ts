@@ -516,6 +516,9 @@ import type {
   ListSourcesData,
   ListSourcesErrors,
   ListSourcesResponses,
+  ListTermHintsData,
+  ListTermHintsErrors,
+  ListTermHintsResponses,
   ListWriteupsEndpointData,
   ListWriteupsEndpointErrors,
   ListWriteupsEndpointResponses,
@@ -1062,6 +1065,7 @@ import {
   zListSourcesPath,
   zListSourcesQuery,
   zListSourcesResponse,
+  zListTermHintsResponse,
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
   zListWriteupsEndpointResponse,
@@ -1672,6 +1676,33 @@ export const getIndicator = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetIndicatorResponse.parseAsync(data),
     url: '/api/catalogue/indicators/{indicator_id}',
+    ...options,
+  });
+
+/**
+ * List Term Hints
+ *
+ * Every term, its definition and the names it is found by in text: what a hover card needs.
+ */
+export const listTermHints = <ThrowOnError extends boolean = false>(
+  options?: Options<ListTermHintsData, ThrowOnError>,
+): RequestResult<ListTermHintsResponses, ListTermHintsErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ListTermHintsResponses,
+    ListTermHintsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListTermHintsResponse.parseAsync(data),
+    url: '/api/catalogue/terms',
     ...options,
   });
 

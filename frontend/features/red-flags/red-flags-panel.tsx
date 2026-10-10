@@ -16,6 +16,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {RedFlagOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
+import {GlossaryText} from '../glossary/glossary-text';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 export const LEVEL: Record<string, {name: string; meaning: string}> = {
@@ -36,7 +37,7 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
   // Strong gets a thicker edge and a tinted band; Textbook a brick frame on every side,
   // a red band saying it meets the published definition, and more room.
   return <article className={`rf-card level-${flag.level}${flag.status !== 'open' ? ' decided' : ''}`} aria-label={`Red Flag: ${ind?.name ?? flag.indicator_id}`}>
-    {flag.level !== 'faint' && <div className="rf-band">{LEVEL[flag.level].name} · {LEVEL[flag.level].meaning}</div>}
+    {flag.level !== 'faint' && <div className="rf-band"><GlossaryText text={`${LEVEL[flag.level].name} · ${LEVEL[flag.level].meaning}`}/></div>}
     <header className="rf-head">
       <span className="rf-rank">{rank}</span>
       <div>
@@ -47,15 +48,15 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
     <div className="rf-who">{flag.parties.map(p => <button type="button" key={p.id} className="sv-pd rf-party"
       onMouseEnter={() => setPointed(p.id)} onMouseLeave={() => setPointed(null)} onFocus={() => setPointed(p.id)} onBlur={() => setPointed(null)}>
       <i style={{borderColor: PARTY[partyKind(p.schema)].ring}}/>{p.name}</button>)}</div>
-    <p className="rf-summary">{flag.summary}</p>
+    <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
     {ind && <>
-      <div className="rf-row"><b>Could be innocent.</b> {ind.innocent_explanations.map(t => t.replace(/[.;]\s*$/, '')).join('; ')}.</div>
-      <div className="rf-row"><b>The pattern.</b> {ind.definition}</div>
+      <div className="rf-row"><b>Could be innocent.</b> <GlossaryText text={`${ind.innocent_explanations.map(t => t.replace(/[.;]\s*$/, '')).join('; ')}.`}/></div>
+      <div className="rf-row"><b>The pattern.</b> <GlossaryText text={ind.definition}/></div>
       {source && <div className="rf-row"><b>Documented in.</b> <a href={source.url} target="_blank" rel="noreferrer">{source.publisher}, {source.title}</a>
         {source.locator ? `, ${source.locator}` : ''}: “{source.quote}”</div>}
-      <div className="rf-row"><b>This level.</b> {LEVEL[flag.level].name}: {ind.levels[flag.level as 'faint' | 'strong' | 'textbook']}</div>
+      <div className="rf-row"><b>This level.</b> <GlossaryText text={`${LEVEL[flag.level].name}: ${ind.levels[flag.level as 'faint' | 'strong' | 'textbook']}`}/></div>
       {ind.cross_hints.length > 0 && <div className="rf-row"><b>This may also point to.</b> {ind.cross_hints.map((h, i) => <span key={i}>
-        {i > 0 && ' '}<a href={h.source_url} target="_blank" rel="noreferrer">{h.target_area}</a>: {h.reason}</span>)}</div>}
+        {i > 0 && ' '}<a href={h.source_url} target="_blank" rel="noreferrer">{h.target_area}</a>: <GlossaryText text={h.reason}/></span>)}</div>}
     </>}
     <div className="rf-weight" aria-label={`Weight ${flag.weight}`}>
       <span>weight</span>

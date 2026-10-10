@@ -7113,6 +7113,42 @@ export type FontPairOut = {
 };
 
 /**
+ * GlossaryHintOut
+ */
+export type GlossaryHintOut = {
+  /**
+   * Areas
+   */
+  areas: Array<string>;
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Names
+   */
+  names: Array<GlossaryNameOut>;
+  /**
+   * Term
+   */
+  term: string;
+};
+
+/**
+ * GlossaryNameOut
+ */
+export type GlossaryNameOut = {
+  /**
+   * Exact
+   */
+  exact: boolean;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * GlossaryPageOut
  */
 export type GlossaryPageOut = {
@@ -14776,6 +14812,38 @@ export type GetIndicatorResponses = {
 
 export type GetIndicatorResponse =
   GetIndicatorResponses[keyof GetIndicatorResponses];
+
+export type ListTermHintsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/catalogue/terms';
+};
+
+export type ListTermHintsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListTermHintsError = ListTermHintsErrors[keyof ListTermHintsErrors];
+
+export type ListTermHintsResponses = {
+  /**
+   * Response List Term Hints
+   *
+   * Successful Response
+   */
+  200: Array<GlossaryHintOut>;
+};
+
+export type ListTermHintsResponse =
+  ListTermHintsResponses[keyof ListTermHintsResponses];
 
 export type CreateClaimEndpointData = {
   body: ClaimCreate;

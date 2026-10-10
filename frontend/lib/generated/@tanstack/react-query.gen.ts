@@ -177,6 +177,7 @@ import {
   listReportingTasks,
   listSourceEvidenceEndpoint,
   listSources,
+  listTermHints,
   listWriteupsEndpoint,
   makeLeadFromHit,
   makeLeadFromNote,
@@ -738,6 +739,9 @@ import type {
   ListSourcesData,
   ListSourcesError,
   ListSourcesResponse,
+  ListTermHintsData,
+  ListTermHintsError,
+  ListTermHintsResponse,
   ListWriteupsEndpointData,
   ListWriteupsEndpointError,
   ListWriteupsEndpointResponse,
@@ -1443,6 +1447,33 @@ export const getIndicatorOptions = (options: Options<GetIndicatorData>) =>
       return data;
     },
     queryKey: getIndicatorQueryKey(options),
+  });
+
+export const listTermHintsQueryKey = (options?: Options<ListTermHintsData>) =>
+  createQueryKey('listTermHints', options);
+
+/**
+ * List Term Hints
+ *
+ * Every term, its definition and the names it is found by in text: what a hover card needs.
+ */
+export const listTermHintsOptions = (options?: Options<ListTermHintsData>) =>
+  queryOptions<
+    ListTermHintsResponse,
+    ListTermHintsError,
+    ListTermHintsResponse,
+    ReturnType<typeof listTermHintsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listTermHints({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listTermHintsQueryKey(options),
   });
 
 /**

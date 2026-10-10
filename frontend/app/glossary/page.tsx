@@ -14,6 +14,7 @@ import {errorMessage} from '../../lib/api-client';
 import {getIndicatorOptions, listAreasOptions, searchGlossaryOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {GlossaryTermOut} from '../../lib/generated/types.gen';
 import {QueryProvider} from '../../lib/query-client';
+import {GlossaryText} from '../../features/glossary/glossary-text';
 
 const OUTCOME: Record<string, string> = {
   convicted: 'Convicted', settled: 'Settled', fined_by_regulator: 'Fined by a regulator',
@@ -38,16 +39,16 @@ function IndicatorDetail({id, onClose}: {id: string; onClose: () => void}): Reac
     {ind && <>
       <p className="wb-eyebrow">{ind.id} · {ind.area_name}{ind.status === 'pending' ? ' · pending checks' : ''}</p>
       <h2>{ind.name}</h2>
-      <p>{ind.definition}</p>
+      <p><GlossaryText text={ind.definition}/></p>
       <h4>Levels</h4>
       <dl className="gl-levels">
-        <dt>Faint</dt><dd>{ind.levels.faint}</dd>
-        <dt>Strong</dt><dd>{ind.levels.strong}</dd>
-        <dt>Textbook</dt><dd>{ind.levels.textbook}</dd>
+        <dt>Faint</dt><dd><GlossaryText text={ind.levels.faint}/></dd>
+        <dt>Strong</dt><dd><GlossaryText text={ind.levels.strong}/></dd>
+        <dt>Textbook</dt><dd><GlossaryText text={ind.levels.textbook}/></dd>
       </dl>
       {ind.levels.threshold_source !== 'none' && <p className="gl-small">Numbers from: {ind.levels.threshold_source}</p>}
       <h4>Could be innocent</h4>
-      <ul>{ind.innocent_explanations.map((t, i) => <li key={i}>{t}</li>)}</ul>
+      <ul>{ind.innocent_explanations.map((t, i) => <li key={i}><GlossaryText text={t}/></li>)}</ul>
       {ind.examples.length > 0 && <><h4>What it looks like</h4><ul>{ind.examples.map((t, i) => <li key={i}>{t}</li>)}</ul></>}
       <h4>How it can be checked</h4>
       <p>{CHECKABLE[ind.checkable]}{ind.lookup_sources.length ? `: ${ind.lookup_sources.join(', ')}` : ''}</p>
@@ -61,7 +62,7 @@ function IndicatorDetail({id, onClose}: {id: string; onClose: () => void}): Reac
         <b>{c.name}</b> ({c.year}, {c.jurisdiction}) · <span className={`gl-outcome ${c.outcome}`}>{OUTCOME[c.outcome] ?? c.outcome}</span>
         <p>{c.what_happened}</p><a href={c.source_url} target="_blank" rel="noreferrer">{c.source_title || 'Source'}</a></li>)}</ul></>}
       {ind.cross_hints.length > 0 && <><h4>This may also point to</h4><ul>{ind.cross_hints.map((h, i) => <li key={i}>
-        <b>{String(h.target_area)}</b>: {String(h.reason)} <a href={String(h.source_url)} target="_blank" rel="noreferrer">source</a></li>)}</ul></>}
+        <b>{String(h.target_area)}</b>: <GlossaryText text={String(h.reason)}/> <a href={String(h.source_url)} target="_blank" rel="noreferrer">source</a></li>)}</ul></>}
       {ind.jurisdictions && <p className="gl-small">Where it applies: {ind.jurisdictions}</p>}
     </>}
   </aside>;
@@ -70,11 +71,11 @@ function IndicatorDetail({id, onClose}: {id: string; onClose: () => void}): Reac
 function Term({term, onIndicator}: {term: GlossaryTermOut; onIndicator: (id: string) => void}): ReactElement {
   return <article className="gl-term" id={`term-${term.term.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
     <h3>{term.term} <small>{term.areas.join(' · ')}</small></h3>
-    <p>{term.definition}</p>
+    <p><GlossaryText text={term.definition} skip={term.term}/></p>
     {term.examples.length > 0 && <p className="gl-small"><b>Examples.</b> {term.examples.join(' · ')}</p>}
     {term.cases.length > 0 && <p className="gl-small"><b>Cases to look up.</b> {term.cases.join(' · ')}</p>}
     {term.related.length > 0 && <p className="gl-small"><b>Related.</b> {term.related.join(' · ')}</p>}
-    <p className="gl-small"><a href={term.source_url} target="_blank" rel="noreferrer">Source</a>
+    <p className="gl-small">{term.areas.includes('APP') ? <a href={term.source_url}>Where it is in the app</a> : <a href={term.source_url} target="_blank" rel="noreferrer">Source</a>}
       {term.indicators.length > 0 && <> · <b>Used by</b> {term.indicators.map(id => <button type="button" key={id} className="gl-ind" onClick={() => onIndicator(id)}>{id}</button>)}</>}
     </p>
   </article>;

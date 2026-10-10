@@ -54,14 +54,51 @@ def catalogue_glossary() -> list[dict[str, Any]]:
     return _glossary()
 
 
+# Glossary areas with no indicators: the app's own names (catalogue/glossary/app.yaml).
+GLOSSARY_ONLY = {"APP": ("The app's own names", "Names the app gives its own tools and levels.")}
+
+
 def catalogue_areas() -> list[dict[str, Any]]:
     cat = load()
     terms: dict[str, int] = {}
     for t in _glossary():
         for a in t["areas"]:
             terms[a] = terms.get(a, 0) + 1
-    return [{"key": a.key, "name": a.name, "scope": a.scope, "indicators": len(a.indicators),
-             "verified": sum(i.status.value == "verified" for i in a.indicators), "terms": terms.get(a.key, 0)} for a in cat.areas]
+    areas = [{"key": a.key, "name": a.name, "scope": a.scope, "indicators": len(a.indicators),
+              "verified": sum(i.status.value == "verified" for i in a.indicators), "terms": terms.get(a.key, 0)} for a in cat.areas]
+    return areas + [{"key": k, "name": n, "scope": s, "indicators": 0, "verified": 0, "terms": terms.get(k, 0)}
+                    for k, (n, s) in GLOSSARY_ONLY.items() if terms.get(k)]
+
+
+def _acronym(text: str) -> bool:
+    return " " not in text and sum(c.isupper() for c in text) >= 2
+
+
+def _names(term: str) -> list[str]:
+    """The ways a term is written in text. "3T / 3TG" is found as either. A part in
+    brackets is a second name only when one side is an acronym of the other kind:
+    "Bank Secrecy Act (BSA)", "HFC (hydrofluorocarbon)". Otherwise it says which
+    sense is meant ("Loitering (vessel)", "Travel Act (US)") and is not searched for.
+    Names under three letters, and under four unless in capitals, are left out."""
+    head, _, rest = term.partition(" (")
+    rest = rest.rstrip(")").strip()
+    parts = [head, rest] if rest and (_acronym(head) or _acronym(rest)) else [head]
+    out = [n.strip() for part in parts for n in part.split(" / ")]
+    return list(dict.fromkeys(n for n in out if len(n) >= 4 or (len(n) >= 3 and n.isupper())))
+
+
+@lru_cache(maxsize=1)
+def catalogue_term_hints() -> list[dict[str, Any]]:
+    """Every term with the names it is found by in text, for hover cards
+    (indicators.md: "a term written anywhere in the app shows a hover card").
+    A name is matched exactly as written when it is an acronym or one of the
+    app's own names (so "Strong" is not found in "strong"); otherwise in any case."""
+    out = []
+    for t in _glossary():
+        own = "APP" in t["areas"]
+        out.append({"term": t["term"], "definition": t["definition"], "areas": t["areas"],
+                    "names": [{"text": n, "exact": own or n.isupper()} for n in _names(t["term"])]})
+    return out
 
 
 def indicator(indicator_id: str) -> tuple[Indicator, str] | None:
