@@ -23,7 +23,7 @@ import {Table, TableBody, TableCell, TableRow} from '@/components/ui/table';
 import type {EntityFormSubmitPayload} from '../../components/entity-form';
 import {
   getInvestigationFinancialFlowsQueryKey, getInvestigationGraphOptions, getInvestigationGraphQueryKey, listEntitiesOptions, listEntitiesQueryKey,
-  listInvestigationEvidenceOptions,
+  getAllRecordTagsOptions, listInvestigationEvidenceOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {createCanonicalRelationship, createEntity} from '../../lib/generated/sdk.gen';
 import type {EntityOut, GraphOut} from '../../lib/generated/types.gen';
@@ -72,6 +72,13 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
   const entitiesQuery = useQuery({...listEntitiesOptions({path}), enabled});
   const graphQuery = useQuery({...graphOptions(investigationId, includeDuplicates), enabled});
   const evidenceQuery = useQuery({...listInvestigationEvidenceOptions({path}), enabled});
+  // The reporter's tags on parties: the network's tag layer.
+  const recordTags = useQuery({...getAllRecordTagsOptions({path}), enabled}).data;
+  const partyTags = useMemo(() => {
+    const out: Record<string, {name: string; colour: string}[]> = {};
+    for (const row of recordTags?.rows ?? []) if (row.record_type === 'entity') (out[row.record_id] ??= []).push({name: row.name, colour: row.colour});
+    return out;
+  }, [recordTags]);
   const entities = entitiesQuery.data ?? NO_ENTITIES;
   const graph = graphQuery.data;
   const relationships: GraphEdge[] = useMemo(() => (graph?.edges ?? []).filter(withEnds), [graph]);
@@ -156,7 +163,7 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
   return <section className="card graphCard" id="relationship-graph">
     <h3>Relationships</h3>
     <p className="muted">Every link is a FollowTheMoney relationship record. Reviewed duplicates are folded into the preferred record unless you show them; the originals stay traceable.</p>
-    <Graph key={investigationId} relationships={relationships} entities={entities} onNode={openDossier} onEdge={openEdge}
+    <Graph key={investigationId} investigationId={investigationId} partyTags={partyTags} relationships={relationships} entities={entities} onNode={openDossier} onEdge={openEdge}
       extraTools={<label className="cf-chip" style={{cursor: 'pointer'}}><Checkbox checked={includeDuplicates}
         onCheckedChange={(checked: boolean | 'indeterminate') => toggleDuplicates(checked === true)}/> Reviewed duplicate copies</label>}
       footnote={reconciliation.suppressed_duplicate_count > 0 ? `${reconciliation.visible_edge_count} links shown from ${reconciliation.underlying_edge_count} records; ${reconciliation.suppressed_duplicate_count} reviewed duplicate${reconciliation.suppressed_duplicate_count === 1 ? '' : 's'} folded into the preferred record.` : undefined}/>

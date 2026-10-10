@@ -202,6 +202,7 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
   .tl-warn { color: #d4a152 !important; }
   .tl-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; font-size: 12.5px; }
   .tl-actions a { color: #d4a152; }
+  .tl-event.tl-lit { box-shadow: 0 0 0 2px #d4a152; }
   .tl-add { margin-top: 16px; border: 1px solid #393941; border-radius: 8px; padding: 10px 14px; }
   .tl-add summary { cursor: pointer; color: #caaf9c; font-weight: 600; }
   @media (max-width: 720px) { .tl-event { grid-template-columns: 1fr; } .tl-actions { justify-content: flex-start; } }
@@ -399,3 +400,30 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
 /* The page is the card colour (Ony, 10 Oct 2026), so cards are set apart from
    it by a drop shadow for now. */
 .card, .wb-tile, .chart-frame, .sv-res, .sv-panel, .candidate, .finding { box-shadow: 0 1px 2px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.35); }
+
+/* The investigation's year slider (components/charts/year-slider.tsx). */
+@layer components {
+  .yr-slider { position: sticky; top: 8px; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 16px; background: #1c262b; border: 1px solid #4e4234; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.35); }
+  .yr-label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #baac91; font-weight: 700; }
+  .yr-value { font: 600 20px var(--font-heading); color: #f3e9d7; min-width: 5ch; }
+  .yr-end { font-size: 12px; color: #bc9574; font-variant-numeric: tabular-nums; }
+  .yr-slider input[type=range] { flex: 1 1 220px; accent-color: #d4a152; }
+  .yr-slider small { flex-basis: 100%; color: #bc9574; font-size: 12px; }
+}
+
+/* Dates on links, and "How are these two connected?" (features/relationship-graph/connections.tsx). */
+@layer components {
+  .net-link-date { position: absolute; pointer-events: none; font-size: 10.5px; color: #caaf9c; background: #1c262b; border-radius: 4px; padding: 0 4px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .nc { border-top: 1px solid #393941; padding: 10px 20px 14px; font-size: 13px; color: #caaf9c; }
+  .nc summary { cursor: pointer; font-weight: 600; color: #e6d6bf; }
+  .nc-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0; }
+  .nc-sum { color: #bc9574; margin: 6px 0; }
+  .nc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .nc-chain { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 3px; width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #393941; border-radius: 8px; background: #1c262b; }
+  .nc-chain:hover { border-color: #4e4234; } .nc-chain.on { box-shadow: 0 0 0 2px #d4a152; }
+  .nc-chain:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+  .nc-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+  .nc-steps b { color: #f3e9d7; font-weight: 600; }
+  .nc-link { font-size: 11.5px; color: #bc9574; border-bottom: 2px solid; margin: 0 4px; }
+  .nc-chain small { color: #bc9574; }
+}

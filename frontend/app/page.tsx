@@ -28,6 +28,7 @@ import {PlacesPanel} from '../features/places/places-panel';
 import {ProvenancePanel} from '../features/provenance/provenance-panel';
 import {withEnds} from '../features/relationship-graph/graph';
 import {StageRail, StageSection, StandingTiles, useStanding} from '../components/layout/workbench-page';
+import {YearSlider} from '../components/charts/year-slider';
 import {RelationshipGraphPanel} from '../features/relationship-graph/relationship-graph-panel';
 import {ReviewQueuePanel} from '../features/review-queue/review-queue-panel';
 import {SearchPanel} from '../features/search/search-panel';
@@ -186,6 +187,7 @@ function Workbench(): ReactElement {
       </StageSection>
 
       <StageSection stage="map">
+        <YearSlider investigationId={inv}/>
         <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
         <div id="timeline"><PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary></div>
         <div id="places"><PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary></div>

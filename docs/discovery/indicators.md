@@ -59,7 +59,10 @@ Status: proposed, 8 October 2026. The catalogue's data and tools exist (`catalog
 - **By default they stay inside the app:** an in-app notification, a small marker on the party or link in any chart, and the flag listed on the Red Flags (indicators) tab. No email or phone unless the reporter turns it on.
 - The safety panel ("Your safety") is built last, after the rest of the catalogue work is done.
 
+## Levels without a number (decided by Ony, 10 October 2026)
+
+Where an indicator's source gives no number, the indicator is researched again to find a published one (a regulator, standard-setter, court or study that states a threshold for that pattern). Only a number found in a source is used; one that cannot be found is reported as not found, never invented.
+
 ## Not yet decided (for Ony)
 
-1. The Faint and Strong levels wherever no source gives a threshold.
-2. Whether the DISARM framework (share-alike licence) should be imported whole, which would make the catalogue's DISARM part share-alike too.
+1. Whether the DISARM framework (share-alike licence) should be imported whole, which would make the catalogue's DISARM part share-alike too.

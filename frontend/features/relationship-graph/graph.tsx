@@ -23,7 +23,11 @@ import type {ReactElement} from 'react';
 import {ChartFrame, ContestedMark, FootStat, KeyRow, KeySection, LineSwatch, Segmented} from '../../components/charts/chart-frame';
 import {ConnectionGrid} from '../../components/connection-grid';
 import {KIND_ICON} from '../../components/network/party-icons';
-import type {NetLink, NetParty} from '../../components/network/network-view';
+import type {NetLink, NetOverlays, NetParty} from '../../components/network/network-view';
+import {isDated, linkSpan, shownAsOf} from '../../lib/as-of';
+import {useWorkbenchStore} from '../../lib/workbench-store';
+import {Connections} from './connections';
+import type {Chain} from './connections';
 import type {EntityOut, RelationshipEndpointOut, RelationshipOut} from '../../lib/generated/types.gen';
 import {NETWORK_SVG_LIMIT, chooseArrangement, dotRadius, mostLinked, ruleOf} from '../../lib/network-rules';
 import type {Arrangement, Placed} from '../../lib/network-rules';
@@ -89,7 +93,13 @@ type Props = {
   extraTools?: ReactElement;
   /** A line the panel adds to the footer. */
   footnote?: string;
+  /** The investigation, for "How are these two connected?". */
+  investigationId?: string;
+  /** The reporter's tags on parties, by party id, for the tag layer (the panel reads them). */
+  partyTags?: Record<string, {name: string; colour: string}[]>;
 };
+
+type Layer = 'tags' | 'dates';
 
 const ARRANGEMENTS: {value: Arrangement; label: string; title: string}[] = [
   {value: 'control', label: 'Who controls whom', title: 'Each owner or director above what it owns or directs'},
@@ -98,7 +108,21 @@ const ARRANGEMENTS: {value: Arrangement; label: string; title: string}[] = [
   {value: 'clusters', label: 'Linked groups', title: 'Parties that share links pulled together'},
 ];
 
-export function Graph({relationships, entities, onNode, onEdge, extraTools, footnote}: Props): ReactElement {
+export function Graph({relationships: allRelationships, entities, onNode, onEdge, extraTools, footnote, investigationId = '', partyTags}: Props): ReactElement {
+  // The year slider (lib/as-of.ts): links that did not hold by then are left out; undated ones stay.
+  const asOf = useWorkbenchStore(state => state.asOf);
+  const pointed = useWorkbenchStore(state => state.pointedParty);
+  const setPointed = useWorkbenchStore(state => state.setPointedParty);
+  const relationships = useMemo(() => allRelationships.filter(r => shownAsOf(linkSpan(r.properties), asOf)), [allRelationships, asOf]);
+  const undated = useMemo(() => allRelationships.filter(r => !isDated(linkSpan(r.properties))).length, [allRelationships]);
+  const [layers, setLayers] = useState<Set<Layer>>(new Set(['tags']));
+  const [chain, setChain] = useState<Chain | null>(null);
+  const overlays: NetOverlays = useMemo(() => {
+    const tags = layers.has('tags') ? partyTags ?? {} : {};
+    const dates: Record<string, string> = {};
+    if (layers.has('dates')) for (const r of relationships) { const start = linkSpan(r.properties).start; if (start) dates[r.id] = start; }
+    return {tags, dates, pointed, chain: chain ? {parties: new Set(chain.parties.map(p => p.id)), links: new Set(chain.links.map(l => l.id))} : null};
+  }, [layers, partyTags, relationships, pointed, chain]);
   const [view, setView] = useState<'network' | 'grid'>('network');
   const [picked, setPicked] = useState<Arrangement | null>(null);
   const [focus, setFocus] = useState<string | null>(null);
@@ -122,7 +146,8 @@ export function Graph({relationships, entities, onNode, onEdge, extraTools, foot
   const crossings = useMemo(() => (placed && view === 'network' && !large && links.every(l => placed.positions[l.from] && placed.positions[l.to])
     ? countCrossings(links, placed.positions) : null), [placed, links, view, large]);
 
-  if (!all.parties.length) return <div className="muted">No relationships match the current filter.</div>;
+  if (!all.parties.length) return <div className="muted">{asOf !== null && allRelationships.length
+    ? `No link had started by ${asOf}. Move the year slider later, or choose “All time”.` : 'No relationships match the current filter.'}</div>;
   const openLink = (id: string) => { const edge = relationships.find(r => r.id === id); if (edge) onEdge(edge); };
   const centreName = all.parties.find(p => p.id === centre)?.label;
   const rule = view === 'grid'
@@ -148,6 +173,10 @@ export function Graph({relationships, entities, onNode, onEdge, extraTools, foot
         <span className="cf-chip-line" style={{width: 14, height: 3, background: LINK[f].colour, display: 'inline-block', borderRadius: 2}}/>
         {LINK[f].name} · {all.links.filter(l => l.family === f).length}</button>)}
     </div>}
+    <div role="group" aria-label="Layers" style={{display: 'flex', flexWrap: 'wrap', gap: 6}}>
+      {([['tags', 'Your tags'], ['dates', 'Link dates']] as [Layer, string][]).map(([layer, name]) => <button key={layer} type="button" className="cf-chip"
+        aria-pressed={layers.has(layer)} onClick={() => setLayers(cur => { const next = new Set(cur); if (next.has(layer)) next.delete(layer); else next.add(layer); return next; })}>{name}</button>)}
+    </div>
     {extraTools}
   </>;
 
@@ -165,6 +194,10 @@ export function Graph({relationships, entities, onNode, onEdge, extraTools, foot
         ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 2}}><LineSwatch colour={SWATCH.sage} dash="6 5"/><ContestedMark size={14}/></span>
         : <LineSwatch colour={SWATCH.sage} dash={CERTAINTY[c].dash}/>}>{CERTAINTY[c].name}</KeyRow>)}
     </KeySection>
+    {view === 'network' && layers.has('tags') && Object.keys(overlays.tags ?? {}).length > 0 && <KeySection title="Your tags" channel="a ring outside the dot">
+      {Array.from(new Map(Object.values(overlays.tags ?? {}).flat().map(t => [t.name, t.colour])).entries()).map(([name, colour]) =>
+        <KeyRow key={name} swatch={<svg width="24" height="24"><circle cx="12" cy="12" r="7" fill="none" stroke={SWATCH.tan} strokeWidth="2"/><circle cx="12" cy="12" r="10" fill="none" stroke={colour} strokeWidth="3"/></svg>}>{name}</KeyRow>)}
+    </KeySection>}
     {view === 'network' && <KeySection title="Size">
       <KeyRow swatch={<svg width="36" height="26"><circle cx="9" cy="13" r={dotRadius(1) / 2} fill="none" stroke={SWATCH.tan}/><circle cx="25" cy="13" r={dotRadius(6) / 2} fill="none" stroke={SWATCH.tan}/></svg>}>
         A bigger dot has more links</KeyRow>
@@ -179,6 +212,7 @@ export function Graph({relationships, entities, onNode, onEdge, extraTools, foot
     {contested > 0 && <FootStat value={contested}>contested</FootStat>}
     {unsupported > 0 && <FootStat value={unsupported}>not yet supported</FootStat>}
     {crossings !== null && <span data-testid="graph-crossings">{crossingsLine(crossings, parties.length)}</span>}
+    {asOf !== null && <span>As of {asOf}: {allRelationships.length - relationships.length} of {allRelationships.length} links had not started or had ended{undated ? `; ${undated} undated always shown` : ''}.</span>}
     {footnote && <span>{footnote}</span>}
     <span>Point at a party or link for its details; click to open it.</span>
   </>;
@@ -189,6 +223,8 @@ export function Graph({relationships, entities, onNode, onEdge, extraTools, foot
       : view === 'grid' ? <div style={{padding: '12px 16px'}}><ConnectionGrid nodes={parties} links={links} onLink={openLink}/></div>
         : large ? <EntityGraph height={560} nodes={parties.map(p => ({id: p.id, label: p.label, schema: p.schema}))}
           edges={links.map(l => ({id: l.id, from: l.from, to: l.to, label: l.label, family: l.family}))} onNodeClick={onNode} onEdgeClick={openLink}/>
-          : <NetworkView parties={parties} links={links} arrangement={arrangement} focus={centre} onPlaced={onPlaced} onParty={onNode} onLink={openLink}/>}
+          : <NetworkView parties={parties} links={links} arrangement={arrangement} focus={centre} onPlaced={onPlaced} onParty={onNode} onLink={openLink}
+            overlays={overlays} onPoint={setPointed}/>}
+    {investigationId && view === 'network' && !large && <Connections investigationId={investigationId} parties={all.parties} chain={chain} onChain={setChain}/>}
   </ChartFrame>;
 }

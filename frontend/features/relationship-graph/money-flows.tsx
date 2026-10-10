@@ -14,6 +14,8 @@ import {getInvestigationFinancialFlowsOptions} from '../../lib/generated/@tansta
 import {BlockSwatch, ChartFrame, FootStat, KeyRow, KeySection} from '../../components/charts/chart-frame';
 import {FLOW_ROLE} from '../../components/charts/flow-roles';
 import {LINK} from '../../lib/viz-tokens';
+import {shownAsOf} from '../../lib/as-of';
+import {useWorkbenchStore} from '../../lib/workbench-store';
 
 const FinancialFlowSankey = dynamic(() => import('../../components/charts/financial-flow-sankey').then(m => m.FinancialFlowSankey), {ssr: false, loading: () => <p className="muted">Loading the flow chart…</p>});
 
@@ -26,7 +28,11 @@ type Props = {
 
 export function MoneyFlows({investigationId, wanted, onLoad}: Props): ReactElement {
   const ledgerQuery = useQuery({...getInvestigationFinancialFlowsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && wanted});
-  const ledger = wanted ? ledgerQuery.data : undefined;
+  // The year slider (lib/as-of.ts): payments not yet made by then are left out; undated ones stay.
+  const asOf = useWorkbenchStore(state => state.asOf);
+  const loaded = wanted ? ledgerQuery.data : undefined;
+  const ledger = loaded && asOf !== null ? {...loaded, transactions: loaded.transactions.filter(t => shownAsOf({start: t.dateTime || undefined}, asOf))} : loaded;
+  const later = loaded && ledger ? loaded.transactions.length - ledger.transactions.length : 0;
   const status = wanted && ledgerQuery.isFetching ? 'Loading money flows…' : wanted && ledgerQuery.isError ? errorMessage(ledgerQuery.error, 'Could not load money flows') : '';
 
   const load = () => {
@@ -51,6 +57,7 @@ export function MoneyFlows({investigationId, wanted, onLoad}: Props): ReactEleme
     footer={ledger ? <>
       <FootStat value={ledger.transactions.length}>{ledger.transactions.length === 1 ? 'payment' : 'payments'} charted</FootStat>
       {ledger.incomplete.length > 0 && <FootStat value={ledger.incomplete.length}>not charted, listed below with why</FootStat>}
+      {asOf !== null && <span>As of {asOf}: {later} later {later === 1 ? 'payment' : 'payments'} left out.</span>}
       <span>{ledger.flow_type_rule}</span>
     </> : undefined}>
     <div style={{padding: '10px 16px'}} data-testid="money-flows-canvas">

@@ -60,6 +60,13 @@ type WorkbenchState = {
    * search hit, a similar document), at the page that matched if known. */
   document: {serial: number; documentId: string; pageNumber: number | null} | null;
   openDocument: (documentId: string, pageNumber?: number | null) => void;
+  /** The investigation's year slider (lib/as-of.ts): the year every chart
+   * shows the state as of, or null for all time. */
+  asOf: number | null;
+  setAsOf: (year: number | null) => void;
+  /** The party pointed at in any chart: every other chart lights it too. */
+  pointedParty: string | null;
+  setPointedParty: (id: string | null) => void;
 };
 
 // Every request gets a serial no earlier request had, even after a new case
@@ -72,7 +79,7 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   investigationId: '',
   // A new case means a new trace, claim, dossier and relationship: nothing from the old one applies.
   setInvestigationId: id => set(state => (state.investigationId === id ? {investigationId: id}
-    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null})),
+    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, asOf: null, pointedParty: null})),
   entityId: '',
   setEntityId: id => set({entityId: id}),
   provenance: null,
@@ -87,4 +94,8 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   openRelationship: request => set({relationship: {serial: nextSerial(), request}}),
   document: null,
   openDocument: (documentId, pageNumber = null) => set({document: {serial: nextSerial(), documentId, pageNumber}}),
+  asOf: null,
+  setAsOf: year => set({asOf: year}),
+  pointedParty: null,
+  setPointedParty: id => set(state => (state.pointedParty === id ? state : {pointedParty: id})),
 }));

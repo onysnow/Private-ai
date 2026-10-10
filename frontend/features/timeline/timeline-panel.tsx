@@ -20,6 +20,7 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {ChartFrame, FootStat, KeyRow, KeySection} from '../../components/charts/chart-frame';
 import {EVENT_KIND_ORDER, EVENT_STATUS, SWATCH, eventKind, eventStatus} from '../../lib/viz-tokens';
 import {dateWords} from '../../lib/dates';
+import {shownAsOf} from '../../lib/as-of';
 
 // ECharts needs a browser canvas, so the chart is loaded on demand and never
 // counts against the page's first load.
@@ -81,7 +82,13 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
     onError: error => setProblem(errorMessage(error, 'Could not grade the event')),
   });
 
-  const events: TimelineEventOut[] = timeline.data?.events ?? [];
+  // The year slider (lib/as-of.ts): events that had not happened by then are left out.
+  const asOf = useWorkbenchStore(state => state.asOf);
+  const pointed = useWorkbenchStore(state => state.pointedParty);
+  const setPointed = useWorkbenchStore(state => state.setPointedParty);
+  const allEvents: TimelineEventOut[] = timeline.data?.events ?? [];
+  const events = allEvents.filter(e => shownAsOf({start: e.date_start}, asOf));
+  const partyOf = (e: TimelineEventOut) => text(e.refs.entity_id);
   const counts = timeline.data?.verification_counts ?? {};
 
   const kindsShown = [...EVENT_KIND_ORDER.filter(k => events.some(e => e.kind === k)), ...Array.from(new Set(events.map(e => e.kind))).filter(k => !EVENT_KIND_ORDER.includes(k))];
@@ -110,17 +117,20 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
     </CardHeader>
     <CardContent>
       {timeline.isError && <p className="muted">{errorMessage(timeline.error, 'Could not load the timeline')}</p>}
+      {asOf !== null && allEvents.length > 0 && events.length === 0 && <p className="muted">Nothing on the timeline had happened by {asOf}.</p>}
       {events.length > 0 && <ChartFrame kind="timeline" title="What happened when"
         rule={{label: 'Left to right by date:', text: 'one row per kind of event. A date known only to the month or year is a soft band over that month or year.'}}
         legend={legend}
         footer={<>
           {Object.entries(counts).map(([k, v]) => <FootStat key={k} value={v}>{eventStatus(k).name.toLowerCase()}</FootStat>)}
+          {asOf !== null && <span>As of {asOf}: {allEvents.length - events.length} later {allEvents.length - events.length === 1 ? 'event' : 'events'} left out.</span>}
           <span>Drag the bar under the chart, or scroll over it, to look at a stretch of time.</span>
         </>}>
         <div style={{padding: '8px 8px 0'}}><CaseTimeline events={events} height={Math.max(220, 90 + kindsShown.length * 56)}/></div>
       </ChartFrame>}
       {events.length > 0 && <ol className="tl-list" aria-label="Events in date order">
-        {events.map(e => <li key={e.id} className="tl-event" style={{borderLeftColor: eventKind(e.kind).colour}}>
+        {events.map(e => <li key={e.id} className={`tl-event${pointed && partyOf(e) === pointed ? ' tl-lit' : ''}`} style={{borderLeftColor: eventKind(e.kind).colour}}
+          onMouseEnter={() => { const party = partyOf(e); if (party) setPointed(party); }} onMouseLeave={() => { if (partyOf(e)) setPointed(null); }}>
           <div className="tl-when"><StatusMark colour={eventKind(e.kind).colour} status={e.verification_status}/>
             <span>{dateWords(e.date_start, e.precision)}{e.date_end ? ` to ${dateWords(e.date_end, e.precision)}` : ''}</span></div>
           <div className="tl-body">

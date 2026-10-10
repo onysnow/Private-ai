@@ -54,22 +54,36 @@ export function lineWidth(link: Pick<NetLink, 'family' | 'amount'>): number {
 }
 
 type Hover = {party: string | null; link: string | null};
-const HoverContext = createContext<{hover: Hover; setHover: (h: Hover) => void; lit: Set<string> | null}>({hover: {party: null, link: null}, setHover: () => {}, lit: null});
+/** What the overlays add (docs/discovery/README.md, "Overlays"): tag rings,
+ * dates on links, the party pointed at in another chart, and a chain to light. */
+export type NetOverlays = {
+  /** Tag colours per party, drawn as rings outside its dot (at most three). */
+  tags?: Record<string, {name: string; colour: string}[]>;
+  /** A date to write on each link (its start date or a payment's date). */
+  dates?: Record<string, string>;
+  /** The party pointed at in another chart. */
+  pointed?: string | null;
+  /** A chain from "How are these two connected?". */
+  chain?: {parties: Set<string>; links: Set<string>} | null;
+};
+type Ctx = {hover: Hover; setHover: (h: Hover) => void; lit: Set<string> | null; litLinks: Set<string> | null; focusParty: string | null; overlays: NetOverlays};
+const HoverContext = createContext<Ctx>({hover: {party: null, link: null}, setHover: () => {}, lit: null, litLinks: null, focusParty: null, overlays: {}});
 
 const HIDDEN_HANDLE = {opacity: 0, pointerEvents: 'none' as const, top: MAX_RADIUS + 2};
 
 type PartyData = {party: NetParty; links: number; lines: string[]; width: number; height: number; onParty?: (id: string) => void};
 
 function PartyNode({data}: NodeProps<Node<PartyData>>): ReactElement {
-  const {hover, setHover, lit} = useContext(HoverContext);
+  const {hover, setHover, lit, focusParty, overlays} = useContext(HoverContext);
   const {party, links, lines, width, onParty} = data;
+  const tagRings = (overlays.tags?.[party.id] ?? []).slice(0, 3);
   const look = PARTY[party.kind];
   const r = dotRadius(links);
   const Icon = KIND_ICON[party.kind];
   const dim = lit !== null && !lit.has(party.id);
-  const on = hover.party === party.id;
+  const on = hover.party === party.id || (hover.party === null && focusParty === party.id);
   return <button type="button" className="net-party" style={{width, opacity: dim ? 0.22 : 1}}
-    aria-label={`${party.label}, ${look.name}, ${links} link${links === 1 ? '' : 's'}`} title={`${party.label} · ${party.schema}`}
+    aria-label={`${party.label}, ${look.name}, ${links} link${links === 1 ? '' : 's'}${tagRings.length ? `, tagged ${tagRings.map(t => t.name).join(', ')}` : ''}`} title={`${party.label} · ${party.schema}`}
     onMouseEnter={() => setHover({party: party.id, link: null})} onMouseLeave={() => setHover({party: null, link: null})}
     onFocus={() => setHover({party: party.id, link: null})} onBlur={() => setHover({party: null, link: null})}
     onClick={() => onParty?.(party.id)}>
@@ -78,6 +92,7 @@ function PartyNode({data}: NodeProps<Node<PartyData>>): ReactElement {
     <Handle type="source" position={Position.Bottom} isConnectable={false} style={HIDDEN_HANDLE}/>
     <svg width={width} height={2 * MAX_RADIUS + 4} style={{display: 'block'}} aria-hidden>
       {on && <circle cx={width / 2} cy={MAX_RADIUS + 2} r={r + 4} fill="none" stroke={SWATCH.parchment} strokeWidth={1.5}/>}
+      {tagRings.map((t, i) => <circle key={t.name} cx={width / 2} cy={MAX_RADIUS + 2} r={r + 3.5 + i * 3.5} fill="none" stroke={t.colour} strokeWidth={3}><title>{t.name}</title></circle>)}
       <circle cx={width / 2} cy={MAX_RADIUS + 2} r={r} fill={look.fill} stroke={look.ring} strokeWidth={2.5}/>
       {Icon && <Icon x={width / 2 - r * 0.55} y={MAX_RADIUS + 2 - r * 0.55} width={r * 1.1} height={r * 1.1} color={look.ring} strokeWidth={2.2}/>}
     </svg>
@@ -117,20 +132,23 @@ export function linkPath(d: Pick<LinkData, 'x1' | 'y1' | 'x2' | 'y2' | 'r1' | 'r
 }
 
 function LinkEdge({id, data, markerEnd}: EdgeProps<Edge<LinkData>>): ReactElement | null {
-  const {hover, setHover, lit} = useContext(HoverContext);
+  const {hover, setHover, lit, litLinks, focusParty, overlays} = useContext(HoverContext);
   if (!data) return null;
   const {link, onLink} = data;
   const {path, mid} = linkPath(data);
   const colour = LINK[link.family].colour;
-  const touched = hover.party !== null && (link.from === hover.party || link.to === hover.party);
+  const party = hover.party ?? (hover.link ? null : focusParty);
+  const touched = litLinks ? litLinks.has(link.id) : party !== null && (link.from === party || link.to === party);
   const dim = lit !== null && !touched && hover.link !== id;
-  const showLabel = hover.link === id || touched;
+  const showLabel = hover.link === id || (touched && (hover.party !== null || litLinks !== null));
+  const date = overlays.dates?.[link.id];
   return <>
     <BaseEdge id={id} path={path} markerEnd={link.directed ? markerEnd : undefined} interactionWidth={14}
       style={{stroke: colour, strokeWidth: lineWidth(link), strokeDasharray: CERTAINTY[link.certainty].dash, opacity: dim ? 0.12 : 0.95}}/>
     <EdgeLabelRenderer>
       {link.certainty === 'contested' && <div className="net-contested nodrag nopan" style={{transform: `translate(-50%,-50%) translate(${mid.x}px,${mid.y}px)`, opacity: dim ? 0.2 : 1}}
         title="A supporting claim is disputed or rejected, or evidence contradicts this link">!</div>}
+      {date && !showLabel && <div className="net-link-date nodrag nopan" style={{transform: `translate(-50%,-50%) translate(${mid.x}px,${mid.y + (link.certainty === 'contested' ? 16 : 0)}px)`, opacity: dim ? 0.2 : 1}}>{date}</div>}
       {showLabel && <div className="net-link-label nodrag nopan" style={{transform: `translate(-50%,${link.certainty === 'contested' ? '-160%' : '-50%'}) translate(${mid.x}px,${mid.y}px)`, borderColor: colour}}>
         {link.label}{link.certainty !== 'supported' ? ` · ${link.certainty === 'contested' ? 'contested' : 'not yet supported'}` : ''}
       </div>}
@@ -181,10 +199,16 @@ type Props = {
   onParty?: (id: string) => void;
   onLink?: (id: string) => void;
   maxHeight?: number;
+  overlays?: NetOverlays;
+  /** Told which party is pointed at (or null), so other charts can light it. */
+  onPoint?: (id: string | null) => void;
 };
 
-export function NetworkView({parties, links, arrangement, focus, onPlaced, onParty, onLink, maxHeight = 720}: Props): ReactElement {
-  const [hover, setHover] = useState<Hover>({party: null, link: null});
+const NO_OVERLAYS: NetOverlays = {};
+
+export function NetworkView({parties, links, arrangement, focus, onPlaced, onParty, onLink, maxHeight = 720, overlays = NO_OVERLAYS, onPoint}: Props): ReactElement {
+  const [hover, setHoverState] = useState<Hover>({party: null, link: null});
+  const setHover = (h: Hover) => { setHoverState(h); onPoint?.(h.party); };
   const degree = useMemo(() => {
     const out = new Map(parties.map(p => [p.id, 0]));
     for (const l of links) { out.set(l.from, (out.get(l.from) ?? 0) + 1); out.set(l.to, (out.get(l.to) ?? 0) + 1); }
@@ -235,16 +259,22 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
     return {nodes, edges};
   }, [parties, links, placed, degree, onParty, onLink]);
 
-  // What is lit while a party or link is pointed at.
+  // What is lit while a party or link is pointed at here; else a chain
+  // being shown; else the party pointed at in another chart.
+  const focusParty = overlays.chain ? null : overlays.pointed && parties.some(p => p.id === overlays.pointed) ? overlays.pointed : null;
+  const litLinks = !hover.party && !hover.link && overlays.chain ? overlays.chain.links : null;
   const lit = useMemo(() => {
-    if (hover.party) {
-      const set = new Set([hover.party]);
-      for (const l of links) if (l.from === hover.party || l.to === hover.party) { set.add(l.from); set.add(l.to); }
+    const around = (id: string) => {
+      const set = new Set([id]);
+      for (const l of links) if (l.from === id || l.to === id) { set.add(l.from); set.add(l.to); }
       return set;
-    }
+    };
+    if (hover.party) return around(hover.party);
     if (hover.link) { const l = links.find(x => x.id === hover.link); return l ? new Set([l.from, l.to]) : null; }
+    if (overlays.chain) return overlays.chain.parties;
+    if (focusParty) return around(focusParty);
     return null;
-  }, [hover, links]);
+  }, [hover, links, overlays.chain, focusParty]);
 
   // As tall as the drawing is when fitted to the box's width (so a narrow
   // screen does not get a tall, mostly empty box), between 260 px and maxHeight.
@@ -261,7 +291,7 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
   }, []);
   const scale = boxWidth > 0 && placed.width > 0 ? Math.min(1.2, (boxWidth * 0.94) / placed.width) : 1;
   const height = Math.round(Math.min(maxHeight, Math.max(260, placed.height * scale + 48)));
-  return <HoverContext.Provider value={{hover, setHover, lit}}><ReactFlowProvider>
+  return <HoverContext.Provider value={{hover, setHover, lit, litLinks, focusParty, overlays}}><ReactFlowProvider>
     <ZoomBar/>
     <FitWhenResized height={height}/>
     <div ref={box} className="net-view" style={{height}} data-testid="network-view" data-arrangement={arrangement}>
