@@ -322,6 +322,14 @@ class VisualPreviewOut(ResponseModel):
 
 # --- Search ------------------------------------------------------------------
 
+class SearchPartyOut(ResponseModel):
+    id: str
+    name: str
+    schema_: str = Field(alias="schema")
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
 class SearchHitOut(ResponseModel):
     type: str
     group: str  # canonical | evidence | reporting | workflow | review | external_lead | other
@@ -333,6 +341,24 @@ class SearchHitOut(ResponseModel):
     # Each record type adds its own keys (locator, source_url, ...): kept open.
     provenance: dict[str, Any]
     metadata: dict[str, Any]
+    # What the redesigned search shows (app/services/search_view.py).
+    kind: Literal["party", "link", "evidence", "claim_event", "lead_task", "document", "outside"]
+    record_type: str | None = None  # the type tags and notes use; None for a statement, text passage or proposal
+    parties: list[SearchPartyOut] = []
+    sure: Literal["supported", "not_yet", "disputed", "rejected"] | None = None
+    date: str | None = None
+    matched_fields: list[str] = []
+    tags: list[TagChipOut] = []
+    note_count: int = 0
+
+
+class SearchFacetsOut(ResponseModel):
+    """Counts over every result the words found, before the filters: kind of
+    record, party kind (parties only), how sure, and tag id."""
+    kind: dict[str, int] = {}
+    party_kind: dict[str, int] = {}
+    sure: dict[str, int] = {}
+    tag: dict[str, int] = {}
 
 
 class SearchOut(ResponseModel):
@@ -342,6 +368,7 @@ class SearchOut(ResponseModel):
     returned: int = 0
     counts: dict[str, int]
     group_counts: dict[str, int] = {}
+    facets: SearchFacetsOut = SearchFacetsOut()
     results: list[SearchHitOut]
 
 
@@ -3747,3 +3774,32 @@ class CollectionOut(ResponseModel):
     created_at: Timestamp
     updated_at: Timestamp
     items: list[CollectionItemOut]
+
+
+class PeekNeighbourOut(ResponseModel):
+    """A party the peeked record links to, and the kind of link."""
+    id: str
+    name: str
+    schema_: str = Field(alias="schema")
+    link: str
+    outgoing: bool
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class PeekEventOut(ResponseModel):
+    id: str
+    title: str
+    date: str | None
+
+
+class PeekOut(ResponseModel):
+    """A search result on hover (app/services/search_view.py peek): up to eight
+    linked parties out of ``link_count``, evidence by stance, latest dated event."""
+    record_type: AnnotatedRecordType
+    record_id: str
+    caption: str | None
+    link_count: int
+    neighbours: list[PeekNeighbourOut]
+    evidence_by_stance: dict[str, int]
+    latest_event: PeekEventOut | None

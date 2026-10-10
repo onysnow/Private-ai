@@ -176,6 +176,7 @@ import {
   makeLeadFromNote,
   openalephIntegrationStatus,
   type Options,
+  peekAtRecord,
   presentationStyles,
   previewBackupRestore,
   previewTableMapping,
@@ -722,6 +723,9 @@ import type {
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
+  PeekAtRecordData,
+  PeekAtRecordError,
+  PeekAtRecordResponse,
   PresentationStylesData,
   PresentationStylesError,
   PresentationStylesResponse,
@@ -5331,6 +5335,33 @@ export const addNoteMutation = (
   return mutationOptions;
 };
 
+export const peekAtRecordQueryKey = (options: Options<PeekAtRecordData>) =>
+  createQueryKey('peekAtRecord', options);
+
+/**
+ * Peek At Record
+ *
+ * A search result on hover: the parties it links to, its evidence by stance, its latest event.
+ */
+export const peekAtRecordOptions = (options: Options<PeekAtRecordData>) =>
+  queryOptions<
+    PeekAtRecordResponse,
+    PeekAtRecordError,
+    PeekAtRecordResponse,
+    ReturnType<typeof peekAtRecordQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await peekAtRecord({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: peekAtRecordQueryKey(options),
+  });
+
 export const getInvestigationPlacesQueryKey = (
   options: Options<GetInvestigationPlacesData>,
 ) => createQueryKey('getInvestigationPlaces', options);
@@ -6661,6 +6692,7 @@ export const searchWorkbenchQueryKey = (
  * Search Workbench
  *
  * Search canonical and evidentiary records without conflating external findings with facts.
+ * One result per thing, with names for ids, facets, and the reporter's tags (app/services/search_view.py).
  */
 export const searchWorkbenchOptions = (options: Options<SearchWorkbenchData>) =>
   queryOptions<

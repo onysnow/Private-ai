@@ -3865,6 +3865,55 @@ export const zOwnershipChainOut = z.object({
 });
 
 /**
+ * PeekEventOut
+ */
+export const zPeekEventOut = z.object({
+  date: z.string().nullable(),
+  id: z.string(),
+  title: z.string(),
+});
+
+/**
+ * PeekNeighbourOut
+ *
+ * A party the peeked record links to, and the kind of link.
+ */
+export const zPeekNeighbourOut = z.object({
+  id: z.string(),
+  link: z.string(),
+  name: z.string(),
+  outgoing: z.boolean(),
+  schema: z.string(),
+});
+
+/**
+ * PeekOut
+ *
+ * A search result on hover (app/services/search_view.py peek): up to eight
+ * linked parties out of ``link_count``, evidence by stance, latest dated event.
+ */
+export const zPeekOut = z.object({
+  caption: z.string().nullable(),
+  evidence_by_stance: z.record(z.number().int()),
+  latest_event: zPeekEventOut.nullable(),
+  link_count: z.number().int(),
+  neighbours: z.array(zPeekNeighbourOut),
+  record_id: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+});
+
+/**
  * PlaceEventOut
  *
  * An event on the investigation's timeline that happened at a place:
@@ -4517,31 +4566,25 @@ export const zQuestionContextOut = z.object({
 export const zScale = z.enum(['linear', 'log']);
 
 /**
- * SearchHitOut
+ * SearchFacetsOut
+ *
+ * Counts over every result the words found, before the filters: kind of
+ * record, party kind (parties only), how sure, and tag id.
  */
-export const zSearchHitOut = z.object({
-  group: z.string(),
-  id: z.string(),
-  investigation_id: z.string(),
-  metadata: z.record(z.unknown()),
-  provenance: z.record(z.unknown()),
-  score: z.number(),
-  snippet: z.string(),
-  title: z.string(),
-  type: z.string(),
+export const zSearchFacetsOut = z.object({
+  kind: z.record(z.number().int()).optional().default({}),
+  party_kind: z.record(z.number().int()).optional().default({}),
+  sure: z.record(z.number().int()).optional().default({}),
+  tag: z.record(z.number().int()).optional().default({}),
 });
 
 /**
- * SearchOut
+ * SearchPartyOut
  */
-export const zSearchOut = z.object({
-  counts: z.record(z.number().int()),
-  group_counts: z.record(z.number().int()).optional().default({}),
-  investigation_id: z.string().nullish(),
-  query: z.string(),
-  results: z.array(zSearchHitOut),
-  returned: z.number().int().optional().default(0),
-  total: z.number().int(),
+export const zSearchPartyOut = z.object({
+  id: z.string(),
+  name: z.string(),
+  schema: z.string(),
 });
 
 /**
@@ -5233,6 +5276,56 @@ export const zRecordMarksOut = z.object({
     'finding',
   ]),
   tags: z.array(zTagChipOut),
+});
+
+/**
+ * SearchHitOut
+ */
+export const zSearchHitOut = z.object({
+  date: z.string().nullish(),
+  group: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  kind: z.enum([
+    'party',
+    'link',
+    'evidence',
+    'claim_event',
+    'lead_task',
+    'document',
+    'outside',
+  ]),
+  matched_fields: z.array(z.string()).optional().default([]),
+  metadata: z.record(z.unknown()),
+  note_count: z.number().int().optional().default(0),
+  parties: z.array(zSearchPartyOut).optional().default([]),
+  provenance: z.record(z.unknown()),
+  record_type: z.string().nullish(),
+  score: z.number(),
+  snippet: z.string(),
+  sure: z.enum(['supported', 'not_yet', 'disputed', 'rejected']).nullish(),
+  tags: z.array(zTagChipOut).optional().default([]),
+  title: z.string(),
+  type: z.string(),
+});
+
+/**
+ * SearchOut
+ */
+export const zSearchOut = z.object({
+  counts: z.record(z.number().int()),
+  facets: zSearchFacetsOut.optional().default({
+    kind: {},
+    party_kind: {},
+    sure: {},
+    tag: {},
+  }),
+  group_counts: z.record(z.number().int()).optional().default({}),
+  investigation_id: z.string().nullish(),
+  query: z.string(),
+  results: z.array(zSearchHitOut),
+  returned: z.number().int().optional().default(0),
+  total: z.number().int(),
 });
 
 /**
@@ -7841,6 +7934,31 @@ export const zAddNotePath = z.object({
  */
 export const zAddNoteResponse = zNoteOut;
 
+export const zPeekAtRecordPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zPeekAtRecordQuery = z.object({
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+  record_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPeekAtRecordResponse = zPeekOut;
+
 export const zGetInvestigationPlacesPath = z.object({
   investigation_id: z.string(),
 });
@@ -8287,6 +8405,30 @@ export const zSearchWorkbenchQuery = z.object({
   investigation_id: z.string().nullish(),
   limit: z.number().int().gte(1).lte(200).optional().default(50),
   include_reconciled_duplicates: z.boolean().optional().default(false),
+  kind: z
+    .enum([
+      'party',
+      'link',
+      'evidence',
+      'claim_event',
+      'lead_task',
+      'document',
+      'outside',
+    ])
+    .nullish(),
+  party_kind: z
+    .enum(['person', 'company', 'organisation', 'vehicle', 'property', 'other'])
+    .nullish(),
+  sure: z.enum(['supported', 'not_yet', 'disputed', 'rejected']).nullish(),
+  tag: z.string().nullish(),
+  date_from: z
+    .string()
+    .regex(/^\d{4}(-\d{2}(-\d{2})?)?$/)
+    .nullish(),
+  date_to: z
+    .string()
+    .regex(/^\d{4}(-\d{2}(-\d{2})?)?$/)
+    .nullish(),
 });
 
 /**

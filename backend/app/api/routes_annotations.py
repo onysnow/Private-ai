@@ -14,7 +14,7 @@ from app.schemas.api import (
     TagUpdate,
 )
 from app.schemas.responses import (
-    CollectionOut, CollectionsOut, LeadOut, NoteOut, NotesOut, RecordMarksOut, TaggedRecordsOut, TagsOut,
+    CollectionOut, CollectionsOut, LeadOut, NoteOut, NotesOut, PeekOut, RecordMarksOut, TaggedRecordsOut, TagsOut,
 )
 from app.services import annotations as svc
 from app.services.leads import serialize_lead
@@ -116,6 +116,18 @@ def get_record_marks(investigation_id: str, record_type: RecordType, record_id: 
     _investigation(db, investigation_id)
     try:
         return svc.record_marks(db, investigation_id, record_type, record_id)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc))
+
+
+@router.get("/investigations/{investigation_id}/peek", response_model=PeekOut)
+def peek_at_record(investigation_id: str, record_type: RecordType, record_id: str, db: Session = Depends(get_db)) -> Any:
+    """A search result on hover: the parties it links to, its evidence by stance, its latest event."""
+    from app.services.search_view import peek
+
+    _investigation(db, investigation_id)
+    try:
+        return peek(db, investigation_id, record_type, record_id)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
 

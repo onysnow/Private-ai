@@ -154,10 +154,12 @@ def _snippet(text: str | None, query: str, limit: int = 260) -> str:
     return prefix + text[start:end].strip() + suffix
 
 
-def investigation_search(db: Session, query: str, investigation_id: str | None = None, limit: int = 50, allowed_investigation_ids: set[str] | frozenset[str] | None = None, include_reconciled_duplicates: bool = False) -> dict:
+def investigation_search(db: Session, query: str, investigation_id: str | None = None, limit: int = 50, allowed_investigation_ids: set[str] | frozenset[str] | None = None, include_reconciled_duplicates: bool = False,
+                         *, kind: str | None = None, party_kind: str | None = None, sure: str | None = None, tag: str | None = None,
+                         date_from: str | None = None, date_to: str | None = None) -> dict:
     query = query.strip()
     if not query:
-        return {"query": query, "investigation_id": investigation_id, "total": 0, "results": [], "counts": {}}
+        return {"query": query, "investigation_id": investigation_id, "total": 0, "results": [], "counts": {}, "facets": {}}
 
     if investigation_id and db.get(Investigation, investigation_id) is None:
         raise ValueError("Investigation not found")
@@ -528,21 +530,28 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
                 {"schema": edge.schema, "source_entity_id": edge.source_entity_id, "target_entity_id": edge.target_entity_id, "reconciliation": reconciliation, "advisory": serialize_relationship(db, edge).get("advisory")},
             ))
 
-    hits.sort(key=lambda hit: (-hit.score, hit.type, hit.title.casefold(), hit.id))
-    total_matches = len(hits)
+    # One result per thing, names for ids, kind, parties, how sure, tags;
+    # facets over everything the words found; then the reporter's filters
+    # (app/services/search_view.py).
+    from app.services.search_view import shape_results
+
+    results, facets = shape_results(db, query, [hit.as_dict() for hit in hits], kind=kind, party_kind=party_kind,
+                                    sure=sure, tag=tag, date_from=date_from, date_to=date_to)
+    results.sort(key=lambda hit: (-hit["score"], hit["type"], hit["title"].casefold(), hit["id"]))
+    total_matches = len(results)
     counts: dict[str, int] = {}
     group_counts: dict[str, int] = {}
-    for hit in hits:
-        counts[hit.type] = counts.get(hit.type, 0) + 1
-        group = SEARCH_GROUPS.get(hit.type, "other")
-        group_counts[group] = group_counts.get(group, 0) + 1
-    hits = hits[: max(1, min(limit, 200))]
+    for result in results:
+        counts[result["type"]] = counts.get(result["type"], 0) + 1
+        group_counts[result["group"]] = group_counts.get(result["group"], 0) + 1
+    results = results[: max(1, min(limit, 200))]
     return {
         "query": query,
         "investigation_id": investigation_id,
         "total": total_matches,
-        "returned": len(hits),
+        "returned": len(results),
         "counts": counts,
         "group_counts": group_counts,
-        "results": [hit.as_dict() for hit in hits],
+        "facets": facets,
+        "results": results,
     }

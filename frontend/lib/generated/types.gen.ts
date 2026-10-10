@@ -9244,6 +9244,98 @@ export type OwnershipChainOwnerOut = {
 };
 
 /**
+ * PeekEventOut
+ */
+export type PeekEventOut = {
+  /**
+   * Date
+   */
+  date: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * PeekNeighbourOut
+ *
+ * A party the peeked record links to, and the kind of link.
+ */
+export type PeekNeighbourOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Link
+   */
+  link: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Outgoing
+   */
+  outgoing: boolean;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * PeekOut
+ *
+ * A search result on hover (app/services/search_view.py peek): up to eight
+ * linked parties out of ``link_count``, evidence by stance, latest dated event.
+ */
+export type PeekOut = {
+  /**
+   * Caption
+   */
+  caption: string | null;
+  /**
+   * Evidence By Stance
+   */
+  evidence_by_stance: {
+    [key: string]: number;
+  };
+  latest_event: PeekEventOut | null;
+  /**
+   * Link Count
+   */
+  link_count: number;
+  /**
+   * Neighbours
+   */
+  neighbours: Array<PeekNeighbourOut>;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding';
+};
+
+/**
  * PlaceEventOut
  *
  * An event on the investigation's timeline that happened at a place:
@@ -10690,9 +10782,46 @@ export type RetrievalSummaryOut = {
 export type Scale = 'linear' | 'log';
 
 /**
+ * SearchFacetsOut
+ *
+ * Counts over every result the words found, before the filters: kind of
+ * record, party kind (parties only), how sure, and tag id.
+ */
+export type SearchFacetsOut = {
+  /**
+   * Kind
+   */
+  kind?: {
+    [key: string]: number;
+  };
+  /**
+   * Party Kind
+   */
+  party_kind?: {
+    [key: string]: number;
+  };
+  /**
+   * Sure
+   */
+  sure?: {
+    [key: string]: number;
+  };
+  /**
+   * Tag
+   */
+  tag?: {
+    [key: string]: number;
+  };
+};
+
+/**
  * SearchHitOut
  */
 export type SearchHitOut = {
+  /**
+   * Date
+   */
+  date?: string | null;
   /**
    * Group
    */
@@ -10706,17 +10835,44 @@ export type SearchHitOut = {
    */
   investigation_id: string;
   /**
+   * Kind
+   */
+  kind:
+    | 'party'
+    | 'link'
+    | 'evidence'
+    | 'claim_event'
+    | 'lead_task'
+    | 'document'
+    | 'outside';
+  /**
+   * Matched Fields
+   */
+  matched_fields?: Array<string>;
+  /**
    * Metadata
    */
   metadata: {
     [key: string]: unknown;
   };
   /**
+   * Note Count
+   */
+  note_count?: number;
+  /**
+   * Parties
+   */
+  parties?: Array<SearchPartyOut>;
+  /**
    * Provenance
    */
   provenance: {
     [key: string]: unknown;
   };
+  /**
+   * Record Type
+   */
+  record_type?: string | null;
   /**
    * Score
    */
@@ -10725,6 +10881,14 @@ export type SearchHitOut = {
    * Snippet
    */
   snippet: string;
+  /**
+   * Sure
+   */
+  sure?: 'supported' | 'not_yet' | 'disputed' | 'rejected' | null;
+  /**
+   * Tags
+   */
+  tags?: Array<TagChipOut>;
   /**
    * Title
    */
@@ -10745,6 +10909,7 @@ export type SearchOut = {
   counts: {
     [key: string]: number;
   };
+  facets?: SearchFacetsOut;
   /**
    * Group Counts
    */
@@ -10771,6 +10936,24 @@ export type SearchOut = {
    * Total
    */
   total: number;
+};
+
+/**
+ * SearchPartyOut
+ */
+export type SearchPartyOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Schema
+   */
+  schema: string;
 };
 
 /**
@@ -18619,6 +18802,60 @@ export type AddNoteResponses = {
 
 export type AddNoteResponse = AddNoteResponses[keyof AddNoteResponses];
 
+export type PeekAtRecordData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query: {
+    /**
+     * Record Type
+     */
+    record_type:
+      | 'entity'
+      | 'relationship'
+      | 'evidence'
+      | 'source'
+      | 'claim'
+      | 'event'
+      | 'document'
+      | 'lead'
+      | 'task'
+      | 'finding';
+    /**
+     * Record Id
+     */
+    record_id: string;
+  };
+  url: '/api/investigations/{investigation_id}/peek';
+};
+
+export type PeekAtRecordErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PeekAtRecordError = PeekAtRecordErrors[keyof PeekAtRecordErrors];
+
+export type PeekAtRecordResponses = {
+  /**
+   * Successful Response
+   */
+  200: PeekOut;
+};
+
+export type PeekAtRecordResponse =
+  PeekAtRecordResponses[keyof PeekAtRecordResponses];
+
 export type GetInvestigationPlacesData = {
   body?: never;
   path: {
@@ -20165,6 +20402,51 @@ export type SearchWorkbenchData = {
      * Include Reconciled Duplicates
      */
     include_reconciled_duplicates?: boolean;
+    /**
+     * Kind
+     */
+    kind?:
+      | 'party'
+      | 'link'
+      | 'evidence'
+      | 'claim_event'
+      | 'lead_task'
+      | 'document'
+      | 'outside'
+      | null;
+    /**
+     * Party Kind
+     */
+    party_kind?:
+      | 'person'
+      | 'company'
+      | 'organisation'
+      | 'vehicle'
+      | 'property'
+      | 'other'
+      | null;
+    /**
+     * Sure
+     */
+    sure?: 'supported' | 'not_yet' | 'disputed' | 'rejected' | null;
+    /**
+     * Tag
+     *
+     * A tag id: only records carrying it.
+     */
+    tag?: string | null;
+    /**
+     * Date From
+     *
+     * Only dated records from this date (YYYY, YYYY-MM or YYYY-MM-DD).
+     */
+    date_from?: string | null;
+    /**
+     * Date To
+     *
+     * Only dated records up to this date.
+     */
+    date_to?: string | null;
   };
   url: '/api/search';
 };

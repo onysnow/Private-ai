@@ -19920,6 +19920,145 @@
         "title": "OwnershipChainOwnerOut",
         "type": "object"
       },
+      "PeekEventOut": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "date"
+        ],
+        "title": "PeekEventOut",
+        "type": "object"
+      },
+      "PeekNeighbourOut": {
+        "description": "A party the peeked record links to, and the kind of link.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "outgoing": {
+            "title": "Outgoing",
+            "type": "boolean"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "schema",
+          "link",
+          "outgoing"
+        ],
+        "title": "PeekNeighbourOut",
+        "type": "object"
+      },
+      "PeekOut": {
+        "description": "A search result on hover (app/services/search_view.py peek): up to eight\nlinked parties out of ``link_count``, evidence by stance, latest dated event.",
+        "properties": {
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "evidence_by_stance": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Evidence By Stance",
+            "type": "object"
+          },
+          "latest_event": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PeekEventOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link_count": {
+            "title": "Link Count",
+            "type": "integer"
+          },
+          "neighbours": {
+            "items": {
+              "$ref": "#/components/schemas/PeekNeighbourOut"
+            },
+            "title": "Neighbours",
+            "type": "array"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "enum": [
+              "entity",
+              "relationship",
+              "evidence",
+              "source",
+              "claim",
+              "event",
+              "document",
+              "lead",
+              "task",
+              "finding"
+            ],
+            "title": "Record Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id",
+          "caption",
+          "link_count",
+          "neighbours",
+          "evidence_by_stance",
+          "latest_event"
+        ],
+        "title": "PeekOut",
+        "type": "object"
+      },
       "PlaceEventOut": {
         "description": "An event on the investigation's timeline that happened at a place:\none about the place's own record (\"place\") or about a relationship\nlinking something to it (\"link\"). `first_day` and `last_day` are the\ndays its dates as recorded can mean; `exact` is false when a date is\nknown only to the month or year.",
         "properties": {
@@ -22385,8 +22524,58 @@
         "title": "Scale",
         "type": "string"
       },
+      "SearchFacetsOut": {
+        "description": "Counts over every result the words found, before the filters: kind of\nrecord, party kind (parties only), how sure, and tag id.",
+        "properties": {
+          "kind": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "Kind",
+            "type": "object"
+          },
+          "party_kind": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "Party Kind",
+            "type": "object"
+          },
+          "sure": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "Sure",
+            "type": "object"
+          },
+          "tag": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "Tag",
+            "type": "object"
+          }
+        },
+        "title": "SearchFacetsOut",
+        "type": "object"
+      },
       "SearchHitOut": {
         "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
           "group": {
             "title": "Group",
             "type": "string"
@@ -22399,15 +22588,60 @@
             "title": "Investigation Id",
             "type": "string"
           },
+          "kind": {
+            "enum": [
+              "party",
+              "link",
+              "evidence",
+              "claim_event",
+              "lead_task",
+              "document",
+              "outside"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "matched_fields": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Matched Fields",
+            "type": "array"
+          },
           "metadata": {
             "additionalProperties": true,
             "title": "Metadata",
             "type": "object"
           },
+          "note_count": {
+            "default": 0,
+            "title": "Note Count",
+            "type": "integer"
+          },
+          "parties": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SearchPartyOut"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
           "provenance": {
             "additionalProperties": true,
             "title": "Provenance",
             "type": "object"
+          },
+          "record_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Record Type"
           },
           "score": {
             "title": "Score",
@@ -22416,6 +22650,31 @@
           "snippet": {
             "title": "Snippet",
             "type": "string"
+          },
+          "sure": {
+            "anyOf": [
+              {
+                "enum": [
+                  "supported",
+                  "not_yet",
+                  "disputed",
+                  "rejected"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sure"
+          },
+          "tags": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/TagChipOut"
+            },
+            "title": "Tags",
+            "type": "array"
           },
           "title": {
             "title": "Title",
@@ -22435,7 +22694,8 @@
           "snippet",
           "score",
           "provenance",
-          "metadata"
+          "metadata",
+          "kind"
         ],
         "title": "SearchHitOut",
         "type": "object"
@@ -22448,6 +22708,15 @@
             },
             "title": "Counts",
             "type": "object"
+          },
+          "facets": {
+            "$ref": "#/components/schemas/SearchFacetsOut",
+            "default": {
+              "kind": {},
+              "party_kind": {},
+              "sure": {},
+              "tag": {}
+            }
           },
           "group_counts": {
             "additionalProperties": {
@@ -22496,6 +22765,29 @@
           "results"
         ],
         "title": "SearchOut",
+        "type": "object"
+      },
+      "SearchPartyOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "schema"
+        ],
+        "title": "SearchPartyOut",
         "type": "object"
       },
       "SecurityAlertsOut": {
@@ -42241,6 +42533,86 @@
         "summary": "Add Note"
       }
     },
+    "/api/investigations/{investigation_id}/peek": {
+      "get": {
+        "description": "A search result on hover: the parties it links to, its evidence by stance, its latest event.",
+        "operationId": "peek_at_record",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "record_type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "entity",
+                "relationship",
+                "evidence",
+                "source",
+                "claim",
+                "event",
+                "document",
+                "lead",
+                "task",
+                "finding"
+              ],
+              "title": "Record Type",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "record_id",
+            "required": true,
+            "schema": {
+              "title": "Record Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeekOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Peek At Record"
+      }
+    },
     "/api/investigations/{investigation_id}/places": {
       "get": {
         "description": "Every record with a latitude and a longitude, what is linked to it, and the records whose coordinates cannot be used, with why.",
@@ -44666,7 +45038,7 @@
     },
     "/api/search": {
       "get": {
-        "description": "Search canonical and evidentiary records without conflating external findings with facts.",
+        "description": "Search canonical and evidentiary records without conflating external findings with facts.\nOne result per thing, with names for ids, facets, and the reporter's tags (app/services/search_view.py).",
         "operationId": "search_workbench",
         "parameters": [
           {
@@ -44715,6 +45087,133 @@
               "default": false,
               "title": "Include Reconciled Duplicates",
               "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "party",
+                    "link",
+                    "evidence",
+                    "claim_event",
+                    "lead_task",
+                    "document",
+                    "outside"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "party_kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "person",
+                    "company",
+                    "organisation",
+                    "vehicle",
+                    "property",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Party Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sure",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "supported",
+                    "not_yet",
+                    "disputed",
+                    "rejected"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sure"
+            }
+          },
+          {
+            "description": "A tag id: only records carrying it.",
+            "in": "query",
+            "name": "tag",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A tag id: only records carrying it.",
+              "title": "Tag"
+            }
+          },
+          {
+            "description": "Only dated records from this date (YYYY, YYYY-MM or YYYY-MM-DD).",
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only dated records from this date (YYYY, YYYY-MM or YYYY-MM-DD).",
+              "title": "Date From"
+            }
+          },
+          {
+            "description": "Only dated records up to this date.",
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only dated records up to this date.",
+              "title": "Date To"
             }
           }
         ],

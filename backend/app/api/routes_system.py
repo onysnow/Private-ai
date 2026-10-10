@@ -13,7 +13,7 @@ here, and any real validation or persistence logic lives in the
 matching app/services/ module, following the pattern app/ai/reasoning.py
 already established for issue #36.
 """
-from typing import Any
+from typing import Any, Literal
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
@@ -104,15 +104,23 @@ def search_workbench(
     investigation_id: str | None = None,
     limit: int = Query(50, ge=1, le=200),
     include_reconciled_duplicates: bool = False,
+    kind: Literal["party", "link", "evidence", "claim_event", "lead_task", "document", "outside"] | None = None,
+    party_kind: Literal["person", "company", "organisation", "vehicle", "property", "other"] | None = None,
+    sure: Literal["supported", "not_yet", "disputed", "rejected"] | None = None,
+    tag: str | None = Query(None, description="A tag id: only records carrying it."),
+    date_from: str | None = Query(None, pattern=r"^\d{4}(-\d{2}(-\d{2})?)?$", description="Only dated records from this date (YYYY, YYYY-MM or YYYY-MM-DD)."),
+    date_to: str | None = Query(None, pattern=r"^\d{4}(-\d{2}(-\d{2})?)?$", description="Only dated records up to this date."),
     db: Session = Depends(get_db),
 ) -> Any:
-    """Search canonical and evidentiary records without conflating external findings with facts."""
+    """Search canonical and evidentiary records without conflating external findings with facts.
+    One result per thing, with names for ids, facets, and the reporter's tags (app/services/search_view.py)."""
     scope = scope_for_request(request)
     allowed_ids = None if scope.unrestricted else scope.investigation_ids
     try:
         return investigation_search(
             db, q, investigation_id=investigation_id, limit=limit,
             allowed_investigation_ids=allowed_ids, include_reconciled_duplicates=include_reconciled_duplicates,
+            kind=kind, party_kind=party_kind, sure=sure, tag=tag, date_from=date_from, date_to=date_to,
         )
     except ValueError as exc:
         raise HTTPException(404, str(exc))

@@ -510,6 +510,9 @@ import type {
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
+  PeekAtRecordData,
+  PeekAtRecordErrors,
+  PeekAtRecordResponses,
   PresentationStylesData,
   PresentationStylesErrors,
   PresentationStylesResponses,
@@ -1027,6 +1030,9 @@ import {
   zMakeLeadFromNotePath,
   zMakeLeadFromNoteResponse,
   zOpenalephIntegrationStatusResponse,
+  zPeekAtRecordPath,
+  zPeekAtRecordQuery,
+  zPeekAtRecordResponse,
   zPresentationStylesResponse,
   zPreviewBackupRestoreBody,
   zPreviewBackupRestoreResponse,
@@ -5420,6 +5426,33 @@ export const addNote = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Peek At Record
+ *
+ * A search result on hover: the parties it links to, its evidence by stance, its latest event.
+ */
+export const peekAtRecord = <ThrowOnError extends boolean = false>(
+  options: Options<PeekAtRecordData, ThrowOnError>,
+): RequestResult<PeekAtRecordResponses, PeekAtRecordErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    PeekAtRecordResponses,
+    PeekAtRecordErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zPeekAtRecordPath,
+          query: zPeekAtRecordQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPeekAtRecordResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/peek',
+    ...options,
+  });
+
+/**
  * Get Investigation Places
  *
  * Every record with a latitude and a longitude, what is linked to it, and the records whose coordinates cannot be used, with why.
@@ -6647,6 +6680,7 @@ export const updateReportingTaskEndpoint = <
  * Search Workbench
  *
  * Search canonical and evidentiary records without conflating external findings with facts.
+ * One result per thing, with names for ids, facets, and the reporter's tags (app/services/search_view.py).
  */
 export const searchWorkbench = <ThrowOnError extends boolean = false>(
   options: Options<SearchWorkbenchData, ThrowOnError>,
