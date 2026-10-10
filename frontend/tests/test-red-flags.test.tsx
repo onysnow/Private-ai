@@ -42,7 +42,8 @@ describe('RedFlagsPanel', () => {
     mockApi({'GET /api/investigations/inv-1/red-flags': body([flag])});
     wrap(<RedFlagsPanel investigationId="inv-1"/>);
     const card = await screen.findByRole('article', {name: 'Red Flag: Circular ownership'});
-    expect(within(card).getByText('Textbook')).toBeInTheDocument();
+    expect(within(card).getByText('Textbook · it meets the published definition or threshold')).toBeInTheDocument();
+    expect(card).toHaveClass('level-textbook');
     expect(within(card).getByText(/Group cross-holdings/)).toBeInTheDocument();
     expect(within(card).getByRole('link', {name: /FATF and Egmont Group/})).toHaveAttribute('href', 'https://example.test/fatf');
     expect(within(card).getByText(/-0.3 rests on a link not yet supported/)).toBeInTheDocument();

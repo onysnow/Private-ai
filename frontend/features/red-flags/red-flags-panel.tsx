@@ -32,13 +32,16 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
   const ind = flag.indicator;
   const source = ind?.sources[0];
   const max = Math.max(1.5, flag.weight);
-  return <article className={`rf-card${flag.status !== 'open' ? ' decided' : ''}`} aria-label={`Red Flag: ${ind?.name ?? flag.indicator_id}`}>
+  // The whole card rises with the level (Ony, 10 Oct 2026): Faint is a quiet card;
+  // Strong gets a thicker edge and a tinted band; Textbook a brick frame on every side,
+  // a red band saying it meets the published definition, and more room.
+  return <article className={`rf-card level-${flag.level}${flag.status !== 'open' ? ' decided' : ''}`} aria-label={`Red Flag: ${ind?.name ?? flag.indicator_id}`}>
+    {flag.level !== 'faint' && <div className="rf-band">{LEVEL[flag.level].name} · {LEVEL[flag.level].meaning}</div>}
     <header className="rf-head">
       <span className="rf-rank">{rank}</span>
       <div>
         <h4>{ind?.name ?? flag.indicator_id}</h4>
-        <span className={`rf-level ${flag.level}`} title={LEVEL[flag.level].meaning}>{LEVEL[flag.level].name}</span>
-        <small> {flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}</small>
+        <small>{flag.level === 'faint' ? `Faint · ${LEVEL.faint.meaning} · ` : ''}{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}</small>
       </div>
     </header>
     <div className="rf-who">{flag.parties.map(p => <button type="button" key={p.id} className="sv-pd rf-party"
@@ -75,6 +78,10 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
   </article>;
 }
 
+const LEVEL_ORDER = ['textbook', 'strong', 'faint'];
+/** Textbook flags first, then Strong, then Faint; by weight within a level (the server's order). */
+const byLevel = (a: RedFlagOut, b: RedFlagOut): number => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level);
+
 export function RedFlagsPanel({investigationId}: {investigationId: string}): ReactElement {
   const queryClient = useQueryClient();
   const path = {investigation_id: investigationId};
@@ -104,7 +111,7 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
     {query.data && !flags.length && <p className="sv-muted">No pattern fires on these records.</p>}
     {areas.map(area => <div key={area} className="rf-group">
       <h4 className="rf-area">{area}</h4>
-      {flags.filter(f => (f.indicator?.area_name ?? 'Other') === area).map(f => { rank += 1; return <FlagCard key={f.id} flag={f} rank={rank}
+      {flags.filter(f => (f.indicator?.area_name ?? 'Other') === area).sort(byLevel).map(f => { rank += 1; return <FlagCard key={f.id} flag={f} rank={rank}
         onLead={() => attempt(async () => { await lead.mutateAsync({path: {flag_id: f.id}}); await Promise.all([
           queryClient.invalidateQueries({queryKey: key}), queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})})]); }, 'Could not make the lead')}
         onDismiss={reason => attempt(async () => { queryClient.setQueryData(key, await dismiss.mutateAsync({path: {flag_id: f.id}, body: {reason}})); }, 'Could not set it aside')}
