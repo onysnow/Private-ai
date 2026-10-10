@@ -2450,6 +2450,324 @@
         "title": "CaseSynthesisRequest",
         "type": "object"
       },
+      "CatalogueAreaOut": {
+        "properties": {
+          "indicators": {
+            "title": "Indicators",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "terms": {
+            "title": "Terms",
+            "type": "integer"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "scope",
+          "indicators",
+          "verified",
+          "terms"
+        ],
+        "title": "CatalogueAreaOut",
+        "type": "object"
+      },
+      "CatalogueCaseOut": {
+        "properties": {
+          "jurisdiction": {
+            "title": "Jurisdiction",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "outcome": {
+            "title": "Outcome",
+            "type": "string"
+          },
+          "outcome_verified": {
+            "title": "Outcome Verified",
+            "type": "boolean"
+          },
+          "source_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Title"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "what_happened": {
+            "title": "What Happened",
+            "type": "string"
+          },
+          "year": {
+            "title": "Year",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "year",
+          "jurisdiction",
+          "what_happened",
+          "outcome",
+          "outcome_verified",
+          "source_url"
+        ],
+        "title": "CatalogueCaseOut",
+        "type": "object"
+      },
+      "CatalogueIndicatorOut": {
+        "description": "One indicator as the catalogue holds it (catalogue/indicators/*.yaml).",
+        "properties": {
+          "area_name": {
+            "title": "Area Name",
+            "type": "string"
+          },
+          "areas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueCaseOut"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "checkable": {
+            "enum": [
+              "records",
+              "lookups",
+              "person"
+            ],
+            "title": "Checkable",
+            "type": "string"
+          },
+          "cross_hints": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Cross Hints",
+            "type": "array"
+          },
+          "data_needed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Data Needed",
+            "type": "array"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "examples": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Examples",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "innocent_explanations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Innocent Explanations",
+            "type": "array"
+          },
+          "jurisdictions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jurisdictions"
+          },
+          "levels": {
+            "$ref": "#/components/schemas/FlagLevelsOut"
+          },
+          "lookup_sources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Lookup Sources",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueSourceOut"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "pending"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "threshold_verified": {
+            "title": "Threshold Verified",
+            "type": "boolean"
+          },
+          "typology": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Typology"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "definition",
+          "areas",
+          "area_name",
+          "status",
+          "sources",
+          "examples",
+          "cases",
+          "data_needed",
+          "checkable",
+          "lookup_sources",
+          "levels",
+          "threshold_verified",
+          "cross_hints",
+          "innocent_explanations",
+          "version"
+        ],
+        "title": "CatalogueIndicatorOut",
+        "type": "object"
+      },
+      "CatalogueSourceOut": {
+        "properties": {
+          "checked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked"
+          },
+          "licence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Licence"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "publisher": {
+            "title": "Publisher",
+            "type": "string"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "quote_verified": {
+            "title": "Quote Verified",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "title",
+          "publisher",
+          "url",
+          "quote",
+          "quote_verified"
+        ],
+        "title": "CatalogueSourceOut",
+        "type": "object"
+      },
       "ChainOut": {
         "properties": {
           "links": {
@@ -16036,6 +16354,90 @@
         "title": "FontPairOut",
         "type": "object"
       },
+      "GlossaryPageOut": {
+        "properties": {
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/GlossaryTermOut"
+            },
+            "title": "Terms",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "terms"
+        ],
+        "title": "GlossaryPageOut",
+        "type": "object"
+      },
+      "GlossaryTermOut": {
+        "properties": {
+          "areas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "cases": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "examples": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Examples",
+            "type": "array"
+          },
+          "indicators": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Indicators",
+            "type": "array"
+          },
+          "related": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Related",
+            "type": "array"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "string"
+          }
+        },
+        "required": [
+          "term",
+          "definition",
+          "examples",
+          "source_url",
+          "cases",
+          "related",
+          "indicators",
+          "areas"
+        ],
+        "title": "GlossaryTermOut",
+        "type": "object"
+      },
       "GraphNodeOut": {
         "description": "A canonical entity that is an endpoint of a shown edge.",
         "properties": {
@@ -28561,6 +28963,191 @@
           }
         },
         "summary": "Capabilities"
+      }
+    },
+    "/api/catalogue/areas": {
+      "get": {
+        "description": "Every area of the catalogue, with how many indicators and terms it holds.",
+        "operationId": "list_areas",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CatalogueAreaOut"
+                  },
+                  "title": "Response List Areas",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Areas"
+      }
+    },
+    "/api/catalogue/glossary": {
+      "get": {
+        "description": "Terms whose name or definition holds the words, names first; one area or all.",
+        "operationId": "search_glossary",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 200,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "area",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Z]{2}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Area"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlossaryPageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Search Glossary"
+      }
+    },
+    "/api/catalogue/indicators/{indicator_id}": {
+      "get": {
+        "description": "One indicator in full: definition, levels, sources, cases, data needed, cross-hints, innocent explanations.",
+        "operationId": "get_indicator",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "indicator_id",
+            "required": true,
+            "schema": {
+              "title": "Indicator Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueIndicatorOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Indicator"
       }
     },
     "/api/claims": {

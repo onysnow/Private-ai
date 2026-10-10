@@ -603,6 +603,47 @@ export const zCaseSynthesisRequest = z.object({
 });
 
 /**
+ * CatalogueAreaOut
+ */
+export const zCatalogueAreaOut = z.object({
+  indicators: z.number().int(),
+  key: z.string(),
+  name: z.string(),
+  scope: z.string(),
+  terms: z.number().int(),
+  verified: z.number().int(),
+});
+
+/**
+ * CatalogueCaseOut
+ */
+export const zCatalogueCaseOut = z.object({
+  jurisdiction: z.string(),
+  name: z.string(),
+  outcome: z.string(),
+  outcome_verified: z.boolean(),
+  source_title: z.string().nullish(),
+  source_url: z.string(),
+  what_happened: z.string(),
+  year: z.string(),
+});
+
+/**
+ * CatalogueSourceOut
+ */
+export const zCatalogueSourceOut = z.object({
+  checked: z.string().nullish(),
+  licence: z.string().nullish(),
+  locator: z.string().nullish(),
+  publisher: z.string(),
+  quote: z.string(),
+  quote_verified: z.boolean(),
+  title: z.string(),
+  url: z.string(),
+  year: z.string().nullish(),
+});
+
+/**
  * ChainPartyOut
  */
 export const zChainPartyOut = z.object({
@@ -2637,6 +2678,33 @@ export const zFlagLevelsOut = z.object({
 });
 
 /**
+ * CatalogueIndicatorOut
+ *
+ * One indicator as the catalogue holds it (catalogue/indicators*.yaml).
+ */
+export const zCatalogueIndicatorOut = z.object({
+  area_name: z.string(),
+  areas: z.array(z.string()),
+  cases: z.array(zCatalogueCaseOut),
+  checkable: z.enum(['records', 'lookups', 'person']),
+  cross_hints: z.array(z.record(z.unknown())),
+  data_needed: z.array(z.string()),
+  definition: z.string(),
+  examples: z.array(z.string()),
+  id: z.string(),
+  innocent_explanations: z.array(z.string()),
+  jurisdictions: z.string().nullish(),
+  levels: zFlagLevelsOut,
+  lookup_sources: z.array(z.string()),
+  name: z.string(),
+  sources: z.array(zCatalogueSourceOut),
+  status: z.enum(['verified', 'pending']),
+  threshold_verified: z.boolean(),
+  typology: z.string().nullish(),
+  version: z.number().int(),
+});
+
+/**
  * FlagPartyOut
  */
 export const zFlagPartyOut = z.object({
@@ -2684,6 +2752,28 @@ export const zFontPairOut = z.object({
   heading: z.string(),
   id: z.string(),
   label: z.string(),
+});
+
+/**
+ * GlossaryTermOut
+ */
+export const zGlossaryTermOut = z.object({
+  areas: z.array(z.string()),
+  cases: z.array(z.string()),
+  definition: z.string(),
+  examples: z.array(z.string()),
+  indicators: z.array(z.string()),
+  related: z.array(z.string()),
+  source_url: z.string(),
+  term: z.string(),
+});
+
+/**
+ * GlossaryPageOut
+ */
+export const zGlossaryPageOut = z.object({
+  terms: z.array(zGlossaryTermOut),
+  total: z.number().int(),
 });
 
 /**
@@ -6739,6 +6829,37 @@ export const zGetBasemapTileResponse = z.string();
  * Successful Response
  */
 export const zCapabilitiesResponse = zCapabilitiesOut;
+
+/**
+ * Response List Areas
+ *
+ * Successful Response
+ */
+export const zListAreasResponse = z.array(zCatalogueAreaOut);
+
+export const zSearchGlossaryQuery = z.object({
+  q: z.string().max(200).optional().default(''),
+  area: z
+    .string()
+    .regex(/^[A-Z]{2}$/)
+    .nullish(),
+  limit: z.number().int().gte(1).lte(500).optional().default(100),
+  offset: z.number().int().gte(0).optional().default(0),
+});
+
+/**
+ * Successful Response
+ */
+export const zSearchGlossaryResponse = zGlossaryPageOut;
+
+export const zGetIndicatorPath = z.object({
+  indicator_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetIndicatorResponse = zCatalogueIndicatorOut;
 
 export const zCreateClaimEndpointBody = zClaimCreate;
 

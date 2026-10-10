@@ -276,6 +276,9 @@ import type {
   GetIdentifierTargetsData,
   GetIdentifierTargetsErrors,
   GetIdentifierTargetsResponses,
+  GetIndicatorData,
+  GetIndicatorErrors,
+  GetIndicatorResponses,
   GetIngestionBatchData,
   GetIngestionBatchErrors,
   GetIngestionBatchResponses,
@@ -408,6 +411,9 @@ import type {
   ListAppUsersData,
   ListAppUsersErrors,
   ListAppUsersResponses,
+  ListAreasData,
+  ListAreasErrors,
+  ListAreasResponses,
   ListAssessmentsData,
   ListAssessmentsErrors,
   ListAssessmentsResponses,
@@ -618,6 +624,9 @@ import type {
   SaveConnectorCredentialData,
   SaveConnectorCredentialErrors,
   SaveConnectorCredentialResponses,
+  SearchGlossaryData,
+  SearchGlossaryErrors,
+  SearchGlossaryResponses,
   SearchInvestigationCorpusData,
   SearchInvestigationCorpusErrors,
   SearchInvestigationCorpusResponses,
@@ -871,6 +880,8 @@ import {
   zGetExtractionOpenalephMatchesResponse,
   zGetIdentifierTargetsPath,
   zGetIdentifierTargetsResponse,
+  zGetIndicatorPath,
+  zGetIndicatorResponse,
   zGetIngestionBatchPath,
   zGetIngestionBatchResponse,
   zGetInvestigationFinancialFlowsPath,
@@ -970,6 +981,7 @@ import {
   zLinkLeadPath,
   zLinkLeadResponse,
   zListAppUsersResponse,
+  zListAreasResponse,
   zListAssessmentsPath,
   zListAssessmentsResponse,
   zListClaimEvidenceEndpointPath,
@@ -1136,6 +1148,8 @@ import {
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
   zSaveConnectorCredentialResponse,
+  zSearchGlossaryQuery,
+  zSearchGlossaryResponse,
   zSearchInvestigationCorpusPath,
   zSearchInvestigationCorpusQuery,
   zSearchInvestigationCorpusResponse,
@@ -1577,6 +1591,87 @@ export const capabilities = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCapabilitiesResponse.parseAsync(data),
     url: '/api/capabilities',
+    ...options,
+  });
+
+/**
+ * List Areas
+ *
+ * Every area of the catalogue, with how many indicators and terms it holds.
+ */
+export const listAreas = <ThrowOnError extends boolean = false>(
+  options?: Options<ListAreasData, ThrowOnError>,
+): RequestResult<ListAreasResponses, ListAreasErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ListAreasResponses,
+    ListAreasErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListAreasResponse.parseAsync(data),
+    url: '/api/catalogue/areas',
+    ...options,
+  });
+
+/**
+ * Search Glossary
+ *
+ * Terms whose name or definition holds the words, names first; one area or all.
+ */
+export const searchGlossary = <ThrowOnError extends boolean = false>(
+  options?: Options<SearchGlossaryData, ThrowOnError>,
+): RequestResult<SearchGlossaryResponses, SearchGlossaryErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    SearchGlossaryResponses,
+    SearchGlossaryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zSearchGlossaryQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSearchGlossaryResponse.parseAsync(data),
+    url: '/api/catalogue/glossary',
+    ...options,
+  });
+
+/**
+ * Get Indicator
+ *
+ * One indicator in full: definition, levels, sources, cases, data needed, cross-hints, innocent explanations.
+ */
+export const getIndicator = <ThrowOnError extends boolean = false>(
+  options: Options<GetIndicatorData, ThrowOnError>,
+): RequestResult<GetIndicatorResponses, GetIndicatorErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetIndicatorResponses,
+    GetIndicatorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetIndicatorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetIndicatorResponse.parseAsync(data),
+    url: '/api/catalogue/indicators/{indicator_id}',
     ...options,
   });
 

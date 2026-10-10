@@ -36,6 +36,34 @@ def _catalogue() -> dict[str, tuple[Indicator, str]]:
     return {i.id: (i, a.name) for a in load().areas for i in a.indicators}
 
 
+@lru_cache(maxsize=1)
+def _glossary() -> list[dict[str, Any]]:
+    cat = load()
+    merged: dict[str, dict[str, Any]] = {}
+    for g in cat.glossaries:
+        for t in g.terms:
+            key = t.term.strip().lower()
+            row = merged.setdefault(key, {**t.model_dump(mode="json"), "areas": []})
+            row["areas"] = sorted(set(row["areas"]) | set(t.areas or [g.area]))
+            for field in ("indicators", "related", "cases", "examples"):
+                row[field] = list(dict.fromkeys([*row.get(field, []), *getattr(t, field)]))
+    return sorted(merged.values(), key=lambda t: t["term"].lower())
+
+
+def catalogue_glossary() -> list[dict[str, Any]]:
+    return _glossary()
+
+
+def catalogue_areas() -> list[dict[str, Any]]:
+    cat = load()
+    terms: dict[str, int] = {}
+    for t in _glossary():
+        for a in t["areas"]:
+            terms[a] = terms.get(a, 0) + 1
+    return [{"key": a.key, "name": a.name, "scope": a.scope, "indicators": len(a.indicators),
+             "verified": sum(i.status.value == "verified" for i in a.indicators), "terms": terms.get(a.key, 0)} for a in cat.areas]
+
+
 def indicator(indicator_id: str) -> tuple[Indicator, str] | None:
     return _catalogue().get(indicator_id)
 

@@ -97,6 +97,7 @@ import {
   getExtractionEntityMatches,
   getExtractionOpenalephMatches,
   getIdentifierTargets,
+  getIndicator,
   getIngestionBatch,
   getInvestigationFinancialFlows,
   getInvestigationGraph,
@@ -141,6 +142,7 @@ import {
   linkClaimEvidenceEndpoint,
   linkLead,
   listAppUsers,
+  listAreas,
   listAssessments,
   listClaimEvidenceEndpoint,
   listClaims,
@@ -212,6 +214,7 @@ import {
   rotateAppUserToken,
   runTableMapping,
   saveConnectorCredential,
+  searchGlossary,
   searchInvestigationCorpus,
   searchWorkbench,
   seedDemo,
@@ -495,6 +498,9 @@ import type {
   GetIdentifierTargetsData,
   GetIdentifierTargetsError,
   GetIdentifierTargetsResponse,
+  GetIndicatorData,
+  GetIndicatorError,
+  GetIndicatorResponse,
   GetIngestionBatchData,
   GetIngestionBatchError,
   GetIngestionBatchResponse,
@@ -627,6 +633,9 @@ import type {
   ListAppUsersData,
   ListAppUsersError,
   ListAppUsersResponse,
+  ListAreasData,
+  ListAreasError,
+  ListAreasResponse,
   ListAssessmentsData,
   ListAssessmentsError,
   ListAssessmentsResponse,
@@ -837,6 +846,9 @@ import type {
   SaveConnectorCredentialData,
   SaveConnectorCredentialError,
   SaveConnectorCredentialResponse,
+  SearchGlossaryData,
+  SearchGlossaryError,
+  SearchGlossaryResponse,
   SearchInvestigationCorpusData,
   SearchInvestigationCorpusError,
   SearchInvestigationCorpusResponse,
@@ -1262,6 +1274,175 @@ export const capabilitiesOptions = (options?: Options<CapabilitiesData>) =>
       return data;
     },
     queryKey: capabilitiesQueryKey(options),
+  });
+
+export const listAreasQueryKey = (options?: Options<ListAreasData>) =>
+  createQueryKey('listAreas', options);
+
+/**
+ * List Areas
+ *
+ * Every area of the catalogue, with how many indicators and terms it holds.
+ */
+export const listAreasOptions = (options?: Options<ListAreasData>) =>
+  queryOptions<
+    ListAreasResponse,
+    ListAreasError,
+    ListAreasResponse,
+    ReturnType<typeof listAreasQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listAreas({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listAreasQueryKey(options),
+  });
+
+export const searchGlossaryQueryKey = (options?: Options<SearchGlossaryData>) =>
+  createQueryKey('searchGlossary', options);
+
+/**
+ * Search Glossary
+ *
+ * Terms whose name or definition holds the words, names first; one area or all.
+ */
+export const searchGlossaryOptions = (options?: Options<SearchGlossaryData>) =>
+  queryOptions<
+    SearchGlossaryResponse,
+    SearchGlossaryError,
+    SearchGlossaryResponse,
+    ReturnType<typeof searchGlossaryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await searchGlossary({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: searchGlossaryQueryKey(options),
+  });
+
+const createInfiniteParams = <
+  K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>,
+>(
+  queryKey: QueryKey<Options>,
+  page: K,
+) => {
+  const params = { ...queryKey[0] };
+  if (page.body) {
+    params.body = {
+      ...(queryKey[0].body as any),
+      ...(page.body as any),
+    };
+  }
+  if (page.headers) {
+    params.headers = {
+      ...queryKey[0].headers,
+      ...page.headers,
+    };
+  }
+  if (page.path) {
+    params.path = {
+      ...(queryKey[0].path as any),
+      ...(page.path as any),
+    };
+  }
+  if (page.query) {
+    params.query = {
+      ...(queryKey[0].query as any),
+      ...(page.query as any),
+    };
+  }
+  return params as unknown as typeof page;
+};
+
+export const searchGlossaryInfiniteQueryKey = (
+  options?: Options<SearchGlossaryData>,
+): QueryKey<Options<SearchGlossaryData>> =>
+  createQueryKey('searchGlossary', options, true);
+
+/**
+ * Search Glossary
+ *
+ * Terms whose name or definition holds the words, names first; one area or all.
+ */
+export const searchGlossaryInfiniteOptions = (
+  options?: Options<SearchGlossaryData>,
+) => {
+  const opts = infiniteQueryOptions<
+    SearchGlossaryResponse,
+    SearchGlossaryError,
+    InfiniteData<SearchGlossaryResponse>,
+    QueryKey<Options<SearchGlossaryData>>,
+    | number
+    | Pick<
+        QueryKey<Options<SearchGlossaryData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<SearchGlossaryData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await searchGlossary({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: searchGlossaryInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getIndicatorQueryKey = (options: Options<GetIndicatorData>) =>
+  createQueryKey('getIndicator', options);
+
+/**
+ * Get Indicator
+ *
+ * One indicator in full: definition, levels, sources, cases, data needed, cross-hints, innocent explanations.
+ */
+export const getIndicatorOptions = (options: Options<GetIndicatorData>) =>
+  queryOptions<
+    GetIndicatorResponse,
+    GetIndicatorError,
+    GetIndicatorResponse,
+    ReturnType<typeof getIndicatorQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getIndicator({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getIndicatorQueryKey(options),
   });
 
 /**
@@ -3805,40 +3986,6 @@ export const listInvestigationAiAnalysisCandidatesOptions = (
     },
     queryKey: listInvestigationAiAnalysisCandidatesQueryKey(options),
   });
-
-const createInfiniteParams = <
-  K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>,
->(
-  queryKey: QueryKey<Options>,
-  page: K,
-) => {
-  const params = { ...queryKey[0] };
-  if (page.body) {
-    params.body = {
-      ...(queryKey[0].body as any),
-      ...(page.body as any),
-    };
-  }
-  if (page.headers) {
-    params.headers = {
-      ...queryKey[0].headers,
-      ...page.headers,
-    };
-  }
-  if (page.path) {
-    params.path = {
-      ...(queryKey[0].path as any),
-      ...(page.path as any),
-    };
-  }
-  if (page.query) {
-    params.query = {
-      ...(queryKey[0].query as any),
-      ...(page.query as any),
-    };
-  }
-  return params as unknown as typeof page;
-};
 
 export const listInvestigationAiAnalysisCandidatesInfiniteQueryKey = (
   options: Options<ListInvestigationAiAnalysisCandidatesData>,

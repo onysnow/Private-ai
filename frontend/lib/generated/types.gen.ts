@@ -1435,6 +1435,199 @@ export type CaseSynthesisRequest = {
 };
 
 /**
+ * CatalogueAreaOut
+ */
+export type CatalogueAreaOut = {
+  /**
+   * Indicators
+   */
+  indicators: number;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Scope
+   */
+  scope: string;
+  /**
+   * Terms
+   */
+  terms: number;
+  /**
+   * Verified
+   */
+  verified: number;
+};
+
+/**
+ * CatalogueCaseOut
+ */
+export type CatalogueCaseOut = {
+  /**
+   * Jurisdiction
+   */
+  jurisdiction: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Outcome
+   */
+  outcome: string;
+  /**
+   * Outcome Verified
+   */
+  outcome_verified: boolean;
+  /**
+   * Source Title
+   */
+  source_title?: string | null;
+  /**
+   * Source Url
+   */
+  source_url: string;
+  /**
+   * What Happened
+   */
+  what_happened: string;
+  /**
+   * Year
+   */
+  year: string;
+};
+
+/**
+ * CatalogueIndicatorOut
+ *
+ * One indicator as the catalogue holds it (catalogue/indicators*.yaml).
+ */
+export type CatalogueIndicatorOut = {
+  /**
+   * Area Name
+   */
+  area_name: string;
+  /**
+   * Areas
+   */
+  areas: Array<string>;
+  /**
+   * Cases
+   */
+  cases: Array<CatalogueCaseOut>;
+  /**
+   * Checkable
+   */
+  checkable: 'records' | 'lookups' | 'person';
+  /**
+   * Cross Hints
+   */
+  cross_hints: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Data Needed
+   */
+  data_needed: Array<string>;
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Examples
+   */
+  examples: Array<string>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Innocent Explanations
+   */
+  innocent_explanations: Array<string>;
+  /**
+   * Jurisdictions
+   */
+  jurisdictions?: string | null;
+  levels: FlagLevelsOut;
+  /**
+   * Lookup Sources
+   */
+  lookup_sources: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Sources
+   */
+  sources: Array<CatalogueSourceOut>;
+  /**
+   * Status
+   */
+  status: 'verified' | 'pending';
+  /**
+   * Threshold Verified
+   */
+  threshold_verified: boolean;
+  /**
+   * Typology
+   */
+  typology?: string | null;
+  /**
+   * Version
+   */
+  version: number;
+};
+
+/**
+ * CatalogueSourceOut
+ */
+export type CatalogueSourceOut = {
+  /**
+   * Checked
+   */
+  checked?: string | null;
+  /**
+   * Licence
+   */
+  licence?: string | null;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Publisher
+   */
+  publisher: string;
+  /**
+   * Quote
+   */
+  quote: string;
+  /**
+   * Quote Verified
+   */
+  quote_verified: boolean;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url: string;
+  /**
+   * Year
+   */
+  year?: string | null;
+};
+
+/**
  * ChainOut
  */
 export type ChainOut = {
@@ -6917,6 +7110,58 @@ export type FontPairOut = {
    * Label
    */
   label: string;
+};
+
+/**
+ * GlossaryPageOut
+ */
+export type GlossaryPageOut = {
+  /**
+   * Terms
+   */
+  terms: Array<GlossaryTermOut>;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * GlossaryTermOut
+ */
+export type GlossaryTermOut = {
+  /**
+   * Areas
+   */
+  areas: Array<string>;
+  /**
+   * Cases
+   */
+  cases: Array<string>;
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Examples
+   */
+  examples: Array<string>;
+  /**
+   * Indicators
+   */
+  indicators: Array<string>;
+  /**
+   * Related
+   */
+  related: Array<string>;
+  /**
+   * Source Url
+   */
+  source_url: string;
+  /**
+   * Term
+   */
+  term: string;
 };
 
 /**
@@ -14417,6 +14662,120 @@ export type CapabilitiesResponses = {
 
 export type CapabilitiesResponse =
   CapabilitiesResponses[keyof CapabilitiesResponses];
+
+export type ListAreasData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/catalogue/areas';
+};
+
+export type ListAreasErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListAreasError = ListAreasErrors[keyof ListAreasErrors];
+
+export type ListAreasResponses = {
+  /**
+   * Response List Areas
+   *
+   * Successful Response
+   */
+  200: Array<CatalogueAreaOut>;
+};
+
+export type ListAreasResponse = ListAreasResponses[keyof ListAreasResponses];
+
+export type SearchGlossaryData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Q
+     */
+    q?: string;
+    /**
+     * Area
+     */
+    area?: string | null;
+    /**
+     * Limit
+     */
+    limit?: number;
+    /**
+     * Offset
+     */
+    offset?: number;
+  };
+  url: '/api/catalogue/glossary';
+};
+
+export type SearchGlossaryErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SearchGlossaryError =
+  SearchGlossaryErrors[keyof SearchGlossaryErrors];
+
+export type SearchGlossaryResponses = {
+  /**
+   * Successful Response
+   */
+  200: GlossaryPageOut;
+};
+
+export type SearchGlossaryResponse =
+  SearchGlossaryResponses[keyof SearchGlossaryResponses];
+
+export type GetIndicatorData = {
+  body?: never;
+  path: {
+    /**
+     * Indicator Id
+     */
+    indicator_id: string;
+  };
+  query?: never;
+  url: '/api/catalogue/indicators/{indicator_id}';
+};
+
+export type GetIndicatorErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetIndicatorError = GetIndicatorErrors[keyof GetIndicatorErrors];
+
+export type GetIndicatorResponses = {
+  /**
+   * Successful Response
+   */
+  200: CatalogueIndicatorOut;
+};
+
+export type GetIndicatorResponse =
+  GetIndicatorResponses[keyof GetIndicatorResponses];
 
 export type CreateClaimEndpointData = {
   body: ClaimCreate;

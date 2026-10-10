@@ -218,6 +218,8 @@ _NOT_INVESTIGATION_RECORDS = {
     # The base map (routes_basemap.py): a tile's zoom and column and row, a font
     # stack and glyph range, a sprite file. The same for every investigation.
     "z", "x", "y", "stack", "glyph_range",
+    # The indicator catalogue (routes_catalogue.py): the same for every investigation.
+    "indicator_id",
 }
 
 

@@ -3936,3 +3936,76 @@ class RedFlagsOut(ResponseModel):
     rules: list[RuleOut]
     flags: list[RedFlagOut]
     gone: list[RedFlagOut]
+
+
+# --- The indicator catalogue and glossary (app/api/routes_catalogue.py) -----------
+
+class CatalogueAreaOut(ResponseModel):
+    key: str
+    name: str
+    scope: str
+    indicators: int
+    verified: int
+    terms: int
+
+
+class GlossaryTermOut(ResponseModel):
+    term: str
+    definition: str
+    examples: list[str]
+    source_url: str
+    cases: list[str]
+    related: list[str]
+    indicators: list[str]
+    areas: list[str]
+
+
+class GlossaryPageOut(ResponseModel):
+    total: int
+    terms: list[GlossaryTermOut]
+
+
+class CatalogueSourceOut(ResponseModel):
+    title: str
+    publisher: str
+    year: str | None = None
+    url: str
+    locator: str | None = None
+    quote: str
+    quote_verified: bool
+    licence: str | None = None
+    checked: str | None = None
+
+
+class CatalogueCaseOut(ResponseModel):
+    name: str
+    year: str
+    jurisdiction: str
+    what_happened: str
+    outcome: str
+    outcome_verified: bool
+    source_url: str
+    source_title: str | None = None
+
+
+class CatalogueIndicatorOut(ResponseModel):
+    """One indicator as the catalogue holds it (catalogue/indicators/*.yaml)."""
+    id: str
+    name: str
+    definition: str
+    areas: list[str]
+    area_name: str
+    typology: str | None = None
+    status: Literal["verified", "pending"]
+    sources: list[CatalogueSourceOut]
+    examples: list[str]
+    cases: list[CatalogueCaseOut]
+    data_needed: list[str]
+    checkable: Literal["records", "lookups", "person"]
+    lookup_sources: list[str]
+    levels: FlagLevelsOut
+    threshold_verified: bool
+    cross_hints: list[dict[str, Any]]
+    innocent_explanations: list[str]
+    jurisdictions: str | None = None
+    version: int
