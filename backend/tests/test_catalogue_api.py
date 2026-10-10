@@ -15,7 +15,7 @@ def ok(reply):
 def test_areas_glossary_search_and_one_indicator():
     areas = ok(client.get("/api/catalogue/areas"))
     found = [a for a in areas if a["key"] != "APP"]
-    assert len(found) == 22 and all(a["indicators"] >= a["verified"] > 0 for a in found)
+    assert len(found) == 23 and all(a["indicators"] >= a["verified"] > 0 for a in found)
     assert all(a["summary"] and len(a["summary"]) < 120 for a in areas), "a plain line for people choosing a type"
     own = next(a for a in areas if a["key"] == "APP")
     assert own["indicators"] == 0 and own["terms"] >= 4

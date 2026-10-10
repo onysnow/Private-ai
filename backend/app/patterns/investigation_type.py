@@ -9,7 +9,7 @@ the app chooses).
 2. The kinds of records: a kind of record (an FtM schema) points to an area
    only when it says something about the case. Kinds that most areas need
    (Person, Company, Payment, Address, Organization) point nowhere. A kind
-   needed by indicators in at most 8 of the 22 areas points to the area where
+   needed by indicators in at most 8 of the areas points to the area where
    the largest share of indicators needs it, if that share is at least 15%
    (and to any other area within 80% of that share): Security points to
    securities market abuse, ContractAward to corruption and procurement,

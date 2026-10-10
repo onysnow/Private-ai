@@ -52,6 +52,8 @@ AREAS: dict[str, str] = {
     "EF": "Elder financial exploitation", "MA": "Securities market abuse", "AF": "Corporate accounting fraud",
     "PD": "Prescription drug diversion", "LE": "Labour exploitation and wage theft",
     "PM": "Police misconduct and state violence", "CA": "Child sexual abuse in institutions",
+    # Added 10 October 2026 at Ony's request.
+    "HO": "Homicide and suspicious deaths",
 }
 
 # One plain line per area for people choosing an investigation's type (the
@@ -79,6 +81,7 @@ AREA_SUMMARIES: dict[str, str] = {
     "LE": "Underpaying or cheating workers short of forced labour, such as wage theft.",
     "PM": "Misconduct and violence by police and other state officers.",
     "CA": "Child sexual abuse in churches, schools, sport and care, and how institutions respond.",
+    "HO": "Murders and suspicious deaths: botched death probes, possible serial killings, wrongful convictions, contract killings.",
 }
 
 

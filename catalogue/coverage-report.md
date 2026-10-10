@@ -2,7 +2,7 @@
 
 Made 10 October 2026 from the files in catalogue/.
 
-**1464 indicators in 22 areas; 1426 verified, 38 pending. 1151 glossary terms.**
+**1621 indicators in 23 areas; 1582 verified, 39 pending. 1297 glossary terms.**
 
 | Area | Indicators | Verified | From records | After lookups | Person only | Cases | Cross-hints | Sources not reached |
 |---|---|---|---|---|---|---|---|---|
@@ -15,6 +15,7 @@ Made 10 October 2026 from the files in catalogue/.
 | EN Environmental crime | 82 | 72 | 22 | 56 | 4 | 26 | 34 | 20 |
 | ES Espionage and insider threat | 42 | 42 | 19 | 12 | 11 | 24 | 5 | 11 |
 | FR Tax evasion and fraud | 97 | 89 | 43 | 36 | 18 | 25 | 31 | 18 |
+| HO Homicide and suspicious deaths | 157 | 156 | 101 | 40 | 16 | 66 | 90 | 48 |
 | HR Human rights abuses, war crimes and cultural property | 110 | 110 | 21 | 64 | 25 | 77 | 37 | 21 |
 | HT Human trafficking and forced labour | 67 | 67 | 31 | 13 | 23 | 20 | 35 | 21 |
 | IN Information integrity | 55 | 55 | 18 | 26 | 11 | 33 | 16 | 25 |
@@ -51,6 +52,7 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - **FR-065** Shares or funds journalled between unrelated accounts for no clear reason: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
 - **FR-066** Securities paid for by third parties with no clear link to the customer: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
 - **FR-067** Multiple or nominee brokerage accounts, or brokerage used as a bank: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **HO-104** Clearance figures padded with exceptional clearances or old cases: case outcome not confirmed: Chicago Police clearance-rate claim
 - **LE-024** Cashback: workers made to hand back part of their wages: case outcome not confirmed: Fair Work Ombudsman v Rubee Enterprises Pty Ltd and Fares Ghazale (Canteen Cuisine, Albury); case outcome not confirmed: Fair Work Ombudsman v Innovative Associates Pty Ltd and Dila Ram Kharel
 - **ML-095** Undisclosed second citizenship or changed identity details from an investment passport: quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
 - **ML-096** New investment passport used soon after issue to open accounts or set up companies: quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
@@ -224,6 +226,56 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - FBI advance-fee schemes page: the fetch failed. The glossary definition is sourced to the FinCEN joint notice.
 - CFPB power-of-attorney definition: the page I fetched had no definition, so I added no glossary entry for power of attorney.
 - Some FinCEN quotes reached me cut short by the fetch tool (FinCEN elder advisory, check alert, timeshare notice). The quoted text matches the start of each red flag but is not the full sentence. Re-check the full wording against the PDFs before publishing.
+
+**HO Homicide and suspicious deaths**
+- NAME Forensic Autopsy Performance Standards: the primary PDF (ospd.ms.gov copy) failed to load; the B3 list was taken from Washoe County's reproduction and a National Academies presentation. The thename.org original was not opened.
+- Minnesota Protocol: text extraction stopped at about para. 123, so Section V.D (autopsy), the annex on autopsy signs of torture, and the guidance on releasing bodies were not reached and are not quoted.
+- Shipman Inquiry First Report (215 deaths, pattern of deaths) primary text not opened. The figure comes from the AP report on Police1. Third Report quotes are from the Summary only.
+- Shipman Inquiry Second Report full text not opened. Quotes are from the GOV.UK summary page.
+- Thirlwall Inquiry report (Sept 2026) volumes and summary not opened. Findings are quoted from Browne Jacobson's legal summary and AP coverage. I did not check whether Lucy Letby's convictions are under review by the Criminal Cases Review Commission or otherwise.
+- Goudge Inquiry report (Ontario, 2008) primary volumes not reached because the archive page carried no text. Findings come from CMAJ and JAAPL. The phrase 'think dirty' was not found in any source I opened.
+- Gosport Panel findings on death certification and the coroner (other chapters) not reached. HO-026 rests on a fetch-tool summary of paras. 12.57-12.61, not a verbatim quote.
+- Stephen Port Regulation 28 / PFD reports on eastlondoninquests.org.uk not opened directly. They are quoted through HMICFRS, Doughty Street and Guernsey Press/PA.
+- Clothier Report (1994, Beverley Allitt) primary text not reached. The BMJ article is paywalled beyond its opening lines.
+- Ontario Coroners Act s.10 (deaths that must be reported) not reached because the e-Laws page needs JavaScript.
+- 2009 NAS report 'Strengthening Forensic Science' executive summary PDF failed to load. Its findings are quoted only through NIJ.
+- OSAC/ASB published medicolegal death investigation standards beyond the 2019 proposed organisational standard were not checked. That document covers scene and chain-of-custody standards only by reference to NIJ guidance.
+- Office of the Chief Coroner (England and Wales) guidance other than the PFD chapter (e.g. guidance on post-mortems, Article 2 inquests) not reached.
+- Charles Cullen hospital-failure details come from 2004 CBS reporting. NJ Senate or state reviews not opened.
+- Niels Högel: German court and parliamentary findings on hospital failures not reached. The English coverage I opened did not cover missed warnings.
+- Byford Report (1981, Yorkshire Ripper): the gov.uk PDFs are image scans with no readable text and the archive.org text copy is blocked by robots.txt, so no quotes on repeated interviews of Sutcliffe or incident-room overload were taken
+- Washington Post 'Murder with Impunity' article page would not load; used the Post's published GitHub methodology instead
+- FBI ViCAP page le.fbi.gov/services/vicap failed to load; ViCAP criteria taken from New Jersey State Police and Montana DOJ copies of the FBI brochure
+- FBI Serial Murder report final ~9,000 characters (after offset 100000) not read
+- MAP 'Missing Murders 2020' report PDF and 2019 Chicago strangulations report PDF on Dropbox not opened
+- Missing and Missed Volume IV remaining 41,000 characters and other volumes not read; Forsaken full Volume IIA analysis of systemic bias not read
+- Justice Campbell's Bernardo Investigation Review (1996) not reached
+- Canada National Inquiry into Missing and Murdered Indigenous Women and Girls final report not reached
+- Outcome of the Chicago charge against Arthur Hilliard (2020) not verified, so the Chicago cluster is recorded only as alleged_in_reporting
+- UK Home Office Homicide Index data itself is held by the Home Office; only ONS summaries were used
+- law.umich.edu PDF copies of NRE reports (bot challenge); the same reports were read from exonerationregistry.org instead. The NRE glossary page itself was read via WebFetch.
+- Innocence Project false confessions page (https://innocenceproject.org/false-confessions-admissions/) - fetch error; its percentages are not used.
+- Innocence Project eyewitness-reform page (https://innocenceproject.org/eyewitness-identification-reform/) - fetch error.
+- Kassin et al. 2010 white paper 'Police-induced confessions: Risk factors and recommendations' full text (williams.edu returned HTML, not PDF); only the abstract of the follow-up commentary was reached.
+- Kassin et al. 2025 scientific review paper (defendyouthrights.org redirect loop).
+- Canada 2011 FPT report 'The Path to Justice' (justice.gc.ca 'pat' path blocked by robots for WebFetch); the 2004 report and the 2018 'Innocence at Stake' report were read instead.
+- Goudge Inquiry report itself (primary); findings quoted from CMAJ coverage only.
+- National Academies 2014 'Identifying the Culprit' full text; only the publication description was reached.
+- Texas Forensic Science Commission materials on arson cases (e.g. Willingham) - not attempted for lack of time; no Willingham claims made.
+- CCRC annual report and case statistics for homicide referrals - not reached; only two CCRC case decision pages and the About page were read.
+- CPJ 2024 Global Impunity Index page (fetch error); 2019 methodology used instead.
+- UNESCO Observatory of Killed Journalists database and the UNESCO DG report text (unesdoc returned an empty page); figures are from UN Geneva's summary only.
+- OHCHR copy of the Special Rapporteur's Khashoggi report A/HRC/41/CRP.1 (fetch error); UN News summary used.
+- UN Special Rapporteur on extrajudicial executions: formal definition of 'extrajudicial execution' and thematic reports on journalists/defenders were not opened.
+- GI-TOC report titled 'The Hit' not found under that title; GI-TOC's South Africa assassination reports (2018, 2023) used instead.
+- UNODC Global Study on Homicide 2019 organised-crime chapter beyond p. 41 (mirror cut off); no UNODC text on contract killings reached.
+- UNODC/UN Women 'Femicides in 2023' full report (only UN Women press release reached); figures on prior reported violence not reached.
+- dangerassessment.org (robots blocked): item weights and calendar scoring not reached; score bands come from an Idaho State Police sheet. DA item 13 and 19 wording was summarised by the fetch tool and should be checked against the form.
+- PubMed abstract of Campbell 2003 (captcha); Baylor-hosted copy of the full article used.
+- Global Witness 2025 report on 2024 killings (146 killed or disappeared) not opened; 2024 report on 2023 used.
+- US National Domestic Violence Fatality Review Initiative site not opened; New York State review report used as the US example.
+- Home Office DHR statutory guidance (2024 revision, Domestic Abuse Related Death Reviews) not opened.
+- Firecrawl not used per instructions.
 
 **HR Human rights abuses, war crimes and cultural property**
 - FATF 'Money Laundering and Terrorist Financing in the Art and Antiquities Market' (2023): the official fatf-gafi.org PDF is behind Cloudflare; read via the regjeringen.no copy, but the WebFetch text stopped partway through Annex A (p. 45), so the indicators after 'Use of social media or financial intermediaries to advertise cultural objects that...' (including any conflict-zone or terrorist-financing indicators) were not reached.
