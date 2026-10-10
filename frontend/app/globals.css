@@ -456,6 +456,7 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
   .rf-party { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; } .rf-party:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; border-radius: 4px; }
   .rf-summary { margin: 0 0 6px; color: #f3e9d7; }
   .rf-row { margin: 5px 0; line-height: 1.45; } .rf-row b { color: #d4a152; font-weight: 600; } .rf-row a { color: #d9b67a; }
+  .rf-row.rf-note { font-size: 12.5px; color: #a8998a; }
   .rf-weight { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 11.5px; color: #bc9574; margin: 8px 0; }
   .rf-track { flex: 0 0 120px; height: 6px; border-radius: 3px; background: #26272b; overflow: hidden; } .rf-track i { display: block; height: 100%; background: #d4a152; }
   .rf-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }

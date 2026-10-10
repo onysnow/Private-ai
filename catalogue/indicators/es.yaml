@@ -613,6 +613,19 @@ indicators:
     quote: Sudden reversal of a bad financial situation or repayment of large debts.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Required Reporting for Clearance Holders
+    publisher: US Nuclear Regulatory Commission (implementing ODNI Security Executive Agent Directive
+      3)
+    year: '2026'
+    url: https://www.nrc.gov/security/required-reporting-for-clearance-holders
+    locator: Section listing SEAD 3 reportable information, item 'Financial issues and anomalies'
+    quote: Financial issues and anomalies including, but not limited to, bankruptcy, foreclosure, tax
+      liens, failure to pay Federal or State taxes, garnishment, over 120 days delinquent on any debt,
+      and any unusual infusion of $10,000 or greater, such as an inheritance, winnings, or similar financial
+      gain.
+    quote_verified: true
+    licence: US federal government work (no licence stated; generally public domain)
+    checked: '2026-10-10'
   examples: []
   cases: []
   data_needed:
@@ -626,10 +639,19 @@ indicators:
   - bankruptcy dockets
   - credit-related court filings
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A person with known money trouble (for example a debt over 120 days delinquent, bankruptcy
+      or garnishment) begins clearing debts, and the source of the money is not yet clear.
+    strong: The person receives or uses an unexplained infusion of money that approaches the $10,000 reporting
+      level, or several smaller ones, while clearing large debts.
+    textbook: There is an unusual infusion of $10,000 or greater (such as an inheritance or winnings)
+      that SEAD 3 requires to be reported, it coincides with the sudden repayment of large debts, and
+      it was not reported or has no clear source.
+    threshold_source: https://www.nrc.gov/security/required-reporting-for-clearance-holders
+    threshold_note: The $10,000 figure is SEAD 3's reporting threshold for unusual financial infusions,
+      as an agency restates it. The ODNI SEAD 3 PDF itself could not be downloaded because of a bot block.
+      Confirm the wording against SEAD 3 (dni.gov). The 120-day delinquency figure in the same sentence
+      marks the 'bad financial situation' side of the pattern. Both numbers apply to US cleared personnel.
+      DoDD 5240.06 (the cited source) gives no figures.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -637,7 +659,7 @@ indicators:
   - Sale of a house or other asset.
   - Family help or a new, better-paid job.
   jurisdictions: United States (DoD)
-  version: 1
+  version: 2
 - id: ES-012
   name: 'Financial distress: debts, bankruptcy, foreclosure, liens, garnishment, unpaid taxes'
   definition: The person is heavily in debt or failing to meet financial obligations, which can create

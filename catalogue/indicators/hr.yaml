@@ -2644,6 +2644,16 @@ indicators:
     quote: Unusually high profit margins on the sale of an item of art, antiquity or other cultural objects.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: Financial Action Task Force (FATF)
+    year: '2023'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Terrorist-Financing-Art-Antiquities-Market.pdf
+    locator: Section 'Under or Over-Pricing', paragraph 66, page 26
+    quote: suspects purchased shares of a commercial bank by selling multiple art at 15 times the average
+      price
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples: []
   cases: []
   data_needed:
@@ -2655,10 +2665,19 @@ indicators:
   - Auction price databases
   - Expert valuation
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded.
-    threshold_source: none
+    faint: Price is out of line with its market segment (suspiciously low, or unusually high margin on
+      resale). No published figure for this level.
+    strong: 'Meets the published definition as worded: price far out of line with the market segment,
+      or unusually high profit margin on resale. No published figure for this level.'
+    textbook: Art sold at 15 times the average price of other works by the same artist, the over-pricing
+      level in the FATF case example.
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Terrorist-Financing-Art-Antiquities-Market.pdf
+    threshold_note: 'FATF, Money Laundering and Terrorist Financing in the Art and Antiquities Market
+      (Feb 2023), ''Under or Over-Pricing'', para. 66, p. 26. The 15x figure comes from a case FATF cites
+      under its pricing red flag. It is a case benchmark, not a regulatory threshold, and it covers over-pricing
+      only. No published percentage for under-pricing or for ''unusual'' profit margins was found. FATF
+      Box 10 (p. 26) gives another case: about USD 30 000 per painting declared against a real value that
+      ''did not exceed USD 2 000 per painting''. The RAMI supplement gives no number. Global.'
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -2667,7 +2686,7 @@ indicators:
   innocent_explanations:
   - Reattribution, cleaning or research can legitimately raise value; estate sales can be cheap.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: HR-049
   name: Buyer or seller indifferent to provenance, price or loss
   definition: A buyer shows no interest in provenance, style or artist, or pays far above notional value;
@@ -2792,6 +2811,16 @@ indicators:
     quote: Cash transactions, in particular using large bulks of cash.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: Financial Action Task Force (FATF)
+    year: '2023'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Terrorist-Financing-Art-Antiquities-Market.pdf
+    locator: Section 'Use of Cash in Transactions', paragraph 62, page 24 (EUR 10 000 AML scope at paragraph
+      17, page 10)
+    quote: do not accept cash payments amounting to more than USD/EUR 10 000 from a single customer
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples: []
   cases: []
   data_needed:
@@ -2799,16 +2828,27 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded.
-    threshold_source: none
+    faint: Cultural objects paid for in cash below EUR 10 000, especially repeatedly or in high-denomination
+      notes.
+    strong: A cash payment, or a series of linked payments, for cultural objects that reaches EUR 10 000
+      or more, the level at which EU and UK art market participants fall under AML/CFT obligations.
+    textbook: Cash payments of more than USD/EUR 10 000 from a single customer, which the FATF report
+      notes some art market participants refuse, or large bulks of cash as worded.
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Terrorist-Financing-Art-Antiquities-Market.pdf
+    threshold_note: 'FATF art and antiquities report (Feb 2023). Para. 17 (p. 10): the EU AML framework
+      covers art market operators ''where the value of a transaction or a series of transactions amounts
+      to EUR 10 000 or more'', and the UK regime uses the same EUR 10 000 level. Para. 61 / Box 8 (p.
+      24): a case of cash transactions of EUR 17 000 to 210 000, ''above the authorised threshold for
+      cash payments in France''. The EU figure comes from Directive (EU) 2018/843 (AMLD5) Art. 2(1)(3)(i).
+      EUR-Lex blocked automated access, so the directive was cited through FATF''s restatement. US Form
+      8300 ($10,000 cash) also exists but was not opened. Applies to the EU and UK, with FATF giving the
+      global context.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Cash is customary in some local antiques markets and flea markets.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: HR-052
   name: Art-backed loan with refusal of identification or early cash repayment
   definition: A customer will not identify themselves for an art-collateralised loan, or repays early
@@ -2912,6 +2952,16 @@ indicators:
     quote: Use of social media or financial intermediaries to advertise cultural objects
     quote_verified: true
     checked: '2026-10-09'
+  - title: Facebook's Black Market in Antiquities
+    publisher: ATHAR Project
+    year: '2019'
+    url: https://atharproject.org/reportsAndPublications/facebooks-black-market-in-antiquities
+    locator: Key findings / summary on report landing page
+    quote: Among the active users with locations in the Groups analyzed, 36% of posts offering artifacts
+      have identifiable locations in conflict zones
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - 'ATHAR: 95 Arabic Facebook groups with 1,947,195 members; participants included individuals associated
     with Hay''at Tahrir al-Sham (alleged in reporting).'
@@ -2936,10 +2986,19 @@ indicators:
   - Social media platforms and archives
   - ATHAR research datasets
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded.
-    threshold_source: none
+    faint: Objects offered in social media groups where some posts come from countries bordering conflict
+      zones, or some posts have conflict-zone locations.
+    strong: 36% or more of the posts offering artifacts in a group or set of groups have identifiable
+      locations in conflict zones, the share ATHAR measured.
+    textbook: 'Meets the published definition as worded: antiquities advertised in online groups with
+      conflict-zone locations, including before excavation.'
+    threshold_source: https://atharproject.org/reportsAndPublications/facebooks-black-market-in-antiquities
+    threshold_note: ATHAR Project, 'Facebook's Black Market in Antiquities' (report files dated June 2019;
+      page dated 22 Feb 2026). It is an NGO study, not a regulator. 36% is a measured share, not a trigger
+      set by an authority. The same report finds '44% of posts offering artifacts were from countries
+      bordering conflict zones' and 'more than one-third' of posts in Syrian-based groups came from users
+      in conflict zones. It also counts 95 groups, 488 admins and 1,947,195 members. FATF (Feb 2023) names
+      social media advertising with no number. Global.
   threshold_verified: true
   cross_hints:
   - target_area: SF
@@ -2948,7 +3007,7 @@ indicators:
   innocent_explanations:
   - Many posts offer fakes or replicas; collectors' groups also discuss legal items.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: HR-055
   name: Physical signs of recent excavation or damage
   definition: Condition analysis shows soil, damage or other clues consistent with recent, unrecorded
@@ -4689,6 +4748,16 @@ indicators:
     quote: (e) High levels of corruption or poor governance;
     quote_verified: true
     checked: '2026-10-09'
+  - title: Corruption Perceptions Index 2015
+    publisher: Transparency International
+    year: '2016'
+    url: https://www.transparency.org/en/cpi/2015
+    locator: Section 'More Than 6 Billion People Live in Countries with a Serious Corruption Problem'
+    quote: scores below 50 out of 100 in our 2015 Corruption Perceptions Index, indicating serious levels
+      of public sector corruption
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Military answers to no civilian authority
   - Victims have no court where they can bring claims
@@ -4702,10 +4771,19 @@ indicators:
   - Governance and corruption indices
   - UN treaty body reports
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Signs that courts lack independence or that security forces lack civilian control, or a Corruption
+      Perceptions Index score near 50. No published figure for this level beyond the 50 mark.
+    strong: Corruption Perceptions Index score below 50 out of 100, together with no independent judiciary
+      or no civilian control of security forces.
+    textbook: Corruption Perceptions Index score below 50 out of 100, which Transparency International
+      describes as serious levels of public sector corruption.
+    threshold_source: https://www.transparency.org/en/cpi/2015
+    threshold_note: Applies only to the 'high corruption' strand. Judicial independence and civilian control
+      have no published numeric trigger here. Transparency International, CPI 2015 page. The CPI 2015
+      report legend, as a mirror copy on the Slovenian anti-corruption commission's archive, reads 'Less
+      than 50 = Serious corruption problem'. The current CPI (2024/2025 pages) uses a scale of '0 (highly
+      corrupt) to 100 (very clean)' and notes 'more than two-thirds of countries score below 50' but does
+      not restate the threshold. Covers any country scored by the CPI.
   threshold_verified: true
   cross_hints:
   - target_area: CO
@@ -4716,7 +4794,7 @@ indicators:
   - Low capacity in a poor state without hostile intent
   - Reforms underway
   jurisdictions: Any country
-  version: 1
+  version: 2
 - id: HR-088
   name: Political, economic or strategic motives for violence against a group, including control of resources
     or territory

@@ -3880,6 +3880,7 @@ class FlagLevelsOut(ResponseModel):
     strong: str
     textbook: str
     threshold_source: str
+    threshold_note: str | None = None
 
 
 class FlagCrossHintOut(ResponseModel):

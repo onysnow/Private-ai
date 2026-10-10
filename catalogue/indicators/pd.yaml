@@ -194,10 +194,16 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Two opioids are prescribed at once, one long-acting and one short-acting (close to the pattern,
+      but not the published wording)
+    strong: Two or more short-acting opioids, or two or more long-acting opioids, prescribed at the same
+      time
+    textbook: 'Meets the published definition as worded: therapeutic duplication of two or more long-acting
+      and/or two or more short-acting opiates'
+    threshold_source: https://www.ama-assn.org/media/7796/download
+    threshold_note: The number comes from the cited NABP consensus document (hosted by the AMA). The DEA
+      decision in the Federal Register (81 FR 49816, 2016) quotes a witness saying that prescribing two
+      immediate-release opioids at once 'would be inappropriate therapy', which agrees with this. US only.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -205,7 +211,7 @@ indicators:
   - Transition between drugs (overlap during switch)
   - Cancer or palliative pain
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PD-005
   name: Excessive quantities relative to the condition / large prescriptions
   definition: Prescriptions are for far more pills than the stated condition would need.
@@ -238,6 +244,18 @@ indicators:
     quote: excessive quantities of opioids
     quote_verified: true
     checked: '2026-10-09'
+  - title: CDC Guideline for Prescribing Opioids for Chronic Pain — United States, 2016
+    publisher: US Centers for Disease Control and Prevention (MMWR Recommendations and Reports)
+    year: '2016'
+    url: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+    locator: Recommendation 6
+    quote: When opioids are used for acute pain, clinicians should prescribe the lowest effective dose
+      of immediate-release opioids and should prescribe no greater quantity than needed for the expected
+      duration of pain severe enough to require opioids. Three days or less will often be sufficient;
+      more than seven days will rarely be needed.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - Hills Pharmacy filled 196 and 240 tablets of hydromorphone 8 mg for two people (81 FR 49816).
   cases:
@@ -257,10 +275,16 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Opioid prescriptions for acute pain run longer than three days' supply
+    strong: Opioid prescriptions for acute pain run longer than seven days' supply
+    textbook: 'Meets the published wording: more than seven days for acute pain, which the guideline says
+      ''will rarely be needed'', with no documented reason'
+    threshold_source: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+    threshold_note: 'The numbers come from CDC''s 2016 opioid prescribing guideline (Recommendation 6,
+      acute pain). The same guideline also sets dose levels: reassess at 50 or more MME/day, and avoid
+      or carefully justify 90 or more MME/day. The 2022 CDC guideline replaced the 2016 one and dropped
+      these fixed day and dose limits, so the numbers are historical, though still widely cited. The cited
+      DEA and NABP sources give no number for ''excessive quantity''. US only.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -268,7 +292,7 @@ indicators:
   - Mail-order 90-day supplies
   - Patient lives far from pharmacy and fills less often
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PD-006
   name: High daily opioid dose / starting patients on high doses
   definition: Patients start on, or are escalated to, high daily opioid doses without careful justification.
@@ -876,6 +900,16 @@ indicators:
     quote: multiple cars in the pharmacy parking lot with out-of-state license plates
     quote_verified: true
     checked: '2026-10-09'
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US Drug Enforcement Administration / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49816 (summary of Show Cause Order)
+    quote: seven of the customers ``resided at least [50] miles from'' Respondent and five of the customers
+      ``resided more than [100] miles from'' it.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - Over 98% of Atlanta Medical Group patients came from surrounding states, mostly Kentucky and Tennessee
     (NDGA 2014).
@@ -887,10 +921,18 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Patients live 50 miles or more from the pharmacy
+    strong: Patients live more than 100 miles from the pharmacy, and several of them get prescriptions
+      from the same clinic
+    textbook: 'Meets the published wording: several patients filling similar prescriptions live at least
+      50 miles away, and some more than 100 miles away, with nothing to explain why'
+    threshold_source: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    threshold_note: 'The numbers are the distances DEA''s Show Cause Order used as red flags. The Administrator''s
+      published decision repeats them (81 FR 49816). The same decision records that DEA rules do not set
+      a distance and that there is ''no bright line'', so these are case figures, not a rule. Other figures
+      in the same decision: a witness''s view that more than 40 miles from the doctor''s office is ''one
+      of the red flags for diversion'', and a pharmacy''s own protocol of 20 or 50 miles. The cited NABP
+      and D.C. Circuit sources give no figure. US only.'
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -901,7 +943,7 @@ indicators:
   - Specialist referral centres draw patients from far
   - Patient works near the clinic but lives elsewhere
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PD-019
   name: Prescriber is an outlier for high-risk patients (Medicare Part D)
   definition: A prescriber orders opioids for an unusually large number of patients with extreme use or
@@ -1024,6 +1066,17 @@ indicators:
       similar quantities and very similar doses
     quote_verified: true
     checked: '2026-10-09'
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US Drug Enforcement Administration / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49816 (summary of Show Cause Order)
+    quote: Respondent's ``pharmacists dispensed large and substantially similar quantities of'' oxycodone
+      30 mg tablets ``to at least nine customers, all of whom received their prescriptions from physicians
+      working at the same clinic,''
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - Hills Pharmacy dispensed large, substantially similar quantities over one week in 2011.
   cases:
@@ -1043,17 +1096,23 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A few patients fill near-identical controlled-drug prescriptions from the same prescriber or
+      clinic
+    strong: Several patients in about one week fill large, substantially similar quantities of the same
+      drug from the same clinic
+    textbook: 'Meets the published wording: at least nine customers in about one week receive large, substantially
+      similar quantities of the same drug, all prescribed at the same clinic'
+    threshold_source: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    threshold_note: The number is a case figure DEA used as a red flag in the cited Show Cause Order (dispensing
+      dates July 28 to August 4, 2011). It is not a general rule. No regulator or study was found that
+      publishes a minimum number of patients for pattern prescribing. US only.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Specialist with standard protocols (e.g. post-surgical packs)
   - Clinic serving a single condition
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PD-022
   name: Patients arrive in groups or share unexplained common factors
   definition: Patients come together, from the same clinic, with the same drugs, often all paying cash.
@@ -1125,6 +1184,17 @@ indicators:
     quote: 85 percent of the controlled substance prescriptions it filled were paid for with cash.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Masters Pharmaceutical, Inc. v. Drug Enforcement Administration, No. 15-1335
+    publisher: US Court of Appeals, D.C. Circuit
+    year: '2017'
+    url: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    locator: Slip opinion p. 19 (PDF page 19)
+    quote: See id. at 55,488 (Administrator explaining that orders placed by The Drug Shoppe were suspicious,
+      in part because "85 percent of the controlled substance prescriptions it filled were paid for with
+      cash")
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - 'The Drug Shoppe: 85% of controlled prescriptions paid in cash (Masters, 2017).'
   cases: []
@@ -1135,10 +1205,17 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: An unusually high share of controlled-substance prescriptions is paid in cash, especially by
+      insured patients (the court gives no lower figure)
+    strong: Cash is the main way patients pay for controlled substances, and insurance is not accepted
+      for some opioid products
+    textbook: 85 percent or more of controlled-substance prescriptions are paid for with cash
+    threshold_source: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    threshold_note: The court cites the 85 percent figure from the DEA Administrator's findings (80 FR
+      55488) as part of why orders were suspicious. It is a case figure, not a bright-line rule. The same
+      opinion records other percentage red flags about the share of controlled substances in a pharmacy's
+      sales (60 to 80 percent, nearly 70 percent, 60 percent, about 80 percent), but those are not about
+      cash. No published national benchmark for a normal pharmacy cash share was found. US only.
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -1150,7 +1227,7 @@ indicators:
   - Insurer refused cover or prior authorisation pending
   - Discount-card pricing cheaper than co-pay
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PD-024
   name: Several members of one household on the same controlled drugs
   definition: Multiple people at one address all receive the same controlled medications.
@@ -1444,6 +1521,16 @@ indicators:
       dispensed.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Masters Pharmaceutical, Inc.; Decision and Order, 80 FR 55418
+    publisher: US Drug Enforcement Administration (Federal Register)
+    year: '2015'
+    url: https://www.govinfo.gov/content/pkg/FR-2015-09-15/html/2015-23038.htm
+    locator: 80 FR 55477 (DEA restating its Southwood Pharmaceuticals decision, 72 FR 36487, at 36492)
+    quote: the percentages of controlled to non-controlled drugs dispensed by the typical retail pharmacy
+      (5 to 20 percent controlled versus 80 to 90 percent non-controlled)
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - City View (60%) and Englewood Specialty Pharmacy (nearly 70%) in Masters.
   cases:
@@ -1465,18 +1552,25 @@ indicators:
   - DEA ARCOS data (where released)
   - Distributor due-diligence records produced in litigation
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded (the figures above are case facts, not published
-      thresholds)
-    threshold_source: none
+    faint: Controlled drugs are more than 20 percent of the pharmacy's dispensing, above the top of the
+      5 to 20 percent DEA describes as typical for a retail pharmacy
+    strong: The controlled share is far above the typical 5 to 20 percent range. No separate published
+      cut-off exists for this level.
+    textbook: 'Meets the published definition as worded: DEA treated a controlled share well above the
+      typical retail pharmacy''s 5 to 20 percent as a sign of possible diversion'
+    threshold_source: https://www.govinfo.gov/content/pkg/FR-2015-09-15/html/2015-23038.htm
+    threshold_note: Applies to US retail pharmacies. It is a DEA-stated benchmark for a typical pharmacy,
+      not a legal limit. Page 55480 of the same decision says the typical ratio 'ranged up to 20 percent
+      for controlled'. The 60 and 70 percent figures in the catalogue (from the D.C. Circuit's 2017 Masters
+      opinion) are facts from individual cases. The FR decision also calls one pharmacy's oxycodone dispensing
+      'more than three times' the typical controlled level.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Pharmacy beside a hospice, cancer centre or pain specialist
   - Specialty or compounding pharmacy
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PD-031
   name: Pharmacists pressured for speed or denied prescriber-risk information
   definition: A pharmacy chain pushes pharmacists to fill fast and withholds internal data on problem
@@ -1872,6 +1966,23 @@ indicators:
       in 2007
     quote_verified: true
     checked: '2026-10-09'
+  - title: Masters Pharmaceutical, Inc. v. Drug Enforcement Administration, No. 15-1335
+    publisher: US Court of Appeals, D.C. Circuit
+    year: '2017'
+    url: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    locator: Slip opinion pp. 6-7 (Background)
+    quote: Thus, for each of the controlled medications that Masters sold, the Computer Program tracked
+      the number of doses that Masters' customers ordered over the preceding six calendar months. Each
+      customer's highest monthly total would then be treated as the customer's "Controlled Substance Limit."
+      ... If a customer ordered enough doses in any 30-day period to exceed its Controlled Substance Limit,
+      the Computer Program would hold the customer's most recent order for the medication so it could
+      be reviewed by Masters' staff. The Computer Program also held the most recent order placed by a
+      customer if the customer submitted more order forms in a 30-day period than it had in any of the
+      prior six calendar months, or if the timing of the order did not comport with the customer's general
+      ordering pattern over those six months.
+    quote_verified: true
+    licence: US court opinion (public domain)
+    checked: '2026-10-10'
   examples:
   - 'Tug Valley Pharmacy, Williamson WV: 1,000%+ increase in five months.'
   cases: []
@@ -1883,10 +1994,19 @@ indicators:
   - ARCOS
   - Distributor records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Orders in any 30-day period exceed the customer's highest monthly total from the preceding
+      six calendar months
+    strong: The customer also sends more order forms in a 30-day period than in any of the prior six calendar
+      months, or orders at times that break its six-month pattern
+    textbook: 'Meets the published definition as worded (21 CFR 1301.74(b): orders of unusual size, deviating
+      substantially from a normal pattern, or of unusual frequency). The regulation sets no number.'
+    threshold_source: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    threshold_note: 'US distributors. The numbers describe one distributor''s suspicious-order system,
+      built under a DEA settlement and set out by the court. They are not a DEA rule. Other figures: DEA''s
+      2020 proposed rule (85 FR 69282) would require suspicious orders to be reported within seven calendar
+      days of receipt. The 2015 DEA Masters decision (80 FR 55418) points to orders at ''nearly three
+      times'' and ''more than three times'' a pharmacy''s limit. The House Energy and Commerce report''s
+      ''1,000 percent in a five-month period'' is a fact from one case, not a threshold.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -1894,7 +2014,7 @@ indicators:
   - New prescriber or clinic opened locally
   - Change of wholesaler
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PD-040
   name: Shipments out of proportion to local population
   definition: Volumes of opioids delivered to a town or pharmacy far exceed what its population could
@@ -1921,6 +2041,18 @@ indicators:
       and oxycodone
     quote_verified: true
     checked: '2026-10-09'
+  - title: Implementation of the Ryan Haight Online Pharmacy Consumer Protection Act of 2008 (interim
+      final rule), 74 FR 15596
+    publisher: US Drug Enforcement Administration (Federal Register)
+    year: '2009'
+    url: https://www.govinfo.gov/content/pkg/FR-2009-04-06/html/E9-7698.htm
+    locator: 74 FR 15597
+    quote: Hence, these pharmacies each dispensed an average of approximately 2.9 million dosage units
+      of hydrocodone per pharmacy in a single year. By means of comparison, the average pharmacy in the
+      United States dispenses approximately 88,000 dosage units of hydrocodone per year.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - Kermit, WV; Williamson, WV.
   cases: []
@@ -1933,17 +2065,26 @@ indicators:
   - ARCOS data
   - Census population data
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A single pharmacy's yearly hydrocodone volume is above the roughly 88,000 dosage units DEA
+      gives for the average US pharmacy
+    strong: The pharmacy's yearly hydrocodone volume is many times the 88,000-dosage-unit average. No
+      separate published cut-off exists for this level.
+    textbook: Volume is close to the roughly 2.9 million dosage units a year that DEA found, on average,
+      at pharmacies supplying rogue internet sites
+    threshold_source: https://www.govinfo.gov/content/pkg/FR-2009-04-06/html/E9-7698.htm
+    threshold_note: These are per-pharmacy benchmarks for hydrocodone only, based on 2006 ARCOS data.
+      They are not per-head population thresholds, and no published per-capita threshold was found. The
+      House Energy and Commerce opioid distribution report (p. 24) restates the 88,000 figure. On p. 6
+      it says some pharmacies got 'six times higher than the annual amount' DEA expected, and on p. 18
+      it cites 'nine times' an average rural West Virginia pharmacy. The Williamson and Kermit figures
+      are facts from individual cases.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Pharmacy serves a wide rural catchment beyond the town
   - Pharmacy supplies nursing homes or hospices
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PD-041
   name: No effective suspicious-order monitoring, or flagged orders shipped without due diligence
   definition: A distributor lacks a working system to catch suspicious orders, or ships them without dispelling
@@ -2165,6 +2306,20 @@ indicators:
     quote: 'Controlled substances are removed: With no doctor''s orders.'
     quote_verified: true
     checked: '2026-10-09'
+  - title: ASHP Guidelines on Preventing Diversion of Controlled Substances (Am J Health-Syst Pharm. 2017;74:325-48)
+    publisher: American Society of Health-System Pharmacists (ASHP)
+    year: '2017'
+    url: https://integratedcare.dc.gov/wp-content/uploads/2021/07/preventing-diversion-of-controlled-substances_ASHP.pdf
+    locator: PDF p. 7 (reprint p. 83), recommendations on resolving controlled-substance discrepancies
+    quote: It is recommended that CS discrepancies be reported to the supervisor in charge and resolved
+      as soon as possible upon discovery, preferably no later than the end of the work shift, and that
+      discrepancies deemed to be resolved are reviewed by the supervisor to ensure the legitimacy of the
+      resolution. Discrepancies that cannot be resolved ("unresolvable discrepancies") are reported immediately
+      to pharmacy and are jointly reviewed by pharmacy and patient care leadership, with resolution within
+      24-72 hours.
+    quote_verified: true
+    licence: Not stated (ASHP copyright)
+    checked: '2026-10-10'
   examples:
   - One nurse's fentanyl withdrawals far exceed colleagues' on the same unit.
   cases: []
@@ -2175,10 +2330,17 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A controlled-substance discrepancy is not resolved by the end of the work shift in which it
+      was found
+    strong: The discrepancy cannot be resolved and is sent to pharmacy and patient-care leadership as
+      unresolvable
+    textbook: An unresolvable discrepancy is still open after the 24-72 hour resolution window in ASHP's
+      guideline
+    threshold_source: https://integratedcare.dc.gov/wp-content/uploads/2021/07/preventing-diversion-of-controlled-substances_ASHP.pdf
+    threshold_note: Applies to US health systems. This is a professional-body guideline, not a regulation.
+      It sets time windows for resolving discrepancies. It gives no numeric threshold for override counts
+      or removals without an order. A 2022 ASHP revision exists and was not checked. The Joint Commission
+      source cited in the catalogue gives no numbers.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -2186,7 +2348,7 @@ indicators:
   - Sicker patient assignments
   - System or barcode faults
   jurisdictions: US (accreditation guidance)
-  version: 1
+  version: 2
 - id: PD-046
   name: 'Hospital staff: waste not witnessed or taken from waste containers'
   definition: Leftover controlled drug is not disposed of with a witness, or is retrieved from unsecured

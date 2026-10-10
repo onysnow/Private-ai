@@ -1620,6 +1620,15 @@ indicators:
     quote: People working with children and young people are suitable and supported
     quote_verified: true
     checked: '2026-10-09'
+  - title: Working With Children Checks (report)
+    publisher: Royal Commission into Institutional Responses to Child Sexual Abuse
+    year: '2015'
+    url: https://www.childabuseroyalcommission.gov.au/working-children-checks
+    locator: Recommendations, heading 'Duration and continuous monitoring'
+    quote: WWCCs are valid for five years.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Volunteer start date earlier than check date
   - No references taken; no check of previous employers
@@ -1635,17 +1644,26 @@ indicators:
   - Teacher and carer registers
   - Sex offender registries (where lawful)
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Checks are done only when a person first starts, with no renewal date or ongoing monitoring
+      set (no published number for this level)
+    strong: A person working with children holds a check that is close to or past the five-year validity
+      and no continuous monitoring is in place
+    textbook: A person works with children with no check, or on a check older than five years, against
+      the Royal Commission's recommended five-year validity
+    threshold_source: https://www.childabuseroyalcommission.gov.au/working-children-checks
+    threshold_note: 'Countable as time since the last check. Royal Commission (Australia) Working With
+      Children Checks report (August 2015) recommends checks be valid for five years, alongside continuous
+      monitoring of criminal records. Other figures seen: USA Shooting''s background check policy requires
+      renewal ''no less than every two (2) years'' (a national governing body''s own policy, not a regulator,
+      so not used). England''s KCSIE and the Lampard/Marsden report note checks only at engagement but
+      give no interval.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Checks done by an umbrella body or agency, not on site
   - Rules in force at the time did not require checks for that role
   - Administrative delay with supervised work pending the check
-  version: 1
+  version: 2
 - id: CA-029
   name: Staff not trained to recognise grooming or to respond
   definition: People working with children have had no safeguarding training and do not know warning signs
@@ -1953,6 +1971,16 @@ indicators:
       trusting relationships.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Stability measures for children looked after in England, reporting year 2025
+    publisher: Department for Education (England)
+    year: '2026'
+    url: https://explore-education-statistics.service.gov.uk/find-statistics/stability-measures-for-children-looked-after-in-england/2025
+    locator: Section 'High placement instability'; also 'Long-term placement stability'
+    quote: High placement instability is defined as a looked after child experiencing 3 or more placements
+      during the year ending 31 March.
+    quote_verified: true
+    licence: Open Government Licence v3.0 (standard for this service)
+    checked: '2026-10-10'
   examples:
   - Child has had many placements in a year
   - Rosters dominated by agency or casual staff
@@ -1964,16 +1992,25 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A child has a second placement move in the year, approaching the published level (no separate
+      published number for this level)
+    strong: A child has 3 or more placements over the previous 2 years (the DfE's long-term instability
+      measure)
+    textbook: A child has 3 or more placements during the year, meeting the DfE definition of high placement
+      instability
+    threshold_source: https://explore-education-statistics.service.gov.uk/find-statistics/stability-measures-for-children-looked-after-in-england/2025
+    threshold_note: Countable (placement moves, staff turnover). England's Department for Education defines
+      'high placement instability' as 3 or more placements in the year ending 31 March; it also reports
+      a two-year measure (3 or more placements in the previous 2 years) and a long-term measure (same
+      placement for at least 2 years among children looked after at least 2.5 years). No published benchmark
+      for staff turnover or casual staffing was found; the number applies to placement moves only, and
+      to England.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Sector-wide workforce shortages
   - Placement changes for the child's own needs
-  version: 1
+  version: 2
 - id: CA-035
   name: Harmful sexual behaviour between children dismissed
   definition: Sexual behaviour by children toward other children is brushed off as play or normal, with

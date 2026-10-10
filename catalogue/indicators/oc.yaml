@@ -768,6 +768,17 @@ indicators:
       Europe, or India.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC (Financial Transactions and Reports Analysis Centre of Canada)
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: Section 'Illicit production of synthetic opioids'
+    quote: Reporting entities observed lower-dollar value transactions (under $1000), which reflect the
+      low-cost of precursors, along with high-dollar value transactions (above $10,000), which suggest
+      the bulk purchase of chemicals.
+    quote_verified: true
+    licence: Not stated (Government of Canada site)
+    checked: '2026-10-10'
   examples:
   - A Mexican clothing retailer wires money to a Hong Kong pharmaceutical intermediate supplier.
   cases:
@@ -792,17 +803,24 @@ indicators:
   - Company registries
   - Blockchain analytics
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Payments from someone outside the chemical trade to overseas chemical firms in low-dollar amounts
+      (under $1000), consistent with buying precursors.
+    strong: Repeated or high-dollar payments (above $10,000) to overseas chemical firms by someone outside
+      the chemical trade, suggesting bulk chemical purchases.
+    textbook: 'Meets the published definition as worded: payments to chemical or pharmaceutical firms
+      in China, India or Eastern Europe with no business reason.'
+    threshold_source: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    threshold_note: Countable through the amounts paid. The figures are what Canadian reporting entities
+      observed in synthetic-opioid precursor cases, not a formal reporting threshold. FINTRAC's own indicator
+      list gives no amount. The FinCEN 2024 fentanyl supplemental advisory was the other cited source
+      and gives no amount for this pattern. Amounts are in Canadian dollars.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Businesses diversify into new product lines.
   - Hobbyists and researchers buy lab supplies abroad.
   jurisdictions: Mexico, Canada, US, PRC, India
-  version: 1
+  version: 2
 - id: OC-015
   name: Importer lacks licences or real presence but buys controlled chemicals
   definition: A company imports precursor chemicals or lab equipment without the required licences, or
@@ -1662,6 +1680,18 @@ indicators:
     quote: Recovered firearm was part of multiple firearms purchased by the same person
     quote_verified: true
     checked: '2026-10-09'
+  - title: 27 CFR 478.126a Reporting multiple sales or other disposition of pistols and revolvers
+    publisher: US Bureau of Alcohol, Tobacco, Firearms and Explosives (Code of Federal Regulations)
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-27/chapter-II/subchapter-B/part-478/subpart-H/section-478.126a
+    locator: 27 CFR 478.126a
+    quote: Each licensee shall prepare a report of multiple sales or other disposition whenever the licensee
+      sells or otherwise disposes of, at one time or during any five consecutive business days, two or
+      more pistols, or revolvers, or any combination of pistols and revolvers totaling two or more, to
+      an unlicensed person
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - One buyer purchases five identical pistols in a week.
   cases: []
@@ -1674,16 +1704,22 @@ indicators:
   - Firearm sales and trace records (law enforcement)
   - Court records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The same unlicensed person bought two or more handguns from a dealer, at one time or within
+      five consecutive business days (enough to require a US multiple-sale report)
+    strong: The recovered gun appears on a multiple-sale report, and the buyer is linked to other traced
+      crime guns
+    textbook: The recovered firearm was part of multiple firearms bought by the same person, as worded
+      by INTERPOL
+    threshold_source: https://www.ecfr.gov/current/title-27/chapter-II/subchapter-B/part-478/subpart-H/section-478.126a
+    threshold_note: 'The number comes from the US federal rule (ATF) on reporting multiple sales of pistols
+      and revolvers, so it applies to the US and to handguns only. The INTERPOL source gives no count.
+      It does give a related number: a gun recovered 2 to 3 years after purchase counts as a short time-to-crime.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Collectors, sport shooters or security firms buy several at once.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: OC-033
   name: Recovered firearm was part of a multiple theft
   definition: The gun was one of several stolen at or around the same time or place.
@@ -2909,6 +2945,17 @@ indicators:
     quote: Numerous daily cash deposits within short timeframes (even seconds apart).
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1021.313 Aggregation
+    publisher: US Financial Crimes Enforcement Network (Code of Federal Regulations)
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1021/subpart-C/section-1021.313
+    locator: 31 CFR 1021.313 (see also 1021.311)
+    quote: In the case of a casino, multiple currency transactions shall be treated as a single transaction
+      if the casino has knowledge that they are by or on behalf of any person and result in either cash
+      in or cash out totaling more than $10,000 during any gaming day.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - A customer cashes out repeatedly just under the casino's ID limit on the same day.
   cases: []
@@ -2918,10 +2965,21 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded (threshold depends on the jurisdiction)
-    threshold_source: none
+    faint: Repeated cash-ins or cash-outs, each kept below the reporting level, that add up toward more
+      than $10,000 in one gaming day
+    strong: Several same-day transactions by or for one person that together total more than $10,000 in
+      a gaming day, split so that no single one triggers a report
+    textbook: The customer repeatedly collects winnings just below a customer identification threshold,
+      as worded by FATF (the exact threshold depends on the jurisdiction)
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1021/subpart-C/section-1021.313
+    threshold_note: 'The number comes from the US casino currency reporting rule (FinCEN), whose aggregation
+      clause defines the linked total that structuring tries to avoid. It applies to US casinos. Other
+      published thresholds: EU AMLD 2015/849 Art 11(d) requires gambling providers to do customer due
+      diligence on winnings or stakes of EUR 2 000 or more, including linked operations. FINTRAC requires
+      a Casino Disbursement Report for $10,000 or more, including under the 24-hour rule. The Isle of
+      Man GSC flags transacting slightly below the verification threshold (''£100s per visit''). FATF
+      Recommendation 22''s USD/EUR 3,000 casino threshold was not opened (the PDF failed to download),
+      so it is not used here.'
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -2932,7 +2990,7 @@ indicators:
   - Machine or cage limits force smaller payouts
   - Privacy concerns unrelated to crime
   jurisdictions: Global (FATF)
-  version: 1
+  version: 2
 - id: OC-057
   name: Player placing bets or buying chips for someone else
   definition: A gambler appears to be following instructions or using money supplied by a hidden third
@@ -3510,6 +3568,16 @@ indicators:
     locator: para. 87, p. 30
     quote: Abuse of cross border shopping limits
     quote_verified: false
+  - title: Council Directive 2008/118/EC concerning the general arrangements for excise duty, Article
+      32
+    publisher: Council of the European Union (via legislation.gov.uk)
+    year: '2008'
+    url: https://www.legislation.gov.uk/eudr/2008/118/article/32
+    locator: Article 32(3)(a), introduced by 'These guide levels may not be lower than:'
+    quote: 'cigarettes: 800 items,'
+    quote_verified: true
+    licence: Not stated on page
+    checked: '2026-10-10'
   examples:
   - The same van crosses a border weekly with the maximum allowance for every passenger.
   cases: []
@@ -3523,17 +3591,25 @@ indicators:
   - Border crossing / ANPR records (via court records)
   - Customs seizure notices
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Repeated purchases of tobacco in low-tax or duty-free outlets, below the published guide level.
+    strong: More than 800 cigarettes (or 400 cigarillos, 200 cigars or 1 kg of smoking tobacco) carried
+      on a trip, especially on repeated trips.
+    textbook: Holdings above the EU minimum guide levels of 800 cigarettes, 400 cigarillos, 200 cigars
+      or 1 kg of smoking tobacco, bought repeatedly in low-tax or duty-free outlets for resale.
+    threshold_source: https://www.legislation.gov.uk/eudr/2008/118/article/32
+    threshold_note: These are the EU minimum guide levels for deciding whether excise goods carried between
+      Member States are for the carrier's own use (Art 32(3)). Quantity is only one of the Art 32(2) factors,
+      and Member States may set higher levels. The text was read on legislation.gov.uk (the UK's retained
+      copy; EUR-Lex was blocked by a bot check). Directive 2008/118/EC was later replaced by Directive
+      (EU) 2020/262. That successor text was not read, so check whether it keeps the same figures. Duty-free
+      traveller allowances (Directive 2007/74/EC) are separate, lower figures and were not read.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Cross-border commuters buying for personal use
   - Buying for family members within allowances
   jurisdictions: Global (FATF)
-  version: 1
+  version: 2
 - id: OC-067
   name: Small bank notes swapped for large ones ('refining'), often at casinos
   definition: Cash in small denominations is exchanged for high-value notes so it is easier to carry and
@@ -3560,6 +3636,16 @@ indicators:
       bills, due to their high value-to-size ratio and weight
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1021.311 Filing obligations (casinos)
+    publisher: US Treasury, FinCEN (Code of Federal Regulations, via Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/31/1021.311
+    locator: 31 CFR 1021.311 opening paragraph; items (a)(8) and (b)(8) 'Exchanges of currency for currency,
+      including foreign currency'
+    quote: Each casino shall file a report of each transaction in currency, involving either cash in or
+      cash out, of more than $10,000.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - A customer buys chips with bags of USD 20 notes, plays briefly and cashes out in USD 100 notes.
   cases: []
@@ -3569,10 +3655,18 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Small notes are exchanged for large ones in amounts at or below $10,000.
+    strong: Several currency-for-currency exchanges that together come close to $10,000, which suggests
+      splitting to avoid a report.
+    textbook: A casino currency-for-currency exchange of more than $10,000, which a US casino must report
+      in a Currency Transaction Report.
+    threshold_source: https://www.law.cornell.edu/cfr/text/31/1021.311
+    threshold_note: US only. Under 31 CFR 1021.311, 'Exchanges of currency for currency, including foreign
+      currency' are listed as both cash-in (a)(8) and cash-out (b)(8) transactions subject to the more-than-$10,000
+      casino report. No published figure was found for note-denomination 'refining' itself. The FATF tobacco
+      report and ESAAMLG cash report (para 76, 'preference for high-denomination banknotes, such as USD
+      100 bills') describe the pattern without a threshold. The FATF Recommendations casino threshold
+      (USD/EUR 3,000) could not be read because the PDF was cut off, so it is not used.
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -3582,7 +3676,7 @@ indicators:
   - Cash businesses (shops, bars) converting takings
   - Travellers wanting compact cash
   jurisdictions: Global (FATF, ESAAMLG)
-  version: 1
+  version: 2
 - id: OC-068
   name: Ransom paid in bulk cash by air drop or courier, mostly in USD 100 notes
   definition: A ransom for a hijacked ship or kidnapped person is delivered as physical cash, usually
@@ -4405,6 +4499,17 @@ indicators:
       may encourage criminals to declare amounts just below the threshold to avoid detection.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: 'Para 29, p.13 (thresholds by country: para 34, p.15)'
+    quote: These measures include requiring all persons (natural and legal) who physically transport cash
+      and BNIs exceeding a pre-set threshold of USD/EUR 15,000 to submit a truthful declaration to the
+      designated competent authorities.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Several members of a group each cross with just under USD 10,000 on the same flight.
   cases: []
@@ -4418,10 +4523,19 @@ indicators:
   lookup_sources:
   - Cash declaration records (FIU/customs, via court files or FOI)
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded (threshold set nationally)
-    threshold_source: none
+    faint: A traveller declares or carries an amount just below the national declaration threshold. In
+      the ESAAMLG region that threshold is set somewhere between USD 750 and USD 15,000.
+    strong: Declarations or carried amounts sit just below the threshold again and again, by the same
+      people or on the same route.
+    textbook: Amounts declared or carried just below the declaration threshold, which under FATF Recommendation
+      32 may be no higher than USD/EUR 15,000 (meets the ESAAMLG wording).
+    threshold_source: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    threshold_note: 'FATF Recommendation 32 sets the maximum declaration threshold at USD/EUR 15,000,
+      as quoted in the indicator''s own ESAAMLG source. National thresholds are lower in many places:
+      the same report (para 34, p.15) says thresholds in the region vary between USD 750 and USD 15,000.
+      The US threshold is more than $10,000 (31 USC 5316(a)(1)), and the EU threshold is EUR 10,000 (Regulation
+      2018/1672; EUR-Lex was blocked, so not read). No source gives a number for how close counts as ''just
+      below''.'
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -4431,7 +4545,7 @@ indicators:
   - Travellers carrying round amounts that happen to be under the limit
   - Family members each carrying their own travel money
   jurisdictions: ESAAMLG region; global
-  version: 1
+  version: 2
 - id: OC-082
   name: Frequent travellers repeatedly carrying large cash, or claiming to be traders
   definition: The same couriers make repeated trips carrying cash, often describing themselves as regular
@@ -4460,6 +4574,17 @@ indicators:
       of transcontinental routes
     quote_verified: true
     checked: '2026-10-09'
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: Para 29, p.13
+    quote: These measures include requiring all persons (natural and legal) who physically transport cash
+      and BNIs exceeding a pre-set threshold of USD/EUR 15,000 to submit a truthful declaration to the
+      designated competent authorities.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Six travellers say they are regular importers of clothes and shoes; their luggage holds USD 857,300
     (ESAAMLG Case Study 8, Kenya, 2022; investigation ongoing).
@@ -4474,10 +4599,18 @@ indicators:
   - Customs seizure records
   - Travel records disclosed in court
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The same person makes repeat trips carrying cash, each below USD/EUR 15,000.
+    strong: The same person makes repeat trips carrying more than USD/EUR 15,000, often calling themselves
+      a trader.
+    textbook: Repeat trips carrying cash above the declaration threshold (no higher than USD/EUR 15,000
+      under FATF R.32), especially undeclared, on transnational routes (meets the ESAAMLG wording).
+    threshold_source: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    threshold_note: 'The only published number is the amount: the FATF R.32 maximum declaration threshold
+      of USD/EUR 15,000, as quoted by ESAAMLG. National thresholds in the region range from USD 750 to
+      USD 15,000 (para 34, p.15), and the US threshold is more than $10,000 (31 USC 5316(a)(1)). No published
+      number was found for how many trips make someone a ''frequent'' traveller. The ESAAMLG cases say
+      only ''frequent travelers'' and ''regular travellers'' (Case Studies 3 and 8). The 58.82% figure
+      is a share of couriers from outside the region, not a threshold.'
   threshold_verified: true
   cross_hints:
   - target_area: HT
@@ -4488,7 +4621,7 @@ indicators:
   - Genuine informal cross-border traders who buy stock with cash
   - Business travellers in cash-based economies
   jurisdictions: ESAAMLG region; global
-  version: 1
+  version: 2
 - id: OC-083
   name: Crossing at unofficial or ungazetted border points with cash or goods
   definition: Couriers avoid official crossings and use remote, unpatrolled routes to move cash, vehicles
@@ -4567,6 +4700,17 @@ indicators:
       to a local resident, found thirty certified cheques
     quote_verified: true
     checked: '2026-10-09'
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: Section 1.7 Compliance with FATF Recommendation, para 29 (PDF page 13)
+    quote: requiring all persons (natural and legal) who physically transport cash and BNIs exceeding
+      a pre-set threshold of USD/EUR 15,000 to submit a truthful declaration to the designated competent
+      authorities.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Courier parcels declared as documents contain thirty signed, mostly undated certified cheques (Mauritius,
     2025; under investigation).
@@ -4581,10 +4725,18 @@ indicators:
   - Customs/courier seizure notices
   - Court records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Bearer cheques, money orders or certified cheques are mailed or couriered and declared as 'documents',
+      whatever their value
+    strong: Several parcels sent this way whose combined value is more than USD/EUR 15,000
+    textbook: A single shipment of bearer negotiable instruments worth more than USD/EUR 15,000, with
+      no declaration
+    threshold_source: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    threshold_note: The number is the FATF Recommendation 32 declaration threshold (USD/EUR 15,000) as
+      the ESAAMLG report restates it. The same report (para 34) says thresholds in the ESAAMLG region
+      range from USD 750 to USD 15,000, and that one member country uses USD 10,000 but does not cover
+      mail and cargo. For the US, 31 CFR 1010.340(a) requires a report for currency or monetary instruments
+      'in an aggregate amount exceeding $10,000 at one time' that are transported, mailed or shipped across
+      the border (read on Cornell LII). A Ghana-style parcel case in the cited report gives no value.
   threshold_verified: true
   cross_hints:
   - target_area: FR
@@ -4595,7 +4747,7 @@ indicators:
   - Businesses mailing cheques as payment in countries where cheques are still common
   - Elderly people sending money orders to relatives
   jurisdictions: ESAAMLG region; global
-  version: 1
+  version: 2
 - id: OC-085
   name: Round-figure payments (about USD 50,000 steps) to East Asian trading companies
   definition: A business sends or receives payments for goods in round amounts, often in steps of roughly
@@ -4867,6 +5019,19 @@ indicators:
       day; and
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1010.100 - General definitions
+    publisher: US Treasury / FinCEN (Code of Federal Regulations, via Cornell LII)
+    year: '2026'
+    url: https://www.law.cornell.edu/cfr/text/31/1010.100
+    locator: 31 CFR 1010.100(ff)(2), Dealer in foreign exchange
+    quote: A person that accepts the currency, or other monetary instruments, funds, or other instruments
+      denominated in the currency, of one or more countries in exchange for the currency, or other monetary
+      instruments, funds, or other instruments denominated in the currency, of one or more other countries
+      in an amount greater than $1,000 for any other person on any day in one or more transactions, whether
+      or not for same-day delivery
+    quote_verified: true
+    licence: US government work (public domain); LII page
+    checked: '2026-10-10'
   examples:
   - A 'student' holds accounts at nine banks, deposits cash at several branches on one day, and buys self-addressed
     bank drafts.
@@ -4880,10 +5045,20 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A personal account takes in wires and cash from many unrelated sources, or exchanges currencies
+      or buys bank drafts for others
+    strong: The person exchanges currency for other people in amounts greater than $1,000 for one person
+      on one day
+    textbook: 'Meets the published definition as worded: the person accepts one currency in exchange for
+      another ''in an amount greater than $1,000 for any other person on any day in one or more transactions''
+      without being registered as a money services business'
+    threshold_source: https://www.law.cornell.edu/cfr/text/31/1010.100
+    threshold_note: The number comes from the US definition of a dealer in foreign exchange in the money
+      services business rules, 31 CFR 1010.100(ff)(2). The same section sets $1,000 per person per day
+      for check cashers (ff)(3) and for issuing or selling money orders (ff)(4). Money transmitters (ff)(5)
+      have no dollar threshold. For the part about structured cash deposits, the cash reporting threshold
+      of more than $10,000 (31 CFR 1010.311) applies. The cited FATF report gives no numbers. US jurisdiction
+      only.
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -4895,7 +5070,7 @@ indicators:
   - Students receiving family funds from abroad
   - Small import businesses run from personal accounts
   jurisdictions: Global (FATF)
-  version: 1
+  version: 2
 - id: OC-090
   name: Many small transfers or small crypto payments typical of low-level drug selling
   definition: A person receives many small electronic transfers or makes many small payments, or uses
@@ -4924,6 +5099,17 @@ indicators:
       appear to be multiple third parties…
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1010.100 - General definitions (Structure (structuring))
+    publisher: US Treasury / FinCEN (Code of Federal Regulations, via Cornell LII)
+    year: '2026'
+    url: https://www.law.cornell.edu/cfr/text/31/1010.100
+    locator: 31 CFR 1010.100(xx)
+    quote: '"In any manner" includes, but is not limited to, the breaking down of a single sum of currency
+      exceeding $10,000 into smaller sums, including sums at or below $10,000, or the conduct of a transaction,
+      or series of currency transactions at or below $10,000'
+    quote_verified: true
+    licence: US government work (public domain); LII page
+    checked: '2026-10-10'
   examples:
   - A payment-app account receives dozens of 20-50 dollar transfers a day from different people.
   cases: []
@@ -4935,10 +5121,16 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Many small transfers in or out, or small incremental crypto payments, from many unrelated people
+    strong: Repeated deposits from apparently different third parties, each at or below $10,000
+    textbook: 'Meets the published definition as worded: a sum of currency exceeding $10,000 broken into
+      smaller sums at or below $10,000'
+    threshold_source: https://www.law.cornell.edu/cfr/text/31/1010.100
+    threshold_note: The number covers the 'below the reporting threshold' part of this indicator. It is
+      the US structuring definition, 31 CFR 1010.100(xx), tied to the currency transaction report trigger
+      of 'more than $10,000' (31 CFR 1010.311). No regulator publishes a count or size for the 'many small
+      transfers' typical of low-level drug selling. The cited FATF report uses words only. US jurisdiction
+      only; other countries' thresholds differ.
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -4949,7 +5141,7 @@ indicators:
   - Small online sellers, gig workers, tutors or hairdressers paid by app
   - Friends splitting bills
   jurisdictions: Global (FATF)
-  version: 1
+  version: 2
 - id: OC-091
   name: Dedicated 'deal line' phone or multiple phones and SIM cards
   definition: A drug network runs sales through a branded mobile number (the 'line'), and people working

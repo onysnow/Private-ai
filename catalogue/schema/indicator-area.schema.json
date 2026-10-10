@@ -251,6 +251,19 @@
           "description": "URL of the source for any number in the levels, or 'none'",
           "title": "Threshold Source",
           "type": "string"
+        },
+        "threshold_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "what the number applies to: its jurisdiction, the kind of rule it is, and its limits",
+          "title": "Threshold Note"
         }
       },
       "required": [

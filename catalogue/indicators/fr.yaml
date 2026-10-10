@@ -139,6 +139,16 @@ indicators:
     quote_verified: true
     licence: Not stated
     checked: '2026-10-09'
+  - title: 26 U.S. Code § 6501 - Limitations on assessment and collection
+    publisher: Cornell Legal Information Institute (text of US Code, Office of the Law Revision Counsel)
+    year: '2026'
+    url: https://www.law.cornell.edu/uscode/text/26/6501
+    locator: § 6501(e)(1)(A)(i); assessment 'at any time within 6 years after the return was filed'
+    quote: such amount is in excess of 25 percent of the amount of gross income stated in the return,
+      or
+    quote_verified: true
+    licence: US Code is public domain; LII presentation
+    checked: '2026-10-10'
   examples:
   - An entity that does not report any revenue but has executed transactions which have been reported
     by third parties (FIAU Annex I s.2)
@@ -152,17 +162,25 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Deposits exceed reported gross income and the difference is unexplained, but the omitted amount
+      is below 25 percent of gross income stated on the return. The source gives no lower figure.
+    strong: Unexplained deposits suggest omitted income approaching 25 percent of the gross income stated
+      on the return.
+    textbook: Omitted income is in excess of 25 percent of the amount of gross income stated in the return.
+      This is the statutory level that extends the IRS assessment period to 6 years.
+    threshold_source: https://www.law.cornell.edu/uscode/text/26/6501
+    threshold_note: 'The IRS IRM 25.1.2 badge of fraud (''substantially exceeding reported income'') gives
+      no figure. The closest published US number for unreported income is the 26 U.S.C. 6501(e)(1)(A)
+      substantial-omission rule: an omission over 25 percent of stated gross income extends the assessment
+      window from 3 to 6 years. It is a statute-of-limitations trigger, not a fraud finding. The FIAU
+      Malta factsheet gives no number.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Transfers between a person's own accounts counted twice
   - Loan proceeds or repayments
   - Customer deposits held on trust
-  version: 1
+  version: 2
 - id: FR-004
   name: Hidden domestic, foreign or digital-asset accounts
   definition: Bank, brokerage or crypto accounts are kept from the tax authority, often abroad or in uncooperative
@@ -280,6 +298,18 @@ indicators:
     quote_verified: true
     licence: Not stated
     checked: '2026-10-09'
+  - title: IRS Form 8300 Reference Guide
+    publisher: US Internal Revenue Service
+    year: '2026'
+    url: https://www.irs.gov/businesses/small-businesses-self-employed/irs-form-8300-reference-guide
+    locator: Introduction; also 'If the same payer makes two or more transactions totaling more than $10,000
+      in a 24-hour period,' and 'The business may voluntarily file a Form 8300 in those situations where
+      the transaction is $10,000 or less and suspicious.'
+    quote: The law requires trades and businesses report cash payments of more than $10,000 to the federal
+      government
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - Inadequately explaining dealings in large sums of currency, or the unexplained expenditure of currency
     (IRM 25.1.2.3(2))
@@ -294,17 +324,24 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A suspicious cash transaction of $10,000 or less, for which the IRS allows a voluntary Form
+      8300.
+    strong: Cash from the same payer, in two or more transactions, totalling more than $10,000 in a 24-hour
+      period, or further cash payments over $10,000 within a 12-month period.
+    textbook: A business receives cash payments of more than $10,000, which it must report to the federal
+      government on Form 8300.
+    threshold_source: https://www.irs.gov/businesses/small-businesses-self-employed/irs-form-8300-reference-guide
+    threshold_note: This is a US federal reporting threshold (26 U.S.C. 6050I / 31 U.S.C. 5331, Form 8300).
+      It applies to businesses receiving cash and does not by itself show evasion. The same $10,000 figure
+      is the bank Currency Transaction Report threshold. The FIAU Malta factsheet ('material levels of
+      cash') and IRS IRM 25.1.2 give no figure.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Business has legitimately cash-paying customers or suppliers
   - Cash payroll in some trades
   - Cultural preference for cash
-  version: 1
+  version: 2
 - id: FR-006
   name: Business receipts kept out of the business account
   definition: Customer payments are not banked in the business account, or income checks are cashed at
@@ -377,6 +414,15 @@ indicators:
     quote_verified: true
     licence: Not stated
     checked: '2026-10-09'
+  - title: Internal Revenue Manual 4.12.1 Nonfiled Returns
+    publisher: US Internal Revenue Service
+    year: '2026'
+    url: https://www.irs.gov/irm/part4/irm_04-012-001
+    locator: IRM 4.12.1.3, Enforcement Period (citing IRM 1.2.1.6.18, Policy Statement 5-133)
+    quote: The enforcement period is not to be more than six years.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - Pattern of consistent failure over several years to report income fully (IRM 25.1.2.3(6))
   - Companies which repeatedly fail to comply with their statutorily duty to file copies of their financial…
@@ -392,17 +438,23 @@ indicators:
   - Company registry filing history
   - Court judgments
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Missing returns for a recent tax year while income was received. The source gives no lower
+      figure.
+    strong: Missing returns over several years, approaching the six-year IRS enforcement period.
+    textbook: Missing returns across the full six-year enforcement period the IRS normally pursues.
+    threshold_source: https://www.irs.gov/irm/part4/irm_04-012-001
+    threshold_note: The six years is the IRS's normal enforcement period for delinquent returns (Policy
+      Statement 5-133, IRM 1.2.1.6.18, applied in IRM 4.12.1.3). It is an enforcement window, not a red-flag
+      count; IRM 4.12.1.3.1 allows longer or shorter periods with management approval. The IRM 1.2.1 page
+      with the policy statement's own wording could not be opened. IRM 25.1.2 ('several years') and FIAU
+      Malta ('a number of years') give no figure.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Income below filing threshold
   - Illness, disability or bereavement
   - Dormant company
-  version: 1
+  version: 2
 - id: FR-008
   name: Fake or personal expenses claimed as business deductions
   definition: Deductions are invented, inflated, or are really personal spending dressed up as business
@@ -943,6 +995,17 @@ indicators:
     quote_verified: true
     licence: Not stated
     checked: '2026-10-09'
+  - title: 26 U.S. Code § 6662 - Imposition of accuracy-related penalty on underpayments
+    publisher: Cornell Legal Information Institute (text of US Code, Office of the Law Revision Counsel)
+    year: '2026'
+    url: https://www.law.cornell.edu/uscode/text/26/6662
+    locator: '§ 6662(e)(1)(B)(i); gross level at § 6662(h)(2)(A)(ii): "''400 percent'' for ''200 percent'',
+      and" "''25 percent'' for ''50 percent''"'
+    quote: in connection with any transaction between persons described in section 482 is 200 percent
+      or more (or 50 percent or less)
+    quote_verified: true
+    licence: US Code is public domain; LII presentation
+    checked: '2026-10-10'
   examples:
   - Syndicated conservation easements relying on inflated appraisals of undeveloped land (IRS 2021 Dirty
     Dozen)
@@ -958,10 +1021,17 @@ indicators:
   - Market price references
   - Appraisal records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The declared price differs from the correct (arm's-length) price, but by less than the 200
+      percent / 50 percent bands.
+    strong: 'Substantial valuation misstatement: the price is 200 percent or more, or 50 percent or less,
+      of the correct section 482 price.'
+    textbook: 'Gross valuation misstatement: the price is 400 percent or more, or 25 percent or less,
+      of the correct section 482 price.'
+    threshold_source: https://www.law.cornell.edu/uscode/text/26/6662
+    threshold_note: These are US penalty thresholds for prices between related parties (IRC 6662(e)(1)(B)(i)
+      and 6662(h)(2)(A)(ii)). They apply to transfer pricing between related persons under section 482,
+      not to every invoice. They are the clearest published numbers for over- or under-valuation. FIAU
+      Malta gives no figure. Trade-based money-laundering guidance (FATF) was not checked in this pass.
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -971,7 +1041,7 @@ indicators:
   - Bulk discounts or distressed sales
   - Bespoke goods with no market price
   - Currency swings
-  version: 1
+  version: 2
 - id: FR-020
   name: Vague consulting, marketing or research fees
   definition: Repeated payments for loosely described consulting or marketing services, often to parties
@@ -1347,6 +1417,18 @@ indicators:
     quote_verified: true
     licence: Not stated
     checked: '2026-10-09'
+  - title: 'Dividend tax withholding and tax fraud: The case of ''cum-ex'''
+    publisher: CEPR VoxEU (authors Felix Kreidl and Thiess Buettner, summarising their peer-reviewed paper
+      in International Tax and Public Finance)
+    year: '2020'
+    url: https://cepr.org/voxeu/columns/dividend-tax-withholding-and-tax-fraud-case-cum-ex
+    locator: Main text, results paragraph discussing Figure 1 (partial sentence; the tool returned only
+      this part)
+    quote: confirms significant increases in the number of stocks traded on the last two days before the
+      ex-dividend date.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Shares bought and sold quickly around the dividend payment date to obscure true ownership (Euronews
     2022)
@@ -1372,15 +1454,24 @@ indicators:
   - Securities trading records
   - Tax refund records where public
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Trading in a stock rises unusually on the last two days before the ex-dividend date.
+    strong: That trading rise on the last two days before the ex-dividend date comes with withholding-tax
+      refund claims from more than one party for the same dividend.
+    textbook: 'Meets the published definition as worded: several parties are refunded withholding tax
+      that was paid only once.'
+    threshold_source: https://cepr.org/voxeu/columns/dividend-tax-withholding-and-tax-fraud-case-cum-ex
+    threshold_note: 'The time window comes from a peer-reviewed study of 829 German HDAX dividend events,
+      summarised by its authors in a CEPR VoxEU column: Buettner, Holzmann, Kreidl and Scholz (2020),
+      ''Withholding-Tax Non-Compliance: The Case of Cum-Ex Stock-Market Transactions'', International
+      Tax and Public Finance. The study found the effect in 2009-2011 and used a 21-day window around
+      the ex-dividend date for analysis. The rise is reported as statistically significant, with no percentage
+      or multiple given. ESMA''s work on multiple withholding-tax reclaim schemes was found but not opened
+      for a number.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Ordinary dividend-season trading and legitimate refund claims by foreign investors
-  version: 1
+  version: 2
 - id: FR-028
   name: High returns with little or no risk, or 'guaranteed' returns
   definition: An investment promises big profits with no risk, which real investments cannot offer.
@@ -1993,6 +2084,16 @@ indicators:
     quote_verified: true
     licence: Not stated
     checked: '2026-10-09'
+  - title: Short-term Acute Care Program for Evaluating Payment Patterns Electronic Report (PEPPER) User's
+      Guide, Twenty-second Edition
+    publisher: TMF Health Quality Institute for the Centers for Medicare & Medicaid Services
+    year: '2016'
+    url: https://acdis.org/sites/acdis/files/Pepper%20Users%20Guide.pdf
+    locator: Introduction, 'What Is PEPPER?', page 3
+    quote: The upper control limit for all target areas is the 80th percentile.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - '''Billing for more expensive services or procedures than were actually provided or performed, commonly
     known as "upcoding"'' (NHCAA)'
@@ -2004,16 +2105,24 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Over time, a provider bills more and more of its claims at the most expensive codes. No published
+      figure for this level.
+    strong: The provider's share of claims in a coding-focused target area is at or above the 80th percentile
+      of peers in its state or its contractor's (jurisdiction) comparison group.
+    textbook: 'The provider is a national high outlier: at or above the national 80th percentile for a
+      coding-focused target area.'
+    threshold_source: https://acdis.org/sites/acdis/files/Pepper%20Users%20Guide.pdf
+    threshold_note: The figure comes from PEPPER, the CMS-funded tool built by TMF Health Quality Institute
+      that flags possible over-coding. PEPPER says outlier status is a reason to audit, not proof of error,
+      and that it uses no formal significance tests. Coding-focused areas also have a 20th-percentile
+      low limit (possible under-coding). The copy read is the 22nd edition, hosted on acdis.org; the official
+      home is pepper.cbrpepper.org. No published number was found for unbundling specifically.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Complex coding rules leading to honest errors
   - Genuinely sicker patient mix
-  version: 1
+  version: 2
 - id: FR-043
   name: Unnecessary treatment or falsified diagnoses
   definition: Patients get treatment they do not need, or records are altered to make non-covered care
@@ -2171,6 +2280,17 @@ indicators:
     quote_verified: true
     licence: US government work, public domain
     checked: '2026-10-09'
+  - title: FinCEN Advisory on Health Care Fraud Schemes Targeting Medicare, Medicaid, and Other Federal
+      and State Health Care Benefit Programs (FIN-2026-A001)
+    publisher: US Financial Crimes Enforcement Network
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    locator: Red flag indicators section, PDF page 10
+    quote: A customer is a health care provider or supplier with consistently low to moderate billing
+      for a year or more and then suddenly begins to file a large number of claims (i.e., spike billing).
+    quote_verified: true
+    licence: US federal government work, public domain
+    checked: '2026-10-10'
   examples:
   - Reimbursements jump shortly after beneficial ownership changes (red flag 9, paraphrase)
   - Low-to-moderate billing for a year or more, then a sudden surge of claims (red flag 17, paraphrase)
@@ -2186,10 +2306,16 @@ indicators:
   - CMS provider enrollment and payment data
   - Company registry ownership history
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A recently opened or recently bought provider receives a significant amount of program reimbursements
+      soon after it starts operating or changes owners. No published figure for this level.
+    strong: Reimbursements jump sharply right after a change in beneficial ownership, out of line with
+      the provider's own history. No published figure for this level.
+    textbook: After consistently low to moderate billing for a year or more, the provider suddenly files
+      a large number of claims (spike billing).
+    threshold_source: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    threshold_note: The only number in the advisory's red flags for this pattern is the 'year or more'
+      history before a spike. The related red flags on recently established providers and changes of ownership
+      carry no figures.
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -2199,7 +2325,7 @@ indicators:
   innocent_explanations:
   - New owner expanding a genuine practice
   - Billing backlog cleared at once
-  version: 1
+  version: 2
 - id: FR-047
   name: Owners with past health fraud convictions or shared across providers
   definition: Owners of a provider were convicted of benefits fraud, are tied to people who were, or appear
@@ -2731,6 +2857,19 @@ indicators:
     quote_verified: true
     licence: US government work, public domain
     checked: '2026-10-09'
+  - title: 11 U.S. Code § 362 - Automatic stay
+    publisher: US Congress, US Code Title 11 (via Cornell LII)
+    year: '2005'
+    url: https://www.law.cornell.edu/uscode/text/11/362
+    locator: § 362(c)(3)(C)(i)(I); see also § 362(c)(3) (prior case pending within the preceding 1-year
+      period) and § 362(c)(4)
+    quote: a case is presumptively filed not in good faith (but such presumption may be rebutted by clear
+      and convincing evidence to the contrary)— (i) as to all creditors, if— (I) more than 1 previous
+      case under any of chapters 7, 11, and 13 in which the individual was a debtor was pending within
+      the preceding 1-year period;
+    quote_verified: true
+    licence: US federal statute, public domain
+    checked: '2026-10-10'
   examples:
   - '''Serial Filer'' is a referral category in Table 1 (p. 5) (16 referrals)'
   cases: []
@@ -2744,16 +2883,26 @@ indicators:
   - Bankruptcy dockets (PACER)
   - Identity verification sources
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A debtor files again after a previous case of theirs was pending within the preceding 1-year
+      period and was dismissed (a repeat filing inside 1 year).
+    strong: More than 1 previous case of the same debtor was pending within the preceding 1-year period.
+    textbook: 'Meets the statute as worded: more than 1 previous case under chapters 7, 11 or 13 was pending
+      within the preceding 1-year period, so the new case is presumed not filed in good faith. Use of
+      false or multiple Social Security numbers is a separate yes-or-no sign with no number.'
+    threshold_source: https://www.law.cornell.edu/uscode/text/11/362
+    threshold_note: 'Applies to US bankruptcy law and covers the serial-filing part of the definition.
+      Other figures: 11 U.S.C. § 109(g) bars a new filing by someone who was a debtor in a case pending
+      ''at any time in the preceding 180 days'' if that case was dismissed for willful failure to obey
+      the court, or was voluntarily dismissed after a creditor asked for relief from the automatic stay.
+      The cited US Trustee FY2014 report gives 17.3% as the share of criminal referrals involving identity
+      theft or false or multiple SSNs. That is how common these cases are, not a trigger level, so it
+      was not used as one.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Re-filing after a dismissed case for procedural reasons
   - Typographical errors in SSNs
-  version: 1
+  version: 2
 - id: FR-059
   name: Wash, cross or pre-arranged trades
   definition: The same person, or people acting together, trade a security with themselves or by agreement
@@ -3042,6 +3191,16 @@ indicators:
     quote: (bidding or offering with the intent to cancel the bid or offer before execution).
     quote_verified: true
     checked: '2026-10-09'
+  - title: United States v. Michael Coscia, No. 16-3017
+    publisher: US Court of Appeals for the Seventh Circuit (via CourtListener)
+    year: '2017'
+    url: https://www.courtlistener.com/opinion/4416689/united-states-v-michael-coscia/
+    locator: Opinion, star page *796
+    quote: Coscia's order-to-trade ratio was 1,592%, whereas the order-to-trade ratio for other market
+      participants ranged from 91% to 264%.
+    quote_verified: true
+    licence: US court opinion, public domain
+    checked: '2026-10-10'
   examples:
   - On the day of the 2010 Flash Crash a trader entered at least 85 spoof sell orders in E-mini S&P futures.
   cases:
@@ -3065,17 +3224,26 @@ indicators:
   - Exchange order-book data (rarely public; usually from court records)
   - CFTC and DOJ enforcement releases
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A trader's order-to-trade ratio is above 264%, the top of the range the court recorded for
+      other market participants.
+    strong: Large orders are almost never filled (0.08% of large orders filled against 35.61% of small
+      orders), or few large orders rest more than one second (0.57%).
+    textbook: An order-to-trade ratio on the scale of 1,592%, the figure proved in the first US criminal
+      spoofing conviction, together with evidence of intent to cancel before execution.
+    threshold_source: https://www.courtlistener.com/opinion/4416689/united-states-v-michael-coscia/
+    threshold_note: 'These are evidence figures a federal appeals court accepted as proof of spoofing
+      under 7 U.S.C. § 6c(a)(5)(C). They are not a rule-based trigger. The same page says: ''on the Chicago
+      Mercantile Exchange, 35.61% of his small orders were filled, whereas only 0.08% of his large orders
+      were filled'' and ''only 0.57% of Coscia''s large orders were on the market for more than one second''.
+      The statute itself gives no number. A law-firm memo (Willkie Farr) repeats these figures but was
+      not used as the source.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Ordinary cancellation of orders when market conditions change
   - High-frequency market makers who cancel most orders as part of normal quoting
   jurisdictions: US (Commodity Exchange Act)
-  version: 1
+  version: 2
 - id: FR-064
   name: Large block of low-priced or shell-company shares deposited and quickly sold
   definition: A customer deposits physical certificates or transfers in a large block of thinly traded
@@ -3109,6 +3277,17 @@ indicators:
       “S” stocks and bearer bonds
     quote_verified: true
     checked: '2026-10-09'
+  - title: 17 CFR § 230.144 (Rule 144) - Persons deemed not to be engaged in a distribution
+    publisher: US Securities and Exchange Commission, 17 CFR (via Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/17/230.144
+    locator: Rule 144(d)(1)(i); one year for non-reporting issuers at (d)(1)(ii)
+    quote: If the issuer of the securities is, and has been for a period of at least 90 days immediately
+      before the sale, subject to the reporting requirements of section 13 or 15(d) of the Exchange Act,
+      a minimum of six months must elapse between the later of the date of the acquisition of the securities
+      from the issuer, or from an affiliate of the issuer, and any resale of such securities
+    quote_verified: true
+    licence: US federal regulation, public domain
+    checked: '2026-10-10'
   examples:
   - An account holder deposits millions of shares of a dormant shell company, which are sold within weeks
     as the stock is promoted.
@@ -3125,10 +3304,17 @@ indicators:
   - Company registry
   - Transfer-agent records (if obtained)
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A large block of restricted low-priced or shell-company shares is deposited and sold soon after
+      (no published number for 'soon').
+    strong: Restricted shares of an issuer that is not filing SEC reports are resold less than one year
+      after they were acquired.
+    textbook: Restricted shares are resold less than six months after they were acquired, which is shorter
+      than the minimum holding period even for an issuer that has filed SEC reports for at least 90 days.
+    threshold_source: https://www.law.cornell.edu/cfr/text/17/230.144
+    threshold_note: These are holding periods for restricted securities, so they apply only when the deposited
+      shares are restricted. Rule 144(i) adds limits for shares of shell companies. For the 'low-priced'
+      part, the SEC penny-stock line is five dollars (17 CFR 240.3a51-1(d)). No published number was found
+      for how large a 'large block' is. FINRA 19-18 and FATF give no number. US only.
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -3138,7 +3324,7 @@ indicators:
   - Founders or early employees of a small company legitimately selling vested shares
   - Shares received in a genuine merger or private placement
   jurisdictions: US (FINRA); international (FATF)
-  version: 1
+  version: 2
 - id: FR-065
   name: Shares or funds journalled between unrelated accounts for no clear reason
   definition: Shares or money are moved by internal book entry between accounts that do not appear to
@@ -4495,6 +4681,16 @@ indicators:
     quote: a significant related party transaction outside the normal course of business
     quote_verified: true
     checked: '2026-10-09'
+  - title: 17 CFR 229.404 (Item 404) Transactions with related persons, promoters and certain control
+      persons
+    publisher: US Securities and Exchange Commission (Regulation S-K), via Cornell LII
+    year: '2026'
+    url: https://www.law.cornell.edu/cfr/text/17/229.404
+    locator: Item 404(a); smaller reporting companies at Item 404(d)(1)
+    quote: the amount involved exceeds $120,000
+    quote_verified: true
+    licence: US federal regulation, public domain
+    checked: '2026-10-10'
   examples:
   - Luckin Coffee used related parties to fabricate more than $300 million of retail sales.
   cases:
@@ -4520,10 +4716,17 @@ indicators:
   - SEC EDGAR filings (related-party disclosures)
   - Beneficial ownership registers
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A related-party transaction outside the normal course of business, below $120,000
+    strong: A related-party transaction outside the normal course of business above $120,000 that is not
+      audited, or is audited by another firm
+    textbook: A related-person transaction where the amount involved exceeds $120,000 (for smaller reporting
+      companies, the lesser of $120,000 or one percent of average total assets), which must be disclosed
+      under SEC Item 404
+    threshold_source: https://www.law.cornell.edu/cfr/text/17/229.404
+    threshold_note: PCAOB AS 2401 gives no number. SEC Regulation S-K Item 404(a) sets the disclosure
+      threshold for related-person transactions at more than $120,000. Item 404(d)(1) sets it for smaller
+      reporting companies at the lesser of $120,000 or 1% of average total assets over the last two completed
+      fiscal years. This is a disclosure trigger, not proof of wrongdoing. US public companies only.
   threshold_verified: true
   cross_hints:
   - target_area: CO
@@ -4534,7 +4737,7 @@ indicators:
   - Family businesses that trade within the group on fair terms
   - Disclosed and board-approved deals at market prices
   jurisdictions: US (PCAOB)
-  version: 1
+  version: 2
 - id: FR-090
   name: High turnover of senior management, lawyers or board members
   definition: Top executives, legal counsel or directors leave unusually often.
@@ -4599,6 +4802,17 @@ indicators:
     quote: The relationship between management and the current or predecessor auditor is strained
     quote_verified: true
     checked: '2026-10-09'
+  - title: 17 CFR 229.304 (Item 304) Changes in and disagreements with accountants on accounting and financial
+      disclosure
+    publisher: US Securities and Exchange Commission (Regulation S-K), via Cornell LII
+    year: '2026'
+    url: https://www.law.cornell.edu/cfr/text/17/229.304
+    locator: Item 304(a)(1)(iv)
+    quote: during the registrant's two most recent fiscal years and any subsequent interim period preceding
+      such resignation
+    quote_verified: true
+    licence: US federal regulation, public domain
+    checked: '2026-10-10'
   examples:
   - An auditor resigns and the filing announcing it mentions disagreements over revenue recognition.
   cases: []
@@ -4612,10 +4826,18 @@ indicators:
   - PCAOB AuditorSearch
   - National company-accounts filings
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A disagreement with the auditor on accounting, auditing or reporting, or a strained relationship,
+      reported or seen once
+    strong: Repeated disputes with the current or previous auditor, or an auditor change, within the two
+      most recent fiscal years
+    textbook: Disagreements with the former accountant during the registrant's two most recent fiscal
+      years and any later interim period, which must be disclosed on an auditor change under SEC Item
+      304
+    threshold_source: https://www.law.cornell.edu/cfr/text/17/229.304
+    threshold_note: 'The count of disputes is countable, but no body publishes a number for ''frequent''.
+      The only published number is a time window: SEC Regulation S-K Item 304(a)(1)(iv) requires disclosure
+      of disagreements with the former accountant during the two most recent fiscal years plus any later
+      interim period. This is a look-back window, not a frequency threshold. US public companies only.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -4623,7 +4845,7 @@ indicators:
   - Fee disputes
   - Rotation of auditors required by law
   jurisdictions: US (PCAOB)
-  version: 1
+  version: 2
 - id: FR-092
   name: Rapid growth or profits well above similar companies
   definition: The company grows much faster or earns much more than others in its industry.

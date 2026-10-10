@@ -85,6 +85,20 @@ indicators:
     quote: we find that cash sales are increasing during misstatement periods
     quote_verified: true
     checked: '2026-10-09'
+  - title: Predicting Material Accounting Misstatements (Dechow, Ge, Larson, Sloan)
+    publisher: Contemporary Accounting Research (Canadian Academic Accounting Association); copy hosted
+      by the Center for Audit Quality
+    year: '2011'
+    url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    locator: 'Table 4, p. 44; text p. 43: ''cash sales significantly increase (rather than decline) during
+      misstatement years.'''
+    quote: 'Table 4 row: "Change in cash sales 263 0.466 0.233 263 0.257 0.165 ) 0.209 0.001 3.88" (columns:
+      Misstatement years N, Mean, Median; Nonmisstatement years N, Mean, Median; pred sign; diff in mean;
+      p-value; t-stat). Text p. 43: "Contrary to our expectations, cash sales significantly increase (rather
+      than decline) during misstatement years."'
+    quote_verified: true
+    licence: Copyright CAAA; further reproduction not permitted
+    checked: '2026-10-10'
   examples:
   - Luckin Coffee reported fast sales growth later found by the SEC (in a settled complaint) to include
     more than $300 million of fabricated sales
@@ -107,17 +121,26 @@ indicators:
   - Company filings
   - Industry peer filings or databases
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Cash sales growing faster than the 0.257 (25.7%) average change seen in non-misstatement years
+      in the study
+    strong: Cash sales growth at or above the 0.466 (46.6%) average change seen in misstatement years
+      in the study
+    textbook: 'Meets the published definition as worded: rapid growth or unusual profitability compared
+      with others in the same industry (no published cut-off)'
+    threshold_source: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    threshold_note: Peer-reviewed benchmark for growth in cash sales (Dechow et al. 2011, US public companies
+      with SEC enforcement-identified misstatements, 1982-2005). These are group averages, not a regulatory
+      threshold. The figures come from a table, so the quote below reports the table values rather than
+      a sentence; the article's copyright notice prevented getting the exact table text. The AUASB auditing
+      standard gives no number. Beneish (1999) M-score sales growth index figures were not used because
+      the full paper is paywalled and could not be opened.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - A genuinely better product or new market
   - Acquisitions
   - Early-stage companies grow fast from a small base
-  version: 1
+  version: 3
 - id: AF-003
   name: Heavy pressure to meet analyst, investor or internal targets
   definition: Managers or staff face strong pressure to hit profit or revenue targets set by analysts,
@@ -282,6 +305,15 @@ indicators:
     quote: we find that misstating firms are actively raising financing in misstating years
     quote_verified: true
     checked: '2026-10-09'
+  - title: Nasdaq Rule 5550 (Continued Listing Requirements, Capital Market); with Rule 5810(c)(3)(A)
+    publisher: The Nasdaq Stock Market LLC
+    year: '2026'
+    url: https://listingcenter.nasdaq.com/rulebook/nasdaq/rules/nasdaq-5500-series
+    locator: Rule 5550(a)(2); deficiency period in Rule 5810(c)(3)(A) at https://listingcenter.nasdaq.com/rulebook/nasdaq/rules/nasdaq-5800-series
+    quote: (2) Minimum bid price of at least $1 per share;
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Results improve just before a bond or share issue
   - Covenant ratios sit just above the limit
@@ -295,16 +327,24 @@ indicators:
   - Loan agreements and covenant disclosures in filings
   - Stock exchange notices
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Share price trading below the $1 minimum bid price
+    strong: Bid price below $1 for 30 consecutive business days (the point at which Nasdaq says a deficiency
+      exists)
+    textbook: 'Meets the published definition as worded: marginal ability to meet listing or debt-covenant
+      requirements, or a need for new debt or equity financing'
+    threshold_source: https://listingcenter.nasdaq.com/rulebook/nasdaq/rules/nasdaq-5500-series
+    threshold_note: 'The number covers only the listing-requirement part (Nasdaq bid-price rule, US).
+      Rule 5810(c)(3)(A): the deficiency exists ''if the deficiency continues for a period of 30 consecutive
+      business days'', followed by a 180-calendar-day compliance period. The Nasdaq page notes that the
+      SEC has stayed the approval order for a filing on this rule, so check the current status. No published
+      number was found for how close to a loan-covenant breach counts as a warning sign. Dechow et al.
+      (2011) say misstating firms are raising financing but give no figure in the text.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Growing companies raise money routinely
   - Many firms operate near covenant limits without misreporting
-  version: 1
+  version: 3
 - id: AF-006
   name: Managers' personal wealth tied to reported results
   definition: Managers or board members hold large stakes, get pay tied to hitting numbers, or have personally
@@ -422,6 +462,15 @@ indicators:
       defined by...
     quote_verified: true
     checked: '2026-10-09'
+  - title: 17 CFR 229.404, Transactions with related persons, promoters and certain control persons
+    publisher: US Securities and Exchange Commission (eCFR)
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-17/chapter-II/part-229/subpart-229.400/section-229.404
+    locator: Item 404(a)
+    quote: the amount involved exceeds $120,000
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - Sales to a customer secretly controlled by the chairman
   - Purchases from a supplier owned by an executive's relative
@@ -451,10 +500,15 @@ indicators:
   - Related-party notes in financial statements
   - Beneficial ownership registers
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Any transaction with a party connected to management or owners that is outside normal business
+    strong: A related-person transaction where the amount involved exceeds $120,000 and it is outside
+      normal business or with an unaudited or unconsolidated party
+    textbook: 'Meets the published definition as worded: a significant related-party transaction outside
+      the ordinary course of business, over the $120,000 disclosure line'
+    threshold_source: https://www.ecfr.gov/current/title-17/chapter-II/part-229/subpart-229.400/section-229.404
+    threshold_note: US SEC Regulation S-K Item 404(a) disclosure threshold for related-person transactions.
+      It is a disclosure line, not a fraud cut-off. The AUASB and PCAOB sources give no number. Smaller
+      reporting companies have a different threshold under Item 404(d), which was not checked.
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -463,7 +517,7 @@ indicators:
   innocent_explanations:
   - Family firms and groups routinely trade with related parties
   - Disclosed, priced-at-market related-party deals are lawful
-  version: 1
+  version: 3
 - id: AF-009
   name: Results depend on subjective estimates, or estimates keep changing
   definition: Key figures (asset values, contract profits, reserves) rest on judgement, or the company
@@ -496,6 +550,19 @@ indicators:
     quote: the percentage of soft assets is high
     quote_verified: true
     checked: '2026-10-09'
+  - title: Predicting Material Accounting Misstatements (Dechow, Ge, Larson, Sloan)
+    publisher: Contemporary Accounting Research (Canadian Academic Accounting Association); copy hosted
+      by the Center for Audit Quality
+    year: '2011'
+    url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    locator: 'Table 4, p. 44; text p. 43: ''% soft assets is also significantly different, suggesting
+      more reporting flexibility in misstating years.'''
+    quote: 'Table 4 row: "% Soft assets 327 0.647 0.696 327 0.611 0.616 + 0.036 0.001 3.87". Text p. 43:
+      "% soft assets is also significantly different, suggesting more reporting flexibility in misstating
+      years."'
+    quote_verified: true
+    licence: Copyright CAAA; further reproduction not permitted
+    checked: '2026-10-10'
   examples:
   - Reserves built up in a good year and released in a bad year (cookie-jar reserves)
   - Long-term construction contract margins revised favourably
@@ -528,16 +595,21 @@ indicators:
   lookup_sources:
   - Financial statement notes on estimates and provisions
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Soft assets above 61.1% of total assets (the average for non-misstatement years in the study)
+    strong: Soft assets at or above 64.7% of total assets (the average for misstatement years in the study)
+    textbook: 'Meets the published definition as worded: key figures rest on subjective estimates, or
+      estimates keep changing without changed circumstances'
+    threshold_source: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    threshold_note: Peer-reviewed benchmark for share of soft assets (Dechow et al. 2011, US public companies).
+      These are group averages, not a regulatory threshold. The quote reports table values, not a sentence,
+      because the copyright notice prevented getting the exact table text. The medians are 0.696 vs 0.616.
+      No published number was found for how often estimates change (AUASB gives none).
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Many industries (construction, insurance, banking) are estimate-heavy by nature
   - Estimates are legitimately revised as information arrives
-  version: 1
+  version: 3
 - id: AF-010
   name: Significant, unusual or highly complex transactions, especially near period end
   definition: Big, odd or complicated deals, especially just before the books close, that lack business
@@ -1321,6 +1393,16 @@ indicators:
     quote: created the misleading appearance of consistent earnings across multiple reporting periods
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Staff Accounting Bulletin No. 99: Materiality'
+    publisher: US Securities and Exchange Commission
+    year: '1999'
+    url: https://www.sec.gov/interps/account/sab99.htm
+    locator: Topic 1.M, section 1 'Assessing Materiality'
+    quote: One rule of thumb in particular suggests that the misstatement or omission of an item that
+      falls under a 5% threshold is not material in the absence of particularly egregious circumstances
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - EPS beats consensus by exactly one cent repeatedly
   cases:
@@ -1342,15 +1424,22 @@ indicators:
   - Analyst consensus history
   - Quarterly filings
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Management calls a questionable item immaterial because it is below 5% of the relevant figure
+    strong: An adjustment below 5% that lets the company meet analysts' consensus expectations or turns
+      a loss into income, which SEC staff say can still be material
+    textbook: 'Meets the published definition as worded: recurring attempts to justify marginal or inappropriate
+      accounting on the basis of materiality'
+    threshold_source: https://www.sec.gov/interps/account/sab99.htm
+    threshold_note: US SEC Staff Accounting Bulletin 99. SEC staff describe 5% as a rule of thumb for
+      a preliminary assumption only, and warn that 'there are numerous circumstances in which misstatements
+      below 5% could well be material', including hiding a failure to meet analysts' consensus expectations
+      or changing a loss into income. The 5% therefore marks the line management tends to hide behind;
+      it is not a safe harbour.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Materiality judgements are a normal and required part of accounting
-  version: 1
+  version: 3
 - id: AF-025
   name: Strained or obstructed relationship with the auditor
   definition: Management fights with, pressures, misleads or restricts the auditor, or refuses to correct

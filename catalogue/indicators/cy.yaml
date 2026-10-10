@@ -287,6 +287,18 @@ indicators:
     quote: A customer appears distressed or anxious to access funds to meet demands or the timeline…
     quote_verified: true
     checked: '2026-10-09'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Paragraph 12, red flags concerning new users, p. 8. The same bullet opens 'Conducting a large
+      initial deposit to open a new relationship with a VASP and funding the entire deposit the first
+      day' and continues 'or if the customer withdraws the whole amount the day after'.
+    quote: the customer starts to trade the total amount or a large portion of the amount on that same
+      day or the day after
+    quote_verified: true
+    licence: not stated
+    checked: '2026-10-10'
   examples:
   - A retiree who has never owned crypto asks the bank to wire $150,000 to a crypto exchange the same
     day.
@@ -299,10 +311,15 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A customer new to crypto makes a large initial deposit and funds all of it on the first day
+      the account is opened. FATF gives no amount.
+    strong: The same customer trades most or all of that deposit on the same day or the day after.
+    textbook: 'Meets the FATF new-user indicator as worded: a large initial deposit funded in full on
+      the first day, then traded the same day or the day after, or withdrawn in full the day after.'
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    threshold_note: The published numbers are time windows (first day, same day, day after). No published
+      amount for 'large' was found. FinCEN's ransomware advisory (2021) and its pig-butchering alert give
+      no amount or time window. The FATF quote was read through a web fetch of the official PDF.
   threshold_verified: true
   cross_hints:
   - target_area: HT
@@ -313,7 +330,7 @@ indicators:
   - People do start investing in crypto for their own reasons
   - A large first purchase may follow an inheritance or bonus
   jurisdictions: US
-  version: 1
+  version: 2
 - id: CY-007
   name: Business with little crypto history makes a large crypto transfer
   definition: A company with no or limited crypto activity sends a large crypto transaction outside its
@@ -693,6 +710,16 @@ indicators:
     quote: over half are directly traced to illicit or high-risk activities
     quote_verified: true
     checked: '2026-10-09'
+  - title: Treasury Takes Robust Actions to Counter Ransomware
+    publisher: U.S. Department of the Treasury
+    year: '2021'
+    url: https://home.treasury.gov/news/press-releases/jy0364
+    locator: Press release jy0364, paragraph on the SUEX designation
+    quote: Analysis of known SUEX transactions shows that over 40% of SUEX’s known transaction history
+      is associated with illicit actors
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - Ransom proceeds from several ransomware variants cashed out through SUEX (Treasury).
   cases:
@@ -725,18 +752,24 @@ indicators:
   - UK and EU sanctions lists
   - Blockchain analytics exposure reports
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: The exchange is on a sanctions list, or official analysis attributes a large share of its
-      business to illicit actors as worded
-    threshold_source: none
+    faint: Official analysis traces some of the exchange's known transactions to illicit actors, but no
+      share is published (no published figure for this level).
+    strong: Official analysis attributes over 40% of the exchange's known transaction history to illicit
+      actors.
+    textbook: The exchange is on a sanctions list, or official analysis attributes over 40% of its known
+      transaction history to illicit actors (the share Treasury cited when it designated SUEX).
+    threshold_source: https://home.treasury.gov/news/press-releases/jy0364
+    threshold_note: 'US (OFAC). The 40% figure comes from Treasury''s analysis of one exchange (SUEX)
+      that was given as grounds for sanctions. It is not a general rule that Treasury applies to every
+      exchange. Other figure: Treasury''s 8 Nov 2021 Chatex release (jy0471) says ''over half are directly
+      traced to illicit or high-risk activities''. Both pages were checked on 2026-10-09.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Ordinary users of a since-sanctioned exchange may have traded before the designation
   - Indirect exposure through multiple hops is common
   jurisdictions: US (OFAC)
-  version: 1
+  version: 2
 - id: CY-014
   name: Ransomware group operating as a service with affiliates, data theft and leak-site threats
   definition: 'An attack follows the affiliate model: affiliates break in, encrypt and steal data, and
@@ -2528,6 +2561,15 @@ indicators:
     quote: A customer significantly older than the average age of platform users opens an account
     quote_verified: true
     checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Page 1, footnote 2
+    quote: an older adult is considered an individual 60 years of age or older
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - An 82-year-old opens an exchange account and deposits life savings.
   cases: []
@@ -2538,10 +2580,16 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The customer is noticeably older than the platform's typical user (no published figure for
+      this level).
+    strong: The customer is 60 or older and suddenly starts buying or discussing virtual currency.
+    textbook: The customer is 60 or older and significantly older than the platform's average user, as
+      FATF words it.
+    threshold_source: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    threshold_note: US. FATF gives no age. The 60-year figure is FinCEN's definition of an 'older adult'
+      in its elder financial exploitation advisory, which also lists 'An older customer suddenly begins
+      discussing and buying CVC' as a red flag. It defines the group at risk; it is not a gap from a platform's
+      average age.
   threshold_verified: true
   cross_hints:
   - target_area: EF
@@ -2551,7 +2599,7 @@ indicators:
   innocent_explanations:
   - Older people invest in crypto by choice
   jurisdictions: FATF members
-  version: 1
+  version: 2
 - id: CY-053
   name: Crypto converted to cash at a loss or whole balance traded at once
   definition: A user exchanges crypto for regular money at an obvious loss, or a new user immediately
@@ -2730,10 +2778,18 @@ indicators:
   - Employer endpoint/security logs
   - Network logs produced in litigation or prosecutions
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Remote-desktop settings or tools are present (for example port 3389 open) where remote desktop
+      is not normal company practice, or one unusually long login session that falls short of one day
+    strong: The account stays logged in continuously for one or more days at a time and remote-desktop
+      configuration is also present
+    textbook: 'Meets the published definition as worded: the account is logged in continuously for one
+      or more days at a time, and/or remote-desktop configuration such as port 3389 is in use where that
+      is not standard company practice'
+    threshold_source: https://ofac.treasury.gov/media/923126/download?inline
+    threshold_note: 'The number is the time window in the joint State/Treasury/FBI advisory on DPRK IT
+      workers (US): continuous login of ''one or more days at a time''. Port 3389 is a technical identifier,
+      not a threshold. The FBI IC3 PSAs (PSA250123, PSA240516) give no duration or count. Applies to freelance
+      and remote-work platforms and to employers.'
   threshold_verified: true
   cross_hints:
   - target_area: SF
@@ -2745,7 +2801,7 @@ indicators:
   - Long sessions may be left open by accident or by automated build jobs
   - Workers may remote into their own home machine while travelling
   jurisdictions: United States
-  version: 1
+  version: 2
 - id: CY-056
   name: Worker asks for work equipment to be sent to an address not on their ID, or changes address after
     hiring

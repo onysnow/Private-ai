@@ -332,6 +332,18 @@ indicators:
       during a defined time period
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Red flags in public procurement: A guide to using data to detect and mitigate risks'
+    publisher: Open Contracting Partnership
+    year: '2024'
+    url: https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf
+    locator: R055 'Multiple direct awards above or just below competitive threshold', Methodology, PDF
+      page 78 (R049 'Direct awards below threshold' is on PDF page 72 and uses the same 'more than 1 direct
+      award' wording)
+    quote: For each supplier k that has won more than 1 direct award from procuring entity j in period
+      t, calculate the sum of all the direct awards.
+    quote_verified: true
+    licence: CC BY-NC-SA 4.0
+    checked: '2026-10-10'
   examples:
   - A consultancy gets eight direct awards from one ministry in a year.
   cases: []
@@ -344,17 +356,23 @@ indicators:
   lookup_sources:
   - Procurement portal
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The supplier has won more than 1 direct (non-competitive) award from the same buyer in the
+      period.
+    strong: More than 1 direct award from the same buyer in the period, clustered just below the competitive
+      threshold (OCP R049).
+    textbook: More than 1 direct award from the same buyer in the period, and their combined value is
+      above the competitive threshold (OCP R055, also in Cardinal).
+    threshold_source: https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf
+    threshold_note: OCP leaves the length of 'period t' and the competitive threshold to local rules,
+      so they come from the jurisdiction's procurement law. The cited 2016 OCP guide states this flag
+      only as 'during a defined time period', with no number.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Supplier holds exclusive licence or maintenance rights
   - Framework or follow-on work legitimately tied to one firm
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-007
   name: Split purchases / awards just under thresholds
   definition: A purchase is divided into smaller contracts so each stays below the value that would require
@@ -386,6 +404,17 @@ indicators:
     quote: Splitting items that are usually purchased together to keep the contract value below threshold;
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Red flags in public procurement: A guide to using data to detect and mitigate risks'
+    publisher: Open Contracting Partnership
+    year: '2024'
+    url: https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf
+    locator: R011 'Splitting purchases to avoid procurement thresholds', Methodology, PDF page 34
+    quote: Two or more contracting procedures procuring the same item category are advertised in a short
+      time period (e.g. three months) and fall just below the competitive threshold value. The time period
+      and the distance to the threshold value (e.g. 1%, 2%) can be defined based on the context.
+    quote_verified: true
+    licence: CC BY-NC-SA 4.0
+    checked: '2026-10-10'
   examples:
   - Five IT purchases from one vendor on the same week, each just below the direct-award limit.
   cases: []
@@ -399,10 +428,15 @@ indicators:
   - Procurement portal
   - Published procurement thresholds
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A single award priced within 2% below the competitive threshold.
+    strong: Two or more same-category purchases by one buyer, each within 2% below the competitive threshold,
+      spread over more than three months.
+    textbook: Two or more same-category purchases by one buyer within three months, each falling 1% to
+      2% below the competitive threshold.
+    threshold_source: https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf
+    threshold_note: OCP gives three months and 1% or 2% as examples ('e.g.') to be set for each context,
+      not fixed rules. The threshold value itself comes from local procurement law. The cited IACRC and
+      OLAF sources describe splitting but give no number.
   threshold_verified: true
   cross_hints:
   - target_area: CO
@@ -414,7 +448,7 @@ indicators:
   - Budget released in tranches
   - Different departments buying independently
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-008
   name: Rigged, tailored or vague specifications
   definition: The technical requirements are written so that only one firm can meet them, or so vaguely
@@ -683,6 +717,17 @@ indicators:
     quote: The ratio of winning bids to submitted bids for a top tenderer is a low outlier.
     quote_verified: true
     checked: '2026-10-09'
+  - title: R025 Excessive unsuccessful bids
+    publisher: Open Contracting Partnership (Cardinal documentation)
+    year: '2026'
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/R/025.html
+    locator: Methodology section (the top-tenderer condition, 'greater than or equal to the upper fence
+      of the third quartile (Q3)', is in the line before)
+    quote: Its ratio is less than or equal to the lower fence of Q1 - 1.5(IQR), where Q1 is the first
+      quartile and IQR is the interquartile range for the set of ratios.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - A firm has bid on 40 tenders from one buyer and won none, always pricing 15–20% above the winner.
   cases: []
@@ -694,11 +739,17 @@ indicators:
   lookup_sources:
   - Procurement portal bid-level data
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded (Cardinal uses a statistical low-outlier test;
-      no fixed number)
-    threshold_source: none
+    faint: A tenderer with many bids (at or above the third quartile, Q3, of bid counts) whose win ratio
+      is in the bottom quarter (at or below Q1).
+    strong: The tenderer's win ratio is at or below the lower fence Q1 - 1.5(IQR), even though its bid
+      count is below Q3.
+    textbook: 'Meets the published definition as worded: bid count at or above Q3 and win ratio at or
+      below Q1 - 1.5(IQR) of all tenderers'' ratios.'
+    threshold_source: https://cardinal.readthedocs.io/en/latest/cli/indicators/R/025.html
+    threshold_note: This is a statistical test whose cut-off depends on the data, not a fixed number.
+      The only published constants are the 1.5 IQR multiplier and the Q1/Q3 quartiles, with a configurable
+      default percentile of 75. The 0.125 lower fence on the page comes from a worked example only. The
+      DOJ Antitrust and OCP 2016 sources give no number.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -706,7 +757,7 @@ indicators:
   - Uncompetitive cost structure
   - New entrant learning the market
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-013
   name: Bid suppression and withdrawn bids
   definition: Firms that would be expected to bid stay out, or withdraw a winning bid, so a chosen competitor
@@ -871,6 +922,17 @@ indicators:
     quote: The offered prices differ by fixed rounded percentages, e.g. by 2%, 3%, 7% etc.;
     quote_verified: true
     checked: '2026-10-09'
+  - title: R024 Price close to winning bid
+    publisher: Open Contracting Partnership (Cardinal documentation)
+    year: '2026'
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/R/024.html
+    locator: Methodology section
+    quote: A contracting process is flagged if the difference is less than or equal to the lower fence
+      of Q1 - 1.5(IQR), where Q1 is the first quartile and IQR is the interquartile range for the set
+      of differences.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Losing bids exactly 3% and 6% above the winner across several tenders.
   cases: []
@@ -881,17 +943,23 @@ indicators:
   lookup_sources:
   - Bid opening records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: 'Meets the published definition as worded (Cardinal: statistical low outlier)'
-    threshold_source: none
+    faint: The gap between the winning bid and the second-lowest valid bid is in the lowest quarter of
+      gaps for the set (at or below Q1).
+    strong: The gap is at or below the lower fence Q1 - 1.5(IQR).
+    textbook: 'Meets the published definition as worded: gap at or below Q1 - 1.5(IQR) of the set of differences,
+      and the winner and second-lowest bidder are both flagged.'
+    threshold_source: https://cardinal.readthedocs.io/en/latest/cli/indicators/R/024.html
+    threshold_note: This is a data-dependent outlier test. The 1.5 multiplier is the only fixed constant,
+      and the 0.05 and 0.02 values on the page are configuration and worked examples only. The fixed-percentage
+      part of this indicator is covered only by the OLAF example already cited ('differ by fixed rounded
+      percentages, e.g. by 2%, 3%, 7%'), which gives examples, not a threshold.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Competitive market with similar cost structures
   - Prices driven by a common published input cost
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-017
   name: Winning bid heavily discounted versus the runner-up
   definition: The winner's price is far below the second bid, which can mean the winner knew something
@@ -909,6 +977,17 @@ indicators:
       outlier.
     quote_verified: true
     checked: '2026-10-09'
+  - title: R058 Heavily discounted bid
+    publisher: Open Contracting Partnership (Cardinal documentation)
+    year: '2026'
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/R/058.html
+    locator: Methodology section
+    quote: A contracting process is flagged if the difference is greater than or equal to the upper fence
+      of Q3 + 1.5(IQR), where Q3 is the third quartile and IQR is the interquartile range for the set
+      of differences.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Winning bid 45% below every other bid, followed by large change orders.
   cases: []
@@ -920,10 +999,15 @@ indicators:
   lookup_sources:
   - Bid opening records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded (statistical high outlier)
-    threshold_source: none
+    faint: The gap between the second-lowest valid bid and the winning bid is in the top quarter of gaps
+      for the set (at or above Q3).
+    strong: The gap is at or above the upper fence Q3 + 1.5(IQR).
+    textbook: 'Meets the published definition as worded: gap at or above Q3 + 1.5(IQR) of the set of differences,
+      and the winner is flagged.'
+    threshold_source: https://cardinal.readthedocs.io/en/latest/cli/indicators/R/058.html
+    threshold_note: This is a data-dependent outlier test. The difference is (second-lowest valid bid
+      - winning bid) / winning bid. The 0.50 setting and the 10% fence in the worked example are illustrations,
+      not defaults.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -931,7 +1015,7 @@ indicators:
   - Firm buying market entry at a loss
   - Error in the bid
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-018
   name: Prices above estimates, history or published lists
   definition: Bids or contract prices are well above cost estimates, earlier prices, or price lists, or
@@ -972,6 +1056,18 @@ indicators:
     quote: Tender value is higher or lower than average for this item category
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Red flags in public procurement: A guide to using data to detect and mitigate risks'
+    publisher: Open Contracting Partnership
+    year: '2024'
+    url: https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf
+    locator: R031 'Winning bid price very close or higher than estimated price', Methodology, PDF page
+      54
+    quote: A contracting process is flagged if its Relative contract valuem is greater than or equal to
+      the upper fence of Q3 + 1.5(IQR) where Q3 is the third quartile and IQR is the interquartile range
+      for the set of ratios for market m.
+    quote_verified: true
+    licence: CC BY-NC-SA 4.0
+    checked: '2026-10-10'
   examples:
   - Asphalt contracts priced 30% above the engineer's estimate for three years, falling 25% the year an
     out-of-state firm bids.
@@ -986,10 +1082,17 @@ indicators:
   - Historical procurement prices
   - Market price indices
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The ratio of winning bid to estimated price is in the top quarter for the market (at or above
+      Q3).
+    strong: The ratio is at or above the upper fence Q3 + 1.5(IQR) for the market.
+    textbook: 'Meets the published definition as worded: ratio of winning bid to estimated price at or
+      above Q3 + 1.5(IQR) for the set of ratios in that market.'
+    threshold_source: https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf
+    threshold_note: This is a data-dependent outlier test, with the market defined by item classification
+      or the whole dataset. The same guide's 'Tender value is threshold distance from mean for item category'
+      flag uses the same Q3 + 1.5(IQR) fence on tender values. The OCP 2016 guide's 1% figure is for a
+      bid too close to the estimate and is marked 'for illustrative purposes', so it is not used here.
+      The DOJ and OLAF sources cited already ('much higher', 'significantly high') give no number.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -997,7 +1100,7 @@ indicators:
   - Poor or outdated estimate
   - Added risk or short deadlines
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-019
   name: Winning bid very close to the confidential cost estimate
   definition: The winner's price lands almost exactly on the buyer's internal estimate, suggesting the
@@ -1014,6 +1117,17 @@ indicators:
     quote: Winning Bid Very Close to Cost Estimates
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Red Flags for Integrity: Giving the green light to open data solutions'
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Flag 4 'Bid is too close to budget, estimate or preferred solution', sample calculation table
+      and R code, PDF pp. 19-20
+    quote: Add a binary flag (0,1) if the percentage distance between prices is less than X%. We have
+      used 1% for illustrative purposes.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Estimate 2,000,000; winning bid 1,998,700; other bids 2.4–2.9 million.
   cases: []
@@ -1024,17 +1138,24 @@ indicators:
   lookup_sources:
   - Internal estimate (often obtained by request or leak)
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The winning bid is close to the buyer's unpublished estimate, but more than 1% away
+    strong: The winning bid is within about 1% of the unpublished estimate, and other signs suggest bidders
+      had inside information
+    textbook: The winning bid is less than 1% away from the unpublished budget or cost estimate
+    threshold_source: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    threshold_note: Applies to how far the winning bid is from an unpublished budget or estimate, measured
+      as a percentage of the bid. The 1% figure comes from the Open Contracting Partnership's worked example.
+      OCP says it chose 1% 'for illustrative purposes' and is not a regulatory rule. The R code on the
+      same page flags bids where the distance is under 0.01. IACRC's cited page lists 'Winning Bid Very
+      Close to Cost Estimates' but gives no number. No regulator figure was found. The web-search budget
+      ran out, so this search went no wider than the cited sources.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Published estimate or budget ceiling that all bidders know
   - Accurate estimate in a mature market
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-020
   name: Physical similarities between bid documents
   definition: Bids from supposedly separate firms share typing errors, calculations, handwriting, formatting
@@ -1435,6 +1556,16 @@ indicators:
     quote: Tenders declared null and void due to errors;
     quote_verified: true
     checked: '2026-10-09'
+  - title: Excessive disqualified bids (R038), Cardinal 0.0.8 documentation
+    publisher: Open Contracting Partnership (Cardinal)
+    year: '2022'
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/R/038.html
+    locator: R038 page, section 'Methodology'
+    quote: A buyer is flagged if its ratio is greater than or equal to the upper fence of \(Q_3 + 1.5(IQR)\)
+      , where \(Q_3\) is the third quartile and \(IQR\) is the interquartile range for the set of ratios.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Four of five bids rejected for a missing page number; the remaining bid is the most expensive.
   cases: []
@@ -1446,17 +1577,26 @@ indicators:
   lookup_sources:
   - Evaluation reports, complaint decisions
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A buyer's share of disqualified bids is above the third quartile (Q3) of all buyers' shares
+    strong: The share is near the upper fence of Q3 + 1.5(IQR), or the lowest bid is disqualified when
+      price is the only award criterion
+    textbook: A buyer's, procuring entity's or bidder's share of disqualified bids is greater than or
+      equal to the upper fence of Q3 + 1.5(IQR)
+    threshold_source: https://cardinal.readthedocs.io/en/latest/cli/indicators/R/038.html
+    threshold_note: 'Applies to the share of submitted bids that get disqualified, measured per buyer,
+      procuring entity or bidder against all of them in the same dataset. The cut-off is relative: it
+      is the standard outlier fence, Q3 + 1.5 times the interquartile range. On the same Cardinal site,
+      R035 (''All except winning bid disqualified'') uses a count: a process is flagged when ''At least
+      1 other tenderer submitted a bid that was disqualified. (1 is the threshold.)'' R036 (lowest bid
+      disqualified when price is the only criterion) flags it whenever it happens and has no number. The
+      OLAF and IACRC sources give no number.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Bidders genuinely failed mandatory requirements
   - Abnormally low bids lawfully rejected
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-027
   name: Unbalanced line-item bidding
   definition: A bidder prices some line items far too low and others far too high, often because it was
@@ -2494,6 +2634,18 @@ indicators:
     quote: structures transactions to avoid mandatory reporting requirements
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1010.311 Filing obligations for reports of transactions in currency
+    publisher: US Department of the Treasury, FinCEN (Code of Federal Regulations, eCFR)
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    locator: 31 CFR 1010.311
+    quote: Each financial institution other than a casino shall file a report of each deposit, withdrawal,
+      exchange of currency or other payment or transfer, by, through, or to such financial institution
+      which involves a transaction in currency of more than $10,000, except as otherwise provided in this
+      section.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - A mosque appeal collected in cash and deposited by a trustee into his personal account in amounts
     just under the reporting threshold.
@@ -2508,10 +2660,19 @@ indicators:
   - Bank records (via leak or court)
   - Charity accounts
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The charity makes repeated cash deposits or withdrawals just under $10,000, or takes donations
+      into staff's personal accounts
+    strong: Several cash transactions in a short period add up to more than $10,000 and appear structured
+      to avoid reporting
+    textbook: The charity makes a cash transaction of more than $10,000, which a financial institution
+      must report, or deliberately keeps transactions under that line
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    threshold_note: 'Applies to the size of cash transactions. The figure is the US currency transaction
+      reporting line under 31 CFR 1010.311, which matches the cited AUSTRAC indicator ''structures transactions
+      to avoid mandatory reporting requirements''. Australia''s own cash-reporting line (AUSTRAC threshold
+      transaction reports) could not be read: the AUSTRAC page refused automated access, so its figure
+      is not used. AUSTRAC''s NPO indicators page (updated 25 Mar 2026) gives no numbers. The personal-bank-account
+      part of this indicator is yes-or-no and has no number.'
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -2522,7 +2683,7 @@ indicators:
   - Small charities without their own bank account
   - Banks having de-risked the charity
   jurisdictions: Australia (AUSTRAC), global
-  version: 1
+  version: 2
 - id: PP-047
   name: Opaque NPO structure, false identity or sham NPO
   definition: The charity gives unverifiable details, hides who controls it, has unclear income, or is
@@ -2856,11 +3017,19 @@ indicators:
   lookup_sources:
   - Election commission precinct results
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded (finite mixture model estimates non-zero incremental
-      or extreme fraud)
-    threshold_source: none
+    faint: The turnout-by-vote-share plot is smeared from the main cluster toward the upper right. The
+      source gives no number for this
+    strong: A separate cluster of polling units appears near 100% turnout with almost all votes going
+      to one party
+    textbook: A second peak appears in the vicinity of the 100% turnout, 100% votes point, and the model
+      estimates extreme fraud above zero
+    threshold_source: https://arxiv.org/pdf/1201.3087
+    threshold_note: Applies to polling units' turnout and the winner's vote share. The 100%/100% point
+      marks 'extreme fraud' in Klimek et al. For incremental and extreme fraud, the paper's cut-off is
+      estimates 'significantly larger than zero', not a fixed number. As examples, the paper reports fe
+      = 0.033 (Russia 2011) and fe = 0.021 (Russia 2012), and says these mean 'two to three percent of
+      all electoral units experience extreme fraud'. The Michigan/USAID election forensics guide defines
+      fi and fe but was not re-read for a fixed number.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -2868,7 +3037,7 @@ indicators:
   - Closed communities (military bases, institutions) voting together
   - Strategic behaviour, which the guide notes can mimic fraud
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: PP-053
   name: Second-digit (Benford 2BL) deviation in vote counts
   definition: The average second digit of precinct vote counts differs from the 4.187 expected under Benford's
@@ -3315,17 +3484,28 @@ indicators:
   - Electoral Commission spending returns
   - Supplier company records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Spending above the statutory limit (meets the published definition as worded)
+    faint: The spending return leaves items out or lacks invoices or receipts, and total spending is near
+      the limit (no published number for this level)
+    strong: Spending that should have been reported was routed through a group working with the campaign
+      under a common plan, which takes the true total near or over the limit (no published number for
+      this level)
+    textbook: Reported plus unreported spending is above the statutory limit (for example above £7 million
+      for a designated lead campaigner in a UK referendum)
     threshold_source: https://www.electoralcommission.org.uk/media-centre/vote-leave-fined-and-referred-police-breaking-electoral-law
+    threshold_note: 'The number is the statutory spending limit, which depends on the type of campaigner
+      and election. This is a UK referendum case: a designated lead campaigner had a £7 million limit.
+      The same Electoral Commission release also gives a £10,000 limit for a non-registered campaigner
+      (BeLeave), 43 inaccurately reported items totalling £236,501.44, and eight payments of over £200
+      with no invoice or receipt (£12,849.99). The £200 invoice figure is not used in the levels because
+      it sits in a different sentence from the quote. For other elections, use the limit set for that
+      office or campaign.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Genuinely independent groups sharing a common supplier
   - Late invoices and accounting errors
   jurisdictions: United Kingdom
-  version: 1
+  version: 2
 - id: PP-062
   name: 'Bait and switch: key staff, equipment or facilities named in the bid are swapped after award'
   definition: The winning firm names people, equipment or premises in its bid, then swaps them for lesser
@@ -3396,6 +3576,20 @@ indicators:
       price of the experienced bidders;
     quote_verified: true
     checked: '2026-10-09'
+  - title: Real Decreto 1098/2001, de 12 de octubre, por el que se aprueba el Reglamento general de la
+      Ley de Contratos de las Administraciones Públicas
+    publisher: Government of Spain, Boletín Oficial del Estado
+    year: '2001'
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2001-19995
+    locator: Artículo 85, Criterios para apreciar las ofertas desproporcionadas o temerarias en las subastas,
+      points 1-3
+    quote: 1. Cuando, concurriendo un solo licitador, sea inferior al presupuesto base de licitación en
+      más de 25 unidades porcentuales. 2. Cuando concurran dos licitadores, la que sea inferior en más
+      de 20 unidades porcentuales a la otra oferta. 3. Cuando concurran tres licitadores, las que sean
+      inferiores en más de 10 unidades porcentuales a la media aritmética de las ofertas presentadas.
+    quote_verified: true
+    licence: Not stated on page (official Spanish legislation)
+    checked: '2026-10-10'
   examples:
   - A first-time bidder wins a road contract at 40% below the engineer's estimate and then files large
     claims for 'unforeseen' costs.
@@ -3408,10 +3602,19 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: With three or more bidders, the bid is more than 10 percentage points below the arithmetic
+      mean of the bids
+    strong: With two bidders, the bid is more than 20 percentage points below the other bid
+    textbook: With a single bidder, the bid is more than 25 percentage points below the base tender budget;
+      Art. 85 also treats any discount above 25 percentage points as abnormally low
+    threshold_source: https://www.boe.es/buscar/act.php?id=BOE-A-2001-19995
+    threshold_note: 'Spain''s procurement regulation (Real Decreto 1098/2001, Art. 85) sets fixed percentage
+      triggers for presuming a bid abnormally low (''desproporcionada o temeraria''). Point 5 lets the
+      buyer cut these percentages by up to a third, with reasons. Spain only. Other sources: the EU Directive
+      2014/24/EU (Art. 69) and the World Bank require checks but set no number. The OCP ''Red flags in
+      public procurement'' guide (2024), R058 ''Heavily discounted bid'', which is also in Cardinal, flags
+      a winning bid whose gap to the second-lowest valid bid is at or above the upper fence Q3 + 1.5(IQR).
+      That is a statistical outlier rule, not a fixed percentage.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -3419,7 +3622,7 @@ indicators:
   - The firm has spare capacity, its own materials or a cheaper method.
   - The cost estimate was too high.
   jurisdictions: World Bank projects; EU (Directive 2014/24/EU requires checks on abnormally low tenders)
-  version: 1
+  version: 2
 - id: PP-064
   name: Bidder or its adviser helped draft the specifications or preparatory studies
   definition: A company, or an outside expert linked to it, wrote or advised on the tender documents and

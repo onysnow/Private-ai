@@ -336,6 +336,15 @@ indicators:
     quote: knowingly say something false to convince a current or former full-time or part-time employee
     quote_verified: true
     checked: '2026-10-09'
+  - title: New rules for changing from casual to full-time or part-time employment
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2024'
+    url: https://www.fairwork.gov.au/about-us/workplace-laws/legislation-changes/closing-loopholes/casual-employment-changes/casual-conversion
+    locator: Eligibility to give notice section
+    quote: have been employed for at least 6 months (12 months if employed by a small business)
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Rosters show a 'casual' worker on the same 38-hour weekly pattern for two years.
   cases: []
@@ -345,10 +354,21 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A worker labelled casual has worked regular, steady hours like permanent staff, but for less
+      than 6 months (less than 12 months at a small business).
+    strong: A worker labelled casual has worked regular, steady hours matching permanent staff for at
+      least 6 months (12 months if the employer is a small business) and is still treated as casual.
+    textbook: A worker has been employed as a casual for at least 6 months (12 months at a small business)
+      on hours matching permanent staff, has the right to give notice to change to permanent under the
+      employee choice pathway, and is still kept on casual terms.
+    threshold_source: https://www.fairwork.gov.au/about-us/workplace-laws/legislation-changes/closing-loopholes/casual-employment-changes/casual-conversion
+    threshold_note: The 6- and 12-month figures are the Fair Work Act eligibility window for a casual
+      to give notice to change to full-time or part-time (the employee choice pathway). This applies from
+      26 February 2025 for casuals employed before 26 August 2024 by non-small businesses, and from 26
+      August 2025 for small business employees. It is a legal window, not a test that proves a sham arrangement.
+      The Fair Work casual employees page separately uses 'a regular and systematic basis over at least
+      12 months', but for flexible-working and unpaid-parental-leave rights, not for conversion. Australia
+      only.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -356,7 +376,7 @@ indicators:
     genuine casuals can work regular shifts.
   - Worker may prefer casual loading over leave.
   jurisdictions: Australia
-  version: 1
+  version: 2
 - id: LE-007
   name: No casual loading paid or shown on pay slips
   definition: Casual workers do not receive the extra casual loading (usually 25%) on top of their base
@@ -532,6 +552,18 @@ indicators:
       minimums for the work
     quote_verified: true
     checked: '2026-10-09'
+  - title: Minimum wage increase starts today
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2026'
+    url: https://www.fairwork.gov.au/newsroom/media-releases/2026-media-releases/july-2026/20260701-minimum-wage-increase-media-release
+    locator: Media release, opening paragraphs
+    quote: The National Minimum Wage is now $1,004.90 per week (based on a 38-hour week for a full-time
+      employee), or $26.44 per hour. ... must receive at least $33.05 per hour, which includes the 25
+      per cent casual loading
+    quote_verified: true
+    licence: Not stated on page (Fair Work Ombudsman website copyright, generally CC BY 4.0 for fairwork.gov.au
+      content - not confirmed)
+    checked: '2026-10-10'
   examples:
   - 'Case study: ''Pay slips have flat rates and do not reflect overtime.'' (OTB p.13)'
   cases: []
@@ -543,17 +575,24 @@ indicators:
   lookup_sources:
   - Modern award pay guides
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A flat hourly rate at or just above $26.44 that stays the same on nights, weekends and public
+      holidays, so no penalty rates or loadings are added on top of the minimum
+    strong: A flat rate below $33.05 an hour paid to casual workers, meaning the 25 per cent casual loading
+      is missing
+    textbook: A flat rate below $26.44 an hour, the National Minimum Wage from 1 July 2026
+    threshold_source: https://www.fairwork.gov.au/newsroom/media-releases/2026-media-releases/july-2026/20260701-minimum-wage-increase-media-release
+    threshold_note: 'Australia only. The National Minimum Wage is the legal floor for adults with no award.
+      Most modern awards set higher base rates and also require penalty rates, so a flat rate can break
+      the law even when it is above $26.44. Check the award that applies. The rate changes every 1 July:
+      the previous figures were $24.95 an hour and $31.19 for casuals (FWO media release, 1 July 2025).
+      The rates in the Walk Free and MJI guidance ($15, $20, $25) are examples, not thresholds.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - A lawful annualised salary or above-award flat rate can cover loadings if it leaves the worker no
     worse off.
   jurisdictions: Australia
-  version: 1
+  version: 2
 - id: LE-011
   name: Rosters, time records, access logs, pay slips and payments do not match
   definition: Independent records of when people were at work (access cards, CCTV, register log-ins, housekeeping
@@ -1107,6 +1146,15 @@ indicators:
       wage
     quote_verified: true
     checked: '2026-10-09'
+  - title: Frequency of pay
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2026'
+    url: https://www.fairwork.gov.au/pay-and-wages/paying-wages/frequency-of-pay
+    locator: Frequency of pay page, opening section
+    quote: 'Employees must be paid at least monthly and can be paid by one, or a combination of, the following:'
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Bank statements show wage deposits at irregular 3 to 7 week gaps.
   cases: []
@@ -1117,10 +1165,16 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Pay dates are irregular or come later than the agreed schedule, but workers are still paid
+      at least monthly
+    strong: Payments are often late enough that the gap between pays comes close to a month
+    textbook: Wages are not paid at least monthly, which breaks the legal minimum pay frequency
+    threshold_source: https://www.fairwork.gov.au/pay-and-wages/paying-wages/frequency-of-pay
+    threshold_note: Australia (Fair Work Act 2009 s323(1)(c), a civil remedy provision; the FWO page restates
+      it). Awards and agreements often set weekly or fortnightly pay, and missing those dates is also
+      a breach, but no number is published for that. The Walk Free/MJI guidance and the ATO phoenix page
+      describe late pay without a figure. The FWO 7-Eleven report says one worker 'sometimes waited weeks
+      for payment' (p.23), which is a case, not a threshold.
   threshold_verified: true
   cross_hints:
   - target_area: HT
@@ -1130,7 +1184,7 @@ indicators:
   - One-off bank or payroll system failure.
   - Change of payroll provider.
   jurisdictions: General
-  version: 1
+  version: 2
 - id: LE-023
   name: Unlawful or unexplained deductions from pay
   definition: Money is taken out of wages for things like alleged misconduct, breakages, till shortfalls,
@@ -1172,6 +1226,16 @@ indicators:
     quote_verified: true
     licence: US federal government work
     checked: '2026-10-09'
+  - title: 'Employment Rights Act 1996, section 18: Limits on amount and time of making deductions'
+    publisher: UK Parliament (legislation.gov.uk, The National Archives)
+    year: '1996'
+    url: https://www.legislation.gov.uk/ukpga/1996/18/section/18
+    locator: s.18(1)
+    quote: the amount or aggregate amount of the deduction or deductions shall not exceed one-tenth of
+      the gross amount of the wages payable to the worker on that day
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-10'
   examples:
   - 'Worker quote: ''They took two weeks’ pay because I lost a key.'' (OTB p.9)'
   - 'US: requiring workers to buy tools for the job is a violation in any week the cost cuts into minimum
@@ -1185,10 +1249,18 @@ indicators:
   lookup_sources:
   - Applicable award or agreement
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Deductions for till shortfalls or missing stock appear on pay slips, below one-tenth of gross
+      pay for that pay day
+    strong: Deductions for shortfalls or missing stock reach about one-tenth of gross pay on a pay day
+    textbook: Deductions for cash shortages or stock deficiencies exceed one-tenth of the gross wages
+      payable on that pay day (UK retail employment)
+    threshold_source: https://www.legislation.gov.uk/ukpga/1996/18/section/18
+    threshold_note: 'The one-tenth cap is set by UK law (Employment Rights Act 1996 s18(1)) and covers
+      only retail work and only deductions for cash shortages or stock deficiencies. Other rules have
+      no percentage: in the US (29 CFR 531.35) and under the UK national minimum wage, a deduction must
+      not take pay below the minimum wage. In Australia (FWO), a deduction must be agreed in writing and
+      be mainly for the employee''s benefit. The Walk Free/MJI guidance gives no number, only a worker
+      quote about losing ''two weeks'' pay'' for a lost key.'
   threshold_verified: true
   cross_hints:
   - target_area: HT
@@ -1200,7 +1272,7 @@ indicators:
   - Deductions required by law (tax, court-ordered garnishment).
   - Some awards allow deductions for breakages in narrow cases.
   jurisdictions: Australia, UK, US
-  version: 1
+  version: 2
 - id: LE-024
   name: 'Cashback: workers made to hand back part of their wages'
   definition: The employer pays the correct wage on paper, then requires workers to return part of it
@@ -1633,6 +1705,17 @@ indicators:
     quote: deregistration of the business
     quote_verified: true
     checked: '2026-10-09'
+  - title: ASIC action to disqualify company directors
+    publisher: Australian Securities and Investments Commission (ASIC)
+    year: '2024'
+    url: https://www.asic.gov.au/about-asic/news-centre/articles/asic-action-to-disqualify-company-directors/
+    locator: Article body, paragraph on the brief to the ASIC Hearing Delegate
+    quote: To disqualify a director, the relevant companies must be in liquidation and ASIC must have
+      received two or more initial statutory reports (s533(1) reports) from liquidators in the last seven
+      years.
+    quote_verified: true
+    licence: Not stated on page (ASIC website copyright terms apply)
+    checked: '2026-10-10'
   examples:
   - 'Harvest Trail Inquiry: a labour hire contractor (now deregistered) and deregistration used as a tactic
     to evade responsibility (pp.35, 38).'
@@ -1647,10 +1730,21 @@ indicators:
   - Insolvency notices
   - Banned and disqualified persons register
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A director of the labour supplier has been involved with a company that went into liquidation,
+      but fewer than two such companies in the last seven years (or the supplier itself has been deregistered).
+    strong: A director has been involved with two or more companies that went into liquidation, whether
+      or not within the last seven years.
+    textbook: A director has been involved with two or more companies in liquidation in the last seven
+      years, with liquidators' initial statutory reports lodged for them. This is the threshold at which
+      ASIC can disqualify a director.
+    threshold_source: https://www.asic.gov.au/about-asic/news-centre/articles/asic-action-to-disqualify-company-directors/
+    threshold_note: 'Counts prior liquidated companies per director. Australia only, under Corporations
+      Act s206F. The same article adds: ''the law only requires people to be involved in two or more failed
+      companies to be considered for director disqualification''. ASIC also says not every failure meets
+      the threshold. The Senate Economics References Committee report on insolvency in the construction
+      industry (ch. 7, para 7.4) says the same thing: two or more companies wound up within seven years.
+      Its page blocked direct download, so the ASIC page is the one cited. Deregistration alone has no
+      published number.'
   threshold_verified: true
   cross_hints:
   - target_area: FR
@@ -1660,7 +1754,7 @@ indicators:
   - Directors of genuinely failed businesses who started again lawfully.
   - Voluntary deregistration of a solvent dormant company.
   jurisdictions: Australia
-  version: 1
+  version: 2
 - id: LE-032
   name: Superannuation or other entitlements not paid
   definition: Compulsory retirement contributions (superannuation) or other entitlements are missing.
@@ -1731,6 +1825,19 @@ indicators:
     quote: the FWO was unable to definitively confirm an employment relationship
     quote_verified: true
     checked: '2026-10-09'
+  - title: Ley 32/2006, de 18 de octubre, reguladora de la subcontratación en el Sector de la Construcción
+      (consolidated text)
+    publisher: Boletín Oficial del Estado (Spain), Jefatura del Estado
+    year: '2006'
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2006-18205
+    locator: Artículo 5, apartado 2, letras c) y d) (letra f bars labour-only subcontractors from subcontracting)
+    quote: c) El primer y segundo subcontratistas podrán subcontratar la ejecución de los trabajos que,
+      respectivamente, tengan contratados, salvo en los supuestos previstos en la letra f) del presente
+      apartado. d) El tercer subcontratista no podrá subcontratar los trabajos que hubiera contratado
+      con otro subcontratista o trabajador autónomo.
+    quote_verified: true
+    licence: BOE consolidated legislation; reuse permitted under BOE terms (not stated on the extract)
+    checked: '2026-10-10'
   examples:
   - Growers -> labour hire company -> sub-contractor -> 'team leader' paying workers in cash.
   cases: []
@@ -1745,17 +1852,24 @@ indicators:
   - Company registry
   - Labour hire licence registers
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Work passes from the contractor to a first or second subcontractor, which the law allows, but
+      the chain is getting longer.
+    strong: 'Work reaches a third-level subcontractor, the last tier that may hold the work. Also strong:
+      a labour-only subcontractor appears anywhere in the chain.'
+    textbook: A third-level subcontractor (or a self-employed worker, or a labour-only subcontractor)
+      passes the work on again. That breaks the published limit on chain length.
+    threshold_source: https://www.boe.es/buscar/act.php?id=BOE-A-2006-18205
+    threshold_note: The pattern counts layers in the chain. The only published numeric cap found is Spain's
+      construction-sector law, which ends the chain at the third subcontractor. The catalogue's own Australian
+      source (FWO Harvest Trail Inquiry) says multiple levels raise the risk but gives no number. Apply
+      this as a benchmark outside Spanish construction, not as a legal limit.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Specialist subcontracting is normal in construction and facilities services.
   - Seasonal surges handled through licensed labour hire.
   jurisdictions: Australia; general
-  version: 1
+  version: 2
 - id: LE-034
   name: Contract price too low to pay legal wages
   definition: The price a client pays a labour supplier (for example a fixed per-room cleaning rate, or
@@ -2056,6 +2170,18 @@ indicators:
     quote_verified: true
     licence: US federal government work
     checked: '2026-10-09'
+  - title: 'Fact Sheet #43: Child Labor Provisions of the Fair Labor Standards Act (FLSA) for Nonagricultural
+      Occupations'
+    publisher: US Department of Labor, Wage and Hour Division
+    year: '2016'
+    url: https://www.dol.gov/agencies/whd/fact-sheets/43-child-labor-non-agriculture
+    locator: Age requirements section; hours limits for 14- and 15-year-olds listed under Child Labor
+      Regulation No. 3 (29 C.F.R. 570.35)
+    quote: no one under 18 may be employed in any occupation the Secretary of Labor has declared to be
+      hazardous.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - At least 102 minors aged 13 to 17 cleaning slaughterhouse equipment on overnight shifts at 13 plants
     in 8 states.
@@ -2080,11 +2206,18 @@ indicators:
   - School enrolment records (by a person)
   - Contract records between plant owners and sanitation contractors
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded (minors employed in occupations the law declares
-      hazardous for their age).
-    threshold_source: none
+    faint: 'A 14- or 15-year-old works outside the permitted window: before 7 a.m. or after 7 p.m. (after
+      9 p.m. between June 1 and Labor Day), or more than 3 hours on a school day.'
+    strong: A worker under 18 is employed by or through a contractor on night shifts or around dangerous
+      machinery.
+    textbook: A worker under 18 is employed in an occupation the Secretary of Labor has declared hazardous
+      (US FLSA).
+    threshold_source: https://www.dol.gov/agencies/whd/fact-sheets/43-child-labor-non-agriculture
+    threshold_note: 'Countable by worker age and hours worked. The same fact sheet gives the hours for
+      14- and 15-year-olds: ''between 7 a.m. and 7 p.m.—except between June 1 and Labor day when the evening
+      hour is extended to 9 p.m.''; ''no more than 3 hours on a school day''; ''no more than 18 hours
+      during a week when school is in session''. US federal law only; state laws may be stricter. Text
+      was read through a page summary tool, so check the exact wording on the page before publishing.'
   threshold_verified: true
   cross_hints:
   - target_area: HT
@@ -2095,7 +2228,7 @@ indicators:
   - Worker presented false adult identity documents.
   - Age rules differ by job and jurisdiction; some youth work is lawful.
   jurisdictions: US (FLSA child labor provisions); general
-  version: 1
+  version: 2
 - id: LE-040
   name: No written contract and no say over conditions
   definition: Workers have no employment contract and cannot negotiate their pay, hours or where they

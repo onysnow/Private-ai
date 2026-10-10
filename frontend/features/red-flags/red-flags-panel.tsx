@@ -55,6 +55,7 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
       {source && <div className="rf-row"><b>Documented in.</b> <a href={source.url} target="_blank" rel="noreferrer">{source.publisher}, {source.title}</a>
         {source.locator ? `, ${source.locator}` : ''}: “{source.quote}”</div>}
       <div className="rf-row"><b>This level.</b> <GlossaryText text={`${LEVEL[flag.level].name}: ${ind.levels[flag.level as 'faint' | 'strong' | 'textbook']}`}/></div>
+      {ind.levels.threshold_note && <div className="rf-row rf-note"><b>About the numbers.</b> {ind.levels.threshold_note}</div>}
       {ind.cross_hints.length > 0 && <div className="rf-row"><b>This may also point to.</b> {ind.cross_hints.map((h, i) => <span key={i}>
         {i > 0 && ' '}<a href={h.source_url} target="_blank" rel="noreferrer">{h.target_area}</a>: <GlossaryText text={h.reason}/></span>)}</div>}
     </>}

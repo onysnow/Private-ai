@@ -16248,6 +16248,17 @@
             "title": "Textbook",
             "type": "string"
           },
+          "threshold_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threshold Note"
+          },
           "threshold_source": {
             "title": "Threshold Source",
             "type": "string"

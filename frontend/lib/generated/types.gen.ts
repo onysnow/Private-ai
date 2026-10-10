@@ -7039,6 +7039,10 @@ export type FlagLevelsOut = {
    */
   textbook: string;
   /**
+   * Threshold Note
+   */
+  threshold_note?: string | null;
+  /**
    * Threshold Source
    */
   threshold_source: string;

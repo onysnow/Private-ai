@@ -162,7 +162,8 @@ Source numbers in square brackets refer to the Sources list.</p>"""
         if i.typology:
             out.append(f'<p class="muted small">Typology: {e(i.typology)}</p>')
         lv = i.levels
-        out.append('<h4>Levels</h4>' + "".join(f'<p class="lvl"><b>{k}:</b> {e(v)}</p>' for k, v in (("Faint", lv.faint), ("Strong", lv.strong), ("Textbook", lv.textbook))))
+        out.append('<h4>Levels</h4>' + "".join(f'<p class="lvl"><b>{k}:</b> {e(v)}</p>' for k, v in (("Faint", lv.faint), ("Strong", lv.strong), ("Textbook", lv.textbook)))
+                   + (f'<p class="muted small">About the numbers: {e(lv.threshold_note)}</p>' if lv.threshold_note else ""))
         check = CHECK[i.checkable.value] + (f": {e(', '.join(i.lookup_sources))}" if i.lookup_sources else "")
         out.append(f'<h4>How it can be checked</h4><p>{check}</p>')
         if i.data_needed:

@@ -685,6 +685,16 @@ indicators:
     quote: Work excessively long hours over long periods
     quote_verified: true
     checked: '2026-10-09'
+  - title: Q&As on business and working time
+    publisher: International Labour Organization (Helpdesk for Business)
+    year: '2012'
+    url: https://www.ilo.org/resource/qas-business-and-working-time-0
+    locator: Answer to 'Are 24 hour shifts consistent with international labour standards?'
+    quote: The relevant international labour standards set a limit on normal (pre-overtime) hours of 8
+      per day and 48 hours per week.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Time records showing 7-day weeks for months
   - Audits finding hours far above legal limits
@@ -705,17 +715,24 @@ indicators:
   - Social audit reports
   - Labour inspection data
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Normal hours regularly above 8 per day or 48 per week.
+    strong: Hours well above 48 per week kept up over long periods, with no rest days.
+    textbook: 'Meets the published definition as worded: made to work hours or days beyond the national
+      legal limit, under a threat or penalty.'
+    threshold_source: https://www.ilo.org/resource/qas-business-and-working-time-0
+    threshold_note: The ILO gives international baselines of 8 hours a day and 48 hours a week. Its forced-labour
+      indicator itself refers back to national law, so the textbook level depends on the country. The
+      same ILO Q&A also states a 56-hour weekly maximum for continuous shift work and a weekly rest of
+      at least one full calendar day (agriculture answer). ILO 2012 indicators (wcms_203832) and the UNODC
+      indicators give no number. The ILO FLARE deck (ilo.org/media/288716) also refers back to national
+      law.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Voluntary paid overtime in peak season
   - Legal shift systems with compensating rest
   jurisdictions: International
-  version: 1
+  version: 2
 - id: HT-012
   name: Third party controls the customer at the bank
   definition: A companion speaks for the customer, insists on being present, fills in forms for them,
@@ -1064,6 +1081,15 @@ indicators:
     quote: Frequent purchases for food delivery services, often on the same day.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Operational alert: Laundering of proceeds from human trafficking for sexual exploitation (FINTRAC-2021-OA001)'
+    publisher: FINTRAC (Financial Transactions and Reports Analysis Centre of Canada)
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, 'Types of financial transactions' (hotel transactions list)
+    quote: Hotel transactions by the same individual for two separate rooms for the same dates;
+    quote_verified: true
+    licence: Not stated (Government of Canada site)
+    checked: '2026-10-10'
   examples:
   - Several hotel rooms and multiple fast-food orders on the same day from one card
   - A construction firm paying for workers' groceries and housing in bulk with no payroll
@@ -1076,10 +1102,16 @@ indicators:
   lookup_sources:
   - Merchant category data in bank records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Frequent purchases for food delivery, often several on the same day, or hotel, transport and
+      pharmacy spending that does not fit the holder's own life.
+    strong: One person pays for two separate hotel rooms for the same dates, along with other spending
+      on several people's needs.
+    textbook: 'Meets the published definition as worded: spending that is not what the customer would
+      be expected to spend, apparently covering trafficking victims'' living costs.'
+    threshold_source: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    threshold_note: The number used is FINTRAC's count of two rooms for the same dates. FINTRAC also lists
+      'Frequent purchases for food delivery services, often on the same day.' as a same-day time window.
+      Neither FinCEN advisory (2014 FIN-2014-A008 or 2020) gives a number for this pattern.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -1087,7 +1119,7 @@ indicators:
   - Employers lawfully providing room and board
   - Shared household spending
   jurisdictions: United States, Canada
-  version: 1
+  version: 2
 - id: HT-018
   name: Transactions across many cities in a short time
   definition: Purchases, deposits and hotel stays move quickly between cities or provinces, sometimes
@@ -1136,18 +1168,21 @@ indicators:
   lookup_sources:
   - ATM and merchant location data
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Deposits in one city followed by same day or next day withdrawal or purchase in another
-      city (FINTRAC wording).
+    faint: Purchases, deposits or hotel stays spread across several cities, with no tight timing.
+    strong: A deposit in one city followed by a withdrawal or purchase in another city the next day.
+    textbook: A deposit in one city followed by a withdrawal or purchase in another city on the same day
+      or the next day (FINTRAC wording).
     threshold_source: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    threshold_note: 'The time window is the same day or the next day. FinCEN FIN-2014-A008 Appendix B
+      uses a similar window for funnel accounts: ''the funds are quickly withdrawn (same day) after the
+      deposits are made.'' The FinCEN 2020 advisory gives no number.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Truck drivers, sales reps, touring performers, travelling nurses
   - Holidays
   jurisdictions: United States, Canada
-  version: 1
+  version: 2
 - id: HT-019
   name: Night-time and after-hours activity
   definition: Cash activity or card sales happen mostly late at night, or a day-time business takes most

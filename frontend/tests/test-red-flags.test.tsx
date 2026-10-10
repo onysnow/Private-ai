@@ -31,7 +31,7 @@ const flag = {
   links: ['l1', 'l2'], facts: {}, summary: 'Ownership runs in a loop: A Ltd → B Ltd → A Ltd.',
   first_seen_at: '2026-10-10T00:00:00', last_seen_at: '2026-10-10T00:00:00', gone_at: null,
   indicator: {id: 'BO-001', name: 'Circular ownership', definition: 'Companies own each other in a loop.', area: 'BO', area_name: 'Hidden ownership and shell companies',
-    levels: {faint: 'To be set', strong: 'To be set', textbook: 'Meets the published definition as worded', threshold_source: 'none'},
+    levels: {faint: 'To be set', strong: 'To be set', textbook: 'Meets the published definition as worded', threshold_source: 'none', threshold_note: 'Applies in the UK only.'},
     sources: [{title: 'Concealment of Beneficial Ownership', publisher: 'FATF and Egmont Group', url: 'https://example.test/fatf', locator: 'Annex E', quote: 'circular ownership'}],
     innocent_explanations: ['Group cross-holdings or treasury shares.'], cross_hints: [{target_area: 'ML', reason: 'Loops are used to layer funds.', source_url: 'https://example.test/x'}], version: 1},
 };
@@ -47,6 +47,7 @@ describe('RedFlagsPanel', () => {
     expect(within(card).getByText(/Group cross-holdings/)).toBeInTheDocument();
     expect(within(card).getByRole('link', {name: /FATF and Egmont Group/})).toHaveAttribute('href', 'https://example.test/fatf');
     expect(within(card).getByText(/-0.3 rests on a link not yet supported/)).toBeInTheDocument();
+    expect(within(card).getByText('Applies in the UK only.')).toBeInTheDocument();
     expect(screen.getByRole('heading', {level: 4, name: 'Hidden ownership and shell companies'})).toBeInTheDocument();
     await userEvent.setup().hover(within(card).getByRole('button', {name: 'A Ltd'}));
     expect(useWorkbenchStore.getState().pointedParty).toBe('a');

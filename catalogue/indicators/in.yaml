@@ -425,6 +425,17 @@ indicators:
     quote: T0084.001 Use Copypasta
     quote_verified: true
     checked: '2026-10-09'
+  - title: Facebook's Architecture Undermines Vaccine Misinformation Removal Efforts
+    publisher: Broniatowski, Gu, Jamison, Simons & Abroms (George Washington University); peer-reviewed
+      version in Science Advances (2023)
+    year: '2022'
+    url: https://arxiv.org/pdf/2202.02172
+    locator: 'Methods, ''Analysis of Facebook''s System Architecture''. Also: ''We also tested several
+      threshold values ranging from 25 - 41 seconds and found that results qualitatively replicated.'''
+    quote: a URL shared by two venues in under 33 seconds is more likely to have originated from the "near-simultaneous"
+    quote_verified: true
+    licence: Not stated on the page read
+    checked: '2026-10-10'
   examples:
   - Dozens of accounts posting the same sentence with the same typo within minutes.
   cases: []
@@ -436,10 +447,21 @@ indicators:
   lookup_sources:
   - Platform search / social listening tools
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Two or more accounts share the identical link or content within 41 seconds of each other (the
+      top of the range the study tested).
+    strong: Two or more accounts share the identical link or content in under 33 seconds of each other,
+      more than once.
+    textbook: Several accounts repeatedly share the same link or content in under 33 seconds of each other,
+      the published cutoff for 'near-simultaneous' coordinated sharing.
+    threshold_source: https://arxiv.org/pdf/2202.02172
+    threshold_note: 'Global, from a peer-reviewed study of Facebook link sharing (Broniatowski et al.,
+      published in Science Advances in 2023; arXiv copy read). Coordination was defined as two venues
+      sharing the same URL within a cutoff fitted from the data, which came out at 33 seconds. The authors
+      tested cutoffs from 25 to 41 seconds and the results held. Other numbers: de-Lima-Santos & Ceron,
+      ''Disinformation Echo-Chambers on Facebook'' (arXiv 2309.07745), used a 30-second threshold and
+      say the window can stretch to about one minute. The CooRnet method (Giglietto et al., AoIR 2021)
+      estimates a window for each dataset and publishes no fixed figure. DFRLab Botspot gives no time
+      window. These cutoffs are for links. Identical text or images are judged the same way by analogy.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -447,7 +469,7 @@ indicators:
   - Share buttons on news sites generate identical text.
   - Memes and quotes spread organically in identical form.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: IN-009
   name: Artificial amplification (high engagement from otherwise inactive accounts)
   definition: A post gets a burst of likes or reposts mostly from accounts that rarely post anything of

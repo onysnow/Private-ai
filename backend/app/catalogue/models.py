@@ -110,6 +110,7 @@ class Levels(Strict):
     strong: str
     textbook: str
     threshold_source: str = Field(description="URL of the source for any number in the levels, or 'none'")
+    threshold_note: str | None = Field(default=None, description="what the number applies to: its jurisdiction, the kind of rule it is, and its limits")
 
     @model_validator(mode="after")
     def numbers_need_a_source(self) -> "Levels":

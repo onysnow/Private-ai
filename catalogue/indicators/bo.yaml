@@ -781,6 +781,16 @@ indicators:
     quote: company age and political connections - also turn out to be valid.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Tello Arista, Fazekas, Volkotrub: beneficial ownership risk indicators in public procurement'
+    publisher: European Journal on Criminal Policy and Research (Springer)
+    year: '2026'
+    url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    locator: Results, Company Age
+    quote: In Denmark, companies younger than 4 years, i.e., those in the bottom 10% of the company age
+      distribution
+    quote_verified: true
+    licence: Open access, copyright The Author(s) 2026; the page did not name the licence
+    checked: '2026-10-10'
   examples: []
   cases: []
   data_needed:
@@ -793,10 +803,20 @@ indicators:
   - Company registry
   - Procurement portals / contract registers
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The company is among the younger firms winning contracts but is not younger than 4 years; no
+      published number marks this lower level
+    strong: The company is younger than 4 years when it wins, and the contract is large relative to its
+      age
+    textbook: The company is younger than 4 years when it wins the contract, putting it in the bottom
+      10% of company ages (Denmark result)
+    threshold_source: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    threshold_note: Applies to government contract winners in the study's countries; the cut-offs are
+      data-driven, so they differ by country. For Slovakia the same paper gives 'less than 2 years' ('For
+      Slovakia, the interval for heightened corruption risks corresponds to less than 2 years'). The paper's
+      theory section also gives 'If a company wins a big procurement contract the same year it was founded,
+      it could signal corruption risks'. The Denmark figure is used because it is stated most directly
+      as a cut-off. The full article text was blocked to direct download and was read through a fetched
+      copy.
   threshold_verified: true
   cross_hints:
   - target_area: PP
@@ -807,7 +827,7 @@ indicators:
   - Single-purpose joint ventures formed specifically to bid
   - Company re-formed after a restructuring
   jurisdictions: Tested in 6 European countries
-  version: 1
+  version: 2
 - id: BO-013
   name: Dormant then suddenly active (shelf company)
   definition: A company sits inactive for a long time after formation, then suddenly shows heavy financial
@@ -947,10 +967,14 @@ indicators:
   lookup_sources:
   - Company registry
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Formed and dissolved within one year (Open Ownership query)
+    faint: Formed and closed within a short time, but more than one year apart; no published number marks
+      this lower level
+    strong: Formed and dissolved within one year, and also connected to a payment, contract or transaction
+    textbook: Founded and then dissolved within one year (Open Ownership query)
     threshold_source: https://www.openownership.org/en/blog/spotting-red-flags-in-beneficial-ownership-datasets/
+    threshold_note: The source is a data-analysis query used to screen UK beneficial-ownership data. It
+      is not a legal threshold. The same Open Ownership post defines complex ownership chains as 5 or
+      more observable layers.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -958,7 +982,7 @@ indicators:
   - Companies formed in error or duplicated
   - Single-project vehicles closed after completion
   jurisdictions: Tested on UK data
-  version: 1
+  version: 2
 - id: BO-016
   name: Stakes clustered just under a disclosure threshold
   definition: Several shareholders each hold slightly less than the percentage that would force them to
@@ -2082,6 +2106,15 @@ indicators:
       withdrawal, which is anomalous, or inconsistent with the company’s profile
     quote_verified: true
     checked: '2026-10-09'
+  - title: Filing obligations for reports of transactions in currency
+    publisher: FinCEN, US Treasury (eCFR, 31 CFR 1010.311)
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    locator: 31 CFR 1010.311
+    quote: which involves a transaction in currency of more than $10,000
+    quote_verified: true
+    licence: US federal government work, public domain
+    checked: '2026-10-10'
   examples: []
   cases:
   - name: Teodorin Nguema Obiang Mangue (biens mal acquis)
@@ -2103,10 +2136,17 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A business account pays for the owner's personal assets or leisure, or shows cash use that
+      does not fit the company (no published number for this level)
+    strong: Repeated cash deposits or withdrawals from the business account that do not fit its profile,
+      including amounts kept just under $10,000
+    textbook: A business-account cash deposit or withdrawal of more than $10,000 that does not fit the
+      company's profile (the US currency transaction reporting level)
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    threshold_note: US only. $10,000 is the FinCEN currency transaction report threshold for any cash
+      transaction. It is a reporting line, not a sign of guilt on its own. The anomaly is judged against
+      the company's profile. The personal-spending part of this indicator has no published number. The
+      FATF/Egmont annex gives no figure.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -2114,7 +2154,7 @@ indicators:
   - Legitimate cash-intensive businesses
   - Expenses later reimbursed
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: BO-035
   name: Property or assets moved into a company off-market, or cash-bought then pledged
   definition: Real estate is sold privately from a person to a company, or an asset bought in cash is
@@ -2706,6 +2746,16 @@ indicators:
       and the UK.'
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Proceeds of Crime Act 2002, section 362B: Requirements for making of unexplained wealth order'
+    publisher: UK Parliament (legislation.gov.uk)
+    year: '2026'
+    url: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+    locator: Section 362B(2)(b); income test at 362B(3)(a)
+    quote: (2) The High Court must be satisfied that there is reasonable cause to believe that— (a) the
+      respondent holds the property, and (b) the value of the property is greater than £50,000.
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-10'
   examples:
   - 'Gaffey case: an elderly mother falsely named as owner of offshore shell companies (DOJ, 2020).'
   cases: []
@@ -2720,10 +2770,17 @@ indicators:
   - Asset and income declarations
   - Property records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Declared income does not appear to explain the assets, spending or activity seen (no published
+      number for this level)
+    strong: A person holds property worth more than £50,000 that their known lawful income would not have
+      been enough to buy
+    textbook: 'Meets the UK unexplained wealth order test as worded: property worth more than £50,000,
+      with reasonable grounds to suspect that known lawful income would have been insufficient to obtain
+      it (the respondent must also be a PEP or linked to serious crime)'
+    threshold_source: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+    threshold_note: UK (England and Wales, and Northern Ireland; Scotland has a parallel provision). It
+      is a court-order threshold, not an FIU red flag. The cited FATF/Egmont annex and the Tello Arista/Fazekas
+      study give no number. The 'strange for their age' part has no published figure.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -2731,7 +2788,7 @@ indicators:
   - Minors holding shares through family estate planning
   - Elderly founders who still own their companies
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: BO-045
   name: 'Front company: real business mixing in outside money'
   definition: A working business, often cash-heavy like a restaurant or salon, reports income or 'sales'
@@ -3196,6 +3253,18 @@ indicators:
       established under the laws of their primary place of residence.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Consultation Paper on draft RTS under Article 28(1) of Regulation (EU) 2024/1624 (customer
+      due diligence)
+    publisher: EU Anti-Money Laundering Authority (AMLA)
+    year: '2026'
+    url: https://www.amla.europa.eu/document/download/3d430294-5171-455c-b565-a86fc5f3cb1c_en?filename=Consultation%20Paper%20Draft%20RTS%20under%20Article%2028%281%29.pdf
+    locator: Draft RTS Article 12(1), page 17
+    quote: obliged entities shall treat an ownership and control structure as a complex corporate structure
+      where there are three or more layers between the customer and the beneficial owner and, in addition,
+      more than one of the following conditions is met
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - A company in Country B is owned by companies in Countries C and D, which are owned by a trust in Country
     E (StAR's own illustration, p. 51).
@@ -3225,10 +3294,20 @@ indicators:
   - OpenCorporates
   - Leak databases (e.g. ICIJ Offshore Leaks)
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The ownership chain passes through entities in a country other than the owner's home country
+      (no published number for this level)
+    strong: Three or more layers sit between the company and its beneficial owner, and some of them are
+      registered outside the owner's home region
+    textbook: 'Meets the AMLA draft test for a ''complex corporate structure'' as worded: three or more
+      layers between customer and beneficial owner, plus more than one extra condition (for example, entities
+      registered outside the EU, a trust or foundation in a layer, or nominees)'
+    threshold_source: https://www.amla.europa.eu/document/download/3d430294-5171-455c-b565-a86fc5f3cb1c_en?filename=Consultation%20Paper%20Draft%20RTS%20under%20Article%2028%281%29.pdf
+    threshold_note: 'EU, and a draft: the AMLA consultation paper of 9 February 2026 under AMLR Article
+      28(1), which may change before adoption. The test counts layers, not jurisdictions. Being outside
+      the EU is one of the conditions, and it sets no number of jurisdictions. Benchmark from the cited
+      StAR Puppet Masters study: ''A little more than one-third of the cases we reviewed involved officials
+      using corporate vehicles established under the laws of their primary place of residence'', so roughly
+      two-thirds used foreign vehicles.'
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -3240,7 +3319,7 @@ indicators:
   - Joint ventures often sit in a neutral third jurisdiction (StAR p. 35).
   - Investment funds and family offices use cross-border structures for tax treaty and regulatory reasons.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: BO-053
   name: Company bought through a chain of service providers, or a bank picked for accepting opaque companies
   definition: The company was formed by one service provider (a 'wholesaler') and sold on through another
@@ -3633,6 +3712,16 @@ indicators:
       approval by the Moldovan Central Bank.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Regulation (EU) No 575/2013 (Capital Requirements Regulation)
+    publisher: European Union (EUR-Lex)
+    year: '2013'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32013R0575
+    locator: Article 4(1), point (36) 'qualifying holding'
+    quote: a direct or indirect holding in an undertaking which represents 10 % or more of the capital
+      or of the voting rights
+    quote_verified: true
+    licence: EUR-Lex reuse permitted with acknowledgement (Commission Decision 2011/833/EU)
+    checked: '2026-10-10'
   examples:
   - A prime minister facing corruption allegations buys most of an offshore bank and moves about US$70
     million into accounts there (StAR box 3.5).
@@ -3681,10 +3770,18 @@ indicators:
   - Company registry
   - Court and audit reports
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Several apparently unconnected parties each buy stakes in a bank, each below 10% (the level
+      that needs supervisory approval)
+    strong: Stakes held by parties who turn out to be linked add up to 10% or more of the bank's capital
+      or votes, without their being declared as acting together
+    textbook: A suspect or hidden group together holds a 'qualifying holding' (10% or more of capital
+      or voting rights) in a bank without notifying the supervisor or getting approval
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32013R0575
+    threshold_note: EU. The 10% qualifying-holding definition is in CRR Article 4(1)(36). CRD Article
+      22(1) adds further notification steps at 20%, 30% and 50% ('would reach or exceed 20 %, 30 % or
+      50 %'). The US (Change in Bank Control Act, generally 10% or 25%) was not checked on the page, so
+      it is not used. The cited StAR (a 67% stake) and TI UK Moldova case give no threshold, only 'small
+      enough to evade scrutiny'.
   threshold_verified: true
   cross_hints:
   - target_area: FR
@@ -3696,7 +3793,7 @@ indicators:
   - Many small shareholders in a bank are normal for listed or cooperative banks.
   - Distressed banks are often sold quickly to new owners.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: BO-059
   name: Limited partnership whose partners are all companies, typically in secrecy jurisdictions
   definition: A limited partnership (such as a Scottish limited partnership) has no human partner, and
@@ -3978,6 +4075,19 @@ indicators:
       never officially transferring the ownership
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'The Puppet Masters: How the Corrupt Use Legal Structures to Hide Stolen Assets and What to
+      Do About It'
+    publisher: World Bank / UNODC Stolen Asset Recovery Initiative (StAR)
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, Box 3.4 'A Typical Advertisement for Shelf Corporations and Aged Corporations'
+    quote: Often, lenders require a business to have been in existence from six months to two years or
+      more before lending it money 6. Ability to borrow money from banks 7. Ability to secure bids on
+      contracts. Many agencies will only sign contracts with a business that has been in business for
+      at least two years.
+    quote_verified: true
+    licence: Creative Commons Attribution CC BY 3.0 IGO (World Bank open access)
+    checked: '2026-10-10'
   examples:
   - Panamanian companies incorporated in 1979 became directors of a company formed nearly 15 years later
     (StAR box 3.3).
@@ -3992,10 +4102,16 @@ indicators:
   lookup_sources:
   - Company registry history (officer and share changes, dormant accounts)
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A recently bought company has existed for six months or more under earlier owners and is used
+      to get credit (lenders' stated lower age)
+    strong: A recently bought company with about two years of history under earlier owners is used for
+      credit or bids
+    textbook: A company bought ready-made, with at least two years of history that the current owners
+      did not build, is used to meet a contract-bid age requirement
+    threshold_source: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    threshold_note: The numbers come from a company-formation advertisement that the StAR Puppet Masters
+      study (World Bank/UNODC) reproduces as Box 3.4. They are what vendors claim lenders and agencies
+      require, not a regulator's rule. Real tender age rules vary by agency.
   threshold_verified: true
   cross_hints:
   - target_area: PP
@@ -4007,7 +4123,7 @@ indicators:
   - Buying a dormant company with its licences is a normal acquisition.
   - Group restructures reuse old companies.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: BO-063
   name: Consultant or subcontractor placed between a company and officials to pass money on
   definition: A company that wants something from officials hires or creates a consulting firm or subcontractor

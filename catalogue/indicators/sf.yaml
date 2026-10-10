@@ -2413,6 +2413,17 @@ indicators:
       in multiple jurisdictions.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Resolution 2321 (2016), S/RES/2321 (2016)
+    publisher: United Nations Security Council
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/407/50/pdf/n1640750.pdf
+    locator: Operative paragraph 16, page 4
+    quote: 16. Decides that all States shall take steps to limit the number of bank accounts to one per
+      DPRK diplomatic mission and consular post, and one per accredited DPRK diplomat and consular officer,
+      at banks in their territory;
+    quote_verified: true
+    licence: UN official document; licence not stated
+    checked: '2026-10-10'
   examples:
   - An embassy staffer's spouse holds an account receiving regular wires from a trading company.
   cases:
@@ -2438,10 +2449,20 @@ indicators:
   - Sanctions lists
   - Company registries
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A DPRK diplomat, consular officer, mission or consular post holds more than one account at
+      banks in one country (above the limit of one per mission or post and one per diplomat or consular
+      officer)
+    strong: More than one account per diplomat or mission, held in family members' or front companies'
+      names, or opened in countries where the person is not posted
+    textbook: 'Meets the published definition as worded: accounts in family members'' or front companies''
+      names, or in multiple jurisdictions, used to get around the assets freeze and the limit of one account
+      per mission or post and one per accredited diplomat or consular officer'
+    threshold_source: https://documents.un.org/doc/undoc/gen/n16/407/50/pdf/n1640750.pdf
+    threshold_note: The number is the account limit that the circumvention defeats. It applies to DPRK
+      missions and diplomats under the UNSC 1718 sanctions regime and binds all UN member states for banks
+      in their territory. Wider search was limited (Firecrawl out of credits, WebSearch limit used up).
+      The UN Panel of Experts report S/2019/171 (the cited source) mentions 'the limit on the number of
+      diplomatic bank accounts' but does not state the number.
   threshold_verified: true
   cross_hints:
   - target_area: CO
@@ -2452,7 +2473,7 @@ indicators:
   - Family members have their own legitimate income and accounts.
   - Diplomats legitimately hold accounts for personal needs.
   jurisdictions: UN DPRK sanctions (UNSC 1718 regime)
-  version: 1
+  version: 2
 - id: SF-043
   name: Non-profit solicits donations but provides no visible charitable services, or openly supports
     a terrorist group
@@ -3351,6 +3372,15 @@ indicators:
     quote: Developers are logged into their accounts continuously for one or more days at a time
     quote_verified: true
     checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: US Department of State, US Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators section, page 8 of the PDF
+    quote: Developers are logged into their accounts continuously for one or more days at a time;
+    quote_verified: true
+    licence: US federal government work (public domain); no licence stated
+    checked: '2026-10-10'
   examples:
   - Five 'different' developer accounts all log in from the same IP address.
   - One account logs in from three countries in the same afternoon.
@@ -3365,10 +3395,19 @@ indicators:
   - IP geolocation
   - Platform login records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: 'One sign appears with no published number attached: one account logs in from several IP addresses
+      (especially in different countries) in a relatively short period, or several developer accounts
+      log in from one IP address.'
+    strong: Developer accounts stay logged in continuously for one or more days at a time and at least
+      one other sign is present, such as shared IPs, logins from many countries, or remote-desktop settings
+      like port 3389.
+    textbook: 'Meets the published definition as worded: a developer is logged into their account continuously
+      for one or more days at a time.'
+    threshold_source: https://ofac.treasury.gov/media/923126/download?inline
+    threshold_note: The number applies to freelance and payment platforms. It is a US advisory with international
+      audience. The same list names 'port 3389' as a remote-desktop configuration sign. The other login
+      signs ('relatively short period of time', 'multiple accounts ... from one IP address') have no published
+      number. Verified by downloading the PDF and extracting its text.
   threshold_verified: true
   cross_hints:
   - target_area: CY
@@ -3381,7 +3420,7 @@ indicators:
   - Agencies legitimately run several developer accounts.
   - Some users simply never log out.
   jurisdictions: United States; freelance and payment platforms globally
-  version: 1
+  version: 2
 - id: SF-059
   name: Rating manipulation and templated bidding across developer accounts
   definition: Developer accounts are boosted by a fake client account that shares their payment account,
@@ -4149,6 +4188,16 @@ indicators:
     quote: has increasingly become a safe haven for Russian wealth, both legitimate and illicit
     quote_verified: true
     checked: '2026-10-09'
+  - title: FinCEN Renews and Expands Real Estate Geographic Targeting Orders
+    publisher: FinCEN (US Treasury)
+    year: '2022'
+    url: https://www.fincen.gov/news/news-releases/fincen-renews-and-expands-real-estate-geographic-targeting-orders
+    locator: Press release body
+    quote: The purchase amount threshold remains $300,000 for each covered metropolitan area, with the
+      exception of the City and County of Baltimore, where the purchase threshold is $50,000.
+    quote_verified: true
+    licence: US federal government work (public domain); no licence stated
+    checked: '2026-10-10'
   examples:
   - A Park Avenue apartment is owned by a BVI company whose shares are held by a lawyer as nominee.
   cases:
@@ -4178,10 +4227,20 @@ indicators:
   - Company registry
   - Beneficial ownership registers
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A company or other legal entity makes an all-cash purchase of residential property at or above
+      $50,000, the lowest published purchase threshold (Baltimore).
+    strong: A company makes an all-cash residential purchase at or above $300,000 and the person behind
+      it is unclear, a nominee or straw buyer, or linked to a sanctioned or at-risk person.
+    textbook: 'Meets the published definition as worded: an all-cash residential purchase by a shell company
+      at or above the $300,000 purchase threshold that FinCEN''s Geographic Targeting Orders cover, where
+      the real owner is hidden behind intermediaries, nominees or opaque structures.'
+    threshold_source: https://www.fincen.gov/news/news-releases/fincen-renews-and-expands-real-estate-geographic-targeting-orders
+    threshold_note: The figure is a US reporting threshold for all-cash residential purchases by legal
+      entities in covered metro areas. Title insurers had to identify the people behind these shell company
+      buyers. That GTO term ran April 30 to October 26, 2022, and GTO terms have changed since, so check
+      the current rule before using these figures. It does not set a percentage for the 'below or above
+      market value' part of the pattern. The REPO advisory page would not load. FinCEN's 2022 oligarch
+      analysis has no price figure.
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -4192,7 +4251,7 @@ indicators:
   - Many buyers use companies or trusts for privacy, liability or tax reasons.
   - Prices vary for real reasons (condition, quick sale, family deals).
   jurisdictions: REPO Task Force members; United States
-  version: 1
+  version: 2
 - id: SF-073
   name: Lawyers, accountants or trust and company service providers move money or manage assets for a
     designated person

@@ -367,6 +367,16 @@ indicators:
     quote: At present, there is no consensus regarding the best set of thresholds.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Early Intervention Systems for Law Enforcement Agencies: A Planning and Management Guide'
+    publisher: US DOJ Office of Community Oriented Policing Services (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Chapter 2, p. 31 (worked example of performance indicators)
+    quote: Officer A used force in more than half of the arrests he made. The ratio of force to arrests
+      is cause for departmental concern and probable intervention.
+    quote_verified: true
+    licence: Not stated (US DOJ-funded publication)
+    checked: '2026-10-10'
   examples:
   - Officer uses force in 20 percent of arrests while unit peers use it in 5 percent.
   cases: []
@@ -378,17 +388,26 @@ indicators:
   lookup_sources:
   - Agency arrest and force datasets
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The officer's force-to-arrest ratio is clearly above unit peers. No published number exists
+      for this level in this source.
+    strong: The officer uses force in close to half of arrests. No separate published cut-off exists for
+      this level.
+    textbook: The officer used force in more than half of the arrests made, which Walker calls cause for
+      concern and probable intervention
+    threshold_source: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    threshold_note: 'This is a worked example in the DOJ COPS guide, not a binding standard. The same
+      guide says ''there is no consensus regarding the best set of thresholds''. Other figures in the
+      same guide: Pittsburgh''s PARS flags officers ''one or more standard deviations greater than their
+      peer officers'' (p. 58), and officers selected by Miami-Dade''s EIS ''averaged twice as many use-of-force
+      incidents per year as their peers'' (p. 48). The quote was read through a fetched-page extract,
+      so check the exact wording against the PDF before publishing.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Units that arrest violent suspects have higher force rates
   - Small numbers make ratios unstable
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PM-008
   name: Frequent reassignment
   definition: The officer is moved between units or districts repeatedly, which can be how a department
@@ -553,6 +572,23 @@ indicators:
     quote: All motor vehicle stops and pedestrian stops made by subject officer
     quote_verified: true
     checked: '2026-10-09'
+  - title: State of Connecticut Traffic Stop Data Analysis and Findings, 2014-15
+    publisher: Connecticut Racial Profiling Prohibition Project (Institute for Municipal and Regional
+      Policy, Central Connecticut State University) with Connecticut Economic Resource Center
+    year: '2016'
+    url: https://imrp.dpp.uconn.edu/wp-content/uploads/sites/3351/2021/09/May-2016.pdf
+    locator: PDF page 45, estimated driving population (EDP) benchmark section; the same 10-point / 5-point
+      / 1.75 rule is restated for the resident-population benchmark and in the summary of findings
+    quote: 'Departments that exceed their EDP percentages by greater than 10 percentage points in any
+      of the three categories: (1) Minority (all race/ethnicity), (2) Black non-Hispanic, and (3) Hispanic,
+      were identified in our tier one group. In addition, departments that exceeded their EDP percentage
+      by more than five but less than 10 percentage points were identified in our tier two group for this
+      benchmark if the ratio of the percentage of stops for the target group compared to the baseline
+      measure for that group also was 1.75 or above (percentage of stops divided by benchmark percentage
+      equals 1.75 or more)'
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - 'Ferguson: 93% of arrests were of African Americans, who were 67% of residents (population share per
     the full DOJ report).'
@@ -576,10 +612,18 @@ indicators:
   - Census population data
   - Agency stop and arrest datasets
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The group's share of stops is more than 5 percentage points above its benchmark share (the
+      published tier-two floor).
+    strong: The stop share is more than 5 but less than 10 percentage points above the benchmark, and
+      the ratio of stop share to benchmark share is 1.75 or above (published tier two).
+    textbook: The stop share is more than 10 percentage points above the benchmark share (published tier
+      one).
+    threshold_source: https://imrp.dpp.uconn.edu/wp-content/uploads/sites/3351/2021/09/May-2016.pdf
+    threshold_note: These are Connecticut's state traffic-stop thresholds, set at agency level against
+      an estimated driving population (EDP) or resident benchmark. They are a descriptive screen, not
+      proof of bias. The report itself says the margins of error in the EDP estimates are why it uses
+      thresholds. The Ferguson figures cited already (85% of stops, 90% of citations and 93% of arrests)
+      are findings from one investigation, not cut-offs.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -587,7 +631,7 @@ indicators:
   - Deployment to high-call areas changes who is stopped
   - Small samples for individual officers
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PM-012
   name: Force used on people already handcuffed or restrained
   definition: Officers strike, kick, restrain by the neck or otherwise use force on someone who is already
@@ -2025,6 +2069,18 @@ indicators:
     quote: Failure to appear in court
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Court No-Shows: A Systemic Issue. New Evidence From Philadelphia'
+    publisher: University of Pennsylvania Carey Law School (Graef, Mayson, Ouss and Stevenson; research
+      forthcoming in University of Pennsylvania Law Review)
+    year: '2023'
+    url: https://www.law.upenn.edu/live/files/13151-court-no-shows-a-systemic-issue
+    locator: Key Results, point 2 (page 2)
+    quote: 'Police officers fail to appear for at least one hearing in 31% of their cases, compared to
+      19% for defendants. At a per-hearing level, police officers fail to appear twice as often as defendants:
+      in 14% versus 7% of cases.'
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Cases dismissed because the arresting officer did not appear.
   cases: []
@@ -2036,16 +2092,25 @@ indicators:
   lookup_sources:
   - Court dockets
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The officer misses more scheduled hearings than the published police-officer average of 14%
+      of hearings.
+    strong: The officer misses at least one hearing in more than 31% of their cases, above the published
+      police-officer average.
+    textbook: Meets the published definition as worded. The study gives average rates only, not a cut-off
+      for 'repeatedly'.
+    threshold_source: https://www.law.upenn.edu/live/files/13151-court-no-shows-a-systemic-issue
+    threshold_note: This is a benchmark, not a disciplinary threshold. It covers Philadelphia criminal
+      cases from January 2010 to March 2020 (341,417 cases), and the figures are averages for all officers,
+      so an officer above them is only a first sign. The research is in a student-edited law review, not
+      a peer-reviewed journal. Seattle PD's EIS has a '1 within 12 months' trigger, but that is for missed
+      mandatory training, not court, so it is not used here. The cited Walker/COPS early-warning guide
+      could not be opened (host blocked by proxy).
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Scheduling conflicts, leave, or poor notice from courts
   jurisdictions: US
-  version: 1
+  version: 2
 - id: PM-042
   name: Discrimination against people in behavioural health crisis
   definition: Officers respond to mental-health calls with force or arrest where the law requires reasonable

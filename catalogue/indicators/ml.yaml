@@ -42,6 +42,17 @@ indicators:
     quote_verified: true
     licence: US government work
     checked: '2026-10-09'
+  - title: 'Consultation Paper EBA/CP/2025/04: Proposed RTS in the context of the EBA''s response to the
+      European Commission''s Call for advice on new AMLA mandates'
+    publisher: European Banking Authority
+    year: '2025'
+    url: https://eba.europa.eu/sites/default/files/2025-03/9bc83e61-e9a1-4e91-93de-2af8325e0182/Consultation%20Paper%20on%20Response%20to%20Call%20for%20Advice%20new%20AMLA%20mandates.pdf
+    locator: Page 41, draft RTS on CDD, Article 11(1)
+    quote: obliged entities shall treat an ownership and control structure as complex where there are
+      two or more layers between the customer and the beneficial owner and in addition, one of the following
+      conditions is met
+    quote_verified: true
+    checked: '2026-10-10'
   examples:
   - A trading firm owned by a BVI company, owned in turn by a Seychelles company, with no named natural
     person
@@ -71,10 +82,20 @@ indicators:
   - offshore leaks databases
   - OpenCorporates
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Two or more layers of companies sit between the customer and the beneficial owner
+    strong: 'Two or more layers, plus one of the aggravating conditions: a trust-like arrangement in a
+      layer, entities in different jurisdictions, nominees, or a structure that obscures ownership with
+      no clear economic reason'
+    textbook: 'Meets the EBA draft definition of a complex structure as worded: two or more layers plus
+      at least one listed condition'
+    threshold_source: https://eba.europa.eu/sites/default/files/2025-03/9bc83e61-e9a1-4e91-93de-2af8325e0182/Consultation%20Paper%20on%20Response%20to%20Call%20for%20Advice%20new%20AMLA%20mandates.pdf
+    threshold_note: EU only; this is a draft Regulatory Technical Standard under AMLR 2024/1624, Art.
+      20(1)(b), not yet final law. AMLA's later consultation draft (9 Feb 2026, Art. 12(1), read via a
+      mirror at dirittobancario.it) raises the bar to 'three or more layers between the customer and the
+      beneficial owner' plus more than one condition, so the final figure may change. FATF/Egmont, FATF
+      real-estate guidance and FFIEC (the cited sources) give no layer count. The World Bank's Puppet
+      Masters report and the FATF/Egmont Concealment of Beneficial Ownership summary were also checked;
+      neither gives a layer threshold.
   threshold_verified: true
   cross_hints:
   - target_area: CO
@@ -86,7 +107,7 @@ indicators:
   - Joint ventures and inherited family structures
   - Investment funds that legitimately pool many owners
   jurisdictions: Global (FATF, FFIEC US)
-  version: 1
+  version: 2
 - id: ML-002
   name: Entity registered in, or dealing with, a weak-AML jurisdiction
   definition: The company is registered or has offices where anti-money-laundering rules are weak, or
@@ -332,6 +353,15 @@ indicators:
       beneficial owners
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Companies Act 2014, Section 142: Limitation on number of directorships'
+    publisher: Irish Statute Book (Office of the Attorney General, Ireland)
+    year: '2014'
+    url: https://www.irishstatutebook.ie/eli/2014/act/38/section/142/enacted/en/html
+    locator: Section 142(1)(a)
+    quote: A person shall not, at a particular time, be a director of more than— (a) 25 private companies
+      limited by shares
+    quote_verified: true
+    checked: '2026-10-10'
   examples:
   - A 22-year-old student listed as director of 40 trading companies
   cases: []
@@ -346,17 +376,25 @@ indicators:
   - OpenCorporates officer search
   - interviews
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: One person is a director of many companies, but no more than the published limit of 25 (no
+      lower published figure)
+    strong: One person is a director of close to 25 companies (no separate published figure for this level)
+    textbook: One person is a director of more than 25 private companies limited by shares, above the
+      Irish statutory limit
+    threshold_source: https://www.irishstatutebook.ie/eli/2014/act/38/section/142/enacted/en/html
+    threshold_note: 'Ireland only: a legal cap on directorships, not an AML red-flag figure. Public limited
+      companies and some other company types are excluded from the count (s.142(3)), and an exemption
+      certificate can raise the limit. Used for the ''fronts many companies'' part of the definition.
+      The other parts (lack of experience, not knowing the transactions) are not countable. The cited
+      FATF/Egmont source gives no number. UK Companies House has no statutory cap; UK limits were only
+      proposed.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Professional directors and company secretaries who legitimately sit on many boards
   - Family members named as directors for succession or tax reasons
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-007
   name: Adverse media or known criminal links
   definition: The company, its owners or managers, or the customer appear in negative news, investigations
@@ -447,6 +485,20 @@ indicators:
     quote: A trade entity has unexplained periods of dormancy.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Inoperative Accounts/Unclaimed Deposits in Banks - Revised Instructions (RBI/2023-24/105, DOR.SOG
+      (LEG).REC/64/09.08.024/2023-24)
+    publisher: Reserve Bank of India
+    year: '2024'
+    url: https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12589&Mode=0
+    locator: Annex, Part I, para 1(a)(iv) (definition); para 4.1 (monitoring after reactivation)
+    quote: A savings/ current account shall be treated as inoperative, if there are no 'customer induced
+      transactions' in the account for a period of over two years. [...] The transactions in inoperative
+      accounts, which have been reactivated, shall be monitored regularly, for at least six months, at
+      higher levels (i.e. by controlling authorities of the concerned branch) without the knowledge and
+      notice of the customers and the dealing staff.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - A company incorporated last month that imports $20m of electronics, then stops trading
   cases: []
@@ -458,10 +510,21 @@ indicators:
   lookup_sources:
   - company registry (incorporation and filing history)
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: An account or company comes back to life after a long quiet spell and starts handling large
+      amounts, but the quiet spell was shorter than two years.
+    strong: An account with no customer-made transactions for over two years is reactivated and handles
+      large, high-value business soon after.
+    textbook: An account with no customer-made transactions for over two years (inoperative under the
+      published definition) is reactivated, then shows large activity within the six months after reactivation,
+      when the regulator requires closer monitoring.
+    threshold_source: https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12589&Mode=0
+    threshold_note: The number comes from the Reserve Bank of India's rules on inoperative accounts. They
+      define dormancy as over two years with no customer-made transactions and require at least six months
+      of closer monitoring after reactivation to reduce fraud risk. This is an Indian banking rule about
+      accounts, not a global standard for trade companies. The cited FATF-Egmont TBML indicators (cbr.ru
+      copy) have no number; The full text was checked. Singapore STRO bank indicators ('Large cash withdrawals
+      from a previously dormant/inactive account') also give no period. The AUSTRAC 2024 money-mule guide
+      has no dormancy figure.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -469,7 +532,7 @@ indicators:
   - Project companies set up for one contract
   - Start-ups winning a big first order
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-009
   name: Trade inconsistent with stated line of business
   definition: A company buys or sells goods that have nothing to do with its declared business, or deals
@@ -1090,6 +1153,16 @@ indicators:
       movement of high-volume transactions and a small end-of-day balance without clear business reasons
     quote_verified: true
     checked: '2026-10-09'
+  - title: Combating the Exploitation of International Students as Money Mules (Financial Crime Guide)
+    publisher: AUSTRAC (Australian Transaction Reports and Analysis Centre)
+    year: '2024'
+    url: https://www.austrac.gov.au/sites/default/files/2024-06/2024_AUSTRAC_FCG_StudentMoneyMules.pdf
+    locator: Page 11, Fraud and scam-related mule activity
+    quote: with large amounts being consolidated and sent on the same day or during a short period of
+      time.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - Daily cash deposits forwarded the same day to entities in a free trade zone
   cases:
@@ -1110,10 +1183,19 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Money received is sent on within a short period with little left behind. The source gives no
+      fixed window beyond the same day.
+    strong: Large amounts received into an account are consolidated and sent out on the same day.
+    textbook: 'Meets the published wording: large amounts consolidated and sent on the same day or during
+      a short period of time, during intense periods of account activity.'
+    threshold_source: https://www.austrac.gov.au/sites/default/files/2024-06/2024_AUSTRAC_FCG_StudentMoneyMules.pdf
+    threshold_note: From AUSTRAC's (Australian FIU) money-mule financial crime guide. It describes pass-through
+      mule accounts sending money on 'the same day'. The same page says mules may receive about 10 per
+      cent commission on funds passing through accounts they operate, which fits a small residual balance.
+      The guide is about money mules, not trade entities. The cited FATF-Egmont indicator ('pay-through'
+      or 'transit' account) has no number. Singapore STRO bank and payment-system indicators and a Trinidad
+      and Tobago FIU kiting advisory (ADV/007/2024) say only 'immediately' or 'within a short period'.
+      No regulator-published 24, 48 or 72-hour window was found.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -1121,7 +1203,7 @@ indicators:
   - Treasury sweeping
   - Payroll accounts
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-021
   name: Structuring below reporting thresholds
   definition: Cash or crypto transactions are repeatedly kept just under the amount that triggers a mandatory
@@ -1240,10 +1322,15 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Some large payments are in round hundred-dollar amounts in a trade where uneven amounts are
+      normal.
+    strong: Many large payments are in round thousand-dollar amounts.
+    textbook: 'Meets the published wording: many funds transfers sent in large, round dollar, hundred
+      dollar, or thousand dollar amounts.'
+    threshold_source: https://bsaaml.ffiec.gov/manual/Appendices/07
+    threshold_note: FFIEC (US bank examiners) red flag, under the Funds Transfers heading. The numbers
+      are the rounding units (hundred dollar, thousand dollar), not a count or share of payments. 'Many'
+      is not quantified. The cited FATF-Egmont TBML indicator ('large round amounts') gives no figure.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -1251,7 +1338,7 @@ indicators:
   - Intra-group funding
   - Loan repayments
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-023
   name: Circular payments
   definition: Money leaves a country or bank, passes through one or more others, and comes back to where
@@ -1652,6 +1739,17 @@ indicators:
       low-income occupation but has unexplained wealth.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Proceeds of Crime Act 2002, section 362B - Requirements for making of unexplained wealth order
+    publisher: UK Parliament (legislation.gov.uk, The National Archives)
+    year: '2017'
+    url: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+    locator: s.362B(2)(b) and s.362B(3)(a)
+    quote: the value of the property is greater than £50,000. [...] that the known sources of the respondent's
+      lawfully obtained income would have been insufficient for the purposes of enabling the respondent
+      to obtain the property
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-10'
   examples:
   - A student buying a $2m house in cash
   cases: []
@@ -1669,10 +1767,18 @@ indicators:
   - social media
   - court and divorce records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A person's transactions or purchases look larger than their known job or income explains. The
+      source gives no published figure.
+    strong: A person holds property worth more than £50,000 that their known lawful income looks insufficient
+      to have paid for.
+    textbook: 'Meets the UK Unexplained Wealth Order test as worded: property worth more than £50,000,
+      with reasonable grounds to suspect that the known sources of the person''s lawfully obtained income
+      would have been insufficient to obtain it.'
+    threshold_source: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+    threshold_note: UK Proceeds of Crime Act 2002 s.362B (inserted by the Criminal Finances Act 2017).
+      These are the conditions the High Court must be satisfied of before making an Unexplained Wealth
+      Order. UK only, and a legal test, not a bank red-flag trigger. The cited FFIEC, FATF virtual-asset,
+      FATF real-estate and FinCEN sources describe the pattern without a number.
   threshold_verified: true
   cross_hints:
   - target_area: CO
@@ -1687,7 +1793,7 @@ indicators:
   - Lottery or investment gains
   - Under-declared occupation (e.g. retired business owner)
   jurisdictions: Global. FinCEN's red flags name Chinese nationals; nationality on its own is not an indicator.
-  version: 1
+  version: 2
 - id: ML-030
   name: Refuses or cannot explain identity or source of funds
   definition: The customer gives incomplete identity information, declines to explain where money came
@@ -2257,6 +2363,22 @@ indicators:
     quote: Requests to expedite transactions, possibly over or under value.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Defining a Housing Market Integrity Index (MII): A Methodology and Application to Quebec''s
+      Housing Market (Working Document)'
+    publisher: Canada Mortgage and Housing Corporation (exhibit 719, Commission of Inquiry into Money
+      Laundering in British Columbia)
+    year: '2021'
+    url: https://ag-pssg-sharedservices-ex.objectstore.gov.bc.ca/ag-pssg-cc-exh-prod-bkt-ex/719%20-%20Defining%20a%20Housing%20Market%20Integrity%20Index%20A%20Methodology%20and%20Application%20to%20Quebecs%20Housing%20Market%20-%20Draft%20-%2019%20Feb%202021.pdf
+    locator: Executive summary, transaction-characteristics indicators 1 and 2 (about PDF page 7)
+    quote: The cut off for the lowest decile in the price distribution is a price 54% below the neighbourhood
+      average, whereas a property with a 43% higher price is the cut off for the top decile. ... relative
+      to the assessed value, a property traded at 38% below the assessed value fall into the lowest decile
+      percentile, whereas a property with a price 19% above is in the top decile, and both trigger a red
+      flag for significant difference from assessed value.
+    quote_verified: true
+    licence: Copyright CMHC; report says it 'shall not be disclosed, distributed or reproduced without
+      the consent of CMHC'; made public as an inquiry exhibit
+    checked: '2026-10-10'
   examples:
   - A buyer offering 20% above asking price for a closing within a week
   cases: []
@@ -2270,10 +2392,21 @@ indicators:
   - property price data (comparable sales)
   - property registries
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Price is at least 19% above, or at least 38% below, the assessed value (CMHC red-flag cut-off
+      against assessed value)
+    strong: Price is at least 43% above, or at least 54% below, the neighbourhood average (CMHC red-flag
+      cut-off against the neighbourhood), and it also crosses the assessed-value cut-off
+    textbook: 'Meets the FATF definition as worded: abnormal haste or pressure to close, at a price beyond
+      the CMHC cut-offs above. No time figure for haste has been published.'
+    threshold_source: https://ag-pssg-sharedservices-ex.objectstore.gov.bc.ca/ag-pssg-cc-exh-prod-bkt-ex/719%20-%20Defining%20a%20Housing%20Market%20Integrity%20Index%20A%20Methodology%20and%20Application%20to%20Quebecs%20Housing%20Market%20-%20Draft%20-%2019%20Feb%202021.pdf
+    threshold_note: 'The number covers the price part only: how far the price sits from the neighbourhood
+      average or the assessed value. It comes from a Canada Mortgage and Housing Corporation (CMHC) working
+      paper on Quebec home sales from 2000 to 2018, filed as Exhibit 719 at British Columbia''s Cullen
+      Commission inquiry into money laundering. The cut-offs are the top and bottom tenths of Quebec sale
+      prices, not a legal threshold. The paper is marked ''Working Document / DO NOT CITE'', but the inquiry
+      made it public. For ''rush'' or ''haste'', no published time figure was found: FATF RBA Real Estate
+      (2022) gives wording only. Related: CMHC Exhibit 715 (Pereboom, 2019) says ''considerably higher
+      / lower'' with no figure. The ELRA/Colegio de Registradores slides give no price figure.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -2281,7 +2414,7 @@ indicators:
   - Competitive markets
   - Family sales below value
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-040
   name: Valuation manipulation, quick resales or unfunded renovation
   definition: Property values are manipulated, properties are sold and resold in quick succession, or
@@ -2308,6 +2441,16 @@ indicators:
       funding.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Scoring and Flagging ML Risks in Real Estate (Bert Pereboom)
+    publisher: Canada Mortgage and Housing Corporation (exhibit 715, Commission of Inquiry into Money
+      Laundering in British Columbia)
+    year: '2019'
+    url: https://ag-pssg-sharedservices-ex.objectstore.gov.bc.ca/ag-pssg-cc-exh-prod-bkt-ex/715%20-%20Scoring%20and%20Flagging%20ML%20Risks%20in%20Real%20Estate%20-%20Bert%20Pereboom%20-%20May%209%202019_Redacted.pdf
+    locator: Slide 5, 'ML Risk Scores – Indicators List', Property Characteristics item 2
+    quote: The property in question is traded at least twice within 1 year
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - The same flat sold three times in a year between related companies at rising prices
   cases: []
@@ -2322,10 +2465,20 @@ indicators:
   - property registries (sale history)
   - building permits
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The property is resold, but not twice within 1 year. No published figure for this level.
+    strong: The property is traded at least twice within 1 year, and the price or the renovation money
+      is not explained
+    textbook: The property is traded at least twice within 1 year (the CMHC indicator as worded)
+    threshold_source: https://ag-pssg-sharedservices-ex.objectstore.gov.bc.ca/ag-pssg-cc-exh-prod-bkt-ex/715%20-%20Scoring%20and%20Flagging%20ML%20Risks%20in%20Real%20Estate%20-%20Bert%20Pereboom%20-%20May%209%202019_Redacted.pdf
+    threshold_note: 'The number covers the quick-resale part only: the time between two sales of the same
+      property. Valuation manipulation and unfunded renovation have no published figure; FATF RBA Real
+      Estate gives wording only. Source: a CMHC presentation of real-estate ML risk indicators built from
+      Unger et al. (2010) and FINTRAC (2016), filed as Exhibit 715 at BC''s Cullen Commission. Other figures:
+      CMHC Exhibit 719 uses the same rule (''exchanged hands at least twice within 365 days'') and flags
+      a buyer who buys again ''within six days or less''. The US FHA anti-flipping rule (24 CFR 203.37a)
+      is a mortgage-eligibility rule, not an ML threshold. Under it, a resale 90 days or less after purchase
+      cannot get FHA insurance, and a resale at 91 to 180 days at a price ''100 percent over the purchase
+      price'' needs a second appraisal.'
   threshold_verified: true
   cross_hints:
   - target_area: FR
@@ -2336,7 +2489,7 @@ indicators:
   - Rising markets
   - Renovation funded by savings or builder credit
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-041
   name: Unusual or abruptly changed financing
   definition: The purchase uses complex or unexplained loans, financing changes suddenly, or loans are
@@ -2418,6 +2571,19 @@ indicators:
     quote: Conducting VA-fiat currency exchange at a potential loss
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Defining a Housing Market Integrity Index (MII): A Methodology and Application to Quebec''s
+      Housing Market (Working Document)'
+    publisher: Canada Mortgage and Housing Corporation (exhibit 719, Commission of Inquiry into Money
+      Laundering in British Columbia)
+    year: '2021'
+    url: https://ag-pssg-sharedservices-ex.objectstore.gov.bc.ca/ag-pssg-cc-exh-prod-bkt-ex/719%20-%20Defining%20a%20Housing%20Market%20Integrity%20Index%20A%20Methodology%20and%20Application%20to%20Quebecs%20Housing%20Market%20-%20Draft%20-%2019%20Feb%202021.pdf
+    locator: Executive summary, transaction-characteristics indicator 3 (about PDF page 7)
+    quote: Finally, we consider the price growth of the same property. A property with a negative 0.8%
+      annual growth rate falls into the lowest decile.
+    quote_verified: true
+    licence: Copyright CMHC; report says it 'shall not be disclosed, distributed or reproduced without
+      the consent of CMHC'; made public as an inquiry exhibit
+    checked: '2026-10-10'
   examples:
   - Buying a property and reselling it a month later for 30% less
   cases: []
@@ -2430,10 +2596,17 @@ indicators:
   lookup_sources:
   - market price data
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The property is resold for less than it was bought for. No published figure for this level.
+    strong: The property's yearly price change is negative 0.8% or worse (CMHC bottom-tenth cut-off)
+    textbook: Meets the FATF definition as worded (no obvious economic sense, particularly an obvious
+      loss), and for property the yearly price change is negative 0.8% or worse
+    threshold_source: https://ag-pssg-sharedservices-ex.objectstore.gov.bc.ca/ag-pssg-cc-exh-prod-bkt-ex/719%20-%20Defining%20a%20Housing%20Market%20Integrity%20Index%20A%20Methodology%20and%20Application%20to%20Quebecs%20Housing%20Market%20-%20Draft%20-%2019%20Feb%202021.pdf
+    threshold_note: 'Narrow fit: the number covers only property resold at a loss, measured as the yearly
+      price change of the same property, from the CMHC Quebec study (Cullen Commission Exhibit 719, marked
+      ''Working Document / DO NOT CITE''). It is the bottom tenth of Quebec price changes, not a legal
+      threshold. For crypto exchanged at a loss, needless fees, and deals with no business purpose, no
+      published figure was found: the FATF VA Red Flag Indicators, FinCEN FIN-2017-A003 and FATF RBA Real
+      Estate give wording only.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -2441,7 +2614,7 @@ indicators:
   - Market crashes
   - Tax-loss selling
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-043
   name: Groups of similar buyers of new-build or off-plan homes
   definition: Several buyers with matching profiles buy new or not-yet-built homes in the same development
@@ -3185,6 +3358,19 @@ indicators:
       cash deposits into credit cards.
     quote_verified: true
     checked: '2026-10-09'
+  - title: FinCEN Notice on Use of Convertible Virtual Currency Kiosks for Scam Payments and Other Illicit
+      Activity (FIN-2025-NTC1)
+    publisher: FinCEN (US Treasury)
+    year: '2025'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN-Notice-CVCKIOSK.pdf
+    locator: p. 9, red flags for CVC kiosk operators, and footnote 46
+    quote: A report of each deposit, withdrawal, exchange of currency, or other payment or transfer, by,
+      through, or to a financial institution that involves a transaction in currency of more than $10,000.
+      Multiple transactions may be aggregated when determining whether the reporting threshold has been
+      met.
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-10'
   examples:
   - Pensioners told by scammers to feed cash into a Bitcoin ATM (FATF case study 10)
   cases: []
@@ -3198,10 +3384,25 @@ indicators:
   - crypto ATM location maps
   - blockchain analytics
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Repeated cash deposits at crypto kiosks that build toward the $10,000 Currency Transaction
+      Report threshold. No lower published figure for 'small' amounts was found.
+    strong: Cash deposits each kept just under $10,000, or adding up to more than $10,000, spread across
+      several kiosks or accounts.
+    textbook: Cash deposits structured just beneath the $10,000 Currency Transaction Report threshold
+      (or a kiosk's daily limit) by using multiple machines or multiple accounts, as FinCEN's red flag
+      words it.
+    threshold_source: https://www.fincen.gov/sites/default/files/shared/FinCEN-Notice-CVCKIOSK.pdf
+    threshold_note: 'The number comes from FinCEN''s red flag for kiosks (p. 9): ''A customer structures
+      cash deposits just beneath the Currency Transaction Report (CTR) threshold,46 or CVC kiosk daily
+      limit, either by using multiple machines or multiple accounts (i.e., smurfing).'' Footnote 46 sets
+      the CTR threshold at more than $10,000, which is the quote used below. Other published figures:
+      (1) The same notice says kiosk fees range ''from 7–20 percent'', which bears on ''despite high fees''.
+      (2) It notes that California''s law bars operators from accepting or dispensing more than $1,000
+      a day per customer (footnote 18). (3) AUSTRAC (Australia) requires ''limits of $5,000 on cash deposits
+      and withdrawals at crypto ATMs'' (page ''Crypto ATM providers to meet minimum standards'', austrac.gov.au,
+      undated, c. mid-2025). The California and AUSTRAC figures are caps on operators, not red-flag triggers.
+      The cited FATF source gives no number. Applies to the US (CTR); the kiosk-limit part depends on
+      the jurisdiction.'
   threshold_verified: true
   cross_hints:
   - target_area: FR
@@ -3211,7 +3412,7 @@ indicators:
   - Unbanked users
   - Convenience despite fees
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-058
   name: Illicit wording in payment or message fields
   definition: Messages attached to crypto transactions use language pointing to illegal goods, such as
@@ -3520,6 +3721,17 @@ indicators:
       minimal or no play
     quote_verified: true
     checked: '2026-10-09'
+  - title: Recognizing Suspicious Activity - Red Flags for Casinos and Card Clubs (FIN-2008-G007)
+    publisher: FinCEN (US Treasury)
+    year: '2008'
+    url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+    locator: 'Section: Minimal Gaming Activities Without Reasonable Explanations'
+    quote: While reviewing computerized player rating records, an employee determines that a customer
+      frequently purchases chips with currency between $5,000 and $10,000, engages in minimal gaming,
+      and walks away with the chips.
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-10'
   examples:
   - A patron buys $40,000 of chips at a baccarat table, plays two hands, and asks the cage for a casino
     cheque for $39,500.
@@ -3535,10 +3747,17 @@ indicators:
   - Casino cash transaction and suspicious activity records (if obtained in court or leaked documents)
   - Court records of casino prosecutions
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A cash chip purchase followed by little or no play. No lower published figure was found.
+    strong: Cash chip purchases between $5,000 and $10,000 with minimal gaming.
+    textbook: Frequent cash chip purchases between $5,000 and $10,000, minimal gaming, then walking away
+      with the chips (or cashing them out), as FinCEN words it.
+    threshold_source: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+    threshold_note: 'Applies to US casinos and card clubs. Other figures on the same FinCEN page: two
+      or more customers each buy chips with currency ''in amounts between $3,000 and $10,000'', play minimally
+      and combine chips over $10,000; slot-machine bill-acceptor loads of ''$2,990'' with minimal play;
+      markers ''between $5,000 and $10,000''; front-money deposits ''in excess of $5,000''. AUSTRAC''s
+      casino indicators (Australia) describe cash buy-ins ''under $10,000 (known as structuring), followed
+      by cashing out with minimal or no play''. The FATF/APG 2009 casinos report gives no number.'
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -3550,7 +3769,7 @@ indicators:
   - Some players cash out for a cheque simply to avoid carrying large sums of cash.
   - Tourists may buy chips and then decide not to play.
   jurisdictions: Global (FATF); US (FinCEN); Australia (AUSTRAC)
-  version: 1
+  version: 2
 - id: ML-065
   name: Refining small notes into large ones at a casino
   definition: Someone uses the casino cage, note-accepting gaming machines or a casino account to swap
@@ -3578,6 +3797,17 @@ indicators:
     quote: A customer makes a large deposit using numerous small denomination bills
     quote_verified: true
     checked: '2026-10-09'
+  - title: Recognizing Suspicious Activity - Red Flags for Casinos and Card Clubs (FIN-2008-G007)
+    publisher: FinCEN (US Treasury)
+    year: '2008'
+    url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+    locator: 'Section: Minimal Gaming Activities Without Reasonable Explanations'
+    quote: A customer makes a large deposit using numerous small denomination bills (e.g., $5s, $10s and
+      $20s); and withdraws it in chips at a table game, engages in minimal gaming, and exchanges remaining
+      chips at a cage for large denomination bills (e.g., $100), a casino check or a money transfer.
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-10'
   examples:
   - A customer brings $15,000 in $20 notes to the cage and asks for $100 notes.
   - Several people each exchange small notes at different cashier windows and meet outside to pool the
@@ -3591,10 +3821,16 @@ indicators:
   lookup_sources:
   - Casino records obtained through court or regulator documents
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A large deposit made up of many small bills ($5s, $10s and $20s).
+    strong: A large deposit of $5s, $10s and $20s followed by minimal gaming.
+    textbook: A large deposit in $5s, $10s and $20s, minimal gaming, then remaining chips exchanged at
+      the cage for large bills (e.g., $100), a casino cheque or a money transfer, as FinCEN words it.
+    threshold_source: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+    threshold_note: The published numbers here are note denominations, not an amount threshold. FinCEN
+      gives no dollar size for 'large deposit'. For a size, the US currency transaction reporting threshold
+      for casinos is more than $10,000 (FinCEN pages on CTRC), but that is not stated for this pattern.
+      AUSTRAC's casino indicators describe exchanging small notes for large notes at the cage with no
+      number. The FATF/APG 2009 casinos report gives no number.
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -3605,7 +3841,7 @@ indicators:
   - Small business owners (for example vending or tips-based trades) may hold many small notes.
   - Players may want larger notes to carry winnings safely.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-066
   name: Casino transactions kept just under the reporting threshold
   definition: Chip purchases, cash-outs, deposits or currency exchanges are split across several players,
@@ -3764,6 +4000,16 @@ indicators:
       winnings for a single cheque
     quote_verified: true
     checked: '2026-10-09'
+  - title: Recognizing Suspicious Activity - Red Flags for Casinos and Card Clubs (FIN-2008-G007)
+    publisher: FinCEN (US Treasury)
+    year: '2008'
+    url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+    locator: 'Section: Unusual Gaming Transactions / transaction characteristics list'
+    quote: A customer requests the issuance of casino checks, each less than $3,000, which are made payable
+      to third parties or checks without a specified payee.
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-10'
   examples:
   - A patron asks for five casino cheques under $3,000 each, made out to different names.
   - A customer wires money from a non-gaming source to the casino and wires it out again to a foreign
@@ -3778,17 +4024,25 @@ indicators:
   lookup_sources:
   - Bank records showing casino cheques deposited by unrelated people
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A customer asks for casino cheques made payable to third parties or with no named payee.
+    strong: Several casino cheques, each under $3,000, made payable to third parties or with no named
+      payee.
+    textbook: Casino cheques issued each for less than $3,000 and made payable to third parties or without
+      a specified payee, as FinCEN words it.
+    threshold_source: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+    threshold_note: 'This is already stated in the cited FinCEN source. Other figures on the same page:
+      a withdrawal of ''$30,000 or more'' from a deposit account split into multiple casino cheques each
+      ''less than $10,000''; deposits or marker payoffs made with multiple instruments ''in amounts of
+      less than $3,000''; banking-like use ''within a short period of time (e.g., one to two days)''.
+      AUSTRAC (frequent transfers in and out through casino financial services) and FATF/APG 2009 give
+      no number. Applies to the US.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Some casinos let regular players pay debts or gifts by cheque.
   - International visitors may move funds through casino accounts for convenience.
   jurisdictions: US, Australia, global
-  version: 1
+  version: 2
 - id: ML-069
   name: Casino front-money or deposit account used like a savings or transit account
   definition: Money is paid into a casino deposit (front-money) account from cash, cheques or wires, little
@@ -3945,6 +4199,17 @@ indicators:
     quote: Frequent „ cash out‟ transactions without corresponding „ buy in‟ transactions
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1021.311 Filing obligations (casinos)
+    publisher: US Treasury, FinCEN (Code of Federal Regulations, 31 CFR 1021.311)
+    year: '2025'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1021/subpart-C/section-1021.311
+    locator: 31 CFR 1021.311, opening sentence; (b)(1) "Redemptions of chips, tokens, tickets, and other
+      gaming instruments"
+    quote: Each casino shall file a report of each transaction in currency, involving either cash in or
+      cash out, of more than $10,000.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - A person who never bought chips at the casino repeatedly cashes in high-value chips just under the
     reporting threshold.
@@ -3957,10 +4222,20 @@ indicators:
   lookup_sources:
   - Casino records via court filings
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Chips are taken out of the casino or cashed in by someone other than the person who bought
+      them, in amounts kept below the casino reporting line of more than $10,000.
+    strong: Repeated chip redemptions by third parties, each kept just under the more-than-$10,000 line,
+      or chips carried across a border and cashed in elsewhere.
+    textbook: 'Meets the published definition as worded: chips used as currency or moved across a border
+      and redeemed by someone else, with redemptions arranged around the more-than-$10,000 casino currency
+      report (redemption of chips is a listed cash-out transaction).'
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1021/subpart-C/section-1021.311
+    threshold_note: 'Countable as an amount: the pattern is defined by cashing chips in below reporting
+      thresholds. The number is the US casino currency transaction report threshold, which explicitly
+      lists redemption of chips as a cash-out transaction. It is a US reporting line, not a red-flag figure
+      from the FATF/APG 2009 casino report (that report, as cited, gives no number). AUSTRAC''s equivalent
+      threshold transaction report is AUD 10,000 but its page could not be opened (robots block), so it
+      is not used.'
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -3970,7 +4245,7 @@ indicators:
   - Players sometimes leave with chips and cash them on a later visit.
   - Chips may be gifted between friends or family.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: ML-072
   name: Winnings claimed that do not match recorded play, or frequent jackpot claims
   definition: Someone presents winnings, jackpots or gaming-machine payouts that the casino's play records
@@ -4565,6 +4840,19 @@ indicators:
       instruments
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1010.415 Purchases of bank checks and drafts, cashier's checks, money orders and traveler's
+      checks
+    publisher: US Treasury, FinCEN (Code of Federal Regulations, 31 CFR 1010.415)
+    year: '2025'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-D/section-1010.415
+    locator: 31 CFR 1010.415(a)
+    quote: No financial institution may issue or sell a bank check or draft, cashier's check, money order
+      or traveler's check for $3,000 or more in currency unless it maintains records of the following
+      information, which must be obtained for each issuance or sale of one or more of these instruments
+      to any individual purchaser which involves currency in amounts of $3,000-$10,000 inclusive
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - Twenty money orders of $900 each, numbered consecutively and bought at the same store, are mailed
     in for deposit.
@@ -4579,10 +4867,18 @@ indicators:
   - Bank deposit records (in court files)
   - Money services business registers (e.g. FinCEN MSB registration search)
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Sequentially numbered money orders, traveller's cheques or cashier's cheques each bought for
+      less than $3,000 in cash, the level at which the seller must keep purchaser records.
+    strong: Sequential instruments bought with cash in the $3,000 to $10,000 recordkeeping band, or many
+      smaller instruments that together exceed $10,000.
+    textbook: 'Meets the published definition as worded: sequential or oddly stamped instruments, or bulk
+      third-party items from exchange houses, used to split cash around the $3,000 and $10,000 lines.'
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-D/section-1010.415
+    threshold_note: The number is the US recordkeeping rule for cash purchases of money orders, traveller's
+      cheques and cashier's cheques ($3,000 to $10,000 inclusive); the more-than-$10,000 bank currency
+      transaction report (31 CFR 1010.311) is the upper line. The FFIEC appendix cited gives no number.
+      These are reporting/recordkeeping lines, not red-flag counts of sequential items; no published count
+      of sequential instruments was found.
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -4594,7 +4890,7 @@ indicators:
     lack bank accounts.
   - Exchange houses legitimately clear customers' cheques through correspondent accounts.
   jurisdictions: US, Latin America
-  version: 1
+  version: 2
 - id: ML-083
   name: Unregistered informal value transfer (hawala) run through bank accounts
   definition: A business or person takes cash and cheques from many local customers, often in structured
@@ -4630,6 +4926,18 @@ indicators:
     quote: The deposits typically were structured to avoid reporting requirements.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1010.311 Filing obligations for reports of transactions in currency
+    publisher: US Treasury, FinCEN (Code of Federal Regulations, 31 CFR 1010.311)
+    year: '2025'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    locator: 31 CFR 1010.311, opening sentence
+    quote: Each financial institution other than a casino shall file a report of each deposit, withdrawal,
+      exchange of currency or other payment or transfer, by, through, or to such financial institution
+      which involves a transaction in currency of more than $10,000, except as otherwise provided in this
+      section.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - A Brooklyn ice-cream shop's accounts took $22.2 million in cash, cheques and wires, consolidated it,
     and wired $21.9 million to 25 countries (FinCEN's Carnival example).
@@ -4663,10 +4971,18 @@ indicators:
   - Money services business registers (FinCEN MSB registrant search; state money transmitter licence lists)
   - Court records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: An unregistered business takes cash from many customers and wires it abroad, with deposits
+      below the bank currency report line of more than $10,000.
+    strong: Repeated cash deposits each kept under the more-than-$10,000 line, gathered in one account
+      and followed by one-way international wires.
+    textbook: 'Meets the published definition as worded: unlicensed money transmission through bank accounts
+      using deposits structured to avoid the more-than-$10,000 currency transaction report.'
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    threshold_note: Both FinCEN advisories cited (Advisory 33, March 2003; FIN-2010-A011, updated 5 July
+      2022) say deposits were structured to avoid reporting requirements but state no dollar figure (Advisory
+      33 only gives 'within 24 hours' for IVTS settlement speed). The number used is the bank currency
+      transaction report threshold that structuring avoids. US money transmitters must register regardless
+      of amount, so there is no amount trigger for the licensing part.
   threshold_verified: true
   cross_hints:
   - target_area: EN
@@ -4677,7 +4993,7 @@ indicators:
   - A business may make regular international payments to suppliers.
   - Advisory 33 itself says each indicator alone does not mean IVTS activity.
   jurisdictions: US; hawala networks worldwide
-  version: 1
+  version: 2
 - id: ML-084
   name: 'Sham litigation: disputes settled too easily or debts enforced by court order'
   definition: A lawsuit or claim is settled quickly with little real dispute, or a fake debt is created

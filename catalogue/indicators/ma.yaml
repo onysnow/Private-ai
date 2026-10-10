@@ -199,6 +199,17 @@ indicators:
       violations, or are associated with multiple low-priced stock issuers.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Disqualification of Felons and Other "Bad Actors" from Rule 506 Offerings and Related Disclosure
+      Requirements (Small Entity Compliance Guide)
+    publisher: US Securities and Exchange Commission
+    year: '2013'
+    url: https://www.sec.gov/resources-small-businesses/small-business-compliance-guides/disqualification-felons-other-bad-actors-rule-506-offerings-related-disclosure-requirements
+    locator: Disqualifying Events, 'Criminal convictions'; general look-back sentence in the same section
+    quote: The criminal conviction must have occurred within ten years of the proposed sale of securities,
+      or five years in the case of the issuer and its predecessors and affiliated issuers.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - The same transfer agent, auditor and promoter appear across several issuers that were later suspended.
   cases: []
@@ -216,10 +227,20 @@ indicators:
   - Court records (PACER)
   - Company registries
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: An officer, promoter or service provider has a securities-related conviction, injunction or
+      regulatory order older than the published look-back periods, or is tied to several other low-priced
+      issuers.
+    strong: A securities-related regulatory order against a linked person was issued within the last ten
+      years, or a court injunction within the last five years.
+    textbook: A director, executive officer or promoter has a securities-related criminal conviction within
+      ten years of the offering (five years for the issuer itself). This is an SEC Rule 506(d) 'bad actor'
+      disqualifying event.
+    threshold_source: https://www.sec.gov/resources-small-businesses/small-business-compliance-guides/disqualification-felons-other-bad-actors-rule-506-offerings-related-disclosure-requirements
+    threshold_note: 'Countable by the age of misconduct events. The same page also says: ''Many disqualifying
+      events include a look-back period (for example, a court injunction that was issued within the last
+      five years or a regulatory order that was issued within the last ten years).'' The other half of
+      the pattern, the number of low-priced issuers a person is tied to, has no published count (FINRA
+      19-18 and 21-03 say only ''multiple'').'
   threshold_verified: true
   cross_hints:
   - target_area: AF
@@ -230,7 +251,7 @@ indicators:
   - Small-cap specialist firms legitimately serve many small issuers
   - Old, minor or resolved violations
   - Common names producing false matches
-  version: 1
+  version: 2
 - id: MA-005
   name: No current, adequate public financial information
   definition: The company does not publish up-to-date accounts, or its SEC filings are late, incomplete
@@ -1356,6 +1377,17 @@ indicators:
       or low-priced security.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Gambling in Penny Stocks: The Case of Stock Spam E-mails'
+    publisher: International Journal of Cyber Criminology (peer-reviewed); Hu, McInish and Zeng
+    year: '2010'
+    url: https://mail.cybercrimejournal.com/pdf/Huetal2010ijcc.pdf
+    locator: p. 626, Discussion
+    quote: Abnormal dollar volume on the PeakDay was about 5 times the average daily dollar volume for
+      the SCs with a short term target price compared to 3 times the average daily dollar volume for the
+      SCs with out a short term target price.
+    quote_verified: true
+    licence: Creative Commons Attribution-NonCommercial-ShareAlike 2.5 India
+    checked: '2026-10-10'
   examples:
   - Volume up 50 times normal and price up 300% in a week with no filing explaining why.
   cases: []
@@ -1368,17 +1400,26 @@ indicators:
   - Market data (OTC Markets, exchange data)
   - SEC EDGAR for news that would explain the move
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Trading in a thin or penny stock jumps to about 3 times its average daily dollar volume while
+      the price rises. The study found this level on the peak day of spam touting campaigns without a
+      short-term target price.
+    strong: Trading reaches about 5 times average daily dollar volume while the price rises. The study
+      found this level on the peak day of spam campaigns that named a short-term target price.
+    textbook: 'Meets the published definition as worded: a sudden spike in demand together with a rising
+      price in a thinly traded or low-priced security (FINRA 19-18).'
+    threshold_source: https://mail.cybercrimejournal.com/pdf/Huetal2010ijcc.pdf
+    threshold_note: These are observed figures from 580 penny-stock spam (pump) campaigns, not a regulatory
+      trigger. The same paper reports peak-day abnormal returns of about 5.85 percent for campaigns with
+      a price target (p. 624). FINRA 19-18 gives no number. Nam and Skillicorn (arXiv 2301.11403) flag
+      price more than two standard deviations above a five-day baseline, but the paper is not peer-reviewed,
+      so it was not used.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Genuine material news
   - Short squeeze driven by real buyers
   - Index inclusion
-  version: 1
+  version: 2
 - id: MA-028
   name: Unrelated accounts trade an illiquid stock at the same moment
   definition: Two or more accounts with no known link suddenly trade the same illiquid stock at the same
@@ -1463,6 +1504,15 @@ indicators:
     quote: (bidding or offering with the intent to cancel the bid or offer before execution)
     quote_verified: true
     checked: '2026-10-09'
+  - title: United States v. Michael Coscia, No. 16-3017
+    publisher: U.S. Court of Appeals for the Seventh Circuit (via Justia)
+    year: '2017'
+    url: https://law.justia.com/cases/federal/appellate-courts/ca7/16-3017/16-3017-2017-08-07.html
+    locator: Slip opinion p. 26
+    quote: 35.61% of his small orders were filled, whereas only 0.08% of his large orders were filled.
+    quote_verified: true
+    licence: US federal court opinion, public domain (not stated on page)
+    checked: '2026-10-10'
   examples:
   - Ten large sell orders above the best offer appear, a small buy fills at a lower price, and the sell
     orders vanish within a second.
@@ -1519,10 +1569,18 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A trader's large orders on one side fill much less often than the same trader's small orders
+      on the other side. No published figure marks this first sign.
+    strong: 'The gap is extreme: small orders fill around 35.61% of the time while large orders almost
+      never fill, near 0.08%.'
+    textbook: Meets the published definition as worded (bidding or offering with intent to cancel, CEA
+      7 USC 6c(a)(5)(C)). In the upheld Coscia spoofing conviction, 35.61% of small orders filled against
+      only 0.08% of large orders.
+    threshold_source: https://law.justia.com/cases/federal/appellate-courts/ca7/16-3017/16-3017-2017-08-07.html
+    threshold_note: The figures are evidence a court accepted in upholding a spoofing conviction, not
+      a regulatory cut-off. On ICE, the same opinion gives about 0.5% of large orders filled against about
+      52% of small orders. It also records an order-to-fill size ratio of about 1,600% against 91% to
+      264% for other traders (p. 13). FINRA 19-18, MAR and 2016/522 give no number.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -1530,7 +1588,7 @@ indicators:
   - Market makers updating quotes
   - Hedging orders legitimately withdrawn
   jurisdictions: US (CEA, SEC/FINRA), EU and UK (MAR)
-  version: 1
+  version: 2
 - id: MA-030
   name: Order flooding and momentum ignition
   definition: Sending huge numbers of orders, cancellations or updates to slow others down or hide a strategy,
@@ -1908,6 +1966,15 @@ indicators:
       falls and investors lose money.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'To the moon: defining and detecting cryptocurrency pump-and-dumps'
+    publisher: Crime Science (Springer Nature / BMC), Kamps and Kleinberg
+    year: '2018'
+    url: https://link.springer.com/article/10.1186/s40163-018-0093-5
+    locator: Results > Anomaly detection > Strict parameters
+    quote: the volume and price thresholds were increased to 400% and 10% respectively
+    quote_verified: true
+    licence: CC BY 4.0
+    checked: '2026-10-10'
   examples:
   - Promoters buy at $0.05, run an email campaign, sell at $0.80; the price returns to $0.04.
   cases:
@@ -1931,10 +1998,18 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Within a 12-hour estimation window, trading volume rises at least 25% and price rises at least
+      3% (the study's initial, loosest settings)
+    strong: Volume rises at least 300% and price rises at least 5% (the study's balanced settings)
+    textbook: Within a 24-hour estimation window, volume rises at least 400% and price rises at least
+      10% (the study's strict settings)
+    threshold_source: https://link.springer.com/article/10.1186/s40163-018-0093-5
+    threshold_note: 'Applies to cryptocurrency pump-and-dumps: the study''s thresholds are for crypto
+      exchange data, not regulated equities. It is a peer-reviewed academic detection method, not a regulatory
+      trigger. Other verbatim settings from the same page: ''We chose a 12 h estimation window, 25% volume
+      increase and a 3% price increase.'' (initial) and ''at 300% and 5% respectively'' (balanced, 12
+      h window). No regulator (SEC, FINRA, EU MAR 2016/522) publishes a numeric pump-and-dump trigger;
+      the cited EU and Investor.gov sources are qualitative.'
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -1944,7 +2019,7 @@ indicators:
   innocent_explanations:
   - Early investors selling into a genuine rally
   - Honest promotion followed by disappointing results
-  version: 1
+  version: 2
 - id: MA-038
   name: 'Trash and cash: short, smear, cover'
   definition: Taking a short position, pushing the price down with more selling or false negative news,
@@ -2216,6 +2291,14 @@ indicators:
       by acquiring or disposing of
     quote_verified: true
     checked: '2026-10-09'
+  - title: Abnormal Trading Volume Ratio
+    publisher: UK Financial Conduct Authority
+    year: '2019'
+    url: https://www.fca.org.uk/data/abnormal-trading-volume-ratio
+    locator: Section defining the Observation, Benchmark and Announcement Periods
+    quote: 'Benchmark Period: 20 working days. Announcement Period: 10 working days.'
+    quote_verified: true
+    checked: '2026-10-10'
   examples:
   - Director's brother sells his whole holding two days before a failed trial result is published.
   cases:
@@ -2241,17 +2324,27 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Average trading volume in the 10 working days before an unexpected price-sensitive announcement
+      is higher than in the 20 working days before that
+    strong: That increase is statistically significant at the FCA's 5% p-value threshold, in either equities
+      or derivatives (CFDs and spread bets)
+    textbook: 'Meets the FCA''s abnormal-trading-volume test as worded: a 10-working-day announcement
+      period against a 20-working-day benchmark, significant at 5%'
+    threshold_source: https://www.fca.org.uk/data/abnormal-trading-volume-ratio
+    threshold_note: 'UK FCA market-cleanliness measure (Abnormal Trading Volume ratio). The FCA states
+      that a flagged result does not by itself mean abuse occurred. Same page: ''We use a 5% p value threshold.''
+      and a minimum of 20 observations in the benchmark and 10 in the announcement period. The FCA''s
+      earlier measure used ''abnormal price movements in the 2-day period ahead of'' UK takeover announcements.
+      Augustin, Brenner and Subrahmanyam (Management Science 2019) found ''About 25% of all takeovers
+      have positive abnormal volumes'' in options before announcements; that is a prevalence figure, not
+      a threshold. FINRA 19-18 and 21-03 are qualitative.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Pre-arranged trading plan (e.g. US Rule 10b5-1 plan)
   - Coincidence after public speculation
   - Trade based on public analysis
-  version: 1
+  version: 2
 - id: MA-044
   name: Unusual short-dated, out-of-the-money call buying before a takeover
   definition: A burst of cheap, short-term bullish options on a target company shortly before a takeover

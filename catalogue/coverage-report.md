@@ -1,8 +1,8 @@
 # Indicator catalogue: coverage report
 
-Made 09 October 2026 from the files in catalogue/.
+Made 10 October 2026 from the files in catalogue/.
 
-**1464 indicators in 22 areas; 1426 verified, 38 pending. 1144 glossary terms.**
+**1464 indicators in 22 areas; 1426 verified, 38 pending. 1151 glossary terms.**
 
 | Area | Indicators | Verified | From records | After lookups | Person only | Cases | Cross-hints | Sources not reached |
 |---|---|---|---|---|---|---|---|---|
@@ -555,4 +555,255 @@ Three agents each looked for what the catalogue misses, in a different way. Each
 - **SA**: Interpol Red Notice or diffusion sought against the investigator by the subject's government (transnational repression) *Why:* Freedom House documents politically motivated Red Notices and diffusions as a tool of transnational repression. SA mentions states reaching critics abroad but not this mechanism. <https://freedomhouse.org/report/special-report/2026/collaboration-and-resistance-tracking-transnational-repression-2025>
 - **SA**: Investigator or outlet designated a 'foreign agent', with labelling duties, frozen earnings and criminal liability *Why:* CPJ documents this administrative and financial pressure, separate from criminal defamation charges. Russia prosecuted or fined 18 journalists under it in late 2024, and El Salvador passed a similar law in 2025. <https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/>
 - **PP**: Polling-station results lost or missing from the tally, and constituency results showing near-100% turnout with near-unanimous votes *Why:* Carter Center observers in the DRC in 2011 flagged nearly 2,000 Kinshasa polling-station results as lost, and turnout of 99–100% in some Katanga constituencies. The catalogue covers statistical fingerprints but not missing results. <https://cartercenter.org/news/pr/drc-121011.html>
+## Threshold numbers (round of 9–10 October 2026)
+
+Decided by Ony, 10 October 2026: where a countable indicator's source gives no number, it is researched again for a published one; a number that cannot be found is reported as not found, never invented.
+
+- 471 indicators had no number in their levels and were looked at.
+- 120 are not countable (the pattern is present or absent), so no number applies.
+- 115 countable indicators now have a published number. Each was re-opened at its source: the quote was found word for word (3 corrected to the source's exact wording), the numbers are in it, and it states them for the same pattern. The source is added to the indicator, the levels carry the number, a note says what the number applies to (jurisdiction, kind of rule, limits), and the version is raised.
+- 50 had a number proposed that did not pass the check, so it is not used.
+- 186 countable indicators have no published number that could be found.
+
+### A number was proposed but did not pass the check
+
+- **AF-006** Managers' personal wealth tied to reported results: the source states the number for a different pattern or context
+- **AF-029** Unusual balance-sheet changes or ratio trends: the source states the number for a different pattern or context
+- **BO-014** Rapid or frequent changes of directors, owners or location: the number is not in the quote or the cited section
+- **BO-031** Dealings between companies with the same owners or directors, without business reason: the source states the number for a different pattern or context
+- **BO-032** Apparently unrelated parties share an address, phone or email: the source states the number for a different pattern or context
+- **CY-005** Pass-through: incident-response or insurer receives funds then quickly sends the same amount to a crypto exchange: the source states the number for a different pattern or context
+- **CY-029** Dormant account suddenly sends large sums to crypto platforms: the source states the number for a different pattern or context
+- **EF-015** Large purchases of gift cards or prepaid cards: the source states the number for a different pattern or context
+- **EF-018** Uncharacteristic large or frequent withdrawals and transfers: the source states the number for a different pattern or context
+- **EF-024** Out-of-character attempts to wire large sums: the source states the number for a different pattern or context
+- **EN-003** Officials with wildlife, forestry, customs or natural-resource duties holding unexplained cash or wealth: the source states the number for a different pattern or context
+- **EN-013** Under- or over-priced resource trade between related parties: the source could not be opened; the quote was not found at the source; the number is not in the quote or the cited section; the source states the number for a different pattern or context
+- **EN-026** Large cash withdrawals near extraction areas: the source states the number for a different pattern or context
+- **EN-028** Cash-intensive businesses sending large sums to mining or logging areas: the source states the number for a different pattern or context
+- **EN-038** Sales below market to a related company, then bankruptcy after extraction: the number is not in the quote or the cited section
+- **EN-052** Heavy cash use by waste companies: the source states the number for a different pattern or context
+- **EN-080** HFCs placed on the EU market without quota or F-gas Portal registration: the source states the number for a different pattern or context
+- **FR-026** Promoted 'too good to be true' tax arrangements: the source states the number for a different pattern or context
+- **FR-037** No real product or no sales to outsiders: the source states the number for a different pattern or context
+- **FR-060** Unrelated accounts trading the same thin stock at the same moment: the source states the number for a different pattern or context
+- **FR-061** Pump-and-dump: sudden demand and price spike in a thinly traded or low-priced stock: the source states the number for a different pattern or context
+- **FR-062** Large trade shortly before news, by someone linked to the issuer: the source states the number for a different pattern or context
+- **FR-072** Older person buys many gift cards or prepaid cards, or suddenly buys crypto: the source states the number for a different pattern or context
+- **FR-073** Sudden heavy withdrawals or draining of an older person's accounts: the source states the number for a different pattern or context
+- **FR-078** New or quiet account suddenly takes check deposits, then quick withdrawals: the source states the number for a different pattern or context
+- **FR-088** Significant unusual or complex transactions near period end: the source states the number for a different pattern or context
+- **HT-024** Payment processors that hide who paid: the source states the number for a different pattern or context
+- **HT-025** Cash-heavy inflows that don't fit the business: the source states the number for a different pattern or context
+- **HT-029** Wages taken back: big deductions, payroll returned to employer, or many salaries into one account: the source states the number for a different pattern or context
+- **HT-044** Swapping small notes for large ones (bulk cash preparation): the source states the number for a different pattern or context
+- **LE-009** Night, weekend or overtime penalty rates missing from pay slips: the number is not in the quote or the cited section
+- **LE-013** After-hours work concentrated among temporary visa holders and casuals: the quote was not found at the source; the source states the number for a different pattern or context
+- **MA-022** Marking the close or other reference prices: the source states the number for a different pattern or context
+- **MA-026** One person or a few make up a big share of daily volume and move the price: the source states the number for a different pattern or context
+- **MA-030** Order flooding and momentum ignition: the source states the number for a different pattern or context
+- **ML-012** Mispriced goods (over- or under-invoicing): the source states the number for a different pattern or context
+- **ML-025** Cash patterns unlike the business or its peers: the source states the number for a different pattern or context
+- **ML-026** Bulk cash deposited by couriers into accounts with no business purpose: the source states the number for a different pattern or context
+- **ML-063** Money transfer agents letting customers split remittances: the source states the number for a different pattern or context
+- **ML-075** Large lump-sum premium, cash premiums, or premiums paid by unrelated third parties: the source states the number for a different pattern or context
+- **ML-097** Investment-programme property overvalued or money returned to the investor: the source states the number for a different pattern or context
+- **OC-027** Unclear beneficial owner or many business accounts with no reason: the source states the number for a different pattern or context
+- **OC-029** Heavy spending on online gambling platforms: the source states the number for a different pattern or context
+- **OC-037** Counterfeits imported in small parcels or split shipments: the source could not be opened
+- **OC-062** Dormant gambling account suddenly funded, or funds parked unused: the source states the number for a different pattern or context
+- **PP-030** Overbilling, inflated or duplicate invoices: the source states the number for a different pattern or context
+- **PP-050** NPO crowdfunding, stored-value cards or risky crypto: the source states the number for a different pattern or context
+- **PP-084** Constituency with near-100% turnout and near-unanimous vote: the source could not be opened; the quote was not found at the source; the number is not in the quote or the cited section; the source states the number for a different pattern or context
+- **SF-001** Vessel AIS switched off or gaps in transmission (going dark): the source states the number for a different pattern or context
+- **SF-048** Excessive e-transfers or cash deposits inconsistent with occupation, then wires to high-risk places or cash withdrawals: the source states the number for a different pattern or context
+
+### Countable, no published number found
+
+- **AF-017** High turnover of senior managers, lawyers, board members or finance staff
+- **AF-028** Unexplained reconciling items and ledgers that do not agree
+- **AF-032** Unexplained inventory movements or missing assets
+- **AF-036** Extensive use of suspense accounts
+- **AF-039** Suspicious journal entries
+- **AF-042** Assets that are easy to steal
+- **BO-010** Pass-through account: money flows straight in and out
+- **BO-011** Large funding soon after formation, quickly moved on
+- **BO-013** Dormant then suddenly active (shelf company)
+- **BO-025** Unexplained account signatories
+- **BO-027** Payments to and from professional intermediaries without due cause
+- **BO-028** Bank accounts abroad or in many jurisdictions without reason
+- **BO-029** Round-robin or loan-back transfers
+- **BO-035** Property or assets moved into a company off-market, or cash-bought then pledged
+- **BO-037** Concentrated or scattered payment patterns
+- **CA-025** Repeated low-level concerns about the same adult not reviewed
+- **CA-032** Concentration of children with extra vulnerability
+- **CO-002** Unusually large discount to a distributor
+- **CO-023** PEP funds moved through countries with no apparent tie
+- **CO-037** Firm's political connections change its share of contracts
+- **CO-064** Shareholder records do not account for all shares, or hold a large unissued block
+- **CO-084** Licence or stake resold for a large profit soon after award, with little work done (flipping)
+- **CY-007** Business with little crypto history makes a large crypto transfer
+- **CY-008** Unregistered broker using an exchange's liquidity for many offsetting trades
+- **CY-010** Rapid swaps across coins or blockchains with no clear purpose (chain-hopping)
+- **CY-028** Small crypto 'return' that mirrors an outflow, followed by much larger outflows
+- **CY-031** Small test transfers followed by large wires to unfamiliar parties
+- **CY-041** Heavy use of a stablecoin that advertises it will not cooperate with law enforcement
+- **CY-051** New account with rapid, high-risk payment activity or many chargebacks
+- **CY-053** Crypto converted to cash at a loss or whole balance traded at once
+- **CY-054** One freelance or work account logged into from many IP addresses or countries in a short time, or many accounts run from one IP
+- **CY-058** Remote worker asks to be paid in crypto or through PRC-linked payment services, with frequent onward transfers
+- **CY-059** Freelance profile ratings boosted by one client account, heavy bidding with few wins, or a previously shut-down account
+- **EF-014** Dormant high-balance account suddenly drained
+- **EF-020** Repeated maximum ATM withdrawals
+- **EF-021** Sudden bounced payments (non-sufficient funds)
+- **EF-037** Guardian accounting: many cash cheques or repeated self-reimbursement
+- **EF-039** Guardian spending that does not fit the ward's life
+- **EN-006** Pet shop or breeder payments that do not fit the business
+- **EN-018** Travel and logistics paid for syndicate members who are elsewhere
+- **EN-025** Offshore or tax-haven companies in the logging, mining or gold trade
+- **EN-027** Sudden unexplained boom in economic activity in a rural or isolated area
+- **EN-029** Money arriving from many unrelated origins without business reason
+- **EN-030** Funds from smelter or refiner countries cashed out almost at once
+- **EN-032** New, renamed or reactivated companies with large short-lived resource exports
+- **EN-033** Output or revenue that does not fit capacity
+- **EN-035** One person behind many extraction companies, or proxies fronting companies
+- **EN-036** Frequent share trading in companies holding agricultural or logging permits
+- **EN-041** Exports larger than the source region or country can produce
+- **EN-045** Shipped timber volume differs from permit or concession volume
+- **EN-051** Inexperienced buyers acquire a waste company cheaply
+- **EN-053** Waste companies moving money with known waste-trafficking source or destination countries
+- **EN-057** Waste disposal priced below what it costs to do legally
+- **EN-064** Frequent flag changes (flag hopping) or stateless vessel
+- **EN-073** Carbon credit investment sold with promised high returns or false links to recognised standards
+- **EN-074** VAT missing-trader (carousel) fraud in emission allowances: short-lived traders and sudden trading spikes
+- **ES-004** Foreign trips that are short, illogical or unaffordable
+- **ES-016** Excessive browsing of internal systems beyond duties, including searching for oneself
+- **ES-017** Off-hours access and unwarranted work outside normal hours
+- **ES-022** Unapproved USB or removable media, and abnormal data volume to it
+- **ES-029** Pattern of security infractions, violations or warnings
+- **FR-021** Companies with no real presence, quickly abandoned, or cloned names
+- **FR-028** High returns with little or no risk, or 'guaranteed' returns
+- **FR-040** Online stranger steering someone into crypto 'investments'
+- **FR-044** Kickbacks for patient referrals
+- **FR-048** Reimbursements without matching business spending
+- **FR-049** Health payouts moved to shells, abroad, luxury goods, crypto or betting
+- **FR-057** Bust-out: running up credit, then bankruptcy
+- **FR-067** Multiple or nominee brokerage accounts, or brokerage used as a bank
+- **FR-090** High turnover of senior management, lawyers or board members
+- **FR-092** Rapid growth or profits well above similar companies
+- **HR-046** Payment to accounts or jurisdictions unconnected to the deal
+- **HR-063** Acquisition of large quantities of arms, ammunition or other means to inflict harm
+- **HR-067** Rising violations against a protected group or new laws and measures that discriminate against it
+- **HT-021** Many unrelated senders paying one person
+- **HT-027** Lifestyle out of line with income
+- **HT-032** Workers' wages sent abroad under escort, or wires to high-risk countries
+- **HT-034** Paying for many residences
+- **HT-035** Collector or nominee accounts
+- **HT-036** Casino, online gambling and investment accounts used as pass-through
+- **HT-038** Shared signers and details across unrelated accounts
+- **HT-042** Remittance patterns typical of smuggling networks
+- **HT-048** Offender travel and spending in high-risk or transit countries
+- **HT-058** Group travel straight to a clinic, escorted, carrying cash and medical letters
+- **IN-009** Artificial amplification (high engagement from otherwise inactive accounts)
+- **IN-013** Network of 'news' sites with no original content and automated republishing
+- **IN-034** Batch similarity across supposedly unrelated papers
+- **IN-037** Inappropriate or irrelevant citations (citation manipulation)
+- **IN-038** Journal self-citation or citation stacking anomaly
+- **IN-044** Predatory journal: aggressive and indiscriminate solicitation
+- **IN-048** Account timeline that mostly amplifies others (retweets, quotes, headline shares) with little or no original content
+- **IN-049** Low posts, high results: idle account whose single post gets implausibly large reach
+- **LE-002** Contractor engagement in a sector where workers are normally employees
+- **LE-008** Shifts cut or withdrawn after a worker raises concerns
+- **LE-011** Rosters, time records, access logs, pay slips and payments do not match
+- **LE-016** Pay slips show identical hours for many workers
+- **LE-017** Same superannuation (pension) number on many workers' pay slips
+- **LE-018** Pay slips record fewer hours at a higher rate (the 'half pay' trick)
+- **LE-021** Recorded wages do not match bank transfers
+- **LE-034** Contract price too low to pay legal wages
+- **MA-001** Abrupt or repeated changes of company name, ticker or business model
+- **MA-012** Spike in social media and chat-room promotion
+- **MA-015** Deposit, sell at once, wire the money out
+- **MA-017** Many new or 'unrelated' accounts with the same stock or introducer
+- **MA-018** Deposited shares quickly split across unrelated accounts
+- **MA-019** Sell-only flow through omnibus, DVP/RVP or master/sub accounts
+- **MA-021** Small buys by a big holder, or creeping buys that lift the price
+- **MA-024** Matched or opposite-side orders between colluding parties
+- **MA-031** Quick position reversals and price moves that snap back
+- **MA-032** Holding the price near a derivative's trigger point
+- **MA-038** Trash and cash: short, smear, cover
+- **MA-041** Collusive buying straight after an IPO
+- **ML-003** Mass-registration or unsuitable business address
+- **ML-005** Company shows no normal business activity
+- **ML-010** Illogical shipping routes or transshipment
+- **ML-011** Overly complex or abnormal trade finance
+- **ML-017** Customs values do not match bank payments
+- **ML-019** Account activity out of line with the stated business
+- **ML-033** Many accounts or wallets sharing one controller
+- **ML-035** Unusual safe deposit box use
+- **ML-043** Groups of similar buyers of new-build or off-plan homes
+- **ML-046** Money parked in a professional's client account then refunded
+- **ML-047** Crypto moved quickly through several providers or countries
+- **ML-048** Exchange used only as a pass-through
+- **ML-050** Many small inflows from unrelated wallets, then consolidation
+- **ML-054** Unlicensed peer-to-peer exchanger
+- **ML-056** Anonymising or suspicious IP behaviour
+- **ML-061** Paying unrelated people's credit cards or buying luxury goods with third-party money
+- **ML-062** Chains of company formation agents or professional enablers
+- **ML-076** Frequent changes of beneficiary or requests to pay benefits to someone else
+- **ML-081** Unusual private lending or early mortgage repayment
+- **ML-084** Sham litigation: disputes settled too easily or debts enforced by court order
+- **ML-086** Client changes advisers repeatedly or was turned away by another professional
+- **ML-090** Capital injections into a new or small company with no logical explanation
+- **ML-091** Shares or securities transferred at a price far too high or too low
+- **ML-092** Several companies formed or bought in a short time with shared features
+- **ML-094** Unusual parties to a deal: minors, incapacitated people, or connected parties without a business reason
+- **OC-019** Rural rentals, storage lockers or warehouses out of line with profile
+- **OC-022** Unexplained wealth for a student, retiree or low-income person (possible money mule)
+- **OC-025** Credit cards paid by strangers to buy luxury goods or electronics
+- **OC-033** Recovered firearm was part of a multiple theft
+- **OC-051** Several gambling accounts linked by the same IP address, device, home address or payment method
+- **OC-053** Money deposited and withdrawn from gambling with little or no play
+- **OC-064** Tobacco or excise goods misdescribed or undervalued on customs declarations
+- **OC-074** Same people repeatedly crossing borders with different vehicles, often luxury ones
+- **OC-077** Vehicle exported, then reported stolen for insurance, or repeated claims from the same dealers
+- **OC-078** Vehicles sold well below market price, registered to proxies or through front companies
+- **OC-086** Trade account used as a pass-through, or imports paid by someone other than the buyer
+- **OC-088** Trading company with dormant periods or trade unrelated to its stated business
+- **PD-022** Patients arrive in groups or share unexplained common factors
+- **PD-024** Several members of one household on the same controlled drugs
+- **PD-028** Prescriptions in other people's names / one person collects for many
+- **PD-049** Pill-mill proceeds hidden in multiple or third-party accounts
+- **PM-004** Repeated civil suits, claims or payouts naming the officer
+- **PM-006** Vehicle pursuits and crashes
+- **PM-008** Frequent reassignment
+- **PM-024** Overtime and attendance fraud
+- **PM-036** Same person stopped or cited over and over
+- **PP-031** Small first purchase followed by much larger ones
+- **PP-032** Concentration of awards with one supplier
+- **PP-035** Questionable agent, consultant or excessive agent fees
+- **PP-049** NPO tax-haven flows, multiple structures and insider spending
+- **PP-066** Deliverables cut after award without a cut in price
+- **PP-069** Unrelated goods or services bundled into one lot
+- **PP-073** Contract value estimate set unrealistically high or low
+- **PP-083** Polling-station results lost or missing from the final tally
+- **SA-002** Cluster of deaths, disappearances or attacks among people who looked into or testified against the same subject
+- **SA-017** Coordinated smear or disinformation campaign against the investigator
+- **SA-020** Lawsuit with a disproportionate or excessive claim
+- **SA-021** Multiple lawsuits by the same claimant or associates over similar matters
+- **SA-023** Bad-faith procedural tactics: delay, forum shopping, late withdrawal
+- **SF-007** False flag, flag hopping or fraudulent ship registration
+- **SF-008** Complex or frequently changing ship ownership and management; single-vessel companies
+- **SF-009** Commodity bought at prices significantly below market
+- **SF-010** Inflated, bundled or opaque shipping and ancillary costs (price cap evasion)
+- **SF-031** Overpaying for goods or paying cash for an expensive item
+- **SF-034** Residential, mass-registration or non-existent business address
+- **SF-036** Declared value of goods low compared with shipping cost
+- **SF-039** Commercial account behaving like a remittance or pass-through account
+- **SF-044** Non-profit receives large donations from unknown sources then wires them on to other non-profits
+- **SF-052** Small recurring payments that look like membership or clubhouse fees
+- **SF-059** Rating manipulation and templated bidding across developer accounts
+- **SF-071** Assets or ownership moved to children, relatives or associates just before or after a sanctions designation
+- **SF-076** Sudden rise in value transferred to accounts in a jurisdiction or institution without a clear reason
+- **SF-077** Jump in new company formations in places previously linked to Russian money flows
+- **VE-045** Energy burst: rising activity around the target
 

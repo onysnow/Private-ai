@@ -31,6 +31,17 @@ indicators:
     quote: paid bribes through agents around the world to stack the decks in its favour
     quote_verified: true
     checked: '2026-10-09'
+  - title: Finnvera's Anti-bribery Policy (export financing)
+    publisher: Finnvera plc (official export credit agency of Finland)
+    year: '2021'
+    url: https://finnvera.fi/eng/file-download/download/public/5729
+    locator: 'Section 2.1 Agent information, page 1 (footnote 2: contract price including local costs)'
+    quote: If the agent remuneration amount exceeds 5% of the transaction price, the Finance Manager who
+      processes the guarantee application contacts the client and requests a clarification regarding the
+      grounds and purpose of the agent remuneration and the ordinariness and reasonability of the amount.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - A sales agent receives 15-25% of a government contract value for introductions, when comparable agents
     in the sector receive a few percent.
@@ -58,10 +69,17 @@ indicators:
   - Procurement portals for the underlying government contract
   - Industry benchmarks for commission rates
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Commission is high for the work done but at or below 5% of the contract price
+    strong: Commission is above 5% of the contract price and the reason or the agent's identity is unclear
+    textbook: Commission exceeds 5% of the transaction price, the level at which Finnvera requires a clarification
+      of its grounds, purpose and reasonableness
+    threshold_source: https://finnvera.fi/eng/file-download/download/public/5729
+    threshold_note: Countable (commission as a share of contract value). Finnvera, Finland's official
+      export credit agency, applying the 2019 OECD Recommendation on Bribery and Officially Supported
+      Export Credits, triggers extra scrutiny when agent pay exceeds 5% of the transaction price (contract
+      price including local costs). The OECD Recommendation itself (OECD/LEGAL/0348) only requires disclosure
+      of the amount and purpose of commissions, with no percentage. DOJ/SEC FCPA Resource Guide gives
+      no number. Applies to Finnish export credit applications; it is a review trigger, not a legal limit.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -70,7 +88,7 @@ indicators:
   - Success fees on very long or risky bids can be legitimately high.
   - The commission may cover genuine after-sales service, logistics or local compliance work.
   jurisdictions: Global (FCPA guidance is US; UK SFO case)
-  version: 1
+  version: 2
 - id: CO-002
   name: Unusually large discount to a distributor
   definition: A company sells to a distributor at a discount much larger than normal, which can create
@@ -1297,6 +1315,18 @@ indicators:
     quote_verified: true
     licence: © FATF/OECD
     checked: '2026-10-09'
+  - title: 31 CFR 1010.311 Filing obligations for reports of transactions in currency
+    publisher: US Department of the Treasury, FinCEN (Code of Federal Regulations)
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    locator: 31 CFR 1010.311
+    quote: Each financial institution other than a casino shall file a report of each deposit, withdrawal,
+      exchange of currency or other payment or transfer, by, through, or to such financial institution
+      which involves a transaction in currency of more than $10,000, except as otherwise provided in this
+      section.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - Monthly deposits of exactly $50,000 in cash into a deputy minister's account.
   cases: []
@@ -1310,17 +1340,25 @@ indicators:
   - Bank records (from leaks, court files or regulators)
   - Suspicious activity report excerpts in court filings
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A PEP repeatedly uses cash or round sums with no clear business reason, at amounts at or below
+      $10,000
+    strong: A PEP's cash transactions go above $10,000, or cash is kept just under $10,000 across several
+      transactions or accounts
+    textbook: A PEP account has cash transactions of more than $10,000, the level that requires a currency
+      transaction report, with no business explanation
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    threshold_note: 'Countable (cash amounts, number of accounts, repeated round sums). The number found
+      applies to cash only: US Bank Secrecy Act rule requiring a currency transaction report for cash
+      transactions of more than $10,000 (US jurisdiction). The FATF PEP Guidance (Rec. 12/22) gives no
+      figure for ''large amounts of cash'', round amounts or number of accounts; no published number found
+      for those parts.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Cash-based economies where salaries and rents are paid in cash.
   - Round-sum transfers between a person's own accounts or to family for living costs.
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: CO-023
   name: PEP funds moved through countries with no apparent tie
   definition: A PEP's money is repeatedly moved to and from countries they have no connection to, and
@@ -1567,6 +1605,18 @@ indicators:
     quote_verified: true
     licence: US government work (public domain)
     checked: '2026-10-09'
+  - title: Geographic Targeting Order (residential real estate), Phase 17
+    publisher: Financial Crimes Enforcement Network (FinCEN), U.S. Department of the Treasury
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/Phase_17_RRE_GTOs_Order_FINAL_508C.pdf
+    locator: Section II.A.2.ii (Covered Transaction), page 2; see also II.A.2.i (Legal Entity purchaser)
+      and II.A.2.iii (no bank loan or external financing)
+    quote: The purchase price of the residential real property is in the amount of $50,000 or more in
+      the City or County of Baltimore ... or in the amount of $300,000 or more in any of the following
+      areas
+    quote_verified: true
+    licence: US government work (public domain); no licence stated
+    checked: '2026-10-10'
   examples:
   - A $30 million Malibu mansion acquired for an Equatoguinean minister through corporate entities (DOJ,
     Obiang).
@@ -1584,10 +1634,21 @@ indicators:
   - Company registries
   - Geographic targeting order data where public
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: A legal entity buys residential property for $50,000 or more without a bank loan (the lowest
+      figure FinCEN set, which applied in the City or County of Baltimore)
+    strong: A legal entity buys residential property for $300,000 or more without a bank loan or similar
+      outside financing
+    textbook: A legal entity buys residential property for $300,000 or more without a bank loan or similar
+      outside financing, in an area covered by the order (any area for which FinCEN set the $300,000 figure)
+    threshold_source: https://www.fincen.gov/sites/default/files/shared/Phase_17_RRE_GTOs_Order_FINAL_508C.pdf
+    threshold_note: The number is FinCEN's reporting threshold for all-cash purchases of homes by legal
+      entities under its Geographic Targeting Orders. The threshold is $300,000 in the listed areas (Texas,
+      Florida, New York City boroughs, California, Hawaii, Nevada, Washington, Massachusetts, Illinois,
+      Maryland, Virginia, Connecticut, Colorado, D.C.) and $50,000 in Baltimore. It is a US reporting
+      trigger, not a finding of corruption, and the indicator's PEP link has to be shown separately. The
+      order used is Phase 17 (October 2023). Earlier GTOs (2016-2022) used the same $300,000 figure, and
+      FinCEN's later nationwide residential real estate rule has no price threshold, so check which rule
+      is current before citing it. The cited 2018 FinCEN PEP advisory gives no dollar figure.
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -1601,7 +1662,7 @@ indicators:
   - Buying property through an LLC is common for privacy, liability and estate reasons.
   - Wealthy foreign buyers legitimately invest in property abroad.
   jurisdictions: Global (US advisory)
-  version: 1
+  version: 2
 - id: CO-028
   name: Official decides a matter in which they have a private interest
   definition: A public official takes part in a decision where their own or their family's private interests
@@ -2230,6 +2291,18 @@ indicators:
       in favour of a specific cause
     quote_verified: true
     checked: '2026-10-09'
+  - title: 5 CFR 2635.204 - Exceptions to the prohibition for acceptance of certain gifts
+    publisher: U.S. Office of Government Ethics, via the Electronic Code of Federal Regulations
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-5/chapter-XVI/subchapter-B/part-2635/subpart-B/section-2635.204
+    locator: 5 CFR 2635.204(a)
+    quote: (a) Gifts of $20 or less. An employee may accept unsolicited gifts having an aggregate market
+      value of $20 or less per source per occasion, provided that the aggregate market value of individual
+      gifts received from any one person under the authority of this paragraph (a) does not exceed $50
+      in a calendar year.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
   examples:
   - A golf trip for a congressman paid by a lobbying firm, followed by statements in the Congressional
     Record for its clients.
@@ -2258,17 +2331,25 @@ indicators:
   - Congressional or parliamentary gift and travel registers
   - Legislative records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Gifts to an executive-branch official from one source are worth more than $20 on a single occasion,
+      or are cash or investments of any amount
+    strong: Gifts from one source total more than $50 in a calendar year
+    textbook: 'Gifts or other things of value are given in exchange for an official act. This is the published
+      quid-pro-quo definition as worded and has no dollar figure: any amount counts'
+    threshold_source: https://www.ecfr.gov/current/title-5/chapter-XVI/subchapter-B/part-2635/subpart-B/section-2635.204
+    threshold_note: 'Countable as the value of things given. The figures are the US federal executive-branch
+      gift limits ($20 per occasion, $50 per year from one source). Above these limits the de minimis
+      exception no longer applies. They are not bribery thresholds: an exchange for an official act is
+      illegal at any value. For members of Congress, House and Senate rules have separate limits and generally
+      ban gifts from registered lobbyists, but those rules were not opened here. The cited DOJ Abramoff/Scanlon
+      release and the Transparency International definition give no threshold.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Lawful, disclosed and capped hospitality permitted by ethics rules.
   - Officials may support the same cause independently of any benefit.
   jurisdictions: Global (US case)
-  version: 1
+  version: 2
 - id: CO-039
   name: Private interests shape laws or decrees for their own benefit (state capture)
   definition: Firms or individuals use payments or connections to shape the rules themselves (laws, decrees,
@@ -3062,6 +3143,17 @@ indicators:
       sell them to the government for premiums not otherwise obtainable in the market.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Red flags in public procurement: A guide to using data to detect and mitigate risks'
+    publisher: Open Contracting Partnership
+    year: '2024'
+    url: https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf
+    locator: Red flag R016, methodology, page 40
+    quote: a. The tender value (tender/value/amount_i) is greater than or equal to the upper fence of
+      Q3+1.5(IQR_j) where Q3 is the third quartile and IQR_j is the interquartile range for the tender
+      values
+    quote_verified: true
+    licence: CC BY-NC-SA 4.0
+    checked: '2026-10-10'
   examples:
   - A state firm buys a drilling rig from a middleman for far more than the middleman paid days earlier.
   cases:
@@ -3088,10 +3180,24 @@ indicators:
   - Procurement databases
   - Trade and customs data
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The contract or tender value is above the third quartile (Q3) of values for the same item category
+      and procurement method
+    strong: No separate published figure. The value is well above Q3 and nears the upper fence of Q3 +
+      1.5 x IQR
+    textbook: The tender value is greater than or equal to Q3 + 1.5 x IQR (interquartile range) of tender
+      values for the same item category and procurement method
+    threshold_source: https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf
+    threshold_note: 'The closest published number is OCP''s red flag R016, ''Tender value is higher or
+      lower than average for this item category''. It is an outlier fence measured against comparable
+      tenders, which stand in for the market rate. It does not cover invoices, and it does not cover the
+      ''thin paperwork'' half of the indicator, which is not countable. Another figure: Transparency International
+      Georgia''s tendermonitor.ge defines ''High price dynamic'' as the final contract value being more
+      than 20 percent above the expected value, and ''Change in procurement value'' as 10 percent or more
+      above it. Both compare against the agency''s estimate, not market prices. The cited FinCEN 2022
+      advisory and NRGI report give no percentage. NRGI''s ''substantially lower or higher than market
+      price'' has no figure, and its Naftogaz ''38 percent less'' is a case example only. The PDF writes
+      the lower fence with Q3 where the text calls for Q1, which looks like a typo. It does not affect
+      the upper fence used here.'
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -3103,7 +3209,7 @@ indicators:
   - Market prices moved between quote and delivery
   - Small or simple purchases genuinely need little paperwork
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: CO-055
   name: Payments that do not match the paperwork or rely on vague, old or fake documents
   definition: Payment amounts differ from the totals in the supporting documents, the payment details
@@ -3313,6 +3419,15 @@ indicators:
       the award. It may appear that the company was set up specifically for the award.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 'Red Flags for Integrity: Giving the green light to open data solutions'
+    publisher: Open Contracting Partnership and Development Gateway
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Section III, Flag 3 'Bidder that has never bid previously wins tender', page 19
+    quote: a first time winning supplier less than 1 year old can be a true flag
+    quote_verified: true
+    licence: Not stated in the document
+    checked: '2026-10-10'
   examples:
   - A licence is awarded to a company incorporated five days earlier.
   cases:
@@ -3334,10 +3449,18 @@ indicators:
   lookup_sources:
   - Company registry
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: The winning company is less than 1 year old when it wins
+    strong: The winning company is less than 1 year old and is winning for the first time (OCP adds that
+      a young company with several wins is also a meaningful sign)
+    textbook: The company was registered only shortly before the award, or after it. This meets NRGI's
+      published definition as worded, which gives no number
+    threshold_source: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    threshold_note: 'The 1-year figure comes from the OCP/Development Gateway 2016 guide. It appears as
+      a suggested refinement to Flag 3, ''Bidder that has never bid previously wins tender'', not as a
+      stand-alone rule. TI Georgia''s tendermonitor.ge flags (''Newly established company'', ''Newly registered
+      supplier'') use the same window, ''less than a year''. The cited NRGI report gives no number in
+      the definition. Its only figure is the OPL 245/Malabu example: ''Malabu had been set up just five
+      days before the award''. OCP''s 2024 guide and the Cardinal indicator list have no company-age flag.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
@@ -3345,7 +3468,7 @@ indicators:
   - Special-purpose vehicles are set up for legal, accounting or tax reasons by established parents
   - Junior mining companies are often new
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: CO-059
   name: Company or owner with a record of corruption or misconduct competes or wins
   definition: A bidder, or someone who owns part of it, is under investigation, indicted, convicted, or

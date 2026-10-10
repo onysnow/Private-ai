@@ -47,6 +47,7 @@ function IndicatorDetail({id, onClose}: {id: string; onClose: () => void}): Reac
         <dt>Textbook</dt><dd><GlossaryText text={ind.levels.textbook}/></dd>
       </dl>
       {ind.levels.threshold_source !== 'none' && <p className="gl-small">Numbers from: {ind.levels.threshold_source}</p>}
+      {ind.levels.threshold_note && <p className="gl-small"><b>About the numbers.</b> {ind.levels.threshold_note}</p>}
       <h4>Could be innocent</h4>
       <ul>{ind.innocent_explanations.map((t, i) => <li key={i}><GlossaryText text={t}/></li>)}</ul>
       {ind.examples.length > 0 && <><h4>What it looks like</h4><ul>{ind.examples.map((t, i) => <li key={i}>{t}</li>)}</ul></>}

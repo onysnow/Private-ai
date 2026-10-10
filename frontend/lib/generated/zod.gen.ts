@@ -2674,6 +2674,7 @@ export const zFlagLevelsOut = z.object({
   faint: z.string(),
   strong: z.string(),
   textbook: z.string(),
+  threshold_note: z.string().nullish(),
   threshold_source: z.string(),
 });
 

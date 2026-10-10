@@ -2597,15 +2597,27 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Others have noticed at least 1 stressor (financial, family, mental health, employment, criminal/legal,
+      partner/marital or physical injury/illness). That is the minimum the FBI study counts, and it was
+      present in 90% of the attacks studied.
+    strong: Others have noticed more than one of the stressor types the FBI lists, especially the most
+      common ones (financial, family, mental health). No published number sets this level.
+    textbook: 'Meets the published definition as worded: bystanders were aware of at least 1 stressor
+      the person was under before acting.'
+    threshold_source: https://www.fbi.gov/file-repository/lone-offender-quick-reference.pdf
+    threshold_note: 'The figure is a count from the FBI Behavioral Analysis Unit''s study of US lone offenders
+      (1972-2015): bystanders noticed ''at least 1 stressor'' in 90% of cases. It describes attackers
+      studied after the fact. It is not a screening cut-off, and it applies to US lone-offender terrorism
+      only. The same page gives how common each stressor type was: financial 48%, family 44%, mental health
+      44%, employment 35%, criminal/legal 29%, partner/marital 27%, physical injury/illness 19%. It gives
+      no time window beyond ''prior to the attack''. No average number of stressors per offender was found:
+      the search budget ran out before the full report could be checked. The UK Prevent guidance cited
+      for this indicator (''significant life changes or personal difficulties'') gives no number.'
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Stress is universal; UK guidance says such factors are not indicators of radicalisation in themselves
-  version: 1
+  version: 2
 - id: VE-056
   name: Attention-seeking crime and violent protest
   definition: Minor crimes or violent protest carried out to draw attention to a cause, such as vandalism

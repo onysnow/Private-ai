@@ -1116,6 +1116,16 @@ indicators:
     quote: Middleman transactions – large incoming payments followed by smaller outgoing payments.
     quote_verified: true
     checked: '2026-10-09'
+  - title: Red Flag Indicators for Bank
+    publisher: Suspicious Transaction Reporting Office (STRO), Singapore Police Force (Singapore's financial
+      intelligence unit)
+    year: '2024'
+    url: https://police.gov.sg/-/media/Spf/Advisories/Bank-Indicators_upd.ashx
+    locator: Section 'Transactions Involving Accounts of the Customer with the Bank', item (iii)
+    quote: Matching of payments out with credits paid in by cash on the same or previous day.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
   examples:
   - A dealer receives one wire from Asia then pays many local suppliers in small amounts
   cases: []
@@ -1126,17 +1136,25 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Large payments come in and smaller payments go out soon afterwards, but more than a day later
+      (the source gives no number for this level).
+    strong: Outgoing payments match incoming credits paid on the previous day.
+    textbook: 'Meets the published indicator as worded: payments out match credits paid in (by cash) on
+      the same or previous day.'
+    threshold_source: https://police.gov.sg/-/media/Spf/Advisories/Bank-Indicators_upd.ashx
+    threshold_note: The time window is written as 'same or previous day', meaning within one day, not
+      as a numeral. STRO words it for cash credits, while the FATF middleman indicator covers any large
+      incoming payment. No published figure was found for the size of the incoming payment or the ratio
+      of incoming to outgoing amounts. The same STRO list also has 'assets are withdrawn immediately after
+      being deposited' and 'High velocity of funds through an account', neither with a number. Applies
+      to Singapore banks; used here as a benchmark.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Agricultural aggregators and payroll accounts work exactly this way
   - Legitimate wholesalers paying many small suppliers
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: EN-020
   name: Payments between businesses in unrelated lines of trade, including odd sponsorship
   definition: Money flows between companies whose businesses have nothing in common (for example wildlife
@@ -1418,6 +1436,17 @@ indicators:
       stage.
     quote_verified: true
     checked: '2026-10-09'
+  - title: 31 CFR 1010.330 Reports relating to currency in excess of $10,000 received in a trade or business
+    publisher: US Treasury / FinCEN (Code of Federal Regulations, eCFR)
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.330
+    locator: 31 CFR 1010.330(a)(1)(i); 15-day filing rule at 1010.330 (initial payment in excess of $10,000)
+    quote: Any person ... who, in the course of a trade or business in which such person is engaged, receives
+      currency in excess of $10,000 in 1 transaction (or 2 or more related transactions) shall, except
+      as otherwise provided, make a report of information with respect to the receipt of currency.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
   examples:
   - A rhino horn syndicate laundering about USD 1 million through cash purchases of property and luxury
     vehicles (FATF 2020 Box 7)
@@ -1455,17 +1484,26 @@ indicators:
   - Vehicle registry
   - Court records
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Cash purchases of vehicles, jewellery, art or property at or below $10,000 each, especially
+      several linked ones (related payments are added together toward the $10,000 figure).
+    strong: A business receives more than $10,000 in cash for one purchase, or for two or more related
+      purchases, from a person tied to wildlife or resource crime.
+    textbook: 'Meets the published reporting threshold as worded: currency of more than $10,000 received
+      in one transaction or two or more related transactions, which must be reported within 15 days.'
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.330
+    threshold_note: US only (IRS/FinCEN Form 8300). The IRS Form 8300 Reference Guide (irs.gov, last updated
+      27-Jul-2026) gives the same figure, 'The amount of cash received is more than $10,000'. It also
+      says payments within a 12-month period count together, and its worked examples include cash purchases
+      of cars and jewellery. The FATF wildlife report gives no number. The EU's cash-payment limit under
+      the AML Regulation was not opened and is not used. The 'bought through others' names' part has no
+      published number.
   threshold_verified: true
   cross_hints: []
   innocent_explanations:
   - Cash property purchases are normal in some markets
   - Assets may be bought with legitimate savings or loans
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: EN-025
   name: Offshore or tax-haven companies in the logging, mining or gold trade
   definition: Logging firms transact often with offshore financial centres, trading companies are registered
@@ -2804,6 +2842,16 @@ indicators:
     quote: Original source of funds to buy gold bullion cannot be established.
     quote_verified: true
     checked: '2026-10-09'
+  - title: IRS Form 8300 Reference Guide
+    publisher: US Internal Revenue Service
+    year: '2026'
+    url: https://www.irs.gov/businesses/small-businesses-self-employed/irs-form-8300-reference-guide
+    locator: Section 'Definition of a related transaction'; the Introduction says 'The law requires trades
+      and businesses report cash payments of more than $10,000.'
+    quote: If the same payer makes two or more transactions totaling more than $10,000 in a 24-hour period
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-10'
   examples:
   - Several cash deposits just under the reporting limit followed by one bullion purchase
   cases: []
@@ -2815,10 +2863,21 @@ indicators:
   checkable: records
   lookup_sources: []
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Cash bullion purchases by one payer with no clear source of funds, below the published more-than-$10,000
+      figure
+    strong: Two or more cash bullion purchases by the same payer totalling more than $10,000 in a 24-hour
+      period, especially if broken into smaller pieces (structuring)
+    textbook: Cash bullion purchases totalling more than $10,000 in a 24-hour period, where the original
+      source of funds cannot be established (meets the published definition as worded)
+    threshold_source: https://www.irs.gov/businesses/small-businesses-self-employed/irs-form-8300-reference-guide
+    threshold_note: 'US jurisdiction: the IRS Form 8300 rule requires a trade or business, including dealers
+      in precious metals, to report cash received of more than $10,000. The same IRS page also treats
+      more than $10,000 in additional cash payments within 12 months as reportable, and says that breaking
+      up a large cash transaction into smaller ones counts as structuring. FATF Recommendation 22 applies
+      due diligence to dealers in precious metals at an ''applicable designated threshold''. The FATF
+      Recommendations give USD/EUR 15,000 for occasional transactions (Recommendation 10), but the dealer-specific
+      USD/EUR 15,000 figure in the interpretive notes could not be read, so it is not used here. The EU
+      AML rules for traders in goods (EUR 10,000) were not checked on an opened page.'
   threshold_verified: true
   cross_hints:
   - target_area: ML
@@ -2828,7 +2887,7 @@ indicators:
   - Cultural preference for gold savings and cash
   - Buying gold during currency crises
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: EN-051
   name: Inexperienced buyers acquire a waste company cheaply
   definition: People with no knowledge of the highly regulated waste sector buy waste companies, sometimes
@@ -4226,6 +4285,21 @@ indicators:
     quote: 250,000 credits were stolen, worth €3.2 million
     quote_verified: true
     checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2019/1122 supplementing Directive 2003/87/EC as regards
+      the functioning of the Union Registry
+    publisher: European Commission (Commission Delegated Regulation (EU) 2019/1122), retained-text copy
+      on legislation.gov.uk (The National Archives)
+    year: '2019'
+    url: https://www.legislation.gov.uk/eur/2019/1122/data.htm
+    locator: Article 35(3), Execution of transfers; see also Article 35(5)-(6) (abort at least two hours
+      before execution)
+    quote: The central administrator shall ensure that all transfers specified in Article 55 to accounts
+      not indicated on the trusted account list and transfers from an Auction Collateral Delivery Account,
+      proposed for execution before 12.00 CET of a working day, are executed at 12.00 CET of the following
+      working day.
+    quote_verified: true
+    licence: Open Government Licence v3.0 (legislation.gov.uk); EU text © European Union, reuse permitted
+    checked: '2026-10-10'
   examples:
   - Emails asking account holders to re-register on a lookalike registry site
   - Credits move out of an account to another country's registry and are sold the same day
@@ -4263,10 +4337,23 @@ indicators:
   - Registry incident notices
   - Lists of stolen allowance serial numbers
   levels:
-    faint: To be set by Ony
-    strong: To be set by Ony
-    textbook: Meets the published definition as worded
-    threshold_source: none
+    faint: Allowances are moved out of an account to an account not on its trusted account list. The rules
+      hold such a transfer until 12.00 CET of the following working day (or the second working day if
+      it is proposed after 12.00 CET), so the holder has time to spot it.
+    strong: The holder did not authorise the transfer, and it was not aborted at least two hours before
+      execution, the latest point at which the holder or national administrator can stop a suspected fraudulent
+      transfer.
+    textbook: Allowances taken from a hijacked account pass the delay and are moved on or sold as soon
+      as they arrive. This is the theft pattern the delay rule was written to stop. It meets the published
+      definition as worded.
+    threshold_source: https://www.legislation.gov.uk/eur/2019/1122/data.htm
+    threshold_note: This number is an anti-theft delay window built into the EU Union Registry, not a
+      red-flag trigger. It sets how long a transfer to an untrusted account must wait and how late it
+      can be aborted ('at least two hours before its execution', Art. 35(5)-(6)). It is the only published
+      time figure that applies directly to fast movement of stolen allowances. The copy read is the UK-retained
+      version on legislation.gov.uk; check it against the current EUR-Lex consolidated text, which could
+      not be loaded because of a bot block. The INTERPOL Guide gives no figure for how fast stolen credits
+      were moved. Registry dates, not account logs, are needed to apply this.
   threshold_verified: true
   cross_hints:
   - target_area: CY
@@ -4276,7 +4363,7 @@ indicators:
   - Legitimate quick transfers between a company's own accounts
   - Real registry notices asking users to update their details
   jurisdictions: European Union, Australia and others
-  version: 1
+  version: 2
 - id: EN-078
   name: HFC refrigerant declared or labelled as an HFO or another less-regulated gas
   definition: Climate-damaging HFC refrigerant gases are passed off at customs or on sale as less-regulated

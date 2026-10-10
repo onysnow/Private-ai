@@ -169,7 +169,7 @@ def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]]) 
         "indicator": None if ind is None else {
             "id": ind.id, "name": ind.name, "definition": ind.definition, "area": ind.areas[0], "area_name": area,
             "levels": {"faint": ind.levels.faint, "strong": ind.levels.strong, "textbook": ind.levels.textbook,
-                       "threshold_source": ind.levels.threshold_source},
+                       "threshold_source": ind.levels.threshold_source, "threshold_note": ind.levels.threshold_note},
             "sources": [{"title": s.title, "publisher": s.publisher, "url": s.url, "locator": s.locator, "quote": s.quote}
                         for s in ind.sources if s.quote_verified][:3],
             "innocent_explanations": ind.innocent_explanations,
