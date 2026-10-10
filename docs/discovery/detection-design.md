@@ -154,7 +154,25 @@ a person's work with the app's help.
   (family 9 and 10) and **checklist items** (family 11), each opening in the
   drawer.
 
-## Decisions for Ony
+## Decided (Ony, 10 October 2026)
+
+1. **Spec format: settings only.** Each spec picks a family and fills in its
+   numbers; no expression language and no new package. Anything the families
+   cannot say waits for a new family.
+2. **Local models for reading documents: later.** Words-in-documents uses the
+   database's built-in full-text search first.
+3. **Drafting the specs waits until the catalogue is complete** (round 3 of
+   the research is still adding areas). The framework and the families are
+   built now; the 8 existing rules move onto it.
+4. **Placement: left to the design.** Passages to read and checklist items
+   live in their own **"To check"** panel in the Verify stage: they are work a
+   person does, not patterns found, and Verify is where claims and evidence
+   are checked. Each item names its indicator and the parties; a Faint flag
+   whose records cannot show a part links to the matching item, and an item
+   links back to the flags on the same parties. Red Flags stays what the
+   records show.
+
+## The questions as asked
 
 1. **Spec format**: parameters only (no new package; the families do the
    logic), or parameters plus a small safe expression language (Google CEL,
