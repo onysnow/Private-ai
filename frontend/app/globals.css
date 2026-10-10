@@ -11,7 +11,7 @@
    a value back to the swatch it came from instead of guessing. */
 @layer base {
   :root {
-    --background: 252 100% 1%;       /* #010005 -- left swatch, near-black */
+    --background: 240 21% 9%;        /* #13131d -- the page colour of the approved page mockup (Ony, 10 Oct 2026: #010005 was too black) */
     --foreground: 40 23% 65%;        /* #baac91 -- right swatch, khaki parchment (text needs a light tone; the left half has none) */
     --card: 202 21% 13%;             /* #1a2328 -- left swatch, deep teal-charcoal */
     --card-foreground: 40 23% 65%;   /* #baac91 */
@@ -394,3 +394,4 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
 .explanation-excerpt { background: #26272b; color: #caaf9c; border-color: #393941; }
 .explanation-excerpt mark { background: rgba(212,161,82,.35); color: #f3e9d7; }
 .relNode { color: #f3e9d7; }
+#investigation-search { min-height: 0; } /* the shared .card floor (160px) left an empty band under the search bar */
