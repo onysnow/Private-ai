@@ -24,9 +24,10 @@ class Measure:
 
 def families() -> dict[str, Any]:
     from app.patterns.detectors import (
-        count_in_band, count_in_window, cycle, missing_property, path_length, property_threshold, sequence_within,
-        shared_holder_link, shared_property,
+        amount_statistic, attribute_in_set, baseline_change, conflicting_values, count_in_band, count_in_window, cycle,
+        missing_link, missing_property, path_length, property_threshold, sequence_within, shared_holder_link, shared_property,
     )
     mods = [cycle, path_length, missing_property, shared_property, count_in_band, shared_holder_link,
-            property_threshold, count_in_window, sequence_within]
+            property_threshold, count_in_window, sequence_within, attribute_in_set, missing_link, conflicting_values,
+            baseline_change, amount_statistic]
     return {m.NAME: m for m in mods}

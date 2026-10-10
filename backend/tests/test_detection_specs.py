@@ -79,3 +79,42 @@ def test_window_sequence_and_threshold_families_measure():
     assert [m.value for m in seq] == [4.0], "bought on 28 Dec, paying out on 1 Jan; 5 Jan is 8 days on"
     big = fam["property_threshold"].measure(g, fam["property_threshold"].Params(record="Payment", property="amount"))
     assert sorted(m.value for m in big) == [50, 100, 200, 300]
+
+
+def test_attribute_missing_link_and_conflicting_values_families():
+    fam = families()
+    g = graph_of(Example(name="x", expect=None, parties=[
+        {"id": "a", "schema": "Company", "properties": {"jurisdiction": ["VG"], "incorporationDate": ["2019-01-01", "2020-05-05"]}},
+        {"id": "b", "schema": "Company", "properties": {"jurisdiction": ["GB"]}},
+        {"id": "c", "schema": "Company"},
+        {"id": "p", "schema": "Person"},
+    ], links=[{"schema": "Directorship", "source": "p", "target": "b"}, {"schema": "Payment", "source": "a", "target": "b"}]))
+    hit = fam["attribute_in_set"].measure(g, fam["attribute_in_set"].Params(record="Company", property="jurisdiction", values=["vg", "KY"]))
+    assert [m.parties for m in hit] == [["a"]] and hit[0].facts["listed_as"] == "vg"
+    missing = fam["missing_link"].measure(g, fam["missing_link"].Params(record="Company", links=["Directorship", "Ownership"]))
+    assert [m.parties for m in missing] == [["a"]], "b has a director; c appears in no link at all"
+    both = fam["conflicting_values"].measure(g, fam["conflicting_values"].Params(record="Company", property="incorporationDate"))
+    assert both[0].value == 2 and both[0].facts["values"] == "2019-01-01 and 2020-05-05"
+
+
+def test_baseline_change_compares_a_party_with_its_own_past():
+    fam = families()
+    links = [{"schema": "Payment", "source": "a", "target": "b", "properties": {"amount": ["100"], "date": [f"2024-0{m}-10"]}} for m in range(1, 7)]
+    links.append({"schema": "Payment", "source": "a", "target": "b", "properties": {"amount": ["900"], "date": ["2024-07-01"]}})
+    g = graph_of(Example(name="x", expect=None, parties=[{"id": "a", "schema": "Company"}, {"id": "b", "schema": "Company"}], links=links))
+    [m] = fam["baseline_change"].measure(g, fam["baseline_change"].Params(recent_days=30))
+    assert 8 <= m.value <= 11, m.value
+    alone = graph_of(Example(name="x", expect=None, parties=[{"id": "a", "schema": "Company"}, {"id": "b", "schema": "Company"}], links=links[-1:]))
+    assert fam["baseline_change"].measure(alone, fam["baseline_change"].Params()) == [], "nothing earlier to compare with"
+
+
+def test_amount_statistic_needs_enough_amounts():
+    fam = families()
+    round_links = [{"schema": "Payment", "source": "a", "target": "b", "properties": {"amount": [str(1000 * (i + 1))]}} for i in range(20)]
+    odd_links = [{"schema": "Payment", "source": "a", "target": "b", "properties": {"amount": [str(1234 + i)]}} for i in range(20)]
+    g = graph_of(Example(name="x", expect=None, parties=[{"id": "a", "schema": "Company"}, {"id": "b", "schema": "Company"}], links=round_links + odd_links))
+    [m] = fam["amount_statistic"].measure(g, fam["amount_statistic"].Params(test="round_share", min_count=30))
+    assert m.value == 0.5 and m.facts["share_text"] == "50%"
+    assert fam["amount_statistic"].measure(g, fam["amount_statistic"].Params(test="round_share", min_count=100)) == []
+    benford = fam["amount_statistic"].measure(g, fam["amount_statistic"].Params(test="benford_mad", min_count=30))[0]
+    assert benford.value > 0.015, "amounts piled on 1s and 2s stray far from Benford"
