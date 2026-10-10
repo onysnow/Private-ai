@@ -163,6 +163,13 @@ def untag_record(db: Session, tag: Tag, record_type: str, record_id: str) -> Non
         db.commit()
 
 
+def all_record_tags(db: Session, investigation_id: str) -> list[dict[str, Any]]:
+    rows = db.execute(select(RecordTag.tag_id, Tag.name, Tag.colour, RecordTag.record_type, RecordTag.record_id)
+                      .join(Tag, Tag.id == RecordTag.tag_id).where(RecordTag.investigation_id == investigation_id)
+                      .order_by(func.lower(Tag.name), RecordTag.created_at))
+    return [{"tag_id": t, "name": n, "colour": c, "record_type": rt, "record_id": ri} for t, n, c, rt, ri in rows]
+
+
 def tagged_records(db: Session, tag: Tag) -> list[dict[str, Any]]:
     rows = db.scalars(select(RecordTag).where(RecordTag.tag_id == tag.id).order_by(RecordTag.created_at))
     return [{"record_type": r.record_type, "record_id": r.record_id, "caption": caption_for(db, r.record_type, r.record_id)} for r in rows]

@@ -2450,6 +2450,97 @@
         "title": "CaseSynthesisRequest",
         "type": "object"
       },
+      "ChainOut": {
+        "properties": {
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/ChainStepOut"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/ChainPartyOut"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "weakest": {
+            "enum": [
+              "supported",
+              "unsupported",
+              "contested"
+            ],
+            "title": "Weakest",
+            "type": "string"
+          }
+        },
+        "required": [
+          "parties",
+          "links",
+          "weakest"
+        ],
+        "title": "ChainOut",
+        "type": "object"
+      },
+      "ChainPartyOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ChainPartyOut",
+        "type": "object"
+      },
+      "ChainStepOut": {
+        "description": "One link of a chain, in its own direction.",
+        "properties": {
+          "certainty": {
+            "enum": [
+              "supported",
+              "unsupported",
+              "contested"
+            ],
+            "title": "Certainty",
+            "type": "string"
+          },
+          "from": {
+            "title": "From",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "to": {
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "schema",
+          "from",
+          "to",
+          "certainty"
+        ],
+        "title": "ChainStepOut",
+        "type": "object"
+      },
       "ChangeSetIn": {
         "properties": {
           "ops": {
@@ -4098,6 +4189,48 @@
           "confirm"
         ],
         "title": "ConfirmIn",
+        "type": "object"
+      },
+      "ConnectionsOut": {
+        "description": "Every chain of links between two parties (app/services/paths.py),\nshortest first, then surest first.",
+        "properties": {
+          "chains": {
+            "items": {
+              "$ref": "#/components/schemas/ChainOut"
+            },
+            "title": "Chains",
+            "type": "array"
+          },
+          "from_id": {
+            "title": "From Id",
+            "type": "string"
+          },
+          "max_len": {
+            "title": "Max Len",
+            "type": "integer"
+          },
+          "to_id": {
+            "title": "To Id",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "from_id",
+          "to_id",
+          "max_len",
+          "total",
+          "truncated",
+          "chains"
+        ],
+        "title": "ConnectionsOut",
         "type": "object"
       },
       "ConnectorCredentialPut": {
@@ -21224,6 +21357,73 @@
           "record_id"
         ],
         "title": "RecordTagCreate",
+        "type": "object"
+      },
+      "RecordTagRowOut": {
+        "properties": {
+          "colour": {
+            "title": "Colour",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "enum": [
+              "entity",
+              "relationship",
+              "evidence",
+              "source",
+              "claim",
+              "event",
+              "document",
+              "lead",
+              "task",
+              "finding"
+            ],
+            "title": "Record Type",
+            "type": "string"
+          },
+          "tag_id": {
+            "title": "Tag Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag_id",
+          "name",
+          "colour",
+          "record_type",
+          "record_id"
+        ],
+        "title": "RecordTagRowOut",
+        "type": "object"
+      },
+      "RecordTagsOut": {
+        "description": "Every tag on every record of the investigation: what the network's tag layer draws.",
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/RecordTagRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "rows"
+        ],
+        "title": "RecordTagsOut",
         "type": "object"
       },
       "RelationshipAdvisoryOut": {
@@ -42533,6 +42733,86 @@
         "summary": "Add Note"
       }
     },
+    "/api/investigations/{investigation_id}/paths": {
+      "get": {
+        "description": "Every chain of links between two parties, up to max_len links, each with how sure its weakest link is.",
+        "operationId": "how_are_they_connected",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "title": "To",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_len",
+            "required": false,
+            "schema": {
+              "default": 4,
+              "maximum": 6,
+              "minimum": 1,
+              "title": "Max Len",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "How Are They Connected"
+      }
+    },
     "/api/investigations/{investigation_id}/peek": {
       "get": {
         "description": "A search result on hover: the parties it links to, its evidence by stance, its latest event.",
@@ -42749,6 +43029,54 @@
           }
         },
         "summary": "Untag A Record"
+      },
+      "get": {
+        "description": "Every tag on every record: what the network's tag layer draws.",
+        "operationId": "get_all_record_tags",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordTagsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get All Record Tags"
       },
       "post": {
         "description": "Put a tag on a record. Tagging a record twice with the same tag changes nothing.",

@@ -454,6 +454,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/search"): {"q": "Meridian"},
             ("GET", "/api/investigations/{investigation_id}/marks"): {"record_type": "entity", "record_id": meridian},
             ("GET", "/api/investigations/{investigation_id}/peek"): {"record_type": "entity", "record_id": meridian},
+            ("GET", "/api/investigations/{investigation_id}/paths"): {"from": meridian, "to": bellcastle},
             ("DELETE", "/api/investigations/{investigation_id}/record-tags"): {"tag_id": tag, "record_type": "entity", "record_id": meridian},
             ("DELETE", "/api/collections/{collection_id}/items"): {"record_type": "entity", "record_id": meridian},
             ("GET", "/api/investigations/{investigation_id}/corpus/search"): {"q": "Meridian"},

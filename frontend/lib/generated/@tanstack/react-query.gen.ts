@@ -72,6 +72,7 @@ import {
   findingCandidates,
   findOpenalephChildren,
   getAiAnalysisCandidateEndpoint,
+  getAllRecordTags,
   getBasemapFont,
   getBasemapSprite,
   getBasemapStatus,
@@ -122,6 +123,7 @@ import {
   getWriteupEndpoint,
   gradeTimelineEventEndpoint,
   health,
+  howAreTheyConnected,
   importOpenalephDocumentEntities,
   importOpenalephDocumentEvidence,
   inspectBackup,
@@ -414,6 +416,9 @@ import type {
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointError,
   GetAiAnalysisCandidateEndpointResponse,
+  GetAllRecordTagsData,
+  GetAllRecordTagsError,
+  GetAllRecordTagsResponse,
   GetBasemapFontData,
   GetBasemapFontError,
   GetBasemapFontResponse,
@@ -564,6 +569,9 @@ import type {
   HealthData,
   HealthError,
   HealthResponse,
+  HowAreTheyConnectedData,
+  HowAreTheyConnectedError,
+  HowAreTheyConnectedResponse,
   ImportOpenalephDocumentEntitiesData,
   ImportOpenalephDocumentEntitiesError,
   ImportOpenalephDocumentEntitiesResponse,
@@ -5335,6 +5343,36 @@ export const addNoteMutation = (
   return mutationOptions;
 };
 
+export const howAreTheyConnectedQueryKey = (
+  options: Options<HowAreTheyConnectedData>,
+) => createQueryKey('howAreTheyConnected', options);
+
+/**
+ * How Are They Connected
+ *
+ * Every chain of links between two parties, up to max_len links, each with how sure its weakest link is.
+ */
+export const howAreTheyConnectedOptions = (
+  options: Options<HowAreTheyConnectedData>,
+) =>
+  queryOptions<
+    HowAreTheyConnectedResponse,
+    HowAreTheyConnectedError,
+    HowAreTheyConnectedResponse,
+    ReturnType<typeof howAreTheyConnectedQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await howAreTheyConnected({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: howAreTheyConnectedQueryKey(options),
+  });
+
 export const peekAtRecordQueryKey = (options: Options<PeekAtRecordData>) =>
   createQueryKey('peekAtRecord', options);
 
@@ -5418,6 +5456,36 @@ export const untagARecordMutation = (
   };
   return mutationOptions;
 };
+
+export const getAllRecordTagsQueryKey = (
+  options: Options<GetAllRecordTagsData>,
+) => createQueryKey('getAllRecordTags', options);
+
+/**
+ * Get All Record Tags
+ *
+ * Every tag on every record: what the network's tag layer draws.
+ */
+export const getAllRecordTagsOptions = (
+  options: Options<GetAllRecordTagsData>,
+) =>
+  queryOptions<
+    GetAllRecordTagsResponse,
+    GetAllRecordTagsError,
+    GetAllRecordTagsResponse,
+    ReturnType<typeof getAllRecordTagsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getAllRecordTags({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getAllRecordTagsQueryKey(options),
+  });
 
 /**
  * Tag A Record

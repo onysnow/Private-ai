@@ -3803,3 +3803,50 @@ class PeekOut(ResponseModel):
     neighbours: list[PeekNeighbourOut]
     evidence_by_stance: dict[str, int]
     latest_event: PeekEventOut | None
+
+
+class ChainPartyOut(ResponseModel):
+    id: str
+    name: str
+
+
+class ChainStepOut(ResponseModel):
+    """One link of a chain, in its own direction."""
+    id: str
+    schema_: str = Field(alias="schema")
+    from_: str = Field(alias="from")
+    to: str
+    certainty: Literal["supported", "unsupported", "contested"]
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class ChainOut(ResponseModel):
+    parties: list[ChainPartyOut]
+    links: list[ChainStepOut]
+    weakest: Literal["supported", "unsupported", "contested"]
+
+
+class ConnectionsOut(ResponseModel):
+    """Every chain of links between two parties (app/services/paths.py),
+    shortest first, then surest first."""
+    from_id: str
+    to_id: str
+    max_len: int
+    total: int
+    truncated: bool
+    chains: list[ChainOut]
+
+
+class RecordTagRowOut(ResponseModel):
+    tag_id: str
+    name: str
+    colour: str
+    record_type: AnnotatedRecordType
+    record_id: str
+
+
+class RecordTagsOut(ResponseModel):
+    """Every tag on every record of the investigation: what the network's tag layer draws."""
+    investigation_id: str
+    rows: list[RecordTagRowOut]

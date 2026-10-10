@@ -201,6 +201,9 @@ import type {
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointErrors,
   GetAiAnalysisCandidateEndpointResponses,
+  GetAllRecordTagsData,
+  GetAllRecordTagsErrors,
+  GetAllRecordTagsResponses,
   GetBasemapFontData,
   GetBasemapFontErrors,
   GetBasemapFontResponses,
@@ -351,6 +354,9 @@ import type {
   HealthData,
   HealthErrors,
   HealthResponses,
+  HowAreTheyConnectedData,
+  HowAreTheyConnectedErrors,
+  HowAreTheyConnectedResponses,
   ImportOpenalephDocumentEntitiesData,
   ImportOpenalephDocumentEntitiesErrors,
   ImportOpenalephDocumentEntitiesResponses,
@@ -803,6 +809,8 @@ import {
   zFindOpenalephChildrenResponse,
   zGetAiAnalysisCandidateEndpointPath,
   zGetAiAnalysisCandidateEndpointResponse,
+  zGetAllRecordTagsPath,
+  zGetAllRecordTagsResponse,
   zGetBasemapFontPath,
   zGetBasemapFontResponse,
   zGetBasemapSpritePath,
@@ -904,6 +912,9 @@ import {
   zGradeTimelineEventEndpointPath,
   zGradeTimelineEventEndpointResponse,
   zHealthResponse,
+  zHowAreTheyConnectedPath,
+  zHowAreTheyConnectedQuery,
+  zHowAreTheyConnectedResponse,
   zImportOpenalephDocumentEntitiesPath,
   zImportOpenalephDocumentEntitiesResponse,
   zImportOpenalephDocumentEvidencePath,
@@ -5426,6 +5437,37 @@ export const addNote = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * How Are They Connected
+ *
+ * Every chain of links between two parties, up to max_len links, each with how sure its weakest link is.
+ */
+export const howAreTheyConnected = <ThrowOnError extends boolean = false>(
+  options: Options<HowAreTheyConnectedData, ThrowOnError>,
+): RequestResult<
+  HowAreTheyConnectedResponses,
+  HowAreTheyConnectedErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    HowAreTheyConnectedResponses,
+    HowAreTheyConnectedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zHowAreTheyConnectedPath,
+          query: zHowAreTheyConnectedQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zHowAreTheyConnectedResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/paths',
+    ...options,
+  });
+
+/**
  * Peek At Record
  *
  * A search result on hover: the parties it links to, its evidence by stance, its latest event.
@@ -5504,6 +5546,37 @@ export const untagARecord = <ThrowOnError extends boolean = false>(
         .parseAsync(data),
     responseValidator: async (data) =>
       await zUntagARecordResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/record-tags',
+    ...options,
+  });
+
+/**
+ * Get All Record Tags
+ *
+ * Every tag on every record: what the network's tag layer draws.
+ */
+export const getAllRecordTags = <ThrowOnError extends boolean = false>(
+  options: Options<GetAllRecordTagsData, ThrowOnError>,
+): RequestResult<
+  GetAllRecordTagsResponses,
+  GetAllRecordTagsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetAllRecordTagsResponses,
+    GetAllRecordTagsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetAllRecordTagsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetAllRecordTagsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/record-tags',
     ...options,
   });

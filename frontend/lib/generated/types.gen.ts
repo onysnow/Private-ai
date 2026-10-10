@@ -1435,6 +1435,66 @@ export type CaseSynthesisRequest = {
 };
 
 /**
+ * ChainOut
+ */
+export type ChainOut = {
+  /**
+   * Links
+   */
+  links: Array<ChainStepOut>;
+  /**
+   * Parties
+   */
+  parties: Array<ChainPartyOut>;
+  /**
+   * Weakest
+   */
+  weakest: 'supported' | 'unsupported' | 'contested';
+};
+
+/**
+ * ChainPartyOut
+ */
+export type ChainPartyOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * ChainStepOut
+ *
+ * One link of a chain, in its own direction.
+ */
+export type ChainStepOut = {
+  /**
+   * Certainty
+   */
+  certainty: 'supported' | 'unsupported' | 'contested';
+  /**
+   * From
+   */
+  from: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * To
+   */
+  to: string;
+};
+
+/**
  * ChartKind
  */
 export type ChartKind =
@@ -2401,6 +2461,39 @@ export type CollectionsOut = {
    * Investigation Id
    */
   investigation_id: string;
+};
+
+/**
+ * ConnectionsOut
+ *
+ * Every chain of links between two parties (app/services/paths.py),
+ * shortest first, then surest first.
+ */
+export type ConnectionsOut = {
+  /**
+   * Chains
+   */
+  chains: Array<ChainOut>;
+  /**
+   * From Id
+   */
+  from_id: string;
+  /**
+   * Max Len
+   */
+  max_len: number;
+  /**
+   * To Id
+   */
+  to_id: string;
+  /**
+   * Total
+   */
+  total: number;
+  /**
+   * Truncated
+   */
+  truncated: boolean;
 };
 
 /**
@@ -10052,6 +10145,58 @@ export type RecordTagCreate = {
    * Tag Id
    */
   tag_id: string;
+};
+
+/**
+ * RecordTagRowOut
+ */
+export type RecordTagRowOut = {
+  /**
+   * Colour
+   */
+  colour: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding';
+  /**
+   * Tag Id
+   */
+  tag_id: string;
+};
+
+/**
+ * RecordTagsOut
+ *
+ * Every tag on every record of the investigation: what the network's tag layer draws.
+ */
+export type RecordTagsOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Rows
+   */
+  rows: Array<RecordTagRowOut>;
 };
 
 /**
@@ -18802,6 +18947,55 @@ export type AddNoteResponses = {
 
 export type AddNoteResponse = AddNoteResponses[keyof AddNoteResponses];
 
+export type HowAreTheyConnectedData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query: {
+    /**
+     * From
+     */
+    from: string;
+    /**
+     * To
+     */
+    to: string;
+    /**
+     * Max Len
+     */
+    max_len?: number;
+  };
+  url: '/api/investigations/{investigation_id}/paths';
+};
+
+export type HowAreTheyConnectedErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type HowAreTheyConnectedError =
+  HowAreTheyConnectedErrors[keyof HowAreTheyConnectedErrors];
+
+export type HowAreTheyConnectedResponses = {
+  /**
+   * Successful Response
+   */
+  200: ConnectionsOut;
+};
+
+export type HowAreTheyConnectedResponse =
+  HowAreTheyConnectedResponses[keyof HowAreTheyConnectedResponses];
+
 export type PeekAtRecordData = {
   body?: never;
   path: {
@@ -18949,6 +19143,42 @@ export type UntagARecordResponses = {
 
 export type UntagARecordResponse =
   UntagARecordResponses[keyof UntagARecordResponses];
+
+export type GetAllRecordTagsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/record-tags';
+};
+
+export type GetAllRecordTagsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetAllRecordTagsError =
+  GetAllRecordTagsErrors[keyof GetAllRecordTagsErrors];
+
+export type GetAllRecordTagsResponses = {
+  /**
+   * Successful Response
+   */
+  200: RecordTagsOut;
+};
+
+export type GetAllRecordTagsResponse =
+  GetAllRecordTagsResponses[keyof GetAllRecordTagsResponses];
 
 export type TagARecordData = {
   body: RecordTagCreate;

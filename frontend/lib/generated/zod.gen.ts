@@ -603,6 +603,36 @@ export const zCaseSynthesisRequest = z.object({
 });
 
 /**
+ * ChainPartyOut
+ */
+export const zChainPartyOut = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+/**
+ * ChainStepOut
+ *
+ * One link of a chain, in its own direction.
+ */
+export const zChainStepOut = z.object({
+  certainty: z.enum(['supported', 'unsupported', 'contested']),
+  from: z.string(),
+  id: z.string(),
+  schema: z.string(),
+  to: z.string(),
+});
+
+/**
+ * ChainOut
+ */
+export const zChainOut = z.object({
+  links: z.array(zChainStepOut),
+  parties: z.array(zChainPartyOut),
+  weakest: z.enum(['supported', 'unsupported', 'contested']),
+});
+
+/**
  * ChartKind
  */
 export const zChartKind = z.enum([
@@ -975,6 +1005,21 @@ export const zCollectionUpdate = z.object({
 export const zCollectionsOut = z.object({
   collections: z.array(zCollectionSummaryOut),
   investigation_id: z.string(),
+});
+
+/**
+ * ConnectionsOut
+ *
+ * Every chain of links between two parties (app/services/paths.py),
+ * shortest first, then surest first.
+ */
+export const zConnectionsOut = z.object({
+  chains: z.array(zChainOut),
+  from_id: z.string(),
+  max_len: z.number().int(),
+  to_id: z.string(),
+  total: z.number().int(),
+  truncated: z.boolean(),
 });
 
 /**
@@ -4267,6 +4312,38 @@ export const zRecordTagCreate = z.object({
     'finding',
   ]),
   tag_id: z.string(),
+});
+
+/**
+ * RecordTagRowOut
+ */
+export const zRecordTagRowOut = z.object({
+  colour: z.string(),
+  name: z.string(),
+  record_id: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+  tag_id: z.string(),
+});
+
+/**
+ * RecordTagsOut
+ *
+ * Every tag on every record of the investigation: what the network's tag layer draws.
+ */
+export const zRecordTagsOut = z.object({
+  investigation_id: z.string(),
+  rows: z.array(zRecordTagRowOut),
 });
 
 /**
@@ -7934,6 +8011,21 @@ export const zAddNotePath = z.object({
  */
 export const zAddNoteResponse = zNoteOut;
 
+export const zHowAreTheyConnectedPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zHowAreTheyConnectedQuery = z.object({
+  from: z.string(),
+  to: z.string(),
+  max_len: z.number().int().gte(1).lte(6).optional().default(4),
+});
+
+/**
+ * Successful Response
+ */
+export const zHowAreTheyConnectedResponse = zConnectionsOut;
+
 export const zPeekAtRecordPath = z.object({
   investigation_id: z.string(),
 });
@@ -7993,6 +8085,15 @@ export const zUntagARecordQuery = z.object({
  * Successful Response
  */
 export const zUntagARecordResponse = zRecordMarksOut;
+
+export const zGetAllRecordTagsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetAllRecordTagsResponse = zRecordTagsOut;
 
 export const zTagARecordBody = zRecordTagCreate;
 

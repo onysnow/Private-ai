@@ -14,7 +14,7 @@ from app.schemas.api import (
     TagUpdate,
 )
 from app.schemas.responses import (
-    CollectionOut, CollectionsOut, LeadOut, NoteOut, NotesOut, PeekOut, RecordMarksOut, TaggedRecordsOut, TagsOut,
+    CollectionOut, CollectionsOut, LeadOut, NoteOut, NotesOut, PeekOut, RecordMarksOut, RecordTagsOut, TaggedRecordsOut, TagsOut,
 )
 from app.services import annotations as svc
 from app.services.leads import serialize_lead
@@ -81,6 +81,13 @@ def get_tagged_records(tag_id: str, db: Session = Depends(get_db)) -> Any:
     tag = _get(db, Tag, tag_id, "Tag")
     summary = next(t for t in svc.list_tags(db, tag.investigation_id) if t["id"] == tag.id)
     return {"tag": summary, "records": svc.tagged_records(db, tag)}
+
+
+@router.get("/investigations/{investigation_id}/record-tags", response_model=RecordTagsOut)
+def get_all_record_tags(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """Every tag on every record: what the network's tag layer draws."""
+    _investigation(db, investigation_id)
+    return {"investigation_id": investigation_id, "rows": svc.all_record_tags(db, investigation_id)}
 
 
 @router.post("/investigations/{investigation_id}/record-tags", response_model=RecordMarksOut)

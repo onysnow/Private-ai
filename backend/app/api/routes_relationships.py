@@ -4,7 +4,7 @@ and app/services/leads.py; this module just wires 404s and ValueErrors
 to HTTP status codes.
 """
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
@@ -13,7 +13,7 @@ from app.models.domain import Investigation, RelationshipEdge
 from app.schemas.api import (
     RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest,
 )
-from app.schemas.responses import LeadOut, RelationshipEvidenceReviewsOut, RelationshipOut
+from app.schemas.responses import ConnectionsOut, LeadOut, RelationshipEvidenceReviewsOut, RelationshipOut
 from app.services.leads import create_relationship_context_lead, serialize_lead
 from app.services.relationships import (
     attach_relationship_evidence, create_relationship, relationship_evidence_review_history,
@@ -79,3 +79,17 @@ def create_lead_from_relationship_context(relationship_id: str, db: Session = De
     db.commit()
     db.refresh(row)
     return serialize_lead(db, row)
+
+
+@router.get("/investigations/{investigation_id}/paths", response_model=ConnectionsOut)
+def how_are_they_connected(investigation_id: str, from_id: str = Query(..., alias="from"), to_id: str = Query(..., alias="to"),
+                           max_len: int = Query(4, ge=1, le=6), db: Session = Depends(get_db)) -> Any:
+    """Every chain of links between two parties, up to max_len links, each with how sure its weakest link is."""
+    from app.services.paths import connections
+
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    try:
+        return connections(db, investigation_id, from_id, to_id, max_len)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
