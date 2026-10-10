@@ -58,13 +58,12 @@ describe('RedFlagsPanel', () => {
 
     await user.click(within(card).getByRole('button', {name: 'Details: Circular ownership'}));
     const drawer = screen.getByRole('complementary', {name: 'Red Flag details: Circular ownership'});
-    expect(within(drawer).getByRole('tab', {name: 'Could be innocent'})).toHaveAttribute('aria-selected', 'true');
+    expect(within(drawer).getAllByRole('heading', {level: 4}).map(h => h.textContent)).toEqual(['Could be innocent', 'Why it matters', 'Source', 'Ranking']);
     expect(within(drawer).getByText(/whether there was a business reason\. A person decides that\./)).toBeInTheDocument();
-    await user.click(within(drawer).getByRole('tab', {name: 'Why it matters'}));
-    expect(within(drawer).getByText('Applies in the UK only.')).toBeInTheDocument();
-    await user.click(within(drawer).getByRole('tab', {name: 'Source'}));
+    expect(within(drawer).getByText('Applies in the UK only.')).not.toBeVisible();
+    await user.click(within(drawer).getByText('About the numbers'));
+    expect(within(drawer).getByText('Applies in the UK only.')).toBeVisible();
     expect(within(drawer).getByRole('link', {name: /FATF and Egmont Group/})).toHaveAttribute('href', 'https://example.test/fatf');
-    await user.click(within(drawer).getByRole('tab', {name: 'Ranking'}));
     expect(within(drawer).getByText(/-0.3 rests on a link not yet supported/)).toBeInTheDocument();
     await user.click(within(drawer).getByRole('button', {name: 'Close the details'}));
     expect(screen.queryByRole('complementary')).toBeNull();

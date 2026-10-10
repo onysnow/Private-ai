@@ -18,7 +18,6 @@ import {
 import type {InvestigationTypeOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {GlossaryText} from '../glossary/glossary-text';
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '../../components/ui/tabs';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 export const LEVEL: Record<string, {name: string; meaning: string}> = {
@@ -89,7 +88,13 @@ function FlagCard({flag, rank, open, onOpen, ...actions}: {flag: RedFlagOut; ran
   </article>;
 }
 
-/** Everything about one flag, beside the list: innocent explanations first (indicators.md), then why it matters,
+function SourceItem({src}: {src: NonNullable<RedFlagOut['indicator']>['sources'][number]}): ReactElement {
+  return <div className="rf-source">
+    <a href={src.url} target="_blank" rel="noreferrer">{src.publisher}, {src.title}</a>{src.locator ? `, ${src.locator}` : ''}
+    <blockquote>“{src.quote}”</blockquote></div>;
+}
+
+/** Everything about one flag, beside the list, as sections (Ony, 10 Oct 2026: the drawer has room, so no tabs): innocent explanations first (indicators.md), then why it matters,
  * where it was documented, and how it ranks. */
 function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () => void} & FlagActions): ReactElement {
   const ind = flag.indicator;
@@ -103,39 +108,33 @@ function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () 
     <p className="sv-muted">{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}{ind && <> · <a href={`/glossary?indicator=${encodeURIComponent(ind.id)}`}>Full entry in the glossary</a></>}</p>
     <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
     <PartyButtons parties={flag.parties}/>
-    <Tabs defaultValue="innocent" className="rf-tabs">
-      <TabsList aria-label="About this flag">
-        <TabsTrigger value="innocent">Could be innocent</TabsTrigger>
-        <TabsTrigger value="why">Why it matters</TabsTrigger>
-        <TabsTrigger value="source">Source</TabsTrigger>
-        <TabsTrigger value="rank">Ranking</TabsTrigger>
-      </TabsList>
-      <TabsContent value="innocent">
-        <ul className="rf-list">{(ind?.innocent_explanations ?? []).map(t => <li key={t}><GlossaryText text={t}/></li>)}</ul>
-        {flag.not_shown.length > 0 && <div className="rf-row rf-unknown"><b>The records can&apos;t show.</b> {flag.not_shown.join('; ')}. A person decides that.</div>}
-      </TabsContent>
-      <TabsContent value="why">
-        {ind && <>
-          <h5>The pattern</h5><p><GlossaryText text={ind.definition}/></p>
-          <h5>This level</h5><p><GlossaryText text={`${LEVEL[flag.level].name}: ${ind.levels[flag.level as 'faint' | 'strong' | 'textbook']}`}/></p>
-          {ind.levels.threshold_note && <><h5>About the numbers</h5><p className="rf-note-text">{ind.levels.threshold_note}</p></>}
-          {ind.cross_hints.length > 0 && <><h5>This may also point to</h5><ul className="rf-list">{ind.cross_hints.map((h, i) => <li key={i}>
-            <a href={h.source_url} target="_blank" rel="noreferrer">{h.target_area}</a>: <GlossaryText text={h.reason}/></li>)}</ul></>}
-        </>}
-      </TabsContent>
-      <TabsContent value="source">
-        {(ind?.sources ?? []).map((src, i) => <div key={i} className="rf-source">
-          <a href={src.url} target="_blank" rel="noreferrer">{src.publisher}, {src.title}</a>{src.locator ? `, ${src.locator}` : ''}
-          <blockquote>“{src.quote}”</blockquote></div>)}
-      </TabsContent>
-      <TabsContent value="rank">
-        <div className="rf-weight" aria-label={`Weight ${flag.weight}`}>
-          <span>weight {flag.weight}</span>
-          <span className="rf-track"><i style={{width: `${Math.max(4, 100 * Math.max(0, flag.weight) / max)}%`}}/></span>
-        </div>
-        <ul className="rf-list">{flag.weight_parts.map(p => <li key={p.why}>{p.value > 0 ? '+' : ''}{p.value} {p.why}</li>)}</ul>
-      </TabsContent>
-    </Tabs>
+    <section className="rf-sec" aria-labelledby="rf-sec-innocent">
+      <h4 id="rf-sec-innocent">Could be innocent</h4>
+      <ul className="rf-list">{(ind?.innocent_explanations ?? []).map(t => <li key={t}><GlossaryText text={t}/></li>)}</ul>
+      {flag.not_shown.length > 0 && <div className="rf-row rf-unknown"><b>The records can&apos;t show.</b> {flag.not_shown.join('; ')}. A person decides that.</div>}
+    </section>
+    {ind && <section className="rf-sec" aria-labelledby="rf-sec-why">
+      <h4 id="rf-sec-why">Why it matters</h4>
+      <p><GlossaryText text={ind.definition}/></p>
+      <h5>This level</h5><p><GlossaryText text={`${LEVEL[flag.level].name}: ${ind.levels[flag.level as 'faint' | 'strong' | 'textbook']}`}/></p>
+      {ind.levels.threshold_note && <details className="rf-fold"><summary>About the numbers</summary><p className="rf-note-text">{ind.levels.threshold_note}</p></details>}
+      {ind.cross_hints.length > 0 && <><h5>This may also point to</h5><ul className="rf-list">{ind.cross_hints.map((h, i) => <li key={i}>
+        <a href={h.source_url} target="_blank" rel="noreferrer">{h.target_area}</a>: <GlossaryText text={h.reason}/></li>)}</ul></>}
+    </section>}
+    {ind && ind.sources.length > 0 && <section className="rf-sec" aria-labelledby="rf-sec-source">
+      <h4 id="rf-sec-source">Source</h4>
+      <SourceItem src={ind.sources[0]}/>
+      {ind.sources.length > 1 && <details className="rf-fold"><summary>{ind.sources.length - 1} more source{ind.sources.length > 2 ? 's' : ''}</summary>
+        {ind.sources.slice(1).map((src, i) => <SourceItem key={i} src={src}/>)}</details>}
+    </section>}
+    <section className="rf-sec" aria-labelledby="rf-sec-rank">
+      <h4 id="rf-sec-rank">Ranking</h4>
+      <div className="rf-weight" aria-label={`Weight ${flag.weight}`}>
+        <span>weight {flag.weight}</span>
+        <span className="rf-track"><i style={{width: `${Math.max(4, 100 * Math.max(0, flag.weight) / max)}%`}}/></span>
+      </div>
+      <ul className="rf-list">{flag.weight_parts.map(p => <li key={p.why}>{p.value > 0 ? '+' : ''}{p.value} {p.why}</li>)}</ul>
+    </section>
     {flag.status === 'dismissed' && <p className="rf-row"><b>Set aside.</b> {flag.dismissed_reason}</p>}
     <FlagActionsRow flag={flag} {...actions}/>
   </aside>;
