@@ -135,6 +135,11 @@ def _score(query: str, *values: object) -> float:
     return score
 
 
+def _readable(properties: dict | None) -> str:
+    """FtM properties as a reader sees them: "name: Acme Ltd · jurisdiction: gb"."""
+    return " · ".join(f"{prop}: {', '.join(str(v) for v in (values or []))}" for prop, values in (properties or {}).items() if values)
+
+
 def _trace(record_type: str, record_id: str) -> dict:
     return {"trace_record_type": record_type, "trace_record_id": record_id}
 
@@ -310,7 +315,7 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
             hits.append(SearchHit(
                 "entity", entity_row.id, entity_row.investigation_id,
                 entity_row.caption if not is_alias else f"{entity_row.caption} → {active.caption}",
-                _snippet(properties_text or entity_row.caption, query), score,
+                _snippet(_readable(entity_row.properties) or entity_row.caption, query), score,
                 {
                     "kind": "merged_alias" if is_alias else "canonical",
                     "ftm_id": entity_row.ftm_id,
@@ -482,7 +487,7 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
         score = _score(query, finding_row.caption, finding_row.schema, props, finding_row.provider, finding_row.provider_record_id, finding_row.source_url)
         if score:
             hits.append(SearchHit(
-                "connector_finding", finding_row.id, finding_row.investigation_id, finding_row.caption, _snippet(props, query), score,
+                "connector_finding", finding_row.id, finding_row.investigation_id, finding_row.caption, _snippet(_readable(finding_row.properties), query), score,
                 {"kind": "external_finding", "provider": finding_row.provider, "provider_record_id": finding_row.provider_record_id, "source_url": finding_row.source_url},
                 {"schema": finding_row.schema, "review_status": finding_row.review_status},
             ))
@@ -525,7 +530,7 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
                 continue
             hits.append(SearchHit(
                 "relationship", edge.id, edge.investigation_id, label,
-                _snippet(str(rel_entity.properties or {}), query), score,
+                _snippet(_readable(rel_entity.properties), query), score,
                 {"kind": "ftm_relationship", "relationship_entity_id": edge.relationship_entity_id, "reconciliation": reconciliation, **_trace("relationship", edge.id)},
                 {"schema": edge.schema, "source_entity_id": edge.source_entity_id, "target_entity_id": edge.target_entity_id, "reconciliation": reconciliation, "advisory": serialize_relationship(db, edge).get("advisory")},
             ))

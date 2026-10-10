@@ -187,8 +187,18 @@ def shape_results(db: Session, query: str, hits: list[dict[str, Any]], *, kind: 
     investigation_ids = {h["investigation_id"] for h in hits}
     captions, by_id, carriers = _names(db, investigation_ids)
 
+    # A party found by its name and by one of its details is one result: the
+    # detail's field joins the party's "why it matched".
+    party_hits = {h["provenance"].get("canonical_entity_id") or h["id"] for h in hits if h["type"] == "entity"}
+    folded: dict[str, list[str]] = defaultdict(list)
+    for h in hits:
+        if h["type"] == "statement" and h["provenance"].get("entity_id") in party_hits:
+            folded[h["provenance"]["entity_id"]].append(f"property: {h['metadata'].get('prop')}")
+
     shaped: list[dict[str, Any]] = []
     for hit in hits:
+        if hit["type"] == "statement" and hit["provenance"].get("entity_id") in party_hits:
+            continue
         # One result per thing: the FtM entity that only carries a link is the link.
         if hit["type"] == "entity" and hit["id"] in carriers:
             continue
@@ -202,6 +212,9 @@ def shape_results(db: Session, query: str, hits: list[dict[str, Any]], *, kind: 
         hit["sure"] = _sure(hit)
         hit["date"] = _date(hit)
         hit["matched_fields"] = _matched_fields(query, _fields(hit))
+        if hit["type"] == "entity":
+            extra = folded.get(hit["provenance"].get("canonical_entity_id") or hit["id"], [])
+            hit["matched_fields"] += [f for f in extra if f not in hit["matched_fields"]]
         hit["record_type"] = MARK_TYPE.get(hit["type"])
         hit["tags"], hit["note_count"] = [], 0
         shaped.append(hit)

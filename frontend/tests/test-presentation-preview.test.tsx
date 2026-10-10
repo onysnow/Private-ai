@@ -149,8 +149,8 @@ describe('RecordPicker', () => {
     const api = mockApi({'GET /api/search': {
       query: 'registry', investigation_id: 'inv-1', total: 2, returned: 2, counts: {}, group_counts: {},
       results: [
-        {type: 'reporting_task', group: 'workflow', id: 't-1', investigation_id: 'inv-1', title: 'Request registry extract', snippet: '', score: 1, provenance: {}, metadata: {}},
-        {type: 'connector_finding', group: 'external_lead', id: 'f-1', investigation_id: 'inv-1', title: 'Aleph hit', snippet: '', score: 1, provenance: {}, metadata: {}},
+        {type: 'reporting_task', group: 'workflow', id: 't-1', investigation_id: 'inv-1', title: 'Request registry extract', snippet: '', score: 1, provenance: {}, metadata: {}, kind: 'lead_task'},
+        {type: 'connector_finding', group: 'external_lead', id: 'f-1', investigation_id: 'inv-1', title: 'Aleph hit', snippet: '', score: 1, provenance: {}, metadata: {}, kind: 'outside'},
       ],
     }});
     let selected: SelectedRef[] = [];

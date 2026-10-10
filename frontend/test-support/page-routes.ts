@@ -321,7 +321,14 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/watchlist`]: watchlistBody(id),
     [`GET ${base}/corpus/entity-sets`]: [],
     [`GET ${base}/places`]: placesBody(id),
+    [`GET ${base}/tags`]: tagsBody(id),
+    [`GET ${base}/collections`]: {investigation_id: id, collections: []},
   };
+}
+
+/** The tags reply (GET /api/investigations/{id}/tags): none yet, and the eight swatches. */
+export function tagsBody(id: string, tags: unknown[] = []): {investigation_id: string; colours: string[]; tags: unknown[]} {
+  return {investigation_id: id, colours: ['#314d65', '#3a5c52', '#8d692b', '#663306', '#89352a', '#61503e', '#3e6181', '#966926'], tags};
 }
 
 /** The places reply (GET /api/investigations/{id}/places): none by default. */

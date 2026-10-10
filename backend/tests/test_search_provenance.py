@@ -43,8 +43,13 @@ def test_investigation_search_returns_typed_provenance_and_claim_evidence_links(
     assert response.status_code == 200, response.text
     body = response.json()
     assert body['investigation_id'] == inv['id']
-    assert body['total'] >= 4
-    assert {'entity', 'statement', 'evidence', 'claim'}.issubset(set(body['counts']))
+    assert body['total'] >= 3
+    assert {'entity', 'evidence', 'claim'}.issubset(set(body['counts']))
+    # One result per thing: the party's matching statements fold into its own
+    # result and name the property in "why it matched" (app/services/search_view.py).
+    assert 'statement' not in body['counts']
+    party_hit = next(row for row in body['results'] if row['type'] == 'entity' and row['id'] == entity['id'])
+    assert 'property: name' in party_hit['matched_fields']
     assert all(row['investigation_id'] == inv['id'] for row in body['results'])
 
     evidence_hit = next(row for row in body['results'] if row['type'] == 'evidence' and row['id'] == evidence['id'])

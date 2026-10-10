@@ -58,6 +58,8 @@ const canonicalHit = {
   score: 3.5,
   provenance: {},
   metadata: {},
+  kind: 'party',
+  record_type: 'entity',
 };
 
 const externalLeadHit = {
@@ -70,6 +72,8 @@ const externalLeadHit = {
   score: 1.2,
   provenance: {},
   metadata: {},
+  kind: 'outside',
+  record_type: 'finding',
 };
 
 function searchBody(results: unknown[]) {
@@ -102,9 +106,9 @@ describe('Home investigation search', () => {
     await user.type(input, 'Kestrelwood');
     await user.click(screen.getByRole('button', {name: 'Search records'}));
 
-    await screen.findByText('Kestrelwood Holdings');
-    expect(screen.getByText('External leads — review required')).toBeInTheDocument();
-    expect(screen.getByText('Aleph result for Kestrelwood')).toBeInTheDocument();
+    await screen.findByRole('option', {name: /Kestrelwood Holdings/});
+    expect(screen.getByRole('button', {name: /Outside findings/, expanded: true})).toBeInTheDocument();
+    expect(screen.getByRole('option', {name: /Aleph result for Kestrelwood/})).toBeInTheDocument();
     // Canonical hits get a "Trace provenance" action; external leads instead
     // get a plain caution note and no trace action.
     expect(
@@ -135,7 +139,7 @@ describe('Home investigation search', () => {
     );
     await user.type(input, 'Kestrelwood{Enter}');
 
-    await screen.findByText('Kestrelwood Holdings');
+    await screen.findByRole('option', {name: /Kestrelwood Holdings/});
     await waitFor(() => expect(api.calls(SEARCH)).toHaveLength(1));
     expect(api.lastUrl(SEARCH).searchParams.get('include_reconciled_duplicates')).toBe('true');
   });

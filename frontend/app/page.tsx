@@ -150,7 +150,8 @@ function Workbench(): ReactElement {
     {(access.state === 'needs_token' || access.state === 'error') && <PanelErrorBoundary name="API access"><ApiAccessPanel message={access.message} onConnect={access.connectWithToken}/></PanelErrorBoundary>}
 
     <section className="hero"><span className="accent">FollowTheMoney-centered review</span><h1>External data stays evidence until a reporter decides what it means.</h1><p>Search Aleph or OpenSanctions, preserve raw findings and provenance, resolve identity separately, then assess individual statements. Accepted values can be explicitly promoted into the canonical graph with provider and source provenance.</p></section>
-    <div className="section-group"><h4 className="group-label">Search &amp; discovery</h4><div className="page-grid-2">
+    {/* Search takes the full width: facets, results and the marks panel sit side by side. */}
+    <div className="section-group"><h4 className="group-label">Search &amp; discovery</h4><div className="section-stack">
       <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>
       <PanelErrorBoundary name="Provenance trace"><ProvenancePanel investigationId={inv}/></PanelErrorBoundary>
     </div></div>

@@ -16,7 +16,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
-import {corpusSearchBody} from '../test-support/page-routes';
+import {corpusSearchBody, tagsBody} from '../test-support/page-routes';
 
 vi.mock('next/dynamic', () => ({
   // The timeline chart needs a canvas; the panel's own list is what these tests check.
@@ -35,23 +35,27 @@ const canonicalHit = {
   type: 'entity', group: 'canonical', id: 'ent-1', investigation_id: 'inv-1', title: 'Kestrelwood Holdings',
   snippet: 'A shell entity mentioned in filing 12.', score: 3.5,
   provenance: {trace_record_type: 'entity', trace_record_id: 'ent-1', source_id: 'src-1', locator: 'p. 4'}, metadata: {},
+  kind: 'party' as const, record_type: 'entity',
 };
 const externalLeadHit = {
   type: 'connector_finding', group: 'external_lead', id: 'find-1', investigation_id: 'inv-1', title: 'Aleph result for Kestrelwood',
   snippet: 'An unreviewed external lead.', score: 1.2, provenance: {}, metadata: {},
+  kind: 'outside' as const, record_type: 'finding',
 };
 const searchBody = (results: unknown[]) => ({query: 'x', investigation_id: 'inv-1', total: results.length, returned: results.length, counts: {entity: results.length}, group_counts: {canonical: 1}, results});
 
 describe('SearchPanel', () => {
   it('searches on click and on Enter, keeps groups apart, and asks for a trace', async () => {
-    const api = mockApi({'GET /api/search': searchBody([canonicalHit, externalLeadHit]), 'GET /api/investigations/inv-1/corpus/search': corpusSearchBody('inv-1')});
+    const api = mockApi({'GET /api/search': searchBody([canonicalHit, externalLeadHit]), 'GET /api/investigations/inv-1/corpus/search': corpusSearchBody('inv-1'),
+      'GET /api/investigations/inv-1/tags': tagsBody('inv-1'), 'GET /api/investigations/inv-1/collections': {investigation_id: 'inv-1', collections: []},
+      'GET /api/investigations/inv-1/notes': {investigation_id: 'inv-1', notes: []}});
     wrap(<SearchPanel investigationId="inv-1"/>);
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Search this investigation…'), 'Kestrelwood');
     await user.click(screen.getByRole('button', {name: 'Search records'}));
 
-    await screen.findByText('Kestrelwood Holdings');
-    expect(screen.getByText('External leads — review required')).toBeInTheDocument();
+    await screen.findByRole('option', {name: /Kestrelwood Holdings/});
+    expect(screen.getByRole('button', {name: /Outside findings/, expanded: true})).toBeInTheDocument();
     expect(screen.getByText('External connector result; treat as a lead until reviewed and promoted.')).toBeInTheDocument();
     expect(screen.getAllByRole('button', {name: 'Trace provenance'})).toHaveLength(1);
     const url = api.lastUrl('GET /api/search');

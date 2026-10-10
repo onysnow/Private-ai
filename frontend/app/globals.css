@@ -221,3 +221,102 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
   .oc-table thead th { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #baac91; font-weight: 600; }
   .oc-table tbody th { color: #e6d6bf; font-weight: 600; }
 }
+
+/* Search (features/search/search-panel.tsx) and the marks panel
+   (features/marks/marks-panel.tsx), from the approved prototype
+   (docs/discovery/prototype.html). Small text is parchment (#caaf9c) or tan
+   (#bc9574), never taupe; each result's left edge is its kind of record
+   (lib/record-kinds.ts). */
+@layer components {
+  .sv { padding: 20px; }
+  .sv-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .sv-head h3 { margin: 0; font-size: 19px; color: #e6d6bf; }
+  .sv-sbox { flex: 1 1 320px; display: flex; align-items: center; gap: 8px; background: #26272b; border: 1px solid #393941; border-radius: 10px; padding: 0 10px; height: 38px; }
+  .sv-sbox:focus-within { border-color: #d4a152; box-shadow: 0 0 0 3px rgba(212,161,82,.18); }
+  .sv-sbox input { all: unset; flex: 1; color: #f3e9d7; min-width: 0; }
+  .sv-sbox kbd { border: 1px solid #393941; border-radius: 5px; padding: 0 5px; font-size: 11px; color: #bc9574; }
+  .sv-check { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: #bc9574; }
+  .sv-wrap { display: grid; grid-template-columns: 200px minmax(0, 1fr) 320px; gap: 18px; margin-top: 16px; }
+  @media (max-width: 1100px) { .sv-wrap { grid-template-columns: 180px minmax(0, 1fr); } .sv-panel { grid-column: 1 / -1; position: static !important; max-height: none !important; } }
+  @media (max-width: 720px) { .sv-wrap { grid-template-columns: 1fr; } .sv-facets { position: static !important; } }
+  .sv-muted { color: #bc9574; font-size: 12.5px; }
+  .sv-error { color: #e0a39b; font-size: 13px; }
+
+  .sv-facets { position: sticky; top: 16px; align-self: start; font-size: 12.5px; }
+  .sv-fg { margin-bottom: 16px; }
+  .sv-fg h4 { margin: 0 0 6px; font-family: inherit; font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: #baac91; font-weight: 700; }
+  .sv-fr { all: unset; cursor: pointer; display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; width: 100%; box-sizing: border-box; padding: 3px 6px; border-radius: 6px; color: #caaf9c; }
+  .sv-fr:hover { background: #202a2f; } .sv-fr.on { background: #2a2a22; color: #f3e9d7; box-shadow: inset 0 0 0 1px #4e4234; } .sv-fr.zero { opacity: .45; }
+  .sv-fr:focus-visible { outline: 2px solid #d4a152; outline-offset: 1px; }
+  .sv-fr .sw { width: 10px; height: 10px; border-radius: 3px; }
+  .sv-fr .n { font-size: 11.5px; color: #bc9574; display: flex; align-items: center; gap: 6px; }
+  .sv-fr .bar { display: inline-block; height: 4px; border-radius: 2px; background: currentColor; opacity: .6; }
+
+  .sv-results { min-width: 0; outline: none; }
+  .sv-results:focus-visible { box-shadow: 0 0 0 2px rgba(212,161,82,.35); border-radius: 10px; }
+  .sv-rhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin: 2px 0 10px; }
+  .sv-rhead h2 { margin: 0; font-size: 20px; color: #f3e9d7; }
+  .sv-rhead span { color: #bc9574; font-size: 12.5px; }
+  .sv-grp { margin-bottom: 16px; }
+  .sv-gh { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; padding: 6px 2px; border-bottom: 2px solid; margin-bottom: 8px; }
+  .sv-gh b { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; }
+  .sv-gh span, .sv-gh i { font-size: 12px; color: #bc9574; } .sv-gh i { margin-left: auto; font-style: normal; }
+  .sv-gh:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+  .sv-res { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; background: #1a2328; border: 1px solid #2e3a40; border-left: 4px solid var(--edge); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; }
+  .sv-res:hover { background: #1f2a30; border-color: #3a4a52; border-left-color: var(--edge); }
+  .sv-res.sel { box-shadow: 0 0 0 2px #d4a152; }
+  .sv-res.outside { background: linear-gradient(90deg, rgba(49,34,55,.95), rgba(49,34,55,.4)); border-color: #4a3a55; border-left-color: var(--edge); }
+  .sv-res .t { color: #f3e9d7; font-weight: 600; font-size: 14px; line-height: 1.35; }
+  .sv-res mark { background: rgba(212,161,82,.28); color: #f3e9d7; border-radius: 3px; padding: 0 2px; }
+  .sv-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 3px; font-size: 12px; color: #bc9574; }
+  .sv-meta .kl { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+  .sv-pill { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 0 8px; font-size: 11.5px; font-weight: 600; line-height: 19px; white-space: nowrap; }
+  .sv-pd { display: inline-flex; align-items: center; gap: 5px; color: #caaf9c; }
+  .sv-pd i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; border: 2px solid; }
+  .sv-sn { margin-top: 4px; font-size: 12.5px; color: #caaf9c; line-height: 1.45; overflow-wrap: anywhere; }
+  .sv-why { margin-top: 3px; font-size: 11.5px; color: #bc9574; }
+  .sv-res.outside .sv-why { color: #c9b6d4; }
+  .sv-tags { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+  .sv-tag { border-radius: 999px; padding: 0 8px; font-size: 11px; font-weight: 600; line-height: 18px; color: #f3e9d7; }
+  .sv-notec { font-size: 11.5px; color: #bc9574; border-left: 2px solid #4e4234; padding-left: 6px; }
+  .sv-acts { display: flex; gap: 4px; align-items: flex-start; opacity: 0; transition: opacity .12s; }
+  .sv-res:hover .sv-acts, .sv-res.sel .sv-acts, .sv-res:focus-within .sv-acts { opacity: 1; }
+  .sv-ab { all: unset; cursor: pointer; width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; color: #bc9574; border: 1px solid #393941; font-size: 12px; font-weight: 700; }
+  .sv-ab:hover { background: #26272b; color: #f3e9d7; }
+  .sv-ab:focus-visible, .sv-btn:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+  .sv-btn { all: unset; cursor: pointer; border: 1px solid #393941; border-radius: 8px; padding: 4px 10px; font-size: 12px; color: #caaf9c; white-space: nowrap; background: #26272b; }
+  .sv-btn:hover { border-color: #4e4234; color: #f3e9d7; }
+  .sv-btn.p { background: #d4a152; color: #010005; border-color: #d4a152; font-weight: 600; padding: 7px 14px; }
+  .sv-btn.danger { border-color: #9f3632; }
+  .sv-btn[disabled] { opacity: .5; cursor: default; }
+
+  .sv-peek { position: absolute; z-index: 30; left: 24px; top: calc(100% - 6px); width: 320px; background: #10161a; border: 1px solid #4e4234; border-radius: 12px; box-shadow: 0 12px 32px #000a; padding: 12px; font-size: 12.5px; pointer-events: none; color: #caaf9c; }
+  .sv-peek b { display: block; color: #f3e9d7; margin-bottom: 6px; }
+  .sv-pr { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #222c31; padding: 4px 0; font-size: 12px; }
+  .sv-pr span:first-child { color: #bc9574; }
+  .sv-pn { display: flex; align-items: center; gap: 6px; padding: 2px 0; } .sv-pn small { color: #bc9574; }
+  .sv-pn i { width: 9px; height: 9px; border-radius: 50%; border: 2px solid; display: inline-block; }
+
+  .sv-panel { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; background: #1c262b; border: 1px solid #4e4234; border-radius: 14px; padding: 14px; }
+  .sv-ph { font: 600 15px var(--font-heading); color: #f3e9d7; margin: 0 0 4px; }
+  .sv-psub { font-size: 12px; color: #bc9574; margin: 0 0 10px; }
+  .sv-sec { font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: #baac91; font-weight: 700; margin: 16px 0 8px; }
+  .sv-tagpick { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+  .sv-tagpick button { all: unset; cursor: pointer; border-radius: 999px; padding: 1px 9px; font-size: 11.5px; font-weight: 600; color: #f3e9d7; opacity: .55; }
+  .sv-tagpick button.on { opacity: 1; box-shadow: 0 0 0 2px #f3e9d7; }
+  .sv-tagpick button:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+  .sv-new { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; }
+  .sv-new.col { flex-direction: column; align-items: stretch; } .sv-new.col .sv-btn { align-self: flex-start; }
+  .sv-marks input[type=text], .sv-marks input:not([type]), .sv-marks textarea { flex: 1 1 140px; min-width: 0; background: #26272b; border: 1px solid #393941; border-radius: 8px; color: #f3e9d7; padding: 6px 8px; }
+  .sv-marks textarea { min-height: 64px; resize: vertical; }
+  .sv-swatches { display: flex; gap: 4px; flex-wrap: wrap; }
+  .sv-swatches button { all: unset; cursor: pointer; width: 18px; height: 18px; border-radius: 5px; border: 2px solid transparent; }
+  .sv-swatches button.on { border-color: #f3e9d7; }
+  .sv-swatches button:focus-visible { outline: 2px solid #d4a152; outline-offset: 1px; }
+  .sv-note { border: 1px solid #2e3a40; border-left: 3px solid #4e4234; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 12.5px; }
+  .sv-note p { margin: 0 0 4px; color: #caaf9c; white-space: pre-wrap; }
+  .sv-note small { display: block; color: #bc9574; margin-bottom: 4px; }
+  .sv-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .sv-ci { display: flex; gap: 8px; align-items: center; font-size: 12.5px; padding: 4px 0; border-top: 1px solid #222c31; }
+  .sv-ci b { color: #f3e9d7; font-weight: 600; } .sv-ci span { margin-left: auto; color: #bc9574; font-size: 11.5px; }
+}
