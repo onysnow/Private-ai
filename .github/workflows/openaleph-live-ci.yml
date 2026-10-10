@@ -44,20 +44,9 @@ jobs:
       # Every `docker compose` call adds the CI settings for Elasticsearch's
       # disk use (.github/openaleph-ci.compose.yml says why).
       COMPOSE_FILE: docker-compose.yml:.github/openaleph-ci.compose.yml
-      # See backend-postgres-ci.yml: the secret is read here so the submodule step's `if:` can test it.
-      TAS_REPO_TOKEN: ${{ secrets.TAS_REPO_TOKEN }}
 
     steps:
       - uses: actions/checkout@v7
-
-      - name: Fetch TAS submodule
-        if: ${{ env.TAS_REPO_TOKEN != '' }}
-        env:
-          TAS_REPO_TOKEN: ${{ secrets.TAS_REPO_TOKEN }}
-        run: |
-          git config submodule.backend/app/ai/tas_spec.url "https://x-access-token:${TAS_REPO_TOKEN}@github.com/onysnow/topic-authority-system.git"
-          git submodule update --init --recursive backend/app/ai/tas_spec
-        continue-on-error: true
 
       - name: Start OpenAleph
         # The API, its worker, ingest-file and ftm-analyze, with what they

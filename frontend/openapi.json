@@ -505,6 +505,56 @@
         "title": "AiAnalysisCandidatesOut",
         "type": "object"
       },
+      "AiAuthoritySuiteOut": {
+        "description": "The vendored Authority System Suite: where it came from and the TAS version the prompts use.",
+        "properties": {
+          "control_surface": {
+            "$ref": "#/components/schemas/AiControlSurfaceOut"
+          },
+          "modules": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AiModuleStatusOut"
+            },
+            "title": "Modules",
+            "type": "object"
+          },
+          "present": {
+            "title": "Present",
+            "type": "boolean"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "tas_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tas Version"
+          }
+        },
+        "required": [
+          "present",
+          "source",
+          "tas_version",
+          "modules",
+          "control_surface"
+        ],
+        "title": "AiAuthoritySuiteOut",
+        "type": "object"
+      },
       "AiControlFlagOut": {
         "properties": {
           "allowed": {
@@ -756,6 +806,9 @@
       "AiReasoningStatusOut": {
         "description": "Whether the AI reasoning endpoints can be called, and what they would\nrun on. Never carries key material. Every key is always sent (null when\nunknown), so the nullable ones have no default: the generated type then\nmatches the AI panel's own status type (lib/api-types.ts).",
         "properties": {
+          "authority_suite": {
+            "$ref": "#/components/schemas/AiAuthoritySuiteOut"
+          },
           "enabled": {
             "title": "Enabled",
             "type": "boolean"
@@ -807,9 +860,6 @@
               }
             ],
             "title": "Runs On This Computer"
-          },
-          "tas_spec": {
-            "$ref": "#/components/schemas/AiTasSpecOut"
           }
         },
         "required": [
@@ -821,46 +871,9 @@
           "runs_on_this_computer",
           "remote_endpoint_allowed",
           "limits",
-          "tas_spec"
+          "authority_suite"
         ],
         "title": "AiReasoningStatusOut",
-        "type": "object"
-      },
-      "AiTasSpecOut": {
-        "properties": {
-          "control_surface": {
-            "$ref": "#/components/schemas/AiControlSurfaceOut"
-          },
-          "modules": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/AiModuleStatusOut"
-            },
-            "title": "Modules",
-            "type": "object"
-          },
-          "present": {
-            "title": "Present",
-            "type": "boolean"
-          },
-          "version": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Version"
-          }
-        },
-        "required": [
-          "present",
-          "version",
-          "modules",
-          "control_surface"
-        ],
-        "title": "AiTasSpecOut",
         "type": "object"
       },
       "ApiAccessStatusOut": {
@@ -2455,9 +2468,7 @@
                   "A",
                   "B",
                   "C",
-                  "D",
-                  "E",
-                  "F"
+                  "D"
                 ],
                 "type": "string"
               },
@@ -16821,9 +16832,7 @@
                   "A",
                   "B",
                   "C",
-                  "D",
-                  "E",
-                  "F"
+                  "D"
                 ],
                 "type": "string"
               },

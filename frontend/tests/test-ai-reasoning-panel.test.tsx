@@ -24,9 +24,10 @@ const readyStatus: AiReasoningStatus = {
   provider: 'anthropic',
   provider_key_configured: true,
   endpoints_callable: true,
-  tas_spec: {
+  authority_suite: {
     present: true,
-    version: '1.8',
+    source: 'onysnow/Authority-System-Suite@b1c71e8',
+    tas_version: '1.12',
     modules: {
       case_synthesis: {spec_file: 'PROMPT_MODULES/08_CASE_SYNTHESIS.md', available: true},
       hypothesis_test: {spec_file: 'PROMPT_MODULES/06_HYPOTHESIS_AND_CONTRADICTION_TESTING.md', available: true},
@@ -63,10 +64,13 @@ const fullCandidate = (overrides: Record<string, unknown> = {}) => ({
       contradicting_evidence: [],
       warrant: 'The filing directly quotes the signature.',
       confidence: 'HIGH',
+      confidence_term: 'VERY_LIKELY',
       confidence_basis: 'single direct primary source',
       limitations: [],
     }],
-    investigative_gaps: ['No independent corroborating source located yet.'],
+    most_likely_failure: 'The filing could be a draft that was never executed.',
+    right_of_reply_needed: [{subject: 'Ada North', claim_ids: ['CLM-0001'], what_will_be_said: 'That she signed the agreement.', draft_questions: ['Did you sign it on 4 March?']}],
+    investigative_gaps: [{gap_id: 'GAP-0001', unresolved_question: 'Is there an independent corroborating source?', bears_on: ['CLM-0001'], needed_record_or_testimony: 'the executed copy'}],
   },
   checked_citation_ids: [{record_type: 'evidence', record_id: 'ev-1'}],
   trace: {system_prompt: 'You are operating under the Topic Authority System', user_prompt: 'RETRIEVAL PACKET (quoted)', response: {model: 'claude-test', truncated: false}},
@@ -91,11 +95,11 @@ describe('describeAiStatus', () => {
     expect(describeAiStatus({...readyStatus, enabled: false})).toMatch(/disabled/);
     expect(describeAiStatus({...readyStatus, provider: null})).toMatch(/no provider/);
     expect(describeAiStatus({...readyStatus, provider_key_configured: false})).toMatch(/API key/);
-    expect(describeAiStatus({...readyStatus, tas_spec: {...readyStatus.tas_spec, present: false}})).toMatch(/not checked out/);
-    expect(describeAiStatus({...readyStatus, tas_spec: {...readyStatus.tas_spec, modules: {...readyStatus.tas_spec.modules, hypothesis_test: {spec_file: 'x', available: false}}}})).toMatch(/hypothesis_test/);
-    expect(describeAiStatus(readyStatus)).toMatch(/Ready: provider anthropic, TAS spec v1.8/);
+    expect(describeAiStatus({...readyStatus, authority_suite: {...readyStatus.authority_suite, present: false}})).toMatch(/Authority System Suite copy .* is missing/);
+    expect(describeAiStatus({...readyStatus, authority_suite: {...readyStatus.authority_suite, modules: {...readyStatus.authority_suite.modules, hypothesis_test: {spec_file: 'x', available: false}}}})).toMatch(/hypothesis_test/);
+    expect(describeAiStatus(readyStatus)).toMatch(/Ready: provider anthropic, Authority System Suite \(TAS v1.12\)/);
     expect(describeAiStatus({...readyStatus, provider: 'ollama', model: 'llama3.2', runs_on_this_computer: true}))
-      .toMatch(/Ready: provider ollama, model llama3.2 \(runs on this computer\), TAS spec v1.8/);
+      .toMatch(/Ready: provider ollama, model llama3.2 \(runs on this computer\), Authority System Suite \(TAS v1.12\)/);
     expect(describeAiStatus({...readyStatus, model: 'claude-x', runs_on_this_computer: false})).toMatch(/runs on the provider's servers/);
     expect(describeAiStatus({...readyStatus, provider: 'ollama', provider_key_configured: false})).toMatch(/no model is chosen/);
   });
@@ -166,7 +170,11 @@ describe('AiReasoningPanel', () => {
     expect(screen.getByTestId('ai-run-status')).toHaveTextContent('Proposed for review (candidate cand-1). Nothing has been written to the investigation.');
     expect(within(detail).getByText('CLM-0001')).toBeInTheDocument();
     expect(within(detail).getByText(/Supports: evidence:ev-1/)).toBeInTheDocument();
-    expect(within(detail).getByText('No independent corroborating source located yet.')).toBeInTheDocument();
+    expect(within(detail).getByText('GAP-0001 · Is there an independent corroborating source? — needs the executed copy (bears on CLM-0001)')).toBeInTheDocument();
+    expect(within(detail).getByText('Corroborated fact · Very likely · confidence High')).toBeInTheDocument();
+    expect(within(detail).getByText('Most likely way this is wrong:').parentElement).toHaveTextContent('could be a draft that was never executed');
+    expect(within(detail).getByTestId('right-of-reply')).toHaveTextContent('Ada North · on CLM-0001: That she signed the agreement.');
+    expect(within(detail).getByTestId('right-of-reply')).toHaveTextContent('the AI never does');
     expect(within(detail).getByTestId('ai-trace')).toHaveTextContent('What the model was sent · claude-test');
     expect(within(detail).getByText(/Topic Authority System/)).toBeInTheDocument();
 
@@ -255,8 +263,8 @@ describe('AiReasoningPanel', () => {
       .mockResolvedValueOnce(jsonResponse({candidates: [summary({id: 'cand-2', module: 'hypothesis_test', request: {question: 'Did Ada act alone?', working_theory: 'Ada acted alone.'}})]}))
       .mockResolvedValueOnce(jsonResponse(fullCandidate({id: 'cand-2', module: 'hypothesis_test', request: {question: 'Did Ada act alone?', working_theory: 'Ada acted alone.'}, payload: {
         working_theory: 'Ada acted alone.',
-        hypothesis_matrix: [{hypothesis_id: 'HYP-0001', hypothesis: 'Ada acted alone.', supporting_evidence: [{record_type: 'evidence', record_id: 'ev-1'}], contradicting_evidence: [], diagnostic_value: 'non-diagnostic', assumptions: [], falsifiers: ['A co-signature on the filing'], missing_records: [], assessment: 'Viable but untested.'}],
-        contradiction_log: [],
+        hypothesis_matrix: [{hypothesis_id: 'HYP-0001', hypothesis: 'Ada acted alone.', supporting_evidence: [{record_type: 'evidence', record_id: 'ev-1'}], contradicting_evidence: [], kind: 'WORKING_THEORY', viable: true, ambiguous_evidence: [], non_diagnostic_evidence: [{record_type: 'evidence', record_id: 'ev-2'}], assumptions: [], falsifiers: ['A co-signature on the filing'], missing_records: [], assessment: 'Viable but untested.', limitations: []}],
+        contradiction_log: [{conflict_id: 'CFLT-0001', statement_a: {statement: 'Signed 4 March', evidence: [{record_type: 'evidence', record_id: 'ev-1'}]}, statement_b: {statement: 'Signed 5 March', evidence: [{record_type: 'evidence', record_id: 'ev-3'}]}, same_proposition: true, same_proposition_basis: 'Same agreement, same signature.', conflict_type: 'DIRECT CONTRADICTION', resolution: null, resolving_evidence: [], limitations: []}],
         conclusion: 'HYP-0001 remains viable; no contradicting record located.',
       }})));
     vi.stubGlobal('fetch', fetchMock);
@@ -289,6 +297,10 @@ describe('AiReasoningPanel', () => {
     expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/hypothesis-test');
     expect(await sentBody(runCall)).toEqual({question: 'Did Ada act alone?', max_results: 30, include_external_leads: true, working_theory: 'Ada acted alone.'});
     expect(within(detail).getByText('HYP-0001')).toBeInTheDocument();
+    expect(within(detail).getByText('Working theory · still viable')).toBeInTheDocument();
+    expect(within(detail).getByText(/Fits every hypothesis \(not counted\): evidence:ev-2/)).toBeInTheDocument();
+    expect(within(detail).getByText('Direct contradiction · open')).toBeInTheDocument();
+    expect(within(detail).getByText('A: Signed 4 March [evidence:ev-1]')).toBeInTheDocument();
     expect(within(detail).getAllByText(/A co-signature on the filing/).length).toBeGreaterThan(0); // rendered falsifier (+ the raw-payload <pre>)
     expect(within(detail).getAllByText(/HYP-0001 remains viable/).length).toBeGreaterThan(0);
   });
@@ -454,7 +466,7 @@ describe('AiReasoningPanel', () => {
     vi.stubGlobal('fetch', fetchMock);
     const noTas: AiReasoningStatus = {
       ...readyStatus, endpoints_callable: false,
-      tas_spec: {present: false, version: null, modules: {
+      authority_suite: {present: false, tas_version: null, modules: {
         case_synthesis: {spec_file: 'x', available: false}, hypothesis_test: {spec_file: 'y', available: false},
         presentation_draft: {spec_file: 'presentation_modules/PRESENTATION_DRAFT.md', available: true},
       }},

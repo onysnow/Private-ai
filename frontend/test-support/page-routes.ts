@@ -59,7 +59,7 @@ export const validSettingsStatus = {
   ai: {
     enabled: false, provider: null, provider_key_configured: false, endpoints_callable: false, model: null, runs_on_this_computer: null, remote_endpoint_allowed: false,
     limits: {runs_per_minute_per_actor: 6, max_concurrent_runs: 2, request_timeout_seconds: 120, max_output_tokens: 8192},
-    tas_spec: {present: false, version: null, modules: {}, control_surface: {spec_file: 'CORE/CONTROL_SURFACE.md', available: false, flags: {}}},
+    authority_suite: {present: false, source: null, tas_version: null, modules: {}, control_surface: {spec_file: 'systems/tas/CORE/CONTROL_SURFACE.md', available: false, flags: {}}},
   },
   connectors: {},
 };

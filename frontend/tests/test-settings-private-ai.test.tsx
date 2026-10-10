@@ -29,15 +29,16 @@ async function renderSettings(ai: Record<string, unknown>) {
 describe('Settings: Private AI', () => {
   it('names the local model and says it runs on this computer', async () => {
     await renderSettings({enabled: true, provider: 'ollama', provider_key_configured: true, endpoints_callable: true, model: 'qwen2.5:7b', runs_on_this_computer: true,
-      tas_spec: {present: true, version: '1.9', modules: {presentation_draft: {spec_file: 'PRESENTATION_DRAFT.md', available: true, vendored_tas: false}}, control_surface: {spec_file: 'x', available: true, flags: {}}}});
+      authority_suite: {present: true, source: 'onysnow/Authority-System-Suite@b1c71e8', tas_version: '1.12', modules: {presentation_draft: {spec_file: 'PRESENTATION_DRAFT.md', available: true, vendored_tas: false}}, control_surface: {spec_file: 'x', available: true, flags: {}}}});
     expect(screen.getByText('qwen2.5:7b')).toBeInTheDocument();
     expect(screen.getAllByText(/runs on this computer/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/remote endpoints allowed/)).not.toBeInTheDocument();
+    expect(screen.getByTestId('authority-suite')).toHaveTextContent('Rules the AI works under: the Authority System Suite (b1c71e8), TAS v1.12. Default source floor: tier D; tier C never counts toward corroboration.');
   });
 
   it('says when a cloud provider answers, and when remote endpoints are allowed', async () => {
     await renderSettings({enabled: true, provider: 'anthropic', provider_key_configured: true, endpoints_callable: true, model: 'claude-x', runs_on_this_computer: false, remote_endpoint_allowed: true,
-      tas_spec: {present: true, version: '1.9', modules: {}, control_surface: {spec_file: 'x', available: true, flags: {}}}});
+      authority_suite: {present: true, source: 'onysnow/Authority-System-Suite@b1c71e8', tas_version: '1.12', modules: {}, control_surface: {spec_file: 'x', available: true, flags: {}}}});
     expect(screen.getByText('claude-x')).toBeInTheDocument();
     expect(screen.getAllByText(/runs on the provider's servers/).length).toBeGreaterThan(0);
     expect(screen.getByText(/remote endpoints allowed/)).toBeInTheDocument();

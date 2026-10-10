@@ -125,6 +125,19 @@ export const zAiModuleStatusOut = z.object({
 });
 
 /**
+ * AiAuthoritySuiteOut
+ *
+ * The vendored Authority System Suite: where it came from and the TAS version the prompts use.
+ */
+export const zAiAuthoritySuiteOut = z.object({
+  control_surface: zAiControlSurfaceOut,
+  modules: z.record(zAiModuleStatusOut),
+  present: z.boolean(),
+  source: z.string().nullable(),
+  tas_version: z.string().nullable(),
+});
+
+/**
  * AiOutputRejectionOut
  *
  * Why a model's answer was kept only as a rejected proposal, with what the
@@ -168,16 +181,6 @@ export const zAiModelFailedOut = z.object({
 });
 
 /**
- * AiTasSpecOut
- */
-export const zAiTasSpecOut = z.object({
-  control_surface: zAiControlSurfaceOut,
-  modules: z.record(zAiModuleStatusOut),
-  present: z.boolean(),
-  version: z.string().nullable(),
-});
-
-/**
  * AiReasoningStatusOut
  *
  * Whether the AI reasoning endpoints can be called, and what they would
@@ -186,6 +189,7 @@ export const zAiTasSpecOut = z.object({
  * matches the AI panel's own status type (lib/api-types.ts).
  */
 export const zAiReasoningStatusOut = z.object({
+  authority_suite: zAiAuthoritySuiteOut,
   enabled: z.boolean(),
   endpoints_callable: z.boolean(),
   limits: zAiLimitsOut,
@@ -194,7 +198,6 @@ export const zAiReasoningStatusOut = z.object({
   provider_key_configured: z.boolean(),
   remote_endpoint_allowed: z.boolean(),
   runs_on_this_computer: z.boolean().nullable(),
-  tas_spec: zAiTasSpecOut,
 });
 
 /**
@@ -610,7 +613,7 @@ export const zCaseSynthesisRequest = z.object({
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   question: z.string().min(1).max(4000),
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
-  source_tier_floor: z.enum(['A', 'B', 'C', 'D', 'E', 'F']).nullish(),
+  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
 });
 
 /**
@@ -2915,7 +2918,7 @@ export const zHypothesisTestRequest = z.object({
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   question: z.string().min(1).max(4000),
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
-  source_tier_floor: z.enum(['A', 'B', 'C', 'D', 'E', 'F']).nullish(),
+  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
   working_theory: z.string().min(1).max(2000),
 });
 

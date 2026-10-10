@@ -22,8 +22,8 @@ from app.ai.llm_client import LLMProviderError, LLMResponse
 # without it (see .github/workflows/backend-postgres-ci.yml). Tests that actually
 # build a prompt from it skip there, mirroring tests/test_tas_submodule_drift.py;
 # gating/queue/settings tests that never read a spec file still run.
-_TAS_SPEC_PRESENT = (reasoning_module.TAS_SPEC_ROOT / "PROMPT_MODULES").exists()
-requires_tas_spec = pytest.mark.skipif(not _TAS_SPEC_PRESENT, reason="tas_spec submodule not checked out")
+_SUITE_PRESENT = (reasoning_module.TAS_ROOT / "PROMPT_MODULES").exists()
+requires_suite = pytest.mark.skipif(not _SUITE_PRESENT, reason="vendored Authority System Suite missing")
 
 
 class _FakeLLMClient:
@@ -90,7 +90,7 @@ def test_case_synthesis_no_provider_configured_returns_4xx_with_no_llm_call(monk
     assert called["n"] == 0
 
 
-@requires_tas_spec
+@requires_suite
 def test_case_synthesis_rejects_invented_citation(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -103,7 +103,7 @@ def test_case_synthesis_rejects_invented_citation(monkeypatch):
             "claim_id": "CLM-0001", "claim": "Ada North signed the agreement.",
             "classification": "CORROBORATED_FACT",
             "supporting_evidence": [{"record_type": "evidence", "record_id": "INVENTED-NOT-REAL"}],
-            "contradicting_evidence": [], "warrant": "x", "confidence": "HIGH",
+            "contradicting_evidence": [], "warrant": "x", "confidence": "HIGH", "confidence_term": "VERY_LIKELY",
             "confidence_basis": "x", "limitations": [],
         }],
         "investigative_gaps": [],
@@ -124,7 +124,7 @@ def test_case_synthesis_rejects_invented_citation(monkeypatch):
         assert rows[0].review_status == "rejected", "an invented citation must never be persisted as proposed/accepted"
 
 
-@requires_tas_spec
+@requires_suite
 def test_case_synthesis_rejects_malformed_schema(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -142,7 +142,7 @@ def test_case_synthesis_rejects_malformed_schema(monkeypatch):
     assert "schema" in r.text.lower()
 
 
-@requires_tas_spec
+@requires_suite
 def test_case_synthesis_valid_response_is_proposed_and_reviewable(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -157,9 +157,9 @@ def test_case_synthesis_valid_response_is_proposed_and_reviewable(monkeypatch):
             "classification": "CORROBORATED_FACT",
             "supporting_evidence": [{"record_type": "evidence", "record_id": evidence_id}],
             "contradicting_evidence": [], "warrant": "The filing directly quotes Ada North's signature on the agreement.",
-            "confidence": "HIGH", "confidence_basis": "single direct primary source", "limitations": [],
+            "confidence": "HIGH", "confidence_term": "VERY_LIKELY", "confidence_basis": "single direct primary source", "limitations": [],
         }],
-        "investigative_gaps": ["No independent corroborating source located yet."],
+        "investigative_gaps": [{"gap_id": "GAP-0001", "unresolved_question": "Is there an independent corroborating source?", "bears_on": ["CLM-0001"]}],
     })
     monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient(valid_response))
 
@@ -212,13 +212,13 @@ def _valid_case_synthesis(evidence_id: str) -> str:
             "classification": "CORROBORATED_FACT",
             "supporting_evidence": [{"record_type": "evidence", "record_id": evidence_id}],
             "contradicting_evidence": [], "warrant": "The filing directly quotes Ada North's signature on the agreement.",
-            "confidence": "HIGH", "confidence_basis": "single direct primary source", "limitations": [],
+            "confidence": "HIGH", "confidence_term": "VERY_LIKELY", "confidence_basis": "single direct primary source", "limitations": [],
         }],
         "investigative_gaps": [],
     })
 
 
-@requires_tas_spec
+@requires_suite
 def test_candidate_queue_list_get_and_filters(monkeypatch):
     """The reviewer-facing surface: list per investigation (newest first,
     payload omitted), filter by review_status/module, fetch one by id with
@@ -261,8 +261,9 @@ def test_candidate_queue_list_get_and_filters(monkeypatch):
     assert {"record_type": "evidence", "record_id": evidence_id} in body["checked_citation_ids"]
     assert body["request"] == {
         "question": "What did Ada North sign?", "working_theory": None, "max_results": 30, "include_external_leads": True,
-        "control_flags": {"severity_floor": "ALL", "source_tier_floor": "C"},  # TAS CONTROL_SURFACE defaults when omitted
+        "control_flags": {"severity_floor": "ALL", "source_tier_floor": "D"},  # the suite's CONTROL_SURFACE defaults when omitted
         "provider": "anthropic", "model": "unknown",  # the fake client returns a bare str, so no model id is known
+        "record_refs": None,
     }
     assert client.get("/api/ai-analysis-candidates/does-not-exist").status_code == 404
 
@@ -280,8 +281,8 @@ def test_settings_status_reports_ai_reasoning_state_without_secrets():
     assert ai["enabled"] is False
     assert ai["provider"] is None
     assert ai["endpoints_callable"] is False
-    assert set(ai["tas_spec"]["modules"]) == {"case_synthesis", "hypothesis_test", "presentation_draft"}
-    assert "spec_file" in ai["tas_spec"]["modules"]["case_synthesis"]
+    assert set(ai["authority_suite"]["modules"]) == {"case_synthesis", "hypothesis_test", "presentation_draft"}
+    assert "spec_file" in ai["authority_suite"]["modules"]["case_synthesis"]
 
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -292,14 +293,15 @@ def test_settings_status_reports_ai_reasoning_state_without_secrets():
         ai = r.json()["ai"]
         assert ai["enabled"] is True and ai["provider"] == "anthropic" and ai["provider_key_configured"] is True
         assert "sk-ant" not in r.text, "settings status must never leak key material"
-        if ai["tas_spec"]["present"]:
+        if ai["authority_suite"]["present"]:
             assert ai["endpoints_callable"] is True
-            assert ai["tas_spec"]["version"], "vendored TAS version should be read from the submodule CHANGELOG"
+            assert ai["authority_suite"]["tas_version"] == "1.12", "TAS version is read from the vendored CHANGELOG's first version heading"
+            assert ai["authority_suite"]["source"].startswith("onysnow/Authority-System-Suite@")
     finally:
         settings.anthropic_api_key = original_key
 
 
-def test_missing_tas_spec_file_is_a_clean_400_not_a_500(monkeypatch):
+def test_missing_suite_file_is_a_clean_400_not_a_500(monkeypatch):
     """Runs everywhere (no submodule needed): point the module table at a path
     that does not exist and make sure the endpoint answers with a message a
     reporter can act on rather than an unhandled FileNotFoundError."""
@@ -308,13 +310,13 @@ def test_missing_tas_spec_file_is_a_clean_400_not_a_500(monkeypatch):
     client = TestClient(app)
     seeded = _seeded_investigation(client)
     monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient("{}"))
-    monkeypatch.setitem(reasoning_module.MODULE_FILES, "case_synthesis", reasoning_module.TAS_SPEC_ROOT / "PROMPT_MODULES" / "99_DOES_NOT_EXIST.md")
+    monkeypatch.setitem(reasoning_module.MODULE_FILES, "case_synthesis", reasoning_module.TAS_ROOT / "PROMPT_MODULES" / "99_DOES_NOT_EXIST.md")
     r = client.post(
         f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis",
         json={"question": "What did Ada North sign?"},
     )
     assert r.status_code == 400, r.text
-    assert "99_DOES_NOT_EXIST.md" in r.text and "submodule" in r.text
+    assert "99_DOES_NOT_EXIST.md" in r.text and "Authority System Suite" in r.text
     with SessionLocal() as db:
         from app.models.domain import AIAnalysisCandidate
         assert db.query(AIAnalysisCandidate).filter_by(investigation_id=seeded["investigation"]["id"]).count() == 0, "nothing is persisted when the prompt cannot even be built"
@@ -336,6 +338,9 @@ def test_control_surface_flags_are_validated_before_any_llm_call(monkeypatch):
     bad_tier = client.post(url, json={"question": "What did Ada North sign?", "source_tier_floor": "Z"})
     assert bad_tier.status_code == 422, bad_tier.text
     assert "source_tier_floor" in bad_tier.text
+    # The suite never lets the floor go below D: E and F are leads only.
+    below_d = client.post(url, json={"question": "What did Ada North sign?", "source_tier_floor": "E"})
+    assert below_d.status_code == 422, below_d.text
     bad_severity = client.post(url, json={"question": "What did Ada North sign?", "severity_floor": "NONE"})
     assert bad_severity.status_code == 422, bad_severity.text
     assert "severity_floor" in bad_severity.text
@@ -344,11 +349,11 @@ def test_control_surface_flags_are_validated_before_any_llm_call(monkeypatch):
     # The service layer rejects flags outside the table too (routes are thin; this is the real gate).
     with pytest.raises(reasoning_module.ReasoningInputError):
         reasoning_module.normalize_control_flags({"auto_run_adversarial_gate": True})
-    assert reasoning_module.normalize_control_flags(None) == {"severity_floor": "ALL", "source_tier_floor": "C"}
+    assert reasoning_module.normalize_control_flags(None) == {"severity_floor": "ALL", "source_tier_floor": "D"}
     assert reasoning_module.normalize_control_flags({"source_tier_floor": "b", "severity_floor": None}) == {"severity_floor": "ALL", "source_tier_floor": "B"}
 
 
-@requires_tas_spec
+@requires_suite
 def test_control_surface_flags_reach_the_prompt_and_the_stored_request_without_touching_validation(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -381,7 +386,7 @@ def test_control_surface_flags_reach_the_prompt_and_the_stored_request_without_t
     monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: fake_bad)
     r2 = client.post(
         f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis",
-        json={"question": "What did Ada North sign?", "severity_floor": "BLOCKING", "source_tier_floor": "F"},
+        json={"question": "What did Ada North sign?", "severity_floor": "BLOCKING", "source_tier_floor": "D"},
     )
     assert r2.status_code == 422, r2.text
 
@@ -389,10 +394,10 @@ def test_control_surface_flags_reach_the_prompt_and_the_stored_request_without_t
 def test_settings_status_lists_the_supported_control_surface():
     settings.enable_ai_features = False
     settings.ai_provider = ""
-    cs = TestClient(app).get("/api/settings/status").json()["ai"]["tas_spec"]["control_surface"]
-    assert cs["spec_file"] == "CORE/CONTROL_SURFACE.md"
+    cs = TestClient(app).get("/api/settings/status").json()["ai"]["authority_suite"]["control_surface"]
+    assert cs["spec_file"] == "systems/tas/CORE/CONTROL_SURFACE.md"
     assert cs["flags"]["severity_floor"] == {"default": "ALL", "allowed": ["ALL", "MATERIAL", "BLOCKING"]}
-    assert cs["flags"]["source_tier_floor"]["default"] == "C" and cs["flags"]["source_tier_floor"]["allowed"] == list("ABCDEF")
+    assert cs["flags"]["source_tier_floor"]["default"] == "D" and cs["flags"]["source_tier_floor"]["allowed"] == list("ABCD")
 
 
 # --- Review fixes: provider-side failures, gating order, throttling ------------------------
@@ -407,7 +412,7 @@ class _FailingClient:
         raise LLMProviderError("anthropic request failed: APIConnectionError: boom")
 
 
-@requires_tas_spec
+@requires_suite
 def test_truncated_model_output_is_a_502_and_a_rejected_candidate_not_a_400(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -424,7 +429,7 @@ def test_truncated_model_output_is_a_502_and_a_rejected_candidate_not_a_400(monk
     assert full["request"]["model"] == "claude-test" and full["request"]["provider"] == "anthropic"
 
 
-@requires_tas_spec
+@requires_suite
 def test_prose_around_the_json_object_is_tolerated(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -437,7 +442,7 @@ def test_prose_around_the_json_object_is_tolerated(monkeypatch):
     assert r.json()["review_status"] == "proposed"
 
 
-@requires_tas_spec
+@requires_suite
 def test_provider_failure_is_a_502_without_vendor_text(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -475,12 +480,12 @@ def test_per_actor_rate_limit_refuses_before_the_provider_is_called(monkeypatch)
     seeded = _seeded_investigation(client)
     url = f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis"
     statuses = [client.post(url, json={"question": "What did Ada North sign?"}).status_code for _ in range(3)]
-    if _TAS_SPEC_PRESENT:
+    if _SUITE_PRESENT:
         assert statuses[:2] == [422, 422], statuses  # ran, then schema-rejected
     third = client.post(url, json={"question": "What did Ada North sign?"})
     assert statuses[2] == 429 and third.status_code == 429, (statuses, third.text)
     assert third.headers.get("retry-after", "").isdigit()
-    assert called["n"] == (2 if _TAS_SPEC_PRESENT else 0), "the third and fourth runs must never reach the provider"
+    assert called["n"] == (2 if _SUITE_PRESENT else 0), "the third and fourth runs must never reach the provider"
 
 
 def test_concurrency_cap_refuses_a_second_in_flight_run():
@@ -499,3 +504,31 @@ def test_concurrency_cap_refuses_a_second_in_flight_run():
         with governor.acquire("actor-a", settings):
             raise RuntimeError("provider blew up")
     assert governor.in_flight == 0
+
+
+def test_suite_value_lists_are_enforced_on_model_output():
+    """A classification, likelihood term, hypothesis kind or conflict type
+    outside the suite's lists is a malformed record (systems/tas/EVALUATION/OUTPUT_SCHEMAS.md)."""
+    claim = {"claim_id": "CLM-0001", "claim": "x", "classification": "UNRESOLVED_CONFLICT", "confidence": "LOW",
+             "confidence_term": "ROUGHLY_EVEN_CHANCE"}
+    assert reasoning_module.validate_output_shape("case_synthesis", {"executive_summary": "s", "claims": [claim]}) == []
+    bad = {**claim, "confidence_term": "PROBABLE"}
+    errors = reasoning_module.validate_output_shape("case_synthesis", {"executive_summary": "s", "claims": [bad]})
+    assert errors and "confidence_term" in errors[0]
+    hyp = {"hypothesis_id": "HYP-0001", "hypothesis": "h", "kind": "INNOCENT_EXPLANATION", "viable": True}
+    conflict = {"conflict_id": "CFLT-0001", "conflict_type": "DIRECT_CONTRADICTION"}
+    errors = reasoning_module.validate_output_shape("hypothesis_test", {"working_theory": "t", "hypothesis_matrix": [hyp],
+                                                                        "contradiction_log": [conflict], "conclusion": "c"})
+    assert errors == ["contradiction_log[0].conflict_type must be one of ['DIRECT CONTRADICTION', 'TEMPORAL CHANGE', "
+                      "'DEFINITIONAL MISMATCH', 'SCOPE DIFFERENCE', 'AMBIGUOUS', 'UNRESOLVED'], got 'DIRECT_CONTRADICTION'"]
+    schema = reasoning_module.module_json_schema("hypothesis_test")
+    row = schema["properties"]["contradiction_log"]["items"]["properties"]
+    assert row["conflict_type"]["enum"][0] == "DIRECT CONTRADICTION" and row["resolution"] == {}
+    assert schema["properties"]["hypothesis_matrix"]["items"]["properties"]["viable"] == {"type": "boolean"}
+
+
+def test_prompt_names_the_suite_and_its_tier_rules():
+    prompt = reasoning_module.build_system_prompt("case_synthesis", {}, None)
+    assert "Authority System Suite" in prompt and "source_tier_floor = D" in prompt
+    assert "Tier C never counts" in prompt and "UNRESOLVED_CONFLICT" in prompt and "CFLT-" not in prompt
+    assert "ALMOST_NO_CHANCE" in prompt and "right_of_reply_needed" in prompt

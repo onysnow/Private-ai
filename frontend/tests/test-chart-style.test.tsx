@@ -178,7 +178,7 @@ describe('a restyled chart on its slide', () => {
 describe('restyling a chart in a presentation draft', () => {
   const readyStatus: AiReasoningStatus = {
     enabled: true, provider: 'anthropic', provider_key_configured: true, endpoints_callable: true,
-    tas_spec: {present: true, version: '1.8', modules: {presentation_draft: {spec_file: 'presentation_modules/PRESENTATION_DRAFT.md', available: true}}},
+    authority_suite: {present: true, tas_version: '1.12', modules: {presentation_draft: {spec_file: 'presentation_modules/PRESENTATION_DRAFT.md', available: true}}},
   };
   // A chart as a stored draft carries it: the checker's report is always kept with it.
   const visual = {type: 'chart', ...stored.stacked_bar_100, report: {ok: true, errors: [], warnings: []}};

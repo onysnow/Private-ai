@@ -2567,3 +2567,32 @@ Built:
 **314 passed**, mypy + ruff clean; frontend 48 passed, tsc clean. Not verified from here: the
 .bat on a real Windows machine (batch edited blind -- the Docker detection uses
 `docker compose ps -q --status running workbench-db`, Compose v2).
+
+## 2026-10-10: the Authority System Suite replaces the tas_spec submodule (redesign step 2)
+
+Ony asked for the TAS submodule to be taken out and the newest Authority System Suite
+(onysnow/Authority-System-Suite) put in its place and reintegrated.
+
+- The `backend/app/ai/tas_spec` submodule and `.gitmodules` are gone. The suite is vendored as a
+  plain copy at `backend/app/ai/authority_suite/` (b1c71e8): `systems/` (TAS, RAS, QAS, LAS, DAS,
+  EGS, EHS) plus the root suite documents. `VENDORED_FROM` names the commit; `README_VENDORING.md`
+  says how to update it. A plain clone is now complete, and CI no longer needs `TAS_REPO_TOKEN`
+  (the fetch steps are removed from both workflows).
+- `app/ai/reasoning.py`: `SUITE_ROOT`/`TAS_ROOT`; prompts frame TAS as part of the suite; TAS
+  version read from the first `## <major>.<minor>` heading (1.12; dated directive entries above it
+  are skipped). The output contract follows the suite's `OUTPUT_SCHEMAS.md`: eight classifications
+  (adds UNRESOLVED_CONFLICT), `confidence_term` (seven likelihood terms) beside `confidence`,
+  Module 08's most-likely-failure statement and right-of-reply subjects (the model drafts
+  questions; a person makes the approach), Gap records (`GAP-`), hypothesis `kind`/`viable`/
+  ambiguous and non-diagnostic evidence, Conflict records (`CFLT-`, types spelled with spaces,
+  `resolution` null while open). Values outside the suite's lists are rejected as malformed.
+- `source_tier_floor`: default D, allowed A–D (the suite never lets it go below D; E and F are
+  leads only; Tier C never counts toward corroboration). The prompt block says so.
+- Status key `tas_spec` → `authority_suite` {present, source, tas_version, modules, control_surface}.
+- Tests: `test_tas_submodule_drift.py` → `test_authority_suite_drift.py`, which also checks the
+  app's value lists against the vendored suite text so an update that changes them fails CI.
+  Several reasoning-endpoint tests had been skipping here because the private submodule was not
+  checked out; with the suite always present they run, and two stale expectations were fixed.
+- Front end: the AI panel shows likelihood terms, hypothesis kind and viability, conflict sides
+  with their own evidence, open/resolved, gaps as records and right-of-reply subjects; Settings
+  shows the suite commit, TAS version and the tier-floor rule.

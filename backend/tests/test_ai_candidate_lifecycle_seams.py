@@ -2,7 +2,7 @@
 lifecycle seams every other investigation-owned record does: portable backup /
 restore, investigation deletion, and the remote authorization boundary.
 
-These run without the tas_spec submodule and without an LLM: rows are
+These run without the vendored suite and without an LLM: rows are
 inserted directly, since what is under test is where the rows travel, not
 how they are produced (that is tests/test_reasoning_endpoints.py).
 """
@@ -37,7 +37,7 @@ PAYLOAD = {
     "executive_summary": "One cited filing.",
     "claims": [{"claim_id": "CLM-0001", "claim": "Ada North signed.", "classification": "CORROBORATED_FACT",
                 "supporting_evidence": [{"record_type": "evidence", "record_id": "ev-1"}], "contradicting_evidence": [],
-                "warrant": "direct quote", "confidence": "HIGH", "confidence_basis": "x", "limitations": []}],
+                "warrant": "direct quote", "confidence": "HIGH", "confidence_term": "VERY_LIKELY", "confidence_basis": "x", "limitations": []}],
     "investigative_gaps": [],
 }
 

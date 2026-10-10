@@ -221,9 +221,9 @@ def tiles(settings: Settings) -> list[TileProvider]:
         last = db.execute(select(AIAnalysisCandidate.created_at, AIAnalysisCandidate.review_status).order_by(AIAnalysisCandidate.created_at.desc()).limit(1)).first()
         proposed = db.execute(select(func.count()).select_from(AIAnalysisCandidate).where(AIAnalysisCandidate.review_status == "proposed")).scalar_one()
         if status["endpoints_callable"]:
-            headline = f"{status['provider']} · {status['model']} · TAS v{status['tas_spec']['version']} · {proposed} awaiting review"
+            headline = f"{status['provider']} · {status['model']} · TAS v{status['authority_suite']['tas_version']} · {proposed} awaiting review"
         else:
-            headline = "not callable: " + ("disabled" if not status["enabled"] else ("no provider" if not status["provider"] else ("no key" if not status["provider_key_configured"] else "spec missing")))
+            headline = "not callable: " + ("disabled" if not status["enabled"] else ("no provider" if not status["provider"] else ("no key" if not status["provider_key_configured"] else "Authority System Suite missing")))
         return Tile(state=_state(True, not status["endpoints_callable"]), headline=headline,
                     details={**status, "last_run_at": last.created_at.isoformat() if last else None, "last_run_status": last.review_status if last else None, "proposed": int(proposed)}, section="config")
 

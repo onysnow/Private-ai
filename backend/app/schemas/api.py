@@ -287,7 +287,8 @@ class ExtractionCandidateReviewRequest(BaseModel):
 # schema and reject anything else at 422 before a route runs; app/ai/reasoning.py
 # normalize_control_flags() is still the service-layer gate for non-HTTP callers.
 SeverityFloor = Literal["ALL", "MATERIAL", "BLOCKING"]
-SourceTierFloor = Literal["A", "B", "C", "D", "E", "F"]
+# The suite never lets the floor go below D (E and F stay leads only).
+SourceTierFloor = Literal["A", "B", "C", "D"]
 
 
 class CaseSynthesisRequest(BaseModel):
@@ -304,7 +305,7 @@ class HypothesisTestRequest(BaseModel):
     max_results: int = Field(default=30, ge=1, le=100)
     include_external_leads: bool = True
     # TAS CONTROL_SURFACE §4 session flags; validated against the table in
-    # app/ai/reasoning.py (ALL|MATERIAL|BLOCKING; A-F). None = TAS default.
+    # app/ai/reasoning.py (ALL|MATERIAL|BLOCKING; A-D). None = the suite's default.
     severity_floor: SeverityFloor | None = None
     source_tier_floor: SourceTierFloor | None = None
 

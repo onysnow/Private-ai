@@ -96,10 +96,11 @@ On the first start, the `openaleph-setup` step creates OpenAleph's database and
 search indexes before its workers start; that takes several minutes. Later
 starts skip it unless the OpenAleph version changes.
 
-Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`). This repo has
-one git submodule ([`topic-authority-system`](https://github.com/onysnow/topic-authority-system)
-at `backend/app/ai/tas_spec/`); run `git submodule update --init --recursive` after
-cloning for full development.
+Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`). The AI
+prompts are built from the [Authority System Suite](https://github.com/onysnow/Authority-System-Suite),
+copied into `backend/app/ai/authority_suite/` at the commit named in its
+`VENDORED_FROM` file (code Apache-2.0, documents CC BY 4.0). There are no
+submodules; a plain clone is complete.
 
 ### Developer mode (no Docker)
 

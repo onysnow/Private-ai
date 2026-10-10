@@ -306,6 +306,33 @@ export type AiAnalysisCandidatesOut = {
 };
 
 /**
+ * AiAuthoritySuiteOut
+ *
+ * The vendored Authority System Suite: where it came from and the TAS version the prompts use.
+ */
+export type AiAuthoritySuiteOut = {
+  control_surface: AiControlSurfaceOut;
+  /**
+   * Modules
+   */
+  modules: {
+    [key: string]: AiModuleStatusOut;
+  };
+  /**
+   * Present
+   */
+  present: boolean;
+  /**
+   * Source
+   */
+  source: string | null;
+  /**
+   * Tas Version
+   */
+  tas_version: string | null;
+};
+
+/**
  * AiControlFlagOut
  */
 export type AiControlFlagOut = {
@@ -479,6 +506,7 @@ export type AiReasoningRunOut = {
  * matches the AI panel's own status type (lib/api-types.ts).
  */
 export type AiReasoningStatusOut = {
+  authority_suite: AiAuthoritySuiteOut;
   /**
    * Enabled
    */
@@ -508,28 +536,6 @@ export type AiReasoningStatusOut = {
    * Runs On This Computer
    */
   runs_on_this_computer: boolean | null;
-  tas_spec: AiTasSpecOut;
-};
-
-/**
- * AiTasSpecOut
- */
-export type AiTasSpecOut = {
-  control_surface: AiControlSurfaceOut;
-  /**
-   * Modules
-   */
-  modules: {
-    [key: string]: AiModuleStatusOut;
-  };
-  /**
-   * Present
-   */
-  present: boolean;
-  /**
-   * Version
-   */
-  version: string | null;
 };
 
 /**
@@ -1451,7 +1457,7 @@ export type CaseSynthesisRequest = {
   /**
    * Source Tier Floor
    */
-  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | null;
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
 };
 
 /**
@@ -7420,7 +7426,7 @@ export type HypothesisTestRequest = {
   /**
    * Source Tier Floor
    */
-  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | null;
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
   /**
    * Working Theory
    */

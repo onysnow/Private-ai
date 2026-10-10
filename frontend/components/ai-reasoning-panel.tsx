@@ -40,11 +40,11 @@ const MODULE_LABEL:Record<AiModuleName,string>={case_synthesis:'Case synthesis (
 const moduleLabel=(m:string):string=>(m in MODULE_LABEL?MODULE_LABEL[m as AiModuleName]:m);
 
 // presentation_draft is app-local (backend/app/ai/presentation_modules), not
-// vendored TAS content: it can run when the TAS spec isn't checked out, so
+// vendored suite content: it can run when the suite copy is missing, so
 // callability is decided per module rather than from endpoints_callable alone.
 export function moduleCallable(status:AiReasoningStatus|null|undefined,module:AiModuleName):boolean{
   if(!status||!status.enabled||!status.provider||!status.provider_key_configured)return false;
-  if(module==='presentation_draft')return status.tas_spec.modules.presentation_draft?.available!==false;
+  if(module==='presentation_draft')return status.authority_suite.modules.presentation_draft?.available!==false;
   return Boolean(status.endpoints_callable);
 }
 
@@ -73,6 +73,17 @@ export function WritingReport({report}:{report:JsonObject|null}):ReactElement|nu
 const asArr=(v:JsonValue|undefined):JsonValue[]=>Array.isArray(v)?v:[];
 const asStr=(v:JsonValue|undefined):string=>typeof v==='string'?v:(v===undefined||v===null?'':JSON.stringify(v));
 const refLabel=(v:JsonValue):string=>{const o=asObj(v);return o?`${asStr(o.record_type)}:${asStr(o.record_id)}`:asStr(v)};
+const refs=(v:JsonValue|undefined):string=>asArr(v).map(refLabel).join(', ')||'none';
+// The suite's fixed values, in words (systems/tas/EVALUATION/OUTPUT_SCHEMAS.md).
+// Unknown values (older runs) are shown as sent.
+export const words=(v:JsonValue|undefined):string=>{const s=asStr(v);return /^[A-Z_ ]+$/.test(s)?(s.charAt(0)+s.slice(1).toLowerCase()).replace(/_/g,' '):s};
+/** A gap is a Gap record ({gap_id, unresolved_question, …}) since the suite; older runs sent a sentence. */
+const gapText=(g:JsonValue):string=>{const o=asObj(g);if(!o)return asStr(g);
+  const head=[asStr(o.gap_id),asStr(o.unresolved_question)].filter(Boolean).join(' · ');
+  const need=asStr(o.needed_record_or_testimony);const on=asArr(o.bears_on).map(asStr).join(', ');
+  return `${head}${need?` — needs ${need}`:''}${on?` (bears on ${on})`:''}`};
+/** A contradiction side is {statement, evidence} since the suite; older runs sent a string plus a shared evidence list. */
+const sideText=(v:JsonValue|undefined):string=>{const o=asObj(v);return o?`${asStr(o.statement)} [${refs(o.evidence)}]`:asStr(v)};
 
 // Which computer reads the evidence the model is sent (Foundation Fixes fix 4).
 // Which computer answers (Foundation Fixes fix 4): the settings page shows the same words.
@@ -84,11 +95,12 @@ export function describeAiStatus(status:AiReasoningStatus|null|undefined):string
   if(!status.enabled)return 'AI reasoning is disabled on this deployment (ENABLE_AI_FEATURES is off). The core workbench does not need it.';
   if(!status.provider)return 'AI reasoning is enabled but no provider is selected (AI_PROVIDER must be anthropic, openai or ollama).';
   if(!status.provider_key_configured)return status.provider==='ollama'?'Ollama is selected but no model is chosen (OLLAMA_MODEL must name a model installed in Ollama).':`AI provider "${status.provider}" is selected but its API key is not configured.`;
-  const draftAvailable=status.tas_spec.modules.presentation_draft?.available===true;
-  if(!status.tas_spec.present)return draftAvailable?'The vendored TAS spec (backend/app/ai/tas_spec) is not checked out, so case synthesis and hypothesis tests cannot run. Presentation drafts do not use it and are available.':'The vendored TAS spec (backend/app/ai/tas_spec) is not checked out, so prompts cannot be built.';
-  const missing=Object.entries(status.tas_spec.modules).filter(([,m])=>!m.available).map(([name])=>name);
-  if(missing.length)return `TAS module file(s) missing from the vendored spec: ${missing.join(', ')}.`;
-  return `Ready: provider ${status.provider}${status.model?`, model ${status.model}`:''}${whereItRuns(status)}, TAS spec v${status.tas_spec.version||'?'} vendored.`;
+  const suite=status.authority_suite;
+  const draftAvailable=suite.modules.presentation_draft?.available===true;
+  if(!suite.present)return draftAvailable?'The Authority System Suite copy (backend/app/ai/authority_suite) is missing, so case synthesis and hypothesis tests cannot run. Presentation drafts do not use it and are available.':'The Authority System Suite copy (backend/app/ai/authority_suite) is missing, so prompts cannot be built.';
+  const missing=Object.entries(suite.modules).filter(([,m])=>!m.available).map(([name])=>name);
+  if(missing.length)return `Module file(s) missing from the Authority System Suite copy: ${missing.join(', ')}.`;
+  return `Ready: provider ${status.provider}${status.model?`, model ${status.model}`:''}${whereItRuns(status)}, Authority System Suite (TAS v${suite.tas_version||'?'}).`;
 }
 
 export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Props):ReactElement{
@@ -278,6 +290,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   const hypotheses=asArr(payload?.hypothesis_matrix);
   const conflicts=asArr(payload?.contradiction_log);
   const gaps=asArr(payload?.investigative_gaps);
+  const replies=asArr(payload?.right_of_reply_needed);
   const isPresentationDraft=selected?.module==='presentation_draft';
 
   return <Card className="card" data-testid="ai-reasoning-panel"><CardHeader className="pb-3"><CardTitle>AI reasoning &amp; presentations</CardTitle>
@@ -324,26 +337,33 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
                 chartLooks={chartLooks} chartProblems={chartProblems}/>
             </div>}
             {claims.map((raw,i)=>{const cl=asObj(raw);if(!cl)return null;return <div className="candidate" key={asStr(cl.claim_id)||String(i)}>
-              <b>{asStr(cl.claim_id)||`Claim ${i+1}`}</b> <small>{asStr(cl.classification)} · confidence {asStr(cl.confidence)}</small>
+              <b>{asStr(cl.claim_id)||`Claim ${i+1}`}</b> <small>{words(cl.classification)} · {cl.confidence_term?`${words(cl.confidence_term)} · `:''}confidence {words(cl.confidence)}</small>
               <div>{asStr(cl.claim)}</div>
               {asStr(cl.warrant)&&<div><b>Warrant:</b> {asStr(cl.warrant)}</div>}
+              {asStr(cl.confidence_basis)&&<div><b>Why this confidence:</b> {asStr(cl.confidence_basis)}</div>}
               <small>Supports: {asArr(cl.supporting_evidence).map(refLabel).join(', ')||'none'} · Contradicts: {asArr(cl.contradicting_evidence).map(refLabel).join(', ')||'none'}</small>
             </div>})}
             {hypotheses.map((raw,i)=>{const h=asObj(raw);if(!h)return null;return <div className="candidate" key={asStr(h.hypothesis_id)||String(i)}>
-              <b>{asStr(h.hypothesis_id)||`Hypothesis ${i+1}`}</b> <small>{asStr(h.diagnostic_value)}</small>
+              <b>{asStr(h.hypothesis_id)||`Hypothesis ${i+1}`}</b> <small>{[h.kind?words(h.kind):'',typeof h.viable==='boolean'?(h.viable?'still viable':'no longer viable'):'',asStr(h.diagnostic_value)].filter(Boolean).join(' · ')}</small>
               <div>{asStr(h.hypothesis)}</div>
               {asStr(h.assessment)&&<div><b>Assessment:</b> {asStr(h.assessment)}</div>}
               {asArr(h.falsifiers).length>0&&<div><b>Falsifiers:</b> {asArr(h.falsifiers).map(asStr).join(' · ')}</div>}
               {asArr(h.missing_records).length>0&&<div><b>Missing records:</b> {asArr(h.missing_records).map(asStr).join(' · ')}</div>}
-              <small>Supports: {asArr(h.supporting_evidence).map(refLabel).join(', ')||'none'} · Contradicts: {asArr(h.contradicting_evidence).map(refLabel).join(', ')||'none'}</small>
+              <small>Supports: {refs(h.supporting_evidence)} · Contradicts: {refs(h.contradicting_evidence)}{asArr(h.ambiguous_evidence).length?` · Ambiguous: ${refs(h.ambiguous_evidence)}`:''}{asArr(h.non_diagnostic_evidence).length?` · Fits every hypothesis (not counted): ${refs(h.non_diagnostic_evidence)}`:''}</small>
             </div>})}
             {conflicts.map((raw,i)=>{const c=asObj(raw);if(!c)return null;return <div className="candidate" key={asStr(c.conflict_id)||String(i)}>
-              <b>{asStr(c.conflict_id)||`Conflict ${i+1}`}</b> <small>{asStr(c.conflict_type)} · {asStr(c.resolution_status)}</small>
-              <div>A: {asStr(c.statement_a)}</div><div>B: {asStr(c.statement_b)}</div>
-              <small>Evidence: {asArr(c.evidence).map(refLabel).join(', ')||'none'}</small>
+              <b>{asStr(c.conflict_id)||`Conflict ${i+1}`}</b> <small>{words(c.conflict_type)} · {'resolution' in c?(c.resolution===null?'open':asStr(c.resolution)):asStr(c.resolution_status)}</small>
+              <div>A: {sideText(c.statement_a)}</div><div>B: {sideText(c.statement_b)}</div>
+              {asStr(c.same_proposition_basis)&&<small>Same proposition? {asStr(c.same_proposition_basis)}</small>}
+              {asArr(c.evidence).length>0&&<small>Evidence: {refs(c.evidence)}</small>}
             </div>})}
             {payload&&'conclusion' in payload&&<p><b>Conclusion:</b> {asStr(payload.conclusion)}</p>}
-            {gaps.length>0&&<div><b>Investigative gaps:</b><ul>{gaps.map((g,i)=><li key={i}>{asStr(g)}</li>)}</ul></div>}
+            {payload&&asStr(payload.most_likely_failure)&&<p><b>Most likely way this is wrong:</b> {asStr(payload.most_likely_failure)}</p>}
+            {replies.length>0&&<div data-testid="right-of-reply"><b>Right of reply needed before publishing:</b><ul>{replies.map((raw,i)=>{const r=asObj(raw);if(!r)return null;
+              return <li key={i}>{asStr(r.subject)} · on {asArr(r.claim_ids).map(asStr).join(', ')||'—'}{asStr(r.what_will_be_said)?`: ${asStr(r.what_will_be_said)}`:''}
+                {asArr(r.draft_questions).length>0&&<div><small>Questions a person could ask: {asArr(r.draft_questions).map(asStr).join(' · ')}</small></div>}</li>})}</ul>
+              <small className="muted">A person makes the approach and records the answer; the AI never does.</small></div>}
+            {gaps.length>0&&<div><b>Investigative gaps:</b><ul>{gaps.map((g,i)=><li key={i}>{gapText(g)}</li>)}</ul></div>}
             <details><summary className="muted">Checked against {selected.checked_citation_ids.length} citation id(s) · raw payload</summary><pre style={{whiteSpace:'pre-wrap',fontSize:12}}>{JSON.stringify(payload,null,2)}</pre></details>
             {selected.trace&&<details data-testid="ai-trace"><summary className="muted">What the model was sent · {asStr(selected.trace.response&&asObj(selected.trace.response)?.model)}{selected.trace.response&&asObj(selected.trace.response)?.truncated?' · truncated':''}</summary>
               <div className="muted"><b>System prompt</b></div><pre style={{whiteSpace:'pre-wrap',fontSize:11,maxHeight:300,overflowY:'auto'}}>{asStr(selected.trace.system_prompt)}</pre>

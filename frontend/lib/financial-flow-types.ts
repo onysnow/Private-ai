@@ -1,7 +1,7 @@
 // STRUCT-0040 / issue #40: types for the financial flow chart.
 //
 // Grounded directly in the TAS Financial Flow Analysis module's transaction
-// ledger columns (backend/app/ai/tas_spec/PROMPT_MODULES/05_FINANCIAL_FLOW_ANALYSIS.md,
+// ledger columns (backend/app/ai/authority_suite/systems/tas/PROMPT_MODULES/05_FINANCIAL_FLOW_ANALYSIS.md,
 // section A): "TXN ID | Date/time | From | To | Amount | Currency |
 // Instrument/account | Intermediary | Stated purpose | Evidence and
 // pinpoint | Status/limitation". Section D (documented flow diagram) also

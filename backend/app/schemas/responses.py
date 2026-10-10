@@ -2638,9 +2638,11 @@ class AiControlSurfaceOut(ResponseModel):
     flags: dict[str, AiControlFlagOut]
 
 
-class AiTasSpecOut(ResponseModel):
+class AiAuthoritySuiteOut(ResponseModel):
+    """The vendored Authority System Suite: where it came from and the TAS version the prompts use."""
     present: bool
-    version: str | None
+    source: str | None
+    tas_version: str | None
     modules: dict[str, AiModuleStatusOut]
     control_surface: AiControlSurfaceOut
 
@@ -2658,7 +2660,7 @@ class AiReasoningStatusOut(ResponseModel):
     runs_on_this_computer: bool | None
     remote_endpoint_allowed: bool
     limits: AiLimitsOut
-    tas_spec: AiTasSpecOut
+    authority_suite: AiAuthoritySuiteOut
 
 
 class ConnectorCredentialStatusOut(ResponseModel):

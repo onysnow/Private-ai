@@ -277,6 +277,12 @@ function Settings(): ReactElement {
             {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}
           </p>
         )}
+        {status?.ai?.authority_suite?.present && (
+          <p className="mt-2 text-sm" data-testid="authority-suite">
+            Rules the AI works under: the Authority System Suite{status.ai.authority_suite.source ? <> (<code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code>)</> : null}, TAS v{status.ai.authority_suite.tas_version ?? '?'}.
+            Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.
+          </p>
+        )}
       </div>
 
       <div className="mt-8 rounded-xl border border-border bg-card p-5">

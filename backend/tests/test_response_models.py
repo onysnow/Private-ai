@@ -928,7 +928,7 @@ def test_settings_and_security_replies(demo, tmp_path, monkeypatch):
 
     for local in (True, False):
         status = get_settings_status(db, local=local)
-        assert status["security"]["total_denials"] == 1 and status["ai"]["tas_spec"]["modules"]
+        assert status["security"]["total_denials"] == 1 and status["ai"]["authority_suite"]["modules"]
         _same_through_model(r.SettingsStatusOut, status)
     _same_through_model(r.SecurityAlertsOut, security_alerts(window_hours=48.0, max_examples=5))
     _same_through_model(r.SecurityAlertsOut, recent_security_denials(audit_file, window_hours=48.0, max_examples=5, now=now))

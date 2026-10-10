@@ -45,33 +45,39 @@ from app.visuals.spec import DRAWN_KINDS, QUESTIONS, spec_errors
 CHART_SCHEMA_QUESTIONS = "|".join(q.id for q in QUESTIONS.values() if any(k in DRAWN_KINDS for k in q.kinds))
 CHART_SCHEMA_KINDS = "|".join(dict.fromkeys(k.value for q in QUESTIONS.values() for k in q.kinds if k in DRAWN_KINDS))
 
-TAS_SPEC_ROOT = Path(__file__).resolve().parent / "tas_spec"
-# App-local reasoning module content -- not part of the vendored TAS spec,
+# The Authority System Suite (onysnow/Authority-System-Suite), vendored as a
+# plain copy at the commit in authority_suite/VENDORED_FROM. It replaced the
+# old tas_spec submodule, which held the Topic Authority System alone. The
+# prompts are built from TAS, the suite's investigative system; the other
+# systems (RAS, QAS, LAS, DAS, EGS, EHS) are kept so the hand-offs TAS names
+# in INTEROP.md resolve. See authority_suite/README_VENDORING.md to update it.
+SUITE_ROOT = Path(__file__).resolve().parent / "authority_suite"
+TAS_ROOT = SUITE_ROOT / "systems" / "tas"
+# App-local reasoning module content -- not part of the vendored suite,
 # not numbered or governed by TAS's CONTROL_SURFACE. See PRESENTATION_DRAFT.md
-# for why this is kept separate rather than added to tas_spec: it serves a
+# for why this is kept separate rather than added to TAS: it serves a
 # workflow (evidence + goal -> brief/deck) that TAS itself doesn't define,
 # and formalizing it into TAS proper, if that ever happens, is a decision
-# for the tas_spec repo's own owner, not something this app does on its own.
+# for the suite's own owner, not something this app does on its own.
 APP_MODULES_ROOT = Path(__file__).resolve().parent / "presentation_modules"
 
-# STRUCT-0025: tests/test_tas_submodule_drift.py verifies every path below
-# still resolves inside the pinned tas_spec submodule commit. If you bump the
-# submodule pin (or wire up a new TAS module here), run that test locally
-# first -- an upstream rename/restructure should fail there, not silently at
+# STRUCT-0025: tests/test_authority_suite_drift.py verifies every path below
+# still resolves inside the vendored suite. If you update the vendored copy
+# (or wire up a new TAS module here), run that test locally first -- an upstream rename/restructure should fail there, not silently at
 # request time with a FileNotFoundError. That drift test only covers
 # TAS_MODULES below; an app-local module's file moving is caught the plain
 # way, by _read() raising when the path doesn't exist.
 MODULE_FILES = {
-    "case_synthesis": TAS_SPEC_ROOT / "PROMPT_MODULES" / "08_CASE_SYNTHESIS.md",
-    "hypothesis_test": TAS_SPEC_ROOT / "PROMPT_MODULES" / "06_HYPOTHESIS_AND_CONTRADICTION_TESTING.md",
+    "case_synthesis": TAS_ROOT / "PROMPT_MODULES" / "08_CASE_SYNTHESIS.md",
+    "hypothesis_test": TAS_ROOT / "PROMPT_MODULES" / "06_HYPOTHESIS_AND_CONTRADICTION_TESTING.md",
     "presentation_draft": APP_MODULES_ROOT / "PRESENTATION_DRAFT.md",
 }
 
-# Which modules are vendored TAS content (pinned submodule) vs. this app's
+# Which modules are vendored TAS content (the suite copy) vs. this app's
 # own prompt content. Drives build_system_prompt()'s framing text and
 # CONTROL_SURFACE flag availability, and ai_reasoning_status()'s TAS-relative
-# path reporting -- a module outside tas_spec was never meant to resolve
-# relative to TAS_SPEC_ROOT.
+# path reporting -- a module outside the suite was never meant to resolve
+# relative to SUITE_ROOT.
 TAS_MODULES = {"case_synthesis", "hypothesis_test"}
 
 # The JSON contract each module's model call must return. Kept separate from
@@ -82,24 +88,60 @@ TAS_MODULES = {"case_synthesis", "hypothesis_test"}
 QUOTE_RULE = ("string - copied word for word from that record's text in the packet's record_texts "
               "(at least 3 words); it must show the point it supports")
 
+# The suite's record shapes (systems/tas/EVALUATION/OUTPUT_SCHEMAS.md), trimmed
+# to what one call over a retrieval packet can honestly fill. Evidence is
+# always a list of the packet's own {record_type, record_id} pairs.
+CLASSIFICATIONS = ("SOURCE_STATEMENT", "CORROBORATED_FACT", "ALLEGATION", "INFERENCE", "HYPOTHESIS", "UNKNOWN",
+                   "NEGATIVE_SEARCH_RESULT", "UNRESOLVED_CONFLICT")
+CONFIDENCE_LEVELS = ("LOW", "MEDIUM", "HIGH")
+# CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md: seven likelihood terms.
+CONFIDENCE_TERMS = ("ALMOST_CERTAIN", "VERY_LIKELY", "LIKELY", "ROUGHLY_EVEN_CHANCE", "UNLIKELY", "VERY_UNLIKELY",
+                    "ALMOST_NO_CHANCE")
+HYPOTHESIS_KINDS = ("WORKING_THEORY", "INNOCENT_EXPLANATION", "ALTERNATIVE_ATTRIBUTION", "DATA_QUALITY", "OTHER")
+# Spelled as Module 06 spells them, with spaces.
+CONFLICT_TYPES = ("DIRECT CONTRADICTION", "TEMPORAL CHANGE", "DEFINITIONAL MISMATCH", "SCOPE DIFFERENCE", "AMBIGUOUS",
+                  "UNRESOLVED")
+_REF = {"record_type": "string", "record_id": "string"}
+
+GAP_RECORD = {
+    "gap_id": "string, e.g. GAP-0001",
+    "unresolved_question": "string",
+    "bears_on": ["string - the CLM- or HYP- ids this gap is tied to"],
+    "why_material": "string",
+    "needed_record_or_testimony": "string",
+    "record_existence": "KNOWN|BELIEVED",
+    "could_confirm_or_refute": "string",
+}
+
 OUTPUT_SCHEMAS = {
     "case_synthesis": {
         "executive_summary": "string",
         "scope_and_limitations": "string",
+        "most_likely_failure": "string - Module 08 rule 9: the single most likely way this report could be shown wrong, overstated or missing something material, and whether the evidence in hand addresses it",
         "claims": [
             {
                 "claim_id": "string, e.g. CLM-0001",
                 "claim": "string",
-                "classification": "SOURCE_STATEMENT|CORROBORATED_FACT|ALLEGATION|INFERENCE|HYPOTHESIS|UNKNOWN|NEGATIVE_SEARCH_RESULT",
-                "supporting_evidence": [{"record_type": "string", "record_id": "string"}],
-                "contradicting_evidence": [{"record_type": "string", "record_id": "string"}],
+                "classification": "|".join(CLASSIFICATIONS),
+                "supporting_evidence": [_REF],
+                "contradicting_evidence": [_REF],
                 "warrant": "string - why the cited evidence supports THIS claim, not just that it's related",
-                "confidence": "LOW|MEDIUM|HIGH",
-                "confidence_basis": "string",
+                "assumptions": ["string"],
+                "confidence": "|".join(CONFIDENCE_LEVELS) + " - the weight the evidence can bear",
+                "confidence_term": "|".join(CONFIDENCE_TERMS) + " - how likely the claim is; not derived from confidence",
+                "confidence_basis": "string - why each of confidence and confidence_term holds",
                 "limitations": ["string"],
             }
         ],
-        "investigative_gaps": ["string"],
+        "right_of_reply_needed": [
+            {
+                "subject": "string - the identifiable person or organization a finding accuses or states adverse conduct by",
+                "claim_ids": ["string - CLM- ids put to them"],
+                "what_will_be_said": "string",
+                "draft_questions": ["string - questions a person could put to them; you never make the approach"],
+            }
+        ],
+        "investigative_gaps": [GAP_RECORD],
     },
     "hypothesis_test": {
         "working_theory": "string - restates the hypothesis under test",
@@ -107,24 +149,30 @@ OUTPUT_SCHEMAS = {
             {
                 "hypothesis_id": "string, e.g. HYP-0001",
                 "hypothesis": "string",
-                "supporting_evidence": [{"record_type": "string", "record_id": "string"}],
-                "contradicting_evidence": [{"record_type": "string", "record_id": "string"}],
-                "diagnostic_value": "string - non-diagnostic if consistent with every live hypothesis",
+                "kind": "|".join(HYPOTHESIS_KINDS),
+                "supporting_evidence": [_REF],
+                "contradicting_evidence": [_REF],
+                "ambiguous_evidence": [_REF],
+                "non_diagnostic_evidence": [_REF],
                 "assumptions": ["string"],
                 "falsifiers": ["string"],
-                "missing_records": ["string"],
-                "assessment": "string",
+                "missing_records": ["string - what record would test it, or a GAP- id"],
+                "viable": "boolean - still live on this evidence",
+                "assessment": "string - its standing in calibrated words; never restated as fact",
+                "limitations": ["string"],
             }
         ],
         "contradiction_log": [
             {
-                "conflict_id": "string, e.g. CONF-0001",
-                "statement_a": "string",
-                "statement_b": "string",
+                "conflict_id": "string, e.g. CFLT-0001",
+                "statement_a": {"statement": "string", "evidence": [_REF]},
+                "statement_b": {"statement": "string", "evidence": [_REF]},
                 "same_proposition": "boolean",
-                "conflict_type": "DIRECT_CONTRADICTION|TEMPORAL_CHANGE|DEFINITIONAL_MISMATCH|SCOPE_DIFFERENCE|AMBIGUOUS|UNRESOLVED",
-                "evidence": [{"record_type": "string", "record_id": "string"}],
-                "resolution_status": "string",
+                "same_proposition_basis": "string - same entity, event, period, amount definition, accounting basis, document version, question and scope?",
+                "conflict_type": "|".join(CONFLICT_TYPES),
+                "resolution": "null, OR string - how it was resolved; null while the conflict is open",
+                "resolving_evidence": [_REF],
+                "limitations": ["string"],
             }
         ],
         "conclusion": "string - which hypotheses remain viable and why; never state the leading one as fact",
@@ -221,14 +269,16 @@ def _validate_presentation_visuals(payload: dict) -> list[str]:
     return errors
 
 
-# TAS v1.9 CORE/CONTROL_SURFACE.md §4 defines five session flags. Only the two
+# TAS CORE/CONTROL_SURFACE.md §4 defines the session flags. Only the two
 # that change what a JSON reasoning call *means* are exposed as request options
 # here; the rest either have no runtime in this app or would collide with the
 # output contract:
 #   severity_floor      -> which finding severities block a "complete" claim
 #                          (BLOCKING is always enforced; this can only ADD).
-#   source_tier_floor   -> minimum source tier (A-F) that may on its own carry a
-#                          CORROBORATED_FACT label; lower tiers stay visible as leads.
+#   source_tier_floor   -> lowest source tier that may COUNT TOWARD the
+#                          independent-source requirement for CORROBORATED_FACT.
+#                          Default D; never below D (E and F are leads only);
+#                          Tier C never counts at any floor (it defines methods).
 #   show_reasoning_chain   NOT exposed: warrant/confidence_basis/assumptions are
 #                          required fields of OUTPUT_SCHEMAS, so "hide the chain"
 #                          would mean relaxing schema validation -- a §2 violation.
@@ -238,10 +288,10 @@ def _validate_presentation_visuals(payload: dict) -> list[str]:
 # non-negotiable evidence rule. The prompt block in build_system_prompt() says so
 # to the model in as many words, and the citation/schema validators run
 # identically whatever the flags are.
-CONTROL_SURFACE_FILE = TAS_SPEC_ROOT / "CORE" / "CONTROL_SURFACE.md"
+CONTROL_SURFACE_FILE = TAS_ROOT / "CORE" / "CONTROL_SURFACE.md"
 CONTROL_SURFACE_FLAGS: dict[str, dict] = {
     "severity_floor": {"default": "ALL", "allowed": ("ALL", "MATERIAL", "BLOCKING")},
-    "source_tier_floor": {"default": "C", "allowed": ("A", "B", "C", "D", "E", "F")},
+    "source_tier_floor": {"default": "D", "allowed": ("A", "B", "C", "D")},
 }
 
 
@@ -275,14 +325,19 @@ def _control_surface_prompt_block(flags: dict[str, str]) -> str:
 they never weaken, skip, or make optional any evidence rule above):
 - severity_floor = {severity}: {severity_text}. BLOCKING findings are enforced
   regardless of this setting.
-- source_tier_floor = {tier}: a claim may carry the CORROBORATED_FACT
-  classification on the strength of its cited sources alone only when at least
-  one supporting source is tier {tier} or higher on the A-F table in
-  CORE/SOURCE_AUTHORITY_AND_RETRIEVAL_POLICY.md §3 (A = authenticated/official
-  primary records ... F = social posts, anonymous tips). Evidence from sources
-  below tier {tier} stays fully visible and citable and may generate leads,
-  INFERENCE or HYPOTHESIS claims, but may never silently override higher-tier
-  evidence, and a claim resting only on it must say so in its limitations.
+- source_tier_floor = {tier}: only sources of tier {tier} or higher on the A-F
+  table in CORE/SOURCE_AUTHORITY_AND_RETRIEVAL_POLICY.md §3 may count toward
+  the independent-source requirement for the CORROBORATED_FACT label
+  (Standard §4.3). Tier C never counts toward it, at any floor: it defines
+  methods and terminology, not case facts. The floor never lets one source
+  stand as corroboration on its own: CORROBORATED_FACT still needs multiple
+  independent reliable sources, or one Tier A source for a proposition of the
+  kind that tier establishes; restatements of one original count as one
+  source; testimony stays an ALLEGATION until independently established.
+  Tiers E and F are leads only. Lower-tier evidence stays visible and citable
+  and may generate leads, INFERENCE or HYPOTHESIS claims, but may never
+  silently override higher-tier evidence, and a claim resting only on it
+  must say so in its limitations.
 """
 
 
@@ -354,11 +409,11 @@ REJECTION_REASONS = {
 _REQUIRED_SHAPE: dict[str, dict[str, type | tuple[type, dict[str, type]]]] = {
     "case_synthesis": {
         "executive_summary": str,
-        "claims": (list, {"claim_id": str, "claim": str, "classification": str, "confidence": str}),
+        "claims": (list, {"claim_id": str, "claim": str, "classification": str, "confidence": str, "confidence_term": str}),
     },
     "hypothesis_test": {
         "working_theory": str,
-        "hypothesis_matrix": (list, {"hypothesis_id": str, "hypothesis": str}),
+        "hypothesis_matrix": (list, {"hypothesis_id": str, "hypothesis": str, "kind": str, "viable": bool}),
         "contradiction_log": (list, {"conflict_id": str, "conflict_type": str}),
         "conclusion": str,
     },
@@ -386,9 +441,9 @@ def _json_schema_from_example(node: Any) -> dict[str, Any]:
         return {"type": "boolean"}
     if text.startswith("number"):
         return {"type": "number"}
-    choices = text.split(" ")[0]
-    if re.fullmatch(r"[A-Z_]+(\|[A-Z_]+)+", choices):
-        return {"type": "string", "enum": choices.split("|")}
+    choices = re.match(r"[A-Z][A-Z_ ]*[A-Z_](?:\|[A-Z][A-Z_ ]*[A-Z_])+", text)
+    if choices:
+        return {"type": "string", "enum": choices.group(0).split("|")}
     return {"type": "string"}
 
 
@@ -423,24 +478,45 @@ def validate_output_shape(module: str, payload: dict) -> list[str]:
             errors.append(f"field {key!r} must be a {expected.__name__}")
     if module == "presentation_draft" and not errors:
         errors.extend(_validate_presentation_visuals(payload))
+    if not errors:
+        errors.extend(_validate_suite_values(module, payload))
+    return errors
+
+
+# Values the suite fixes: a classification, confidence or conflict type
+# outside its list is a malformed record, not a stylistic choice.
+_SUITE_VALUES: dict[str, list[tuple[str, str, tuple[str, ...]]]] = {
+    "case_synthesis": [("claims", "classification", CLASSIFICATIONS), ("claims", "confidence", CONFIDENCE_LEVELS),
+                       ("claims", "confidence_term", CONFIDENCE_TERMS)],
+    "hypothesis_test": [("hypothesis_matrix", "kind", HYPOTHESIS_KINDS), ("contradiction_log", "conflict_type", CONFLICT_TYPES)],
+}
+
+
+def _validate_suite_values(module: str, payload: dict) -> list[str]:
+    errors: list[str] = []
+    for list_key, field, allowed in _SUITE_VALUES.get(module, []):
+        for i, item in enumerate(payload.get(list_key) or []):
+            value = item.get(field) if isinstance(item, dict) else None
+            if value is not None and value not in allowed:
+                errors.append(f"{list_key}[{i}].{field} must be one of {list(allowed)}, got {value!r}")
     return errors
 
 
 def _read(path: Path) -> str:
     """Read one module's prompt file. A missing file for a vendored TAS
-    module (see TAS_MODULES) means the tas_spec submodule is not checked
-    out, or was restructured upstream -- STRUCT-0025 drift test. A missing
+    module (see TAS_MODULES) means the vendored suite copy is incomplete,
+    or was restructured upstream -- STRUCT-0025 drift test. A missing
     file for an app-local module means it was moved or deleted outside
-    that submodule entirely. Either way, surface a 400-class input error
+    the suite entirely. Either way, surface a 400-class input error
     with the path named, not a 500 from deep inside the request."""
     try:
         return path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
-        if path.is_relative_to(TAS_SPEC_ROOT):
-            rel = path.relative_to(TAS_SPEC_ROOT)
+        if path.is_relative_to(SUITE_ROOT):
+            rel = path.relative_to(SUITE_ROOT)
             raise ReasoningInputError(
-                f"vendored TAS spec file {str(rel)!r} is missing -- the backend/app/ai/tas_spec submodule is not checked out "
-                "(git submodule update --init) or no longer matches app/ai/reasoning.py MODULE_FILES"
+                f"vendored Authority System Suite file {str(rel)!r} is missing -- backend/app/ai/authority_suite is "
+                "incomplete or no longer matches app/ai/reasoning.py MODULE_FILES"
             ) from exc
         raise ReasoningInputError(
             f"module prompt file {str(path)!r} is missing -- it no longer matches app/ai/reasoning.py MODULE_FILES"
@@ -454,9 +530,9 @@ def build_system_prompt(module: str, reasoning_contract: dict, control_flags: di
     concatenated, so the model never sees two rule sets that could read
     as being in tension (issue #36 point 2).
 
-    A TAS module (see TAS_MODULES) gets TAS's own framing language and its
+    A TAS module (see TAS_MODULES) gets the suite's own framing language and its
     CONTROL_SURFACE flags block; an app-local module (presentation_draft)
-    gets neither -- it isn't part of the vendored spec and CONTROL_SURFACE
+    gets neither -- it isn't part of the vendored suite and CONTROL_SURFACE
     is a TAS CORE concept with no runtime meaning outside it. Both still
     get the same non-negotiable evidence-authority rules and output
     contract below -- that part of this function's job doesn't change.
@@ -469,9 +545,11 @@ def build_system_prompt(module: str, reasoning_contract: dict, control_flags: di
 
     if module in TAS_MODULES:
         flags_block = _control_surface_prompt_block(normalize_control_flags(control_flags))
-        framing = f"""You are operating under the Topic Authority System (TAS) — Investigative
-& Legal-Document Evidence Edition. The following module defines your task,
-required rules, and the report structure a human reviewer expects:
+        framing = f"""You are operating under the Topic Authority System (TAS), the investigative
+system of the Authority System Suite (Investigative & Legal-Document Evidence
+Edition). The following module defines your task, required rules, and the
+report structure a human reviewer expects. Return its content as the JSON
+records in the OUTPUT CONTRACT below, not as a markdown report:
 
 {module_text}
 """
@@ -961,21 +1039,33 @@ def list_ai_analysis_candidates(
 
 @lru_cache(maxsize=1)
 def _vendored_tas_version() -> str | None:
-    """The first '## <version>' heading in the vendored CHANGELOG, e.g. '1.8'.
-    None when the submodule is not checked out (CI without TAS_REPO_TOKEN)."""
-    changelog = TAS_SPEC_ROOT / "CHANGELOG.md"
+    """The first '## <major>.<minor>' heading in TAS's CHANGELOG, e.g. '1.12'.
+    Dated directive entries ('## 2026-10-10 — DIR-0044 ...') above it are
+    skipped. None when the vendored copy is missing."""
+    changelog = TAS_ROOT / "CHANGELOG.md"
     if not changelog.exists():
         return None
     for line in changelog.read_text(encoding="utf-8").splitlines():
-        if line.startswith("## "):
-            return line[3:].split("\u2014")[0].split("-")[0].strip() or None
+        m = re.match(r"## (\d+\.\d+(?:\.\d+)?)\b", line)
+        if m:
+            return m.group(1)
     return None
+
+
+@lru_cache(maxsize=1)
+def _vendored_suite_commit() -> str | None:
+    """'onysnow/Authority-System-Suite@b1c71e8', from authority_suite/VENDORED_FROM."""
+    marker = SUITE_ROOT / "VENDORED_FROM"
+    if not marker.exists():
+        return None
+    first = marker.read_text(encoding="utf-8").splitlines()[:1]
+    return first[0].strip() or None if first else None
 
 
 def ai_reasoning_status(settings: Settings = default_settings) -> dict:
     """What the settings panel shows about the AI layer: whether the
     endpoints are callable, which provider adapter is selected, and whether
-    the vendored TAS spec the prompts are built from is actually present.
+    the vendored Authority System Suite the prompts are built from is present.
     Never reveals key material -- only whether a key is configured.
     """
     provider = (settings.ai_provider or "").strip()
@@ -994,7 +1084,7 @@ def ai_reasoning_status(settings: Settings = default_settings) -> dict:
         on_this_computer = False if provider in ("anthropic", "openai") else None
     modules = {
         name: {
-            "spec_file": str(path.relative_to(TAS_SPEC_ROOT) if path.is_relative_to(TAS_SPEC_ROOT) else path.relative_to(APP_MODULES_ROOT.parent)),
+            "spec_file": str(path.relative_to(SUITE_ROOT) if path.is_relative_to(SUITE_ROOT) else path.relative_to(APP_MODULES_ROOT.parent)),
             "available": path.exists(),
             "vendored_tas": name in TAS_MODULES,
         }
@@ -1014,12 +1104,13 @@ def ai_reasoning_status(settings: Settings = default_settings) -> dict:
             "request_timeout_seconds": settings.ai_request_timeout_seconds,
             "max_output_tokens": settings.ai_max_output_tokens,
         },
-        "tas_spec": {
-            "present": TAS_SPEC_ROOT.exists() and (TAS_SPEC_ROOT / "PROMPT_MODULES").exists(),
-            "version": _vendored_tas_version(),
+        "authority_suite": {
+            "present": TAS_ROOT.exists() and (TAS_ROOT / "PROMPT_MODULES").exists(),
+            "source": _vendored_suite_commit(),
+            "tas_version": _vendored_tas_version(),
             "modules": modules,
             "control_surface": {
-                "spec_file": str(CONTROL_SURFACE_FILE.relative_to(TAS_SPEC_ROOT)),
+                "spec_file": str(CONTROL_SURFACE_FILE.relative_to(SUITE_ROOT)),
                 "available": CONTROL_SURFACE_FILE.exists(),
                 "flags": {name: {"default": spec["default"], "allowed": list(spec["allowed"])} for name, spec in CONTROL_SURFACE_FLAGS.items()},
             },
