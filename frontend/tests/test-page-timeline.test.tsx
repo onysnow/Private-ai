@@ -64,7 +64,7 @@ async function bootstrap(events: unknown[]): Promise<void> {
   const api = mockApi(pageRoutes({investigations: [investigation], events}));
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText('Kestrelwood filings');
+  await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
   // The panel loads the timeline on its own; wait until it has asked.
   await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/timeline')).toHaveLength(1));
 }

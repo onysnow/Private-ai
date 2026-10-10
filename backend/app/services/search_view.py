@@ -188,16 +188,22 @@ def shape_results(db: Session, query: str, hits: list[dict[str, Any]], *, kind: 
     captions, by_id, carriers = _names(db, investigation_ids)
 
     # A party found by its name and by one of its details is one result: the
-    # detail's field joins the party's "why it matched".
+    # detail's field joins the party's "why it matched". A detail with a
+    # reviewed-duplicate decision on it stays its own result, so the reporter
+    # still sees which copy was preferred (app/services/post_merge_reconciliation.py).
     party_hits = {h["provenance"].get("canonical_entity_id") or h["id"] for h in hits if h["type"] == "entity"}
+
+    def folds(h: dict[str, Any]) -> bool:
+        return h["type"] == "statement" and h["provenance"].get("entity_id") in party_hits and not h["provenance"].get("reconciliation")
+
     folded: dict[str, list[str]] = defaultdict(list)
     for h in hits:
-        if h["type"] == "statement" and h["provenance"].get("entity_id") in party_hits:
+        if folds(h):
             folded[h["provenance"]["entity_id"]].append(f"property: {h['metadata'].get('prop')}")
 
     shaped: list[dict[str, Any]] = []
     for hit in hits:
-        if hit["type"] == "statement" and hit["provenance"].get("entity_id") in party_hits:
+        if folds(hit):
             continue
         # One result per thing: the FtM entity that only carries a link is the link.
         if hit["type"] == "entity" and hit["id"] in carriers:

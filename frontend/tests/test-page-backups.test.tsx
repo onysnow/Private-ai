@@ -86,7 +86,8 @@ async function bootstrapNoInvestigations(): Promise<MockApi> {
 }
 
 function fileInput(): HTMLInputElement {
-  const input = document.querySelector('input[type="file"]');
+  // The backup panel's own picker: the page has other file inputs (documents) above it.
+  const input = document.querySelector('#backup-restore input[type="file"]');
   if (!input) throw new Error('backup file input not found');
   return input as HTMLInputElement;
 }
@@ -181,7 +182,7 @@ describe('Home portable investigation backup & restore', () => {
     await screen.findByText('Restored investigation inv-restored.');
     // The new case is opened: its name is selected and every one of its
     // loads has been requested.
-    await screen.findByText('Restored investigation');
+    await screen.findByRole('heading', {level: 1, name: 'Restored investigation'});
     await waitFor(() => {
       for (const route of Object.keys(investigationRoutes(restored.id))) {
         expect(api.calls(route).length, route).toBeGreaterThan(0);

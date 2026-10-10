@@ -79,7 +79,7 @@ async function bootstrapWithSelectedInvestigation(): Promise<MockApi> {
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText('Kestrelwood filings');
+  await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
   await waitFor(() => expect(screen.getByRole('button', {name: 'Download backup'})).not.toBeDisabled());
   return api;
 }

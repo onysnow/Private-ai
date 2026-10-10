@@ -27,6 +27,7 @@ import {LeadsPanel} from '../features/leads/leads-panel';
 import {PlacesPanel} from '../features/places/places-panel';
 import {ProvenancePanel} from '../features/provenance/provenance-panel';
 import {withEnds} from '../features/relationship-graph/graph';
+import {StageRail, StageSection, StandingTiles, useStanding} from '../components/layout/workbench-page';
 import {RelationshipGraphPanel} from '../features/relationship-graph/relationship-graph-panel';
 import {ReviewQueuePanel} from '../features/review-queue/review-queue-panel';
 import {SearchPanel} from '../features/search/search-panel';
@@ -134,54 +135,82 @@ function Workbench(): ReactElement {
     <SelectContent>{investigations.map(i => <SelectItem value={i.id} key={i.id}>{i.name}</SelectItem>)}</SelectContent>
   </Select>;
 
-  return <main className="shell">
-    <div className="top">
-      <strong>JOURNALISM WORKBENCH</strong>
-      <span>
-        <a className="badge" href="/console/" style={{marginRight: 8}}>backend console</a>
-        <Badge variant="outline" className="badge">DEV 1.18</Badge>
-        <Badge variant="outline" className="badge" title={access.message} data-testid="api-access-badge">
-          {access.state === 'authenticated' ? 'API: session active' : access.state === 'local' ? 'API: local access' : access.state === 'needs_token' ? 'API: token needed'
-            : access.state === 'remote_disabled' ? 'API: remote disabled' : access.state === 'error' ? 'API: connection error' : 'API: checking…'}
-        </Badge>
-        {access.state === 'authenticated' && <Button size="sm" variant="outline" onClick={clearApiSession}>Clear session token</Button>}
-      </span>
-    </div>
-    {(access.state === 'needs_token' || access.state === 'error') && <PanelErrorBoundary name="API access"><ApiAccessPanel message={access.message} onConnect={access.connectWithToken}/></PanelErrorBoundary>}
+  const standing = useStanding(inv);
+  const investigationName = investigations.find(i => i.id === inv)?.name ?? '';
+  const provenance = useWorkbenchStore(state => state.provenance);
+  const clearProvenance = useWorkbenchStore(state => state.clearProvenance);
+  // "Search records" in the header: the search box, as ⌘K does.
+  const focusSearch = () => {
+    document.getElementById('investigation-search')?.scrollIntoView({behavior: 'smooth', block: 'start'});
+    document.querySelector<HTMLInputElement>('#investigation-search input')?.focus();
+  };
+  const accessLabel = access.state === 'authenticated' ? 'API: session active' : access.state === 'local' ? 'API: local access' : access.state === 'needs_token' ? 'API: token needed'
+    : access.state === 'remote_disabled' ? 'API: remote disabled' : access.state === 'error' ? 'API: connection error' : 'API: checking…';
 
-    <section className="hero"><span className="accent">FollowTheMoney-centered review</span><h1>External data stays evidence until a reporter decides what it means.</h1><p>Search Aleph or OpenSanctions, preserve raw findings and provenance, resolve identity separately, then assess individual statements. Accepted values can be explicitly promoted into the canonical graph with provider and source provenance.</p></section>
-    {/* Search takes the full width: facets, results and the marks panel sit side by side. */}
-    <div className="section-group"><h4 className="group-label">Search &amp; discovery</h4><div className="section-stack">
-      <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>
-      <PanelErrorBoundary name="Provenance trace"><ProvenancePanel investigationId={inv}/></PanelErrorBoundary>
-    </div></div>
+  // The five-stage page (docs/discovery/README.md, page-by-page audit; the
+  // approved page mockup): the rail of stages stays on screen; the header
+  // says what is open and where things stand; one numbered section per stage.
+  return <div className="wb-page">
+    <StageRail investigationName={investigationName} standing={standing}/>
+    <main className="wb-main">
+      <header className="wb-head">
+        <div>
+          <p className="wb-eyebrow">FollowTheMoney-centred review</p>
+          <h1>{investigationName || 'Journalism Workbench'}</h1>
+          <p className="wb-tagline">External data stays evidence until a reporter decides what it means.</p>
+        </div>
+        <div className="wb-actions">
+          {investigations.length > 0 && picker}
+          <Button variant="outline" onClick={focusSearch}>Search records ⌘K</Button>
+          <Button asChild><a href="#document-ingestion">Add a document</a></Button>
+          <Badge variant="outline" className="badge" title={access.message} data-testid="api-access-badge">{accessLabel}</Badge>
+          {access.state === 'authenticated' && <Button size="sm" variant="outline" onClick={clearApiSession}>Clear session token</Button>}
+        </div>
+      </header>
+      {(access.state === 'needs_token' || access.state === 'error') && <PanelErrorBoundary name="API access"><ApiAccessPanel message={access.message} onConnect={access.connectWithToken}/></PanelErrorBoundary>}
+      <StandingTiles standing={standing}/>
 
-    <div className="section-group"><h4 className="group-label">Data portability &amp; timeline</h4><div className="section-stack">
-      <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}>
-        {access.settingsStatus && <PanelErrorBoundary name="Local security/settings status"><SecurityPanel settingsStatus={access.settingsStatus} providers={providers}/></PanelErrorBoundary>}
-      </BackupPanel></PanelErrorBoundary>
-      <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>
-      <PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary>
-    </div></div>
+      <StageSection stage="collect">
+        <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>
+        <div className="wb-row">
+          <div><PanelErrorBoundary name="The Drop"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary></div>
+          <div id="source-capture"><PanelErrorBoundary name="Source & exact evidence capture"><SourceCapturePanel investigationId={inv} sourceCount={sourcesQuery.data?.length ?? 0} evidenceCount={evidenceQuery.data?.length ?? 0}/></PanelErrorBoundary></div>
+        </div>
+        <div id="connectors"><PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary></div>
+        <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>
+      </StageSection>
 
-    <div className="section-group"><h4 className="group-label">Document workflow</h4><div className="section-stack">
-      <PanelErrorBoundary name="Document ingestion & extraction"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>
-      <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>
-    </div></div>
-    {/* A chart from the records without the AI; keyed by case, so a new case starts a new chart. */}
-    <div className="section-group"><h4 className="group-label">Charts from the records</h4><div className="section-stack">
-      <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>
-    </div></div>
-    <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>
-    <div className="section-group"><h4 className="group-label">Investigation maintenance</h4><div className="page-grid-2">
-      <PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary>
-      <PanelErrorBoundary name="Source & exact evidence capture"><SourceCapturePanel investigationId={inv} sourceCount={sourcesQuery.data?.length ?? 0} evidenceCount={evidenceQuery.data?.length ?? 0}/></PanelErrorBoundary>
-    </div></div>
-    <PanelErrorBoundary name="Claim verification workspace"><ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>
-    <PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary>
-    <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
-    <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>
-    <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>
+      <StageSection stage="verify">
+        <PanelErrorBoundary name="Claim verification workspace"><ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>
+        <div id="review-queue"><PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary></div>
+      </StageSection>
+
+      <StageSection stage="map">
+        <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
+        <div id="timeline"><PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary></div>
+        <div id="places"><PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary></div>
+      </StageSection>
+
+      <StageSection stage="report">
+        <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>
+        {/* A chart from the records without the AI; keyed by case, so a new case starts a new chart. */}
+        <div id="chart-builder"><PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary></div>
+        <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>
+      </StageSection>
+
+      <StageSection stage="keep">
+        <div className="wb-row">
+          <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>
+          <div id="deletion"><PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary></div>
+        </div>
+        {access.settingsStatus && <div id="access"><PanelErrorBoundary name="Local security/settings status"><SecurityPanel settingsStatus={access.settingsStatus} providers={providers}/></PanelErrorBoundary></div>}
+      </StageSection>
+    </main>
+    {/* Chain of Custody: the trace opens beside the page from any "Trace" button (README, page-by-page audit). */}
+    <aside className="wb-drawer" hidden={!provenance} aria-label="Chain of Custody">
+      <button type="button" className="wb-drawer-close" onClick={clearProvenance} aria-label="Close Chain of Custody">×</button>
+      <PanelErrorBoundary name="Chain of Custody"><ProvenancePanel investigationId={inv}/></PanelErrorBoundary>
+    </aside>
     <Toaster />
-  </main>;
+  </div>;
 }

@@ -115,7 +115,7 @@ async function bootstrapAndOpenDossier(dossier: unknown): Promise<MockApi> {
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText('Kestrelwood filings');
+  await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
 
   // loadEntities() auto-fills entityId to entities[0], so "Open dossier" is
   // already enabled without touching the entity <select>.

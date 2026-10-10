@@ -89,7 +89,7 @@ async function bootstrapAndOpenDossier(
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText('Kestrelwood filings');
+  await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
 
   // loadEntities() auto-fills entityId to entities[0].
   await userEvent.setup().click(screen.getByRole('button', {name: 'Open dossier'}));

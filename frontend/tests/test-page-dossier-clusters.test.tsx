@@ -88,7 +88,7 @@ async function bootstrap(): Promise<MockApi> {
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText('Kestrelwood filings');
+  await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
 
   // loadEntities() auto-fills entityId to entities[0], so the enrich
   // buttons are already enabled with no <select> interaction needed.

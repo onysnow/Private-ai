@@ -228,7 +228,7 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
    (#bc9574), never taupe; each result's left edge is its kind of record
    (lib/record-kinds.ts). */
 @layer components {
-  .sv { padding: 20px; }
+  .sv { padding: 20px; min-height: 0; }
   .sv-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
   .sv-head h3 { margin: 0; font-size: 19px; color: #e6d6bf; }
   .sv-sbox { flex: 1 1 320px; display: flex; align-items: center; gap: 8px; background: #26272b; border: 1px solid #393941; border-radius: 10px; padding: 0 10px; height: 38px; }
@@ -320,3 +320,77 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
   .sv-ci { display: flex; gap: 8px; align-items: center; font-size: 12.5px; padding: 4px 0; border-top: 1px solid #222c31; }
   .sv-ci b { color: #f3e9d7; font-weight: 600; } .sv-ci span { margin-left: auto; color: #bc9574; font-size: 11.5px; }
 }
+
+/* The workbench page's frame (components/layout/workbench-page.tsx): the rail
+   of five stages, the header, "Where things stand" tiles and one numbered
+   section per stage, as in the approved page mockup. A stage colour marks only
+   the rail number, the section number and the section rule (lib/stages.ts). */
+@layer components {
+  .wb-page { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 32px; max-width: 1480px; margin: 0 auto; padding: 32px 28px 64px; }
+  @media (max-width: 1000px) { .wb-page { grid-template-columns: 1fr; padding: 20px 16px 48px; } .wb-rail { position: static !important; max-height: none !important; } }
+  .wb-rail { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; font-size: 13.5px; }
+  .wb-rail-eyebrow, .wb-eyebrow { margin: 0; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #bc9574; }
+  .wb-rail-name { margin: 2px 0 12px; padding-bottom: 12px; border-bottom: 1px solid #393941; font: 600 15px var(--font-heading); color: #f3e9d7; }
+  .wb-rail ol { list-style: none; margin: 0; padding: 0; }
+  .wb-rail ol > li { margin-bottom: 12px; }
+  .wb-rail-stage { display: flex; align-items: center; gap: 10px; color: #f3e9d7; font-weight: 600; text-decoration: none; }
+  .wb-rail ul { list-style: none; margin: 6px 0 0 11px; padding: 0 0 0 20px; border-left: 2px solid; }
+  .wb-rail ul a { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; color: #caaf9c; text-decoration: none; }
+  .wb-rail ul a:hover, .wb-rail-stage:hover { color: #f3e9d7; }
+  .wb-rail ul small { color: #bc9574; font-variant-numeric: tabular-nums; }
+  .wb-rail a:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; border-radius: 4px; }
+  .wb-num { flex: 0 0 auto; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; color: #010005; font-size: 12px; font-weight: 700; }
+
+  .wb-main { min-width: 0; }
+  .wb-main > * + * { margin-top: 28px; }
+  .wb-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px 24px; }
+  .wb-head h1 { margin: 4px 0; font-size: 34px; line-height: 1.1; color: #f3e9d7; }
+  .wb-tagline { margin: 0; color: #caaf9c; font-size: 15px; }
+  .wb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+  .wb-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 1250px) { .wb-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .wb-tiles { grid-template-columns: 1fr; } }
+  .wb-tile { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: #1a2328; border: 1px solid #393941; border-top: 4px solid; border-radius: 12px; color: #caaf9c; text-decoration: none; min-height: 150px; }
+  .wb-tile:hover { background: #1f2a30; }
+  .wb-tile:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+  .wb-tile-name { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #baac91; font-weight: 700; }
+  .wb-big { font-size: 13.5px; color: #caaf9c; } .wb-big b { font: 600 24px var(--font-heading); color: #f3e9d7; margin-right: 2px; }
+  .wb-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 2px; }
+  .wb-bar i { display: block; height: 100%; }
+  .wb-legend { list-style: none; margin: 0; padding: 0; font-size: 12.5px; }
+  .wb-legend li { display: flex; align-items: center; gap: 7px; line-height: 1.6; }
+  .wb-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; flex: 0 0 auto; }
+
+  .wb-stage { scroll-margin-top: 12px; }
+  .wb-stage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding-bottom: 10px; border-bottom: 2px solid; margin-bottom: 18px; }
+  .wb-stage-head .wb-num { width: 30px; height: 30px; font-size: 16px; align-self: center; }
+  .wb-stage-head h2 { margin: 0; font-size: 24px; color: #f3e9d7; }
+  .wb-stage-head p { margin: 0; color: #caaf9c; font-size: 14px; }
+  .wb-stage-body > * + * { margin-top: 20px; }
+  .wb-stage-body .card { margin: 0; }
+  .wb-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+  .wb-row > * > .card, .wb-row > .card { height: 100%; }
+  @media (max-width: 960px) { .wb-row { grid-template-columns: 1fr; } }
+  [id] { scroll-margin-top: 12px; }
+
+  .wb-drawer { position: fixed; z-index: 40; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); overflow: auto; background: #10161a; border-left: 1px solid #4e4234; box-shadow: -16px 0 40px #000a; padding: 16px; }
+  .wb-drawer[hidden] { display: none; }
+  .wb-drawer-close { position: absolute; top: 10px; right: 12px; z-index: 1; width: 30px; height: 30px; border-radius: 8px; border: 1px solid #393941; background: #26272b; color: #f3e9d7; cursor: pointer; font-size: 18px; line-height: 1; }
+  .wb-drawer-close:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+}
+
+/* Palette pass (docs/discovery/README.md, page-by-page audit: "beige cards
+   elsewhere"). The shared record cards turn from parchment to the dark card
+   with a parchment edge for evidence, as search results are; text moves to
+   parchment and ink so it keeps its contrast. These rules come after the
+   original ones above and replace their colours only. */
+.finding { background: #1c262b; color: #caaf9c; border: 1px solid #393941; border-left: 4px solid #caaf9c; }
+.finding small { color: #bc9574; }
+.finding b, .finding strong, .candidate b, .candidate strong { color: #f3e9d7; }
+.candidate { background: #1c262b; color: #caaf9c; border: 1px solid #393941; border-left: 4px solid #caaf9c; }
+.candidate small { color: #bc9574; }
+.explanation { background: #1c262b; color: #caaf9c; }
+.explanation-excerpt { background: #26272b; color: #caaf9c; border-color: #393941; }
+.explanation-excerpt mark { background: rgba(212,161,82,.35); color: #f3e9d7; }
+.relNode { color: #f3e9d7; }

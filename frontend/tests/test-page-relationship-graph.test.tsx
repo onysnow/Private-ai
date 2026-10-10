@@ -122,7 +122,7 @@ async function bootstrap(
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText('Kestrelwood filings');
+  await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
   return api;
 }
 

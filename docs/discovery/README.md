@@ -277,6 +277,15 @@ Still open: the chart rules question (Ony asked where the rules come from), undo
 
 Each step: tests, the full check gate, screenshots to Ony.
 
+After these steps are built and tested, and after several people can work on
+one investigation (planned, 8 October), the next item is **admin tools and
+project-management tooling for the app's own teams** (Ony, 10 October 2026).
+
+Progress: step 1 built on 9–10 October (tags, notes and collections; the
+search redesign; the five-stage page with its rail and "Where things stand"
+tiles; Chain of Custody as a drawer; the dark record cards). Ony kept the two
+gold tag swatches (#8d692b, #966926) with cream text as they are.
+
 ## Sources
 
 - Research notes with every URL: `sources.md` (data sources and the

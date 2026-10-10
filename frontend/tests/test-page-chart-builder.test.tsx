@@ -31,7 +31,7 @@ describe('Home chart builder', () => {
     }});
     const Home = await importHome();
     render(<Home/>);
-    await screen.findByText('Kestrelwood filings');
+    await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
     expect(screen.getByText('Chart builder')).toBeInTheDocument();
     expect(api.calls(CATALOG)).toHaveLength(0);
 

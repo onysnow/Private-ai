@@ -104,7 +104,7 @@ export function ProvenancePanel({investigationId}: Props): ReactElement {
 
   return <Card className="card">
     <CardHeader className="pb-3">
-      <CardTitle>Provenance trace</CardTitle>
+      <CardTitle>Chain of Custody</CardTitle>
       <CardDescription>One place to follow a record back through source, document, exact chunk/page, extraction proposal, reporter decision, accepted record, supporting evidence, and entity review/promotion history without changing canonical status.</CardDescription>
     </CardHeader>
     <CardContent>
