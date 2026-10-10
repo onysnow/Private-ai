@@ -75,6 +75,10 @@ Ony asked for a recommendation on each and accepted it.
   - Built (app/patterns/investigation_type.py): each open Red Flag puts its indicator's own area in; a kind of record points to an area only if at most 8 of the 22 areas need it and at least 15% of that area's indicators do (Security → securities market abuse; Person, Company or Payment point nowhere). The reason is shown for each area. The reporter's choice is stored on the investigation (`type_areas`) and travels in backups. The safety area (SA) is not a type.
 - **Contract awards** (who won a contract, for how much, when; FtM ContractAward, contract to supplier) are added as a link type with the procurement lookups in step 4. Rules that need them, such as CO-046 (payments 30% or more above the award), come then.
 
+## Homicide and suspicious deaths (Ony, 10 October 2026)
+
+Ony noticed the catalogue had no area for homicide and asked for one, with no limit on scope: "All of those and more if there are more." A new area, HO, is researched in four parts: deaths wrongly classified or poorly investigated (UN Minnesota Protocol, medical examiner standards, the Shipman Inquiry); unsolved killings, clusters and clearance rates (Murder Accountability Project, FBI serial murder report, NamUs); wrongful convictions (National Registry of Exonerations, NAS 2009, PCAST 2016); and killings commissioned or meant to silence someone, impunity, and homicide risk in families (UNODC, CPJ impunity index, Global Initiative, domestic homicide reviews). Every source and case is checked before an indicator is marked verified, as for the other areas.
+
 ## Not yet decided (for Ony)
 
 1. Whether the DISARM framework (share-alike licence) should be imported whole, which would make the catalogue's DISARM part share-alike too.
