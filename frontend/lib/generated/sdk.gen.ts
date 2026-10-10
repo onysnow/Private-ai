@@ -18,6 +18,18 @@ import type {
   AddChartToWriteupEndpointData,
   AddChartToWriteupEndpointErrors,
   AddChartToWriteupEndpointResponses,
+  AddCollectionData,
+  AddCollectionErrors,
+  AddCollectionItemData,
+  AddCollectionItemErrors,
+  AddCollectionItemResponses,
+  AddCollectionResponses,
+  AddNoteData,
+  AddNoteErrors,
+  AddNoteResponses,
+  AddTagData,
+  AddTagErrors,
+  AddTagResponses,
   AddWatchlistEntryData,
   AddWatchlistEntryErrors,
   AddWatchlistEntryResponses,
@@ -123,6 +135,15 @@ import type {
   DismissHitData,
   DismissHitErrors,
   DismissHitResponses,
+  EditCollectionData,
+  EditCollectionErrors,
+  EditCollectionResponses,
+  EditNoteData,
+  EditNoteErrors,
+  EditNoteResponses,
+  EditTagData,
+  EditTagErrors,
+  EditTagResponses,
   EnrichEntityData,
   EnrichEntityErrors,
   EnrichEntityMultiData,
@@ -195,6 +216,12 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
+  GetCollectionData,
+  GetCollectionErrors,
+  GetCollectionResponses,
+  GetCollectionsData,
+  GetCollectionsErrors,
+  GetCollectionsResponses,
   GetCorpusInsightsData,
   GetCorpusInsightsErrors,
   GetCorpusInsightsResponses,
@@ -267,6 +294,9 @@ import type {
   GetMappingSchemasData,
   GetMappingSchemasErrors,
   GetMappingSchemasResponses,
+  GetNotesData,
+  GetNotesErrors,
+  GetNotesResponses,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingErrors,
   GetOpenalephCorpusBindingResponses,
@@ -282,6 +312,9 @@ import type {
   GetOwnershipChainData,
   GetOwnershipChainErrors,
   GetOwnershipChainResponses,
+  GetRecordMarksData,
+  GetRecordMarksErrors,
+  GetRecordMarksResponses,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceErrors,
   GetRecordProvenanceTraceResponses,
@@ -300,6 +333,12 @@ import type {
   GetSimilarDocumentsData,
   GetSimilarDocumentsErrors,
   GetSimilarDocumentsResponses,
+  GetTaggedRecordsData,
+  GetTaggedRecordsErrors,
+  GetTaggedRecordsResponses,
+  GetTagsData,
+  GetTagsErrors,
+  GetTagsResponses,
   GetWatchlistData,
   GetWatchlistErrors,
   GetWatchlistResponses,
@@ -465,6 +504,9 @@ import type {
   MakeLeadFromHitData,
   MakeLeadFromHitErrors,
   MakeLeadFromHitResponses,
+  MakeLeadFromNoteData,
+  MakeLeadFromNoteErrors,
+  MakeLeadFromNoteResponses,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
@@ -501,9 +543,21 @@ import type {
   RelationshipSchemasData,
   RelationshipSchemasErrors,
   RelationshipSchemasResponses,
+  RemoveCollectionData,
+  RemoveCollectionErrors,
+  RemoveCollectionItemData,
+  RemoveCollectionItemErrors,
+  RemoveCollectionItemResponses,
+  RemoveCollectionResponses,
   RemoveInvestigationData,
   RemoveInvestigationErrors,
   RemoveInvestigationResponses,
+  RemoveNoteData,
+  RemoveNoteErrors,
+  RemoveNoteResponses,
+  RemoveTagData,
+  RemoveTagErrors,
+  RemoveTagResponses,
   RemoveWatchlistEntryData,
   RemoveWatchlistEntryErrors,
   RemoveWatchlistEntryResponses,
@@ -564,6 +618,12 @@ import type {
   SyncOpenalephDocumentData,
   SyncOpenalephDocumentErrors,
   SyncOpenalephDocumentResponses,
+  TagARecordData,
+  TagARecordErrors,
+  TagARecordResponses,
+  UntagARecordData,
+  UntagARecordErrors,
+  UntagARecordResponses,
   UpdateAppUserData,
   UpdateAppUserErrors,
   UpdateAppUserResponses,
@@ -596,6 +656,18 @@ import {
   zAddChartToWriteupEndpointBody,
   zAddChartToWriteupEndpointPath,
   zAddChartToWriteupEndpointResponse,
+  zAddCollectionBody,
+  zAddCollectionItemBody,
+  zAddCollectionItemPath,
+  zAddCollectionItemResponse,
+  zAddCollectionPath,
+  zAddCollectionResponse,
+  zAddNoteBody,
+  zAddNotePath,
+  zAddNoteResponse,
+  zAddTagBody,
+  zAddTagPath,
+  zAddTagResponse,
   zAddWatchlistEntryBody,
   zAddWatchlistEntryPath,
   zAddWatchlistEntryResponse,
@@ -677,6 +749,15 @@ import {
   zDeleteWriteupEndpointResponse,
   zDismissHitPath,
   zDismissHitResponse,
+  zEditCollectionBody,
+  zEditCollectionPath,
+  zEditCollectionResponse,
+  zEditNoteBody,
+  zEditNotePath,
+  zEditNoteResponse,
+  zEditTagBody,
+  zEditTagPath,
+  zEditTagResponse,
   zEnrichEntityMultiBody,
   zEnrichEntityMultiPath,
   zEnrichEntityMultiResponse,
@@ -728,6 +809,10 @@ import {
   zGetBasemapTileResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
+  zGetCollectionPath,
+  zGetCollectionResponse,
+  zGetCollectionsPath,
+  zGetCollectionsResponse,
   zGetCorpusInsightsPath,
   zGetCorpusInsightsResponse,
   zGetCorpusStatusPath,
@@ -777,6 +862,9 @@ import {
   zGetLeadPath,
   zGetLeadResponse,
   zGetMappingSchemasResponse,
+  zGetNotesPath,
+  zGetNotesQuery,
+  zGetNotesResponse,
   zGetOpenalephCorpusBindingPath,
   zGetOpenalephCorpusBindingResponse,
   zGetOpenalephDocumentReviewStatusPath,
@@ -786,6 +874,9 @@ import {
   zGetOrphanStoragePreviewResponse,
   zGetOwnershipChainPath,
   zGetOwnershipChainResponse,
+  zGetRecordMarksPath,
+  zGetRecordMarksQuery,
+  zGetRecordMarksResponse,
   zGetRecordProvenanceTraceQuery,
   zGetRecordProvenanceTraceResponse,
   zGetSecurityAlertsQuery,
@@ -798,6 +889,10 @@ import {
   zGetSimilarDocumentsPath,
   zGetSimilarDocumentsQuery,
   zGetSimilarDocumentsResponse,
+  zGetTaggedRecordsPath,
+  zGetTaggedRecordsResponse,
+  zGetTagsPath,
+  zGetTagsResponse,
   zGetWatchlistPath,
   zGetWatchlistResponse,
   zGetWriteupEndpointPath,
@@ -929,6 +1024,8 @@ import {
   zListWriteupsEndpointResponse,
   zMakeLeadFromHitPath,
   zMakeLeadFromHitResponse,
+  zMakeLeadFromNotePath,
+  zMakeLeadFromNoteResponse,
   zOpenalephIntegrationStatusResponse,
   zPresentationStylesResponse,
   zPreviewBackupRestoreBody,
@@ -955,9 +1052,18 @@ import {
   zRefreshOpenalephDocumentReviewPath,
   zRefreshOpenalephDocumentReviewResponse,
   zRelationshipSchemasResponse,
+  zRemoveCollectionItemPath,
+  zRemoveCollectionItemQuery,
+  zRemoveCollectionItemResponse,
+  zRemoveCollectionPath,
+  zRemoveCollectionResponse,
   zRemoveInvestigationPath,
   zRemoveInvestigationQuery,
   zRemoveInvestigationResponse,
+  zRemoveNotePath,
+  zRemoveNoteResponse,
+  zRemoveTagPath,
+  zRemoveTagResponse,
   zRemoveWatchlistEntryPath,
   zRemoveWatchlistEntryResponse,
   zResolveFindingBody,
@@ -1006,6 +1112,12 @@ import {
   zSyncCorpusNowResponse,
   zSyncOpenalephDocumentPath,
   zSyncOpenalephDocumentResponse,
+  zTagARecordBody,
+  zTagARecordPath,
+  zTagARecordResponse,
+  zUntagARecordPath,
+  zUntagARecordQuery,
+  zUntagARecordResponse,
   zUpdateAppUserBody,
   zUpdateAppUserPath,
   zUpdateAppUserResponse,
@@ -1648,6 +1760,155 @@ export const createClaimReview = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCreateClaimReviewResponse.parseAsync(data),
     url: '/api/claims/{claim_id}/reviews',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Remove Collection
+ *
+ * Delete the collection. The records in it stay.
+ */
+export const removeCollection = <ThrowOnError extends boolean = false>(
+  options: Options<RemoveCollectionData, ThrowOnError>,
+): RequestResult<
+  RemoveCollectionResponses,
+  RemoveCollectionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    RemoveCollectionResponses,
+    RemoveCollectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRemoveCollectionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRemoveCollectionResponse.parseAsync(data),
+    url: '/api/collections/{collection_id}',
+    ...options,
+  });
+
+/**
+ * Get Collection
+ */
+export const getCollection = <ThrowOnError extends boolean = false>(
+  options: Options<GetCollectionData, ThrowOnError>,
+): RequestResult<GetCollectionResponses, GetCollectionErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCollectionResponses,
+    GetCollectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCollectionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCollectionResponse.parseAsync(data),
+    url: '/api/collections/{collection_id}',
+    ...options,
+  });
+
+/**
+ * Edit Collection
+ */
+export const editCollection = <ThrowOnError extends boolean = false>(
+  options: Options<EditCollectionData, ThrowOnError>,
+): RequestResult<EditCollectionResponses, EditCollectionErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    EditCollectionResponses,
+    EditCollectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zEditCollectionBody,
+          path: zEditCollectionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEditCollectionResponse.parseAsync(data),
+    url: '/api/collections/{collection_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Remove Collection Item
+ */
+export const removeCollectionItem = <ThrowOnError extends boolean = false>(
+  options: Options<RemoveCollectionItemData, ThrowOnError>,
+): RequestResult<
+  RemoveCollectionItemResponses,
+  RemoveCollectionItemErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    RemoveCollectionItemResponses,
+    RemoveCollectionItemErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRemoveCollectionItemPath,
+          query: zRemoveCollectionItemQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRemoveCollectionItemResponse.parseAsync(data),
+    url: '/api/collections/{collection_id}/items',
+    ...options,
+  });
+
+/**
+ * Add Collection Item
+ *
+ * Add a record to the collection, or move it when it is already there.
+ */
+export const addCollectionItem = <ThrowOnError extends boolean = false>(
+  options: Options<AddCollectionItemData, ThrowOnError>,
+): RequestResult<
+  AddCollectionItemResponses,
+  AddCollectionItemErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AddCollectionItemResponses,
+    AddCollectionItemErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddCollectionItemBody,
+          path: zAddCollectionItemPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddCollectionItemResponse.parseAsync(data),
+    url: '/api/collections/{collection_id}/items',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -4270,6 +4531,60 @@ export const listClaims = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Collections
+ */
+export const getCollections = <ThrowOnError extends boolean = false>(
+  options: Options<GetCollectionsData, ThrowOnError>,
+): RequestResult<GetCollectionsResponses, GetCollectionsErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCollectionsResponses,
+    GetCollectionsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCollectionsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCollectionsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/collections',
+    ...options,
+  });
+
+/**
+ * Add Collection
+ */
+export const addCollection = <ThrowOnError extends boolean = false>(
+  options: Options<AddCollectionData, ThrowOnError>,
+): RequestResult<AddCollectionResponses, AddCollectionErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    AddCollectionResponses,
+    AddCollectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddCollectionBody,
+          path: zAddCollectionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddCollectionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/collections',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * List Connector Findings
  */
 export const listConnectorFindings = <ThrowOnError extends boolean = false>(
@@ -5022,6 +5337,89 @@ export const leadQueue = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Record Marks
+ *
+ * One record's tags, notes and the collections it is in.
+ */
+export const getRecordMarks = <ThrowOnError extends boolean = false>(
+  options: Options<GetRecordMarksData, ThrowOnError>,
+): RequestResult<GetRecordMarksResponses, GetRecordMarksErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetRecordMarksResponses,
+    GetRecordMarksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetRecordMarksPath,
+          query: zGetRecordMarksQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRecordMarksResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/marks',
+    ...options,
+  });
+
+/**
+ * Get Notes
+ *
+ * Notes, newest first: all of them, or those on one record.
+ */
+export const getNotes = <ThrowOnError extends boolean = false>(
+  options: Options<GetNotesData, ThrowOnError>,
+): RequestResult<GetNotesResponses, GetNotesErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetNotesResponses,
+    GetNotesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetNotesPath,
+          query: zGetNotesQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetNotesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/notes',
+    ...options,
+  });
+
+/**
+ * Add Note
+ *
+ * A note on a record, on a chart mark, or (with neither) on the investigation.
+ */
+export const addNote = <ThrowOnError extends boolean = false>(
+  options: Options<AddNoteData, ThrowOnError>,
+): RequestResult<AddNoteResponses, AddNoteErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    AddNoteResponses,
+    AddNoteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddNoteBody,
+          path: zAddNotePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zAddNoteResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/notes',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Investigation Places
  *
  * Every record with a latitude and a longitude, what is linked to it, and the records whose coordinates cannot be used, with why.
@@ -5050,6 +5448,62 @@ export const getInvestigationPlaces = <ThrowOnError extends boolean = false>(
       await zGetInvestigationPlacesResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/places',
     ...options,
+  });
+
+/**
+ * Untag A Record
+ */
+export const untagARecord = <ThrowOnError extends boolean = false>(
+  options: Options<UntagARecordData, ThrowOnError>,
+): RequestResult<UntagARecordResponses, UntagARecordErrors, ThrowOnError> =>
+  (options.client ?? client).delete<
+    UntagARecordResponses,
+    UntagARecordErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zUntagARecordPath,
+          query: zUntagARecordQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUntagARecordResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/record-tags',
+    ...options,
+  });
+
+/**
+ * Tag A Record
+ *
+ * Put a tag on a record. Tagging a record twice with the same tag changes nothing.
+ */
+export const tagARecord = <ThrowOnError extends boolean = false>(
+  options: Options<TagARecordData, ThrowOnError>,
+): RequestResult<TagARecordResponses, TagARecordErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    TagARecordResponses,
+    TagARecordErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zTagARecordBody,
+          path: zTagARecordPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zTagARecordResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/record-tags',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -5135,6 +5589,55 @@ export const listSources = <ThrowOnError extends boolean = false>(
       await zListSourcesResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/sources',
     ...options,
+  });
+
+/**
+ * Get Tags
+ *
+ * The investigation's tags, each with how many records carry it, and the swatches a tag may use.
+ */
+export const getTags = <ThrowOnError extends boolean = false>(
+  options: Options<GetTagsData, ThrowOnError>,
+): RequestResult<GetTagsResponses, GetTagsErrors, ThrowOnError> =>
+  (options.client ?? client).get<GetTagsResponses, GetTagsErrors, ThrowOnError>(
+    {
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: zGetTagsPath,
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseValidator: async (data) =>
+        await zGetTagsResponse.parseAsync(data),
+      url: '/api/investigations/{investigation_id}/tags',
+      ...options,
+    },
+  );
+
+/**
+ * Add Tag
+ */
+export const addTag = <ThrowOnError extends boolean = false>(
+  options: Options<AddTagData, ThrowOnError>,
+): RequestResult<AddTagResponses, AddTagErrors, ThrowOnError> =>
+  (options.client ?? client).post<AddTagResponses, AddTagErrors, ThrowOnError>({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddTagBody,
+          path: zAddTagPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zAddTagResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/tags',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -5694,6 +6197,92 @@ export const linkLead = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Remove Note
+ *
+ * Delete the note. A lead made from it stays.
+ */
+export const removeNote = <ThrowOnError extends boolean = false>(
+  options: Options<RemoveNoteData, ThrowOnError>,
+): RequestResult<RemoveNoteResponses, RemoveNoteErrors, ThrowOnError> =>
+  (options.client ?? client).delete<
+    RemoveNoteResponses,
+    RemoveNoteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRemoveNotePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRemoveNoteResponse.parseAsync(data),
+    url: '/api/notes/{note_id}',
+    ...options,
+  });
+
+/**
+ * Edit Note
+ */
+export const editNote = <ThrowOnError extends boolean = false>(
+  options: Options<EditNoteData, ThrowOnError>,
+): RequestResult<EditNoteResponses, EditNoteErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    EditNoteResponses,
+    EditNoteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zEditNoteBody,
+          path: zEditNotePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zEditNoteResponse.parseAsync(data),
+    url: '/api/notes/{note_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Make Lead From Note
+ *
+ * Make the note a lead, linked to the record it was written on.
+ */
+export const makeLeadFromNote = <ThrowOnError extends boolean = false>(
+  options: Options<MakeLeadFromNoteData, ThrowOnError>,
+): RequestResult<
+  MakeLeadFromNoteResponses,
+  MakeLeadFromNoteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MakeLeadFromNoteResponses,
+    MakeLeadFromNoteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zMakeLeadFromNotePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakeLeadFromNoteResponse.parseAsync(data),
+    url: '/api/notes/{note_id}/lead',
+    ...options,
   });
 
 /**
@@ -6698,6 +7287,90 @@ export const getMappingSchemas = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetMappingSchemasResponse.parseAsync(data),
     url: '/api/table-mapping/schemas',
+    ...options,
+  });
+
+/**
+ * Remove Tag
+ *
+ * Take the tag off every record, then delete it. The records stay.
+ */
+export const removeTag = <ThrowOnError extends boolean = false>(
+  options: Options<RemoveTagData, ThrowOnError>,
+): RequestResult<RemoveTagResponses, RemoveTagErrors, ThrowOnError> =>
+  (options.client ?? client).delete<
+    RemoveTagResponses,
+    RemoveTagErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRemoveTagPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRemoveTagResponse.parseAsync(data),
+    url: '/api/tags/{tag_id}',
+    ...options,
+  });
+
+/**
+ * Edit Tag
+ */
+export const editTag = <ThrowOnError extends boolean = false>(
+  options: Options<EditTagData, ThrowOnError>,
+): RequestResult<EditTagResponses, EditTagErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    EditTagResponses,
+    EditTagErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zEditTagBody,
+          path: zEditTagPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zEditTagResponse.parseAsync(data),
+    url: '/api/tags/{tag_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Tagged Records
+ */
+export const getTaggedRecords = <ThrowOnError extends boolean = false>(
+  options: Options<GetTaggedRecordsData, ThrowOnError>,
+): RequestResult<
+  GetTaggedRecordsResponses,
+  GetTaggedRecordsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetTaggedRecordsResponses,
+    GetTaggedRecordsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetTaggedRecordsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTaggedRecordsResponse.parseAsync(data),
+    url: '/api/tags/{tag_id}/records',
     ...options,
   });
 

@@ -862,6 +862,122 @@ export const zClusterPairOut = z.object({
 });
 
 /**
+ * CollectionCreate
+ */
+export const zCollectionCreate = z.object({
+  description: z.string().max(2000).nullish(),
+  name: z.string().min(1).max(200),
+});
+
+/**
+ * CollectionItemCreate
+ */
+export const zCollectionItemCreate = z.object({
+  position: z.number().int().gte(0).nullish(),
+  record_id: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+});
+
+/**
+ * CollectionItemOut
+ */
+export const zCollectionItemOut = z.object({
+  caption: z.string().nullable(),
+  id: z.string(),
+  position: z.number().int(),
+  record_id: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+});
+
+/**
+ * CollectionOut
+ *
+ * A collection and its records in order.
+ */
+export const zCollectionOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  description: z.string().nullable(),
+  id: z.string(),
+  items: z.array(zCollectionItemOut),
+  name: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * CollectionRefOut
+ */
+export const zCollectionRefOut = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+/**
+ * CollectionSummaryOut
+ */
+export const zCollectionSummaryOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  description: z.string().nullable(),
+  id: z.string(),
+  item_count: z.number().int(),
+  name: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * CollectionUpdate
+ */
+export const zCollectionUpdate = z.object({
+  description: z.string().max(2000).nullish(),
+  name: z.string().min(1).max(200).nullish(),
+});
+
+/**
+ * CollectionsOut
+ */
+export const zCollectionsOut = z.object({
+  collections: z.array(zCollectionSummaryOut),
+  investigation_id: z.string(),
+});
+
+/**
  * ConnectorCredentialPut
  *
  * A connector's secret (PUT /settings/connectors/{provider}/credential).
@@ -3139,6 +3255,28 @@ export const zMappingSchemasOut = z.object({
 });
 
 /**
+ * MarkedRecordOut
+ *
+ * A record a mark points at. ``caption`` is None when the record no longer exists.
+ */
+export const zMarkedRecordOut = z.object({
+  caption: z.string().nullable(),
+  record_id: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+});
+
+/**
  * MatchedPropertyOut
  *
  * One kind of property both entities have, and how well it agrees
@@ -3272,6 +3410,80 @@ export const zCanonicalMergePreviewOut = z.object({
  */
 export const zMultiEnrichmentRequest = z.object({
   providers: z.array(z.string()).optional(),
+});
+
+/**
+ * NoteCreate
+ */
+export const zNoteCreate = z.object({
+  chart_ref: z.record(z.unknown()).nullish(),
+  record_id: z.string().nullish(),
+  record_type: z
+    .enum([
+      'entity',
+      'relationship',
+      'evidence',
+      'source',
+      'claim',
+      'event',
+      'document',
+      'lead',
+      'task',
+      'finding',
+    ])
+    .nullish(),
+  text: z.string().min(1).max(20000),
+});
+
+/**
+ * NoteOut
+ */
+export const zNoteOut = z.object({
+  caption: z.string().nullable(),
+  chart_ref: z.record(z.unknown()).nullable(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  lead_id: z.string().nullable(),
+  record_id: z.string().nullable(),
+  record_type: z
+    .enum([
+      'entity',
+      'relationship',
+      'evidence',
+      'source',
+      'claim',
+      'event',
+      'document',
+      'lead',
+      'task',
+      'finding',
+    ])
+    .nullable(),
+  text: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * NoteUpdate
+ */
+export const zNoteUpdate = z.object({
+  text: z.string().min(1).max(20000),
+});
+
+/**
+ * NotesOut
+ */
+export const zNotesOut = z.object({
+  investigation_id: z.string(),
+  notes: z.array(zNoteOut),
 });
 
 /**
@@ -3986,6 +4198,26 @@ export const zFigureItemOut = z.object({
   evidence: z.array(zRecordRefOut),
   label: z.string(),
   value: z.string(),
+});
+
+/**
+ * RecordTagCreate
+ */
+export const zRecordTagCreate = z.object({
+  record_id: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+  tag_id: z.string(),
 });
 
 /**
@@ -4967,6 +5199,85 @@ export const zTableOut = z.object({
   sheet: z.string().nullable(),
   sheets: z.array(z.string()),
   truncated: z.boolean(),
+});
+
+/**
+ * TagChipOut
+ */
+export const zTagChipOut = z.object({
+  colour: z.string(),
+  id: z.string(),
+  name: z.string(),
+});
+
+/**
+ * RecordMarksOut
+ *
+ * One record's tags, notes and the collections it is in.
+ */
+export const zRecordMarksOut = z.object({
+  caption: z.string().nullable(),
+  collections: z.array(zCollectionRefOut),
+  notes: z.array(zNoteOut),
+  record_id: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+  tags: z.array(zTagChipOut),
+});
+
+/**
+ * TagCreate
+ */
+export const zTagCreate = z.object({
+  colour: z.string(),
+  name: z.string().min(1).max(80),
+});
+
+/**
+ * TagOut
+ *
+ * A reporter's tag and how many records carry it.
+ */
+export const zTagOut = z.object({
+  colour: z.string(),
+  count: z.number().int(),
+  id: z.string(),
+  name: z.string(),
+});
+
+/**
+ * TagUpdate
+ */
+export const zTagUpdate = z.object({
+  colour: z.string().nullish(),
+  name: z.string().min(1).max(80).nullish(),
+});
+
+/**
+ * TaggedRecordsOut
+ */
+export const zTaggedRecordsOut = z.object({
+  records: z.array(zMarkedRecordOut),
+  tag: zTagOut,
+});
+
+/**
+ * TagsOut
+ */
+export const zTagsOut = z.object({
+  colours: z.array(z.string()),
+  investigation_id: z.string(),
+  tags: z.array(zTagOut),
 });
 
 /**
@@ -6200,6 +6511,71 @@ export const zCreateClaimReviewPath = z.object({
  */
 export const zCreateClaimReviewResponse = zClaimReviewResultOut;
 
+export const zRemoveCollectionPath = z.object({
+  collection_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRemoveCollectionResponse = zCollectionsOut;
+
+export const zGetCollectionPath = z.object({
+  collection_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCollectionResponse = zCollectionOut;
+
+export const zEditCollectionBody = zCollectionUpdate;
+
+export const zEditCollectionPath = z.object({
+  collection_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zEditCollectionResponse = zCollectionOut;
+
+export const zRemoveCollectionItemPath = z.object({
+  collection_id: z.string(),
+});
+
+export const zRemoveCollectionItemQuery = z.object({
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+  record_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRemoveCollectionItemResponse = zCollectionOut;
+
+export const zAddCollectionItemBody = zCollectionItemCreate;
+
+export const zAddCollectionItemPath = z.object({
+  collection_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddCollectionItemResponse = zCollectionOut;
+
 export const zListAssessmentsPath = z.object({
   finding_id: z.string(),
 });
@@ -7072,6 +7448,26 @@ export const zListClaimsQuery = z.object({
  */
 export const zListClaimsResponse = z.array(zClaimOut);
 
+export const zGetCollectionsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCollectionsResponse = zCollectionsOut;
+
+export const zAddCollectionBody = zCollectionCreate;
+
+export const zAddCollectionPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddCollectionResponse = zCollectionOut;
+
 export const zListConnectorFindingsPath = z.object({
   investigation_id: z.string(),
 });
@@ -7382,6 +7778,69 @@ export const zLeadQueueQuery = z.object({
  */
 export const zLeadQueueResponse = zLeadQueueOut;
 
+export const zGetRecordMarksPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetRecordMarksQuery = z.object({
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+  record_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetRecordMarksResponse = zRecordMarksOut;
+
+export const zGetNotesPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetNotesQuery = z.object({
+  record_type: z
+    .enum([
+      'entity',
+      'relationship',
+      'evidence',
+      'source',
+      'claim',
+      'event',
+      'document',
+      'lead',
+      'task',
+      'finding',
+    ])
+    .nullish(),
+  record_id: z.string().nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetNotesResponse = zNotesOut;
+
+export const zAddNoteBody = zNoteCreate;
+
+export const zAddNotePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddNoteResponse = zNoteOut;
+
 export const zGetInvestigationPlacesPath = z.object({
   investigation_id: z.string(),
 });
@@ -7390,6 +7849,43 @@ export const zGetInvestigationPlacesPath = z.object({
  * Successful Response
  */
 export const zGetInvestigationPlacesResponse = zPlacesOut;
+
+export const zUntagARecordPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zUntagARecordQuery = z.object({
+  tag_id: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'source',
+    'claim',
+    'event',
+    'document',
+    'lead',
+    'task',
+    'finding',
+  ]),
+  record_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUntagARecordResponse = zRecordMarksOut;
+
+export const zTagARecordBody = zRecordTagCreate;
+
+export const zTagARecordPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zTagARecordResponse = zRecordMarksOut;
 
 export const zListInvestigationRelationshipsPath = z.object({
   investigation_id: z.string(),
@@ -7440,6 +7936,26 @@ export const zListSourcesQuery = z.object({
  * Successful Response
  */
 export const zListSourcesResponse = z.array(zSourceOut);
+
+export const zGetTagsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetTagsResponse = zTagsOut;
+
+export const zAddTagBody = zTagCreate;
+
+export const zAddTagPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddTagResponse = zTagsOut;
 
 export const zGetInvestigationTimelinePath = z.object({
   investigation_id: z.string(),
@@ -7636,6 +8152,35 @@ export const zLinkLeadPath = z.object({
  * Successful Response
  */
 export const zLinkLeadResponse = zLeadLinkOut;
+
+export const zRemoveNotePath = z.object({
+  note_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRemoveNoteResponse = zNotesOut;
+
+export const zEditNoteBody = zNoteUpdate;
+
+export const zEditNotePath = z.object({
+  note_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zEditNoteResponse = zNoteOut;
+
+export const zMakeLeadFromNotePath = z.object({
+  note_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeLeadFromNoteResponse = zLeadOut;
 
 /**
  * Successful Response
@@ -7924,6 +8469,35 @@ export const zPromoteStatementAssessmentResponse = zStatementPromotionOut;
  * Successful Response
  */
 export const zGetMappingSchemasResponse = zMappingSchemasOut;
+
+export const zRemoveTagPath = z.object({
+  tag_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRemoveTagResponse = zTagsOut;
+
+export const zEditTagBody = zTagUpdate;
+
+export const zEditTagPath = z.object({
+  tag_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zEditTagResponse = zTagsOut;
+
+export const zGetTaggedRecordsPath = z.object({
+  tag_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetTaggedRecordsResponse = zTaggedRecordsOut;
 
 export const zCreateTimelineEventEndpointBody = zTimelineEventCreate;
 

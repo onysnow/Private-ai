@@ -27,7 +27,7 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping,
+    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -43,7 +43,7 @@ MODEL_BY_TABLE = {
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
-        WatchlistEntry, WatchlistHit, TableMapping,
+        WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem,
     ]
 }
 
@@ -67,6 +67,9 @@ RESTORE_ORDER = [
     "table_mappings",
     # Watched names and what they turned up; a hit may point at a document and a lead.
     "watchlist_entries", "watchlist_hits",
+    # The reporter's own marks: tags before the records they are on, collections
+    # before their items; a note may point at the lead made from it.
+    "tags", "record_tags", "notes", "collections", "collection_items",
     # The TAS reasoning review queue travels with the investigation: a restored
     # backup keeps every proposed/accepted/rejected analysis and its reviewer note,
     # exactly as extraction_candidates keeps the document review trail.
@@ -140,7 +143,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
-        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping,
+        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -179,6 +182,8 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "ingestion_batches": direct["ingestion_batches"], "ingestion_batch_items": batch_items,
         "watchlist_entries": direct["watchlist_entries"], "watchlist_hits": direct["watchlist_hits"],
         "table_mappings": direct["table_mappings"],
+        "tags": direct["tags"], "record_tags": direct["record_tags"], "notes": direct["notes"],
+        "collections": direct["collections"], "collection_items": direct["collection_items"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

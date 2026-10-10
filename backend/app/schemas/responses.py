@@ -3646,3 +3646,104 @@ class DocumentTranslationOut(ResponseModel):
     detected_languages: list[str]
     translated_language: str | None
     parts: list[TranslationPartOut]
+
+
+# --- tags, notes and collections (app/services/annotations.py) ----------------
+
+AnnotatedRecordType = Literal["entity", "relationship", "evidence", "source", "claim", "event", "document", "lead", "task", "finding"]
+
+
+class TagOut(ResponseModel):
+    """A reporter's tag and how many records carry it."""
+    id: str
+    name: str
+    colour: str
+    count: int
+
+
+class TagsOut(ResponseModel):
+    investigation_id: str
+    colours: list[str]
+    tags: list[TagOut]
+
+
+class TagChipOut(ResponseModel):
+    id: str
+    name: str
+    colour: str
+
+
+class MarkedRecordOut(ResponseModel):
+    """A record a mark points at. ``caption`` is None when the record no longer exists."""
+    record_type: AnnotatedRecordType
+    record_id: str
+    caption: str | None
+
+
+class TaggedRecordsOut(ResponseModel):
+    tag: TagOut
+    records: list[MarkedRecordOut]
+
+
+class NoteOut(ResponseModel):
+    id: str
+    record_type: AnnotatedRecordType | None
+    record_id: str | None
+    caption: str | None
+    chart_ref: dict[str, Any] | None
+    text: str
+    lead_id: str | None
+    created_at: Timestamp
+    updated_at: Timestamp
+
+
+class NotesOut(ResponseModel):
+    investigation_id: str
+    notes: list[NoteOut]
+
+
+class CollectionRefOut(ResponseModel):
+    id: str
+    name: str
+
+
+class RecordMarksOut(ResponseModel):
+    """One record's tags, notes and the collections it is in."""
+    record_type: AnnotatedRecordType
+    record_id: str
+    caption: str | None
+    tags: list[TagChipOut]
+    notes: list[NoteOut]
+    collections: list[CollectionRefOut]
+
+
+class CollectionSummaryOut(ResponseModel):
+    id: str
+    name: str
+    description: str | None
+    item_count: int
+    created_at: Timestamp
+    updated_at: Timestamp
+
+
+class CollectionsOut(ResponseModel):
+    investigation_id: str
+    collections: list[CollectionSummaryOut]
+
+
+class CollectionItemOut(ResponseModel):
+    id: str
+    record_type: AnnotatedRecordType
+    record_id: str
+    position: int
+    caption: str | None
+
+
+class CollectionOut(ResponseModel):
+    """A collection and its records in order."""
+    id: str
+    name: str
+    description: str | None
+    created_at: Timestamp
+    updated_at: Timestamp
+    items: list[CollectionItemOut]

@@ -347,6 +347,12 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # A watched name and a document it was found in.
     watched = ok(client.post(f"{base}/watchlist", json={"query": "Meridian Holdings", "note": "The holding company"}))["entries"][0]["id"]
     watch_hit = _watchlist_hit(watched, document["id"])
+    # A tag on a party, a note on it, and a collection holding it (app/services/annotations.py).
+    tag = ok(client.post(f"{base}/tags", json={"name": "Holding company", "colour": "#314d65"}))["tags"][0]["id"]
+    ok(client.post(f"{base}/record-tags", json={"tag_id": tag, "record_type": "entity", "record_id": meridian}))
+    note = ok(client.post(f"{base}/notes", json={"text": "Who signed for Meridian?", "record_type": "entity", "record_id": meridian}))["id"]
+    marked = ok(client.post(f"{base}/collections", json={"name": "Money trail"}))["id"]
+    ok(client.post(f"/api/collections/{marked}/items", json={"record_type": "entity", "record_id": meridian}))
     # A reporter's timeline event, which can be graded.
     event = ok(client.post("/api/timeline-events", json={"investigation_id": inv, "title": "Wire sent", "date_start": "2023-11-14"}))["id"]
 
@@ -405,6 +411,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
+            "tag_id": tag, "note_id": note, "collection_id": marked,
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={
@@ -445,6 +452,9 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/provenance/extraction-lineage"): {"record_type": "evidence", "record_id": accepted["accepted_record_id"]},
             ("GET", "/api/provenance/trace"): {"record_type": "claim", "record_id": claim["id"]},
             ("GET", "/api/search"): {"q": "Meridian"},
+            ("GET", "/api/investigations/{investigation_id}/marks"): {"record_type": "entity", "record_id": meridian},
+            ("DELETE", "/api/investigations/{investigation_id}/record-tags"): {"tag_id": tag, "record_type": "entity", "record_id": meridian},
+            ("DELETE", "/api/collections/{collection_id}/items"): {"record_type": "entity", "record_id": meridian},
             ("GET", "/api/investigations/{investigation_id}/corpus/search"): {"q": "Meridian"},
             ("POST", "/api/console/backups/{bid}/restore/plan"): {"kind": "investigation_export"},
         },

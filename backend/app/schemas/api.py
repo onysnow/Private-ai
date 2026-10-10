@@ -493,3 +493,51 @@ class EntitySetSend(BaseModel):
     kind: Literal["diagram", "timeline", "list"]
     label: str | None = Field(default=None, max_length=512, description="The set's name; a list is updated when one with this name exists.")
     entity_ids: list[str] | None = Field(default=None, max_length=500, description="A list's entities (Workbench ids).")
+
+
+# --- tags, notes and collections (app/services/annotations.py) ----------------
+
+RecordType = Literal["entity", "relationship", "evidence", "source", "claim", "event", "document", "lead", "task", "finding"]
+
+
+class TagCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    colour: str = Field(description="One of the eight tag swatches (app/services/annotations.py TAG_COLOURS).")
+
+
+class TagUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=80)
+    colour: str | None = None
+
+
+class RecordTagCreate(BaseModel):
+    tag_id: str
+    record_type: RecordType
+    record_id: str
+
+
+class NoteCreate(BaseModel):
+    text: str = Field(min_length=1, max_length=20000)
+    record_type: RecordType | None = None
+    record_id: str | None = None
+    chart_ref: dict[str, Any] | None = Field(default=None, description="The chart kind and mark the note is on, when it is on a chart mark.")
+
+
+class NoteUpdate(BaseModel):
+    text: str = Field(min_length=1, max_length=20000)
+
+
+class CollectionCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+
+
+class CollectionUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+
+
+class CollectionItemCreate(BaseModel):
+    record_type: RecordType
+    record_id: str
+    position: int | None = Field(default=None, ge=0, description="Where in the list; the end when left out. A record already in the collection moves.")

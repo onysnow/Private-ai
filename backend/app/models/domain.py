@@ -70,6 +70,13 @@ from app.models.watchlists import (
     WatchlistEntry,
     WatchlistHit,
 )
+from app.models.annotations import (
+    Collection,
+    CollectionItem,
+    Note,
+    RecordTag,
+    Tag,
+)
 from app.models.ai import (
     AIAnalysisCandidate,
 )
@@ -140,6 +147,11 @@ __all__ = [
     "TableMapping",
     "WatchlistEntry",
     "WatchlistHit",
+    "Tag",
+    "RecordTag",
+    "Note",
+    "Collection",
+    "CollectionItem",
     "AIAnalysisCandidate",
     "Writeup",
     "Deck",

@@ -171,6 +171,9 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         WatchlistEntry,
         WatchlistHit,
         Writeup,
+        Tag,
+        Note,
+        Collection,
     )
 
     direct = {
@@ -192,6 +195,9 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "batch_id": (IngestionBatch, "investigation_id"),
         "watch_id": (WatchlistEntry, "investigation_id"),
         "hit_id": (WatchlistHit, "investigation_id"),
+        "tag_id": (Tag, "investigation_id"),
+        "note_id": (Note, "investigation_id"),
+        "collection_id": (Collection, "investigation_id"),
         "timeline_event_id": (TimelineEvent, "investigation_id"),
     }
     if key in direct:

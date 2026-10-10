@@ -2212,6 +2212,198 @@ export type ClusterReasonOut = {
 };
 
 /**
+ * CollectionCreate
+ */
+export type CollectionCreate = {
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * CollectionItemCreate
+ */
+export type CollectionItemCreate = {
+  /**
+   * Position
+   *
+   * Where in the list; the end when left out. A record already in the collection moves.
+   */
+  position?: number | null;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding';
+};
+
+/**
+ * CollectionItemOut
+ */
+export type CollectionItemOut = {
+  /**
+   * Caption
+   */
+  caption: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Position
+   */
+  position: number;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding';
+};
+
+/**
+ * CollectionOut
+ *
+ * A collection and its records in order.
+ */
+export type CollectionOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Description
+   */
+  description: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Items
+   */
+  items: Array<CollectionItemOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+};
+
+/**
+ * CollectionRefOut
+ */
+export type CollectionRefOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * CollectionSummaryOut
+ */
+export type CollectionSummaryOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Description
+   */
+  description: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Item Count
+   */
+  item_count: number;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+};
+
+/**
+ * CollectionUpdate
+ */
+export type CollectionUpdate = {
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+};
+
+/**
+ * CollectionsOut
+ */
+export type CollectionsOut = {
+  /**
+   * Collections
+   */
+  collections: Array<CollectionSummaryOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+};
+
+/**
  * ConnectorCredentialPut
  *
  * A connector's secret (PUT /settings/connectors/{provider}/credential).
@@ -8087,6 +8279,36 @@ export type MappingSchemasOut = {
 };
 
 /**
+ * MarkedRecordOut
+ *
+ * A record a mark points at. ``caption`` is None when the record no longer exists.
+ */
+export type MarkedRecordOut = {
+  /**
+   * Caption
+   */
+  caption: string | null;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding';
+};
+
+/**
  * MatchedPropertyOut
  *
  * One kind of property both entities have, and how well it agrees
@@ -8197,6 +8419,126 @@ export type MultiEnrichmentRequest = {
    * Providers
    */
   providers?: Array<string>;
+};
+
+/**
+ * NoteCreate
+ */
+export type NoteCreate = {
+  /**
+   * Chart Ref
+   *
+   * The chart kind and mark the note is on, when it is on a chart mark.
+   */
+  chart_ref?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Record Id
+   */
+  record_id?: string | null;
+  /**
+   * Record Type
+   */
+  record_type?:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding'
+    | null;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * NoteOut
+ */
+export type NoteOut = {
+  /**
+   * Caption
+   */
+  caption: string | null;
+  /**
+   * Chart Ref
+   */
+  chart_ref: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Lead Id
+   */
+  lead_id: string | null;
+  /**
+   * Record Id
+   */
+  record_id: string | null;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding'
+    | null;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+};
+
+/**
+ * NoteUpdate
+ */
+export type NoteUpdate = {
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * NotesOut
+ */
+export type NotesOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Notes
+   */
+  notes: Array<NoteOut>;
 };
 
 /**
@@ -9523,6 +9865,48 @@ export type ReconciliationSummaryOut = {
 };
 
 /**
+ * RecordMarksOut
+ *
+ * One record's tags, notes and the collections it is in.
+ */
+export type RecordMarksOut = {
+  /**
+   * Caption
+   */
+  caption: string | null;
+  /**
+   * Collections
+   */
+  collections: Array<CollectionRefOut>;
+  /**
+   * Notes
+   */
+  notes: Array<NoteOut>;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding';
+  /**
+   * Tags
+   */
+  tags: Array<TagChipOut>;
+};
+
+/**
  * RecordRef
  */
 export type RecordRef = {
@@ -9548,6 +9932,34 @@ export type RecordRefOut = {
    * Record Type
    */
   record_type: string;
+};
+
+/**
+ * RecordTagCreate
+ */
+export type RecordTagCreate = {
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'source'
+    | 'claim'
+    | 'event'
+    | 'document'
+    | 'lead'
+    | 'task'
+    | 'finding';
+  /**
+   * Tag Id
+   */
+  tag_id: string;
 };
 
 /**
@@ -11355,6 +11767,107 @@ export type TableRowOut = {
    * Number
    */
   number: number;
+};
+
+/**
+ * TagChipOut
+ */
+export type TagChipOut = {
+  /**
+   * Colour
+   */
+  colour: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * TagCreate
+ */
+export type TagCreate = {
+  /**
+   * Colour
+   *
+   * One of the eight tag swatches (app/services/annotations.py TAG_COLOURS).
+   */
+  colour: string;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * TagOut
+ *
+ * A reporter's tag and how many records carry it.
+ */
+export type TagOut = {
+  /**
+   * Colour
+   */
+  colour: string;
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * TagUpdate
+ */
+export type TagUpdate = {
+  /**
+   * Colour
+   */
+  colour?: string | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+};
+
+/**
+ * TaggedRecordsOut
+ */
+export type TaggedRecordsOut = {
+  /**
+   * Records
+   */
+  records: Array<MarkedRecordOut>;
+  tag: TagOut;
+};
+
+/**
+ * TagsOut
+ */
+export type TagsOut = {
+  /**
+   * Colours
+   */
+  colours: Array<string>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Tags
+   */
+  tags: Array<TagOut>;
 };
 
 /**
@@ -13548,6 +14061,204 @@ export type CreateClaimReviewResponses = {
 
 export type CreateClaimReviewResponse =
   CreateClaimReviewResponses[keyof CreateClaimReviewResponses];
+
+export type RemoveCollectionData = {
+  body?: never;
+  path: {
+    /**
+     * Collection Id
+     */
+    collection_id: string;
+  };
+  query?: never;
+  url: '/api/collections/{collection_id}';
+};
+
+export type RemoveCollectionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemoveCollectionError =
+  RemoveCollectionErrors[keyof RemoveCollectionErrors];
+
+export type RemoveCollectionResponses = {
+  /**
+   * Successful Response
+   */
+  200: CollectionsOut;
+};
+
+export type RemoveCollectionResponse =
+  RemoveCollectionResponses[keyof RemoveCollectionResponses];
+
+export type GetCollectionData = {
+  body?: never;
+  path: {
+    /**
+     * Collection Id
+     */
+    collection_id: string;
+  };
+  query?: never;
+  url: '/api/collections/{collection_id}';
+};
+
+export type GetCollectionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCollectionError = GetCollectionErrors[keyof GetCollectionErrors];
+
+export type GetCollectionResponses = {
+  /**
+   * Successful Response
+   */
+  200: CollectionOut;
+};
+
+export type GetCollectionResponse =
+  GetCollectionResponses[keyof GetCollectionResponses];
+
+export type EditCollectionData = {
+  body: CollectionUpdate;
+  path: {
+    /**
+     * Collection Id
+     */
+    collection_id: string;
+  };
+  query?: never;
+  url: '/api/collections/{collection_id}';
+};
+
+export type EditCollectionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type EditCollectionError =
+  EditCollectionErrors[keyof EditCollectionErrors];
+
+export type EditCollectionResponses = {
+  /**
+   * Successful Response
+   */
+  200: CollectionOut;
+};
+
+export type EditCollectionResponse =
+  EditCollectionResponses[keyof EditCollectionResponses];
+
+export type RemoveCollectionItemData = {
+  body?: never;
+  path: {
+    /**
+     * Collection Id
+     */
+    collection_id: string;
+  };
+  query: {
+    /**
+     * Record Type
+     */
+    record_type:
+      | 'entity'
+      | 'relationship'
+      | 'evidence'
+      | 'source'
+      | 'claim'
+      | 'event'
+      | 'document'
+      | 'lead'
+      | 'task'
+      | 'finding';
+    /**
+     * Record Id
+     */
+    record_id: string;
+  };
+  url: '/api/collections/{collection_id}/items';
+};
+
+export type RemoveCollectionItemErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemoveCollectionItemError =
+  RemoveCollectionItemErrors[keyof RemoveCollectionItemErrors];
+
+export type RemoveCollectionItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: CollectionOut;
+};
+
+export type RemoveCollectionItemResponse =
+  RemoveCollectionItemResponses[keyof RemoveCollectionItemResponses];
+
+export type AddCollectionItemData = {
+  body: CollectionItemCreate;
+  path: {
+    /**
+     * Collection Id
+     */
+    collection_id: string;
+  };
+  query?: never;
+  url: '/api/collections/{collection_id}/items';
+};
+
+export type AddCollectionItemErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddCollectionItemError =
+  AddCollectionItemErrors[keyof AddCollectionItemErrors];
+
+export type AddCollectionItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: CollectionOut;
+};
+
+export type AddCollectionItemResponse =
+  AddCollectionItemResponses[keyof AddCollectionItemResponses];
 
 export type ListAssessmentsData = {
   body?: never;
@@ -16661,6 +17372,77 @@ export type ListClaimsResponses = {
 
 export type ListClaimsResponse = ListClaimsResponses[keyof ListClaimsResponses];
 
+export type GetCollectionsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/collections';
+};
+
+export type GetCollectionsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCollectionsError =
+  GetCollectionsErrors[keyof GetCollectionsErrors];
+
+export type GetCollectionsResponses = {
+  /**
+   * Successful Response
+   */
+  200: CollectionsOut;
+};
+
+export type GetCollectionsResponse =
+  GetCollectionsResponses[keyof GetCollectionsResponses];
+
+export type AddCollectionData = {
+  body: CollectionCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/collections';
+};
+
+export type AddCollectionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddCollectionError = AddCollectionErrors[keyof AddCollectionErrors];
+
+export type AddCollectionResponses = {
+  /**
+   * Successful Response
+   */
+  200: CollectionOut;
+};
+
+export type AddCollectionResponse =
+  AddCollectionResponses[keyof AddCollectionResponses];
+
 export type ListConnectorFindingsData = {
   body?: never;
   path: {
@@ -17694,6 +18476,149 @@ export type LeadQueueResponses = {
 
 export type LeadQueueResponse = LeadQueueResponses[keyof LeadQueueResponses];
 
+export type GetRecordMarksData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query: {
+    /**
+     * Record Type
+     */
+    record_type:
+      | 'entity'
+      | 'relationship'
+      | 'evidence'
+      | 'source'
+      | 'claim'
+      | 'event'
+      | 'document'
+      | 'lead'
+      | 'task'
+      | 'finding';
+    /**
+     * Record Id
+     */
+    record_id: string;
+  };
+  url: '/api/investigations/{investigation_id}/marks';
+};
+
+export type GetRecordMarksErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetRecordMarksError =
+  GetRecordMarksErrors[keyof GetRecordMarksErrors];
+
+export type GetRecordMarksResponses = {
+  /**
+   * Successful Response
+   */
+  200: RecordMarksOut;
+};
+
+export type GetRecordMarksResponse =
+  GetRecordMarksResponses[keyof GetRecordMarksResponses];
+
+export type GetNotesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Record Type
+     */
+    record_type?:
+      | 'entity'
+      | 'relationship'
+      | 'evidence'
+      | 'source'
+      | 'claim'
+      | 'event'
+      | 'document'
+      | 'lead'
+      | 'task'
+      | 'finding'
+      | null;
+    /**
+     * Record Id
+     */
+    record_id?: string | null;
+  };
+  url: '/api/investigations/{investigation_id}/notes';
+};
+
+export type GetNotesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetNotesError = GetNotesErrors[keyof GetNotesErrors];
+
+export type GetNotesResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotesOut;
+};
+
+export type GetNotesResponse = GetNotesResponses[keyof GetNotesResponses];
+
+export type AddNoteData = {
+  body: NoteCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/notes';
+};
+
+export type AddNoteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddNoteError = AddNoteErrors[keyof AddNoteErrors];
+
+export type AddNoteResponses = {
+  /**
+   * Successful Response
+   */
+  200: NoteOut;
+};
+
+export type AddNoteResponse = AddNoteResponses[keyof AddNoteResponses];
+
 export type GetInvestigationPlacesData = {
   body?: never;
   path: {
@@ -17729,6 +18654,98 @@ export type GetInvestigationPlacesResponses = {
 
 export type GetInvestigationPlacesResponse =
   GetInvestigationPlacesResponses[keyof GetInvestigationPlacesResponses];
+
+export type UntagARecordData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query: {
+    /**
+     * Tag Id
+     */
+    tag_id: string;
+    /**
+     * Record Type
+     */
+    record_type:
+      | 'entity'
+      | 'relationship'
+      | 'evidence'
+      | 'source'
+      | 'claim'
+      | 'event'
+      | 'document'
+      | 'lead'
+      | 'task'
+      | 'finding';
+    /**
+     * Record Id
+     */
+    record_id: string;
+  };
+  url: '/api/investigations/{investigation_id}/record-tags';
+};
+
+export type UntagARecordErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UntagARecordError = UntagARecordErrors[keyof UntagARecordErrors];
+
+export type UntagARecordResponses = {
+  /**
+   * Successful Response
+   */
+  200: RecordMarksOut;
+};
+
+export type UntagARecordResponse =
+  UntagARecordResponses[keyof UntagARecordResponses];
+
+export type TagARecordData = {
+  body: RecordTagCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/record-tags';
+};
+
+export type TagARecordErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TagARecordError = TagARecordErrors[keyof TagARecordErrors];
+
+export type TagARecordResponses = {
+  /**
+   * Successful Response
+   */
+  200: RecordMarksOut;
+};
+
+export type TagARecordResponse = TagARecordResponses[keyof TagARecordResponses];
 
 export type ListInvestigationRelationshipsData = {
   body?: never;
@@ -17873,6 +18890,74 @@ export type ListSourcesResponses = {
 
 export type ListSourcesResponse =
   ListSourcesResponses[keyof ListSourcesResponses];
+
+export type GetTagsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/tags';
+};
+
+export type GetTagsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetTagsError = GetTagsErrors[keyof GetTagsErrors];
+
+export type GetTagsResponses = {
+  /**
+   * Successful Response
+   */
+  200: TagsOut;
+};
+
+export type GetTagsResponse = GetTagsResponses[keyof GetTagsResponses];
+
+export type AddTagData = {
+  body: TagCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/tags';
+};
+
+export type AddTagErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddTagError = AddTagErrors[keyof AddTagErrors];
+
+export type AddTagResponses = {
+  /**
+   * Successful Response
+   */
+  200: TagsOut;
+};
+
+export type AddTagResponse = AddTagResponses[keyof AddTagResponses];
 
 export type GetInvestigationTimelineData = {
   body?: never;
@@ -18567,6 +19652,110 @@ export type LinkLeadResponses = {
 };
 
 export type LinkLeadResponse = LinkLeadResponses[keyof LinkLeadResponses];
+
+export type RemoveNoteData = {
+  body?: never;
+  path: {
+    /**
+     * Note Id
+     */
+    note_id: string;
+  };
+  query?: never;
+  url: '/api/notes/{note_id}';
+};
+
+export type RemoveNoteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemoveNoteError = RemoveNoteErrors[keyof RemoveNoteErrors];
+
+export type RemoveNoteResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotesOut;
+};
+
+export type RemoveNoteResponse = RemoveNoteResponses[keyof RemoveNoteResponses];
+
+export type EditNoteData = {
+  body: NoteUpdate;
+  path: {
+    /**
+     * Note Id
+     */
+    note_id: string;
+  };
+  query?: never;
+  url: '/api/notes/{note_id}';
+};
+
+export type EditNoteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type EditNoteError = EditNoteErrors[keyof EditNoteErrors];
+
+export type EditNoteResponses = {
+  /**
+   * Successful Response
+   */
+  200: NoteOut;
+};
+
+export type EditNoteResponse = EditNoteResponses[keyof EditNoteResponses];
+
+export type MakeLeadFromNoteData = {
+  body?: never;
+  path: {
+    /**
+     * Note Id
+     */
+    note_id: string;
+  };
+  query?: never;
+  url: '/api/notes/{note_id}/lead';
+};
+
+export type MakeLeadFromNoteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeLeadFromNoteError =
+  MakeLeadFromNoteErrors[keyof MakeLeadFromNoteErrors];
+
+export type MakeLeadFromNoteResponses = {
+  /**
+   * Successful Response
+   */
+  200: LeadOut;
+};
+
+export type MakeLeadFromNoteResponse =
+  MakeLeadFromNoteResponses[keyof MakeLeadFromNoteResponses];
 
 export type PresentationStylesData = {
   body?: never;
@@ -19716,6 +20905,110 @@ export type GetMappingSchemasResponses = {
 
 export type GetMappingSchemasResponse =
   GetMappingSchemasResponses[keyof GetMappingSchemasResponses];
+
+export type RemoveTagData = {
+  body?: never;
+  path: {
+    /**
+     * Tag Id
+     */
+    tag_id: string;
+  };
+  query?: never;
+  url: '/api/tags/{tag_id}';
+};
+
+export type RemoveTagErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemoveTagError = RemoveTagErrors[keyof RemoveTagErrors];
+
+export type RemoveTagResponses = {
+  /**
+   * Successful Response
+   */
+  200: TagsOut;
+};
+
+export type RemoveTagResponse = RemoveTagResponses[keyof RemoveTagResponses];
+
+export type EditTagData = {
+  body: TagUpdate;
+  path: {
+    /**
+     * Tag Id
+     */
+    tag_id: string;
+  };
+  query?: never;
+  url: '/api/tags/{tag_id}';
+};
+
+export type EditTagErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type EditTagError = EditTagErrors[keyof EditTagErrors];
+
+export type EditTagResponses = {
+  /**
+   * Successful Response
+   */
+  200: TagsOut;
+};
+
+export type EditTagResponse = EditTagResponses[keyof EditTagResponses];
+
+export type GetTaggedRecordsData = {
+  body?: never;
+  path: {
+    /**
+     * Tag Id
+     */
+    tag_id: string;
+  };
+  query?: never;
+  url: '/api/tags/{tag_id}/records';
+};
+
+export type GetTaggedRecordsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetTaggedRecordsError =
+  GetTaggedRecordsErrors[keyof GetTaggedRecordsErrors];
+
+export type GetTaggedRecordsResponses = {
+  /**
+   * Successful Response
+   */
+  200: TaggedRecordsOut;
+};
+
+export type GetTaggedRecordsResponse =
+  GetTaggedRecordsResponses[keyof GetTaggedRecordsResponses];
 
 export type CreateTimelineEventEndpointData = {
   body: TimelineEventCreate;

@@ -11,6 +11,10 @@ import { client } from '../client.gen';
 import {
   addChartToDeckEndpoint,
   addChartToWriteupEndpoint,
+  addCollection,
+  addCollectionItem,
+  addNote,
+  addTag,
   addWatchlistEntry,
   analyzeOpenalephDocument,
   assessStatement,
@@ -46,6 +50,9 @@ import {
   deleteInvestigationMembership,
   deleteWriteupEndpoint,
   dismissHit,
+  editCollection,
+  editNote,
+  editTag,
   enrichEntity,
   enrichEntityMulti,
   enrichmentSessionClusters,
@@ -70,6 +77,8 @@ import {
   getBasemapStatus,
   getBasemapTile,
   getClaimReviewWorkspace,
+  getCollection,
+  getCollections,
   getCorpusInsights,
   getCorpusStatus,
   getCorpusSync,
@@ -94,17 +103,21 @@ import {
   getJobEndpoint,
   getLead,
   getMappingSchemas,
+  getNotes,
   getOpenalephCorpusBinding,
   getOpenalephDocumentReviewStatus,
   getOpenalephDocumentSync,
   getOrphanStoragePreview,
   getOwnershipChain,
+  getRecordMarks,
   getRecordProvenanceTrace,
   getSecurityAlerts,
   getSecurityAudit,
   getSecurityAuditRetentionPreview,
   getSecurityAuditSummary,
   getSimilarDocuments,
+  getTaggedRecords,
+  getTags,
   getWatchlist,
   getWriteupEndpoint,
   gradeTimelineEventEndpoint,
@@ -160,6 +173,7 @@ import {
   listSources,
   listWriteupsEndpoint,
   makeLeadFromHit,
+  makeLeadFromNote,
   openalephIntegrationStatus,
   type Options,
   presentationStyles,
@@ -173,7 +187,11 @@ import {
   putInvestigationMembership,
   refreshOpenalephDocumentReview,
   relationshipSchemas,
+  removeCollection,
+  removeCollectionItem,
   removeInvestigation,
+  removeNote,
+  removeTag,
   removeWatchlistEntry,
   resolveFinding,
   restoreBackup,
@@ -194,6 +212,8 @@ import {
   settingsStatus,
   syncCorpusNow,
   syncOpenalephDocument,
+  tagARecord,
+  untagARecord,
   updateAppUser,
   updateClaimEndpoint,
   updateDeckEndpoint,
@@ -210,6 +230,18 @@ import type {
   AddChartToWriteupEndpointData,
   AddChartToWriteupEndpointError,
   AddChartToWriteupEndpointResponse,
+  AddCollectionData,
+  AddCollectionError,
+  AddCollectionItemData,
+  AddCollectionItemError,
+  AddCollectionItemResponse,
+  AddCollectionResponse,
+  AddNoteData,
+  AddNoteError,
+  AddNoteResponse,
+  AddTagData,
+  AddTagError,
+  AddTagResponse,
   AddWatchlistEntryData,
   AddWatchlistEntryError,
   AddWatchlistEntryResponse,
@@ -315,6 +347,15 @@ import type {
   DismissHitData,
   DismissHitError,
   DismissHitResponse,
+  EditCollectionData,
+  EditCollectionError,
+  EditCollectionResponse,
+  EditNoteData,
+  EditNoteError,
+  EditNoteResponse,
+  EditTagData,
+  EditTagError,
+  EditTagResponse,
   EnrichEntityData,
   EnrichEntityError,
   EnrichEntityMultiData,
@@ -387,6 +428,12 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
+  GetCollectionData,
+  GetCollectionError,
+  GetCollectionResponse,
+  GetCollectionsData,
+  GetCollectionsError,
+  GetCollectionsResponse,
   GetCorpusInsightsData,
   GetCorpusInsightsError,
   GetCorpusInsightsResponse,
@@ -459,6 +506,9 @@ import type {
   GetMappingSchemasData,
   GetMappingSchemasError,
   GetMappingSchemasResponse,
+  GetNotesData,
+  GetNotesError,
+  GetNotesResponse,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingError,
   GetOpenalephCorpusBindingResponse,
@@ -474,6 +524,9 @@ import type {
   GetOwnershipChainData,
   GetOwnershipChainError,
   GetOwnershipChainResponse,
+  GetRecordMarksData,
+  GetRecordMarksError,
+  GetRecordMarksResponse,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceError,
   GetRecordProvenanceTraceResponse,
@@ -492,6 +545,12 @@ import type {
   GetSimilarDocumentsData,
   GetSimilarDocumentsError,
   GetSimilarDocumentsResponse,
+  GetTaggedRecordsData,
+  GetTaggedRecordsError,
+  GetTaggedRecordsResponse,
+  GetTagsData,
+  GetTagsError,
+  GetTagsResponse,
   GetWatchlistData,
   GetWatchlistError,
   GetWatchlistResponse,
@@ -657,6 +716,9 @@ import type {
   MakeLeadFromHitData,
   MakeLeadFromHitError,
   MakeLeadFromHitResponse,
+  MakeLeadFromNoteData,
+  MakeLeadFromNoteError,
+  MakeLeadFromNoteResponse,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
@@ -693,9 +755,21 @@ import type {
   RelationshipSchemasData,
   RelationshipSchemasError,
   RelationshipSchemasResponse,
+  RemoveCollectionData,
+  RemoveCollectionError,
+  RemoveCollectionItemData,
+  RemoveCollectionItemError,
+  RemoveCollectionItemResponse,
+  RemoveCollectionResponse,
   RemoveInvestigationData,
   RemoveInvestigationError,
   RemoveInvestigationResponse,
+  RemoveNoteData,
+  RemoveNoteError,
+  RemoveNoteResponse,
+  RemoveTagData,
+  RemoveTagError,
+  RemoveTagResponse,
   RemoveWatchlistEntryData,
   RemoveWatchlistEntryError,
   RemoveWatchlistEntryResponse,
@@ -756,6 +830,12 @@ import type {
   SyncOpenalephDocumentData,
   SyncOpenalephDocumentError,
   SyncOpenalephDocumentResponse,
+  TagARecordData,
+  TagARecordError,
+  TagARecordResponse,
+  UntagARecordData,
+  UntagARecordError,
+  UntagARecordResponse,
   UpdateAppUserData,
   UpdateAppUserError,
   UpdateAppUserResponse,
@@ -1337,6 +1417,143 @@ export const createClaimReviewMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createClaimReview({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Remove Collection
+ *
+ * Delete the collection. The records in it stay.
+ */
+export const removeCollectionMutation = (
+  options?: Partial<Options<RemoveCollectionData>>,
+): UseMutationOptions<
+  RemoveCollectionResponse,
+  RemoveCollectionError,
+  Options<RemoveCollectionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RemoveCollectionResponse,
+    RemoveCollectionError,
+    Options<RemoveCollectionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await removeCollection({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getCollectionQueryKey = (options: Options<GetCollectionData>) =>
+  createQueryKey('getCollection', options);
+
+/**
+ * Get Collection
+ */
+export const getCollectionOptions = (options: Options<GetCollectionData>) =>
+  queryOptions<
+    GetCollectionResponse,
+    GetCollectionError,
+    GetCollectionResponse,
+    ReturnType<typeof getCollectionQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCollection({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCollectionQueryKey(options),
+  });
+
+/**
+ * Edit Collection
+ */
+export const editCollectionMutation = (
+  options?: Partial<Options<EditCollectionData>>,
+): UseMutationOptions<
+  EditCollectionResponse,
+  EditCollectionError,
+  Options<EditCollectionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    EditCollectionResponse,
+    EditCollectionError,
+    Options<EditCollectionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await editCollection({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Remove Collection Item
+ */
+export const removeCollectionItemMutation = (
+  options?: Partial<Options<RemoveCollectionItemData>>,
+): UseMutationOptions<
+  RemoveCollectionItemResponse,
+  RemoveCollectionItemError,
+  Options<RemoveCollectionItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RemoveCollectionItemResponse,
+    RemoveCollectionItemError,
+    Options<RemoveCollectionItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await removeCollectionItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add Collection Item
+ *
+ * Add a record to the collection, or move it when it is already there.
+ */
+export const addCollectionItemMutation = (
+  options?: Partial<Options<AddCollectionItemData>>,
+): UseMutationOptions<
+  AddCollectionItemResponse,
+  AddCollectionItemError,
+  Options<AddCollectionItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddCollectionItemResponse,
+    AddCollectionItemError,
+    Options<AddCollectionItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addCollectionItem({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -3853,6 +4070,58 @@ export const listClaimsInfiniteOptions = (options: Options<ListClaimsData>) => {
   return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const getCollectionsQueryKey = (options: Options<GetCollectionsData>) =>
+  createQueryKey('getCollections', options);
+
+/**
+ * Get Collections
+ */
+export const getCollectionsOptions = (options: Options<GetCollectionsData>) =>
+  queryOptions<
+    GetCollectionsResponse,
+    GetCollectionsError,
+    GetCollectionsResponse,
+    ReturnType<typeof getCollectionsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCollections({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCollectionsQueryKey(options),
+  });
+
+/**
+ * Add Collection
+ */
+export const addCollectionMutation = (
+  options?: Partial<Options<AddCollectionData>>,
+): UseMutationOptions<
+  AddCollectionResponse,
+  AddCollectionError,
+  Options<AddCollectionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddCollectionResponse,
+    AddCollectionError,
+    Options<AddCollectionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addCollection({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const listConnectorFindingsQueryKey = (
   options: Options<ListConnectorFindingsData>,
 ) => createQueryKey('listConnectorFindings', options);
@@ -4983,6 +5252,85 @@ export const leadQueueInfiniteOptions = (options: Options<LeadQueueData>) => {
   return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const getRecordMarksQueryKey = (options: Options<GetRecordMarksData>) =>
+  createQueryKey('getRecordMarks', options);
+
+/**
+ * Get Record Marks
+ *
+ * One record's tags, notes and the collections it is in.
+ */
+export const getRecordMarksOptions = (options: Options<GetRecordMarksData>) =>
+  queryOptions<
+    GetRecordMarksResponse,
+    GetRecordMarksError,
+    GetRecordMarksResponse,
+    ReturnType<typeof getRecordMarksQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getRecordMarks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getRecordMarksQueryKey(options),
+  });
+
+export const getNotesQueryKey = (options: Options<GetNotesData>) =>
+  createQueryKey('getNotes', options);
+
+/**
+ * Get Notes
+ *
+ * Notes, newest first: all of them, or those on one record.
+ */
+export const getNotesOptions = (options: Options<GetNotesData>) =>
+  queryOptions<
+    GetNotesResponse,
+    GetNotesError,
+    GetNotesResponse,
+    ReturnType<typeof getNotesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getNotes({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getNotesQueryKey(options),
+  });
+
+/**
+ * Add Note
+ *
+ * A note on a record, on a chart mark, or (with neither) on the investigation.
+ */
+export const addNoteMutation = (
+  options?: Partial<Options<AddNoteData>>,
+): UseMutationOptions<AddNoteResponse, AddNoteError, Options<AddNoteData>> => {
+  const mutationOptions: UseMutationOptions<
+    AddNoteResponse,
+    AddNoteError,
+    Options<AddNoteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getInvestigationPlacesQueryKey = (
   options: Options<GetInvestigationPlacesData>,
 ) => createQueryKey('getInvestigationPlaces', options);
@@ -5012,6 +5360,62 @@ export const getInvestigationPlacesOptions = (
     },
     queryKey: getInvestigationPlacesQueryKey(options),
   });
+
+/**
+ * Untag A Record
+ */
+export const untagARecordMutation = (
+  options?: Partial<Options<UntagARecordData>>,
+): UseMutationOptions<
+  UntagARecordResponse,
+  UntagARecordError,
+  Options<UntagARecordData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UntagARecordResponse,
+    UntagARecordError,
+    Options<UntagARecordData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await untagARecord({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Tag A Record
+ *
+ * Put a tag on a record. Tagging a record twice with the same tag changes nothing.
+ */
+export const tagARecordMutation = (
+  options?: Partial<Options<TagARecordData>>,
+): UseMutationOptions<
+  TagARecordResponse,
+  TagARecordError,
+  Options<TagARecordData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    TagARecordResponse,
+    TagARecordError,
+    Options<TagARecordData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await tagARecord({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const listInvestigationRelationshipsQueryKey = (
   options: Options<ListInvestigationRelationshipsData>,
@@ -5248,6 +5652,56 @@ export const listSourcesInfiniteOptions = (
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getTagsQueryKey = (options: Options<GetTagsData>) =>
+  createQueryKey('getTags', options);
+
+/**
+ * Get Tags
+ *
+ * The investigation's tags, each with how many records carry it, and the swatches a tag may use.
+ */
+export const getTagsOptions = (options: Options<GetTagsData>) =>
+  queryOptions<
+    GetTagsResponse,
+    GetTagsError,
+    GetTagsResponse,
+    ReturnType<typeof getTagsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTags({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTagsQueryKey(options),
+  });
+
+/**
+ * Add Tag
+ */
+export const addTagMutation = (
+  options?: Partial<Options<AddTagData>>,
+): UseMutationOptions<AddTagResponse, AddTagError, Options<AddTagData>> => {
+  const mutationOptions: UseMutationOptions<
+    AddTagResponse,
+    AddTagError,
+    Options<AddTagData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addTag({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const getInvestigationTimelineQueryKey = (
@@ -5799,6 +6253,91 @@ export const linkLeadMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await linkLead({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Remove Note
+ *
+ * Delete the note. A lead made from it stays.
+ */
+export const removeNoteMutation = (
+  options?: Partial<Options<RemoveNoteData>>,
+): UseMutationOptions<
+  RemoveNoteResponse,
+  RemoveNoteError,
+  Options<RemoveNoteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RemoveNoteResponse,
+    RemoveNoteError,
+    Options<RemoveNoteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await removeNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Edit Note
+ */
+export const editNoteMutation = (
+  options?: Partial<Options<EditNoteData>>,
+): UseMutationOptions<
+  EditNoteResponse,
+  EditNoteError,
+  Options<EditNoteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    EditNoteResponse,
+    EditNoteError,
+    Options<EditNoteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await editNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Make Lead From Note
+ *
+ * Make the note a lead, linked to the record it was written on.
+ */
+export const makeLeadFromNoteMutation = (
+  options?: Partial<Options<MakeLeadFromNoteData>>,
+): UseMutationOptions<
+  MakeLeadFromNoteResponse,
+  MakeLeadFromNoteError,
+  Options<MakeLeadFromNoteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeLeadFromNoteResponse,
+    MakeLeadFromNoteError,
+    Options<MakeLeadFromNoteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeLeadFromNote({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -6749,6 +7288,86 @@ export const getMappingSchemasOptions = (
       return data;
     },
     queryKey: getMappingSchemasQueryKey(options),
+  });
+
+/**
+ * Remove Tag
+ *
+ * Take the tag off every record, then delete it. The records stay.
+ */
+export const removeTagMutation = (
+  options?: Partial<Options<RemoveTagData>>,
+): UseMutationOptions<
+  RemoveTagResponse,
+  RemoveTagError,
+  Options<RemoveTagData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RemoveTagResponse,
+    RemoveTagError,
+    Options<RemoveTagData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await removeTag({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Edit Tag
+ */
+export const editTagMutation = (
+  options?: Partial<Options<EditTagData>>,
+): UseMutationOptions<EditTagResponse, EditTagError, Options<EditTagData>> => {
+  const mutationOptions: UseMutationOptions<
+    EditTagResponse,
+    EditTagError,
+    Options<EditTagData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await editTag({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getTaggedRecordsQueryKey = (
+  options: Options<GetTaggedRecordsData>,
+) => createQueryKey('getTaggedRecords', options);
+
+/**
+ * Get Tagged Records
+ */
+export const getTaggedRecordsOptions = (
+  options: Options<GetTaggedRecordsData>,
+) =>
+  queryOptions<
+    GetTaggedRecordsResponse,
+    GetTaggedRecordsError,
+    GetTaggedRecordsResponse,
+    ReturnType<typeof getTaggedRecordsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTaggedRecords({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTaggedRecordsQueryKey(options),
   });
 
 /**
