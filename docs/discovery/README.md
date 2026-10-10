@@ -301,6 +301,13 @@ background, showing a preview of their date or time.
   that period, marked "sometime in March 2019", so it is never shown as
   happening on a particular day. Each finer layer inside that period carries a
   small note ("2 items dated only to March 2019") that opens them.
+- Mostly visual, not text (Ony, 10 October 2026): each card shows the
+  evidence itself (the scan, the photo, the text-message screenshot, the news
+  clipping, the bank line), with one line of words; more colour, one hue per
+  kind of evidence. Library first: start from existing components (Swiper's
+  creative and cards effects with its mousewheel module, Framer-style depth
+  stacks, Codrops' on-scroll 3D stack; vis-timeline or react-chrono for the
+  lanes view), each needing an ADR before it is added.
 
 After these steps are built and tested, and after several people can work on
 one investigation (planned, 8 October), the next item is **admin tools and
