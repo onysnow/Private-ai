@@ -286,6 +286,14 @@ timeline. The reporter changes how it is viewed, chooses what items make it
 up, and can build their own timeline by dragging and dropping event entities
 or placing named placeholders.
 
+One view is **a stack in depth** (Ony, 10 October 2026): time is cut into
+segments as fine as the evidence allows (minute, hour, day, week, month).
+The current segment's cards (every piece of evidence that falls in it) sit on
+top and can be clicked through. One notch of the mouse wheel moves the top
+layer toward the viewer as if coming out of the screen; it disappears and the
+next segment's cards are there. The later segments recede into the
+background, showing a preview of their date or time.
+
 After these steps are built and tested, and after several people can work on
 one investigation (planned, 8 October), the next item is **admin tools and
 project-management tooling for the app's own teams** (Ony, 10 October 2026).
