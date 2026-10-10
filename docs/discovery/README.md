@@ -281,6 +281,19 @@ After these steps are built and tested, and after several people can work on
 one investigation (planned, 8 October), the next item is **admin tools and
 project-management tooling for the app's own teams** (Ony, 10 October 2026).
 
+After the application is finished: **a community on top of it, like Reddit**
+(Ony, 10 October 2026). Noted, not designed yet:
+
+- People open investigations and run them as lead investigators or in other
+  roles, including moderation.
+- Each investigation is open to anyone to join, or only to specific users;
+  who may join could depend on locality or on in-app stats (investigations
+  completed, contributions).
+- Stats and badges for users, as Reddit has.
+- A place where users post things and ask others to look into them.
+- Major events where something looks wrong: the app itself opens an
+  investigation.
+
 Progress: step 1 built on 9–10 October (tags, notes and collections; the
 search redesign; the five-stage page with its rail and "Where things stand"
 tiles; Chain of Custody as a drawer; the dark record cards). Ony kept the two

@@ -29,6 +29,7 @@ import {ProvenancePanel} from '../features/provenance/provenance-panel';
 import {withEnds} from '../features/relationship-graph/graph';
 import {StageRail, StageSection, StandingTiles, useStanding} from '../components/layout/workbench-page';
 import {YearSlider} from '../components/charts/year-slider';
+import {RedFlagsPanel} from '../features/red-flags/red-flags-panel';
 import {RelationshipGraphPanel} from '../features/relationship-graph/relationship-graph-panel';
 import {ReviewQueuePanel} from '../features/review-queue/review-queue-panel';
 import {SearchPanel} from '../features/search/search-panel';
@@ -194,6 +195,7 @@ function Workbench(): ReactElement {
       </StageSection>
 
       <StageSection stage="report">
+        <PanelErrorBoundary name="Red Flags"><RedFlagsPanel investigationId={inv}/></PanelErrorBoundary>
         <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>
         {/* A chart from the records without the AI; keyed by case, so a new case starts a new chart. */}
         <div id="chart-builder"><PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary></div>

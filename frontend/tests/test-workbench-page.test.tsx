@@ -18,6 +18,7 @@ const standing: Standing = {
   timeline: {total: 6, from: '2019', to: '2024', sure: {supported: 3, not_yet: 2, disputed: 1}},
   leads: {open: 3, status: {active: 1, unreviewed: 2}, urgent: 1},
   places: 0,
+  flags: 2,
 };
 
 describe('Workbench page frame', () => {

@@ -66,7 +66,8 @@ const attached = () => relationshipFixture({provenance: {statement_count: 0, sou
 
 async function renderPanel(routes: Routes = {}, {entities = [entityA, entityB], edges = [] as unknown[], evidence = [] as unknown[]} = {}) {
   const api = mockApi({[ENTITIES]: entities, [GRAPH]: emptyGraph(edges), [EVIDENCE]: evidence,
-    'GET /api/investigations/inv-1/record-tags': {investigation_id: 'inv-1', rows: []}, ...routes});
+    'GET /api/investigations/inv-1/record-tags': {investigation_id: 'inv-1', rows: []},
+    'GET /api/investigations/inv-1/red-flags': {investigation_id: 'inv-1', rules: [], flags: [], gone: []}, ...routes});
   wrap(<RelationshipGraphPanel investigationId="inv-1"/>);
   await waitFor(() => expect(api.calls(GRAPH)).toHaveLength(1));
   return api;
@@ -160,6 +161,8 @@ describe('RelationshipGraphPanel', () => {
       'GET /api/investigations/inv-2/evidence': [],
       'GET /api/investigations/inv-1/record-tags': {investigation_id: 'inv-1', rows: []},
       'GET /api/investigations/inv-2/record-tags': {investigation_id: 'inv-2', rows: []},
+      'GET /api/investigations/inv-1/red-flags': {investigation_id: 'inv-1', rules: [], flags: [], gone: []},
+      'GET /api/investigations/inv-2/red-flags': {investigation_id: 'inv-2', rules: [], flags: [], gone: []},
     });
     const view = wrap(<RelationshipGraphPanel investigationId="inv-1"/>);
     expect(await screen.findByTestId('graph-edge-rel-1')).toBeInTheDocument();

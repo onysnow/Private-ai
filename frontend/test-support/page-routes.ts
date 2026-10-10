@@ -324,6 +324,7 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/tags`]: tagsBody(id),
     [`GET ${base}/collections`]: {investigation_id: id, collections: []},
     [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
+    [`GET ${base}/red-flags`]: {investigation_id: id, rules: [], flags: [], gone: []},
   };
 }
 

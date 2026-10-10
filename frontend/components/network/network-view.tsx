@@ -65,6 +65,8 @@ export type NetOverlays = {
   pointed?: string | null;
   /** A chain from "How are these two connected?". */
   chain?: {parties: Set<string>; links: Set<string>} | null;
+  /** Open Red Flags on each party: a small marker on its dot (alerts stay in the app). */
+  flags?: Record<string, number>;
 };
 type Ctx = {hover: Hover; setHover: (h: Hover) => void; lit: Set<string> | null; litLinks: Set<string> | null; focusParty: string | null; overlays: NetOverlays};
 const HoverContext = createContext<Ctx>({hover: {party: null, link: null}, setHover: () => {}, lit: null, litLinks: null, focusParty: null, overlays: {}});
@@ -77,13 +79,14 @@ function PartyNode({data}: NodeProps<Node<PartyData>>): ReactElement {
   const {hover, setHover, lit, focusParty, overlays} = useContext(HoverContext);
   const {party, links, lines, width, onParty} = data;
   const tagRings = (overlays.tags?.[party.id] ?? []).slice(0, 3);
+  const flagCount = overlays.flags?.[party.id] ?? 0;
   const look = PARTY[party.kind];
   const r = dotRadius(links);
   const Icon = KIND_ICON[party.kind];
   const dim = lit !== null && !lit.has(party.id);
   const on = hover.party === party.id || (hover.party === null && focusParty === party.id);
   return <button type="button" className="net-party" style={{width, opacity: dim ? 0.22 : 1}}
-    aria-label={`${party.label}, ${look.name}, ${links} link${links === 1 ? '' : 's'}${tagRings.length ? `, tagged ${tagRings.map(t => t.name).join(', ')}` : ''}`} title={`${party.label} · ${party.schema}`}
+    aria-label={`${party.label}, ${look.name}, ${links} link${links === 1 ? '' : 's'}${tagRings.length ? `, tagged ${tagRings.map(t => t.name).join(', ')}` : ''}${flagCount ? `, ${flagCount} open Red Flag${flagCount === 1 ? '' : 's'}` : ''}`} title={`${party.label} · ${party.schema}`}
     onMouseEnter={() => setHover({party: party.id, link: null})} onMouseLeave={() => setHover({party: null, link: null})}
     onFocus={() => setHover({party: party.id, link: null})} onBlur={() => setHover({party: null, link: null})}
     onClick={() => onParty?.(party.id)}>
@@ -94,6 +97,9 @@ function PartyNode({data}: NodeProps<Node<PartyData>>): ReactElement {
       {on && <circle cx={width / 2} cy={MAX_RADIUS + 2} r={r + 4} fill="none" stroke={SWATCH.parchment} strokeWidth={1.5}/>}
       {tagRings.map((t, i) => <circle key={t.name} cx={width / 2} cy={MAX_RADIUS + 2} r={r + 3.5 + i * 3.5} fill="none" stroke={t.colour} strokeWidth={3}><title>{t.name}</title></circle>)}
       <circle cx={width / 2} cy={MAX_RADIUS + 2} r={r} fill={look.fill} stroke={look.ring} strokeWidth={2.5}/>
+      {flagCount > 0 && <g><circle cx={width / 2 + r * 0.8} cy={MAX_RADIUS + 2 - r * 0.8} r={8} fill="#312237" stroke="#9a83a8" strokeWidth={1.5}/>
+        <text x={width / 2 + r * 0.8} y={MAX_RADIUS + 2 - r * 0.8 + 3.5} textAnchor="middle" fontSize={10} fontWeight={700} fill={SWATCH.ink}>{flagCount}</text>
+        <title>{flagCount} open Red Flag{flagCount === 1 ? '' : 's'}</title></g>}
       {Icon && <Icon x={width / 2 - r * 0.55} y={MAX_RADIUS + 2 - r * 0.55} width={r * 1.1} height={r * 1.1} color={look.ring} strokeWidth={2.2}/>}
     </svg>
     <span className="net-name">{lines.map((line, i) => <span key={i}>{line}</span>)}</span>

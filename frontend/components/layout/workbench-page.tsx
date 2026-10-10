@@ -8,7 +8,7 @@ import {useQuery} from '@tanstack/react-query';
 import type {ReactElement, ReactNode} from 'react';
 
 import {
-  getInvestigationGraphOptions, getInvestigationPlacesOptions, getInvestigationTimelineOptions, leadQueueOptions, listClaimsOptions,
+  getInvestigationGraphOptions, getInvestigationPlacesOptions, getRedFlagsOptions, getInvestigationTimelineOptions, leadQueueOptions, listClaimsOptions,
   listDocumentsOptions, listInvestigationEvidenceOptions, listSourcesOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {RelationshipOut} from '../../lib/generated/types.gen';
@@ -47,6 +47,8 @@ export type Standing = {
   timeline: {total: number; from?: string; to?: string; sure: SureCounts};
   leads: {open: number; status: Record<string, number>; urgent: number};
   places: number;
+  /** Open Red Flags. */
+  flags: number;
 };
 
 /** Everything the rail and the tiles show, from the panels' own cached reads. */
@@ -61,6 +63,7 @@ export function useStanding(investigationId: string): Standing {
   const timeline = useQuery({...getInvestigationTimelineOptions({path}), enabled}).data;
   const leads = useQuery({...leadQueueOptions({path, query: {unresolved_only: false}}), enabled}).data;
   const places = useQuery({...getInvestigationPlacesOptions({path}), enabled}).data;
+  const redFlags = useQuery({...getRedFlagsOptions({path}), enabled}).data;
   const edges = graph?.edges ?? [];
   const events = timeline?.events ?? [];
   const years = events.map(e => (e.date_start ?? '').slice(0, 4)).filter(y => /^\d{4}$/.test(y)).sort();
@@ -74,6 +77,7 @@ export function useStanding(investigationId: string): Standing {
     leads: {open: leadRows.filter(l => OPEN_LEAD.has(l.status)).length, status: count(leadRows.filter(l => OPEN_LEAD.has(l.status)), l => l.status),
       urgent: leadRows.filter(l => OPEN_LEAD.has(l.status) && l.priority === 'urgent').length},
     places: places?.places.length ?? 0,
+    flags: (redFlags?.flags ?? []).filter(f => f.status === 'open').length,
   };
 }
 
@@ -137,6 +141,7 @@ function partCount(standing: Standing, anchor: string): string | null {
     case 'timeline': return String(standing.timeline.total);
     case 'places': return String(standing.places);
     case 'leads': return String(standing.leads.open);
+    case 'red-flags': return String(standing.flags);
     default: return null;
   }
 }

@@ -29,6 +29,7 @@ export const STAGES: Stage[] = [
     {label: 'Places', anchor: 'places'},
   ]},
   {key: 'report', n: 4, name: 'Report', line: 'What to chase next, and what to publish from.', colour: SWATCH.copper, parts: [
+    {label: 'Red Flags', anchor: 'red-flags'},
     {label: 'Leads', anchor: 'leads'},
     {label: 'Charts', anchor: 'chart-builder'},
     {label: 'AI drafts', anchor: 'ai-reasoning-panel'},

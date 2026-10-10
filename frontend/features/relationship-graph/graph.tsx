@@ -97,6 +97,8 @@ type Props = {
   investigationId?: string;
   /** The reporter's tags on parties, by party id, for the tag layer (the panel reads them). */
   partyTags?: Record<string, {name: string; colour: string}[]>;
+  /** Open Red Flags per party (the panel reads them). */
+  partyFlags?: Record<string, number>;
 };
 
 type Layer = 'tags' | 'dates';
@@ -108,7 +110,7 @@ const ARRANGEMENTS: {value: Arrangement; label: string; title: string}[] = [
   {value: 'clusters', label: 'Linked groups', title: 'Parties that share links pulled together'},
 ];
 
-export function Graph({relationships: allRelationships, entities, onNode, onEdge, extraTools, footnote, investigationId = '', partyTags}: Props): ReactElement {
+export function Graph({relationships: allRelationships, entities, onNode, onEdge, extraTools, footnote, investigationId = '', partyTags, partyFlags}: Props): ReactElement {
   // The year slider (lib/as-of.ts): links that did not hold by then are left out; undated ones stay.
   const asOf = useWorkbenchStore(state => state.asOf);
   const pointed = useWorkbenchStore(state => state.pointedParty);
@@ -121,8 +123,8 @@ export function Graph({relationships: allRelationships, entities, onNode, onEdge
     const tags = layers.has('tags') ? partyTags ?? {} : {};
     const dates: Record<string, string> = {};
     if (layers.has('dates')) for (const r of relationships) { const start = linkSpan(r.properties).start; if (start) dates[r.id] = start; }
-    return {tags, dates, pointed, chain: chain ? {parties: new Set(chain.parties.map(p => p.id)), links: new Set(chain.links.map(l => l.id))} : null};
-  }, [layers, partyTags, relationships, pointed, chain]);
+    return {tags, dates, pointed, flags: partyFlags, chain: chain ? {parties: new Set(chain.parties.map(p => p.id)), links: new Set(chain.links.map(l => l.id))} : null};
+  }, [layers, partyTags, partyFlags, relationships, pointed, chain]);
   const [view, setView] = useState<'network' | 'grid'>('network');
   const [picked, setPicked] = useState<Arrangement | null>(null);
   const [focus, setFocus] = useState<string | null>(null);
