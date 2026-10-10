@@ -12,9 +12,10 @@ import type {ChangeEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {
-  dismissRedFlagMutation, getRedFlagsOptions, getRedFlagsQueryKey, listLeadsQueryKey, makeLeadFromRedFlagMutation, reopenRedFlagMutation,
+  dismissRedFlagMutation, getRedFlagsOptions, getRedFlagsQueryKey, listAreasOptions, listLeadsQueryKey, makeLeadFromRedFlagMutation,
+  reopenRedFlagMutation, setInvestigationTypeMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import type {RedFlagOut} from '../../lib/generated/types.gen';
+import type {InvestigationTypeOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {GlossaryText} from '../glossary/glossary-text';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -81,6 +82,31 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
   </article>;
 }
 
+/** The investigation's type: catalogue areas, chosen by the app with its reasons, or by the reporter (indicators.md). */
+function InvestigationType({kind, onSet}: {kind: InvestigationTypeOut; onSet: (areas: string[] | null) => Promise<void>}): ReactElement {
+  const [editing, setEditing] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+  const all = useQuery({...listAreasOptions(), enabled: editing}).data?.filter(a => a.indicators > 0 && a.key !== 'SA') ?? [];  // SA is the reporter's safety, not a type
+  const start = () => { setPicked(kind.areas.map(a => a.key)); setEditing(true); };
+  const toggle = (key: string) => setPicked(p => (p.includes(key) ? p.filter(k => k !== key) : [...p, key]));
+  return <div className="rf-type" role="group" aria-label="Type of investigation">
+    <span className="rf-type-label">Type of investigation</span>
+    {!editing && <>
+      {kind.areas.length ? kind.areas.map(a => <span key={a.key} className="rf-type-area" title={a.reasons.join('\n')}>{a.name}
+        <small>{a.reasons.join('; ')}</small></span>) : <span className="sv-muted">Not known yet: the records don&apos;t point to an area.</span>}
+      <span className="sv-muted">{kind.set_by === 'app' ? 'Chosen by the app' : 'Chosen by you'}</span>
+      <button type="button" className="sv-btn" onClick={start}>Change</button>
+      {kind.set_by === 'reporter' && <button type="button" className="sv-btn" onClick={() => void onSet(null)}>Let the app choose</button>}
+    </>}
+    {editing && <>
+      <div className="gl-areas">{all.map(a => <button type="button" key={a.key} className="cf-chip" aria-pressed={picked.includes(a.key)} title={a.scope}
+        onClick={() => toggle(a.key)}>{a.name}</button>)}</div>
+      <button type="button" className="sv-btn p" onClick={() => void onSet(picked).then(() => setEditing(false))}>Save</button>
+      <button type="button" className="sv-btn" onClick={() => setEditing(false)}>Cancel</button>
+    </>}
+  </div>;
+}
+
 const LEVEL_ORDER = ['textbook', 'strong', 'faint'];
 /** Textbook flags first, then Strong, then Faint; by weight within a level (the server's order). */
 const byLevel = (a: RedFlagOut, b: RedFlagOut): number => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level);
@@ -92,6 +118,7 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
   const dismiss = useMutation({...dismissRedFlagMutation()});
   const reopen = useMutation({...reopenRedFlagMutation()});
   const lead = useMutation({...makeLeadFromRedFlagMutation()});
+  const setType = useMutation({...setInvestigationTypeMutation()});
   const [problem, setProblem] = useState('');
   const key = getRedFlagsQueryKey({path});
   const attempt = async (work: () => Promise<unknown>, failed: string) => {
@@ -101,18 +128,27 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
   const flags = query.data?.flags ?? [];
   const gone = query.data?.gone ?? [];
   const rules = query.data?.rules ?? [];
-  // Grouped by the indicator's area; the investigation's own type is not set yet, so no area comes first.
-  const areas = Array.from(new Set(flags.map(f => f.indicator?.area_name ?? 'Other')));
+  // Grouped by the indicator's area: the investigation's own areas first, then
+  // every other area under "This may also point to" (indicators.md).
+  const kind = query.data?.investigation_type;
+  const own = (kind?.areas ?? []).map(a => a.name);
+  const found = Array.from(new Set(flags.map(f => f.indicator?.area_name ?? 'Other')));
+  const ownFound = own.filter(a => found.includes(a));
+  const others = found.filter(a => !own.includes(a));
+  const areas = [...ownFound, ...others];
   let rank = 0;
 
   return <section className="card rf" id="red-flags" aria-labelledby="red-flags-title">
     <h3 id="red-flags-title">Red Flags</h3>
     <p className="sv-psub">Patterns from published cases found in this investigation&apos;s records. Each is a lead, not a finding: it says why it matters,
       where it was documented, and the innocent explanations. {rules.length} rules run now: {rules.map(r => r.name).join('; ')}.</p>
+    {kind && <InvestigationType kind={kind} onSet={areas => attempt(async () => {
+      await setType.mutateAsync({path, body: {areas}}); await queryClient.invalidateQueries({queryKey: key}); }, 'Could not change the type')}/>}
     {query.isError && <p className="sv-error">{errorMessage(query.error, 'Could not run the rules')}</p>}
     {problem && <p className="sv-error" role="alert">{problem}</p>}
     {query.data && !flags.length && <p className="sv-muted">No pattern fires on these records.</p>}
     {areas.map(area => <div key={area} className="rf-group">
+      {own.length > 0 && area === others[0] && <h3 className="rf-also">This may also point to</h3>}
       <h4 className="rf-area">{area}</h4>
       {flags.filter(f => (f.indicator?.area_name ?? 'Other') === area).sort(byLevel).map(f => { rank += 1; return <FlagCard key={f.id} flag={f} rank={rank}
         onLead={() => attempt(async () => { await lead.mutateAsync({path: {flag_id: f.id}}); await Promise.all([

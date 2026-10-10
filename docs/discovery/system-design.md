@@ -150,8 +150,10 @@ pattern_flags   id, investigation_id, rule_id (e.g. "circular_ownership"), rule_
 pattern_gaps    id, investigation_id, rule_id, fingerprint, parties JSON, missing (e.g. "incorporation_date"),
                 suggested_sources JSON, first_seen_at, gone_at
 
-lookup_settings investigation_id (PK), mode (off | ask | auto) default 'auto', investigation_type JSON
-                (procurement | influence | litigation …), allowed_sites JSON (sites the crawler may search)
+lookup_settings investigation_id (PK), mode (off | ask | auto) default 'auto',
+                allowed_sites JSON (sites the crawler may search)
+                (the investigation's type is investigations.type_areas, catalogue areas; built 10 Oct 2026,
+                GET/PUT /api/investigations/{id}/type; see indicators.md)
 lookup_requests id, investigation_id, job_id → background_jobs, source, party_id, query, url,
                 trigger (auto | click | pattern_gap), status, http_status, response_sha256,
                 cached (bool), licence, started_at, finished_at, error
@@ -211,7 +213,7 @@ POST /api/investigations/{id}/patterns/recompute → 202 job
 POST /api/pattern-flags/{fid}/dismiss {reason} | /lead | /clear
 GET  /api/pattern-rules                          → catalogue: id, name, rule text, sources, innocent, confirm
 
-GET  /api/investigations/{id}/lookup-settings  | PATCH {mode, investigation_type, allowed_sites}
+GET  /api/investigations/{id}/lookup-settings  | PATCH {mode, allowed_sites}
 GET  /api/investigations/{id}/lookups/plan?party_id → router output: [{source, why, policy, licence, status}]
 POST /api/investigations/{id}/lookups {party_id, sources?: [...]} → 202 {job_ids}
 GET  /api/investigations/{id}/lookup-requests  → the request log (what left the machine)

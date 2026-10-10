@@ -4,7 +4,7 @@ Part of the STRUCT-0024 split; see app/models/base.py.
 """
 
 from datetime import datetime
-from sqlalchemy import Boolean, String, Text, DateTime, ForeignKey
+from sqlalchemy import JSON, Boolean, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.time import utcnow_naive
 from app.db.session import Base
@@ -20,6 +20,9 @@ class Investigation(Base):
     # app/services/demo_seed.py) -- lets the frontend offer a "hide demo
     # data" toggle without guessing from the name/description.
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    # The investigation's type as the reporter chose it: catalogue area keys
+    # (app/patterns/investigation_type.py). None while the app chooses.
+    type_areas: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

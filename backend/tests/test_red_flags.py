@@ -148,3 +148,31 @@ def test_payments_between_companies_with_a_shared_owner_are_faint():
     assert flags[0]["level"] == "faint" and flags[0]["not_shown"] == ["whether there was a business reason for the payments"]
     assert {p["name"] for p in flags[0]["parties"]} == {"A Ltd", "B Ltd", "M Smith"}
     assert "M Smith (directorship and ownership)" in flags[0]["summary"]
+
+
+def test_the_investigation_type_comes_from_flags_and_records_and_the_reporter_can_set_it():
+    from app.services.exports import collect_investigation_records
+
+    inv = _inv("Fishing fleet")
+    a, b, c = _party(inv, "A Ltd"), _party(inv, "B Ltd"), _party(inv, "C Ltd")
+    for upper, lower in ((a, b), (b, c), (c, a)):
+        _link(inv, "Ownership", upper, lower)
+    _party(inv, "MV Example", "Vessel")
+    body = _flags(inv)
+    kind = body["investigation_type"]
+    assert kind["set_by"] == "app"
+    areas = {x["key"]: x for x in kind["areas"]}
+    assert "Red Flag: Circular ownership (BO-001)" in areas["BO"]["reasons"]
+    assert kind["areas"][0]["key"] == "BO", "areas with a Red Flag come first"
+    assert any(r.startswith("Records hold Vessel") for r in areas["SF"]["reasons"]), "a kind that says something about the case counts"
+    assert not any("Company" in r or "Ownership" in r for x in kind["areas"] for r in x["reasons"]), "kinds most areas need point nowhere"
+
+    chosen = ok(client.put(f"/api/investigations/{inv}/type", json={"areas": ["OC", "ML", "OC"]}))
+    assert chosen == {"set_by": "reporter", "areas": [{"key": "OC", "name": "Organised crime and illicit goods", "reasons": ["Chosen by the reporter"]},
+                                                       {"key": "ML", "name": "Money laundering", "reasons": ["Chosen by the reporter"]}]}
+    assert _flags(inv)["investigation_type"] == chosen
+    with SessionLocal() as db:
+        assert collect_investigation_records(db, inv)["investigations"][0]["type_areas"] == ["OC", "ML"], "it travels in a backup"
+    assert client.put(f"/api/investigations/{inv}/type", json={"areas": ["XX"]}).status_code == 400
+    assert client.put(f"/api/investigations/{inv}/type", json={"areas": ["SA"]}).status_code == 400, "the reporter's safety is not a type"
+    assert ok(client.put(f"/api/investigations/{inv}/type", json={"areas": None}))["set_by"] == "app"

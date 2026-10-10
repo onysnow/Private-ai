@@ -294,6 +294,9 @@ import type {
   GetInvestigationTimelineData,
   GetInvestigationTimelineErrors,
   GetInvestigationTimelineResponses,
+  GetInvestigationTypeData,
+  GetInvestigationTypeErrors,
+  GetInvestigationTypeResponses,
   GetJobEndpointData,
   GetJobEndpointErrors,
   GetJobEndpointResponses,
@@ -642,6 +645,9 @@ import type {
   SendCorpusEntitySetData,
   SendCorpusEntitySetErrors,
   SendCorpusEntitySetResponses,
+  SetInvestigationTypeData,
+  SetInvestigationTypeErrors,
+  SetInvestigationTypeResponses,
   SettingsStatusData,
   SettingsStatusErrors,
   SettingsStatusResponses,
@@ -897,6 +903,8 @@ import {
   zGetInvestigationTimelinePath,
   zGetInvestigationTimelineQuery,
   zGetInvestigationTimelineResponse,
+  zGetInvestigationTypePath,
+  zGetInvestigationTypeResponse,
   zGetJobEndpointPath,
   zGetJobEndpointResponse,
   zGetLeadPath,
@@ -1163,6 +1171,9 @@ import {
   zSendCorpusEntitySetBody,
   zSendCorpusEntitySetPath,
   zSendCorpusEntitySetResponse,
+  zSetInvestigationTypeBody,
+  zSetInvestigationTypePath,
+  zSetInvestigationTypeResponse,
   zSettingsStatusResponse,
   zSyncCorpusNowPath,
   zSyncCorpusNowResponse,
@@ -5947,6 +5958,72 @@ export const getInvestigationTimeline = <ThrowOnError extends boolean = false>(
       await zGetInvestigationTimelineResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/timeline',
     ...options,
+  });
+
+/**
+ * Get Investigation Type
+ *
+ * The investigation's type: catalogue areas, with why the app chose each, or the reporter's choice.
+ */
+export const getInvestigationType = <ThrowOnError extends boolean = false>(
+  options: Options<GetInvestigationTypeData, ThrowOnError>,
+): RequestResult<
+  GetInvestigationTypeResponses,
+  GetInvestigationTypeErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetInvestigationTypeResponses,
+    GetInvestigationTypeErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetInvestigationTypePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInvestigationTypeResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/type',
+    ...options,
+  });
+
+/**
+ * Set Investigation Type
+ *
+ * The reporter chooses the areas; null hands the choice back to the app.
+ */
+export const setInvestigationType = <ThrowOnError extends boolean = false>(
+  options: Options<SetInvestigationTypeData, ThrowOnError>,
+): RequestResult<
+  SetInvestigationTypeResponses,
+  SetInvestigationTypeErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    SetInvestigationTypeResponses,
+    SetInvestigationTypeErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSetInvestigationTypeBody,
+          path: zSetInvestigationTypePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSetInvestigationTypeResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/type',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

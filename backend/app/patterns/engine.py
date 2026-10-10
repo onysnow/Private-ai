@@ -20,11 +20,12 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.catalogue.loader import load
+from app.catalogue.loader import Catalogue, load
 from app.catalogue.models import Indicator
 from app.core.time import utcnow_naive
-from app.models.domain import Lead, PatternFlag
+from app.models.domain import Investigation, Lead, PatternFlag
 from app.patterns import graph as case_graph
+from app.patterns import investigation_type
 from app.patterns.rules import (
     circular_ownership, circular_payments, ownership_layers, payment_no_purpose, shared_contact, shared_owner_dealings, structuring,
 )
@@ -34,13 +35,19 @@ LEVELS = ("faint", "strong", "textbook")
 
 
 @lru_cache(maxsize=1)
+def catalogue() -> Catalogue:
+    """The catalogue, parsed once per process (parsing every file takes seconds)."""
+    return load()
+
+
+@lru_cache(maxsize=1)
 def _catalogue() -> dict[str, tuple[Indicator, str]]:
-    return {i.id: (i, a.name) for a in load().areas for i in a.indicators}
+    return {i.id: (i, a.name) for a in catalogue().areas for i in a.indicators}
 
 
 @lru_cache(maxsize=1)
 def _glossary() -> list[dict[str, Any]]:
-    cat = load()
+    cat = catalogue()
     merged: dict[str, dict[str, Any]] = {}
     for g in cat.glossaries:
         for t in g.terms:
@@ -61,7 +68,7 @@ GLOSSARY_ONLY = {"APP": ("The app's own names", "Names the app gives its own too
 
 
 def catalogue_areas() -> list[dict[str, Any]]:
-    cat = load()
+    cat = catalogue()
     terms: dict[str, int] = {}
     for t in _glossary():
         for a in t["areas"]:
@@ -198,11 +205,13 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
     names = {e.id: (e.caption or e.id, e.schema) for e in db.scalars(select(Entity).where(Entity.id.in_(party_ids)))} if party_ids else {}
     current = sorted((r for r in rows if r.gone_at is None), key=lambda r: (-r.weight, r.indicator_id, r.fingerprint))
     gone = sorted((r for r in rows if r.gone_at is not None), key=lambda r: r.gone_at or r.last_seen_at, reverse=True)
+    inv = db.get(Investigation, investigation_id)
     return {
         "investigation_id": investigation_id,
         "rules": [{"indicator_id": r.INDICATOR, "version": r.VERSION, "name": _name(r.INDICATOR)} for r in RULES],
         "flags": [serialize(db, r, names) for r in current],
         "gone": [serialize(db, r, names) for r in gone],
+        "investigation_type": investigation_type.current(db, inv) if inv else {"set_by": "app", "areas": []},
     }
 
 

@@ -35,7 +35,9 @@ const flag = {
     sources: [{title: 'Concealment of Beneficial Ownership', publisher: 'FATF and Egmont Group', url: 'https://example.test/fatf', locator: 'Annex E', quote: 'circular ownership'}],
     innocent_explanations: ['Group cross-holdings or treasury shares.'], cross_hints: [{target_area: 'ML', reason: 'Loops are used to layer funds.', source_url: 'https://example.test/x'}], version: 1},
 };
-const body = (flags: unknown[]) => ({investigation_id: 'inv-1', rules: [{indicator_id: 'BO-001', version: 1, name: 'Circular ownership'}], flags, gone: []});
+const appType = {set_by: 'app', areas: [{key: 'BO', name: 'Hidden ownership and shell companies', reasons: ['Red Flag: Circular ownership (BO-001)']}]};
+const body = (flags: unknown[], investigation_type: unknown = appType) =>
+  ({investigation_id: 'inv-1', rules: [{indicator_id: 'BO-001', version: 1, name: 'Circular ownership'}], flags, gone: [], investigation_type});
 
 describe('RedFlagsPanel', () => {
   it('shows the flag with its innocent explanations, source, level and ranking, and lights a party when pointed at', async () => {
@@ -70,5 +72,35 @@ describe('RedFlagsPanel', () => {
     expect(await screen.findByText('Known group structure')).toBeInTheDocument();
     await user.click(screen.getByRole('button', {name: 'Make it a lead'}));
     await waitFor(() => expect(api.calls('POST /api/red-flags/f-1/lead')).toHaveLength(1));
+  });
+
+  it(`lists the investigation's own areas first and the rest under "This may also point to"; the reporter can change the type`, async () => {
+    const other = {...flag, id: 'f-2', indicator_id: 'ML-023', summary: 'Money goes round.',
+      indicator: {...flag.indicator, id: 'ML-023', name: 'Circular payments', area: 'ML', area_name: 'Money laundering'}};
+    const chosen = {set_by: 'reporter', areas: [{key: 'ML', name: 'Money laundering', reasons: ['Chosen by the reporter']}]};
+    let current: unknown = appType;
+    const api = mockApi({
+      'GET /api/investigations/inv-1/red-flags': () => body([flag, other], current),
+      'GET /api/catalogue/areas': [{key: 'BO', name: 'Hidden ownership and shell companies', scope: '', indicators: 3, verified: 3, terms: 1},
+        {key: 'ML', name: 'Money laundering', scope: '', indicators: 3, verified: 3, terms: 1},
+        {key: 'APP', name: "The app's own names", scope: '', indicators: 0, verified: 0, terms: 7}],
+      'PUT /api/investigations/inv-1/type': () => { current = chosen; return chosen; },
+    });
+    wrap(<RedFlagsPanel investigationId="inv-1"/>);
+    const type = await screen.findByRole('group', {name: 'Type of investigation'});
+    expect(within(type).getByText('Chosen by the app')).toBeInTheDocument();
+    expect(within(type).getByText('Red Flag: Circular ownership (BO-001)')).toBeInTheDocument();
+    const headings = () => screen.getAllByRole('heading').map(h => h.textContent);
+    expect(headings()).toEqual(['Red Flags', 'Hidden ownership and shell companies', 'Circular ownership', 'This may also point to', 'Money laundering', 'Circular payments']);
+    const user = userEvent.setup();
+    await user.click(within(type).getByRole('button', {name: 'Change'}));
+    expect(await within(type).findByRole('button', {name: 'Hidden ownership and shell companies'})).toHaveAttribute('aria-pressed', 'true');
+    expect(within(type).queryByRole('button', {name: "The app's own names"})).toBeNull();
+    await user.click(within(type).getByRole('button', {name: 'Hidden ownership and shell companies'}));
+    await user.click(within(type).getByRole('button', {name: 'Money laundering'}));
+    await user.click(within(type).getByRole('button', {name: 'Save'}));
+    await waitFor(() => expect(api.lastBody('PUT /api/investigations/inv-1/type')).toEqual({areas: ['ML']}));
+    expect(await within(type).findByText('Chosen by you')).toBeInTheDocument();
+    await waitFor(() => expect(headings()).toEqual(['Red Flags', 'Money laundering', 'Circular payments', 'This may also point to', 'Hidden ownership and shell companies', 'Circular ownership']));
   });
 });

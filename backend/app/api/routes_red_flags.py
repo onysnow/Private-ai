@@ -10,8 +10,9 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Investigation, PatternFlag
 from app.patterns import engine
-from app.schemas.api import FlagDismiss
-from app.schemas.responses import LeadOut, RedFlagsOut
+from app.patterns import investigation_type
+from app.schemas.api import FlagDismiss, InvestigationTypeSet
+from app.schemas.responses import InvestigationTypeOut, LeadOut, RedFlagsOut
 from app.services.leads import serialize_lead
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -30,6 +31,30 @@ def get_red_flags(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return engine.flags(db, investigation_id)
+
+
+def _investigation(db: Session, investigation_id: str) -> Investigation:
+    row = db.get(Investigation, investigation_id)
+    if row is None:
+        raise HTTPException(404, "Investigation not found")
+    return row
+
+
+@router.get("/investigations/{investigation_id}/type", response_model=InvestigationTypeOut)
+def get_investigation_type(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """The investigation's type: catalogue areas, with why the app chose each, or the reporter's choice."""
+    return investigation_type.current(db, _investigation(db, investigation_id))
+
+
+@router.put("/investigations/{investigation_id}/type", response_model=InvestigationTypeOut)
+def set_investigation_type(investigation_id: str, body: InvestigationTypeSet, db: Session = Depends(get_db)) -> Any:
+    """The reporter chooses the areas; null hands the choice back to the app."""
+    row = _investigation(db, investigation_id)
+    try:
+        investigation_type.set_areas(db, row, body.areas)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    return investigation_type.current(db, row)
 
 
 @router.post("/red-flags/{flag_id}/dismiss", response_model=RedFlagsOut)

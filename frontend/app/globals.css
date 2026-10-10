@@ -500,3 +500,10 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
   box-shadow: 0 8px 24px rgba(0,0,0,.45); color: #caaf9c; font-size: 13px; line-height: 1.45; pointer-events: none; }
 .gt-card[hidden] { display: none; }
 .gt-card b { color: #f0d9a8; } .gt-card small { display: block; margin-top: 6px; color: #8f8478; }
+
+/* The investigation's type on Red Flags (features/red-flags/red-flags-panel.tsx). */
+.rf-type { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0 14px; padding: 10px 12px; border: 1px solid #3a3229; border-radius: 10px; background: #151d22; font-size: 13px; }
+.rf-type-label { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: #a8998a; }
+.rf-type-area { display: inline-flex; flex-direction: column; padding: 4px 10px; border-radius: 8px; background: #2a2620; color: #f0d9a8; }
+.rf-type-area small { color: #a8998a; font-size: 11px; }
+.rf-also { margin: 22px 0 6px; font-size: 15px; color: #d4a152; }

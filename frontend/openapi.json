@@ -17696,6 +17696,20 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "type_areas": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Areas"
           }
         },
         "required": [
@@ -17737,6 +17751,57 @@
           "question"
         ],
         "title": "InvestigationQuestionContextRequest",
+        "type": "object"
+      },
+      "InvestigationTypeOut": {
+        "description": "The investigation's type: catalogue areas, chosen by the app (with its\nreasons) or by the reporter.",
+        "properties": {
+          "areas": {
+            "items": {
+              "$ref": "#/components/schemas/TypeAreaOut"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "set_by": {
+            "enum": [
+              "app",
+              "reporter"
+            ],
+            "title": "Set By",
+            "type": "string"
+          }
+        },
+        "required": [
+          "set_by",
+          "areas"
+        ],
+        "title": "InvestigationTypeOut",
+        "type": "object"
+      },
+      "InvestigationTypeSet": {
+        "properties": {
+          "areas": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 40,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Catalogue area keys; null hands the choice back to the app.",
+            "title": "Areas"
+          }
+        },
+        "required": [
+          "areas"
+        ],
+        "title": "InvestigationTypeSet",
         "type": "object"
       },
       "IssueIn": {
@@ -22244,7 +22309,7 @@
         "type": "object"
       },
       "RedFlagsOut": {
-        "description": "Every rule that ran, the flags that fire now (highest weight first),\nand those that no longer fire.",
+        "description": "Every rule that ran, the flags that fire now (highest weight first),\nand those that no longer fire; with the investigation's type, whose areas\nare listed first.",
         "properties": {
           "flags": {
             "items": {
@@ -22264,6 +22329,9 @@
             "title": "Investigation Id",
             "type": "string"
           },
+          "investigation_type": {
+            "$ref": "#/components/schemas/InvestigationTypeOut"
+          },
           "rules": {
             "items": {
               "$ref": "#/components/schemas/RuleOut"
@@ -22276,7 +22344,8 @@
           "investigation_id",
           "rules",
           "flags",
-          "gone"
+          "gone",
+          "investigation_type"
         ],
         "title": "RedFlagsOut",
         "type": "object"
@@ -26622,6 +26691,32 @@
           "translated"
         ],
         "title": "TranslationPartOut",
+        "type": "object"
+      },
+      "TypeAreaOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "reasons"
+        ],
+        "title": "TypeAreaOut",
         "type": "object"
       },
       "UnsafeDocumentReferenceOut": {
@@ -44802,6 +44897,114 @@
           }
         },
         "summary": "Get Investigation Timeline"
+      }
+    },
+    "/api/investigations/{investigation_id}/type": {
+      "get": {
+        "description": "The investigation's type: catalogue areas, with why the app chose each, or the reporter's choice.",
+        "operationId": "get_investigation_type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvestigationTypeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Investigation Type"
+      },
+      "put": {
+        "description": "The reporter chooses the areas; null hands the choice back to the app.",
+        "operationId": "set_investigation_type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvestigationTypeSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvestigationTypeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Set Investigation Type"
       }
     },
     "/api/investigations/{investigation_id}/visuals/catalog": {

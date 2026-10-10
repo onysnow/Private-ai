@@ -1815,6 +1815,8 @@ class InvestigationOut(ResponseModel):
     name: str
     description: str | None = None
     is_demo: bool
+    # The type as the reporter chose it (catalogue areas); null while the app chooses (GET .../type).
+    type_areas: list[str] | None = None
     created_at: Timestamp
 
 
@@ -3931,13 +3933,28 @@ class RuleOut(ResponseModel):
     name: str
 
 
+class TypeAreaOut(ResponseModel):
+    key: str
+    name: str
+    reasons: list[str]
+
+
+class InvestigationTypeOut(ResponseModel):
+    """The investigation's type: catalogue areas, chosen by the app (with its
+    reasons) or by the reporter."""
+    set_by: Literal["app", "reporter"]
+    areas: list[TypeAreaOut]
+
+
 class RedFlagsOut(ResponseModel):
     """Every rule that ran, the flags that fire now (highest weight first),
-    and those that no longer fire."""
+    and those that no longer fire; with the investigation's type, whose areas
+    are listed first."""
     investigation_id: str
     rules: list[RuleOut]
     flags: list[RedFlagOut]
     gone: list[RedFlagOut]
+    investigation_type: InvestigationTypeOut
 
 
 # --- The indicator catalogue and glossary (app/api/routes_catalogue.py) -----------

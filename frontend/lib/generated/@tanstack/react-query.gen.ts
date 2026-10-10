@@ -103,6 +103,7 @@ import {
   getInvestigationGraph,
   getInvestigationPlaces,
   getInvestigationTimeline,
+  getInvestigationType,
   getJobEndpoint,
   getLead,
   getMappingSchemas,
@@ -220,6 +221,7 @@ import {
   searchWorkbench,
   seedDemo,
   sendCorpusEntitySet,
+  setInvestigationType,
   settingsStatus,
   syncCorpusNow,
   syncOpenalephDocument,
@@ -517,6 +519,9 @@ import type {
   GetInvestigationTimelineData,
   GetInvestigationTimelineError,
   GetInvestigationTimelineResponse,
+  GetInvestigationTypeData,
+  GetInvestigationTypeError,
+  GetInvestigationTypeResponse,
   GetJobEndpointData,
   GetJobEndpointError,
   GetJobEndpointResponse,
@@ -865,6 +870,9 @@ import type {
   SendCorpusEntitySetData,
   SendCorpusEntitySetError,
   SendCorpusEntitySetResponse,
+  SetInvestigationTypeData,
+  SetInvestigationTypeError,
+  SetInvestigationTypeResponse,
   SettingsStatusData,
   SettingsStatusError,
   SettingsStatusResponse,
@@ -6102,6 +6110,65 @@ export const getInvestigationTimelineInfiniteOptions = (
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getInvestigationTypeQueryKey = (
+  options: Options<GetInvestigationTypeData>,
+) => createQueryKey('getInvestigationType', options);
+
+/**
+ * Get Investigation Type
+ *
+ * The investigation's type: catalogue areas, with why the app chose each, or the reporter's choice.
+ */
+export const getInvestigationTypeOptions = (
+  options: Options<GetInvestigationTypeData>,
+) =>
+  queryOptions<
+    GetInvestigationTypeResponse,
+    GetInvestigationTypeError,
+    GetInvestigationTypeResponse,
+    ReturnType<typeof getInvestigationTypeQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInvestigationType({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInvestigationTypeQueryKey(options),
+  });
+
+/**
+ * Set Investigation Type
+ *
+ * The reporter chooses the areas; null hands the choice back to the app.
+ */
+export const setInvestigationTypeMutation = (
+  options?: Partial<Options<SetInvestigationTypeData>>,
+): UseMutationOptions<
+  SetInvestigationTypeResponse,
+  SetInvestigationTypeError,
+  Options<SetInvestigationTypeData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SetInvestigationTypeResponse,
+    SetInvestigationTypeError,
+    Options<SetInvestigationTypeData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await setInvestigationType({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const investigationVisualCatalogQueryKey = (

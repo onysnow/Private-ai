@@ -3143,6 +3143,7 @@ export const zInvestigationOut = z.object({
   id: z.string(),
   is_demo: z.boolean(),
   name: z.string(),
+  type_areas: z.array(z.string()).nullish(),
 });
 
 /**
@@ -3153,6 +3154,13 @@ export const zInvestigationQuestionContextRequest = z.object({
   include_reconciled_duplicates: z.boolean().optional().default(false),
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   question: z.string().min(1).max(4000),
+});
+
+/**
+ * InvestigationTypeSet
+ */
+export const zInvestigationTypeSet = z.object({
+  areas: z.array(z.string()).max(40).nullable(),
 });
 
 /**
@@ -6016,6 +6024,26 @@ export const zDocumentTranslationOut = z.object({
 });
 
 /**
+ * TypeAreaOut
+ */
+export const zTypeAreaOut = z.object({
+  key: z.string(),
+  name: z.string(),
+  reasons: z.array(z.string()),
+});
+
+/**
+ * InvestigationTypeOut
+ *
+ * The investigation's type: catalogue areas, chosen by the app (with its
+ * reasons) or by the reporter.
+ */
+export const zInvestigationTypeOut = z.object({
+  areas: z.array(zTypeAreaOut),
+  set_by: z.enum(['app', 'reporter']),
+});
+
+/**
  * UnsafeDocumentReferenceOut
  */
 export const zUnsafeDocumentReferenceOut = z.object({
@@ -6654,12 +6682,14 @@ export const zRedFlagOut = z.object({
  * RedFlagsOut
  *
  * Every rule that ran, the flags that fire now (highest weight first),
- * and those that no longer fire.
+ * and those that no longer fire; with the investigation's type, whose areas
+ * are listed first.
  */
 export const zRedFlagsOut = z.object({
   flags: z.array(zRedFlagOut),
   gone: z.array(zRedFlagOut),
   investigation_id: z.string(),
+  investigation_type: zInvestigationTypeOut,
   rules: z.array(zRuleOut),
 });
 
@@ -8481,6 +8511,26 @@ export const zGetInvestigationTimelineQuery = z.object({
  * Successful Response
  */
 export const zGetInvestigationTimelineResponse = zTimelineOut;
+
+export const zGetInvestigationTypePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetInvestigationTypeResponse = zInvestigationTypeOut;
+
+export const zSetInvestigationTypeBody = zInvestigationTypeSet;
+
+export const zSetInvestigationTypePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSetInvestigationTypeResponse = zInvestigationTypeOut;
 
 export const zInvestigationVisualCatalogPath = z.object({
   investigation_id: z.string(),

@@ -7933,6 +7933,10 @@ export type InvestigationOut = {
    * Name
    */
   name: string;
+  /**
+   * Type Areas
+   */
+  type_areas?: Array<string> | null;
 };
 
 /**
@@ -7955,6 +7959,35 @@ export type InvestigationQuestionContextRequest = {
    * Question
    */
   question: string;
+};
+
+/**
+ * InvestigationTypeOut
+ *
+ * The investigation's type: catalogue areas, chosen by the app (with its
+ * reasons) or by the reporter.
+ */
+export type InvestigationTypeOut = {
+  /**
+   * Areas
+   */
+  areas: Array<TypeAreaOut>;
+  /**
+   * Set By
+   */
+  set_by: 'app' | 'reporter';
+};
+
+/**
+ * InvestigationTypeSet
+ */
+export type InvestigationTypeSet = {
+  /**
+   * Areas
+   *
+   * Catalogue area keys; null hands the choice back to the app.
+   */
+  areas: Array<string> | null;
 };
 
 /**
@@ -10712,7 +10745,8 @@ export type RedFlagOut = {
  * RedFlagsOut
  *
  * Every rule that ran, the flags that fire now (highest weight first),
- * and those that no longer fire.
+ * and those that no longer fire; with the investigation's type, whose areas
+ * are listed first.
  */
 export type RedFlagsOut = {
   /**
@@ -10727,6 +10761,7 @@ export type RedFlagsOut = {
    * Investigation Id
    */
   investigation_id: string;
+  investigation_type: InvestigationTypeOut;
   /**
    * Rules
    */
@@ -13311,6 +13346,24 @@ export type TranslationPartOut = {
    * Translated
    */
   translated: string | null;
+};
+
+/**
+ * TypeAreaOut
+ */
+export type TypeAreaOut = {
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Reasons
+   */
+  reasons: Array<string>;
 };
 
 /**
@@ -20229,6 +20282,78 @@ export type GetInvestigationTimelineResponses = {
 
 export type GetInvestigationTimelineResponse =
   GetInvestigationTimelineResponses[keyof GetInvestigationTimelineResponses];
+
+export type GetInvestigationTypeData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/type';
+};
+
+export type GetInvestigationTypeErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetInvestigationTypeError =
+  GetInvestigationTypeErrors[keyof GetInvestigationTypeErrors];
+
+export type GetInvestigationTypeResponses = {
+  /**
+   * Successful Response
+   */
+  200: InvestigationTypeOut;
+};
+
+export type GetInvestigationTypeResponse =
+  GetInvestigationTypeResponses[keyof GetInvestigationTypeResponses];
+
+export type SetInvestigationTypeData = {
+  body: InvestigationTypeSet;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/type';
+};
+
+export type SetInvestigationTypeErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SetInvestigationTypeError =
+  SetInvestigationTypeErrors[keyof SetInvestigationTypeErrors];
+
+export type SetInvestigationTypeResponses = {
+  /**
+   * Successful Response
+   */
+  200: InvestigationTypeOut;
+};
+
+export type SetInvestigationTypeResponse =
+  SetInvestigationTypeResponses[keyof SetInvestigationTypeResponses];
 
 export type InvestigationVisualCatalogData = {
   body?: never;
