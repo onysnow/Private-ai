@@ -1943,6 +1943,36 @@ export type ChartVisualOut = {
 };
 
 /**
+ * CheckDecide
+ */
+export type CheckDecide = {
+  /**
+   * Note
+   *
+   * What the person saw; it stays with the item.
+   */
+  note?: string | null;
+  /**
+   * Status
+   */
+  status: 'open' | 'shows' | 'does_not' | 'unclear';
+};
+
+/**
+ * CheckDocumentOut
+ */
+export type CheckDocumentOut = {
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Id
+   */
+  id: string;
+};
+
+/**
  * CheckItemOut
  */
 export type CheckItemOut = {
@@ -1988,6 +2018,26 @@ export type CheckReportOut = {
    * Warnings
    */
   warnings: Array<CheckItemOut>;
+};
+
+/**
+ * ChecksOut
+ *
+ * Items the case calls for now (open first), and those it no longer does.
+ */
+export type ChecksOut = {
+  /**
+   * Gone
+   */
+  gone: Array<ToCheckItemOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Items
+   */
+  items: Array<ToCheckItemOut>;
 };
 
 /**
@@ -6972,6 +7022,26 @@ export type FindingReviewRequest = {
 };
 
 /**
+ * FlagCheckOut
+ *
+ * A "To check" item for a part of the indicator this flag's records cannot show.
+ */
+export type FlagCheckOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Status
+   */
+  status: 'open' | 'shows' | 'does_not' | 'unclear';
+};
+
+/**
  * FlagCrossHintOut
  */
 export type FlagCrossHintOut = {
@@ -10693,6 +10763,10 @@ export type RecordTagsOut = {
  */
 export type RedFlagOut = {
   /**
+   * Checks
+   */
+  checks?: Array<FlagCheckOut>;
+  /**
    * Dismissed Reason
    */
   dismissed_reason: string | null;
@@ -13232,6 +13306,82 @@ export type TimelineVisualOut = {
 };
 
 /**
+ * ToCheckItemOut
+ *
+ * Something a person checks: a passage to read, or a checklist item. The
+ * app never decides it; open until a person does.
+ */
+export type ToCheckItemOut = {
+  /**
+   * Decided At
+   */
+  decided_at: string | null;
+  document: CheckDocumentOut | null;
+  /**
+   * Excerpt
+   */
+  excerpt: string | null;
+  /**
+   * First Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  first_seen_at: string;
+  /**
+   * Flag Id
+   */
+  flag_id: string | null;
+  /**
+   * Gone At
+   */
+  gone_at: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Indicator Id
+   */
+  indicator_id: string;
+  /**
+   * Indicator Name
+   */
+  indicator_name: string;
+  /**
+   * Kind
+   */
+  kind: 'passage' | 'checklist';
+  /**
+   * Locator
+   */
+  locator: string | null;
+  /**
+   * Note
+   */
+  note: string | null;
+  /**
+   * Parties
+   */
+  parties: Array<FlagPartyOut>;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Related Flags
+   */
+  related_flags: Array<string>;
+  /**
+   * Status
+   */
+  status: 'open' | 'shows' | 'does_not' | 'unclear';
+  /**
+   * Terms
+   */
+  terms: Array<string>;
+};
+
+/**
  * TraceClaimLinkOut
  */
 export type TraceClaimLinkOut = {
@@ -14937,6 +15087,41 @@ export type ListTermHintsResponses = {
 
 export type ListTermHintsResponse =
   ListTermHintsResponses[keyof ListTermHintsResponses];
+
+export type DecideCheckData = {
+  body: CheckDecide;
+  path: {
+    /**
+     * Check Id
+     */
+    check_id: string;
+  };
+  query?: never;
+  url: '/api/checks/{check_id}/decide';
+};
+
+export type DecideCheckErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DecideCheckError = DecideCheckErrors[keyof DecideCheckErrors];
+
+export type DecideCheckResponses = {
+  /**
+   * Successful Response
+   */
+  200: ChecksOut;
+};
+
+export type DecideCheckResponse =
+  DecideCheckResponses[keyof DecideCheckResponses];
 
 export type CreateClaimEndpointData = {
   body: ClaimCreate;
@@ -18451,6 +18636,40 @@ export type InvestigationPresentationDraftResponses = {
 
 export type InvestigationPresentationDraftResponse =
   InvestigationPresentationDraftResponses[keyof InvestigationPresentationDraftResponses];
+
+export type GetChecksData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/checks';
+};
+
+export type GetChecksErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetChecksError = GetChecksErrors[keyof GetChecksErrors];
+
+export type GetChecksResponses = {
+  /**
+   * Successful Response
+   */
+  200: ChecksOut;
+};
+
+export type GetChecksResponse = GetChecksResponses[keyof GetChecksResponses];
 
 export type ListClaimsData = {
   body?: never;

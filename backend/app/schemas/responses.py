@@ -3905,6 +3905,13 @@ class FlagIndicatorOut(ResponseModel):
     version: int
 
 
+class FlagCheckOut(ResponseModel):
+    """A "To check" item for a part of the indicator this flag's records cannot show."""
+    id: str
+    question: str
+    status: Literal["open", "shows", "does_not", "unclear"]
+
+
 class RedFlagOut(ResponseModel):
     """One occurrence of a pattern. A flag is a lead, not a finding."""
     id: str
@@ -3921,6 +3928,7 @@ class RedFlagOut(ResponseModel):
     facts: dict[str, Any]
     summary: str
     not_shown: list[str]
+    checks: list[FlagCheckOut] = []
     first_seen_at: Timestamp
     last_seen_at: Timestamp
     gone_at: Timestamp | None
@@ -3964,6 +3972,42 @@ class RedFlagsOut(ResponseModel):
     flags: list[RedFlagOut]
     gone: list[RedFlagOut]
     investigation_type: InvestigationTypeOut
+
+
+# --- To check (app/patterns/checks.py) ---------------------------------------------
+
+class CheckDocumentOut(ResponseModel):
+    id: str
+    filename: str
+
+
+class ToCheckItemOut(ResponseModel):
+    """Something a person checks: a passage to read, or a checklist item. The
+    app never decides it; open until a person does."""
+    id: str
+    indicator_id: str
+    indicator_name: str
+    kind: Literal["passage", "checklist"]
+    question: str
+    status: Literal["open", "shows", "does_not", "unclear"]
+    note: str | None
+    decided_at: Timestamp | None
+    parties: list[FlagPartyOut]
+    flag_id: str | None  # the flag whose records cannot show this part
+    related_flags: list[str]  # other current flags on the same parties
+    document: CheckDocumentOut | None
+    locator: str | None
+    excerpt: str | None
+    terms: list[str]
+    first_seen_at: Timestamp
+    gone_at: Timestamp | None
+
+
+class ChecksOut(ResponseModel):
+    """Items the case calls for now (open first), and those it no longer does."""
+    investigation_id: str
+    items: list[ToCheckItemOut]
+    gone: list[ToCheckItemOut]
 
 
 # --- The indicator catalogue and glossary (app/api/routes_catalogue.py) -----------

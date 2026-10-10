@@ -291,6 +291,18 @@ def _red_flag(client: TestClient, inv: str) -> str:
     return next(f["id"] for f in flags if f["indicator_id"] == "BO-033")
 
 
+def _check_item(client: TestClient) -> str:
+    """A "To check" item: what a seven-layer ownership chain's Red Flag (BO-002)
+    cannot show from the records, in an investigation of its own."""
+    inv = client.post("/api/investigations", json={"name": "Contract: to check"}).json()["id"]
+    chain = [client.post("/api/entities", json={"investigation_id": inv, "schema": "Company", "caption": f"Layer {i}",
+                                                "properties": {"name": [f"Layer {i}"]}}).json()["id"] for i in range(7)]
+    for upper, lower in zip(chain, chain[1:]):
+        client.post("/api/relationships", json={"investigation_id": inv, "schema": "Ownership", "source_entity_id": upper,
+                                                "target_entity_id": lower, "properties": {}})
+    return client.get(f"/api/investigations/{inv}/checks").json()["items"][0]["id"]
+
+
 def _watchlist_hit(entry_id: str, document_id: str) -> str:
     """A document a watched name was found in, as a check keeps it
     (app/services/watchlists.py check_entry); the demo investigation is never
@@ -421,6 +433,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
             "indicator_id": "BO-001", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
+            "check_id": _check_item(client),
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={

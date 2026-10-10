@@ -7,17 +7,18 @@
 // reporter adds it to leads or sets it aside with a reason; pointing at a
 // party lights it in every chart.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {
-  dismissRedFlagMutation, getRedFlagsOptions, getRedFlagsQueryKey, listAreasOptions, listLeadsQueryKey, makeLeadFromRedFlagMutation,
+  dismissRedFlagMutation, getChecksQueryKey, getRedFlagsOptions, getRedFlagsQueryKey, listAreasOptions, listLeadsQueryKey, makeLeadFromRedFlagMutation,
   reopenRedFlagMutation, setInvestigationTypeMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {InvestigationTypeOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {GlossaryText} from '../glossary/glossary-text';
+import {DECISION} from '../to-check/to-check-panel';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 export const LEVEL: Record<string, {name: string; meaning: string}> = {
@@ -59,6 +60,18 @@ function PartyButtons({parties, limit}: {parties: RedFlagOut['parties']; limit?:
     {shown.length < parties.length && <span className="sv-muted">+{parties.length - shown.length} more</span>}</div>;
 }
 
+/** What the records can't show, each part a link to its item in To check (Verify), with the decision once made. */
+function NotShown({flag}: {flag: RedFlagOut}): ReactElement {
+  const openCheck = useWorkbenchStore(state => state.openCheck);
+  const go = (id: string) => { openCheck(id); document.getElementById('to-check')?.scrollIntoView({behavior: 'smooth', block: 'start'}); };
+  return <>{flag.not_shown.map((part, i) => {
+    const item = (flag.checks ?? []).find(c => c.question === part);
+    return <span key={part}>{i > 0 && '; '}{item
+      ? <button type="button" className="tc-link" onClick={() => go(item.id)} title="Open it in To check">{part}</button> : part}
+      {item && item.status !== 'open' && <small> ({DECISION[item.status]})</small>}</span>;
+  })}</>;
+}
+
 /** The card in the list: what is needed to decide whether to open it (Ony, 10 Oct 2026: "only the necessary text
  * before you click"). The level, the pattern, who, what was found, the first innocent explanation, what the records
  * can't show, and the actions. Everything else is in the drawer. The whole card rises with the level: Faint is quiet;
@@ -79,7 +92,7 @@ function FlagCard({flag, rank, open, onOpen, ...actions}: {flag: RedFlagOut; ran
     <PartyButtons parties={flag.parties} limit={PARTIES_SHOWN}/>
     <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
     {innocent.length > 0 && <p className="rf-line"><b>Could be innocent:</b> {plain(innocent[0])}{innocent.length > 1 ? `, +${innocent.length - 1} more` : ''}</p>}
-    {flag.not_shown.length > 0 && <p className="rf-line"><b>Records can&apos;t show:</b> {flag.not_shown.join('; ')}</p>}
+    {flag.not_shown.length > 0 && <p className="rf-line"><b>Records can&apos;t show:</b> <NotShown flag={flag}/></p>}
     {flag.status === 'dismissed' && <p className="rf-line"><b>Set aside:</b> {flag.dismissed_reason}</p>}
     <div className="rf-foot">
       <FlagActionsRow flag={flag} {...actions}/>
@@ -111,7 +124,7 @@ function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () 
     <section className="rf-sec" aria-labelledby="rf-sec-innocent">
       <h4 id="rf-sec-innocent">Could be innocent</h4>
       <ul className="rf-list">{(ind?.innocent_explanations ?? []).map(t => <li key={t}><GlossaryText text={t}/></li>)}</ul>
-      {flag.not_shown.length > 0 && <div className="rf-row rf-unknown"><b>The records can&apos;t show.</b> {flag.not_shown.join('; ')}. A person decides that.</div>}
+      {flag.not_shown.length > 0 && <div className="rf-row rf-unknown"><b>The records can&apos;t show.</b> <NotShown flag={flag}/>. A person decides that, in To check.</div>}
     </section>
     {ind && <section className="rf-sec" aria-labelledby="rf-sec-why">
       <h4 id="rf-sec-why">Why it matters</h4>
@@ -216,6 +229,15 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
   const [problem, setProblem] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
   const key = getRedFlagsQueryKey({path});
+  const checksKey = getChecksQueryKey({path});
+  // An item in To check asks for its flag: open its details and bring the list into view.
+  const askedFlag = useWorkbenchStore(state => state.flag);
+  const answered = useRef(0);
+  useEffect(() => {
+    if (!askedFlag || askedFlag.serial === answered.current) return;
+    answered.current = askedFlag.serial;
+    setOpenId(askedFlag.flagId);
+  }, [askedFlag]);
   const attempt = async (work: () => Promise<unknown>, failed: string) => {
     try { await work(); setProblem(''); } catch (error) { setProblem(errorMessage(error, failed)); }
   };
@@ -223,8 +245,10 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
   const actionsFor = (f: RedFlagOut): FlagActions => ({
     onLead: () => attempt(async () => { await lead.mutateAsync({path: {flag_id: f.id}}); await Promise.all([
       queryClient.invalidateQueries({queryKey: key}), queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})})]); }, 'Could not add it to leads'),
-    onDismiss: reason => attempt(async () => { queryClient.setQueryData(key, await dismiss.mutateAsync({path: {flag_id: f.id}, body: {reason}})); }, 'Could not set it aside'),
-    onReopen: () => attempt(async () => { queryClient.setQueryData(key, await reopen.mutateAsync({path: {flag_id: f.id}})); }, 'Could not open it again'),
+    onDismiss: reason => attempt(async () => { queryClient.setQueryData(key, await dismiss.mutateAsync({path: {flag_id: f.id}, body: {reason}}));
+      await queryClient.invalidateQueries({queryKey: checksKey}); }, 'Could not set it aside'),
+    onReopen: () => attempt(async () => { queryClient.setQueryData(key, await reopen.mutateAsync({path: {flag_id: f.id}}));
+      await queryClient.invalidateQueries({queryKey: checksKey}); }, 'Could not open it again'),
   });
 
   const flags = query.data?.flags ?? [];

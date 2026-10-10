@@ -547,5 +547,10 @@ class InvestigationTypeSet(BaseModel):
     areas: list[str] | None = Field(description="Catalogue area keys; null hands the choice back to the app.", max_length=40)
 
 
+class CheckDecide(BaseModel):
+    status: Literal["open", "shows", "does_not", "unclear"]
+    note: str | None = Field(default=None, max_length=4000, description="What the person saw; it stays with the item.")
+
+
 class FlagDismiss(BaseModel):
     reason: str = Field(min_length=1, max_length=2000, description="Why the flag is not relevant; it stays with the flag.")

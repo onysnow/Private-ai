@@ -735,6 +735,22 @@ export const zChartPresetOut = z.object({
 });
 
 /**
+ * CheckDecide
+ */
+export const zCheckDecide = z.object({
+  note: z.string().max(4000).nullish(),
+  status: z.enum(['open', 'shows', 'does_not', 'unclear']),
+});
+
+/**
+ * CheckDocumentOut
+ */
+export const zCheckDocumentOut = z.object({
+  filename: z.string(),
+  id: z.string(),
+});
+
+/**
  * CheckItemOut
  */
 export const zCheckItemOut = z.object({
@@ -2661,6 +2677,17 @@ export const zFinancialTransactionOut = z.object({
  */
 export const zFindingReviewRequest = z.object({
   status: z.string(),
+});
+
+/**
+ * FlagCheckOut
+ *
+ * A "To check" item for a part of the indicator this flag's records cannot show.
+ */
+export const zFlagCheckOut = z.object({
+  id: z.string(),
+  question: z.string(),
+  status: z.enum(['open', 'shows', 'does_not', 'unclear']),
 });
 
 /**
@@ -5920,6 +5947,57 @@ export const zTimelineOut = z.object({
 });
 
 /**
+ * ToCheckItemOut
+ *
+ * Something a person checks: a passage to read, or a checklist item. The
+ * app never decides it; open until a person does.
+ */
+export const zToCheckItemOut = z.object({
+  decided_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  document: zCheckDocumentOut.nullable(),
+  excerpt: z.string().nullable(),
+  first_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  flag_id: z.string().nullable(),
+  gone_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  id: z.string(),
+  indicator_id: z.string(),
+  indicator_name: z.string(),
+  kind: z.enum(['passage', 'checklist']),
+  locator: z.string().nullable(),
+  note: z.string().nullable(),
+  parties: z.array(zFlagPartyOut),
+  question: z.string(),
+  related_flags: z.array(z.string()),
+  status: z.enum(['open', 'shows', 'does_not', 'unclear']),
+  terms: z.array(z.string()),
+});
+
+/**
+ * ChecksOut
+ *
+ * Items the case calls for now (open first), and those it no longer does.
+ */
+export const zChecksOut = z.object({
+  gone: z.array(zToCheckItemOut),
+  investigation_id: z.string(),
+  items: z.array(zToCheckItemOut),
+});
+
+/**
  * TraceClaimOut
  */
 export const zTraceClaimOut = z.object({
@@ -6658,6 +6736,7 @@ export const zWeightPartOut = z.object({
  * One occurrence of a pattern. A flag is a lead, not a finding.
  */
 export const zRedFlagOut = z.object({
+  checks: z.array(zFlagCheckOut).optional().default([]),
   dismissed_reason: z.string().nullable(),
   facts: z.record(z.unknown()),
   first_seen_at: z
@@ -6931,6 +7010,17 @@ export const zGetIndicatorResponse = zCatalogueIndicatorOut;
  * Successful Response
  */
 export const zListTermHintsResponse = z.array(zGlossaryHintOut);
+
+export const zDecideCheckBody = zCheckDecide;
+
+export const zDecideCheckPath = z.object({
+  check_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDecideCheckResponse = zChecksOut;
 
 export const zCreateClaimEndpointBody = zClaimCreate;
 
@@ -7925,6 +8015,15 @@ export const zInvestigationPresentationDraftPath = z.object({
  * Successful Response
  */
 export const zInvestigationPresentationDraftResponse = zAiReasoningRunOut;
+
+export const zGetChecksPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetChecksResponse = zChecksOut;
 
 export const zListClaimsPath = z.object({
   investigation_id: z.string(),

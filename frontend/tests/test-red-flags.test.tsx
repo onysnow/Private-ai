@@ -62,7 +62,7 @@ describe('RedFlagsPanel', () => {
     await user.click(within(card).getByRole('button', {name: 'Details: Circular ownership'}));
     const drawer = screen.getByRole('complementary', {name: 'Red Flag details: Circular ownership'});
     expect(within(drawer).getAllByRole('heading', {level: 4}).map(h => h.textContent)).toEqual(['Could be innocent', 'Why it matters', 'Source', 'Ranking']);
-    expect(within(drawer).getByText(/whether there was a business reason\. A person decides that\./)).toBeInTheDocument();
+    expect(drawer.querySelector('.rf-unknown')?.textContent).toBe("The records can't show. whether there was a business reason. A person decides that, in To check.");
     expect(within(drawer).getByText('Applies in the UK only.')).not.toBeVisible();
     await user.click(within(drawer).getByText('About the numbers'));
     expect(within(drawer).getByText('Applies in the UK only.')).toBeVisible();

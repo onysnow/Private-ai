@@ -1,0 +1,223 @@
+"""To check (docs/discovery/detection-design.md, "Decided" 4): the work a
+person does that the records cannot do.
+
+Two kinds of item, kept per case by fingerprint so a decision stays with its
+item when the case changes:
+
+- **checklist**: something a person confirms. Every flag whose records cannot
+  show part of its indicator (the spec's ``not_shown``) gives one item per
+  part, on the flag's parties and linked to the flag; a check spec of kind
+  ``checklist`` gives one item per party of a kind (or one for the case).
+- **passage**: a part of a document that holds an indicator's words. A check
+  spec of kind ``passage`` lists the words; every document chunk in the case
+  that holds enough of them is an item, with the words found, a short excerpt
+  around the first one and the case's parties named in it. A person decides
+  whether the passage shows the indicator; the app never decides.
+
+Check specs live in catalogue/detection/checks/*.yaml. The words are matched
+in Python, whole words and phrases, ignoring case, so the same search runs on
+SQLite and Postgres."""
+
+from __future__ import annotations
+
+import hashlib
+import re
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Literal
+
+import yaml  # type: ignore[import-untyped]
+from pydantic import BaseModel, Field, model_validator
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.core.time import utcnow_naive
+from app.models.domain import CheckItem, Document, DocumentChunk, Entity, PatternFlag
+
+ROOT = Path(__file__).resolve().parents[3] / "catalogue" / "detection" / "checks"
+STATUSES = ("open", "shows", "does_not", "unclear")
+EXCERPT = 160  # characters either side of the first word found
+
+
+class PassageExample(BaseModel):
+    text: str
+    expect: bool  # whether the passage becomes an item
+
+
+class CheckSpec(BaseModel):
+    indicator: str
+    version: int = 1
+    kind: Literal["passage", "checklist"]
+    question: str = Field(min_length=1, description="what the person decides")
+    terms: list[str] = []  # passage: words and phrases
+    min_terms: int = Field(default=1, ge=1)  # passage: how many different terms a chunk must hold
+    for_each: str | None = None  # checklist: one item per party of this kind (Person, Company…); none: one for the case
+    examples: list[PassageExample] = []
+
+    @model_validator(mode="after")
+    def shape(self) -> "CheckSpec":
+        if self.kind == "passage" and not self.terms:
+            raise ValueError(f"{self.indicator}: a passage check needs terms")
+        if self.kind == "passage" and self.min_terms > len(self.terms):
+            raise ValueError(f"{self.indicator}: min_terms is more than the terms given")
+        if self.kind == "checklist" and self.terms:
+            raise ValueError(f"{self.indicator}: a checklist item has no terms")
+        return self
+
+    def found(self, text: str) -> list[str]:
+        """The spec's terms in the text, in the order given; [] unless at least min_terms."""
+        hits = [t for t in self.terms if _pattern(t).search(text)]
+        return hits if len(hits) >= self.min_terms else []
+
+
+@lru_cache(maxsize=4096)
+def _pattern(term: str) -> re.Pattern[str]:
+    words = [re.escape(w) for w in term.split()]
+    return re.compile(r"(?<!\w)" + r"\s+".join(words) + r"(?!\w)", re.IGNORECASE)
+
+
+@lru_cache(maxsize=1)
+def load(root: Path = ROOT) -> tuple[CheckSpec, ...]:
+    if not root.is_dir():
+        return ()
+    specs: list[CheckSpec] = []
+    for path in sorted(root.glob("*.yaml")):
+        specs += [CheckSpec.model_validate(x) for x in (yaml.safe_load(path.read_text(encoding="utf-8")) or [])]
+    return tuple(specs)
+
+
+def problems(specs: tuple[CheckSpec, ...], known_indicators: dict[str, Any]) -> list[str]:
+    """Lint: unknown indicator, two specs for one indicator, a passage check without
+    an example of each outcome, an example that does not come out as expected."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for s in specs:
+        if s.indicator in seen:
+            out.append(f"{s.indicator}: two check specs")
+        seen.add(s.indicator)
+        if s.indicator not in known_indicators:
+            out.append(f"{s.indicator}: not in the catalogue")
+        if s.kind == "passage":
+            if {e.expect for e in s.examples} != {True, False}:
+                out.append(f"{s.indicator}: needs an example that is found and one that is not")
+            for e in s.examples:
+                if bool(s.found(e.text)) != e.expect:
+                    out.append(f"{s.indicator}: example {e.text[:40]!r} should {'' if e.expect else 'not '}be found")
+    return out
+
+
+def _fp(*parts: str) -> str:
+    return hashlib.sha256("|".join(parts).encode()).hexdigest()[:32]
+
+
+def _excerpt(text: str, first: str) -> str:
+    m = _pattern(first).search(text)
+    start = max(0, (m.start() if m else 0) - EXCERPT)
+    end = min(len(text), (m.end() if m else 0) + EXCERPT)
+    return ("…" if start else "") + " ".join(text[start:end].split()) + ("…" if end < len(text) else "")
+
+
+def _wanted(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...]) -> dict[str, dict[str, Any]]:
+    """Every item the case calls for now, by fingerprint."""
+    out: dict[str, dict[str, Any]] = {}
+    flags = db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id, PatternFlag.gone_at.is_(None),
+                                                 PatternFlag.status != "dismissed"))
+    for flag in flags:
+        for part in (flag.facts or {}).get("not_shown") or []:
+            fp = _fp("flag", flag.fingerprint, part)
+            out[fp] = {"indicator_id": flag.indicator_id, "kind": "checklist", "question": part, "parties": list(flag.parties),
+                       "flag_id": flag.id, "document_id": None, "locator": None, "excerpt": None, "terms": []}
+    entities = list(db.scalars(select(Entity).where(Entity.investigation_id == investigation_id)))
+    for spec in specs:
+        if spec.kind != "checklist":
+            continue
+        if spec.for_each is None:
+            out[_fp("case", spec.indicator)] = {"indicator_id": spec.indicator, "kind": "checklist", "question": spec.question, "parties": [],
+                                                "flag_id": None, "document_id": None, "locator": None, "excerpt": None, "terms": []}
+            continue
+        for e in entities:
+            if e.schema == spec.for_each:
+                out[_fp("party", spec.indicator, e.id)] = {"indicator_id": spec.indicator, "kind": "checklist", "question": spec.question,
+                                                           "parties": [e.id], "flag_id": None, "document_id": None, "locator": None,
+                                                           "excerpt": None, "terms": []}
+    passage = [s for s in specs if s.kind == "passage"]
+    if passage:
+        named = [(e.id, _pattern(e.caption)) for e in entities if e.caption and len(e.caption.strip()) >= 4]
+        chunks = db.execute(select(DocumentChunk).join(Document, Document.id == DocumentChunk.document_id)
+                            .where(Document.investigation_id == investigation_id)).scalars()
+        for chunk in chunks:
+            for spec in passage:
+                hits = spec.found(chunk.text)
+                if not hits:
+                    continue
+                out[_fp("passage", spec.indicator, chunk.id)] = {
+                    "indicator_id": spec.indicator, "kind": "passage", "question": spec.question,
+                    "parties": [pid for pid, pat in named if pat.search(chunk.text)], "flag_id": None,
+                    "document_id": chunk.document_id, "locator": chunk.locator, "excerpt": _excerpt(chunk.text, hits[0]), "terms": hits}
+    return out
+
+
+def recompute(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] | None = None) -> None:
+    """Brings the case's items up to date: new ones open, ones no longer called
+    for are marked gone (decisions kept), ones that come back lose the mark."""
+    wanted = _wanted(db, investigation_id, load() if specs is None else specs)
+    now = utcnow_naive()
+    existing = {c.fingerprint: c for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id))}
+    for fp, fields in wanted.items():
+        row = existing.get(fp)
+        if row is None:
+            row = CheckItem(investigation_id=investigation_id, fingerprint=fp, first_seen_at=now, status="open")
+            db.add(row)
+        for key, value in fields.items():
+            setattr(row, key, value)
+        row.gone_at = None
+    for fp, row in existing.items():
+        if fp not in wanted and row.gone_at is None:
+            row.gone_at = now
+    db.commit()
+
+
+def decide(db: Session, row: CheckItem, status: str, note: str | None) -> None:
+    if status not in STATUSES:
+        raise ValueError(f"Status is one of {', '.join(STATUSES)}")
+    row.status = status
+    row.note = (note or "").strip() or None
+    row.decided_at = None if status == "open" else utcnow_naive()
+    db.commit()
+
+
+def serialize(row: CheckItem, names: dict[str, tuple[str, str]], indicator_names: dict[str, str],
+              documents: dict[str, str], flags_on_parties: dict[str, list[str]]) -> dict[str, Any]:
+    return {
+        "id": row.id, "indicator_id": row.indicator_id, "indicator_name": indicator_names.get(row.indicator_id, row.indicator_id),
+        "kind": row.kind, "question": row.question, "status": row.status, "note": row.note, "decided_at": row.decided_at,
+        "parties": [{"id": p, "name": names.get(p, (p, ""))[0], "schema": names.get(p, ("", "Thing"))[1]} for p in row.parties],
+        "flag_id": row.flag_id,
+        "related_flags": sorted({f for p in row.parties for f in flags_on_parties.get(p, [])} - ({row.flag_id} if row.flag_id else set())),
+        "document": None if row.document_id is None else {"id": row.document_id, "filename": documents.get(row.document_id, row.document_id)},
+        "locator": row.locator, "excerpt": row.excerpt, "terms": list(row.terms or []),
+        "first_seen_at": row.first_seen_at, "gone_at": row.gone_at,
+    }
+
+
+def items(db: Session, investigation_id: str) -> dict[str, Any]:
+    from app.patterns.engine import _name
+
+    rows = list(db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id)))
+    party_ids = {p for r in rows for p in r.parties}
+    names = {e.id: (e.caption or e.id, e.schema) for e in db.scalars(select(Entity).where(Entity.id.in_(party_ids)))} if party_ids else {}
+    doc_ids = {r.document_id for r in rows if r.document_id}
+    documents = {d.id: d.filename for d in db.scalars(select(Document).where(Document.id.in_(doc_ids)))} if doc_ids else {}
+    flags_on_parties: dict[str, list[str]] = {}
+    for f in db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id, PatternFlag.gone_at.is_(None))):
+        for p in f.parties:
+            flags_on_parties.setdefault(p, []).append(f.id)
+    indicator_names = {r.indicator_id: _name(r.indicator_id) for r in rows}
+    order = {"open": 0, "unclear": 1, "shows": 2, "does_not": 3}
+    current = sorted((r for r in rows if r.gone_at is None), key=lambda r: (order.get(r.status, 9), r.indicator_id, r.first_seen_at))
+    gone = sorted((r for r in rows if r.gone_at is not None), key=lambda r: r.gone_at or r.first_seen_at, reverse=True)
+    return {
+        "investigation_id": investigation_id,
+        "items": [serialize(r, names, indicator_names, documents, flags_on_parties) for r in current],
+        "gone": [serialize(r, names, indicator_names, documents, flags_on_parties) for r in gone],
+    }

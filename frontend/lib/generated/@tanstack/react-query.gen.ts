@@ -41,6 +41,7 @@ import {
   createSourceEndpoint,
   createTimelineEventEndpoint,
   createWriteupEndpoint,
+  decideCheck,
   decideCrossProviderCluster,
   decideEntityPostMergeReconciliation,
   decideInvestigationCrossReference,
@@ -78,6 +79,7 @@ import {
   getBasemapSprite,
   getBasemapStatus,
   getBasemapTile,
+  getChecks,
   getClaimReviewWorkspace,
   getCollection,
   getCollections,
@@ -333,6 +335,9 @@ import type {
   CreateWriteupEndpointData,
   CreateWriteupEndpointError,
   CreateWriteupEndpointResponse,
+  DecideCheckData,
+  DecideCheckError,
+  DecideCheckResponse,
   DecideCrossProviderClusterData,
   DecideCrossProviderClusterError,
   DecideCrossProviderClusterResponse,
@@ -444,6 +449,9 @@ import type {
   GetBasemapTileData,
   GetBasemapTileError,
   GetBasemapTileResponse,
+  GetChecksData,
+  GetChecksError,
+  GetChecksResponse,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
@@ -1483,6 +1491,35 @@ export const listTermHintsOptions = (options?: Options<ListTermHintsData>) =>
     },
     queryKey: listTermHintsQueryKey(options),
   });
+
+/**
+ * Decide Check
+ *
+ * A person's decision: shows it, does not, unclear, or back to open; with a note.
+ */
+export const decideCheckMutation = (
+  options?: Partial<Options<DecideCheckData>>,
+): UseMutationOptions<
+  DecideCheckResponse,
+  DecideCheckError,
+  Options<DecideCheckData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DecideCheckResponse,
+    DecideCheckError,
+    Options<DecideCheckData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await decideCheck({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Create Claim Endpoint
@@ -4208,6 +4245,33 @@ export const investigationPresentationDraftMutation = (
   };
   return mutationOptions;
 };
+
+export const getChecksQueryKey = (options: Options<GetChecksData>) =>
+  createQueryKey('getChecks', options);
+
+/**
+ * Get Checks
+ *
+ * Brings the flags and the items up to date with the case's records, then lists the items.
+ */
+export const getChecksOptions = (options: Options<GetChecksData>) =>
+  queryOptions<
+    GetChecksResponse,
+    GetChecksError,
+    GetChecksResponse,
+    ReturnType<typeof getChecksQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getChecks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getChecksQueryKey(options),
+  });
 
 export const listClaimsQueryKey = (options: Options<ListClaimsData>) =>
   createQueryKey('listClaims', options);

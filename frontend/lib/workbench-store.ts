@@ -60,6 +60,12 @@ type WorkbenchState = {
    * search hit, a similar document), at the page that matched if known. */
   document: {serial: number; documentId: string; pageNumber: number | null} | null;
   openDocument: (documentId: string, pageNumber?: number | null) => void;
+  /** The Red Flag whose details were last asked for (a "To check" item's flag). */
+  flag: {serial: number; flagId: string} | null;
+  openFlag: (flagId: string) => void;
+  /** The "To check" item last asked for (a flag's "records can't show" part). */
+  check: {serial: number; checkId: string} | null;
+  openCheck: (checkId: string) => void;
   /** The investigation's year slider (lib/as-of.ts): the year every chart
    * shows the state as of, or null for all time. */
   asOf: number | null;
@@ -79,7 +85,7 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   investigationId: '',
   // A new case means a new trace, claim, dossier and relationship: nothing from the old one applies.
   setInvestigationId: id => set(state => (state.investigationId === id ? {investigationId: id}
-    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, asOf: null, pointedParty: null})),
+    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, flag: null, check: null, asOf: null, pointedParty: null})),
   entityId: '',
   setEntityId: id => set({entityId: id}),
   provenance: null,
@@ -94,6 +100,10 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   openRelationship: request => set({relationship: {serial: nextSerial(), request}}),
   document: null,
   openDocument: (documentId, pageNumber = null) => set({document: {serial: nextSerial(), documentId, pageNumber}}),
+  flag: null,
+  openFlag: flagId => set({flag: {serial: nextSerial(), flagId}}),
+  check: null,
+  openCheck: checkId => set({check: {serial: nextSerial(), checkId}}),
   asOf: null,
   setAsOf: year => set({asOf: year}),
   pointedParty: null,

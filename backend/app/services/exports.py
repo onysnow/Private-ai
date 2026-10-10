@@ -27,7 +27,7 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag,
+    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -43,7 +43,7 @@ MODEL_BY_TABLE = {
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
-        WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag,
+        WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem,
     ]
 }
 
@@ -72,6 +72,8 @@ RESTORE_ORDER = [
     "tags", "record_tags", "notes", "collections", "collection_items",
     # Red Flags keep the reporter's decisions on them (dismissed and why, made a lead).
     "pattern_flags",
+    # What a person checks, with their decisions; an item may point at its flag and its document.
+    "check_items",
     # The TAS reasoning review queue travels with the investigation: a restored
     # backup keeps every proposed/accepted/rejected analysis and its reviewer note,
     # exactly as extraction_candidates keeps the document review trail.
@@ -145,7 +147,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
-        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag,
+        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -187,6 +189,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "tags": direct["tags"], "record_tags": direct["record_tags"], "notes": direct["notes"],
         "collections": direct["collections"], "collection_items": direct["collection_items"],
         "pattern_flags": direct["pattern_flags"],
+        "check_items": direct["check_items"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

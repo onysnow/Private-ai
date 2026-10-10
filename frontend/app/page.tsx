@@ -30,6 +30,7 @@ import {withEnds} from '../features/relationship-graph/graph';
 import {StageRail, StageSection, StandingTiles, useStanding} from '../components/layout/workbench-page';
 import {YearSlider} from '../components/charts/year-slider';
 import {RedFlagsPanel} from '../features/red-flags/red-flags-panel';
+import {ToCheckPanel} from '../features/to-check/to-check-panel';
 import {RelationshipGraphPanel} from '../features/relationship-graph/relationship-graph-panel';
 import {ReviewQueuePanel} from '../features/review-queue/review-queue-panel';
 import {SearchPanel} from '../features/search/search-panel';
@@ -184,6 +185,7 @@ function Workbench(): ReactElement {
 
       <StageSection stage="verify">
         <PanelErrorBoundary name="Claim verification workspace"><ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>
+        <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>
         <div id="review-queue"><PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary></div>
       </StageSection>
 

@@ -175,6 +175,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         Note,
         Collection,
         PatternFlag,
+        CheckItem,
     )
 
     direct = {
@@ -200,6 +201,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "note_id": (Note, "investigation_id"),
         "collection_id": (Collection, "investigation_id"),
         "flag_id": (PatternFlag, "investigation_id"),
+        "check_id": (CheckItem, "investigation_id"),
         "timeline_event_id": (TimelineEvent, "investigation_id"),
     }
     if key in direct:

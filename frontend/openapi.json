@@ -3304,6 +3304,56 @@
         "title": "ChartVisualOut",
         "type": "object"
       },
+      "CheckDecide": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the person saw; it stays with the item.",
+            "title": "Note"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "shows",
+              "does_not",
+              "unclear"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "CheckDecide",
+        "type": "object"
+      },
+      "CheckDocumentOut": {
+        "properties": {
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "filename"
+        ],
+        "title": "CheckDocumentOut",
+        "type": "object"
+      },
       "CheckItemOut": {
         "properties": {
           "message": {
@@ -3372,6 +3422,36 @@
           "not_checked"
         ],
         "title": "CheckReportOut",
+        "type": "object"
+      },
+      "ChecksOut": {
+        "description": "Items the case calls for now (open first), and those it no longer does.",
+        "properties": {
+          "gone": {
+            "items": {
+              "$ref": "#/components/schemas/ToCheckItemOut"
+            },
+            "title": "Gone",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ToCheckItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "items",
+          "gone"
+        ],
+        "title": "ChecksOut",
         "type": "object"
       },
       "CitationDetailOut": {
@@ -16139,6 +16219,36 @@
         "title": "FindingReviewRequest",
         "type": "object"
       },
+      "FlagCheckOut": {
+        "description": "A \"To check\" item for a part of the indicator this flag's records cannot show.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "shows",
+              "does_not",
+              "unclear"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "status"
+        ],
+        "title": "FlagCheckOut",
+        "type": "object"
+      },
       "FlagCrossHintOut": {
         "properties": {
           "reason": {
@@ -22193,6 +22303,14 @@
       "RedFlagOut": {
         "description": "One occurrence of a pattern. A flag is a lead, not a finding.",
         "properties": {
+          "checks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FlagCheckOut"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
           "dismissed_reason": {
             "anyOf": [
               {
@@ -26444,6 +26562,173 @@
         "title": "TimelineVisualOut",
         "type": "object"
       },
+      "ToCheckItemOut": {
+        "description": "Something a person checks: a passage to read, or a checklist item. The\napp never decides it; open until a person does.",
+        "properties": {
+          "decided_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "document": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CheckDocumentOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "excerpt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Excerpt"
+          },
+          "first_seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "First Seen At",
+            "type": "string"
+          },
+          "flag_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag Id"
+          },
+          "gone_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gone At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "indicator_id": {
+            "title": "Indicator Id",
+            "type": "string"
+          },
+          "indicator_name": {
+            "title": "Indicator Name",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "passage",
+              "checklist"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/FlagPartyOut"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "related_flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Related Flags",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "shows",
+              "does_not",
+              "unclear"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "terms": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Terms",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "indicator_id",
+          "indicator_name",
+          "kind",
+          "question",
+          "status",
+          "note",
+          "decided_at",
+          "parties",
+          "flag_id",
+          "related_flags",
+          "document",
+          "locator",
+          "excerpt",
+          "terms",
+          "first_seen_at",
+          "gone_at"
+        ],
+        "title": "ToCheckItemOut",
+        "type": "object"
+      },
       "TraceClaimLinkOut": {
         "properties": {
           "claim": {
@@ -29402,6 +29687,66 @@
           }
         },
         "summary": "List Term Hints"
+      }
+    },
+    "/api/checks/{check_id}/decide": {
+      "post": {
+        "description": "A person's decision: shows it, does not, unclear, or back to open; with a note.",
+        "operationId": "decide_check",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "check_id",
+            "required": true,
+            "schema": {
+              "title": "Check Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckDecide"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecksOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Decide Check"
       }
     },
     "/api/claims": {
@@ -41896,6 +42241,56 @@
           }
         },
         "summary": "Investigation Presentation Draft"
+      }
+    },
+    "/api/investigations/{investigation_id}/checks": {
+      "get": {
+        "description": "Brings the flags and the items up to date with the case's records, then lists the items.",
+        "operationId": "get_checks",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecksOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Checks"
       }
     },
     "/api/investigations/{investigation_id}/claims": {

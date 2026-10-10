@@ -108,6 +108,9 @@ import type {
   CreateWriteupEndpointData,
   CreateWriteupEndpointErrors,
   CreateWriteupEndpointResponses,
+  DecideCheckData,
+  DecideCheckErrors,
+  DecideCheckResponses,
   DecideCrossProviderClusterData,
   DecideCrossProviderClusterErrors,
   DecideCrossProviderClusterResponses,
@@ -219,6 +222,9 @@ import type {
   GetBasemapTileData,
   GetBasemapTileErrors,
   GetBasemapTileResponses,
+  GetChecksData,
+  GetChecksErrors,
+  GetChecksResponses,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
@@ -766,6 +772,9 @@ import {
   zCreateTimelineEventEndpointResponse,
   zCreateWriteupEndpointBody,
   zCreateWriteupEndpointResponse,
+  zDecideCheckBody,
+  zDecideCheckPath,
+  zDecideCheckResponse,
   zDecideCrossProviderClusterBody,
   zDecideCrossProviderClusterPath,
   zDecideCrossProviderClusterResponse,
@@ -851,6 +860,8 @@ import {
   zGetBasemapStatusResponse,
   zGetBasemapTilePath,
   zGetBasemapTileResponse,
+  zGetChecksPath,
+  zGetChecksResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
   zGetCollectionPath,
@@ -1715,6 +1726,37 @@ export const listTermHints = <ThrowOnError extends boolean = false>(
       await zListTermHintsResponse.parseAsync(data),
     url: '/api/catalogue/terms',
     ...options,
+  });
+
+/**
+ * Decide Check
+ *
+ * A person's decision: shows it, does not, unclear, or back to open; with a note.
+ */
+export const decideCheck = <ThrowOnError extends boolean = false>(
+  options: Options<DecideCheckData, ThrowOnError>,
+): RequestResult<DecideCheckResponses, DecideCheckErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    DecideCheckResponses,
+    DecideCheckErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDecideCheckBody,
+          path: zDecideCheckPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDecideCheckResponse.parseAsync(data),
+    url: '/api/checks/{check_id}/decide',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -4678,6 +4720,33 @@ export const investigationPresentationDraft = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Checks
+ *
+ * Brings the flags and the items up to date with the case's records, then lists the items.
+ */
+export const getChecks = <ThrowOnError extends boolean = false>(
+  options: Options<GetChecksData, ThrowOnError>,
+): RequestResult<GetChecksResponses, GetChecksErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetChecksResponses,
+    GetChecksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetChecksPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetChecksResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/checks',
+    ...options,
   });
 
 /**

@@ -20,6 +20,7 @@ export const STAGES: Stage[] = [
   ]},
   {key: 'verify', n: 2, name: 'Verify', line: 'Decide what the evidence shows. Colour here is always how sure: green supported, red disputed, brown not yet shown.', colour: SWATCH.sage, parts: [
     {label: 'Claims', anchor: 'claim-verification'},
+    {label: 'To check', anchor: 'to-check'},
     {label: 'Connector findings', anchor: 'review-queue'},
   ]},
   {key: 'map', n: 3, name: 'Map', line: 'The reviewed records drawn four ways. Each chart says its rule and has its own key.', colour: SWATCH.amber, parts: [

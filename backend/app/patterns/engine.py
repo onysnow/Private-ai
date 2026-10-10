@@ -23,7 +23,8 @@ from sqlalchemy.orm import Session
 from app.catalogue.loader import Catalogue, load
 from app.catalogue.models import AREA_SUMMARIES, Indicator
 from app.core.time import utcnow_naive
-from app.models.domain import Investigation, Lead, PatternFlag
+from app.models.domain import CheckItem, Investigation, Lead, PatternFlag
+from app.patterns import checks as check_items
 from app.patterns import graph as case_graph
 from app.patterns import investigation_type
 from app.patterns import specs as detection
@@ -172,7 +173,8 @@ def _rank(rows: list[PatternFlag]) -> None:
         row.weight = round(sum(p["value"] for p in parts), 2)
 
 
-def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]]) -> dict[str, Any]:
+def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]],
+              checks: dict[str, list[dict[str, str]]] | None = None) -> dict[str, Any]:
     found = indicator(row.indicator_id)
     ind, area = found if found else (None, "")
     return {
@@ -182,6 +184,7 @@ def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]]) 
         "parties": [{"id": p, "name": names.get(p, (p, ""))[0], "schema": names.get(p, ("", "Thing"))[1]} for p in row.parties],
         "links": row.links, "facts": row.facts, "summary": (row.facts or {}).get("summary", ""),
         "not_shown": list((row.facts or {}).get("not_shown") or []),
+        "checks": (checks or {}).get(row.id, []),
         "first_seen_at": row.first_seen_at, "last_seen_at": row.last_seen_at, "gone_at": row.gone_at,
         "indicator": None if ind is None else {
             "id": ind.id, "name": ind.name, "definition": ind.definition, "area": ind.areas[0], "area_name": area,
@@ -205,6 +208,7 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
     if refresh:
         try:
             cannot = recompute(db, investigation_id)
+            check_items.recompute(db, investigation_id)
         except InvestigationAuthorizationError:
             # A reader without write access sees the flags as last computed.
             db.rollback()
@@ -217,11 +221,15 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
     current = sorted((r for r in rows if r.gone_at is None), key=lambda r: (-r.weight, r.indicator_id, r.fingerprint))
     gone = sorted((r for r in rows if r.gone_at is not None), key=lambda r: r.gone_at or r.last_seen_at, reverse=True)
     inv = db.get(Investigation, investigation_id)
+    linked: dict[str, list[dict[str, str]]] = {}
+    for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id, CheckItem.flag_id.is_not(None),
+                                                CheckItem.gone_at.is_(None))):
+        linked.setdefault(c.flag_id or "", []).append({"id": c.id, "question": c.question, "status": c.status})
     return {
         "investigation_id": investigation_id,
         "rules": [{"indicator_id": s.indicator, "version": s.version, "name": _name(s.indicator)} for s in detection.load()],
         "cannot_run": cannot,
-        "flags": [serialize(db, r, names) for r in current],
+        "flags": [serialize(db, r, names, linked) for r in current],
         "gone": [serialize(db, r, names) for r in gone],
         "investigation_type": investigation_type.current(db, inv) if inv else {"set_by": "app", "areas": [], "suggested": []},
     }

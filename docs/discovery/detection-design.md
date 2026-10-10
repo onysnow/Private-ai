@@ -168,6 +168,25 @@ a person's work with the app's help.
   the reason.
 - `backend/tests/test_detection_specs.py` runs every spec's examples and the lint.
 
+- Five more families (attribute_in_set, missing_link, conflicting_values,
+  baseline_change, amount_statistic with round-number share and Benford), so
+  fourteen in all.
+- **To check** (`backend/app/patterns/checks.py`, the `check_items` table,
+  `GET /api/investigations/{id}/checks`, `POST /api/checks/{id}/decide`, and
+  `frontend/features/to-check/`): a panel in the Verify stage.
+  - Every part a flag's records cannot show (`not_shown`) is a checklist item
+    on the flag's parties, linked to the flag; the flag's "records can't show"
+    line links to the item and shows the decision once made.
+  - Check specs (`catalogue/detection/checks/*.yaml`) add passages (an
+    indicator's words found in the case's document chunks, whole words and
+    phrases, any case; matched in Python so the same search runs on SQLite and
+    Postgres) and checklist items per party of a kind or per case. None are
+    written yet: that is part of the spec drafting that is on hold.
+  - A person marks each item shows it / does not / unclear, with a note. Items
+    are kept by fingerprint, so a decision stays when the case changes; an
+    item no longer called for is kept under "No longer called for" with its
+    decision.
+
 ## Decided (Ony, 10 October 2026)
 
 1. **Spec format: settings only.** Each spec picks a family and fills in its
