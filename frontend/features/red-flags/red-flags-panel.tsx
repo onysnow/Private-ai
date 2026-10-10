@@ -49,6 +49,7 @@ function FlagCard({flag, rank, onLead, onDismiss, onReopen}: {flag: RedFlagOut; 
       onMouseEnter={() => setPointed(p.id)} onMouseLeave={() => setPointed(null)} onFocus={() => setPointed(p.id)} onBlur={() => setPointed(null)}>
       <i style={{borderColor: PARTY[partyKind(p.schema)].ring}}/>{p.name}</button>)}</div>
     <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
+    {flag.not_shown.length > 0 && <div className="rf-row rf-unknown"><b>The records can&apos;t show.</b> {flag.not_shown.join('; ')}. A person decides that.</div>}
     {ind && <>
       <div className="rf-row"><b>Could be innocent.</b> <GlossaryText text={`${ind.innocent_explanations.map(t => t.replace(/[.;]\s*$/, '')).join('; ')}.`}/></div>
       <div className="rf-row"><b>The pattern.</b> <GlossaryText text={ind.definition}/></div>

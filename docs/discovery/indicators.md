@@ -63,6 +63,17 @@ Status: proposed, 8 October 2026. The catalogue's data and tools exist (`catalog
 
 Where an indicator's source gives no number, the indicator is researched again to find a published one (a regulator, standard-setter, court or study that states a threshold for that pattern). Only a number found in a source is used; one that cannot be found is reported as not found, never invented.
 
+## Vague words, partial matches, investigation type, contract awards (Ony, 10 October 2026: "do what's best")
+
+Ony asked for a recommendation on each and accepted it.
+
+- **Vague words with no published number.** A second search (10 October) found no regulator, court or study that puts a number on "just under", "repeated", "large", "many" or "several" in ML-021, ML-022, ML-008 or BO-016.
+  - **ML-021 (structuring) is built with the $9,000 to $10,000 band** that US Treasury reports show in past cases (TIGTA 2017: 89% of 235 sampled structuring investigations; a FinCEN case example). The card says it comes from past cases, not a rule, and that smaller splits are missed. "Repeated" is read as its plain meaning, twice or more; no source sets a time window, and FinCEN declines to.
+  - **BO-016, ML-022 and ML-008 wait** for a published number. BO-016's only figure (24 to 24.99%) is from a commercial data firm, and the UK register records holdings only in bands from 25%, so the rule also needs shareholder lists.
+- **Partial matches are Faint.** When the records show the structure of a pattern but not the part only a person can judge (a business reason, an intent, whether money was cash), the rule raises a Faint flag, and the card says which part the records cannot show. Faint means "the pattern appears".
+- **Investigation type is one or more of the catalogue's areas**, filled in by the app from both the kinds of records and the Red Flags that fire, with the reason shown for each area; the reporter can change it at any time, and then the app stops changing it. The areas decide the order on Red Flags: the investigation's own areas first, every other area under "This may also point to". The three types in sources.md (procurement, influence, litigation) become a mapping from areas to lookup sources in step 4.
+- **Contract awards** (who won a contract, for how much, when; FtM ContractAward, contract to supplier) are added as a link type with the procurement lookups in step 4. Rules that need them, such as CO-046 (payments 30% or more above the award), come then.
+
 ## Not yet decided (for Ony)
 
 1. Whether the DISARM framework (share-alike licence) should be imported whole, which would make the catalogue's DISARM part share-alike too.

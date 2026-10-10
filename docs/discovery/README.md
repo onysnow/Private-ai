@@ -271,7 +271,8 @@ Still open: the chart rules question (Ony asked where the rules come from), undo
 3. **Pattern engine** with the patterns computable from today's records,
    and the "Red Flags" panel.
 4. **Router, lookups and crawler** (ADRs for the new packages first), then
-   research runs and the research pages.
+   research runs and the research pages. Contract awards as a link type,
+   with the procurement lookups, and the rules that need them (Ony, 10 Oct).
 5. **Patterns that need looked-up data.** Saved views and story mode.
    Dashboard and review page.
 

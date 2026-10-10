@@ -3918,6 +3918,7 @@ class RedFlagOut(ResponseModel):
     links: list[str]
     facts: dict[str, Any]
     summary: str
+    not_shown: list[str]
     first_seen_at: Timestamp
     last_seen_at: Timestamp
     gone_at: Timestamp | None

@@ -1935,7 +1935,8 @@ indicators:
   lookup_sources:
   - Company registry for both parties
   levels:
-    faint: To be set by Ony
+    faint: Companies that share an owner or a director pay each other. The records cannot show whether
+      there was a business reason; a person decides that.
     strong: To be set by Ony
     textbook: Meets the published definition as worded
     threshold_source: none
@@ -1950,7 +1951,7 @@ indicators:
   - Licensing of brand or IP to group subsidiaries
   - Family business groups
   jurisdictions: Global
-  version: 1
+  version: 2
 - id: BO-032
   name: Apparently unrelated parties share an address, phone or email
   definition: Companies or people that claim no connection use the same address, phone number, email or

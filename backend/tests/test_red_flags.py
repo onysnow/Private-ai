@@ -117,3 +117,34 @@ def test_ranking_parts_dismissal_that_sticks_and_a_flag_made_a_lead():
         links = db.query(LeadLink).filter(LeadLink.lead_id == lead["id"]).all()
         assert {l.entity_id for l in links if l.entity_id} == {a, b}
         assert any(l.relationship_id for l in links)
+
+
+def test_repeated_payments_just_under_10000_dollars_are_faint_and_say_what_is_not_shown():
+    inv = _inv("Structuring")
+    payer, bank, other = _party(inv, "J Doe", "Person"), _party(inv, "Bank account 1"), _party(inv, "Bank account 2")
+    _link(inv, "Payment", payer, bank, amount=["9,500"], currency=["USD"], purpose=["deposit"], date=["2024-01-02"])
+    _link(inv, "Payment", payer, bank, amount=["10000"], currency=["USD"], purpose=["deposit"])
+    _link(inv, "Payment", payer, other, amount=["9500"], currency=["EUR"], purpose=["deposit"])
+    assert "ML-021" not in {f["indicator_id"] for f in _flags(inv)["flags"]}, "one payment in the band is not repeated"
+    _link(inv, "Payment", payer, other, amount=["9900"], currency=["usd"], purpose=["deposit"], date=["2024-01-03"])
+    flag = next(f for f in _flags(inv)["flags"] if f["indicator_id"] == "ML-021")
+    assert flag["level"] == "faint" and flag["facts"]["payments"] == 2 and flag["facts"]["total"] == 19400
+    assert flag["not_shown"] == ["whether the money was cash", "whether it was split to avoid the report"]
+    assert "from 2024-01-02 to 2024-01-03" in flag["summary"]
+    assert "Treasury" in flag["indicator"]["levels"]["faint"] and "not a rule" in flag["indicator"]["levels"]["threshold_note"]
+
+
+def test_payments_between_companies_with_a_shared_owner_are_faint():
+    inv = _inv("Shared owner")
+    owner, a, b, parent = _party(inv, "M Smith", "Person"), _party(inv, "A Ltd"), _party(inv, "B Ltd"), _party(inv, "Parent Ltd")
+    _link(inv, "Payment", a, b, amount=["5000"], currency=["GBP"], purpose=["services"])
+    assert "BO-031" not in {f["indicator_id"] for f in _flags(inv)["flags"]}
+    _link(inv, "Ownership", owner, a)
+    _link(inv, "Directorship", owner, b)
+    _link(inv, "Ownership", parent, a)
+    _link(inv, "Payment", parent, a, amount=["100"], currency=["GBP"], purpose=["capital"])
+    flags = [f for f in _flags(inv)["flags"] if f["indicator_id"] == "BO-031"]
+    assert len(flags) == 1, "a parent paying its own company is not counted"
+    assert flags[0]["level"] == "faint" and flags[0]["not_shown"] == ["whether there was a business reason for the payments"]
+    assert {p["name"] for p in flags[0]["parties"]} == {"A Ltd", "B Ltd", "M Smith"}
+    assert "M Smith (directorship and ownership)" in flags[0]["summary"]

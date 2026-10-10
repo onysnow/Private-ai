@@ -25,9 +25,11 @@ from app.catalogue.models import Indicator
 from app.core.time import utcnow_naive
 from app.models.domain import Lead, PatternFlag
 from app.patterns import graph as case_graph
-from app.patterns.rules import circular_ownership, circular_payments, ownership_layers, payment_no_purpose, shared_contact
+from app.patterns.rules import (
+    circular_ownership, circular_payments, ownership_layers, payment_no_purpose, shared_contact, shared_owner_dealings, structuring,
+)
 
-RULES = [circular_ownership, ownership_layers, circular_payments, payment_no_purpose, shared_contact]
+RULES = [circular_ownership, ownership_layers, circular_payments, payment_no_purpose, shared_contact, structuring, shared_owner_dealings]
 LEVELS = ("faint", "strong", "textbook")
 
 
@@ -125,7 +127,7 @@ def recompute(db: Session, investigation_id: str) -> None:
         for occ in rule.run(graph):
             fp = _fingerprint(rule.INDICATOR, occ.parties, occ.links)
             seen.add(fp)
-            facts = {**occ.facts, "summary": occ.summary, "weak": rule.WEAK,
+            facts = {**occ.facts, "summary": occ.summary, "weak": rule.WEAK, "not_shown": occ.not_shown,
                      "unreviewed_links": [l for l in occ.links if certainty.get(l) != "supported"]}
             row = existing.get(fp)
             if row is None:
@@ -165,6 +167,7 @@ def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]]) 
         "weight": row.weight, "weight_parts": row.weight_parts,
         "parties": [{"id": p, "name": names.get(p, (p, ""))[0], "schema": names.get(p, ("", "Thing"))[1]} for p in row.parties],
         "links": row.links, "facts": row.facts, "summary": (row.facts or {}).get("summary", ""),
+        "not_shown": list((row.facts or {}).get("not_shown") or []),
         "first_seen_at": row.first_seen_at, "last_seen_at": row.last_seen_at, "gone_at": row.gone_at,
         "indicator": None if ind is None else {
             "id": ind.id, "name": ind.name, "definition": ind.definition, "area": ind.areas[0], "area_name": area,

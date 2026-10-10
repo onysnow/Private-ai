@@ -22177,6 +22177,13 @@
             "title": "Links",
             "type": "array"
           },
+          "not_shown": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Not Shown",
+            "type": "array"
+          },
           "parties": {
             "items": {
               "$ref": "#/components/schemas/FlagPartyOut"
@@ -22227,6 +22234,7 @@
           "links",
           "facts",
           "summary",
+          "not_shown",
           "first_seen_at",
           "last_seen_at",
           "gone_at",

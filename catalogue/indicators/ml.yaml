@@ -1246,6 +1246,24 @@ indicators:
     quote: structure or assist in structuring, or attempt to structure or assist in structuring,
     quote_verified: true
     checked: '2026-10-09'
+  - title: Criminal Investigation Enforced Structuring Laws Primarily Against Legal Source Funds and Compromised
+      the Rights of Some Individuals and Businesses (2017-30-025)
+    publisher: Treasury Inspector General for Tax Administration
+    year: '2017'
+    url: https://www.tigta.gov/sites/default/files/auditreports/2017reports/201730025fr.pdf
+    locator: Figure 4, page 14
+    quote: 209 (89 percent) listed currency transactions between $9,000 and $10,000.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: SAR Leads to Structuring Conviction for Mortgage Broker (The SAR Activity Review, Issue 14)
+    publisher: FinCEN
+    year: '2008'
+    url: https://www.fincen.gov/sites/default/files/case_example/Issue14-story11.pdf
+    locator: page 1, paragraph 4
+    quote: Each of his cash deposits was split among his bank accounts in amounts ranging between $9,000
+      and $10,000.
+    quote_verified: true
+    checked: '2026-10-10'
   examples:
   - Daily cash deposits of $9,500 across several branches
   - Cash pushed through bank deposit machines in amounts below the reporting line
@@ -1270,12 +1288,20 @@ indicators:
   lookup_sources:
   - national reporting thresholds (e.g. US 31 CFR 1010.311)
   levels:
-    faint: To be set by Ony
+    faint: Two or more payments by the same payer between $9,000 and $10,000, the band US Treasury reports
+      show in most past structuring cases. The records cannot show whether the money was cash or whether
+      it was split to avoid the report; a person decides that.
     strong: To be set by Ony
     textbook: 'In the US: repeated cash transactions kept just under the $10,000 currency transaction
       report threshold to evade the report (31 CFR 1010.311; 31 U.S.C. 5324). Other countries: the local
       threshold.'
-    threshold_source: https://www.law.cornell.edu/cfr/text/31/1010.311
+    threshold_source: https://www.law.cornell.edu/cfr/text/31/1010.311 ; https://www.tigta.gov/sites/default/files/auditreports/2017reports/201730025fr.pdf
+    threshold_note: 'The $10,000 is the US currency transaction report threshold (31 CFR 1010.311). The
+      $9,000 to $10,000 band is not a rule: it comes from past cases, where a Treasury Inspector General
+      audit found it in 89% of 235 sampled structuring investigations (2017) and a FinCEN case example
+      describes deposits in the same band (2008). FinCEN sets no count or time window (''cannot be one
+      size fits all''), so ''repeated'' is read as twice or more. Splits well below the band, such as
+      FinCEN''s own $6,000 example, are missed. Chosen on 10 October 2026 (Ony accepted the recommendation).'
   threshold_verified: true
   cross_hints:
   - target_area: OC
@@ -1287,7 +1313,7 @@ indicators:
   - Customers unaware of thresholds who bank daily
   - ATM or machine deposit limits
   jurisdictions: Global; threshold US-specific
-  version: 1
+  version: 2
 - id: ML-022
   name: Large round-amount payments
   definition: Payments are made in large, round figures in a trade or business where amounts would normally

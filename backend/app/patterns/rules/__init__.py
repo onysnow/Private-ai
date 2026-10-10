@@ -15,3 +15,6 @@ class Occurrence:
     links: list[str]
     facts: dict[str, Any] = field(default_factory=dict)
     summary: str = ""
+    # What the records cannot show and a person has to judge (a partial match is
+    # Faint; indicators.md, "Partial matches are Faint").
+    not_shown: list[str] = field(default_factory=list)

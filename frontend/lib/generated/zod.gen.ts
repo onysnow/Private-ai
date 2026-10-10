@@ -6641,6 +6641,7 @@ export const zRedFlagOut = z.object({
   lead_id: z.string().nullable(),
   level: z.enum(['faint', 'strong', 'textbook']),
   links: z.array(z.string()),
+  not_shown: z.array(z.string()),
   parties: z.array(zFlagPartyOut),
   rule_version: z.number().int(),
   status: z.enum(['open', 'dismissed', 'made_lead']),

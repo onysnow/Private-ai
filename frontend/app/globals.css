@@ -457,6 +457,7 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
   .rf-summary { margin: 0 0 6px; color: #f3e9d7; }
   .rf-row { margin: 5px 0; line-height: 1.45; } .rf-row b { color: #d4a152; font-weight: 600; } .rf-row a { color: #d9b67a; }
   .rf-row.rf-note { font-size: 12.5px; color: #a8998a; }
+  .rf-row.rf-unknown { padding: 6px 10px; border-left: 3px solid #8d692b; background: rgba(141,105,43,.12); border-radius: 0 6px 6px 0; }
   .rf-weight { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 11.5px; color: #bc9574; margin: 8px 0; }
   .rf-track { flex: 0 0 120px; height: 6px; border-radius: 3px; background: #26272b; overflow: hidden; } .rf-track i { display: block; height: 100%; background: #d4a152; }
   .rf-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }

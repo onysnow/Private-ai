@@ -28,7 +28,7 @@ const flag = {
   weight: 0.95, weight_parts: [{why: 'one flag', value: 1}, {why: '1 other open flag on the same parties', value: 0.25},
     {why: 'rests on a link not yet supported by reviewed claims or evidence', value: -0.3}],
   parties: [{id: 'a', name: 'A Ltd', schema: 'Company'}, {id: 'b', name: 'B Ltd', schema: 'Company'}],
-  links: ['l1', 'l2'], facts: {}, summary: 'Ownership runs in a loop: A Ltd → B Ltd → A Ltd.',
+  links: ['l1', 'l2'], facts: {}, not_shown: ['whether there was a business reason'], summary: 'Ownership runs in a loop: A Ltd → B Ltd → A Ltd.',
   first_seen_at: '2026-10-10T00:00:00', last_seen_at: '2026-10-10T00:00:00', gone_at: null,
   indicator: {id: 'BO-001', name: 'Circular ownership', definition: 'Companies own each other in a loop.', area: 'BO', area_name: 'Hidden ownership and shell companies',
     levels: {faint: 'To be set', strong: 'To be set', textbook: 'Meets the published definition as worded', threshold_source: 'none', threshold_note: 'Applies in the UK only.'},
@@ -48,6 +48,7 @@ describe('RedFlagsPanel', () => {
     expect(within(card).getByRole('link', {name: /FATF and Egmont Group/})).toHaveAttribute('href', 'https://example.test/fatf');
     expect(within(card).getByText(/-0.3 rests on a link not yet supported/)).toBeInTheDocument();
     expect(within(card).getByText('Applies in the UK only.')).toBeInTheDocument();
+    expect(within(card).getByText(/whether there was a business reason\. A person decides that\./)).toBeInTheDocument();
     expect(screen.getByRole('heading', {level: 4, name: 'Hidden ownership and shell companies'})).toBeInTheDocument();
     await userEvent.setup().hover(within(card).getByRole('button', {name: 'A Ltd'}));
     expect(useWorkbenchStore.getState().pointedParty).toBe('a');

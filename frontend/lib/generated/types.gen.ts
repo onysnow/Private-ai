@@ -10679,6 +10679,10 @@ export type RedFlagOut = {
    */
   links: Array<string>;
   /**
+   * Not Shown
+   */
+  not_shown: Array<string>;
+  /**
    * Parties
    */
   parties: Array<FlagPartyOut>;
