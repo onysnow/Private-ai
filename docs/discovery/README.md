@@ -293,6 +293,14 @@ top and can be clicked through. One notch of the mouse wheel moves the top
 layer toward the viewer as if coming out of the screen; it disappears and the
 next segment's cards are there. The later segments recede into the
 background, showing a preview of their date or time.
+- Empty stretches are skipped: the next notch goes to the next segment with
+  evidence, and the background says how much time passed ("3 weeks later").
+- The app picks the finest step the evidence supports; the reporter can switch
+  to minute, hour, day, week, month or year.
+- Evidence dated only to a month or year gets its own layer at the start of
+  that period, marked "sometime in March 2019", so it is never shown as
+  happening on a particular day. Each finer layer inside that period carries a
+  small note ("2 items dated only to March 2019") that opens them.
 
 After these steps are built and tested, and after several people can work on
 one investigation (planned, 8 October), the next item is **admin tools and
