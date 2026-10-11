@@ -110,6 +110,7 @@ export function DecideScreen({investigationId, investigationName, active = true}
     return out;
   }, [items, order]);
 
+  const loading = all.query.isPending && Boolean(investigationId);
   const session = {yes: 0, no: 0, unsure: 0};
   for (const d of all.decided) session[d.choice.key] += 1;
   const failed = all.decided.find(d => d.state === 'failed');
@@ -120,7 +121,7 @@ export function DecideScreen({investigationId, investigationName, active = true}
       <h1>To decide</h1>
       <p className="ch-quiet">{investigationName ? `${investigationName} · ` : ''}only you can decide these</p>
       <div className="dc-chips" role="group" aria-label="Show">
-        <button type="button" className={!kind ? 'on' : ''} aria-pressed={!kind} onClick={() => setKind(undefined)}>All {total}</button>
+        <button type="button" className={!kind ? 'on' : ''} aria-pressed={!kind} onClick={() => setKind(undefined)}>All {loading ? '…' : total}</button>
         {kinds.filter(k => all.counts[k]).map(k => <button key={k} type="button" className={kind === k ? 'on' : ''} aria-pressed={kind === k}
           onClick={() => setKind(kind === k ? undefined : k)}>{KIND_LABEL[k]} {all.counts[k]}</button>)}
       </div>
@@ -133,6 +134,7 @@ export function DecideScreen({investigationId, investigationName, active = true}
       </label>
       {(all.query.data?.total ?? 0) > (all.query.data?.items.length ?? 0) && <p className="ch-quiet">Showing the first {all.query.data?.items.length} of {all.query.data?.total}; each one you decide makes room for the next.</p>}
       <div className="dc-list">
+        {loading && <p className="dc-loading" aria-busy="true">Gathering what waits for you…</p>}
         {all.query.isError && <p role="alert">{errorMessage(all.query.error, 'Could not load what waits for you')}</p>}
         {groups.map(g => <div key={g.key} className="dc-group">
           {g.label && <p className="dc-group-name">{g.label}<span>{g.items.length} left</span></p>}
@@ -155,7 +157,7 @@ export function DecideScreen({investigationId, investigationName, active = true}
         {item.choices.length === 0 && <Link className="dc-elsewhere" href={caseHref(item.open.href, investigationId)}>{item.open.label} ↗</Link>}
       </section>
     </> : <section className="dc-empty">
-      {all.query.isPending && investigationId ? <div className="ch-skeleton" aria-busy="true"/> : <>
+      {loading ? <div className="ch-skeleton dc-skeleton" aria-busy="true" aria-label="Gathering what waits for you"/> : <>
         <h2>Nothing waits for you{kind ? ` in ${KIND_LABEL[kind]}` : ''}.</h2>
         <p>{all.decided.length ? `${all.decided.length} decided in this session.` : 'New proposals, checks and missing values arrive here as the case grows.'}</p>
         <Link href={caseHref('/bring-in#document-ingestion', investigationId)}>Drop documents</Link>

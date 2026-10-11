@@ -175,3 +175,13 @@ def test_money_traced_counts_each_sum_once_where_it_starts():
                                                    "properties": {"amount": ["700000000"], "currency": ["USD"], "date": ["2009-09-30"]}}))
     money = ok(client.get(f"/api/investigations/{inv}/standing"))["money"]
     assert money == {"currency": "USD", "amount": 700000000.0, "payments": 2, "from_sources": 1, "other_currencies": []}
+
+
+def test_a_proposal_shows_the_passage_around_it_not_the_top_of_the_page():
+    from app.services.case_home import around
+    page = "UNITED STATES DISTRICT COURT " * 30 + "The Company acknowledges and agrees to the filing. " + "Later text " * 50
+    start = page.find("The Company")
+    shown = around(page, start, start + 50)
+    assert "The Company acknowledges and agrees to the filing." in shown
+    assert shown.startswith("… ") and shown.endswith(" …") and len(shown) < 520
+    assert around("A short page.", 2, 7) == "A short page."

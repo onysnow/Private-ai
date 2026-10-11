@@ -203,6 +203,24 @@ def _missing(db: Session, inv: str) -> list[dict[str, Any]]:
 PROPOSAL_RANK = {"claim": 60, "relationship": 55, "entity": 50, "evidence": 45, "identifier": 40}
 
 
+def around(text: str, start: int, end: int, before: int = 160, after: int = 260) -> str:
+    """The passage around what a proposal was taken from (its span in the page),
+    cut at word boundaries and marked with … where it was cut. Found on the 1MDB
+    case: cards showed the first 400 characters of the page, the court caption,
+    not the sentence the claim came from."""
+    if not text:
+        return ""
+    start, end = max(0, min(start, len(text))), max(0, min(max(end, start), len(text)))
+    lo, hi = max(0, start - before), min(len(text), end + after)
+    if lo > 0:
+        space = text.find(" ", lo)
+        lo = space + 1 if 0 <= space < start else lo
+    if hi < len(text):
+        space = text.rfind(" ", end, hi)
+        hi = space if space > end else hi
+    return f"{'… ' if lo > 0 else ''}{text[lo:hi].strip()}{' …' if hi < len(text) else ''}"
+
+
 def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> None:
     """A name proposal asks "add it?", or "same as this record?" when the case has a record of that name."""
     row: ExtractionCandidate = item["_entity_row"]
@@ -240,7 +258,9 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
         path = f"/api/extraction-candidates/{r.id}/review"
         caption = str(p.get("caption") or p.get("text") or p.get("quote") or "").strip()
         chunk = chunks.get(r.chunk_id or "")
-        quote = str(p.get("quote") or "") or (chunk.text[:400] if chunk else "")
+        raw_span = p.get("span")
+        span: dict[str, Any] = raw_span if isinstance(raw_span, dict) else {}
+        quote = str(p.get("quote") or "") or (around(chunk.text, int(span.get("start_char") or 0), int(span.get("end_char") or 0)) if chunk else "")
         band = "high" if r.confidence >= 0.8 else ("medium" if r.confidence >= 0.5 else "low")
         item: dict[str, Any] = {
             "kind": "proposal", "id": r.id, "actor": "Name-finder" if r.candidate_type in ("entity", "identifier") else "Document reader",

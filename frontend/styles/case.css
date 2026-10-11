@@ -346,3 +346,7 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 
 .one-mdb-links { margin: 0; font-size: 12.5px; opacity: .85; }
 .one-mdb-links a { color: var(--accent-2); }
+
+/* Decide while its feed loads: say so, rather than showing "All 0". */
+.dc-loading { margin: 6px 0; color: var(--text-muted); font-size: 13px; }
+.dc-skeleton { align-self: stretch; width: 100%; background: linear-gradient(100deg, var(--surface-2) 30%, color-mix(in srgb, var(--surface-3) 70%, var(--text) 6%) 50%, var(--surface-2) 70%) 0 0 / 300% 100%; }
