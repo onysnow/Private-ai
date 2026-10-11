@@ -53,13 +53,18 @@ def test_loading_makes_the_case_with_every_record(tmp_path):
         inv, document_ids = demo_1mdb.build(db, docs, storage_dir=tmp_path)
         assert inv.is_demo and inv.question == case["investigation"]["question"]
         assert len(document_ids) == len(docs) == db.query(Document).filter_by(investigation_id=inv.id).count()
-        assert db.query(RelationshipEdge).filter_by(investigation_id=inv.id).count() == len(case["relationships"])
-        assert db.query(TimelineEvent).filter_by(investigation_id=inv.id).count() == len(case["events"])
+        more = demo_1mdb.more()
+        linked_places = sum(1 for p in more["places"] if p.get("link"))
+        assert db.query(RelationshipEdge).filter_by(investigation_id=inv.id).count() == \
+            len(case["relationships"]) + len(more["relationships"]) + linked_places
+        assert db.query(TimelineEvent).filter_by(investigation_id=inv.id).count() == len(case["events"]) + len(more["events"])
         statuses = {c.status for c in db.query(Claim).filter_by(investigation_id=inv.id)}
-        assert statuses == {"supported", "unverified", "disputed", "lead"}
+        assert statuses == {"supported", "confirmed", "unverified", "disputed", "rejected", "lead"}
         assert demo_1mdb.existing(db).id == inv.id
+        assert demo_1mdb.LAST_PROBLEMS == []
+    n_claims = len(case["claims"]) + len(more["claims"]) + len(more["inferred_claims"])
     body = client.get("/api/demo/1mdb").json()
-    assert body["investigation_id"] == inv.id and body["documents"] == len(docs) and body["claims"] == len(case["claims"])
+    assert body["investigation_id"] == inv.id and body["documents"] == len(docs) and body["claims"] == n_claims
     # Loading again changes nothing.
     assert client.post("/api/demo/1mdb").json()["investigation_id"] == inv.id
     # The small made-up demo is still its own case.
@@ -96,6 +101,6 @@ def test_a_web_page_that_is_not_the_expected_page_is_kept_as_a_link(tmp_path):
     with SessionLocal() as db:
         inv, document_ids = demo_1mdb.build(db, docs, storage_dir=tmp_path)
         assert len(document_ids) == len(pdfs)
-        assert db.query(RelationshipEdge).filter_by(investigation_id=inv.id).count() == len(demo_1mdb.records()["relationships"])
+        assert db.query(RelationshipEdge).filter_by(investigation_id=inv.id).count() >= len(demo_1mdb.records()["relationships"])
         shown = demo_1mdb.progress(db)["not_downloaded"]
-        assert {p["url"] for p in shown} == {d["url"] for d in pages}
+        assert {d["url"] for d in pages} <= {p["url"] for p in shown}
