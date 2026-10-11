@@ -180,14 +180,16 @@ def is_expected_page(doc: dict[str, Any], data: bytes, quotes: list[str]) -> boo
     return bool(text) and all(_squash(q) in text for q in quotes)
 
 
-def fetch_documents(fetch: Fetch = download) -> list[tuple[dict[str, Any], bytes | None]]:
+def fetch_documents(fetch: Fetch = download, on_fetched: Callable[[], None] = lambda: None) -> list[tuple[dict[str, Any], bytes | None]]:
     """Every document's bytes. A PDF must match its pinned hash or loading
     stops. A web page that did not arrive as the expected page comes back as
     None: the case keeps it as a link to the publisher, and its quotes still
-    stand, but there is nothing to read."""
+    stand, but there is nothing to read. ``on_fetched`` is called once per
+    document, whether it arrived or not, for the screen's loading bar."""
     quotes = _quotes_by_document()
     out: list[tuple[dict[str, Any], bytes | None]] = []
     for doc in manifest():
+        on_fetched()
         pinned = bool(doc.get("sha256"))
         try:
             data = fetch(doc["url"])
@@ -206,7 +208,7 @@ def fetch_documents(fetch: Fetch = download) -> list[tuple[dict[str, Any], bytes
             out.append((doc, None))
             continue
         out.append((doc, data))
-    return out + fetch_more(fetch)
+    return out + fetch_more(fetch, on_fetched)
 
 
 def _fetch_one(doc: dict[str, Any], fetch: Fetch) -> tuple[dict[str, Any], bytes | None]:
@@ -260,10 +262,20 @@ def _fetch_one(doc: dict[str, Any], fetch: Fetch) -> tuple[dict[str, Any], bytes
     return meta, data
 
 
-def fetch_more(fetch: Fetch = download) -> list[tuple[dict[str, Any], bytes | None]]:
+def fetch_more(fetch: Fetch = download, on_fetched: Callable[[], None] = lambda: None) -> list[tuple[dict[str, Any], bytes | None]]:
     """Every more.json document, fetched a few at a time, in manifest order."""
+    def one(doc: dict[str, Any]) -> tuple[dict[str, Any], bytes | None]:
+        try:
+            return _fetch_one(doc, fetch)
+        finally:
+            on_fetched()
     with ThreadPoolExecutor(max_workers=4) as pool:
-        return list(pool.map(lambda d: _fetch_one(d, fetch), more_manifest()))
+        return list(pool.map(one, more_manifest()))
+
+
+def to_fetch() -> int:
+    """How many documents a load goes through, for the loading bar."""
+    return len(manifest()) + len(more_manifest())
 
 
 # What the last build had to adjust (a record the app refused), for the log and the tests.
@@ -759,3 +771,10 @@ def set_state(**fields: Any) -> None:
     with _lock:
         _state.clear()
         _state.update(fields)
+
+
+def count_fetched() -> None:
+    """One more document downloaded (or given up on), for the loading bar.
+    Called from the download threads."""
+    with _lock:
+        _state["fetched"] = _state.get("fetched", 0) + 1

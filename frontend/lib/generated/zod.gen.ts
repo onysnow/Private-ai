@@ -1993,6 +1993,7 @@ export const zDemoCaseProgressOut = z.object({
   documents: z.number().int().nullish(),
   error: z.string().nullish(),
   failed: z.number().int().nullish(),
+  fetched: z.number().int().nullish(),
   investigation_id: z.string().nullish(),
   leads: z.number().int().nullish(),
   not_downloaded: z
@@ -2009,6 +2010,7 @@ export const zDemoCaseProgressOut = z.object({
     'failed',
   ]),
   step: z.string().nullish(),
+  to_fetch: z.number().int().nullish(),
 });
 
 /**

@@ -122,9 +122,10 @@ async def load_1mdb(request: Request, db: Session = Depends(get_db)) -> Any:
     with _one_build_at_a_time(ONE_MDB) as mine:
         if not mine:
             return demo_1mdb.progress(db)
-        demo_1mdb.set_state(state="downloading", step="Downloading the court records, regulator findings, articles, photos and media")
+        demo_1mdb.set_state(state="downloading", step="Downloading the court records, regulator findings, articles, photos and media",
+                            fetched=0, to_fetch=demo_1mdb.to_fetch())
         try:
-            documents = await run_in_threadpool(demo_1mdb.fetch_documents)
+            documents = await run_in_threadpool(demo_1mdb.fetch_documents, on_fetched=demo_1mdb.count_fetched)
         except demo_1mdb.DemoDownloadError as exc:
             # Not the server's fault: say what failed in the progress, so the screen shows it.
             demo_1mdb.set_state(state="failed", error=str(exc))
@@ -166,9 +167,10 @@ async def load_demo_case(case_id: DemoCaseId, request: Request, db: Session = De
         if not mine:
             return demo_cases.progress(db, case_id)
         count = len(demo_cases.manifest(case_id))
-        demo_cases.set_state(case_id, state="downloading", step=f"Downloading {count} public document{'s' if count != 1 else ''}")
+        demo_cases.set_state(case_id, state="downloading", step=f"Downloading {count} public document{'s' if count != 1 else ''}",
+                             fetched=0, to_fetch=count)
         try:
-            documents = await run_in_threadpool(demo_cases.fetch_documents, case_id)
+            documents = await run_in_threadpool(demo_cases.fetch_documents, case_id, on_fetched=lambda: demo_cases.count_fetched(case_id))
         except demo_cases.DemoDownloadError as exc:
             demo_cases.set_state(case_id, state="failed", error=str(exc))
             return demo_cases.progress(db, case_id)

@@ -4361,6 +4361,9 @@ class DemoCaseProgressOut(ResponseModel):
     state: Literal["idle", "downloading", "building", "reading", "ready", "failed"]
     step: str | None = None
     error: str | None = None
+    # While downloading: how many of the documents have been started or done so far.
+    fetched: int | None = None
+    to_fetch: int | None = None
     investigation_id: str | None = None
     documents: int | None = None
     read: int | None = None

@@ -239,3 +239,22 @@ def test_the_records_reach_the_screens(loaded):
     with_action = [lead for lead in leads if (db.scalar(select(LeadProfile).where(LeadProfile.lead_id == lead.id)) or LeadProfile()).next_action]
     assert len(with_action) >= 10
     assert db.scalar(select(LeadLink).where(LeadLink.lead_id.in_([lead.id for lead in leads]), LeadLink.claim_id.is_not(None)))
+
+
+def test_every_document_is_counted_for_the_loading_bar():
+    """Each of more.json's documents counts once, whether it arrived or not,
+    so the loading bar reaches the end."""
+    import threading
+    seen = []
+    lock = threading.Lock()
+
+    def counted():
+        with lock:
+            seen.append(1)
+
+    def offline(url):
+        raise OSError("offline")
+
+    demo_1mdb.fetch_more(offline, counted)
+    assert len(seen) == len(demo_1mdb.more_manifest())
+    assert demo_1mdb.to_fetch() == len(demo_1mdb.manifest()) + len(demo_1mdb.more_manifest())

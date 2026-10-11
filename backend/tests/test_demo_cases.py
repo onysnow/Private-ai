@@ -92,6 +92,24 @@ def test_a_document_that_is_not_the_pinned_file_is_refused():
         demo_cases.fetch_documents("deripaska-en-rusal", lambda url: b"not the notice")
 
 
+def test_each_download_is_counted_for_the_loading_bar():
+    """The loading bar counts each document as its download starts."""
+    seen = []
+    docs = demo_cases.manifest("vekselberg-shell-network")
+    by_url = {d["url"]: d for d in docs}
+    def offline(url):
+        raise OSError("offline")
+    with pytest.raises(demo_cases.DemoDownloadError):
+        demo_cases.fetch_documents("vekselberg-shell-network", offline, on_fetched=lambda: seen.append(1))
+    assert len(seen) == 1 and len(by_url) == len(docs)
+    demo_cases.set_state("vekselberg-shell-network", state="downloading", fetched=0, to_fetch=len(docs))
+    for _ in docs:
+        demo_cases.count_fetched("vekselberg-shell-network")
+    state = demo_cases._states["vekselberg-shell-network"]
+    assert (state["fetched"], state["to_fetch"]) == (len(docs), len(docs))
+    demo_cases.set_state("vekselberg-shell-network", state="idle")
+
+
 def _load(case_id: str, tmp_path: Path) -> dict:
     docs = [(meta, f"stand-in for {meta['id']}".encode()) for meta in demo_cases.manifest(case_id)]
     case = demo_cases.records(case_id)
@@ -176,7 +194,7 @@ def test_a_load_that_stops_halfway_keeps_nothing(monkeypatch):
     """A half-made case would pass for the loaded one, so it is removed and the
     progress says what stopped the load."""
     case_id = "us-v-anise-structuring"
-    monkeypatch.setattr(demo_cases, "fetch_documents", lambda cid: [(meta, b"stand-in") for meta in demo_cases.manifest(cid)])
+    monkeypatch.setattr(demo_cases, "fetch_documents", lambda cid, **_: [(meta, b"stand-in") for meta in demo_cases.manifest(cid)])
     real_build = demo_cases.build
 
     def broken_build(db, cid, documents, *, storage_dir):
@@ -196,7 +214,7 @@ def test_one_demo_loads_at_a_time(monkeypatch):
     """Two builds at once can break SQLite. While one case loads, asking for it
     again answers with its progress; asking for another is refused, naming it."""
     from app.api import routes_demo
-    monkeypatch.setattr(demo_cases, "fetch_documents", lambda cid: (_ for _ in ()).throw(AssertionError("must not start")))
+    monkeypatch.setattr(demo_cases, "fetch_documents", lambda cid, **_: (_ for _ in ()).throw(AssertionError("must not start")))
     with routes_demo._one_build_at_a_time("deripaska-en-rusal"):
         demo_cases.set_state("deripaska-en-rusal", state="building", step="Adding the parties, links, events and claims")
         again = client.post("/api/demo/cases/deripaska-en-rusal")
@@ -216,7 +234,7 @@ def test_a_failed_load_lets_the_next_one_start(monkeypatch):
     from app.api import routes_demo
     calls = []
 
-    def failing_fetch(cid):
+    def failing_fetch(cid, **_):
         calls.append(cid)
         raise demo_cases.DemoDownloadError("offline")
 

@@ -5067,6 +5067,10 @@ export type DemoCaseProgressOut = {
    */
   failed?: number | null;
   /**
+   * Fetched
+   */
+  fetched?: number | null;
+  /**
    * Investigation Id
    */
   investigation_id?: string | null;
@@ -5092,6 +5096,10 @@ export type DemoCaseProgressOut = {
    * Step
    */
   step?: string | null;
+  /**
+   * To Fetch
+   */
+  to_fetch?: number | null;
 };
 
 /**

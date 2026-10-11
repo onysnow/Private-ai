@@ -340,6 +340,22 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .one-mdb-load { all: unset; cursor: pointer; align-self: flex-start; padding: 9px 14px; border-radius: 10px; background: var(--accent-1); color: var(--ground); font-weight: 650; }
 .one-mdb-load:disabled { opacity: .7; cursor: progress; }
 .one-mdb-state { margin: 0; }
+/* The loading bar for a demo case (features/demo/load-bar): one segment per stage. */
+.load-bar { display: flex; flex-direction: column; gap: 6px; }
+.load-bar-text { margin: 0; color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.load-bar-track { display: grid; grid-template-columns: 3fr 1fr 3fr; gap: 4px; }
+.load-bar-seg { position: relative; padding-top: 10px; }
+.load-bar-seg::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; border-radius: 3px;
+  background: color-mix(in srgb, var(--line) 45%, transparent); }
+.load-bar-fill { position: absolute; top: 0; left: 0; height: 6px; border-radius: 3px; background: var(--accent-1); z-index: 1;
+  transition: width .6s ease; }
+.load-bar-fill.working { width: 100% !important; background: linear-gradient(90deg, transparent, var(--accent-1), transparent);
+  background-size: 50% 100%; background-repeat: no-repeat; animation: load-bar-sweep 1.2s linear infinite; }
+@keyframes load-bar-sweep { from { background-position: -50% 0; } to { background-position: 150% 0; } }
+@media (prefers-reduced-motion: reduce) { .load-bar-fill.working { animation: none; background: var(--accent-1); opacity: .5; } }
+.load-bar-seg small { color: var(--text-muted); font-size: 11.5px; }
+.load-bar-seg.now small { color: var(--text); }
+.load-bar-seg.done small { opacity: .7; }
 .one-mdb-state a { color: var(--accent-2); font-weight: 600; }
 .one-mdb-note { color: var(--text-muted); }
 .ch-first .one-mdb { border-top: 1px solid color-mix(in srgb, var(--line) 35%, transparent); padding-top: 12px; }

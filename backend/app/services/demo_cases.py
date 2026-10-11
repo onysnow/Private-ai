@@ -28,6 +28,7 @@ import hashlib
 import json
 import logging
 import threading
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -84,11 +85,13 @@ def summary(case_id: str) -> dict[str, Any]:
             "publishers": sorted({d["url"].split("/")[2] for d in docs})}
 
 
-def fetch_documents(case_id: str, fetch: Fetch = download) -> list[tuple[dict[str, Any], bytes]]:
+def fetch_documents(case_id: str, fetch: Fetch = download, on_fetched: Callable[[], None] = lambda: None) -> list[tuple[dict[str, Any], bytes]]:
     """Every document's bytes; each is a PDF pinned by its sha256, so a
-    document that cannot be fetched or is not the pinned file stops the load."""
+    document that cannot be fetched or is not the pinned file stops the load.
+    ``on_fetched`` is called before each download, for the loading bar."""
     out: list[tuple[dict[str, Any], bytes]] = []
     for doc in manifest(case_id):
+        on_fetched()
         try:
             data = fetch(doc["url"])
         except Exception as exc:  # network, HTTP error
@@ -257,3 +260,10 @@ def progress(db: Session, case_id: str) -> dict[str, Any]:
 def set_state(case_id: str, **fields: Any) -> None:
     with _lock:
         _states[case_id] = dict(fields)
+
+
+def count_fetched(case_id: str) -> None:
+    """One more document being downloaded, for the loading bar."""
+    with _lock:
+        state = _states.setdefault(case_id, {"state": "downloading"})
+        state["fetched"] = state.get("fetched", 0) + 1

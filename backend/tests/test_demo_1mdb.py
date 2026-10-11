@@ -109,7 +109,7 @@ def test_a_web_page_that_is_not_the_expected_page_is_kept_as_a_link(tmp_path):
 def test_a_1mdb_load_that_stops_halfway_keeps_nothing(monkeypatch):
     """As for the small cases: a half-made 1MDB case would pass for the loaded one,
     so it is removed and the progress says what stopped the load."""
-    monkeypatch.setattr(demo_1mdb, "fetch_documents", lambda: [(meta, b"stand-in") for meta in demo_1mdb.manifest()])
+    monkeypatch.setattr(demo_1mdb, "fetch_documents", lambda **_: [(meta, b"stand-in") for meta in demo_1mdb.manifest()])
     real_build = demo_1mdb.build
 
     def broken_build(db, documents, *, storage_dir):

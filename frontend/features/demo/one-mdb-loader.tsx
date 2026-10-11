@@ -11,12 +11,13 @@ import {errorMessage} from '../../lib/api-client';
 import {caseHref} from '../../lib/case-href';
 import {get1MdbOptions, get1MdbQueryKey, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {load1Mdb} from '../../lib/generated/sdk.gen';
+import {LoadBar} from './load-bar';
 
 export function OneMdbLoader({onOpen, compact = false}: {onOpen?: (investigationId: string) => void; compact?: boolean}): ReactElement {
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState('');
-  const progress = useQuery({...get1MdbOptions(), refetchInterval: q => (q.state.data?.state === 'reading' || busy ? 3000 : false)});
+  const progress = useQuery({...get1MdbOptions(), refetchInterval: q => (busy ? 1000 : q.state.data?.state === 'reading' ? 3000 : false)});
   const p = progress.data;
   const load = async () => {
     setBusy(true); setProblem('');
@@ -37,12 +38,11 @@ export function OneMdbLoader({onOpen, compact = false}: {onOpen?: (investigation
       Reserve order, Singapore and Swiss regulators’ findings, Malaysian, Singapore and Swiss judgments (some scanned, some in Malay, French or German),
       news articles and posts, photos, video and a podcast, a payments table, and emails rebuilt word for word from the filings. Allegations stay
       allegations; what was admitted or found is Supported.</p>}
+    <LoadBar progress={p} starting={busy} />
     {loaded ? <p className="one-mdb-state">
-      {p?.state === 'reading' ? <>Reading the documents: <b>{p.read} of {p.documents}</b> read{p.failed ? `, ${p.failed} could not be read` : ''}. </> : <>Loaded: {p?.documents} documents, {p?.claims} claims, {p?.leads} leads. </>}
+      {p?.state === 'reading' ? null : <>Loaded: {p?.documents} documents, {p?.claims} claims, {p?.leads} leads. </>}
       <a href={caseHref('/', p?.investigation_id ?? '')} onClick={e => { if (onOpen && p?.investigation_id) { e.preventDefault(); onOpen(p.investigation_id); } }}>Open the 1MDB case</a>
-    </p> : <button type="button" className="one-mdb-load" onClick={() => void load()} disabled={busy}>
-      {busy ? 'Downloading the documents and adding the records…' : 'Load the 1MDB case'}
-    </button>}
+    </p> : !busy && <button type="button" className="one-mdb-load" onClick={() => void load()}>Load the 1MDB case</button>}
     {loaded && Boolean(p?.not_downloaded?.length) && <p className="one-mdb-links">
       {p!.not_downloaded!.length === 1 ? 'One page' : `${p!.not_downloaded!.length} pages`} did not come back from the publisher when the case was loaded,
       so {p!.not_downloaded!.length === 1 ? 'it is' : 'they are'} kept as a link and not read. The passages quoted from {p!.not_downloaded!.length === 1 ? 'it' : 'them'} still

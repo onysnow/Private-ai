@@ -13,6 +13,7 @@ import {caseHref} from '../../lib/case-href';
 import {listDemoCasesOptions, listDemoCasesQueryKey, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {loadDemoCase} from '../../lib/generated/sdk.gen';
 import type {DemoCaseOut} from '../../lib/generated/types.gen';
+import {LoadBar} from './load-bar';
 
 type CaseId = 'us-v-anise-structuring' | 'vekselberg-shell-network' | 'deripaska-en-rusal';
 
@@ -25,7 +26,7 @@ export function DemoCasesLoader({onOpen}: {onOpen?: (investigationId: string) =>
   const [busy, setBusy] = useState('');
   const [problem, setProblem] = useState<{id: string; text: string} | null>(null);
   const list = useQuery({...listDemoCasesOptions(),
-    refetchInterval: q => (busy || (q.state.data ?? []).some(c => c.progress.state === 'reading') ? 3000 : false)});
+    refetchInterval: q => (busy ? 1000 : (q.state.data ?? []).some(c => c.progress.state === 'reading') ? 3000 : false)});
   const load = async (item: DemoCaseOut) => {
     setBusy(item.id); setProblem(null);
     try {
@@ -45,12 +46,13 @@ export function DemoCasesLoader({onOpen}: {onOpen?: (investigationId: string) =>
       const loaded = Boolean(p.investigation_id);
       return <li key={item.id} className="one-mdb">
         <p className="one-mdb-what"><b>{item.title}.</b> {item.description}</p>
+        <LoadBar progress={p} starting={busy === item.id} />
         {loaded ? <p className="one-mdb-state">
-          {p.state === 'reading' ? <>Reading the documents: <b>{p.read} of {p.documents}</b> read{p.failed ? `, ${p.failed} could not be read` : ''}. </>
+          {p.state === 'reading' ? null
             : <>Loaded: {p.documents} document{p.documents === 1 ? '' : 's'}, {p.claims} claims, {p.leads} leads. </>}
           <a href={caseHref('/', p.investigation_id ?? '')} onClick={e => { if (onOpen && p.investigation_id) { e.preventDefault(); onOpen(p.investigation_id); } }}>Open the case</a>
-        </p> : <button type="button" className="one-mdb-load" onClick={() => void load(item)} disabled={Boolean(busy)}>
-          {busy === item.id ? 'Downloading the documents and adding the records…' : 'Load this case'}
+        </p> : busy !== item.id && <button type="button" className="one-mdb-load" onClick={() => void load(item)} disabled={Boolean(busy)}>
+          Load this case
         </button>}
         {!loaded && busy !== item.id && <small className="one-mdb-note">
           Downloads {item.documents} document{item.documents === 1 ? '' : 's'} ({megabytes(item.bytes)}) from {item.publishers.join(', ')}.

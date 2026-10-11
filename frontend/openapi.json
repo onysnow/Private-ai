@@ -12667,6 +12667,17 @@
             ],
             "title": "Failed"
           },
+          "fetched": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fetched"
+          },
           "investigation_id": {
             "anyOf": [
               {
@@ -12740,6 +12751,17 @@
               }
             ],
             "title": "Step"
+          },
+          "to_fetch": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Fetch"
           }
         },
         "required": [
