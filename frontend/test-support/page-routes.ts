@@ -14,7 +14,7 @@
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 //   api.add({'POST /api/leads': {id: 'lead-2'}});           // a route the test's action needs
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
-import type {BasemapStatusOut, CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, OwnershipChainOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
+import type {BasemapStatusOut, ClaimDoneByStatusOut, CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, OwnershipChainOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
 
 /** A reply as a test writes it: the generated shape, with whatever a test overrides. */
@@ -367,4 +367,15 @@ export function pageRoutes(options: PageRoutesOptions = {}): Routes {
   };
   for (const investigation of investigations) Object.assign(routes, investigationRoutes(investigation.id, records));
   return routes;
+}
+
+/** The Done rules a claim workspace carries (backend app/services/claim_done.py): met by default, or the first rule not met. */
+export function claimDoneFixture(claimId = 'claim-1', met = true): ClaimDoneByStatusOut {
+  const rules = [
+    {key: 'supporting', label: 'At least one supporting item is linked', state: met ? 'met' as const : 'not_met' as const,
+      detail: met ? '1 supporting item' : 'Link the evidence that shows it, with the stance Supports.'},
+    {key: 'file', label: 'The file behind each item still matches its fingerprint', state: 'unknown' as const, detail: 'No supporting item has a stored file.'},
+  ];
+  const one = (target: 'supported' | 'confirmed') => ({claim_id: claimId, target, rules, met, left: met ? 0 : 1, unknown: 1});
+  return {supported: one('supported'), confirmed: one('confirmed')};
 }

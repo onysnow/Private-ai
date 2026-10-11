@@ -42,7 +42,7 @@ afterEach(() => {
 
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
-  const mod = await import('../app/page');
+  const mod = await import('../components/case/workbench-all');
   return mod.default;
 }
 

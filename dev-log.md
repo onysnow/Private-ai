@@ -2596,3 +2596,15 @@ Ony asked for the TAS submodule to be taken out and the newest Authority System 
 - Front end: the AI panel shows likelihood terms, hypothesis kind and viability, conflict sides
   with their own evidence, open/resolved, gaps as records and right-of-reply subjects; Settings
   shows the suite commit, TAS version and the tier-floor rule.
+
+## 2026-10-11: redesign step 3 — Case home, Decide, Done rules for Supported, missing values
+
+See docs/design/README.md §3 for what was built. Notes for the next session:
+- The case's addresses share `frontend/app/(case)/layout.tsx`; the page tests render every stage at once through
+  `components/case/workbench-all.tsx` (view="all"), which is the old long page.
+- Flag and To check recomputes can race when Case home asks for several reads at once; `engine.bring_up_to_date`
+  retries on the unique-fingerprint conflict (it used to surface as a 500 with no CORS header in the browser).
+- Done rules: picked the PDF's recommended seven (minus "seen", which has no stored flag yet). Ony has not ruled on
+  the list; it is listed in the PDF's decisions chapter.
+- Migration c6e1a9d4f2b7: investigations.question; claim_review_events.override_reason / unmet_rules;
+  check_items.record_type / record_id / blocks / lead_id.

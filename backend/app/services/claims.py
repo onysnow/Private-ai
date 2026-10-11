@@ -28,14 +28,21 @@ def validate_grade(*, evidence_grade: str | None, agreement_grade: str | None) -
 
 
 def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, rationale: str,
-                 evidence_grade: str | None = None, agreement_grade: str | None = None) -> Any:
+                 evidence_grade: str | None = None, agreement_grade: str | None = None,
+                 override_reason: str | None = None) -> Any:
     """Record a reporter's review: the claim's status, confidence and, when
     given, its grade (both halves together; a review without one keeps the
-    grade the claim has)."""
+    grade the claim has). Supported and Confirmed are held to the Done rules
+    (app/services/claim_done.py); with a rule not met, a written reason is
+    required and kept on the event."""
+    from app.services.claim_done import require_done
+
     rationale = rationale.strip()
     if not rationale:
         raise ValueError("Reporter rationale is required for a claim review")
+    validate_claim_fields(status=status, confidence=confidence)
     validate_grade(evidence_grade=evidence_grade, agreement_grade=agreement_grade)
+    unmet = require_done(db, claim, status, override_reason)
     new_evidence = evidence_grade if evidence_grade is not None else claim.evidence_grade
     new_agreement = agreement_grade if agreement_grade is not None else claim.agreement_grade
     event = ClaimReviewEvent(
@@ -43,6 +50,8 @@ def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, r
         from_confidence=claim.confidence, to_confidence=confidence, rationale=rationale,
         from_evidence_grade=claim.evidence_grade, to_evidence_grade=new_evidence,
         from_agreement_grade=claim.agreement_grade, to_agreement_grade=new_agreement,
+        override_reason=(override_reason or "").strip() or None if unmet else None,
+        unmet_rules=[r["key"] for r in unmet["rules"] if r["state"] == "not_met"] if unmet else None,
     )
     claim.status = status
     claim.confidence = confidence
@@ -76,9 +85,12 @@ def claim_review_workspace(db: Session, claim: Claim) -> dict:
     history = list(db.scalars(select(ClaimReviewEvent).where(ClaimReviewEvent.claim_id == claim.id).order_by(ClaimReviewEvent.created_at.desc())).all())
     # What the grade is judged from: the stances, and how many separate sources the evidence comes from.
     sources = {link_source.id for row in evidence_rows if isinstance(link_source := row["source"], Source)}
+    from app.services.claim_done import done_checks
+
     return {"claim": claim, "evidence": evidence_rows, "dependent_relationships": relationships, "review_history": history,
             "stance_counts": {s: sum(1 for x in links if x.stance == s) for s in ("supports", "contradicts", "context")},
-            "source_count": len(sources)}
+            "source_count": len(sources),
+            "done": {"supported": done_checks(db, claim, target="supported"), "confirmed": done_checks(db, claim, target="confirmed")}}
 
 
 CLAIM_STATUSES = {"lead", "unverified", "supported", "confirmed", "disputed", "rejected"}
@@ -109,6 +121,9 @@ def update_claim(db: Session, row: Claim, changes: dict) -> Claim:
     """Apply a partial update to a Claim. Raises ValueError for a bad
     status/confidence or an empty text value."""
     validate_claim_fields(status=changes.get("status"), confidence=changes.get("confidence"))
+    if changes.get("status") in {"supported", "confirmed"} and changes["status"] != row.status:
+        raise ValueError("Mark a claim Supported or Confirmed by reviewing it (POST /api/claims/{id}/reviews), "
+                         "so the Done rules run and the reason is kept")
     if "text" in changes:
         if changes["text"] is None or not changes["text"].strip():
             raise ValueError("Claim text is required")

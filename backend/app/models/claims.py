@@ -4,7 +4,7 @@ Part of the STRUCT-0024 split; see app/models/base.py.
 """
 
 from datetime import datetime
-from sqlalchemy import String, Text, DateTime, ForeignKey, Float, UniqueConstraint
+from sqlalchemy import JSON, String, Text, DateTime, ForeignKey, Float, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.time import utcnow_naive
 from app.db.session import Base
@@ -52,4 +52,8 @@ class ClaimReviewEvent(Base):
     from_agreement_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
     to_agreement_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
     rationale: Mapped[str] = mapped_column(Text)
+    # A review to Supported/Confirmed with a Done rule not met (app/services/claim_done.py):
+    # the reporter's written reason, and which rules were not met at the time.
+    override_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    unmet_rules: Mapped[list | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

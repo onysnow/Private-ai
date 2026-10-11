@@ -1682,7 +1682,31 @@ class ClaimReviewEventOut(ResponseModel):
     from_agreement_grade: str | None = None
     to_agreement_grade: str | None = None
     rationale: str
+    override_reason: str | None = None
+    unmet_rules: list[str] | None = None
     created_at: Timestamp
+
+
+class ClaimDoneRuleOut(ResponseModel):
+    key: str
+    label: str
+    state: Literal["met", "not_met", "unknown"]
+    detail: str
+
+
+class ClaimDoneOut(ResponseModel):
+    """The Done rules for one status (app/services/claim_done.py)."""
+    claim_id: str
+    target: Literal["supported", "confirmed"]
+    rules: list[ClaimDoneRuleOut]
+    met: bool
+    left: int
+    unknown: int
+
+
+class ClaimDoneByStatusOut(ResponseModel):
+    supported: ClaimDoneOut
+    confirmed: ClaimDoneOut
 
 
 class ClaimReviewWorkspaceOut(ResponseModel):
@@ -1693,6 +1717,8 @@ class ClaimReviewWorkspaceOut(ResponseModel):
     stance_counts: StanceCountsOut
     # How many separate sources the linked evidence comes from (what the evidence grade is judged on, with the stances).
     source_count: int = 0
+    # What Supported and Confirmed still need.
+    done: ClaimDoneByStatusOut
 
 
 class ClaimReviewResultOut(ResponseModel):
@@ -1814,6 +1840,7 @@ class InvestigationOut(ResponseModel):
     id: str
     name: str
     description: str | None = None
+    question: str | None = None
     is_demo: bool
     # The type as the reporter chose it (catalogue areas); null while the app chooses (GET .../type).
     type_areas: list[str] | None = None
@@ -4005,11 +4032,34 @@ class ToCheckItemOut(ResponseModel):
     gone_at: Timestamp | None
 
 
+class MissingValueOut(ResponseModel):
+    """A value a record needs and does not have (app/patterns/missing.py). It goes
+    when the value is filled in; until then a person can chase it (a lead is made),
+    say it cannot be known, or say it does not apply."""
+    id: str
+    rule: str
+    rule_name: str
+    question: str
+    record_label: str
+    record_type: Literal["entity", "relationship", "evidence", "claim", "event", "source"]
+    record_id: str
+    blocks: str
+    status: Literal["open", "chasing", "unknowable", "not_needed"]
+    note: str | None
+    lead_id: str | None
+    decided_at: Timestamp | None
+    first_seen_at: Timestamp
+    gone_at: Timestamp | None
+    parties: list[FlagPartyOut]
+
+
 class ChecksOut(ResponseModel):
-    """Items the case calls for now (open first), and those it no longer does."""
+    """Items the case calls for now (open first), and those it no longer does;
+    and the values the case's records are missing."""
     investigation_id: str
     items: list[ToCheckItemOut]
     gone: list[ToCheckItemOut]
+    missing: list[MissingValueOut] = []
 
 
 # --- The indicator catalogue and glossary (app/api/routes_catalogue.py) -----------
@@ -4096,3 +4146,157 @@ class CatalogueIndicatorOut(ResponseModel):
     innocent_explanations: list[str]
     jurisdictions: str | None = None
     version: int
+
+
+# --- Case home and Decide (app/services/case_home.py) -----------------------------------------
+
+class CaseClaimCountsOut(ResponseModel):
+    total: int
+    supported: int
+    disputed: int
+    unshown: int
+    ruled_out: int
+
+
+class CaseMoneyOut(ResponseModel):
+    currency: str | None
+    amount: float
+    payments: int
+    other_currencies: list[str]
+
+
+class CaseYearOut(ResponseModel):
+    year: str
+    events: int
+
+
+class CaseTimelineCountsOut(ResponseModel):
+    events: int
+    from_: str | None = Field(alias="from", default=None)
+    to: str | None = None
+    years: list[CaseYearOut]
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class CaseDocumentCountsOut(ResponseModel):
+    total: int
+    unread: int
+    failed: int
+
+
+class CaseNetworkCountsOut(ResponseModel):
+    parties: int
+    links: int
+
+
+class CaseFlagCountsOut(ResponseModel):
+    open: int
+    textbook: int
+    strong: int
+    faint: int
+
+
+class CaseLeadCountsOut(ResponseModel):
+    open: int
+
+
+class CaseWatchlistCountsOut(ResponseModel):
+    names: int
+    new_hits: int
+
+
+class CaseStandingOut(ResponseModel):
+    """The standing numbers on Case home, counted on the server."""
+    investigation_id: str
+    claims: CaseClaimCountsOut
+    to_check: int
+    # Values the records need and do not have, still open (app/patterns/missing.py).
+    missing: int
+    to_decide: int
+    to_decide_by_kind: dict[str, int]
+    money: CaseMoneyOut
+    timeline: CaseTimelineCountsOut
+    documents: CaseDocumentCountsOut
+    sources: int
+    evidence: int
+    network: CaseNetworkCountsOut
+    flags: CaseFlagCountsOut
+    leads: CaseLeadCountsOut
+    watchlist: CaseWatchlistCountsOut
+
+
+class DecisionChoiceOut(ResponseModel):
+    """One answer: the existing endpoint it posts to and the body it sends."""
+    key: Literal["yes", "no", "unsure"]
+    label: str
+    method: Literal["POST"]
+    path: str
+    body: dict[str, Any]
+
+
+class DecisionEvidenceOut(ResponseModel):
+    document_id: str | None = None
+    filename: str | None = None
+    locator: str | None = None
+    excerpt: str | None = None
+    terms: list[str]
+
+
+class DecisionPartyOut(ResponseModel):
+    id: str
+    name: str
+    schema_: str = Field(alias="schema")
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class DecisionGroupOut(ResponseModel):
+    key: str
+    label: str
+
+
+class DecisionLinkOut(ResponseModel):
+    href: str
+    label: str
+
+
+class DecisionItemOut(ResponseModel):
+    """Every decision is the same five-part card: question, proposal (and who
+    proposed it), evidence, choices, what happens. An item with no choices is
+    answered where it lives (``open``)."""
+    kind: Literal["to_check", "missing", "proposal", "match", "outside", "ai", "watchlist"]
+    id: str
+    question: str
+    proposal: str
+    actor: str
+    actor_kind: Literal["person", "app", "ai", "connector"]
+    created_at: Timestamp
+    rank: int
+    reason: str
+    level: Literal["faint", "strong", "textbook"] | None = None
+    group: DecisionGroupOut
+    evidence: DecisionEvidenceOut | None = None
+    parties: list[DecisionPartyOut]
+    consequences: list[str]
+    choices: list[DecisionChoiceOut]
+    open: DecisionLinkOut
+
+
+class CaseDecisionsOut(ResponseModel):
+    investigation_id: str
+    counts: dict[str, int]
+    items: list[DecisionItemOut]
+
+
+class CaseChangeOut(ResponseModel):
+    key: str
+    count: int
+    label: str
+    actor_kind: Literal["person", "app", "ai", "connector"]
+    href: str
+    level: Literal["faint", "strong", "textbook"] | None = None
+
+
+class CaseSinceOut(ResponseModel):
+    investigation_id: str
+    after: Timestamp
+    changes: list[CaseChangeOut]

@@ -551,11 +551,12 @@ def test_claim_replies(demo):
 
     created = create_claim(db, ClaimCreate(investigation_id=inv.id, text="The wire cleared on 3 March.", status="unverified", confidence=0.2))
     _same_through_model(r.ClaimOut, created)
-    _same_through_model(r.ClaimOut, update_claim(db, created, {"status": "supported", "confidence": 0.6}))
+    _same_through_model(r.ClaimOut, update_claim(db, created, {"status": "disputed", "confidence": 0.6}))
     evidence = db.query(Evidence).join(Source, Source.id == Evidence.source_id).filter(Source.investigation_id == inv.id).first()
     link = link_claim_evidence(db, created, evidence, stance="supports", note="matches the ledger")
     _same_through_model(r.ClaimEvidenceLinkOut, link)
-    claim, event = review_claim(db, db.get(Claim, created.id), status="confirmed", confidence=0.9, rationale="Two sources agree.")
+    claim, event = review_claim(db, db.get(Claim, created.id), status="confirmed", confidence=0.9, rationale="Two sources agree.",
+                               override_reason="The response models test: one demo source.")
     _same_through_model(r.ClaimReviewResultOut, {"claim": claim, "review": event, "workspace": claim_review_workspace(db, claim)})
 
 

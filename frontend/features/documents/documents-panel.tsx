@@ -73,7 +73,7 @@ function uploadForm(investigationId: string, title: string, file: File, options:
   return fd;
 }
 
-const upload = (investigationId: string, title: string, file: File, options: UploadOptions = {}): Promise<DocumentUploadOut> =>
+export const upload = (investigationId: string, title: string, file: File, options: UploadOptions = {}): Promise<DocumentUploadOut> =>
   api.parsed('/api/documents/upload', checkedReply(zDocumentUploadOut), {method: 'POST', rawBody: uploadForm(investigationId, title, file, options)});
 
 /** The same bytes are already a document of this investigation (409 from the upload). */

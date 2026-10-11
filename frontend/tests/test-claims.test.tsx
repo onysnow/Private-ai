@@ -4,6 +4,7 @@
 // claim's workspace (evidence, dependent relationships, review history),
 // attaching pool evidence, recording a review, and opening a claim on
 // another panel's request through the shared store.
+import {claimDoneFixture} from '../test-support/page-routes';
 import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
@@ -37,7 +38,7 @@ const evidence = {id: 'ev-1', source_id: 'src-1', quote: 'Approved 3/3, signed b
 const poolRow = {evidence, source};
 
 function workspace(claim: ReturnType<typeof claimFixture>, overrides: Record<string, unknown> = {}) {
-  return {claim, evidence: [], dependent_relationships: [], review_history: [], stance_counts: {supports: 0, contradicts: 0, context: 0}, ...overrides};
+  return {claim, evidence: [], dependent_relationships: [], review_history: [], stance_counts: {supports: 0, contradicts: 0, context: 0}, done: claimDoneFixture(), ...overrides};
 }
 
 const relationships = [{id: 'rel-1', schema: 'Directorship', source: {caption: 'Jane Doe'}, target: {caption: 'Kestrelwood Holdings'}}];
@@ -164,7 +165,7 @@ describe('ClaimsPanel', () => {
       'POST /api/claims/claim-1/evidence': {id: 'link-1', claim_id: 'claim-1', evidence_id: 'ev-1', stance: 'supports', note: 'Signed copy', created_at: '2026-10-02T00:00:00'},
       [WORKSPACE]: workspace(claimFixture(), {
         evidence: [{id: 'link-1', stance: 'supports', evidence, source, note: 'Signed copy', created_at: '2026-10-02T00:00:00'}],
-        stance_counts: {supports: 1, contradicts: 0, context: 0},
+        stance_counts: {supports: 1, contradicts: 0, context: 0}, done: claimDoneFixture(),
       }),
     });
     await user.type(screen.getByPlaceholderText('Optional reporter note for the next evidence link'), 'Signed copy');
@@ -189,7 +190,7 @@ describe('ClaimsPanel', () => {
         {id: 'rel-1', relationship_entity_id: 'rel-ent-1', source_entity_id: 'ent-2', target_entity_id: 'ent-1', evidence_ids: ['ev-1']},
         {id: 'rel-9', relationship_entity_id: null, source_entity_id: 'ent-3', target_entity_id: 'ent-4', evidence_ids: ['ev-1', 'ev-2']},
       ],
-      stance_counts: {supports: 1, contradicts: 0, context: 0},
+      stance_counts: {supports: 1, contradicts: 0, context: 0}, done: claimDoneFixture(),
     })}, onInspect);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
@@ -230,5 +231,28 @@ describe('ClaimsPanel', () => {
     wrap(<ClaimsPanel investigationId="inv-2" relationships={[]} onInspectRelationship={vi.fn()}/>);
     await waitFor(() => expect(api.calls('GET /api/investigations/inv-2/claims')).toHaveLength(1));
     expect(screen.getByText('No claims yet.')).toBeInTheDocument();
+  });
+
+  it('holds Supported to the Done rules: names what is left, and records it anyway only with a reason', async () => {
+    const api = await renderPanel({[WORKSPACE]: workspace(claimFixture(), {done: claimDoneFixture('claim-1', false)})});
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: /The contract was approved/}));
+    await screen.findByText("No canonical relationship currently depends on this claim's linked evidence.");
+    await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
+    await user.click(await screen.findByRole('option', {name: 'supported'}));
+    const done = await screen.findByTestId('claim-done');
+    expect(done).toHaveTextContent('Supported means');
+    expect(done).toHaveTextContent('✕At least one supporting item is linked');
+    expect(done).toHaveTextContent('cannot be checked here');
+    await user.type(screen.getByPlaceholderText('Required rationale for this review'), 'Two editors read it.');
+    expect(screen.getByRole('button', {name: 'Supported — 1 check left'})).toBeDisabled();
+    await user.type(screen.getByPlaceholderText(/Some true facts have one source/), 'The registry is the only record.');
+    const updated = claimFixture({status: 'supported'});
+    const review = {id: 'rev-9', claim_id: 'claim-1', from_status: 'unverified', to_status: 'supported', from_confidence: 0.4, to_confidence: 0.4,
+      rationale: 'Two editors read it.', override_reason: 'The registry is the only record.', unmet_rules: ['supporting'], created_at: '2026-10-11T00:00:00'};
+    api.add({'POST /api/claims/claim-1/reviews': {claim: updated, review, workspace: workspace(updated, {review_history: [review]})}});
+    await user.click(screen.getByRole('button', {name: 'Mark supported anyway'}));
+    await screen.findByText('Marked without: supporting. Reason: The registry is the only record.');
+    expect(api.lastBody('POST /api/claims/claim-1/reviews')).toMatchObject({status: 'supported', override_reason: 'The registry is the only record.'});
   });
 });

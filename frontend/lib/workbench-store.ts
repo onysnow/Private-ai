@@ -32,6 +32,9 @@ export type RelationshipRequest = {relationshipId: string; record?: Relationship
 type WorkbenchState = {
   investigationId: string;
   setInvestigationId: (id: string) => void;
+  /** The open case's name, for the breadcrumb on every page. */
+  investigationName: string;
+  setInvestigationName: (name: string) => void;
   /** The canonical entity the connectors panel has selected: what "Open
    * dossier" and the enrich buttons act on. The graph moves it when a node
    * is clicked; the dossier moves it to the surviving record after a merge
@@ -86,6 +89,8 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   // A new case means a new trace, claim, dossier and relationship: nothing from the old one applies.
   setInvestigationId: id => set(state => (state.investigationId === id ? {investigationId: id}
     : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, flag: null, check: null, asOf: null, pointedParty: null})),
+  investigationName: '',
+  setInvestigationName: name => set(state => (state.investigationName === name ? state : {investigationName: name})),
   entityId: '',
   setEntityId: id => set({entityId: id}),
   provenance: null,

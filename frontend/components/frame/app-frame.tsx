@@ -14,7 +14,8 @@ import {usePathname, useRouter} from 'next/navigation';
 
 import {Dialog, DialogContent, DialogDescription, DialogTitle} from '@/components/ui/dialog';
 import {TryingBar} from '../../features/appearance/appearance-panel';
-import {STAGES} from '../../lib/stages';
+import {STAGES, hrefOfAnchor} from '../../lib/stages';
+import {useWorkbenchStore} from '../../lib/workbench-store';
 import {handOffSearch} from '../../lib/search-handoff';
 import {applyAppearance, currentAppearance, keepAppearance, THEMES, tryTheme} from '../../lib/theme';
 import {singleKeysOn} from '../../lib/shortcuts';
@@ -23,14 +24,24 @@ const DWELL_MS = 260;
 const EDGE_PX = 6;
 
 const PAGES: {label: string; href: string; hint: string}[] = [
-  {label: 'Case at a glance', href: '/dashboard', hint: 'The quick look at a case'},
-  {label: 'Workbench', href: '/', hint: 'Every step of the case'},
+  {label: 'Case home', href: '/', hint: 'Where the case stands and what needs you'},
+  {label: 'Decide', href: '/decide', hint: 'Everything only you can decide, one at a time'},
   {label: 'Glossary', href: '/glossary', hint: 'Terms and Red Flag indicators'},
   {label: 'Settings', href: '/settings', hint: 'Appearance, access, demo case'},
   {label: 'About', href: '/about', hint: 'What this app is'},
 ];
 
-const PAGE_NAMES: Record<string, string> = {'/': 'Workbench', '/dashboard': 'Case at a glance', '/glossary': 'Glossary', '/settings': 'Settings', '/about': 'About', '/review': 'Review', '/review/batch': 'Batch review'};
+const PAGE_NAMES: Record<string, string> = {'/': 'Case home', '/decide': 'Decide', '/glossary': 'Glossary', '/settings': 'Settings', '/about': 'About', '/review': 'Review', '/review/batch': 'Batch review'};
+
+/** A link inside the case keeps the open case (?inv=) so a reload or a shared link opens it again. */
+function useCaseHref(): (href: string) => string {
+  const inv = useWorkbenchStore(state => state.investigationId);
+  return useCallback((href: string) => {
+    if (!inv || !(href === '/' || href.startsWith('/#') || href.startsWith('/decide') || STAGES.some(s => href.startsWith(s.route)))) return href;
+    const [path, hash] = href.split('#');
+    return `${path}${path.includes('?') ? '&' : '?'}inv=${encodeURIComponent(inv)}${hash ? `#${hash}` : ''}`;
+  }, [inv]);
+}
 
 function typing(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null;
@@ -40,7 +51,8 @@ function typing(target: EventTarget | null): boolean {
 
 /** Where you are: the page, and on the workbench the step and part you jumped to. */
 function useTrail(): {label: string; href?: string}[] {
-  const pathname = usePathname() ?? '/';
+  const pathname = (usePathname() ?? '/').replace(/(.)\/+$/, '$1');
+  const caseName = useWorkbenchStore(state => state.investigationName);
   const [hash, setHash] = useState('');
   useEffect(() => {
     const read = () => setHash(window.location.hash.replace('#', ''));
@@ -48,16 +60,20 @@ function useTrail(): {label: string; href?: string}[] {
     window.addEventListener('hashchange', read);
     return () => window.removeEventListener('hashchange', read);
   }, [pathname]);
-  const trail: {label: string; href?: string}[] = [{label: PAGE_NAMES[pathname] ?? pathname.split('/').filter(Boolean).map(s => s[0].toUpperCase() + s.slice(1)).join(' › '), href: pathname}];
-  if (pathname === '/' && hash) {
-    const stage = STAGES.find(s => s.parts.some(p => p.anchor === hash));
-    const part = stage?.parts.find(p => p.anchor === hash);
-    if (stage) trail.push({label: stage.name, href: `/#stage-${stage.key}`});
+  const stage = STAGES.find(s => s.route === pathname);
+  const inCase = pathname === '/' || pathname === '/decide' || Boolean(stage);
+  const trail: {label: string; href?: string}[] = [];
+  if (inCase && caseName) trail.push({label: caseName, href: '/'});
+  if (stage) {
+    trail.push({label: stage.name, href: stage.route});
+    const part = stage.parts.find(p => p.anchor === hash);
     if (part) trail.push({label: part.label});
-    else {
-      const byStage = STAGES.find(s => `stage-${s.key}` === hash);
-      if (byStage) trail.push({label: byStage.name});
-    }
+  } else if (pathname === '/decide') {
+    trail.push({label: 'Check', href: '/check'}, {label: 'Decide'});
+  } else if (pathname === '/') {
+    trail.push({label: 'Home'});
+  } else {
+    trail.push({label: PAGE_NAMES[pathname] ?? pathname.split('/').filter(Boolean).map(s => s[0].toUpperCase() + s.slice(1)).join(' › '), href: pathname});
   }
   return trail;
 }
@@ -95,11 +111,13 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
   const [active, setActive] = useState(0);
   useEffect(() => { if (open) { setQ(''); setActive(0); } }, [open]);
 
-  const go = useCallback((href: string) => { onOpenChange(false); router.push(href); }, [onOpenChange, router]);
+  const caseHref = useCaseHref();
+  const go = useCallback((href: string) => { onOpenChange(false); router.push(caseHref(href)); }, [onOpenChange, router, caseHref]);
   const commands = useMemo<Command[]>(() => {
     const list: Command[] = [];
     PAGES.forEach(p => list.push({id: `page-${p.href}`, group: 'Go to', label: p.label, hint: p.hint, run: () => go(p.href)}));
-    STAGES.forEach(s => s.parts.forEach(part => list.push({id: `part-${part.anchor}`, group: 'Go to', label: `${s.name} › ${part.label}`, run: () => go(`/#${part.anchor}`)})));
+    STAGES.forEach(s => s.parts.forEach(part => list.push({id: `part-${part.anchor}`, group: 'Go to', label: `${s.name} › ${part.label}`, run: () => go(hrefOfAnchor(part.anchor))})));
+    STAGES.forEach(s => list.push({id: `stage-${s.key}`, group: 'Go to', label: s.name, hint: s.line, run: () => go(s.route)}));
     THEMES.forEach(t => list.push({id: `try-${t.id}`, group: 'Appearance', label: `Try the ${t.name} theme`, hint: 'For this session; keep it from the bar', run: () => { tryTheme(t.id); onOpenChange(false); }}));
     list.push({id: 'calm', group: 'Appearance', label: currentAppearance().motion === 'calm' ? 'Turn calm motion off' : 'Turn calm motion on', run: () => { keepAppearance({motion: currentAppearance().motion === 'calm' ? 'normal' : 'calm'}); onOpenChange(false); }});
     list.push({id: 'console', group: 'Go to', label: 'Backend console', run: () => { onOpenChange(false); window.location.href = '/console/'; }});
@@ -111,7 +129,7 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
   const items: Command[] = q.trim()
     ? [{id: 'search', group: 'Search', label: `Search the case for “${q.trim()}”`, hint: 'Names, documents, claims, dates', run: () => {
         onOpenChange(false);
-        if (handOffSearch(q.trim()) === 'navigate' || pathname !== '/') router.push('/#investigation-search');
+        if (handOffSearch(q.trim()) === 'navigate' || !/^\/bring-in\/?$/.test(pathname ?? '')) router.push(caseHref('/bring-in#investigation-search'));
       }}, ...shown]
     : shown;
   const groups = Array.from(new Set(items.map(i => i.group)));
@@ -158,7 +176,8 @@ function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open
 }
 
 export function AppFrame({children}: {children: ReactNode}): ReactElement {
-  const pathname = usePathname();
+  const pathname = (usePathname() ?? '/').replace(/(.)\/+$/, '$1');
+  const caseHref = useCaseHref();
   const trail = useTrail();
   const leftAt = useCallback((e: PointerEvent) => e.clientX <= EDGE_PX, []);
   const topAt = useCallback((e: PointerEvent) => e.clientY <= EDGE_PX, []);
@@ -185,18 +204,18 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
       <button type="button" className="fr-crumb-home" onClick={() => setLeft(o => !o)} aria-expanded={left} aria-controls="fr-left" title="Steps and pages ( [ )">
         <span aria-hidden="true">≡</span><span className="sr-only">Steps and pages</span>
       </button>
-      <ol>{trail.map((t, i) => <li key={i}>{t.href && i < trail.length - 1 ? <Link href={t.href}>{t.label}</Link> : <span aria-current={i === trail.length - 1 ? 'page' : undefined}>{t.label}</span>}</li>)}</ol>
+      <ol>{trail.map((t, i) => <li key={i}>{t.href && i < trail.length - 1 ? <Link href={caseHref(t.href)}>{t.label}</Link> : <span aria-current={i === trail.length - 1 ? 'page' : undefined}>{t.label}</span>}</li>)}</ol>
     </nav>
 
     {/* Left edge: where to go. */}
     <button type="button" className={`fr-handle fr-handle-left${left ? ' on' : ''}`} aria-label="Open steps and pages" aria-expanded={left} aria-controls="fr-left" onClick={() => setLeft(o => !o)}/>
     <aside id="fr-left" className={`fr-left${left ? ' open' : ''}`} aria-label="Steps and pages" aria-hidden={!left} onMouseLeave={() => setLeft(false)} inert={!left ? true : undefined}>
       <div className="fr-left-head"><b>Journalism Workbench</b><button type="button" className="fr-x" onClick={() => setLeft(false)} aria-label="Close">×</button></div>
-      <ul className="fr-pages">{PAGES.map(p => <li key={p.href}><Link href={p.href} className={pathname === p.href ? 'on' : ''}>{p.label}</Link></li>)}</ul>
+      <ul className="fr-pages">{PAGES.map(p => <li key={p.href}><Link href={caseHref(p.href)} className={pathname === p.href ? 'on' : ''} aria-current={pathname === p.href ? 'page' : undefined}>{p.label}</Link></li>)}</ul>
       <div className="fr-steps">
         {STAGES.map(s => <div key={s.key} className="fr-step">
-          <Link href={`/#stage-${s.key}`} className="fr-step-name" style={{['--stage' as string]: s.colour}}><span>{s.n}</span>{s.name}</Link>
-          <ul>{s.parts.map(p => <li key={p.anchor}><Link href={`/#${p.anchor}`}>{p.label}</Link></li>)}</ul>
+          <Link href={caseHref(s.route)} className={`fr-step-name${pathname === s.route ? ' on' : ''}`} style={{['--stage' as string]: s.colour}}><span>{s.n}</span>{s.name}</Link>
+          <ul>{s.parts.map(p => <li key={p.anchor}><Link href={caseHref(`${s.route}#${p.anchor}`)}>{p.label}</Link></li>)}</ul>
         </div>)}
       </div>
       <a href="/console/" className="fr-console">Backend console</a>
@@ -206,7 +225,8 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     <button type="button" className={`fr-handle fr-handle-top${top ? ' on' : ''}`} aria-label="Open tools" aria-expanded={top} aria-controls="fr-top" onClick={() => setTop(o => !o)}/>
     <div id="fr-top" className={`fr-top${top ? ' open' : ''}`} role="toolbar" aria-label="Tools" aria-hidden={!top} onMouseLeave={() => setTop(false)} inert={!top ? true : undefined}>
       <button type="button" className="fr-tool wide" onClick={() => { setTop(false); setPalette(true); }}>Search the case, or type a command… <kbd>⌘K</kbd></button>
-      <Link href="/#document-ingestion" className="fr-tool">Add documents</Link>
+      <Link href={caseHref('/bring-in#document-ingestion')} className="fr-tool">Add documents</Link>
+      <Link href={caseHref('/decide')} className="fr-tool">Decide</Link>
       <Link href="/settings" className="fr-tool">Settings</Link>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setHelp(true); }}>Keys <kbd>?</kbd></button>
     </div>

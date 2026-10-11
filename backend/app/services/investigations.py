@@ -14,8 +14,21 @@ from app.services.leads import LEAD_STATUSES, list_leads_serialized, serialize_t
 
 
 def create_investigation(db: Session, body: InvestigationCreate) -> Investigation:
-    row = Investigation(name=body.name, description=body.description)
+    row = Investigation(name=body.name, description=body.description, question=(body.question or "").strip() or None)
     db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def update_investigation(db: Session, row: Investigation, changes: dict) -> Investigation:
+    """Name, description and question; only what was sent changes."""
+    if "name" in changes and changes["name"] is not None:
+        row.name = changes["name"].strip()
+    if "description" in changes:
+        row.description = changes["description"]
+    if "question" in changes:
+        row.question = (changes["question"] or "").strip() or None
     db.commit()
     db.refresh(row)
     return row

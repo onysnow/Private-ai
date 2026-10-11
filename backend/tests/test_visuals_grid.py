@@ -29,7 +29,8 @@ DARK = THEMES["dark_academia"]
 
 
 def _review(claim_id: str, **body):
-    return client.post(f"/api/claims/{claim_id}/reviews", json={"status": "supported", "confidence": 0.7, "rationale": "Checked.", **body})
+    return client.post(f"/api/claims/{claim_id}/reviews", json={"status": "supported", "confidence": 0.7, "rationale": "Checked.",
+                                                                 "override_reason": "Grid test: no evidence linked.", **body})
 
 
 def _investigation() -> tuple[str, list[str]]:

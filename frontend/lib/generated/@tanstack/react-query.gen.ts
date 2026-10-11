@@ -86,6 +86,7 @@ import {
   getCorpusInsights,
   getCorpusStatus,
   getCorpusSync,
+  getDecisions,
   getDeckEndpoint,
   getDocument,
   getDocumentEmail,
@@ -123,6 +124,8 @@ import {
   getSecurityAuditRetentionPreview,
   getSecurityAuditSummary,
   getSimilarDocuments,
+  getSince,
+  getStanding,
   getTaggedRecords,
   getTags,
   getWatchlist,
@@ -187,6 +190,7 @@ import {
   makeLeadFromRedFlag,
   openalephIntegrationStatus,
   type Options,
+  patchInvestigation,
   peekAtRecord,
   presentationStyles,
   previewBackupRestore,
@@ -470,6 +474,9 @@ import type {
   GetCorpusSyncData,
   GetCorpusSyncError,
   GetCorpusSyncResponse,
+  GetDecisionsData,
+  GetDecisionsError,
+  GetDecisionsResponse,
   GetDeckEndpointData,
   GetDeckEndpointError,
   GetDeckEndpointResponse,
@@ -581,6 +588,12 @@ import type {
   GetSimilarDocumentsData,
   GetSimilarDocumentsError,
   GetSimilarDocumentsResponse,
+  GetSinceData,
+  GetSinceError,
+  GetSinceResponse,
+  GetStandingData,
+  GetStandingError,
+  GetStandingResponse,
   GetTaggedRecordsData,
   GetTaggedRecordsError,
   GetTaggedRecordsResponse,
@@ -770,6 +783,9 @@ import type {
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
+  PatchInvestigationData,
+  PatchInvestigationError,
+  PatchInvestigationResponse,
   PeekAtRecordData,
   PeekAtRecordError,
   PeekAtRecordResponse,
@@ -4032,6 +4048,33 @@ export const removeInvestigationMutation = (
   return mutationOptions;
 };
 
+/**
+ * Patch Investigation
+ */
+export const patchInvestigationMutation = (
+  options?: Partial<Options<PatchInvestigationData>>,
+): UseMutationOptions<
+  PatchInvestigationResponse,
+  PatchInvestigationError,
+  Options<PatchInvestigationData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PatchInvestigationResponse,
+    PatchInvestigationError,
+    Options<PatchInvestigationData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await patchInvestigation({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const listInvestigationAiAnalysisCandidatesQueryKey = (
   options: Options<ListInvestigationAiAnalysisCandidatesData>,
 ) => createQueryKey('listInvestigationAiAnalysisCandidates', options);
@@ -4943,6 +4986,31 @@ export const listInvestigationCrossReferencesOptions = (
       return data;
     },
     queryKey: listInvestigationCrossReferencesQueryKey(options),
+  });
+
+export const getDecisionsQueryKey = (options: Options<GetDecisionsData>) =>
+  createQueryKey('getDecisions', options);
+
+/**
+ * Get Decisions
+ */
+export const getDecisionsOptions = (options: Options<GetDecisionsData>) =>
+  queryOptions<
+    GetDecisionsResponse,
+    GetDecisionsError,
+    GetDecisionsResponse,
+    ReturnType<typeof getDecisionsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDecisions({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDecisionsQueryKey(options),
   });
 
 export const listDecksEndpointQueryKey = (
@@ -5969,6 +6037,80 @@ export const listReportingTasksInfiniteOptions = (
   return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const getSinceQueryKey = (options: Options<GetSinceData>) =>
+  createQueryKey('getSince', options);
+
+/**
+ * Get Since
+ */
+export const getSinceOptions = (options: Options<GetSinceData>) =>
+  queryOptions<
+    GetSinceResponse,
+    GetSinceError,
+    GetSinceResponse,
+    ReturnType<typeof getSinceQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSince({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSinceQueryKey(options),
+  });
+
+export const getSinceInfiniteQueryKey = (
+  options: Options<GetSinceData>,
+): QueryKey<Options<GetSinceData>> => createQueryKey('getSince', options, true);
+
+/**
+ * Get Since
+ */
+export const getSinceInfiniteOptions = (options: Options<GetSinceData>) => {
+  const opts = infiniteQueryOptions<
+    GetSinceResponse,
+    GetSinceError,
+    InfiniteData<GetSinceResponse>,
+    QueryKey<Options<GetSinceData>>,
+    | string
+    | Pick<
+        QueryKey<Options<GetSinceData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetSinceData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  after: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getSince({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getSinceInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
 export const listSourcesQueryKey = (options: Options<ListSourcesData>) =>
   createQueryKey('listSources', options);
 
@@ -6045,6 +6187,33 @@ export const listSourcesInfiniteOptions = (
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const getStandingQueryKey = (options: Options<GetStandingData>) =>
+  createQueryKey('getStanding', options);
+
+/**
+ * Get Standing
+ *
+ * Red Flags and To check counts are as last computed (GET .../decisions recomputes them).
+ */
+export const getStandingOptions = (options: Options<GetStandingData>) =>
+  queryOptions<
+    GetStandingResponse,
+    GetStandingError,
+    GetStandingResponse,
+    ReturnType<typeof getStandingQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getStanding({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getStandingQueryKey(options),
+  });
 
 export const getTagsQueryKey = (options: Options<GetTagsData>) =>
   createQueryKey('getTags', options);

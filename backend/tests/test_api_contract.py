@@ -480,6 +480,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("DELETE", "/api/investigations/{investigation_id}/record-tags"): {"tag_id": tag, "record_type": "entity", "record_id": meridian},
             ("DELETE", "/api/collections/{collection_id}/items"): {"record_type": "entity", "record_id": meridian},
             ("GET", "/api/investigations/{investigation_id}/corpus/search"): {"q": "Meridian"},
+            ("GET", "/api/investigations/{investigation_id}/since"): {"after": "2020-01-01T00:00:00"},
             ("POST", "/api/console/backups/{bid}/restore/plan"): {"kind": "investigation_export"},
         },
     )

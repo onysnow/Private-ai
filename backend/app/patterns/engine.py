@@ -199,19 +199,41 @@ def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]],
     }
 
 
-def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[str, Any]:
-    from app.models.domain import Entity
+def bring_up_to_date(db: Session, investigation_id: str) -> list[dict[str, str]] | None:
+    """Brings the flags and To check items (missing values too) up to date. Two
+    requests may do this at the same moment (Case home asks for flags, checks and
+    decisions together): the one that loses the race on a new item's fingerprint
+    starts again from what the other wrote. Returns what could not run, or None
+    for a reader without write access, who sees them as last computed."""
+    from sqlalchemy.exc import IntegrityError
 
     from app.core.authorization import InvestigationAuthorizationError
 
-    cannot: list[dict[str, str]] = []
-    if refresh:
+    for attempt in range(3):
         try:
             cannot = recompute(db, investigation_id)
             check_items.recompute(db, investigation_id)
+            return cannot
         except InvestigationAuthorizationError:
-            # A reader without write access sees the flags as last computed.
             db.rollback()
+            return None
+        except IntegrityError:
+            db.rollback()
+            if attempt == 2:
+                raise
+    return None
+
+
+def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[str, Any]:
+    from app.models.domain import Entity
+
+    cannot: list[dict[str, str]] = []
+    if refresh:
+        refreshed = bring_up_to_date(db, investigation_id)
+        if refreshed is not None:
+            cannot = refreshed
+        else:
+            # A reader without write access sees the flags as last computed.
             graph = case_graph.build(db, investigation_id)
             cannot = [{"indicator_id": s.indicator, "name": _name(s.indicator), "reason": r}
                       for s in detection.load() if isinstance(r := detection.run(s, graph), str)]

@@ -17,8 +17,14 @@ def test_claim_review_requires_rationale_preserves_history_and_shows_relationshi
     assert body['claim']['status']=='disputed'; assert body['workspace']['stance_counts']=={'supports':1,'contradicts':1,'context':0}; assert body['workspace']['dependent_relationships'][0]['id']==edge['id']
     assert body['workspace']['review_history'][0]['from_status']=='unverified'; assert body['workspace']['review_history'][0]['to_status']=='disputed'
     advisory=client.get(f"/api/investigations/{inv['id']}/graph").json()['edges'][0]['advisory']; assert advisory['needs_review'] is True; assert advisory['disputed_claim_count']==1
-    assert client.post(f"/api/claims/{claim['id']}/reviews",json={'status':'supported','confidence':.7,'rationale':'Additional authentication completed.'}).status_code==200
+    # The Done rules: the contradicting item has no written answer, so Supported needs a reason.
+    done=client.get(f"/api/claims/{claim['id']}/review-workspace").json()['done']['supported']
+    assert done['met'] is False and [r['key'] for r in done['rules'] if r['state']=='not_met']==['contradictions']
+    refused=client.post(f"/api/claims/{claim['id']}/reviews",json={'status':'supported','confidence':.7,'rationale':'Additional authentication completed.'})
+    assert refused.status_code==400 and 'every contradicting item has a written answer' in refused.text
+    assert client.post(f"/api/claims/{claim['id']}/reviews",json={'status':'supported','confidence':.7,'rationale':'Additional authentication completed.','override_reason':'The denial came from the subject and is answered in the piece.'}).status_code==200
     hist=client.get(f"/api/claims/{claim['id']}/review-workspace").json()['review_history']; assert len(hist)==2; assert {x['to_status'] for x in hist}=={'disputed','supported'}
+    assert hist[0]['override_reason'].startswith('The denial') and hist[0]['unmet_rules']==['contradictions']
     assert client.get(f"/api/investigations/{inv['id']}/graph").json()['edges'][0]['advisory']['needs_review'] is False
 
 def test_reconciled_relationship_advisory_distinguishes_independent_support_and_timeline_disclosure():

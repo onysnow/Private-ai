@@ -606,6 +606,86 @@ export const zCanonicalStatementOut = z.object({
 });
 
 /**
+ * CaseChangeOut
+ */
+export const zCaseChangeOut = z.object({
+  actor_kind: z.enum(['person', 'app', 'ai', 'connector']),
+  count: z.number().int(),
+  href: z.string(),
+  key: z.string(),
+  label: z.string(),
+  level: z.enum(['faint', 'strong', 'textbook']).nullish(),
+});
+
+/**
+ * CaseClaimCountsOut
+ */
+export const zCaseClaimCountsOut = z.object({
+  disputed: z.number().int(),
+  ruled_out: z.number().int(),
+  supported: z.number().int(),
+  total: z.number().int(),
+  unshown: z.number().int(),
+});
+
+/**
+ * CaseDocumentCountsOut
+ */
+export const zCaseDocumentCountsOut = z.object({
+  failed: z.number().int(),
+  total: z.number().int(),
+  unread: z.number().int(),
+});
+
+/**
+ * CaseFlagCountsOut
+ */
+export const zCaseFlagCountsOut = z.object({
+  faint: z.number().int(),
+  open: z.number().int(),
+  strong: z.number().int(),
+  textbook: z.number().int(),
+});
+
+/**
+ * CaseLeadCountsOut
+ */
+export const zCaseLeadCountsOut = z.object({
+  open: z.number().int(),
+});
+
+/**
+ * CaseMoneyOut
+ */
+export const zCaseMoneyOut = z.object({
+  amount: z.number(),
+  currency: z.string().nullable(),
+  other_currencies: z.array(z.string()),
+  payments: z.number().int(),
+});
+
+/**
+ * CaseNetworkCountsOut
+ */
+export const zCaseNetworkCountsOut = z.object({
+  links: z.number().int(),
+  parties: z.number().int(),
+});
+
+/**
+ * CaseSinceOut
+ */
+export const zCaseSinceOut = z.object({
+  after: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  changes: z.array(zCaseChangeOut),
+  investigation_id: z.string(),
+});
+
+/**
  * CaseSynthesisRequest
  */
 export const zCaseSynthesisRequest = z.object({
@@ -614,6 +694,55 @@ export const zCaseSynthesisRequest = z.object({
   question: z.string().min(1).max(4000),
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
   source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
+});
+
+/**
+ * CaseWatchlistCountsOut
+ */
+export const zCaseWatchlistCountsOut = z.object({
+  names: z.number().int(),
+  new_hits: z.number().int(),
+});
+
+/**
+ * CaseYearOut
+ */
+export const zCaseYearOut = z.object({
+  events: z.number().int(),
+  year: z.string(),
+});
+
+/**
+ * CaseTimelineCountsOut
+ */
+export const zCaseTimelineCountsOut = z.object({
+  events: z.number().int(),
+  from: z.string().nullish(),
+  to: z.string().nullish(),
+  years: z.array(zCaseYearOut),
+});
+
+/**
+ * CaseStandingOut
+ *
+ * The standing numbers on Case home, counted on the server.
+ */
+export const zCaseStandingOut = z.object({
+  claims: zCaseClaimCountsOut,
+  documents: zCaseDocumentCountsOut,
+  evidence: z.number().int(),
+  flags: zCaseFlagCountsOut,
+  investigation_id: z.string(),
+  leads: zCaseLeadCountsOut,
+  missing: z.number().int(),
+  money: zCaseMoneyOut,
+  network: zCaseNetworkCountsOut,
+  sources: z.number().int(),
+  timeline: zCaseTimelineCountsOut,
+  to_check: z.number().int(),
+  to_decide: z.number().int(),
+  to_decide_by_kind: z.record(z.number().int()),
+  watchlist: zCaseWatchlistCountsOut,
 });
 
 /**
@@ -742,7 +871,15 @@ export const zChartPresetOut = z.object({
  */
 export const zCheckDecide = z.object({
   note: z.string().max(4000).nullish(),
-  status: z.enum(['open', 'shows', 'does_not', 'unclear']),
+  status: z.enum([
+    'open',
+    'shows',
+    'does_not',
+    'unclear',
+    'chasing',
+    'unknowable',
+    'not_needed',
+  ]),
 });
 
 /**
@@ -831,6 +968,38 @@ export const zClaimDependentRelationshipOut = z.object({
 });
 
 /**
+ * ClaimDoneRuleOut
+ */
+export const zClaimDoneRuleOut = z.object({
+  detail: z.string(),
+  key: z.string(),
+  label: z.string(),
+  state: z.enum(['met', 'not_met', 'unknown']),
+});
+
+/**
+ * ClaimDoneOut
+ *
+ * The Done rules for one status (app/services/claim_done.py).
+ */
+export const zClaimDoneOut = z.object({
+  claim_id: z.string(),
+  left: z.number().int(),
+  met: z.boolean(),
+  rules: z.array(zClaimDoneRuleOut),
+  target: z.enum(['supported', 'confirmed']),
+  unknown: z.number().int(),
+});
+
+/**
+ * ClaimDoneByStatusOut
+ */
+export const zClaimDoneByStatusOut = z.object({
+  confirmed: zClaimDoneOut,
+  supported: zClaimDoneOut,
+});
+
+/**
  * ClaimEvidenceLinkCreate
  */
 export const zClaimEvidenceLinkCreate = z.object({
@@ -890,11 +1059,13 @@ export const zClaimReviewEventOut = z.object({
   from_evidence_grade: z.string().nullish(),
   from_status: z.string(),
   id: z.string(),
+  override_reason: z.string().nullish(),
   rationale: z.string(),
   to_agreement_grade: z.string().nullish(),
   to_confidence: z.number(),
   to_evidence_grade: z.string().nullish(),
   to_status: z.string(),
+  unmet_rules: z.array(z.string()).nullish(),
 });
 
 /**
@@ -904,6 +1075,7 @@ export const zClaimReviewRequest = z.object({
   agreement_grade: z.enum(['low', 'medium', 'high']).nullish(),
   confidence: z.number(),
   evidence_grade: z.enum(['limited', 'medium', 'robust']).nullish(),
+  override_reason: z.string().max(2000).nullish(),
   rationale: z.string(),
   status: z.string(),
 });
@@ -1571,6 +1743,102 @@ export const zCrossReferenceMatchOut = z.object({
   properties: z.record(z.array(z.string())),
   schema: z.string(),
   url: z.string(),
+});
+
+/**
+ * DecisionChoiceOut
+ *
+ * One answer: the existing endpoint it posts to and the body it sends.
+ */
+export const zDecisionChoiceOut = z.object({
+  body: z.record(z.unknown()),
+  key: z.enum(['yes', 'no', 'unsure']),
+  label: z.string(),
+  method: z.literal('POST'),
+  path: z.string(),
+});
+
+/**
+ * DecisionEvidenceOut
+ */
+export const zDecisionEvidenceOut = z.object({
+  document_id: z.string().nullish(),
+  excerpt: z.string().nullish(),
+  filename: z.string().nullish(),
+  locator: z.string().nullish(),
+  terms: z.array(z.string()),
+});
+
+/**
+ * DecisionGroupOut
+ */
+export const zDecisionGroupOut = z.object({
+  key: z.string(),
+  label: z.string(),
+});
+
+/**
+ * DecisionLinkOut
+ */
+export const zDecisionLinkOut = z.object({
+  href: z.string(),
+  label: z.string(),
+});
+
+/**
+ * DecisionPartyOut
+ */
+export const zDecisionPartyOut = z.object({
+  id: z.string(),
+  name: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * DecisionItemOut
+ *
+ * Every decision is the same five-part card: question, proposal (and who
+ * proposed it), evidence, choices, what happens. An item with no choices is
+ * answered where it lives (``open``).
+ */
+export const zDecisionItemOut = z.object({
+  actor: z.string(),
+  actor_kind: z.enum(['person', 'app', 'ai', 'connector']),
+  choices: z.array(zDecisionChoiceOut),
+  consequences: z.array(z.string()),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  evidence: zDecisionEvidenceOut.nullish(),
+  group: zDecisionGroupOut,
+  id: z.string(),
+  kind: z.enum([
+    'to_check',
+    'missing',
+    'proposal',
+    'match',
+    'outside',
+    'ai',
+    'watchlist',
+  ]),
+  level: z.enum(['faint', 'strong', 'textbook']).nullish(),
+  open: zDecisionLinkOut,
+  parties: z.array(zDecisionPartyOut),
+  proposal: z.string(),
+  question: z.string(),
+  rank: z.number().int(),
+  reason: z.string(),
+});
+
+/**
+ * CaseDecisionsOut
+ */
+export const zCaseDecisionsOut = z.object({
+  counts: z.record(z.number().int()),
+  investigation_id: z.string(),
+  items: z.array(zDecisionItemOut),
 });
 
 /**
@@ -3124,6 +3392,7 @@ export const zIngestionBatchesOut = z.object({
 export const zInvestigationCreate = z.object({
   description: z.string().nullish(),
   name: z.string(),
+  question: z.string().max(500).nullish(),
 });
 
 /**
@@ -3185,6 +3454,7 @@ export const zInvestigationOut = z.object({
   id: z.string(),
   is_demo: z.boolean(),
   name: z.string(),
+  question: z.string().nullish(),
   type_areas: z.array(z.string()).nullish(),
 });
 
@@ -3203,6 +3473,17 @@ export const zInvestigationQuestionContextRequest = z.object({
  */
 export const zInvestigationTypeSet = z.object({
   areas: z.array(z.string()).max(40).nullable(),
+});
+
+/**
+ * InvestigationUpdate
+ *
+ * Only the fields sent change; an empty question clears it.
+ */
+export const zInvestigationUpdate = z.object({
+  description: z.string().nullish(),
+  name: z.string().min(1).max(255).nullish(),
+  question: z.string().max(500).nullish(),
 });
 
 /**
@@ -3671,6 +3952,52 @@ export const zCanonicalMergePreviewOut = z.object({
   source: zMergeEntityOut,
   target: zMergeEntityOut,
   total_references: z.number().int(),
+});
+
+/**
+ * MissingValueOut
+ *
+ * A value a record needs and does not have (app/patterns/missing.py). It goes
+ * when the value is filled in; until then a person can chase it (a lead is made),
+ * say it cannot be known, or say it does not apply.
+ */
+export const zMissingValueOut = z.object({
+  blocks: z.string(),
+  decided_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  first_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  gone_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  id: z.string(),
+  lead_id: z.string().nullable(),
+  note: z.string().nullable(),
+  parties: z.array(zFlagPartyOut),
+  question: z.string(),
+  record_id: z.string(),
+  record_label: z.string(),
+  record_type: z.enum([
+    'entity',
+    'relationship',
+    'evidence',
+    'claim',
+    'event',
+    'source',
+  ]),
+  rule: z.string(),
+  rule_name: z.string(),
+  status: z.enum(['open', 'chasing', 'unknowable', 'not_needed']),
 });
 
 /**
@@ -5186,6 +5513,7 @@ export const zStanceCountsOut = z.object({
 export const zClaimReviewWorkspaceOut = z.object({
   claim: zClaimOut,
   dependent_relationships: z.array(zClaimDependentRelationshipOut),
+  done: zClaimDoneByStatusOut,
   evidence: z.array(zClaimEvidenceRowOut),
   review_history: z.array(zClaimReviewEventOut),
   source_count: z.number().int().optional().default(0),
@@ -5992,12 +6320,14 @@ export const zToCheckItemOut = z.object({
 /**
  * ChecksOut
  *
- * Items the case calls for now (open first), and those it no longer does.
+ * Items the case calls for now (open first), and those it no longer does;
+ * and the values the case's records are missing.
  */
 export const zChecksOut = z.object({
   gone: z.array(zToCheckItemOut),
   investigation_id: z.string(),
   items: z.array(zToCheckItemOut),
+  missing: z.array(zMissingValueOut).optional().default([]),
 });
 
 /**
@@ -7957,6 +8287,17 @@ export const zRemoveInvestigationQuery = z.object({
  */
 export const zRemoveInvestigationResponse = zInvestigationDeletionResult;
 
+export const zPatchInvestigationBody = zInvestigationUpdate;
+
+export const zPatchInvestigationPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPatchInvestigationResponse = zInvestigationOut;
+
 export const zListInvestigationAiAnalysisCandidatesPath = z.object({
   investigation_id: z.string(),
 });
@@ -8215,6 +8556,33 @@ export const zListInvestigationCrossReferencesQuery = z.object({
  */
 export const zListInvestigationCrossReferencesResponse =
   z.array(zCrossReferenceOut);
+
+export const zGetDecisionsPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetDecisionsQuery = z.object({
+  kind: z
+    .enum([
+      'to_check',
+      'missing',
+      'proposal',
+      'match',
+      'outside',
+      'ai',
+      'watchlist',
+    ])
+    .nullish(),
+  order: z
+    .enum(['consequence', 'source', 'oldest'])
+    .optional()
+    .default('consequence'),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDecisionsResponse = zCaseDecisionsOut;
 
 export const zListDecksEndpointPath = z.object({
   investigation_id: z.string(),
@@ -8575,6 +8943,19 @@ export const zListReportingTasksQuery = z.object({
  */
 export const zListReportingTasksResponse = z.array(zReportingTaskOut);
 
+export const zGetSincePath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetSinceQuery = z.object({
+  after: z.string().datetime({ offset: true, local: true }),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSinceResponse = zCaseSinceOut;
+
 export const zListSourcesPath = z.object({
   investigation_id: z.string(),
 });
@@ -8590,6 +8971,15 @@ export const zListSourcesQuery = z.object({
  * Successful Response
  */
 export const zListSourcesResponse = z.array(zSourceOut);
+
+export const zGetStandingPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetStandingResponse = zCaseStandingOut;
 
 export const zGetTagsPath = z.object({
   investigation_id: z.string(),

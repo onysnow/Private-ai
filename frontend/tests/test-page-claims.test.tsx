@@ -14,7 +14,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi} from '../test-support/mock-api';
-import {pageRoutes} from '../test-support/page-routes';
+import {pageRoutes, claimDoneFixture} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -38,7 +38,7 @@ afterEach(() => {
 
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
-  const mod = await import('../app/page');
+  const mod = await import('../components/case/workbench-all');
   return mod.default;
 }
 
@@ -73,7 +73,7 @@ function emptyWorkspace(claim: ReturnType<typeof claimFixture>) {
     evidence: [],
     dependent_relationships: [],
     review_history: [],
-    stance_counts: {supports: 0, contradicts: 0, context: 0},
+    stance_counts: {supports: 0, contradicts: 0, context: 0}, done: claimDoneFixture(),
   };
 }
 
@@ -169,7 +169,7 @@ describe('Home claim verification workspace', () => {
         evidence: [
           {id: 'link-1', stance: 'supports', evidence: evidencePoolRow().evidence, source: evidencePoolRow().source, note: null, created_at: '2026-10-02T00:00:00'},
         ],
-        stance_counts: {supports: 1, contradicts: 0, context: 0},
+        stance_counts: {supports: 1, contradicts: 0, context: 0}, done: claimDoneFixture(),
       },
     });
 

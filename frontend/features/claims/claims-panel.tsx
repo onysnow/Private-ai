@@ -65,6 +65,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const [newClaimText, setNewClaimText] = useState('');
   const [evidenceNote, setEvidenceNote] = useState('');
   const [rationale, setRationale] = useState('');
+  const [overrideReason, setOverrideReason] = useState('');
   const [reviewStatus, setReviewStatus] = useState('');
   const [createProblem, setCreateProblem] = useState('');
 
@@ -125,12 +126,14 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
     }
     try {
       const grade = graded ? {evidence_grade: evidenceGrade as typeof EVIDENCE_GRADES[number], agreement_grade: agreementGrade as typeof AGREEMENT_GRADES[number]} : {};
-      const result = (await createClaimReview({path: {claim_id: selectedClaim.id}, body: {status: claimStatus, confidence: claimConfidence, rationale: rationale.trim(), ...grade}, throwOnError: true})).data;
+      const result = (await createClaimReview({path: {claim_id: selectedClaim.id}, body: {status: claimStatus, confidence: claimConfidence, rationale: rationale.trim(), ...grade,
+        ...(overrideReason.trim() ? {override_reason: overrideReason.trim()} : {})}, throwOnError: true})).data;
       const updated = result.claim;
       // The reply already carries the claim and its workspace as they now stand.
       queryClient.setQueryData<ClaimOut[]>(listClaimsQueryKey({path}), current => current?.map(c => (c.id === updated.id ? updated : c)));
       queryClient.setQueryData(getClaimReviewWorkspaceQueryKey({path: {claim_id: updated.id}}), result.workspace);
       setRationale('');
+      setOverrideReason('');
       const words = gradeText(updated);
       setReviewStatus(`Recorded immutable review: ${updated.status} at ${Math.round(updated.confidence * 100)}% confidence${words ? `; ${words}` : ''}.`);
     } catch (error) {
@@ -151,6 +154,10 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   };
 
   const hasLink = (evidenceId: string, stance: Stance) => claimEvidence.some(row => row.evidence?.id === evidenceId && row.stance === stance);
+
+  // The Done rules for the status chosen (backend app/services/claim_done.py): Supported and Confirmed need them met, or a written reason.
+  const done = workspace && (claimStatus === 'supported' || claimStatus === 'confirmed') ? workspace.done[claimStatus] : null;
+  const blocked = Boolean(done && !done.met && !overrideReason.trim());
 
   const statusLine = reviewStatus || (selectedClaim && workspaceQuery.isPending ? 'Loading claim review workspace…'
     : selectedClaim && workspaceQuery.isError ? errorMessage(workspaceQuery.error, 'Could not load the claim review workspace') : '');
@@ -197,8 +204,20 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
               </Select>
               <label>Confidence {Math.round(claimConfidence * 100)}% <Slider className="w-32" value={[claimConfidence]} min={0} max={1} step={0.05} onValueChange={(vals: number[]) => setClaimConfidence(vals[0])}/></label>
               <Input value={rationale} onChange={(e: ChangeEvent<HTMLInputElement>) => setRationale(e.target.value)} placeholder="Required rationale for this review"/>
-              <Button onClick={saveClaimReview} disabled={!rationale.trim()}>Record review</Button>
+              <Button onClick={saveClaimReview} disabled={!rationale.trim() || blocked}>
+                {done && !done.met ? (overrideReason.trim() ? `Mark ${claimStatus} anyway` : `${claimStatus === 'confirmed' ? 'Confirmed' : 'Supported'} — ${done.left} check${done.left === 1 ? '' : 's'} left`) : 'Record review'}
+              </Button>
             </div>
+            {done && <div className="done-list" data-testid="claim-done">
+              <b>{claimStatus === 'confirmed' ? 'Confirmed' : 'Supported'} means</b>
+              <ul>{done.rules.map(r => <li key={r.key} className={`done-${r.state}`}>
+                <span aria-hidden="true">{r.state === 'met' ? '✓' : r.state === 'not_met' ? '✕' : '○'}</span>
+                <span><b>{r.label}</b> <small>{r.state === 'unknown' ? 'cannot be checked here: ' : ''}{r.detail}</small></span>
+              </li>)}</ul>
+              {!done.met && <label className="done-override">Mark it anyway, because…
+                <Input value={overrideReason} onChange={(e: ChangeEvent<HTMLInputElement>) => setOverrideReason(e.target.value)}
+                  placeholder="Some true facts have one source. Say why this one can stand; the reason is kept with the review."/></label>}
+            </div>}
             {statusLine && <p className="muted">{statusLine}</p>}
             {workspace && <>
               <div className="candidate">
@@ -224,6 +243,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                 <b>{event.from_status} → {event.to_status}</b> · {Math.round(event.from_confidence * 100)}% → {Math.round(event.to_confidence * 100)}%
                 {(event.to_evidence_grade || event.from_evidence_grade) && <span> · {gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
                 <div>{event.rationale}</div>
+                {event.override_reason && <div className="done-overridden">Marked without: {(event.unmet_rules ?? []).join(', ')}. Reason: {event.override_reason}</div>}
                 {event.created_at && <small>{new Date(event.created_at).toLocaleString()}</small>}
               </div>)}
             </>}

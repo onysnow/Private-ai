@@ -1435,6 +1435,234 @@ export type CapabilitiesOut = {
 };
 
 /**
+ * CaseChangeOut
+ */
+export type CaseChangeOut = {
+  /**
+   * Actor Kind
+   */
+  actor_kind: 'person' | 'app' | 'ai' | 'connector';
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Href
+   */
+  href: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Level
+   */
+  level?: 'faint' | 'strong' | 'textbook' | null;
+};
+
+/**
+ * CaseClaimCountsOut
+ */
+export type CaseClaimCountsOut = {
+  /**
+   * Disputed
+   */
+  disputed: number;
+  /**
+   * Ruled Out
+   */
+  ruled_out: number;
+  /**
+   * Supported
+   */
+  supported: number;
+  /**
+   * Total
+   */
+  total: number;
+  /**
+   * Unshown
+   */
+  unshown: number;
+};
+
+/**
+ * CaseDecisionsOut
+ */
+export type CaseDecisionsOut = {
+  /**
+   * Counts
+   */
+  counts: {
+    [key: string]: number;
+  };
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Items
+   */
+  items: Array<DecisionItemOut>;
+};
+
+/**
+ * CaseDocumentCountsOut
+ */
+export type CaseDocumentCountsOut = {
+  /**
+   * Failed
+   */
+  failed: number;
+  /**
+   * Total
+   */
+  total: number;
+  /**
+   * Unread
+   */
+  unread: number;
+};
+
+/**
+ * CaseFlagCountsOut
+ */
+export type CaseFlagCountsOut = {
+  /**
+   * Faint
+   */
+  faint: number;
+  /**
+   * Open
+   */
+  open: number;
+  /**
+   * Strong
+   */
+  strong: number;
+  /**
+   * Textbook
+   */
+  textbook: number;
+};
+
+/**
+ * CaseLeadCountsOut
+ */
+export type CaseLeadCountsOut = {
+  /**
+   * Open
+   */
+  open: number;
+};
+
+/**
+ * CaseMoneyOut
+ */
+export type CaseMoneyOut = {
+  /**
+   * Amount
+   */
+  amount: number;
+  /**
+   * Currency
+   */
+  currency: string | null;
+  /**
+   * Other Currencies
+   */
+  other_currencies: Array<string>;
+  /**
+   * Payments
+   */
+  payments: number;
+};
+
+/**
+ * CaseNetworkCountsOut
+ */
+export type CaseNetworkCountsOut = {
+  /**
+   * Links
+   */
+  links: number;
+  /**
+   * Parties
+   */
+  parties: number;
+};
+
+/**
+ * CaseSinceOut
+ */
+export type CaseSinceOut = {
+  /**
+   * After
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  after: string;
+  /**
+   * Changes
+   */
+  changes: Array<CaseChangeOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+};
+
+/**
+ * CaseStandingOut
+ *
+ * The standing numbers on Case home, counted on the server.
+ */
+export type CaseStandingOut = {
+  claims: CaseClaimCountsOut;
+  documents: CaseDocumentCountsOut;
+  /**
+   * Evidence
+   */
+  evidence: number;
+  flags: CaseFlagCountsOut;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  leads: CaseLeadCountsOut;
+  /**
+   * Missing
+   */
+  missing: number;
+  money: CaseMoneyOut;
+  network: CaseNetworkCountsOut;
+  /**
+   * Sources
+   */
+  sources: number;
+  timeline: CaseTimelineCountsOut;
+  /**
+   * To Check
+   */
+  to_check: number;
+  /**
+   * To Decide
+   */
+  to_decide: number;
+  /**
+   * To Decide By Kind
+   */
+  to_decide_by_kind: {
+    [key: string]: number;
+  };
+  watchlist: CaseWatchlistCountsOut;
+};
+
+/**
  * CaseSynthesisRequest
  */
 export type CaseSynthesisRequest = {
@@ -1458,6 +1686,56 @@ export type CaseSynthesisRequest = {
    * Source Tier Floor
    */
   source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
+};
+
+/**
+ * CaseTimelineCountsOut
+ */
+export type CaseTimelineCountsOut = {
+  /**
+   * Events
+   */
+  events: number;
+  /**
+   * From
+   */
+  from?: string | null;
+  /**
+   * To
+   */
+  to?: string | null;
+  /**
+   * Years
+   */
+  years: Array<CaseYearOut>;
+};
+
+/**
+ * CaseWatchlistCountsOut
+ */
+export type CaseWatchlistCountsOut = {
+  /**
+   * Names
+   */
+  names: number;
+  /**
+   * New Hits
+   */
+  new_hits: number;
+};
+
+/**
+ * CaseYearOut
+ */
+export type CaseYearOut = {
+  /**
+   * Events
+   */
+  events: number;
+  /**
+   * Year
+   */
+  year: string;
 };
 
 /**
@@ -1961,7 +2239,14 @@ export type CheckDecide = {
   /**
    * Status
    */
-  status: 'open' | 'shows' | 'does_not' | 'unclear';
+  status:
+    | 'open'
+    | 'shows'
+    | 'does_not'
+    | 'unclear'
+    | 'chasing'
+    | 'unknowable'
+    | 'not_needed';
 };
 
 /**
@@ -2029,7 +2314,8 @@ export type CheckReportOut = {
 /**
  * ChecksOut
  *
- * Items the case calls for now (open first), and those it no longer does.
+ * Items the case calls for now (open first), and those it no longer does;
+ * and the values the case's records are missing.
  */
 export type ChecksOut = {
   /**
@@ -2044,6 +2330,10 @@ export type ChecksOut = {
    * Items
    */
   items: Array<ToCheckItemOut>;
+  /**
+   * Missing
+   */
+  missing?: Array<MissingValueOut>;
 };
 
 /**
@@ -2185,6 +2475,68 @@ export type ClaimDependentRelationshipOut = {
    * Target Entity Id
    */
   target_entity_id: string;
+};
+
+/**
+ * ClaimDoneByStatusOut
+ */
+export type ClaimDoneByStatusOut = {
+  confirmed: ClaimDoneOut;
+  supported: ClaimDoneOut;
+};
+
+/**
+ * ClaimDoneOut
+ *
+ * The Done rules for one status (app/services/claim_done.py).
+ */
+export type ClaimDoneOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Left
+   */
+  left: number;
+  /**
+   * Met
+   */
+  met: boolean;
+  /**
+   * Rules
+   */
+  rules: Array<ClaimDoneRuleOut>;
+  /**
+   * Target
+   */
+  target: 'supported' | 'confirmed';
+  /**
+   * Unknown
+   */
+  unknown: number;
+};
+
+/**
+ * ClaimDoneRuleOut
+ */
+export type ClaimDoneRuleOut = {
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * State
+   */
+  state: 'met' | 'not_met' | 'unknown';
 };
 
 /**
@@ -2343,6 +2695,10 @@ export type ClaimReviewEventOut = {
    */
   id: string;
   /**
+   * Override Reason
+   */
+  override_reason?: string | null;
+  /**
    * Rationale
    */
   rationale: string;
@@ -2362,6 +2718,10 @@ export type ClaimReviewEventOut = {
    * To Status
    */
   to_status: string;
+  /**
+   * Unmet Rules
+   */
+  unmet_rules?: Array<string> | null;
 };
 
 /**
@@ -2380,6 +2740,10 @@ export type ClaimReviewRequest = {
    * Evidence Grade
    */
   evidence_grade?: 'limited' | 'medium' | 'robust' | null;
+  /**
+   * Override Reason
+   */
+  override_reason?: string | null;
   /**
    * Rationale
    */
@@ -2411,6 +2775,7 @@ export type ClaimReviewWorkspaceOut = {
    * Dependent Relationships
    */
   dependent_relationships: Array<ClaimDependentRelationshipOut>;
+  done: ClaimDoneByStatusOut;
   /**
    * Evidence
    */
@@ -4040,6 +4405,182 @@ export type DataTableRowOut = {
    * X Formatted
    */
   x_formatted?: string | null;
+};
+
+/**
+ * DecisionChoiceOut
+ *
+ * One answer: the existing endpoint it posts to and the body it sends.
+ */
+export type DecisionChoiceOut = {
+  /**
+   * Body
+   */
+  body: {
+    [key: string]: unknown;
+  };
+  /**
+   * Key
+   */
+  key: 'yes' | 'no' | 'unsure';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Method
+   */
+  method: 'POST';
+  /**
+   * Path
+   */
+  path: string;
+};
+
+/**
+ * DecisionEvidenceOut
+ */
+export type DecisionEvidenceOut = {
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  /**
+   * Excerpt
+   */
+  excerpt?: string | null;
+  /**
+   * Filename
+   */
+  filename?: string | null;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Terms
+   */
+  terms: Array<string>;
+};
+
+/**
+ * DecisionGroupOut
+ */
+export type DecisionGroupOut = {
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
+ * DecisionItemOut
+ *
+ * Every decision is the same five-part card: question, proposal (and who
+ * proposed it), evidence, choices, what happens. An item with no choices is
+ * answered where it lives (``open``).
+ */
+export type DecisionItemOut = {
+  /**
+   * Actor
+   */
+  actor: string;
+  /**
+   * Actor Kind
+   */
+  actor_kind: 'person' | 'app' | 'ai' | 'connector';
+  /**
+   * Choices
+   */
+  choices: Array<DecisionChoiceOut>;
+  /**
+   * Consequences
+   */
+  consequences: Array<string>;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  evidence?: DecisionEvidenceOut | null;
+  group: DecisionGroupOut;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind:
+    | 'to_check'
+    | 'missing'
+    | 'proposal'
+    | 'match'
+    | 'outside'
+    | 'ai'
+    | 'watchlist';
+  /**
+   * Level
+   */
+  level?: 'faint' | 'strong' | 'textbook' | null;
+  open: DecisionLinkOut;
+  /**
+   * Parties
+   */
+  parties: Array<DecisionPartyOut>;
+  /**
+   * Proposal
+   */
+  proposal: string;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Rank
+   */
+  rank: number;
+  /**
+   * Reason
+   */
+  reason: string;
+};
+
+/**
+ * DecisionLinkOut
+ */
+export type DecisionLinkOut = {
+  /**
+   * Href
+   */
+  href: string;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
+ * DecisionPartyOut
+ */
+export type DecisionPartyOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Schema
+   */
+  schema: string;
 };
 
 /**
@@ -7898,6 +8439,10 @@ export type InvestigationCreate = {
    * Name
    */
   name: string;
+  /**
+   * Question
+   */
+  question?: string | null;
 };
 
 /**
@@ -8034,6 +8579,10 @@ export type InvestigationOut = {
    */
   name: string;
   /**
+   * Question
+   */
+  question?: string | null;
+  /**
    * Type Areas
    */
   type_areas?: Array<string> | null;
@@ -8092,6 +8641,26 @@ export type InvestigationTypeSet = {
    * Catalogue area keys; null hands the choice back to the app.
    */
   areas: Array<string> | null;
+};
+
+/**
+ * InvestigationUpdate
+ *
+ * Only the fields sent change; an empty question clears it.
+ */
+export type InvestigationUpdate = {
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+  /**
+   * Question
+   */
+  question?: string | null;
 };
 
 /**
@@ -9065,6 +9634,84 @@ export type MergeResolutionOut = {
    * Rationale
    */
   rationale?: string | null;
+};
+
+/**
+ * MissingValueOut
+ *
+ * A value a record needs and does not have (app/patterns/missing.py). It goes
+ * when the value is filled in; until then a person can chase it (a lead is made),
+ * say it cannot be known, or say it does not apply.
+ */
+export type MissingValueOut = {
+  /**
+   * Blocks
+   */
+  blocks: string;
+  /**
+   * Decided At
+   */
+  decided_at: string | null;
+  /**
+   * First Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  first_seen_at: string;
+  /**
+   * Gone At
+   */
+  gone_at: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Lead Id
+   */
+  lead_id: string | null;
+  /**
+   * Note
+   */
+  note: string | null;
+  /**
+   * Parties
+   */
+  parties: Array<FlagPartyOut>;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Label
+   */
+  record_label: string;
+  /**
+   * Record Type
+   */
+  record_type:
+    | 'entity'
+    | 'relationship'
+    | 'evidence'
+    | 'claim'
+    | 'event'
+    | 'source';
+  /**
+   * Rule
+   */
+  rule: string;
+  /**
+   * Rule Name
+   */
+  rule_name: string;
+  /**
+   * Status
+   */
+  status: 'open' | 'chasing' | 'unknowable' | 'not_needed';
 };
 
 /**
@@ -18410,6 +19057,42 @@ export type RemoveInvestigationResponses = {
 export type RemoveInvestigationResponse =
   RemoveInvestigationResponses[keyof RemoveInvestigationResponses];
 
+export type PatchInvestigationData = {
+  body: InvestigationUpdate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}';
+};
+
+export type PatchInvestigationErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PatchInvestigationError =
+  PatchInvestigationErrors[keyof PatchInvestigationErrors];
+
+export type PatchInvestigationResponses = {
+  /**
+   * Successful Response
+   */
+  200: InvestigationOut;
+};
+
+export type PatchInvestigationResponse =
+  PatchInvestigationResponses[keyof PatchInvestigationResponses];
+
 export type ListInvestigationAiAnalysisCandidatesData = {
   body?: never;
   path: {
@@ -19312,6 +19995,58 @@ export type ListInvestigationCrossReferencesResponses = {
 
 export type ListInvestigationCrossReferencesResponse =
   ListInvestigationCrossReferencesResponses[keyof ListInvestigationCrossReferencesResponses];
+
+export type GetDecisionsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Kind
+     */
+    kind?:
+      | 'to_check'
+      | 'missing'
+      | 'proposal'
+      | 'match'
+      | 'outside'
+      | 'ai'
+      | 'watchlist'
+      | null;
+    /**
+     * Order
+     */
+    order?: 'consequence' | 'source' | 'oldest';
+  };
+  url: '/api/investigations/{investigation_id}/decisions';
+};
+
+export type GetDecisionsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDecisionsError = GetDecisionsErrors[keyof GetDecisionsErrors];
+
+export type GetDecisionsResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseDecisionsOut;
+};
+
+export type GetDecisionsResponse =
+  GetDecisionsResponses[keyof GetDecisionsResponses];
 
 export type ListDecksEndpointData = {
   body?: never;
@@ -20369,6 +21104,45 @@ export type ListReportingTasksResponses = {
 export type ListReportingTasksResponse =
   ListReportingTasksResponses[keyof ListReportingTasksResponses];
 
+export type GetSinceData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query: {
+    /**
+     * After
+     */
+    after: string;
+  };
+  url: '/api/investigations/{investigation_id}/since';
+};
+
+export type GetSinceErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSinceError = GetSinceErrors[keyof GetSinceErrors];
+
+export type GetSinceResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseSinceOut;
+};
+
+export type GetSinceResponse = GetSinceResponses[keyof GetSinceResponses];
+
 export type ListSourcesData = {
   body?: never;
   path: {
@@ -20414,6 +21188,41 @@ export type ListSourcesResponses = {
 
 export type ListSourcesResponse =
   ListSourcesResponses[keyof ListSourcesResponses];
+
+export type GetStandingData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/standing';
+};
+
+export type GetStandingErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetStandingError = GetStandingErrors[keyof GetStandingErrors];
+
+export type GetStandingResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseStandingOut;
+};
+
+export type GetStandingResponse =
+  GetStandingResponses[keyof GetStandingResponses];
 
 export type GetTagsData = {
   body?: never;

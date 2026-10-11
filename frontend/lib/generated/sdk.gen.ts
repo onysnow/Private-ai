@@ -243,6 +243,9 @@ import type {
   GetCorpusSyncData,
   GetCorpusSyncErrors,
   GetCorpusSyncResponses,
+  GetDecisionsData,
+  GetDecisionsErrors,
+  GetDecisionsResponses,
   GetDeckEndpointData,
   GetDeckEndpointErrors,
   GetDeckEndpointResponses,
@@ -354,6 +357,12 @@ import type {
   GetSimilarDocumentsData,
   GetSimilarDocumentsErrors,
   GetSimilarDocumentsResponses,
+  GetSinceData,
+  GetSinceErrors,
+  GetSinceResponses,
+  GetStandingData,
+  GetStandingErrors,
+  GetStandingResponses,
   GetTaggedRecordsData,
   GetTaggedRecordsErrors,
   GetTaggedRecordsResponses,
@@ -543,6 +552,9 @@ import type {
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
+  PatchInvestigationData,
+  PatchInvestigationErrors,
+  PatchInvestigationResponses,
   PeekAtRecordData,
   PeekAtRecordErrors,
   PeekAtRecordResponses,
@@ -874,6 +886,9 @@ import {
   zGetCorpusStatusResponse,
   zGetCorpusSyncPath,
   zGetCorpusSyncResponse,
+  zGetDecisionsPath,
+  zGetDecisionsQuery,
+  zGetDecisionsResponse,
   zGetDeckEndpointPath,
   zGetDeckEndpointResponse,
   zGetDocumentEmailPath,
@@ -950,6 +965,11 @@ import {
   zGetSimilarDocumentsPath,
   zGetSimilarDocumentsQuery,
   zGetSimilarDocumentsResponse,
+  zGetSincePath,
+  zGetSinceQuery,
+  zGetSinceResponse,
+  zGetStandingPath,
+  zGetStandingResponse,
   zGetTaggedRecordsPath,
   zGetTaggedRecordsResponse,
   zGetTagsPath,
@@ -1095,6 +1115,9 @@ import {
   zMakeLeadFromRedFlagPath,
   zMakeLeadFromRedFlagResponse,
   zOpenalephIntegrationStatusResponse,
+  zPatchInvestigationBody,
+  zPatchInvestigationPath,
+  zPatchInvestigationResponse,
   zPeekAtRecordPath,
   zPeekAtRecordQuery,
   zPeekAtRecordResponse,
@@ -4529,6 +4552,39 @@ export const removeInvestigation = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Patch Investigation
+ */
+export const patchInvestigation = <ThrowOnError extends boolean = false>(
+  options: Options<PatchInvestigationData, ThrowOnError>,
+): RequestResult<
+  PatchInvestigationResponses,
+  PatchInvestigationErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    PatchInvestigationResponses,
+    PatchInvestigationErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPatchInvestigationBody,
+          path: zPatchInvestigationPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPatchInvestigationResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * List Investigation Ai Analysis Candidates
  *
  * The review queue for TAS reasoning output, newest first. Payloads are
@@ -5235,6 +5291,31 @@ export const listInvestigationCrossReferences = <
   });
 
 /**
+ * Get Decisions
+ */
+export const getDecisions = <ThrowOnError extends boolean = false>(
+  options: Options<GetDecisionsData, ThrowOnError>,
+): RequestResult<GetDecisionsResponses, GetDecisionsErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetDecisionsResponses,
+    GetDecisionsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDecisionsPath,
+          query: zGetDecisionsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDecisionsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/decisions',
+    ...options,
+  });
+
+/**
  * List Decks Endpoint
  */
 export const listDecksEndpoint = <ThrowOnError extends boolean = false>(
@@ -5927,6 +6008,30 @@ export const listReportingTasks = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Since
+ */
+export const getSince = <ThrowOnError extends boolean = false>(
+  options: Options<GetSinceData, ThrowOnError>,
+): RequestResult<GetSinceResponses, GetSinceErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetSinceResponses,
+    GetSinceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSincePath,
+          query: zGetSinceQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetSinceResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/since',
+    ...options,
+  });
+
+/**
  * List Sources
  */
 export const listSources = <ThrowOnError extends boolean = false>(
@@ -5948,6 +6053,33 @@ export const listSources = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListSourcesResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/sources',
+    ...options,
+  });
+
+/**
+ * Get Standing
+ *
+ * Red Flags and To check counts are as last computed (GET .../decisions recomputes them).
+ */
+export const getStanding = <ThrowOnError extends boolean = false>(
+  options: Options<GetStandingData, ThrowOnError>,
+): RequestResult<GetStandingResponses, GetStandingErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetStandingResponses,
+    GetStandingErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetStandingPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetStandingResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/standing',
     ...options,
   });
 

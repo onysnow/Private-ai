@@ -16,6 +16,9 @@ class Investigation(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
     name: Mapped[str] = mapped_column(String(255), index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # The case's own question in the reporter's words ("Who really owns the
+    # harbour land?"): the title of Case home, and what exports open with.
+    question: Mapped[str | None] = mapped_column(Text, nullable=True)
     # True only for the single seeded demo investigation (see
     # app/services/demo_seed.py) -- lets the frontend offer a "hide demo
     # data" toggle without guessing from the name/description.

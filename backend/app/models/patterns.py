@@ -67,3 +67,9 @@ class CheckItem(Base):
     decided_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     first_seen_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     gone_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # A missing value (app/patterns/missing.py): the record the value is missing from, what the
+    # gap stops, and the lead made when a person chose to chase it.
+    record_type: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    record_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+    blocks: Mapped[str | None] = mapped_column(Text, nullable=True)
+    lead_id: Mapped[str | None] = mapped_column(ForeignKey("leads.id"), nullable=True)

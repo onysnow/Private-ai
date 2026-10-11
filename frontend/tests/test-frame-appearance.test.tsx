@@ -12,6 +12,7 @@ import {LevelChip, StatusChip} from '../components/status';
 import {AppearancePanel, TryingBar} from '../features/appearance/appearance-panel';
 import {currentAppearance, keepAppearance, keptAppearance, tryTheme} from '../lib/theme';
 import {setSingleKeys} from '../lib/shortcuts';
+import {useWorkbenchStore} from '../lib/workbench-store';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -71,6 +72,18 @@ describe('AppFrame', () => {
     expect(within(screen.getByRole('navigation', {name: 'You are here'})).getByText('Settings')).toHaveAttribute('aria-current', 'page');
   });
 
+  it('keeps the open case in the address of every link into the case', async () => {
+    act(() => useWorkbenchStore.getState().setInvestigationId('inv-7'));
+    render(<AppFrame><p>content</p></AppFrame>);
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Open steps and pages'}));
+    const left = document.getElementById('fr-left')!;
+    expect(within(left).getByRole('link', {name: 'Case home'})).toHaveAttribute('href', '/?inv=inv-7');
+    expect(within(left).getByRole('link', {name: /^4\s*Act$/})).toHaveAttribute('href', '/act?inv=inv-7');
+    expect(within(left).getByRole('link', {name: 'Red Flags'})).toHaveAttribute('href', '/act?inv=inv-7#red-flags');
+    expect(within(left).getByRole('link', {name: 'Settings'})).toHaveAttribute('href', '/settings');
+    act(() => useWorkbenchStore.getState().setInvestigationId(''));
+  });
+
   it('opens the left edge on its handle and by the [ key, but not while typing or with single keys off', async () => {
     render(<AppFrame><input aria-label="Notes"/></AppFrame>);
     const left = document.getElementById('fr-left')!;
@@ -98,7 +111,7 @@ describe('AppFrame', () => {
     expect(screen.getByRole('option', {name: /Search the case for “red flags”/})).toBeInTheDocument();
     const place = screen.getByRole('option', {name: 'Act › Red Flags'});
     await user.click(place);
-    expect(push).toHaveBeenCalledWith('/#red-flags');
+    expect(push).toHaveBeenCalledWith('/act#red-flags');
   });
 });
 

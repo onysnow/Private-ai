@@ -7,6 +7,14 @@ from app.visuals.spec import VisualSpec
 class InvestigationCreate(BaseModel):
     name: str
     description: str | None = None
+    question: str | None = Field(default=None, max_length=500)
+
+
+class InvestigationUpdate(BaseModel):
+    """Only the fields sent change; an empty question clears it."""
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+    description: str | None = None
+    question: str | None = Field(default=None, max_length=500)
 
 class EntityCreate(BaseModel):
     investigation_id: str
@@ -355,6 +363,9 @@ class ClaimReviewRequest(BaseModel):
     # both or neither; left out, the claim keeps the grade it has.
     evidence_grade: Literal["limited", "medium", "robust"] | None = None
     agreement_grade: Literal["low", "medium", "high"] | None = None
+    # Marking Supported or Confirmed with a Done rule not met (app/services/claim_done.py)
+    # needs a written reason; it is kept on the review event.
+    override_reason: str | None = Field(default=None, max_length=2000)
 
 
 class WriteupCreate(BaseModel):
@@ -549,7 +560,8 @@ class InvestigationTypeSet(BaseModel):
 
 
 class CheckDecide(BaseModel):
-    status: Literal["open", "shows", "does_not", "unclear"]
+    # A missing value (kind "missing") is answered chasing, unknowable or not_needed; other items shows, does_not or unclear.
+    status: Literal["open", "shows", "does_not", "unclear", "chasing", "unknowable", "not_needed"]
     note: str | None = Field(default=None, max_length=4000, description="What the person saw; it stays with the item.")
 
 

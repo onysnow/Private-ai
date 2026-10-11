@@ -51,7 +51,7 @@ afterEach(() => {
 
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
-  const mod = await import('../app/page');
+  const mod = await import('../components/case/workbench-all');
   return mod.default;
 }
 
@@ -179,7 +179,7 @@ describe('Home API-access bootstrap', () => {
     mockApi({...pageRoutes(), [SETTINGS]: settingsBehindToken});
 
     vi.resetModules();
-    const pageMod = await import('../app/page');
+    const pageMod = await import('../components/case/workbench-all');
     const Home = pageMod.default;
     const {api} = await import('../lib/api-instance');
 

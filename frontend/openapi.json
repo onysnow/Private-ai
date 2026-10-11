@@ -2425,6 +2425,350 @@
         "title": "CapabilitiesOut",
         "type": "object"
       },
+      "CaseChangeOut": {
+        "properties": {
+          "actor_kind": {
+            "enum": [
+              "person",
+              "app",
+              "ai",
+              "connector"
+            ],
+            "title": "Actor Kind",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "faint",
+                  "strong",
+                  "textbook"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          }
+        },
+        "required": [
+          "key",
+          "count",
+          "label",
+          "actor_kind",
+          "href"
+        ],
+        "title": "CaseChangeOut",
+        "type": "object"
+      },
+      "CaseClaimCountsOut": {
+        "properties": {
+          "disputed": {
+            "title": "Disputed",
+            "type": "integer"
+          },
+          "ruled_out": {
+            "title": "Ruled Out",
+            "type": "integer"
+          },
+          "supported": {
+            "title": "Supported",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unshown": {
+            "title": "Unshown",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "supported",
+          "disputed",
+          "unshown",
+          "ruled_out"
+        ],
+        "title": "CaseClaimCountsOut",
+        "type": "object"
+      },
+      "CaseDecisionsOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "counts",
+          "items"
+        ],
+        "title": "CaseDecisionsOut",
+        "type": "object"
+      },
+      "CaseDocumentCountsOut": {
+        "properties": {
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unread": {
+            "title": "Unread",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "unread",
+          "failed"
+        ],
+        "title": "CaseDocumentCountsOut",
+        "type": "object"
+      },
+      "CaseFlagCountsOut": {
+        "properties": {
+          "faint": {
+            "title": "Faint",
+            "type": "integer"
+          },
+          "open": {
+            "title": "Open",
+            "type": "integer"
+          },
+          "strong": {
+            "title": "Strong",
+            "type": "integer"
+          },
+          "textbook": {
+            "title": "Textbook",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "open",
+          "textbook",
+          "strong",
+          "faint"
+        ],
+        "title": "CaseFlagCountsOut",
+        "type": "object"
+      },
+      "CaseLeadCountsOut": {
+        "properties": {
+          "open": {
+            "title": "Open",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "open"
+        ],
+        "title": "CaseLeadCountsOut",
+        "type": "object"
+      },
+      "CaseMoneyOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "other_currencies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Other Currencies",
+            "type": "array"
+          },
+          "payments": {
+            "title": "Payments",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "currency",
+          "amount",
+          "payments",
+          "other_currencies"
+        ],
+        "title": "CaseMoneyOut",
+        "type": "object"
+      },
+      "CaseNetworkCountsOut": {
+        "properties": {
+          "links": {
+            "title": "Links",
+            "type": "integer"
+          },
+          "parties": {
+            "title": "Parties",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "parties",
+          "links"
+        ],
+        "title": "CaseNetworkCountsOut",
+        "type": "object"
+      },
+      "CaseSinceOut": {
+        "properties": {
+          "after": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "After",
+            "type": "string"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/CaseChangeOut"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "after",
+          "changes"
+        ],
+        "title": "CaseSinceOut",
+        "type": "object"
+      },
+      "CaseStandingOut": {
+        "description": "The standing numbers on Case home, counted on the server.",
+        "properties": {
+          "claims": {
+            "$ref": "#/components/schemas/CaseClaimCountsOut"
+          },
+          "documents": {
+            "$ref": "#/components/schemas/CaseDocumentCountsOut"
+          },
+          "evidence": {
+            "title": "Evidence",
+            "type": "integer"
+          },
+          "flags": {
+            "$ref": "#/components/schemas/CaseFlagCountsOut"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "leads": {
+            "$ref": "#/components/schemas/CaseLeadCountsOut"
+          },
+          "missing": {
+            "title": "Missing",
+            "type": "integer"
+          },
+          "money": {
+            "$ref": "#/components/schemas/CaseMoneyOut"
+          },
+          "network": {
+            "$ref": "#/components/schemas/CaseNetworkCountsOut"
+          },
+          "sources": {
+            "title": "Sources",
+            "type": "integer"
+          },
+          "timeline": {
+            "$ref": "#/components/schemas/CaseTimelineCountsOut"
+          },
+          "to_check": {
+            "title": "To Check",
+            "type": "integer"
+          },
+          "to_decide": {
+            "title": "To Decide",
+            "type": "integer"
+          },
+          "to_decide_by_kind": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "To Decide By Kind",
+            "type": "object"
+          },
+          "watchlist": {
+            "$ref": "#/components/schemas/CaseWatchlistCountsOut"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "claims",
+          "to_check",
+          "missing",
+          "to_decide",
+          "to_decide_by_kind",
+          "money",
+          "timeline",
+          "documents",
+          "sources",
+          "evidence",
+          "network",
+          "flags",
+          "leads",
+          "watchlist"
+        ],
+        "title": "CaseStandingOut",
+        "type": "object"
+      },
       "CaseSynthesisRequest": {
         "properties": {
           "include_external_leads": {
@@ -2483,6 +2827,85 @@
           "question"
         ],
         "title": "CaseSynthesisRequest",
+        "type": "object"
+      },
+      "CaseTimelineCountsOut": {
+        "properties": {
+          "events": {
+            "title": "Events",
+            "type": "integer"
+          },
+          "from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To"
+          },
+          "years": {
+            "items": {
+              "$ref": "#/components/schemas/CaseYearOut"
+            },
+            "title": "Years",
+            "type": "array"
+          }
+        },
+        "required": [
+          "events",
+          "years"
+        ],
+        "title": "CaseTimelineCountsOut",
+        "type": "object"
+      },
+      "CaseWatchlistCountsOut": {
+        "properties": {
+          "names": {
+            "title": "Names",
+            "type": "integer"
+          },
+          "new_hits": {
+            "title": "New Hits",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "names",
+          "new_hits"
+        ],
+        "title": "CaseWatchlistCountsOut",
+        "type": "object"
+      },
+      "CaseYearOut": {
+        "properties": {
+          "events": {
+            "title": "Events",
+            "type": "integer"
+          },
+          "year": {
+            "title": "Year",
+            "type": "string"
+          }
+        },
+        "required": [
+          "year",
+          "events"
+        ],
+        "title": "CaseYearOut",
         "type": "object"
       },
       "CatalogueAreaOut": {
@@ -3335,7 +3758,10 @@
               "open",
               "shows",
               "does_not",
-              "unclear"
+              "unclear",
+              "chasing",
+              "unknowable",
+              "not_needed"
             ],
             "title": "Status",
             "type": "string"
@@ -3436,7 +3862,7 @@
         "type": "object"
       },
       "ChecksOut": {
-        "description": "Items the case calls for now (open first), and those it no longer does.",
+        "description": "Items the case calls for now (open first), and those it no longer does;\nand the values the case's records are missing.",
         "properties": {
           "gone": {
             "items": {
@@ -3454,6 +3880,14 @@
               "$ref": "#/components/schemas/ToCheckItemOut"
             },
             "title": "Items",
+            "type": "array"
+          },
+          "missing": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MissingValueOut"
+            },
+            "title": "Missing",
             "type": "array"
           }
         },
@@ -3687,6 +4121,101 @@
           "evidence_ids"
         ],
         "title": "ClaimDependentRelationshipOut",
+        "type": "object"
+      },
+      "ClaimDoneByStatusOut": {
+        "properties": {
+          "confirmed": {
+            "$ref": "#/components/schemas/ClaimDoneOut"
+          },
+          "supported": {
+            "$ref": "#/components/schemas/ClaimDoneOut"
+          }
+        },
+        "required": [
+          "supported",
+          "confirmed"
+        ],
+        "title": "ClaimDoneByStatusOut",
+        "type": "object"
+      },
+      "ClaimDoneOut": {
+        "description": "The Done rules for one status (app/services/claim_done.py).",
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "left": {
+            "title": "Left",
+            "type": "integer"
+          },
+          "met": {
+            "title": "Met",
+            "type": "boolean"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/ClaimDoneRuleOut"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "target": {
+            "enum": [
+              "supported",
+              "confirmed"
+            ],
+            "title": "Target",
+            "type": "string"
+          },
+          "unknown": {
+            "title": "Unknown",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "claim_id",
+          "target",
+          "rules",
+          "met",
+          "left",
+          "unknown"
+        ],
+        "title": "ClaimDoneOut",
+        "type": "object"
+      },
+      "ClaimDoneRuleOut": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "met",
+              "not_met",
+              "unknown"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "state",
+          "detail"
+        ],
+        "title": "ClaimDoneRuleOut",
         "type": "object"
       },
       "ClaimEvidenceLinkCreate": {
@@ -3940,6 +4469,17 @@
             "title": "Id",
             "type": "string"
           },
+          "override_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Override Reason"
+          },
           "rationale": {
             "title": "Rationale",
             "type": "string"
@@ -3973,6 +4513,20 @@
           "to_status": {
             "title": "To Status",
             "type": "string"
+          },
+          "unmet_rules": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unmet Rules"
           }
         },
         "required": [
@@ -4026,6 +4580,18 @@
             ],
             "title": "Evidence Grade"
           },
+          "override_reason": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Override Reason"
+          },
           "rationale": {
             "title": "Rationale",
             "type": "string"
@@ -4076,6 +4642,9 @@
             "title": "Dependent Relationships",
             "type": "array"
           },
+          "done": {
+            "$ref": "#/components/schemas/ClaimDoneByStatusOut"
+          },
           "evidence": {
             "items": {
               "$ref": "#/components/schemas/ClaimEvidenceRowOut"
@@ -4104,7 +4673,8 @@
           "evidence",
           "dependent_relationships",
           "review_history",
-          "stance_counts"
+          "stance_counts",
+          "done"
         ],
         "title": "ClaimReviewWorkspaceOut",
         "type": "object"
@@ -11075,6 +11645,295 @@
         "title": "DataTableRowOut",
         "type": "object"
       },
+      "DecisionChoiceOut": {
+        "description": "One answer: the existing endpoint it posts to and the body it sends.",
+        "properties": {
+          "body": {
+            "additionalProperties": true,
+            "title": "Body",
+            "type": "object"
+          },
+          "key": {
+            "enum": [
+              "yes",
+              "no",
+              "unsure"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "method": {
+            "const": "POST",
+            "title": "Method",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "method",
+          "path",
+          "body"
+        ],
+        "title": "DecisionChoiceOut",
+        "type": "object"
+      },
+      "DecisionEvidenceOut": {
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "excerpt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Excerpt"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "terms": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Terms",
+            "type": "array"
+          }
+        },
+        "required": [
+          "terms"
+        ],
+        "title": "DecisionEvidenceOut",
+        "type": "object"
+      },
+      "DecisionGroupOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label"
+        ],
+        "title": "DecisionGroupOut",
+        "type": "object"
+      },
+      "DecisionItemOut": {
+        "description": "Every decision is the same five-part card: question, proposal (and who\nproposed it), evidence, choices, what happens. An item with no choices is\nanswered where it lives (``open``).",
+        "properties": {
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "actor_kind": {
+            "enum": [
+              "person",
+              "app",
+              "ai",
+              "connector"
+            ],
+            "title": "Actor Kind",
+            "type": "string"
+          },
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionChoiceOut"
+            },
+            "title": "Choices",
+            "type": "array"
+          },
+          "consequences": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Consequences",
+            "type": "array"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionEvidenceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "group": {
+            "$ref": "#/components/schemas/DecisionGroupOut"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "to_check",
+              "missing",
+              "proposal",
+              "match",
+              "outside",
+              "ai",
+              "watchlist"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "faint",
+                  "strong",
+                  "textbook"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "open": {
+            "$ref": "#/components/schemas/DecisionLinkOut"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionPartyOut"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "proposal": {
+            "title": "Proposal",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "integer"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "question",
+          "proposal",
+          "actor",
+          "actor_kind",
+          "created_at",
+          "rank",
+          "reason",
+          "group",
+          "parties",
+          "consequences",
+          "choices",
+          "open"
+        ],
+        "title": "DecisionItemOut",
+        "type": "object"
+      },
+      "DecisionLinkOut": {
+        "properties": {
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "href",
+          "label"
+        ],
+        "title": "DecisionLinkOut",
+        "type": "object"
+      },
+      "DecisionPartyOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "schema"
+        ],
+        "title": "DecisionPartyOut",
+        "type": "object"
+      },
       "DeckOut": {
         "description": "A presentation deck. Every key is always sent, so the nullable ones have no default.",
         "properties": {
@@ -17643,6 +18502,18 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "question": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question"
           }
         },
         "required": [
@@ -17845,6 +18716,17 @@
             "title": "Name",
             "type": "string"
           },
+          "question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question"
+          },
           "type_areas": {
             "anyOf": [
               {
@@ -17958,6 +18840,49 @@
           "areas"
         ],
         "title": "InvestigationTypeSet",
+        "type": "object"
+      },
+      "InvestigationUpdate": {
+        "description": "Only the fields sent change; an empty question clears it.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "question": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question"
+          }
+        },
+        "title": "InvestigationUpdate",
         "type": "object"
       },
       "IssueIn": {
@@ -19634,6 +20559,141 @@
           "confidence"
         ],
         "title": "MergeResolutionOut",
+        "type": "object"
+      },
+      "MissingValueOut": {
+        "description": "A value a record needs and does not have (app/patterns/missing.py). It goes\nwhen the value is filled in; until then a person can chase it (a lead is made),\nsay it cannot be known, or say it does not apply.",
+        "properties": {
+          "blocks": {
+            "title": "Blocks",
+            "type": "string"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "first_seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "First Seen At",
+            "type": "string"
+          },
+          "gone_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gone At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/FlagPartyOut"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_label": {
+            "title": "Record Label",
+            "type": "string"
+          },
+          "record_type": {
+            "enum": [
+              "entity",
+              "relationship",
+              "evidence",
+              "claim",
+              "event",
+              "source"
+            ],
+            "title": "Record Type",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "rule_name": {
+            "title": "Rule Name",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "chasing",
+              "unknowable",
+              "not_needed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rule",
+          "rule_name",
+          "question",
+          "record_label",
+          "record_type",
+          "record_id",
+          "blocks",
+          "status",
+          "note",
+          "lead_id",
+          "decided_at",
+          "first_seen_at",
+          "gone_at",
+          "parties"
+        ],
+        "title": "MissingValueOut",
         "type": "object"
       },
       "MultiEnrichmentRequest": {
@@ -41796,6 +42856,63 @@
           }
         },
         "summary": "Remove Investigation"
+      },
+      "patch": {
+        "operationId": "patch_investigation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvestigationUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvestigationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Patch Investigation"
       }
     },
     "/api/investigations/{investigation_id}/ai-analysis-candidates": {
@@ -43288,6 +44405,95 @@
           }
         },
         "summary": "List Investigation Cross References"
+      }
+    },
+    "/api/investigations/{investigation_id}/decisions": {
+      "get": {
+        "operationId": "get_decisions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "to_check",
+                    "missing",
+                    "proposal",
+                    "match",
+                    "outside",
+                    "ai",
+                    "watchlist"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "default": "consequence",
+              "enum": [
+                "consequence",
+                "source",
+                "oldest"
+              ],
+              "title": "Order",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseDecisionsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Decisions"
       }
     },
     "/api/investigations/{investigation_id}/decks": {
@@ -45031,6 +46237,65 @@
         "summary": "List Reporting Tasks"
       }
     },
+    "/api/investigations/{investigation_id}/since": {
+      "get": {
+        "operationId": "get_since",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": true,
+            "schema": {
+              "format": "date-time",
+              "title": "After",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseSinceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Since"
+      }
+    },
     "/api/investigations/{investigation_id}/sources": {
       "get": {
         "operationId": "list_sources",
@@ -45112,6 +46377,56 @@
           }
         },
         "summary": "List Sources"
+      }
+    },
+    "/api/investigations/{investigation_id}/standing": {
+      "get": {
+        "description": "Red Flags and To check counts are as last computed (GET .../decisions recomputes them).",
+        "operationId": "get_standing",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseStandingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Standing"
       }
     },
     "/api/investigations/{investigation_id}/tags": {

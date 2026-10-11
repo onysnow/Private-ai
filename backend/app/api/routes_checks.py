@@ -8,7 +8,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
-from app.core.authorization import InvestigationAuthorizationError
 from app.db.session import get_db
 from app.models.domain import CheckItem, Investigation
 from app.patterns import checks, engine
@@ -23,12 +22,7 @@ def get_checks(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     """Brings the flags and the items up to date with the case's records, then lists the items."""
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    try:
-        engine.recompute(db, investigation_id)
-        checks.recompute(db, investigation_id)
-    except InvestigationAuthorizationError:
-        # A reader without write access sees the items as last computed.
-        db.rollback()
+    engine.bring_up_to_date(db, investigation_id)
     return checks.items(db, investigation_id)
 
 

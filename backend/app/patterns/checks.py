@@ -36,6 +36,8 @@ from app.models.domain import CheckItem, Document, DocumentChunk, Entity, Patter
 
 ROOT = Path(__file__).resolve().parents[3] / "catalogue" / "detection" / "checks"
 STATUSES = ("open", "shows", "does_not", "unclear")
+# A missing value's answers (app/patterns/missing.py).
+MISSING_STATUSES = ("open", "chasing", "unknowable", "not_needed")
 EXCERPT = 160  # characters either side of the first word found
 
 
@@ -154,6 +156,13 @@ def _wanted(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...]) ->
                     "indicator_id": spec.indicator, "kind": "passage", "question": spec.question,
                     "parties": [pid for pid, pat in named if pat.search(chunk.text)], "flag_id": None,
                     "document_id": chunk.document_id, "locator": chunk.locator, "excerpt": _excerpt(chunk.text, hits[0]), "terms": hits}
+    from app.patterns.missing import gaps
+
+    for gap in gaps(db, investigation_id):
+        out[_fp("missing", gap.rule, gap.record_id)] = {
+            "indicator_id": gap.rule, "kind": "missing", "question": gap.question, "parties": list(gap.parties), "flag_id": None,
+            "document_id": None, "locator": None, "excerpt": gap.label, "terms": [], "record_type": gap.record_type,
+            "record_id": gap.record_id, "blocks": gap.blocks}
     return out
 
 
@@ -178,12 +187,45 @@ def recompute(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] |
 
 
 def decide(db: Session, row: CheckItem, status: str, note: str | None) -> None:
-    if status not in STATUSES:
-        raise ValueError(f"Status is one of {', '.join(STATUSES)}")
+    allowed = MISSING_STATUSES if row.kind == "missing" else STATUSES
+    if status not in allowed:
+        raise ValueError(f"Status is one of {', '.join(allowed)}")
+    if row.kind == "missing" and status == "chasing" and not row.lead_id:
+        row.lead_id = _lead_for_missing(db, row, note).id
     row.status = status
     row.note = (note or "").strip() or None
     row.decided_at = None if status == "open" else utcnow_naive()
     db.commit()
+
+
+def _lead_for_missing(db: Session, row: CheckItem, note: str | None) -> Any:
+    """Chasing a missing value makes a lead pointing at the record it is missing from."""
+    from app.patterns.missing import rule_name
+    from app.schemas.api import LeadCreate, LeadLinkCreate
+    from app.services.leads import create_lead, create_lead_link
+
+    lead = create_lead(db, LeadCreate(investigation_id=row.investigation_id, title=f"Find: {row.question}"[:500],
+                                      detail=f"Missing value ({rule_name(row.indicator_id)}) on {row.excerpt}. {row.blocks or ''}"
+                                             + (f" Note: {note.strip()}" if note and note.strip() else ""),
+                                      provider="missing_values", provider_record_id=row.id))
+    field = {"entity": "entity_id", "relationship": "relationship_id", "evidence": "evidence_id", "claim": "claim_id", "source": "source_id"}.get(row.record_type or "")
+    if field and row.record_id:
+        create_lead_link(db, lead, LeadLinkCreate(**{field: row.record_id}, note="The record the value is missing from"))
+    for party in row.parties or []:
+        if field != "entity_id" or party != row.record_id:
+            create_lead_link(db, lead, LeadLinkCreate(entity_id=party, note="A party on the record"))
+    return lead
+
+
+def serialize_missing(row: CheckItem, names: dict[str, tuple[str, str]]) -> dict[str, Any]:
+    from app.patterns.missing import rule_name
+
+    return {
+        "id": row.id, "rule": row.indicator_id, "rule_name": rule_name(row.indicator_id), "question": row.question, "record_label": row.excerpt or "",
+        "record_type": row.record_type or "", "record_id": row.record_id or "", "blocks": row.blocks or "", "status": row.status, "note": row.note,
+        "lead_id": row.lead_id, "decided_at": row.decided_at, "first_seen_at": row.first_seen_at, "gone_at": row.gone_at,
+        "parties": [{"id": p, "name": names.get(p, (p, ""))[0], "schema": names.get(p, ("", "Thing"))[1]} for p in row.parties],
+    }
 
 
 def serialize(row: CheckItem, names: dict[str, tuple[str, str]], indicator_names: dict[str, str],
@@ -212,12 +254,15 @@ def items(db: Session, investigation_id: str) -> dict[str, Any]:
     for f in db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id, PatternFlag.gone_at.is_(None))):
         for p in f.parties:
             flags_on_parties.setdefault(p, []).append(f.id)
-    indicator_names = {r.indicator_id: _name(r.indicator_id) for r in rows}
-    order = {"open": 0, "unclear": 1, "shows": 2, "does_not": 3}
+    indicator_names = {r.indicator_id: _name(r.indicator_id) for r in rows if r.kind != "missing"}
+    order = {"open": 0, "unclear": 1, "chasing": 1, "shows": 2, "does_not": 3}
+    missing = sorted((r for r in rows if r.kind == "missing" and r.gone_at is None), key=lambda r: (order.get(r.status, 9), r.indicator_id, r.first_seen_at))
+    rows = [r for r in rows if r.kind != "missing"]
     current = sorted((r for r in rows if r.gone_at is None), key=lambda r: (order.get(r.status, 9), r.indicator_id, r.first_seen_at))
     gone = sorted((r for r in rows if r.gone_at is not None), key=lambda r: r.gone_at or r.first_seen_at, reverse=True)
     return {
         "investigation_id": investigation_id,
         "items": [serialize(r, names, indicator_names, documents, flags_on_parties) for r in current],
         "gone": [serialize(r, names, indicator_names, documents, flags_on_parties) for r in gone],
+        "missing": [serialize_missing(r, names) for r in missing],
     }
