@@ -106,7 +106,7 @@ def test_only_public_domain_and_own_files_are_shipped():
         if d["kind"] in ("article", "video", "audio") or (d["kind"] == "photo" and not d["licence"].lower().startswith("public domain")):
             assert d["mode"] != "ship", f"{d['id']} is copyrighted: fetch it, do not ship it"
     shipped = {(d.get("path") or d["filename"]) for d in MORE["documents"] if d["mode"] == "ship"}
-    on_disk = {str(p.relative_to(demo_1mdb.FILES)) for p in demo_1mdb.FILES.rglob("*") if p.is_file()}
+    on_disk = {str(p.relative_to(demo_1mdb.FILES)) for p in demo_1mdb.FILES.rglob("*") if p.is_file() and p.name != ".gitattributes"}
     assert on_disk == shipped
 
 
