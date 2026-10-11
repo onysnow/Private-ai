@@ -1,6 +1,6 @@
 # Working on the Journalism Workbench (Private-ai)
 
-Read docs/project-notes/START_HERE.md first: it says where the work stands and what is next.
+Read docs/project-notes/START_HERE.md first: it says where the work stands. docs/project-notes/BACKLOG.md lists everything Ony has asked for that is not done yet.
 
 ## How Ony wants to work
 - **Commands for him to run:** always one single line, starting with the command that goes to the
