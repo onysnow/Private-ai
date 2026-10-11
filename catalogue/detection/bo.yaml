@@ -75,13 +75,25 @@
 
 - indicator: BO-033
   family: missing_property
+  version: 2
   params: {link: Payment, property: purpose}
-  level: textbook   # a payment with no stated purpose meets the definition as worded; the invoice half needs a person
-  summary: "{source} paid {target}{amount_text} with no stated purpose."
+  bands:
+    - level: faint
+      from: 1
+      to: 2
+      reason: "No purpose found: the records give none yet. That may only mean no one has recorded it; find what the documents say the payment was for."
+    - level: textbook
+      from: 2
+      reason: "The record says the payment had no purpose, which meets the definition as worded. Whether invoices were false needs a person."
+  summary: "{source} paid {target}{amount_text}, {finding}."
   examples:
-    - name: no purpose
+    - name: no purpose recorded yet
       parties: [{id: a, schema: Company}, {id: b, schema: Company}]
       links: [{schema: Payment, source: a, target: b, properties: {amount: ["100"], currency: ["EUR"]}}]
+      expect: faint
+    - name: the record says there was none
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Payment, source: a, target: b, properties: {amount: ["100"], purpose: ["None stated"]}}]
       expect: textbook
     - name: a purpose given
       parties: [{id: a, schema: Company}, {id: b, schema: Company}]
