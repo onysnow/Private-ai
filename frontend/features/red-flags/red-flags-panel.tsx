@@ -7,6 +7,7 @@
 // reporter adds it to leads or sets it aside with a reason; pointing at a
 // party lights it in every chart.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import type {UseQueryResult} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
@@ -15,7 +16,7 @@ import {
   dismissRedFlagMutation, getChecksQueryKey, getRedFlagsOptions, getRedFlagsQueryKey, listAreasOptions, listLeadsQueryKey, makeLeadFromRedFlagMutation,
   reopenRedFlagMutation, setInvestigationTypeMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import type {InvestigationTypeOut, RedFlagOut} from '../../lib/generated/types.gen';
+import type {GetRedFlagsError, InvestigationTypeOut, RedFlagOut, RedFlagsOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {GlossaryText} from '../glossary/glossary-text';
 import {DECISION} from '../to-check/to-check-panel';
@@ -27,12 +28,12 @@ export const LEVEL: Record<string, {name: string; meaning: string}> = {
   textbook: {name: 'Textbook', meaning: 'it meets the published definition or threshold'},
 };
 
-type FlagActions = {onLead: () => Promise<void>; onDismiss: (reason: string) => Promise<void>; onReopen: () => Promise<void>};
+export type FlagActions = {onLead: () => Promise<void>; onDismiss: (reason: string) => Promise<void>; onReopen: () => Promise<void>};
 const PARTIES_SHOWN = 4;
 const plain = (t: string) => t.replace(/[.;]\s*$/, '');
 
 /** Add to leads, Not relevant (with a reason), Open it again: the same on the card and in the drawer. */
-function FlagActionsRow({flag, onLead, onDismiss, onReopen}: {flag: RedFlagOut} & FlagActions): ReactElement {
+export function FlagActionsRow({flag, onLead, onDismiss, onReopen}: {flag: RedFlagOut} & FlagActions): ReactElement {
   const [reason, setReason] = useState('');
   const [asking, setAsking] = useState(false);
   return <>
@@ -51,7 +52,7 @@ function FlagActionsRow({flag, onLead, onDismiss, onReopen}: {flag: RedFlagOut} 
   </>;
 }
 
-function PartyButtons({parties, limit}: {parties: RedFlagOut['parties']; limit?: number}): ReactElement {
+export function PartyButtons({parties, limit}: {parties: RedFlagOut['parties']; limit?: number}): ReactElement {
   const setPointed = useWorkbenchStore(state => state.setPointedParty);
   const shown = limit ? parties.slice(0, limit) : parties;
   return <div className="rf-who">{shown.map(p => <button type="button" key={p.id} className="sv-pd rf-party"
@@ -61,7 +62,7 @@ function PartyButtons({parties, limit}: {parties: RedFlagOut['parties']; limit?:
 }
 
 /** What the records can't show, each part a link to its item in To check (Verify), with the decision once made. */
-function NotShown({flag}: {flag: RedFlagOut}): ReactElement {
+export function NotShown({flag}: {flag: RedFlagOut}): ReactElement {
   const openCheck = useWorkbenchStore(state => state.openCheck);
   const go = (id: string) => { openCheck(id); document.getElementById('to-check')?.scrollIntoView({behavior: 'smooth', block: 'start'}); };
   return <>{flag.not_shown.map((part, i) => {
@@ -107,15 +108,13 @@ function SourceItem({src}: {src: NonNullable<RedFlagOut['indicator']>['sources']
     <blockquote>“{src.quote}”</blockquote></div>;
 }
 
-/** Everything about one flag, beside the list, as sections (Ony, 10 Oct 2026: the drawer has room, so no tabs): innocent explanations first (indicators.md), then why it matters,
- * where it was documented, and how it ranks. */
-function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () => void} & FlagActions): ReactElement {
+/** Everything about one flag, as sections (Ony, 10 Oct 2026: the drawer has room, so no tabs): innocent explanations first (indicators.md),
+ * then why it matters, where it was documented, and how it ranks. Shown in the drawer, and beside the list on the Act screen. */
+export function FlagDetail({flag, ...actions}: {flag: RedFlagOut} & FlagActions): ReactElement {
   const ind = flag.indicator;
   const max = Math.max(1.5, flag.weight);
   const name = ind?.name ?? flag.indicator_id;
-  return <aside id="rf-drawer" className={`wb-drawer rf-drawer level-${flag.level}`} aria-label={`Red Flag details: ${name}`}
-    onKeyDown={e => { if (e.key === 'Escape') onClose(); }}>
-    <button type="button" className="wb-drawer-close" onClick={onClose} aria-label="Close the details">×</button>
+  return <>
     <p className="rf-drawer-level">{LEVEL[flag.level].name} · {LEVEL[flag.level].meaning}</p>
     <h3>{name}</h3>
     <p className="sv-muted">{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}{ind && <> · <a href={`/glossary?indicator=${encodeURIComponent(ind.id)}`}>Full entry in the glossary</a></>}</p>
@@ -150,13 +149,22 @@ function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () 
     </section>
     {flag.status === 'dismissed' && <p className="rf-row"><b>Set aside.</b> {flag.dismissed_reason}</p>}
     <FlagActionsRow flag={flag} {...actions}/>
+  </>;
+}
+
+function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () => void} & FlagActions): ReactElement {
+  const name = flag.indicator?.name ?? flag.indicator_id;
+  return <aside id="rf-drawer" className={`wb-drawer rf-drawer level-${flag.level}`} aria-label={`Red Flag details: ${name}`}
+    onKeyDown={e => { if (e.key === 'Escape') onClose(); }}>
+    <button type="button" className="wb-drawer-close" onClick={onClose} aria-label="Close the details">×</button>
+    <FlagDetail flag={flag} {...actions}/>
   </aside>;
 }
 
 /** The investigation's type: catalogue areas, chosen by the app with its reasons, or by the reporter (indicators.md).
  * Closed, it is one line of area names. Open, the app's suggestions come first with why, then every other area
  * as a card with a one-line summary, searchable. The safety area (SA) is the reporter's safety, not a type. */
-function InvestigationType({kind, flagsByArea, onSet}: {kind: InvestigationTypeOut; flagsByArea: Record<string, number>;
+export function InvestigationType({kind, flagsByArea, onSet}: {kind: InvestigationTypeOut; flagsByArea: Record<string, number>;
   onSet: (areas: string[] | null) => Promise<void>}): ReactElement {
   const [editing, setEditing] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
@@ -214,11 +222,16 @@ function InvestigationType({kind, flagsByArea, onSet}: {kind: InvestigationTypeO
   </div>;
 }
 
-const LEVEL_ORDER = ['textbook', 'strong', 'faint'];
+export const LEVEL_ORDER = ['textbook', 'strong', 'faint'];
 /** Textbook flags first, then Strong, then Faint; by weight within a level (the server's order). */
-const byLevel = (a: RedFlagOut, b: RedFlagOut): number => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level);
+export const byLevel = (a: RedFlagOut, b: RedFlagOut): number => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level);
 
-export function RedFlagsPanel({investigationId}: {investigationId: string}): ReactElement {
+export type RedFlagsState = {
+  query: UseQueryResult<RedFlagsOut, GetRedFlagsError>; problem: string; actionsFor: (f: RedFlagOut) => FlagActions; setAreas: (areas: string[] | null) => Promise<void>;
+};
+
+/** The case's Red Flags and what a reporter can do with each: shared by the panel and the Act screen. */
+export function useRedFlags(investigationId: string): RedFlagsState {
   const queryClient = useQueryClient();
   const path = {investigation_id: investigationId};
   const query = useQuery({...getRedFlagsOptions({path}), enabled: Boolean(investigationId)});
@@ -227,21 +240,11 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
   const lead = useMutation({...makeLeadFromRedFlagMutation()});
   const setType = useMutation({...setInvestigationTypeMutation()});
   const [problem, setProblem] = useState('');
-  const [openId, setOpenId] = useState<string | null>(null);
   const key = getRedFlagsQueryKey({path});
   const checksKey = getChecksQueryKey({path});
-  // An item in To check asks for its flag: open its details and bring the list into view.
-  const askedFlag = useWorkbenchStore(state => state.flag);
-  const answered = useRef(0);
-  useEffect(() => {
-    if (!askedFlag || askedFlag.serial === answered.current) return;
-    answered.current = askedFlag.serial;
-    setOpenId(askedFlag.flagId);
-  }, [askedFlag]);
   const attempt = async (work: () => Promise<unknown>, failed: string) => {
     try { await work(); setProblem(''); } catch (error) { setProblem(errorMessage(error, failed)); }
   };
-
   const actionsFor = (f: RedFlagOut): FlagActions => ({
     onLead: () => attempt(async () => { await lead.mutateAsync({path: {flag_id: f.id}}); await Promise.all([
       queryClient.invalidateQueries({queryKey: key}), queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})})]); }, 'Could not add it to leads'),
@@ -250,6 +253,26 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
     onReopen: () => attempt(async () => { queryClient.setQueryData(key, await reopen.mutateAsync({path: {flag_id: f.id}}));
       await queryClient.invalidateQueries({queryKey: checksKey}); }, 'Could not open it again'),
   });
+  const setAreas = (areas: string[] | null) => attempt(async () => {
+    await setType.mutateAsync({path, body: {areas}}); await queryClient.invalidateQueries({queryKey: key}); }, 'Could not change the type');
+  return {query, problem, actionsFor, setAreas};
+}
+
+/** How many open flags fired in each catalogue area (for the type picker). */
+export const flagsByArea = (flags: RedFlagOut[]): Record<string, number> => flags.reduce<Record<string, number>>((m, f) => {
+  if (f.indicator) m[f.indicator.area] = (m[f.indicator.area] ?? 0) + 1; return m; }, {});
+
+export function RedFlagsPanel({investigationId}: {investigationId: string}): ReactElement {
+  const {query, problem, actionsFor, setAreas} = useRedFlags(investigationId);
+  const [openId, setOpenId] = useState<string | null>(null);
+  // An item in To check asks for its flag: open its details and bring the list into view.
+  const askedFlag = useWorkbenchStore(state => state.flag);
+  const answered = useRef(0);
+  useEffect(() => {
+    if (!askedFlag || askedFlag.serial === answered.current) return;
+    answered.current = askedFlag.serial;
+    setOpenId(askedFlag.flagId);
+  }, [askedFlag]);
 
   const flags = query.data?.flags ?? [];
   const opened = flags.find(f => f.id === openId);
@@ -272,9 +295,7 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
       <span className="rf-rules" title={rules.map(r => r.name).join('\n')}>{rules.length - cannot.length} of {rules.length} checks ran</span>.</p>
     {cannot.length > 0 && <details className="rf-cannot"><summary>{cannot.length} could not run on these records</summary>
       <ul>{cannot.map(c => <li key={c.indicator_id}><b>{c.name}</b>: {c.reason}</li>)}</ul></details>}
-    {kind && <InvestigationType kind={kind} flagsByArea={flags.reduce<Record<string, number>>((m, f) => {
-      if (f.indicator) m[f.indicator.area] = (m[f.indicator.area] ?? 0) + 1; return m; }, {})} onSet={areas => attempt(async () => {
-      await setType.mutateAsync({path, body: {areas}}); await queryClient.invalidateQueries({queryKey: key}); }, 'Could not change the type')}/>}
+    {kind && <InvestigationType kind={kind} flagsByArea={flagsByArea(flags)} onSet={setAreas}/>}
     {query.isError && <p className="sv-error">{errorMessage(query.error, 'Could not run the rules')}</p>}
     {problem && <p className="sv-error" role="alert">{problem}</p>}
     {query.data && !flags.length && <p className="sv-muted">No pattern fires on these records.</p>}

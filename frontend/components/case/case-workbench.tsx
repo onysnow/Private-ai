@@ -39,6 +39,9 @@ import {PlacesPanel} from '../../features/places/places-panel';
 import {ProvenancePanel} from '../../features/provenance/provenance-panel';
 import {withEnds} from '../../features/relationship-graph/graph';
 import {StageRail, StageSection, StandingTiles, useStanding} from '../layout/workbench-page';
+import {RedFlagsBoard} from '../../features/act/red-flags-board';
+import {SectionScreen} from './section-screen';
+import type {Section} from './section-screen';
 import {YearSlider} from '../charts/year-slider';
 import {RedFlagsPanel} from '../../features/red-flags/red-flags-panel';
 import {ToCheckPanel} from '../../features/to-check/to-check-panel';
@@ -200,6 +203,11 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
     <StageSection stage={key}>{children}</StageSection>
   </div>;
 
+  /** A stage's own page: its sections as tabs, one filling the screen (components/case/section-screen.tsx). */
+  const screen = (key: StageKey, sections: Section[]) => mounted(key) && <div className="cv-screen" hidden={!shown(key)} data-view={key}>
+    <SectionScreen stage={key} investigationName={investigationName} sections={sections} active={view === key}/>
+  </div>;
+
   const body = <>
     {accessProblem && <PanelErrorBoundary name="API access"><ApiAccessPanel message={access.message} onConnect={access.connectWithToken}/></PanelErrorBoundary>}
     {view !== 'all' && mounted('home') && <div hidden={!shown('home')} className="cv-home-wrap">
@@ -210,43 +218,78 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       <PanelErrorBoundary name="Decide"><DecideScreen investigationId={inv} investigationName={investigationName} active={view === 'decide'}/></PanelErrorBoundary>
     </div>}
 
-    {stage('collect', <>
-      <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>
-      <div className="wb-row">
-        <div><PanelErrorBoundary name="The Drop"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary></div>
-        <div id="source-capture"><PanelErrorBoundary name="Source & exact evidence capture"><SourceCapturePanel investigationId={inv} sourceCount={sourcesQuery.data?.length ?? 0} evidenceCount={evidenceQuery.data?.length ?? 0}/></PanelErrorBoundary></div>
-      </div>
-      <div id="connectors"><PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary></div>
-      <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>
-    </>)}
+    {view === 'all' ? <>
+      {stage('collect', <>
+        <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>
+        <div className="wb-row">
+          <div><PanelErrorBoundary name="The Drop"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary></div>
+          <div id="source-capture"><PanelErrorBoundary name="Source & exact evidence capture"><SourceCapturePanel investigationId={inv} sourceCount={sourcesQuery.data?.length ?? 0} evidenceCount={evidenceQuery.data?.length ?? 0}/></PanelErrorBoundary></div>
+        </div>
+        <div id="connectors"><PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary></div>
+        <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>
+      </>)}
 
-    {stage('verify', <>
-      <PanelErrorBoundary name="Claim verification workspace"><ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>
-      <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>
-      <div id="review-queue"><PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary></div>
-    </>)}
+      {stage('verify', <>
+        <PanelErrorBoundary name="Claim verification workspace"><ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>
+        <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>
+        <div id="review-queue"><PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary></div>
+      </>)}
 
-    {stage('map', <>
-      <YearSlider investigationId={inv}/>
-      <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
-      <div id="timeline"><PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary></div>
-      <div id="places"><PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary></div>
-    </>)}
+      {stage('map', <>
+        <YearSlider investigationId={inv}/>
+        <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
+        <div id="timeline"><PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary></div>
+        <div id="places"><PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary></div>
+      </>)}
 
-    {stage('report', <>
-      <PanelErrorBoundary name="Red Flags"><RedFlagsPanel investigationId={inv}/></PanelErrorBoundary>
-      <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>
-      <div id="chart-builder"><PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary></div>
-      <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>
-    </>)}
+      {stage('report', <>
+        <PanelErrorBoundary name="Red Flags"><RedFlagsPanel investigationId={inv}/></PanelErrorBoundary>
+        <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>
+        <div id="chart-builder"><PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary></div>
+        <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>
+      </>)}
 
-    {stage('keep', <>
-      <div className="wb-row">
-        <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>
-        <div id="deletion"><PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary></div>
-      </div>
-      {access.settingsStatus && <div id="access"><PanelErrorBoundary name="Local security/settings status"><SecurityPanel settingsStatus={access.settingsStatus} providers={providers}/></PanelErrorBoundary></div>}
-    </>)}
+      {stage('keep', <>
+        <div className="wb-row">
+          <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>
+          <div id="deletion"><PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary></div>
+        </div>
+        {access.settingsStatus && <div id="access"><PanelErrorBoundary name="Local security/settings status"><SecurityPanel settingsStatus={access.settingsStatus} providers={providers}/></PanelErrorBoundary></div>}
+      </>)}
+    </> : <>
+      {screen('collect', [
+        {anchor: 'investigation-search', label: 'Search', render: () => <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'document-ingestion', label: 'Documents', render: () => <PanelErrorBoundary name="The Drop"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'source-capture', label: 'Sources & evidence', render: () => <PanelErrorBoundary name="Source & exact evidence capture">
+          <SourceCapturePanel investigationId={inv} sourceCount={sourcesQuery.data?.length ?? 0} evidenceCount={evidenceQuery.data?.length ?? 0}/></PanelErrorBoundary>},
+        {anchor: 'connectors', label: 'Connectors', render: () => <PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary>},
+        {anchor: 'corpus', label: 'OpenAleph corpus', render: () => <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>},
+      ])}
+      {screen('verify', [
+        {anchor: 'claim-verification', label: 'Claims', render: () => <PanelErrorBoundary name="Claim verification workspace">
+          <ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>},
+        {anchor: 'to-check', label: 'To check', render: () => <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'review-queue', label: 'Connector findings', render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
+      ])}
+      {screen('map', [
+        {anchor: 'relationship-graph', label: 'Relationships', render: () => <><YearSlider investigationId={inv}/>
+          <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary></>},
+        {anchor: 'timeline', label: 'Timeline', render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'places', label: 'Places', render: () => <PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary>},
+      ])}
+      {screen('report', [
+        {anchor: 'red-flags', label: 'Red Flags', fill: true, render: () => <PanelErrorBoundary name="Red Flags"><RedFlagsBoard investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'leads', label: 'Leads', render: () => <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'chart-builder', label: 'Charts', render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},
+      ])}
+      {screen('keep', [
+        {anchor: 'backup-restore', label: 'Backup & restore', render: () => <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>},
+        {anchor: 'deletion', label: 'Delete', render: () => <PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary>},
+        ...(access.settingsStatus ? [{anchor: 'access', label: 'Access', render: () => <PanelErrorBoundary name="Local security/settings status">
+          <SecurityPanel settingsStatus={access.settingsStatus!} providers={providers}/></PanelErrorBoundary>}] : []),
+      ])}
+    </>}
   </>;
 
   const drawer = <aside className="wb-drawer" hidden={!provenance} aria-label="Chain of Custody">
