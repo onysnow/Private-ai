@@ -163,6 +163,39 @@ def _fail_openaleph_only_read(db: Session, document_id: str, filename: str, exc:
     raise JobFailed(message, {"reason": "needs_openaleph" if kind == "unreachable" else f"openaleph_{kind}"})
 
 
+def _openaleph_package(schema: str | None) -> bool:
+    """OpenAleph holds the file as a package (a .zip, a mailbox): each file
+    or message in it becomes a document of its own under it."""
+    from followthemoney import model as ftm_model
+
+    found = ftm_model.get(schema or "")
+    return found is not None and found.is_a("Package")
+
+
+def _with_local_text(read: OpenAlephText, storage_path: str) -> OpenAlephText:
+    """OpenAleph read an email or a workbook and returned no text (it often
+    gives an email none), so its proposals would have no passage to show.
+    Use the Workbench's own reading of the file as the text instead, and keep
+    everything else OpenAleph gave (its names, headers and files inside).
+    Not done for a package: its files are read as documents of their own, and
+    reading them into the package too would propose everything twice. When
+    the Workbench cannot read it either, OpenAleph's empty read stands."""
+    from dataclasses import replace
+    from pathlib import Path
+
+    from app.services.document_reader import read_chunks
+    from app.services.openaleph_reader import NO_TEXT_ISSUE
+
+    try:
+        chunks, issues = read_chunks(Path(storage_path))
+    except Exception:
+        logger.warning("the Workbench's own reader could not read a file OpenAleph found no text in", exc_info=True)
+        return read
+    if not chunks:
+        return read
+    return replace(read, chunks=chunks, issues=[*(issue for issue in read.issues if issue != NO_TEXT_ISSUE), *issues])
+
+
 def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str | None:
     """Read an uploaded document into chunks and proposals.
 
@@ -173,6 +206,7 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
     fails the job, with the reason the document also records.
     """
     from app.models.domain import Document
+    from app.services.container_readers import is_container_file
     from app.services.document_formats import needs_openaleph
     from app.services.documents import extract_document
     from app.services.openaleph_corpus import sync_document_to_openaleph
@@ -186,14 +220,23 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
     if reading_with_openaleph():
         stored = db.get(Document, document_id)
         openaleph_only = stored is not None and needs_openaleph(stored.filename)
+        # An email, mailbox, .zip or workbook: OpenAleph may read it and find no text (its files
+        # become documents of their own), which is a read, not a reason to fall back.
+        container = stored is not None and is_container_file(stored.filename)
         try:
-            read = read_with_openaleph(db, document_id, report, allow_empty=openaleph_only)
+            read = read_with_openaleph(db, document_id, report, allow_empty=openaleph_only or container)
         except OpenAlephUnavailable as exc:
             if stored is not None and openaleph_only:
                 _fail_openaleph_only_read(db, document_id, stored.filename, exc)
             fallback_reason = str(exc)
         else:
+            local_text = container and not read.chunks and not _openaleph_package(read.schema)
+            if local_text:
+                read = _with_local_text(read, stored.storage_path)
+                local_text = bool(read.chunks)
             message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner)
+            if local_text and message:
+                message = f"{message}; OpenAleph found no text, so the text is the Workbench's own reading"
             return _check_watchlist_after_read(db, document_id, message)
 
     report(5, "Reading the document")

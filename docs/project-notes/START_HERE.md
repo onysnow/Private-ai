@@ -58,7 +58,8 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   so studying and porting from them is fine.
 
 ## Still open from the demos
-- Email, .mbox, .zip, video, audio and .xlsx files are read only through OpenAleph.
+- Video and audio files are read only through OpenAleph. (Email, .mbox, .zip and .xlsx are now read by the
+  Workbench's own reader too: `app/services/container_readers.py`.)
 - BO-033 raises one flag per payment.
 - Documents have no kind or language field.
 - Claim evidence can't be "superseded".

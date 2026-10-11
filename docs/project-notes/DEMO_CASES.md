@@ -36,7 +36,10 @@ Ony: "how the hell are we supposed to test everything if we don't HAVE everythin
   one indicator. Its record is kept for the tutorial in TUTORIAL_NOTES.md.
 
 ## Still not covered
-- **File formats:** email, .mbox, .zip, video, audio and .xlsx are read only through OpenAleph. Without it, 20 documents end as "failed"; the email headers are pre-filled on each source.
+- **File formats:** video and audio are read only through OpenAleph. Without it, those 2 documents end as "failed".
+  Email, .mbox, .zip and .xlsx are read by the Workbench's own reader since 11 Oct (`app/services/container_readers.py`):
+  every proposal from them has a passage with a locator (`headers`, `body, paragraph N`, `message N · …`, `<file in the zip> · …`, `<sheet> row N`);
+  the email headers are still pre-filled on each source.
 - **Media analysis:** none yet (see docs/research/media-suite/).
 - **Downloads:**
   - MAS blocks automated downloads, so its pages are links only;
