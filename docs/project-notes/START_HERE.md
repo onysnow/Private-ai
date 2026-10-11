@@ -51,8 +51,11 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   https://github.com/storytold (Ony's request). It is an open-source Adobe-like suite: filmcraft
   (video), lightcraft (photo), wordcraft (text), a Photoshop-like editor, soundcraft (audio),
   deckcraft (slides), artcraft and artcraft-services, and pdfcraft for drafting and editing
-  documents, which he says the app absolutely needs. Check each one's licence and what can be
-  reused.
+  documents, which he says the app absolutely needs. Licences checked 11 Oct: lightcraft,
+  photocraft and vectorcraft are MIT/Apache-2.0; artcraft and artcraft-services are the
+  "ArtCraft License (WIP)" (fair source: no selling it, no competing product, a fork can't strip
+  its community/donation/paid-model links). Ony's call: the Workbench is not a competing product,
+  so studying and porting from them is fine.
 
 ## Still open from the demos
 - Email, .mbox, .zip, video, audio and .xlsx files are read only through OpenAleph.
