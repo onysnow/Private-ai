@@ -6,6 +6,9 @@ from sqlalchemy.orm import Session
 from app.models.domain import Evidence, Source
 
 
+# The kinds of source the capture form offers (frontend features/source-capture).
+SOURCE_TYPES = ("web", "document", "interview", "public_record", "social", "other")
+
 def create_source(db: Session, payload: dict) -> Source:
     """Persist a new Source from a request payload already known to reference
     a valid, lockable Investigation (the caller handles the investigation-scoped

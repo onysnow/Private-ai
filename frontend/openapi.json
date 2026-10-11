@@ -26465,6 +26465,237 @@
         "title": "StyleWarningOut",
         "type": "object"
       },
+      "SuiteCoverageCountsOut": {
+        "properties": {
+          "app_lacks": {
+            "title": "App Lacks",
+            "type": "integer"
+          },
+          "close": {
+            "title": "Close",
+            "type": "integer"
+          },
+          "drifted": {
+            "title": "Drifted",
+            "type": "integer"
+          },
+          "none": {
+            "title": "None",
+            "type": "integer"
+          },
+          "same": {
+            "title": "Same",
+            "type": "integer"
+          },
+          "unmapped": {
+            "title": "Unmapped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "same",
+          "close",
+          "none",
+          "unmapped",
+          "app_lacks",
+          "drifted"
+        ],
+        "title": "SuiteCoverageCountsOut",
+        "type": "object"
+      },
+      "SuiteCoverageOut": {
+        "description": "Values the app needs that the suite does not define (close, none, unmapped) are\nproblems for the suite; what the suite requires that the app does not record are\nproblems for the app.",
+        "properties": {
+          "counts": {
+            "$ref": "#/components/schemas/SuiteCoverageCountsOut"
+          },
+          "mappings": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteMappingOut"
+            },
+            "title": "Mappings",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "suite_requires_app_lacks": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteRequirementOut"
+            },
+            "title": "Suite Requires App Lacks",
+            "type": "array"
+          },
+          "tas_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tas Version"
+          },
+          "unmapped": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteUnmappedOut"
+            },
+            "title": "Unmapped",
+            "type": "array"
+          }
+        },
+        "required": [
+          "source",
+          "tas_version",
+          "counts",
+          "mappings",
+          "unmapped",
+          "suite_requires_app_lacks"
+        ],
+        "title": "SuiteCoverageOut",
+        "type": "object"
+      },
+      "SuiteMappingOut": {
+        "properties": {
+          "file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "found": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Found"
+          },
+          "match": {
+            "enum": [
+              "same",
+              "close",
+              "none"
+            ],
+            "title": "Match",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "suite_term": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suite Term"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          },
+          "vocabulary": {
+            "title": "Vocabulary",
+            "type": "string"
+          },
+          "vocabulary_name": {
+            "title": "Vocabulary Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "vocabulary",
+          "vocabulary_name",
+          "value",
+          "suite_term",
+          "file",
+          "match",
+          "note",
+          "found"
+        ],
+        "title": "SuiteMappingOut",
+        "type": "object"
+      },
+      "SuiteRequirementOut": {
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "found": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Found"
+          },
+          "suite_term": {
+            "title": "Suite Term",
+            "type": "string"
+          },
+          "what": {
+            "title": "What",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "what",
+          "suite_term",
+          "file",
+          "why",
+          "found"
+        ],
+        "title": "SuiteRequirementOut",
+        "type": "object"
+      },
+      "SuiteUnmappedOut": {
+        "properties": {
+          "value": {
+            "title": "Value",
+            "type": "string"
+          },
+          "vocabulary": {
+            "title": "Vocabulary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "vocabulary",
+          "value"
+        ],
+        "title": "SuiteUnmappedOut",
+        "type": "object"
+      },
       "TableMappingIn": {
         "description": "A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,\nkeyed by a name the mapping uses to point one entity at another.",
         "properties": {
@@ -30114,6 +30345,45 @@
           }
         },
         "summary": "Review Ai Analysis Candidate Endpoint"
+      }
+    },
+    "/api/ai/suite-coverage": {
+      "get": {
+        "description": "Every value the app uses, matched to the Authority System Suite term that defines it;\nthe values the suite does not define, and what the suite requires that the app does not record.",
+        "operationId": "get_suite_coverage",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuiteCoverageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Suite Coverage"
       }
     },
     "/api/backups/inspect": {

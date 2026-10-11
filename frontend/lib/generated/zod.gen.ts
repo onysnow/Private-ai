@@ -5799,6 +5799,67 @@ export const zStyleWarningOut = z.object({
 });
 
 /**
+ * SuiteCoverageCountsOut
+ */
+export const zSuiteCoverageCountsOut = z.object({
+  app_lacks: z.number().int(),
+  close: z.number().int(),
+  drifted: z.number().int(),
+  none: z.number().int(),
+  same: z.number().int(),
+  unmapped: z.number().int(),
+});
+
+/**
+ * SuiteMappingOut
+ */
+export const zSuiteMappingOut = z.object({
+  file: z.string().nullable(),
+  found: z.boolean().nullable(),
+  match: z.enum(['same', 'close', 'none']),
+  note: z.string(),
+  suite_term: z.string().nullable(),
+  value: z.string(),
+  vocabulary: z.string(),
+  vocabulary_name: z.string(),
+});
+
+/**
+ * SuiteRequirementOut
+ */
+export const zSuiteRequirementOut = z.object({
+  file: z.string(),
+  found: z.boolean().nullable(),
+  suite_term: z.string(),
+  what: z.string(),
+  why: z.string(),
+});
+
+/**
+ * SuiteUnmappedOut
+ */
+export const zSuiteUnmappedOut = z.object({
+  value: z.string(),
+  vocabulary: z.string(),
+});
+
+/**
+ * SuiteCoverageOut
+ *
+ * Values the app needs that the suite does not define (close, none, unmapped) are
+ * problems for the suite; what the suite requires that the app does not record are
+ * problems for the app.
+ */
+export const zSuiteCoverageOut = z.object({
+  counts: zSuiteCoverageCountsOut,
+  mappings: z.array(zSuiteMappingOut),
+  source: z.string().nullable(),
+  suite_requires_app_lacks: z.array(zSuiteRequirementOut),
+  tas_version: z.string().nullable(),
+  unmapped: z.array(zSuiteUnmappedOut),
+});
+
+/**
  * TableMappingIn
  *
  * A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,
@@ -7244,6 +7305,11 @@ export const zReviewAiAnalysisCandidateEndpointPath = z.object({
  */
 export const zReviewAiAnalysisCandidateEndpointResponse =
   zAiAnalysisCandidateReviewOut;
+
+/**
+ * Successful Response
+ */
+export const zGetSuiteCoverageResponse = zSuiteCoverageOut;
 
 export const zInspectBackupBody = zBodyInspectBackup;
 

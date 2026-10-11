@@ -2608,3 +2608,6 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
   the list; it is listed in the PDF's decisions chapter.
 - Migration c6e1a9d4f2b7: investigations.question; claim_review_events.override_reason / unmet_rules;
   check_items.record_type / record_id / blocks / lead_id.
+- Suite coverage (same day): app/ai/suite_map.json maps 78 app values to suite terms (an agent read the suite;
+  every term string was then checked present in the vendored file). Adding a value to any of the vocabularies in
+  suite_map.app_vocabularies() without mapping it fails tests/test_suite_map.py; so does a stale SUITE_GAPS.md.

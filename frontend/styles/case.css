@@ -300,3 +300,25 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .done-unknown > span:first-child { color: var(--status-unshown); }
 .done-override { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; font-size: 12.5px; font-weight: 600; }
 .done-overridden { font-size: 12.5px; color: var(--accent-1); }
+
+/* Settings › Private AI: the app's values in the Authority System Suite (features/suite-coverage). */
+.sc { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.sc h3 { margin: 0; font: 650 16px var(--font-ui); }
+.sc-quiet { margin: 0; color: var(--text-muted); font-size: 13px; }
+.sc-counts { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.sc-counts li { padding: 8px 12px; border-radius: 12px; background: var(--surface-2); font-size: 12.5px; border-left: 3px solid var(--line); }
+.sc-counts b { font: 600 18px var(--font-display); margin-right: 6px; }
+.sc-counts .sc-none { border-left-color: var(--status-disputed); } .sc-counts .sc-close { border-left-color: var(--accent-1); }
+.sc-counts .sc-lacks { border-left-color: var(--accent-2); } .sc-counts .sc-same { border-left-color: var(--status-supported); }
+.sc details { border-radius: 12px; background: var(--surface-2); padding: 8px 12px; }
+.sc summary { cursor: pointer; font-weight: 600; font-size: 13.5px; }
+.sc-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 420px; overflow-y: auto; }
+.sc-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(180px, 1.4fr) minmax(220px, 2fr); gap: 10px; padding: 8px 10px; border-radius: 10px;
+  background: var(--surface-1); font-size: 12.5px; border-left: 3px solid var(--line); }
+.sc-row.sc-none { border-left-color: var(--status-disputed); } .sc-row.sc-close { border-left-color: var(--accent-1); }
+.sc-row.sc-lacks { border-left-color: var(--accent-2); } .sc-row.sc-same { border-left-color: var(--status-supported); }
+.sc-value, .sc-term { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sc-value small, .sc-term small { color: var(--text-muted); font-size: 11px; overflow-wrap: anywhere; }
+.sc-term code { font: 500 11.5px var(--font-mono); overflow-wrap: anywhere; color: var(--text); }
+.sc-note { color: var(--text-muted); line-height: 1.4; }
+@media (max-width: 860px) { .sc-row { grid-template-columns: 1fr; } }

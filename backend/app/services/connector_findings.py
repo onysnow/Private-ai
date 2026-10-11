@@ -10,6 +10,10 @@ from app.models.domain import ConnectorFinding, ResolutionDecision, StatementAss
 from app.schemas.api import ResolutionRequest, StatementAssessmentRequest
 
 
+# Is an outside record about our party, and what a person made of one of its values.
+FINDING_DECISIONS = ("positive", "negative", "unsure")
+STATEMENT_ASSESSMENTS = ("accepted", "conflicting", "outdated", "superseded", "unresolved")
+
 def update_finding_review_status(db: Session, row: ConnectorFinding, status: str) -> ConnectorFinding:
     """Set a ConnectorFinding's review_status. Raises ValueError for an
     unrecognized status."""
@@ -27,7 +31,7 @@ def create_resolution_decision(db: Session, finding: ConnectorFinding, body: Res
     review_status to match. Raises ValueError for a bad decision enum.
     The caller confirms the finding (and, if given, body.entity_id) exist
     -- a 404 concern."""
-    if body.decision not in {"positive", "negative", "unsure"}:
+    if body.decision not in FINDING_DECISIONS:
         raise ValueError("Decision must be positive, negative, or unsure")
     row = ResolutionDecision(
         investigation_id=finding.investigation_id, finding_id=finding.id, entity_id=body.entity_id,
@@ -51,7 +55,7 @@ def create_statement_assessment(db: Session, finding: ConnectorFinding, body: St
     """Persist a StatementAssessment for a finding. Raises ValueError for
     an unrecognized status. The caller confirms the finding (and, if
     given, body.entity_id) exist -- a 404 concern."""
-    allowed = {"accepted", "conflicting", "outdated", "superseded", "unresolved"}
+    allowed = STATEMENT_ASSESSMENTS
     if body.status not in allowed:
         raise ValueError(f"Status must be one of: {', '.join(sorted(allowed))}")
     row = StatementAssessment(

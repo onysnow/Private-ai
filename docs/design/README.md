@@ -56,6 +56,14 @@ The old `tas_spec` submodule is replaced by a vendored copy of the Authority Sys
   stops, goes when the value is filled in, and can be chased (a lead), marked unknowable, or not needed. Separate
   from Red Flags: a flag is a pattern; a missing value is a gap.
 
+- **The app's values in the suite** (`backend/app/ai/suite_map.py`, `suite_map.json`; Ony: "if there is a need for a
+  value that doesn't exist in the Authority system but needs to exist, that's a problem"): every value the app decides
+  with is matched to the suite term that defines it, read against the vendored suite: 7 defined, 63 defined only
+  nearly, 8 not defined; and 25 things the suite requires that the app does not record yet (source tier,
+  classification, likelihood term, right of reply, gap records…). Shown in Settings › Private AI; written out for the
+  suite's owner in `docs/authority-suite/SUITE_GAPS.md`. `tests/test_suite_map.py` fails when the app adds a value
+  without mapping it, or a suite update drops a mapped term.
+
 ## Next
 4. Bring in. 5. See. 6. Act. 7. The AI run view (neural paths). 8. Knowledge and safety. 9. Theme effects and
 formats. 10. The website. Each starts with mockups of what the PDF's screens did not cover.

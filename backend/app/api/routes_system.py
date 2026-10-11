@@ -23,6 +23,7 @@ from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AIAnalysisCandidate, Investigation, Source, StatementAssessment, TimelineEvent
 from app.schemas.responses import (
+    SuiteCoverageOut,
     AiAnalysisCandidateOut, AiAnalysisCandidateReviewOut, CapabilitiesOut, DeckOut, EvidenceOut, HealthOut,
     OpenAlephStatusOut, PresentationStyleCatalogOut, RelationshipSchemasOut, SearchOut, StatementPromotionOut,
     TimelineEventRowOut, WriteupOut,
@@ -52,6 +53,15 @@ from app.services.timeline import create_timeline_event, grade_timeline_event
 from app.services.writeups import serialize_writeup
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
+
+
+@router.get("/ai/suite-coverage", response_model=SuiteCoverageOut)
+def get_suite_coverage() -> Any:
+    """Every value the app uses, matched to the Authority System Suite term that defines it;
+    the values the suite does not define, and what the suite requires that the app does not record."""
+    from app.ai.suite_map import coverage
+
+    return coverage()
 
 
 @router.get("/health", response_model=HealthOut)

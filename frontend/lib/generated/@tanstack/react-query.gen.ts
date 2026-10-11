@@ -126,6 +126,7 @@ import {
   getSimilarDocuments,
   getSince,
   getStanding,
+  getSuiteCoverage,
   getTaggedRecords,
   getTags,
   getWatchlist,
@@ -594,6 +595,9 @@ import type {
   GetStandingData,
   GetStandingError,
   GetStandingResponse,
+  GetSuiteCoverageData,
+  GetSuiteCoverageError,
+  GetSuiteCoverageResponse,
   GetTaggedRecordsData,
   GetTaggedRecordsError,
   GetTaggedRecordsResponse,
@@ -1095,6 +1099,37 @@ export const reviewAiAnalysisCandidateEndpointMutation = (
   };
   return mutationOptions;
 };
+
+export const getSuiteCoverageQueryKey = (
+  options?: Options<GetSuiteCoverageData>,
+) => createQueryKey('getSuiteCoverage', options);
+
+/**
+ * Get Suite Coverage
+ *
+ * Every value the app uses, matched to the Authority System Suite term that defines it;
+ * the values the suite does not define, and what the suite requires that the app does not record.
+ */
+export const getSuiteCoverageOptions = (
+  options?: Options<GetSuiteCoverageData>,
+) =>
+  queryOptions<
+    GetSuiteCoverageResponse,
+    GetSuiteCoverageError,
+    GetSuiteCoverageResponse,
+    ReturnType<typeof getSuiteCoverageQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSuiteCoverage({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSuiteCoverageQueryKey(options),
+  });
 
 /**
  * Inspect Backup

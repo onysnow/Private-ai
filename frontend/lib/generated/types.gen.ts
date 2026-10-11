@@ -13271,6 +13271,145 @@ export type StyleWarningOut = {
 };
 
 /**
+ * SuiteCoverageCountsOut
+ */
+export type SuiteCoverageCountsOut = {
+  /**
+   * App Lacks
+   */
+  app_lacks: number;
+  /**
+   * Close
+   */
+  close: number;
+  /**
+   * Drifted
+   */
+  drifted: number;
+  /**
+   * None
+   */
+  none: number;
+  /**
+   * Same
+   */
+  same: number;
+  /**
+   * Unmapped
+   */
+  unmapped: number;
+};
+
+/**
+ * SuiteCoverageOut
+ *
+ * Values the app needs that the suite does not define (close, none, unmapped) are
+ * problems for the suite; what the suite requires that the app does not record are
+ * problems for the app.
+ */
+export type SuiteCoverageOut = {
+  counts: SuiteCoverageCountsOut;
+  /**
+   * Mappings
+   */
+  mappings: Array<SuiteMappingOut>;
+  /**
+   * Source
+   */
+  source: string | null;
+  /**
+   * Suite Requires App Lacks
+   */
+  suite_requires_app_lacks: Array<SuiteRequirementOut>;
+  /**
+   * Tas Version
+   */
+  tas_version: string | null;
+  /**
+   * Unmapped
+   */
+  unmapped: Array<SuiteUnmappedOut>;
+};
+
+/**
+ * SuiteMappingOut
+ */
+export type SuiteMappingOut = {
+  /**
+   * File
+   */
+  file: string | null;
+  /**
+   * Found
+   */
+  found: boolean | null;
+  /**
+   * Match
+   */
+  match: 'same' | 'close' | 'none';
+  /**
+   * Note
+   */
+  note: string;
+  /**
+   * Suite Term
+   */
+  suite_term: string | null;
+  /**
+   * Value
+   */
+  value: string;
+  /**
+   * Vocabulary
+   */
+  vocabulary: string;
+  /**
+   * Vocabulary Name
+   */
+  vocabulary_name: string;
+};
+
+/**
+ * SuiteRequirementOut
+ */
+export type SuiteRequirementOut = {
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Found
+   */
+  found: boolean | null;
+  /**
+   * Suite Term
+   */
+  suite_term: string;
+  /**
+   * What
+   */
+  what: string;
+  /**
+   * Why
+   */
+  why: string;
+};
+
+/**
+ * SuiteUnmappedOut
+ */
+export type SuiteUnmappedOut = {
+  /**
+   * Value
+   */
+  value: string;
+  /**
+   * Vocabulary
+   */
+  vocabulary: string;
+};
+
+/**
  * TableMappingIn
  *
  * A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,
@@ -15316,6 +15455,37 @@ export type ReviewAiAnalysisCandidateEndpointResponses = {
 
 export type ReviewAiAnalysisCandidateEndpointResponse =
   ReviewAiAnalysisCandidateEndpointResponses[keyof ReviewAiAnalysisCandidateEndpointResponses];
+
+export type GetSuiteCoverageData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/ai/suite-coverage';
+};
+
+export type GetSuiteCoverageErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSuiteCoverageError =
+  GetSuiteCoverageErrors[keyof GetSuiteCoverageErrors];
+
+export type GetSuiteCoverageResponses = {
+  /**
+   * Successful Response
+   */
+  200: SuiteCoverageOut;
+};
+
+export type GetSuiteCoverageResponse =
+  GetSuiteCoverageResponses[keyof GetSuiteCoverageResponses];
 
 export type InspectBackupData = {
   body: BodyInspectBackup;

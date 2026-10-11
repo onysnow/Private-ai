@@ -363,6 +363,9 @@ import type {
   GetStandingData,
   GetStandingErrors,
   GetStandingResponses,
+  GetSuiteCoverageData,
+  GetSuiteCoverageErrors,
+  GetSuiteCoverageResponses,
   GetTaggedRecordsData,
   GetTaggedRecordsErrors,
   GetTaggedRecordsResponses,
@@ -970,6 +973,7 @@ import {
   zGetSinceResponse,
   zGetStandingPath,
   zGetStandingResponse,
+  zGetSuiteCoverageResponse,
   zGetTaggedRecordsPath,
   zGetTaggedRecordsResponse,
   zGetTagsPath,
@@ -1410,6 +1414,38 @@ export const reviewAiAnalysisCandidateEndpoint = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Suite Coverage
+ *
+ * Every value the app uses, matched to the Authority System Suite term that defines it;
+ * the values the suite does not define, and what the suite requires that the app does not record.
+ */
+export const getSuiteCoverage = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSuiteCoverageData, ThrowOnError>,
+): RequestResult<
+  GetSuiteCoverageResponses,
+  GetSuiteCoverageErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetSuiteCoverageResponses,
+    GetSuiteCoverageErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSuiteCoverageResponse.parseAsync(data),
+    url: '/api/ai/suite-coverage',
+    ...options,
   });
 
 /**

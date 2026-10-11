@@ -25,6 +25,8 @@ from sqlalchemy.orm import Session
 from app.models.domain import Claim, ClaimEvidenceLink, Document, DocumentChunk, Evidence, Source
 
 DONE_STATUSES = {"supported", "confirmed"}
+# Every rule's key, in the order shown; "independent" is Confirmed's alone.
+DONE_RULES = ("supporting", "says_it", "locator", "file", "contradictions", "not_leads_only", "independent")
 # Sources the suite keeps as leads only (Tier E/F): they never carry a claim alone.
 LEADS_ONLY = {"social"}
 PRIMARY_OFFICIAL = {"public_record"}

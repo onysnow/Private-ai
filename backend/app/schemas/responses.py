@@ -4300,3 +4300,50 @@ class CaseSinceOut(ResponseModel):
     investigation_id: str
     after: Timestamp
     changes: list[CaseChangeOut]
+
+
+# --- The app's values against the Authority System Suite (app/ai/suite_map.py) -----------------
+
+class SuiteMappingOut(ResponseModel):
+    vocabulary: str
+    vocabulary_name: str
+    value: str
+    suite_term: str | None
+    file: str | None
+    match: Literal["same", "close", "none"]
+    note: str
+    found: bool | None  # the term is still in the vendored suite; null when there is no term
+
+
+class SuiteUnmappedOut(ResponseModel):
+    vocabulary: str
+    value: str
+
+
+class SuiteRequirementOut(ResponseModel):
+    what: str
+    suite_term: str
+    file: str
+    why: str
+    found: bool | None
+
+
+class SuiteCoverageCountsOut(ResponseModel):
+    same: int
+    close: int
+    none: int
+    unmapped: int
+    app_lacks: int
+    drifted: int
+
+
+class SuiteCoverageOut(ResponseModel):
+    """Values the app needs that the suite does not define (close, none, unmapped) are
+    problems for the suite; what the suite requires that the app does not record are
+    problems for the app."""
+    source: str | None
+    tas_version: str | None
+    counts: SuiteCoverageCountsOut
+    mappings: list[SuiteMappingOut]
+    unmapped: list[SuiteUnmappedOut]
+    suite_requires_app_lacks: list[SuiteRequirementOut]
