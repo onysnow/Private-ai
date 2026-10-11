@@ -32,8 +32,9 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
     judgments, rebuilt emails, a .docx and a spreadsheet;
   - its records gained coordinates, IDs, PEP status, six currencies, graded claims, disputed
     links, ranged dates and merge candidates;
-  - four small real cases: Anise (structuring), Vekselberg (shell chains), Deripaska
-    (sanctions, shared address) and Jardine (ownership loop).
+  - three small real cases: Anise (structuring), Vekselberg (shell chains) and Deripaska
+    (sanctions, shared address). Jardine (ownership loop) was removed as a case and kept for
+    the tutorial in `TUTORIAL_NOTES.md`; the tutorial will be built on the 1MDB demo.
 - **Fixes:**
   - a scanned page with a filing stamp is now OCR'd;
   - BO-032 matches an address written two ways;

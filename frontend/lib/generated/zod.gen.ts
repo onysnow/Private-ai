@@ -7804,7 +7804,6 @@ export const zGetDemoCasePath = z.object({
     'us-v-anise-structuring',
     'vekselberg-shell-network',
     'deripaska-en-rusal',
-    'jardine-cross-holding',
   ]),
 });
 
@@ -7818,7 +7817,6 @@ export const zLoadDemoCasePath = z.object({
     'us-v-anise-structuring',
     'vekselberg-shell-network',
     'deripaska-en-rusal',
-    'jardine-cross-holding',
   ]),
 });
 

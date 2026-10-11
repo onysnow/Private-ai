@@ -17179,8 +17179,7 @@ export type GetDemoCaseData = {
     case_id:
       | 'us-v-anise-structuring'
       | 'vekselberg-shell-network'
-      | 'deripaska-en-rusal'
-      | 'jardine-cross-holding';
+      | 'deripaska-en-rusal';
   };
   query?: never;
   url: '/api/demo/cases/{case_id}';
@@ -17218,8 +17217,7 @@ export type LoadDemoCaseData = {
     case_id:
       | 'us-v-anise-structuring'
       | 'vekselberg-shell-network'
-      | 'deripaska-en-rusal'
-      | 'jardine-cross-holding';
+      | 'deripaska-en-rusal';
   };
   query?: never;
   url: '/api/demo/cases/{case_id}';

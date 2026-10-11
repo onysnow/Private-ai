@@ -40147,8 +40147,7 @@
               "enum": [
                 "us-v-anise-structuring",
                 "vekselberg-shell-network",
-                "deripaska-en-rusal",
-                "jardine-cross-holding"
+                "deripaska-en-rusal"
               ],
               "title": "Case Id",
               "type": "string"
@@ -40201,8 +40200,7 @@
               "enum": [
                 "us-v-anise-structuring",
                 "vekselberg-shell-network",
-                "deripaska-en-rusal",
-                "jardine-cross-holding"
+                "deripaska-en-rusal"
               ],
               "title": "Case Id",
               "type": "string"

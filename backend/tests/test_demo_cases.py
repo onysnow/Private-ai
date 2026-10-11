@@ -66,27 +66,13 @@ def test_the_records_hang_together(case_id):
     assert "real case" in case["investigation"]["name"].lower()
 
 
-def test_only_the_jardine_record_holds_an_ownership_loop():
-    """BO-001's one real case is the Jardine cross-holding, and its loop is the
-    two links the judgment states; no other case is made to describe one."""
+def test_no_case_holds_an_ownership_loop():
+    """The ownership loop (BO-001) is kept for the tutorial, not as a case
+    (Ony, 11 Oct 2026), so no case may be made to describe one."""
     import networkx as nx
     for case_id in demo_cases.CASE_IDS:
         g = nx.DiGraph([(r["source"], r["target"]) for r in demo_cases.records(case_id)["relationships"] if r["schema"] == "Ownership"])
-        if case_id == "jardine-cross-holding":
-            assert sorted(sorted(c) for c in nx.simple_cycles(g)) == [["jardine-matheson", "jardine-strategic"]]
-        else:
-            assert nx.is_directed_acyclic_graph(g), case_id
-
-
-def test_the_jardine_loop_is_the_judgments_two_holdings():
-    case = demo_cases.records("jardine-cross-holding")
-    links = {(r["source"], r["target"]): r for r in case["relationships"]}
-    there, back = links[("jardine-matheson", "jardine-strategic")], links[("jardine-strategic", "jardine-matheson")]
-    assert there["properties"]["percentage"] == ["84.9"] and "84.9% of the shares in the Company" in there["evidence"][0]["quote"]
-    assert back["properties"]["percentage"] == ["59.3"] and "59.3% of the shares in Jardine Matheson" in back["evidence"][0]["quote"]
-    # "the Company" in the judgment is Jardine Strategic Holdings Limited.
-    strategic = next(e for e in case["entities"] if e["key"] == "jardine-strategic")
-    assert "Jardine Strategic Holdings Limited (“the Company”)" in strategic["evidence"][0]["quote"]
+        assert nx.is_directed_acyclic_graph(g), case_id
 
 
 def test_the_anise_deposits_are_the_indictments():
@@ -167,16 +153,6 @@ def test_deripaska_raises_shared_address_however_it_is_written(tmp_path):
     assert moscow["facts"]["spellings"] == ["1 Vasilisy Kozhinoy Street, Moscow 121096, Russia", "1 Vasilisy Kozhinoy Str., Moscow 121096, Russia"]
     assert "also written “1 Vasilisy Kozhinoy Str., Moscow 121096, Russia”" in moscow["summary"]
     assert set(_counts(flags)) == {"BO-032"}
-
-
-def test_jardine_raises_the_ownership_loop(tmp_path):
-    flags = _load("jardine-cross-holding", tmp_path)
-    loops = [f for f in flags["flags"] if f["indicator_id"] == "BO-001"]
-    assert len(loops) == 1
-    assert sorted(loops[0]["facts"]["loop"]) == ["Jardine Matheson Holdings Limited", "Jardine Strategic Holdings Limited"]
-    assert loops[0]["facts"]["parties_in_loop"] == 2
-    assert {p["name"] for p in loops[0]["parties"]} == {"Jardine Matheson Holdings Limited", "Jardine Strategic Holdings Limited"}
-    assert set(_counts(flags)) == {"BO-001"}
 
 
 def test_the_routes_list_and_follow_each_case(tmp_path):

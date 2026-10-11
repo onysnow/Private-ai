@@ -32,9 +32,8 @@ Ony: "how the hell are we supposed to test everything if we don't HAVE everythin
   - payments in USD and EUR.
 - **deripaska-en-rusal** (OFAC notice, Treasury letter to Congress): sanctions, PEPs and ownership percentages.
   - BO-032 for the Jersey address written two ways and a Moscow address written three ways.
-- **jardine-cross-holding** (Supreme Court of Bermuda judgment, 12 Nov 2021):
-  - Jardine Matheson owns about 84.9% of Jardine Strategic, which owns 59.3% back;
-  - raises BO-001.
+- **Jardine (BO-001, ownership loop):** removed as a case on 11 Oct; Ony doesn't want a demo for
+  one indicator. Its record is kept for the tutorial in TUTORIAL_NOTES.md.
 
 ## Still not covered
 - **File formats:** email, .mbox, .zip, video, audio and .xlsx are read only through OpenAleph. Without it, 20 documents end as "failed"; the email headers are pre-filled on each source.
