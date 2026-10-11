@@ -133,6 +133,19 @@ def _parties(ids: list[str], names: dict[str, tuple[str, str]]) -> list[dict[str
     return [{"id": p, "name": names.get(p, (p, ""))[0], "schema": names.get(p, ("", "Thing"))[1]} for p in ids]
 
 
+def _with_parties(question: str, ids: list[str], names: dict[str, tuple[str, str]]) -> str:
+    """A checklist question names the parties it is about: one flag kind fires on
+    several groups, and without names their items read the same. Found on the
+    1MDB case: three "Was there a business reason for the payments?" items, one
+    per group of companies."""
+    who = [names[p][0] for p in ids if p in names][:3]
+    if not who or not question.endswith("?"):
+        return question
+    more = len([p for p in ids if p in names]) - len(who)
+    listed = ", ".join(who[:-1]) + f" and {who[-1]}" if len(who) > 1 else who[0]
+    return f"{question[:-1]} ({listed}{f' and {more} more' if more > 0 else ''})?"
+
+
 def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
     from app.patterns.checks import as_question
     from app.patterns.engine import _name
@@ -156,7 +169,7 @@ def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
                         "excerpt": r.excerpt, "terms": list(r.terms or [])}
         path = f"/api/checks/{r.id}/decide"
         out.append({
-            "kind": "to_check", "id": r.id, "question": as_question(r.question) if r.kind == "checklist" else r.question,
+            "kind": "to_check", "id": r.id, "question": _with_parties(as_question(r.question), list(r.parties), names) if r.kind == "checklist" else r.question,
             "actor": "Red Flags", "actor_kind": "app",
             "created_at": r.first_seen_at, "rank": 100 * LEVEL_RANK.get(level or "", 0) + (20 if r.kind == "passage" else 10),
             "reason": reason, "level": level,
@@ -201,6 +214,17 @@ def _missing(db: Session, inv: str) -> list[dict[str, Any]]:
 
 
 PROPOSAL_RANK = {"claim": 60, "relationship": 55, "entity": 50, "evidence": 45, "identifier": 40}
+
+
+def mentioned(payload: dict[str, Any]) -> str:
+    """How often a proposal's name or sentence comes up in its document: " ·
+    mentioned 146 times on 120 pages". Empty for a single mention."""
+    count = int(payload.get("mention_count") or 1)
+    if count < 2:
+        return ""
+    places = {str(m.get("locator")) for m in payload.get("mentions") or [] if isinstance(m, dict)}
+    more = "+" if len(payload.get("mentions") or []) < count else ""
+    return f" · mentioned {count} times on {len(places)}{more} {'page' if len(places) == 1 else 'pages'}"
 
 
 def around(text: str, start: int, end: int, before: int = 160, after: int = 260) -> str:
@@ -265,7 +289,7 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
         item: dict[str, Any] = {
             "kind": "proposal", "id": r.id, "actor": "Name-finder" if r.candidate_type in ("entity", "identifier") else "Document reader",
             "actor_kind": "app", "created_at": r.created_at, "rank": PROPOSAL_RANK.get(r.candidate_type, 30), "level": None,
-            "reason": f"Proposed from {docs.get(r.document_id, 'a document')} · confidence {band} ({r.confidence:.2f})",
+            "reason": f"Proposed from {docs.get(r.document_id, 'a document')}{mentioned(p)} · confidence {band} ({r.confidence:.2f})",
             "group": {"key": f"doc:{r.document_id}", "label": docs.get(r.document_id, r.document_id)},
             "evidence": {"document_id": r.document_id, "filename": docs.get(r.document_id, r.document_id),
                          "locator": (chunk.locator if chunk else p.get("locator")), "excerpt": quote,

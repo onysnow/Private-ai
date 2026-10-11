@@ -164,8 +164,14 @@ def test_the_investigation_type_comes_from_flags_and_records_and_the_reporter_ca
     areas = {x["key"]: x for x in kind["areas"]}
     assert "Red Flag: Circular ownership (BO-001)" in areas["BO"]["reasons"]
     assert kind["areas"][0]["key"] == "BO", "areas with a Red Flag come first"
-    assert any(r.startswith("Records hold Vessel") for r in areas["SF"]["reasons"]), "a kind that says something about the case counts"
-    assert not any("Company" in r or "Ownership" in r for x in kind["areas"] for r in x["reasons"]), "kinds most areas need point nowhere"
+    offered = {x["key"]: x for x in kind["suggested"]}
+    assert any(r.startswith("Records hold Vessel") for r in offered["SF"]["reasons"]), "a kind that says something about the case is offered"
+    assert "SF" not in areas, "but with Red Flags in the case, the flags choose (1MDB: one yacht chose Pollution)"
+    assert not any("Company" in r or "Ownership" in r for x in kind["suggested"] for r in x["reasons"]), "kinds most areas need point nowhere"
+    # With no flags yet, the kinds of records choose.
+    bare = _inv("Fleet, no flags")
+    _party(bare, "MV Other", "Vessel")
+    assert "SF" in {x["key"] for x in _flags(bare)["investigation_type"]["areas"]}
 
     chosen = ok(client.put(f"/api/investigations/{inv}/type", json={"areas": ["OC", "ML", "OC"]}))
     assert chosen.pop("suggested") == kind["suggested"], "the app's picks stay on offer"

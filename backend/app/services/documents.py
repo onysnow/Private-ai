@@ -13,7 +13,7 @@ from app.services.resolution import BASIS_SAME, candidate_entities
 from app.services.pdf_ocr import extract_pdf_chunks
 from app.services.image_reader import IMAGE_EXTENSIONS, extract_image_chunks
 from app.services.document_reader import read_chunks
-from app.services.entity_signals import norm_name, read_name, read_passage, split_title
+from app.services.entity_signals import clean_names, norm_name, read_name, read_passage, split_title
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
 from app.jobs.corpus import request_corpus_sync
@@ -135,16 +135,18 @@ def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True,
         return
     seen=set()
     for match in NAME_RE.finditer(text):
-        caption, title_chars = split_title(match.group(1).strip(' .,:;'))
-        start = match.start(1) + title_chars
-        if len(caption) < 5 or caption in seen: continue
-        seen.add(caption)
-        reading = read_name(caption, text[:start], existing)
-        payload = {'caption': caption, 'suggested_schema': reading.schema, 'span': {'start_char': start, 'end_char': start + len(caption)},
-                   'rationale': reading.rationale()}
-        if reading.choices:
-            payload['schema_choices'] = reading.choices
-        yield ('entity', payload, reading.confidence)
+        for found, offset, stop in clean_names(match.group(1)):
+            caption, title_chars = split_title(found)
+            start = match.start(1) + offset + title_chars
+            if len(caption) < 5 or caption in seen:
+                continue
+            seen.add(caption)
+            reading = read_name(caption, text[:start], existing)
+            payload = {'caption': caption, 'suggested_schema': reading.schema,
+                       'span': {'start_char': start, 'end_char': match.start(1) + stop}, 'rationale': reading.rationale()}
+            if reading.choices:
+                payload['schema_choices'] = reading.choices
+            yield ('entity', payload, reading.confidence)
 
 
 def store_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path,
@@ -209,6 +211,20 @@ def store_document(db: Session, *, investigation_id: str, title: str, filename: 
             pass
 
 
+MAX_MENTIONS_KEPT = 500  # places kept per proposal; the count goes on past it
+
+
+def _once_key(typ: str, payload: dict) -> tuple[str, str] | None:
+    """What makes two proposals in one document the same thing to decide: the
+    same name (as the name-matcher compares names), or the same claim sentence.
+    Passages are each their own page and are not folded."""
+    if typ == 'entity' and payload.get('caption'):
+        return ('entity', norm_name(str(payload['caption'])))
+    if typ == 'claim' and payload.get('text'):
+        return ('claim', re.sub(r"\s+", " ", str(payload['text'])).strip().lower())
+    return None
+
+
 def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], list[str]] | None = None,
                      find_names: bool = True) -> Document | None:
     """Turn a stored document into locator-preserving chunks and proposals.
@@ -245,6 +261,9 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
         Entity.investigation_id == doc.investigation_id, Entity.merged_into_entity_id.is_(None)))}
     try:
         chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
+        # One proposal per name (and per claim sentence) in a document, with every place it is
+        # mentioned: a name on 146 pages is one thing to decide, mentioned 146 times.
+        once: dict[tuple[str, str], ExtractionCandidate] = {}
         for ordinal, raw in enumerate(chunks, 1):
             item = dict(raw)
             provenance = item.pop('provenance', None)
@@ -254,7 +273,20 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
                                                           existing=existing):
                 if provenance:
                     payload = {**payload, 'provenance': provenance}
-                db.add(ExtractionCandidate(investigation_id=doc.investigation_id, document_id=doc.id, chunk_id=chunk.id, candidate_type=typ, payload=payload, confidence=conf))
+                key = _once_key(typ, payload)
+                mention = {'chunk_id': chunk.id, 'locator': chunk.locator, 'span': payload.get('span')}
+                if key is not None and key in once:
+                    first = once[key]
+                    mentions = [*first.payload.get('mentions', []), mention][:MAX_MENTIONS_KEPT]
+                    first.payload = {**first.payload, 'mentions': mentions, 'mention_count': int(first.payload.get('mention_count', 1)) + 1}
+                    first.confidence = max(first.confidence, conf)
+                    continue
+                if key is not None:
+                    payload = {**payload, 'mentions': [mention], 'mention_count': 1}
+                row = ExtractionCandidate(investigation_id=doc.investigation_id, document_id=doc.id, chunk_id=chunk.id, candidate_type=typ, payload=payload, confidence=conf)
+                db.add(row)
+                if key is not None:
+                    once[key] = row
         doc.extraction_status = 'complete'
         doc.extraction_issues = issues or None
         db.commit()
@@ -566,6 +598,16 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
         # proposal becomes a Workbench entity; provider resolution metadata is
         # not treated as a canonical identity decision.
         db.add(Statement(entity_id=entity_record.id, prop='name', value=cap, dataset=dataset, origin=statement_origin, original_value=cap))
+        # Every other place the document names it, one statement per mention: the one record carries
+        # all its mentions in this document, so each can be traced (extract_document folds them).
+        seen_places = {statement_origin}
+        for m in (candidate.payload.get('mentions') or [])[1:]:
+            m_span = m.get('span') if isinstance(m, dict) else None
+            suffix = f"@chars:{m_span['start_char']}-{m_span['end_char']}" if isinstance(m_span, dict) and isinstance(m_span.get('start_char'), int) else ''
+            place = f"document:{doc.id}#{m.get('locator') or 'document'}{suffix}"
+            if place not in seen_places:
+                seen_places.add(place)
+                db.add(Statement(entity_id=entity_record.id, prop='name', value=cap, dataset=dataset, origin=place, original_value=cap))
         if entity_identity_decision == 'different' and matched is not None:
             from app.services.resolution import record_canonical_resolution
             # Record the reporter's explicit negative identity decision without auto-merging.

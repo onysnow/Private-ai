@@ -185,3 +185,12 @@ def test_a_proposal_shows_the_passage_around_it_not_the_top_of_the_page():
     assert "The Company acknowledges and agrees to the filing." in shown
     assert shown.startswith("… ") and shown.endswith(" …") and len(shown) < 520
     assert around("A short page.", 2, 7) == "A short page."
+
+
+def test_a_checklist_question_names_its_parties():
+    from app.services.case_home import _with_parties
+    names = {"a": ("Granton", "Company"), "b": ("Tanore", "Company"), "c": ("Tan Kim Loong", "Person"), "d": ("Blackstone", "Company")}
+    q = "Was there a business reason for the payments?"
+    assert _with_parties(q, ["a", "b", "c"], names) == "Was there a business reason for the payments (Granton, Tanore and Tan Kim Loong)?"
+    assert _with_parties(q, ["a", "b", "c", "d"], names).endswith("(Granton, Tanore and Tan Kim Loong and 1 more)?")
+    assert _with_parties(q, [], names) == q

@@ -16,6 +16,13 @@ the app chooses).
    Vessel to sanctions evasion. Share = the area's verified indicators whose
    data needed names the kind. MAX_SHARE_OF_AREAS, MIN_SHARE and NEAR are design
    choices, not published figures; the reason shown gives the share.
+
+A kind of record alone only suggests an area; it does not choose it when Red
+Flags have already chosen some. Found on the 1MDB case: one Vessel record (a
+yacht bought with the money) chose "Pollution" and "Terrorist financing and
+sanctions evasion". The app chooses the areas its flags point to; the kinds
+of records choose only while there are no flags, and are otherwise offered
+as "could also be".
 """
 
 from __future__ import annotations
@@ -106,7 +113,8 @@ def current(db: Session, investigation: Investigation) -> dict[str, Any]:
     if investigation.type_areas is not None:
         return {"set_by": "reporter", "suggested": picks,
                 "areas": [{"key": a, "name": names.get(a, a), "reasons": ["Chosen by the reporter"]} for a in investigation.type_areas]}
-    return {"set_by": "app", "areas": picks, "suggested": picks}
+    flagged = [a for a in picks if any(r.startswith("Red Flag") for r in a["reasons"])]
+    return {"set_by": "app", "areas": flagged or picks, "suggested": picks}
 
 
 def set_areas(db: Session, investigation: Investigation, areas: list[str] | None) -> None:

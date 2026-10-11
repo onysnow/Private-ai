@@ -137,3 +137,72 @@ def read_passage(text: str) -> tuple[float, dict]:
     if len(clean.split()) < SHORT_WORDS:
         return SHORT_PASSAGE, {"rule": "whole_chunk", "signal": "short_passage", "words": len(clean.split())}
     return WHOLE_PASSAGE, {"rule": "whole_chunk"}
+
+
+# --- Cleaning what the capitalised-words pattern takes in -------------------------------------
+# Found on the 1MDB case (13,337 name proposals from 9 documents): the pattern ran across
+# sentence ends ("United States. As"), "and" ("TAN and Tanore"), line breaks
+# ("Red \nGranite Pictures. For") and headings ("Section VI").
+
+ABBREVIATION = re.compile(r"^(?:[A-Z]\.)+$|^(?:Inc|Ltd|Co|Corp|Mr|Mrs|Ms|Dr|St|Jr|Sr|No|Bhd|Pte|Ave|N\.W|S\.A|S\.p\.A)\.$")
+EDGE_WORDS = {"and", "of", "the", "&", "as", "for", "that", "despite", "in", "on", "at", "by", "to", "if", "when", "while", "after",
+              "before", "during", "from", "with", "under", "pursuant", "hi", "dear", "okay", "ah", "so", "but", "then", "this", "these",
+              "those", "his", "her", "its", "their", "our", "a", "an"}
+KEEP_LEADING = {"the"}  # "The Park Lane Hotel"
+HEADING_WORDS = {"section", "page", "paragraph", "count", "exhibit", "title", "chapter", "part", "article", "schedule", "attachment", "table"}
+ROMAN = re.compile(r"^[IVXLC]+$")
+# A heading in capitals reads like a sentence: it has a verb or a joining word inside it.
+HEADING_INSIDE = {"the", "through", "for", "were", "was", "is", "are", "also", "including", "using", "with", "from", "to", "by", "in", "on",
+                  "into", "as", "at", "that", "which"}
+NAME_ENDINGS_OK = {"united", "limited", "incorporated", "associated", "unlimited", "consolidated", "holding", "trading", "banking",
+                   "family", "italy", "germany", "sicily"}
+
+
+def _heading_in_capitals(words: list[str]) -> bool:
+    if len(words) < 2 or not all(w.isupper() or not any(ch.isalpha() for ch in w) for w in words):
+        return False
+    lowered = [w.lower().strip(".,:;") for w in words]
+    if any(w in HEADING_INSIDE for w in lowered[1:-1]):
+        return True
+    return any(w.endswith(("ed", "ly", "ing")) and w not in NAME_ENDINGS_OK and len(w) > 4 for w in lowered)
+
+
+def clean_names(raw: str) -> list[tuple[str, int, int]]:
+    """The names in a run of capitalised words, each with where it starts and
+    ends in the run (the run's own characters, line breaks and all).
+    Cuts at a sentence end, splits at "and", drops function words at either
+    edge, collapses line breaks, and drops headings and single words."""
+    words = [(m.group(0), m.start()) for m in re.finditer(r"\S+", raw)]
+    by_line = raw.count("\n") >= 2  # a column of a table, one cell per line: each line its own name
+    parts: list[list[tuple[str, int]]] = [[]]
+    for i, (word, at) in enumerate(words):
+        if by_line and i and "\n" in raw[words[i - 1][1]:at]:
+            parts.append([])
+        if word.lower() == "and":
+            parts.append([])
+            continue
+        parts[-1].append((word, at))
+        ends_sentence = word.endswith((".", "!", "?", ";", ":")) and not ABBREVIATION.match(word)
+        if ends_sentence and i + 1 < len(words):
+            parts[-1][-1] = (word.rstrip(".!?;:"), at)
+            parts.append([])
+    out = []
+    for part in parts:
+        while part and part[-1][0].lower().strip(".,") in EDGE_WORDS:
+            part = part[:-1]
+        while part and part[0][0].lower() in EDGE_WORDS and part[0][0].lower() not in KEEP_LEADING:
+            part = part[1:]
+        if len(part) < 2 or part[0][0].lower() == "the" and len(part) < 3:
+            continue
+        if part[0][0].lower() in HEADING_WORDS and (ROMAN.match(part[-1][0]) or part[-1][0][:1].isdigit()):
+            continue
+        if not part[-1][0][:1].isupper() and not part[-1][0][:1].isdigit():
+            continue
+        if _heading_in_capitals([w for w, _ in part]):
+            continue
+        if re.search(r"['’]s$", part[-1][0]):  # "Brazen Sky’s" is Brazen Sky
+            part = [*part[:-1], (re.sub(r"['’]s$", "", part[-1][0]), part[-1][1])]
+        caption = " ".join(w for w, _ in part).strip(" .,:;")
+        last_word, last_at = part[-1]
+        out.append((caption, part[0][1], last_at + len(last_word.rstrip(" .,:;"))))
+    return out
