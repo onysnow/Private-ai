@@ -13,6 +13,7 @@ import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 import {AppearancePanel} from '../../features/appearance/appearance-panel';
 import {SuiteCoverage} from '../../features/suite-coverage/suite-coverage';
+import {DemoCasesLoader} from '../../features/demo/demo-cases-loader';
 import {OneMdbLoader} from '../../features/demo/one-mdb-loader';
 
 // Phase 1 scope: the bearer-token API access card only, reusing the shared
@@ -294,6 +295,17 @@ function Settings(): ReactElement {
           A real case to look around
         </h2>
         <OneMdbLoader/>
+      </div>
+
+      <div className="mt-8 rounded-xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
+          Small real cases for the red flags
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Three closed public cases, each loaded as its own investigation, that show red flags the 1MDB case does not:
+          deposits just under $10,000, long chains of shell companies, and one address shared by unlinked companies.
+        </p>
+        <DemoCasesLoader/>
       </div>
 
       <div className="mt-8 rounded-xl border border-border bg-card p-5">

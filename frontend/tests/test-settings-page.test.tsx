@@ -21,8 +21,8 @@ const LIST = 'GET /api/investigations';
 const DEMO = investigationRecord({id: 'inv-demo', name: 'Demo Investigation', is_demo: true});
 const CASE = investigationRecord({id: 'inv-1', name: 'Harbor contracts'});
 
-/** The 1MDB loader on Settings asks how far that case has got; it is not loaded here. */
-const ONE_MDB = {'GET /api/demo/1mdb': {state: 'idle', not_downloaded: []}};
+/** The 1MDB loader and the small real cases on Settings ask how far each has got; none is loaded here. */
+const ONE_MDB = {'GET /api/demo/1mdb': {state: 'idle', not_downloaded: []}, 'GET /api/demo/cases': []};
 
 async function renderSettings(routes: Routes) {
   const api = mockApi({...ONE_MDB, ...routes});

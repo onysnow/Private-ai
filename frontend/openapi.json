@@ -12569,8 +12569,59 @@
         "title": "DeletionUnsafePath",
         "type": "object"
       },
+      "DemoCaseOut": {
+        "description": "One of the small real demo cases (app/services/demo_cases.py), before and after it is loaded.",
+        "properties": {
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "documents": {
+            "title": "Documents",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/DemoCaseProgressOut"
+          },
+          "publishers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Publishers",
+            "type": "array"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "question",
+          "description",
+          "documents",
+          "bytes",
+          "publishers",
+          "progress"
+        ],
+        "title": "DemoCaseOut",
+        "type": "object"
+      },
       "DemoCaseProgressOut": {
-        "description": "The 1MDB demo case (app/services/demo_1mdb.py): loading, reading or ready.",
+        "description": "A demo case (the 1MDB case, app/services/demo_1mdb.py, or one of the small\nreal cases, app/services/demo_cases.py): loading, reading or ready.",
         "properties": {
           "claims": {
             "anyOf": [
@@ -40038,6 +40089,157 @@
           }
         },
         "summary": "Load 1Mdb"
+      }
+    },
+    "/api/demo/cases": {
+      "get": {
+        "description": "The small real cases that can be loaded, each with how far it is loaded.",
+        "operationId": "list_demo_cases",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DemoCaseOut"
+                  },
+                  "title": "Response List Demo Cases",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Demo Cases"
+      }
+    },
+    "/api/demo/cases/{case_id}": {
+      "get": {
+        "description": "Whether this case is loaded, and how far its documents are read.",
+        "operationId": "get_demo_case",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "enum": [
+                "us-v-anise-structuring",
+                "vekselberg-shell-network",
+                "deripaska-en-rusal"
+              ],
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoCaseProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Demo Case"
+      },
+      "post": {
+        "description": "Download the case's public documents, make it as its own investigation\nwith its records, and start reading the documents. Loading again while it\nexists changes nothing.",
+        "operationId": "load_demo_case",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "enum": [
+                "us-v-anise-structuring",
+                "vekselberg-shell-network",
+                "deripaska-en-rusal"
+              ],
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoCaseProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Load Demo Case"
       }
     },
     "/api/demo/seed": {

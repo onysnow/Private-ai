@@ -1,0 +1,4418 @@
+{
+ "investigation": {
+  "name": "Demo · real case: United States v. Anise (cash structuring)",
+  "question": "Did Magdy Anise split cash into deposits under $10,000 across five bank accounts to avoid the banks' reports, and how much?",
+  "description": "A demo built from one public record: the 2015 federal grand jury indictment of New Jersey attorney Magdy Fouad Anise (D.N.J., Crim. No. 2:15-cr-00218), which lists 144 dated cash deposits into five accounts in his name between December 2009 and January 2012. Everything here is an allegation in the indictment, quoted exactly; the record does not say how the case ended. Loaded to show the structuring red flag (ML-021) on real data."
+ },
+ "entities": [
+  {
+   "key": "anise",
+   "schema": "Person",
+   "caption": "Magdy Fouad Anise",
+   "properties": {
+    "name": [
+     "Magdy Fouad Anise"
+    ],
+    "alias": [
+     "Michael Anise"
+    ],
+    "position": [
+     "Attorney"
+    ],
+    "country": [
+     "us"
+    ]
+   },
+   "note": "The defendant. The indictment's charges are allegations; it does not say how the case ended.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(a)",
+     "quote": "Defendant Magdy Fouad Anise, a/k/a \"Michael Anise\" (\"defendant ANISE\"), was an attorney practicing in the law firm of Anise & Anise, Attorneys at Law (the \"Firm\"), in Jersey City, New Jersey."
+    }
+   ]
+  },
+  {
+   "key": "firm",
+   "schema": "Company",
+   "caption": "Anise & Anise, Attorneys at Law",
+   "properties": {
+    "name": [
+     "Anise & Anise, Attorneys at Law"
+    ],
+    "address": [
+     "Jersey City, New Jersey"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(a)",
+     "quote": "was an attorney practicing in the law firm of Anise & Anise, Attorneys at Law (the \"Firm\"), in Jersey City, New Jersey."
+    }
+   ]
+  },
+  {
+   "key": "banco-popular",
+   "schema": "Company",
+   "caption": "Banco Popular",
+   "properties": {
+    "name": [
+     "Banco Popular"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(b)",
+     "quote": "Banco Popular, JP Morgan Chase & Co. (\"JP Morgan\") and Bank of America were domestic financial institutions"
+    }
+   ]
+  },
+  {
+   "key": "jp-morgan",
+   "schema": "Company",
+   "caption": "JP Morgan Chase & Co. (JP Morgan)",
+   "properties": {
+    "name": [
+     "JP Morgan Chase & Co."
+    ],
+    "alias": [
+     "JP Morgan"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(b)",
+     "quote": "Banco Popular, JP Morgan Chase & Co. (\"JP Morgan\") and Bank of America were domestic financial institutions"
+    }
+   ]
+  },
+  {
+   "key": "bank-of-america",
+   "schema": "Company",
+   "caption": "Bank of America",
+   "properties": {
+    "name": [
+     "Bank of America"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(b)",
+     "quote": "Banco Popular, JP Morgan Chase & Co. (\"JP Morgan\") and Bank of America were domestic financial institutions"
+    }
+   ]
+  },
+  {
+   "key": "boca-raton",
+   "schema": "RealEstate",
+   "caption": "17147 Avenue Le Rivage, Boca Raton, Florida 33496",
+   "properties": {
+    "name": [
+     "17147 Avenue Le Rivage, Boca Raton"
+    ],
+    "address": [
+     "17147 Avenue Le Rivage, Boca Raton, Florida 33496"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 13, Forfeiture Allegation, para. 2(b)",
+     "quote": "in the property located at 17147 Avenue Le Rivage, Boca Raton, Florida 33496."
+    }
+   ]
+  },
+  {
+   "key": "acct-banco-popular-6876",
+   "schema": "BankAccount",
+   "caption": "Banco Popular account ending in 6876",
+   "properties": {
+    "name": [
+     "Banco Popular account ending in 6876"
+    ],
+    "bankName": [
+     "Banco Popular"
+    ]
+   },
+   "note": "Only the last four digits are in the record.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    }
+   ]
+  },
+  {
+   "key": "acct-banco-popular-0979",
+   "schema": "BankAccount",
+   "caption": "Banco Popular account ending in 0979",
+   "properties": {
+    "name": [
+     "Banco Popular account ending in 0979"
+    ],
+    "bankName": [
+     "Banco Popular"
+    ]
+   },
+   "note": "Only the last four digits are in the record.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    }
+   ]
+  },
+  {
+   "key": "acct-jp-morgan-6100",
+   "schema": "BankAccount",
+   "caption": "JP Morgan account ending in 6100",
+   "properties": {
+    "name": [
+     "JP Morgan account ending in 6100"
+    ],
+    "bankName": [
+     "JP Morgan"
+    ]
+   },
+   "note": "Only the last four digits are in the record.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    }
+   ]
+  },
+  {
+   "key": "acct-jp-morgan-3770",
+   "schema": "BankAccount",
+   "caption": "JP Morgan account ending in 3770",
+   "properties": {
+    "name": [
+     "JP Morgan account ending in 3770"
+    ],
+    "bankName": [
+     "JP Morgan"
+    ]
+   },
+   "note": "Only the last four digits are in the record.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    }
+   ]
+  },
+  {
+   "key": "acct-bank-of-america-2315",
+   "schema": "BankAccount",
+   "caption": "Bank of America account ending in 2315",
+   "properties": {
+    "name": [
+     "Bank of America account ending in 2315"
+    ],
+    "bankName": [
+     "Bank of America"
+    ]
+   },
+   "note": "Only the last four digits are in the record.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    }
+   ]
+  }
+ ],
+ "relationships": [
+  {
+   "schema": "Employment",
+   "source": "anise",
+   "target": "firm",
+   "properties": {
+    "role": [
+     "Attorney"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(a)",
+     "quote": "was an attorney practicing in the law firm of Anise & Anise, Attorneys at Law (the \"Firm\"), in Jersey City, New Jersey."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "anise",
+   "target": "acct-banco-popular-6876",
+   "properties": {
+    "role": [
+     "Controlled by and in the name of defendant ANISE"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 4, Count Two, para. 2",
+     "quote": "including the following structured deposits into two Banco Popular accounts, two JP Morgan accounts, and one Bank of America account in the name of defendant ANISE"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "role": [
+     "Controlled by and in the name of defendant ANISE"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 4, Count Two, para. 2",
+     "quote": "including the following structured deposits into two Banco Popular accounts, two JP Morgan accounts, and one Bank of America account in the name of defendant ANISE"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "role": [
+     "Controlled by and in the name of defendant ANISE"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 4, Count Two, para. 2",
+     "quote": "including the following structured deposits into two Banco Popular accounts, two JP Morgan accounts, and one Bank of America account in the name of defendant ANISE"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "anise",
+   "target": "acct-jp-morgan-3770",
+   "properties": {
+    "role": [
+     "Controlled by and in the name of defendant ANISE"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 4, Count Two, para. 2",
+     "quote": "including the following structured deposits into two Banco Popular accounts, two JP Morgan accounts, and one Bank of America account in the name of defendant ANISE"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "role": [
+     "Controlled by and in the name of defendant ANISE"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 1, Count One, para. 1(c)",
+     "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315."
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 4, Count Two, para. 2",
+     "quote": "including the following structured deposits into two Banco Popular accounts, two JP Morgan accounts, and one Bank of America account in the name of defendant ANISE"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-02"
+    ],
+    "description": [
+     "Cash deposit (Count One: one of two deposits the same day)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 3, Count One, para. 5 table",
+     "quote": "2/02/2010 $9,500/$7,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count One structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "7800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-02"
+    ],
+    "description": [
+     "Cash deposit (Count One: one of two deposits the same day)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 3, Count One, para. 5 table",
+     "quote": "2/02/2010 $9,500/$7,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count One structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "1500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-08"
+    ],
+    "description": [
+     "Cash deposit (Count One: one of two deposits the same day)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 3, Count One, para. 5 table",
+     "quote": "3/08/2010 $1,500/$8,800 JP Morgan 6100"
+    }
+   ],
+   "note": "Count One structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "8800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-08"
+    ],
+    "description": [
+     "Cash deposit (Count One: one of two deposits the same day)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 3, Count One, para. 5 table",
+     "quote": "3/08/2010 $1,500/$8,800 JP Morgan 6100"
+    }
+   ],
+   "note": "Count One structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-17"
+    ],
+    "description": [
+     "Cash deposit (Count One: one of two deposits the same day)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 3, Count One, para. 5 table",
+     "quote": "1/17/2012 $8,400 /$2,400 Bank of America 2315"
+    }
+   ],
+   "note": "Count One structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "2400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-17"
+    ],
+    "description": [
+     "Cash deposit (Count One: one of two deposits the same day)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 3, Count One, para. 5 table",
+     "quote": "1/17/2012 $8,400 /$2,400 Bank of America 2315"
+    }
+   ],
+   "note": "Count One structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-12-08"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "12/08/2009 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-12-09"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "12/09/2009 $9,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-12-10"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "12/10/2009 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-12-11"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "12/11/2009 $9,400 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-12-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "12/14/2009 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "8000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-12-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "12/14/2009 $8,000 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "7000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-12-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "12/15/2009 $7,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-12-31"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "12/31/2009 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-06"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/06/2010 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "7000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-06"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/06/2010 $7,000 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-07"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/07/2010 $9,600 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-08"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/08/2010 $9,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-11"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/11/2010 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/12/2010 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-13"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/13/2010 $9,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/14/2010 $9,600 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-01-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "1/15/2010 $9,400 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-04"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "2/04/2010 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "1500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-04"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "2/04/2010 $1,500 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-09"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 5, Count Two table",
+     "quote": "2/09/2010 $9,600 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-10"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "2/10/2010 $9,500 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "2/12/2010 $9,500 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "2/12/2010 $9,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-02-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "2/14/2010 $9,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-01"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/01/2010 $8,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-02"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/02/2010 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-04"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/04/2010 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-08"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/08/2010 $9,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "9400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-09"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/09/2010 $9,400 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9200"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-09"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/09/2010 $9,200 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-11"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/11/2010 $9,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "9300"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-11"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/11/2010 $9,300 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/12/2010 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/12/2010 $9,600 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/15/2010 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/15/2010 $9,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-03-25"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "3/25/2010 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-04-07"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "4/07/2010 $9,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-04-08"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "4/08/2010 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9300"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-04-09"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 6, Count Two table",
+     "quote": "4/09/2010 $9,300 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "9000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-04-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "4/12/2010 $9,000 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-04-13"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "4/13/2010 $9,400 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-04-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "4/14/2010 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-04-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "4/14/2010 $9,700 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-04-29"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "4/29/2010 $8,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-06"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/06/2010 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-07"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/07/2010 $9,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-10"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/10/2010 $9,600 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/12/2010 $9,600 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/12/2010 $9,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-13"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/13/2010 $9,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-6100",
+   "properties": {
+    "amount": [
+     "1000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/14/2010 $1,000 JP Morgan 6100"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9100"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/14/2010 $9,100 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-20"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/20/2010 $8,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "4800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-05-24"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "5/24/2010 $4,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-06-01"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "6/01/2010 $9,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-06-08"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "6/08/2010 $8,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9200"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-06-09"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "6/09/2010 $9,200 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8300"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-06-10"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "6/10/2010 $8,300 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-06-11"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 7, Count Two table",
+     "quote": "6/11/2010 $9,700 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-06-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "6/14/2010 $9,600 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9850"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-06-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "6/14/2010 $9,850 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9850"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-06-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "6/15/2010 $9,850 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-07-06"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "7/06/2010 $9,400 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-07-08"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "7/08/2010 $9,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-07-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "7/14/2010 $9,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-6876",
+   "properties": {
+    "amount": [
+     "8000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-07-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "7/15/2010 $8,000 Banco Popular 6876"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-07-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "7/15/2010 $9,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-08-02"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "8/02/2010 $9,600 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9100"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-08-03"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "8/03/2010 $9,100 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-08-04"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "8/04/2010 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-08-11"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "8/11/2010 $9,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-09-07"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "9/07/2010 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-09-13"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "9/13/2010 $9,400 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "5000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-09-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "9/14/2010 $5,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-10-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "10/12/2010 $9,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "5000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-10-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "10/14/2010 $5,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "6000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-10-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "10/15/2010 $6,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-10-21"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "10/21/2010 $9,600 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-04"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 8, Count Two table",
+     "quote": "11/04/2010 $9,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "2500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-05"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "11/05/2010 $2,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-08"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "11/08/2010 $8,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-10"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "11/10/2010 $8,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "11/12/2010 $8,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "4500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "11/12/2010 $4,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "11/15/2010 $9,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-16"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "11/16/2010 $9,600 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8650"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-11-18"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "11/18/2010 $8,650 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-12-13"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "12/13/2010 $9,500 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9200"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-12-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "12/14/2010 $9,200 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2010-12-16"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "12/16/2010 $8,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "8300"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-01-11"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "1/11/2011 $8,300 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "5000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-01-13"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "1/13/2011 $5,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "6000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-01-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "1/14/2011 $6,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9300"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-02-09"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "2/09/2011 $9,300 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "4000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-02-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "2/14/2011 $4,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-03-03"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "3/03/2011 $9,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-04-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "4/12/2011 $8,700 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "4000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-04-16"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "4/16/2011 $4,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "1000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-05-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 9, Count Two table",
+     "quote": "5/12/2011 $1,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "7000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-05-13"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "5/13/2011 $7,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "4800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-07-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "7/15/2011 $4,800 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "6000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-08-15"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "8/15/2011 $6,000 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "7800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-09-23"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "9/23/2011 $7,800 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8200"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-09-27"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "9/27/2011 $8,200 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "7900"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-09-29"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "9/29/2011 $7,900 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-09-30"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "9/30/2011 $8,700 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "5500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-03"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/03/2011 $5,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "2200"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-04"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/04/2011 $2,200 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "9200"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-11"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/11/2011 $9,200 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-3770",
+   "properties": {
+    "amount": [
+     "7000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-13"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/13/2011 $7,000 JP Morgan 3770"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "7600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/14/2011 $7,600 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9200"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-18"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/18/2011 $9,200 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-3770",
+   "properties": {
+    "amount": [
+     "7800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-26"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/26/2011 $7,800 JP Morgan 3770"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "5400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-26"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/26/2011 $5,400 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-3770",
+   "properties": {
+    "amount": [
+     "8700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-28"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/28/2011 $8,700 JP Morgan 3770"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "3000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-10-28"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "10/28/2011 $3,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "7500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-11-12"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "11/12/2011 $7,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8100"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-11-14"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "11/14/2011 $8,100 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "7800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-11-18"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 10, Count Two table",
+     "quote": "11/18/2011 $7,800 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-0979",
+   "properties": {
+    "amount": [
+     "7700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-11-22"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "11/22/2011 $7,700 Banco Popular 0979"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-3770",
+   "properties": {
+    "amount": [
+     "8800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-11-25"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "11/25/2011 $8,800 JP Morgan 3770"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "4500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-11-27"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "11/27/2011 $4,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-3770",
+   "properties": {
+    "amount": [
+     "8100"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-11-28"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "11/28/2011 $8,100 JP Morgan 3770"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-12-19"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "12/19/2011 $8,700 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "4200"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-12-20"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "12/20/2011 $4,200 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "7700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-12-22"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "12/22/2011 $7,700 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-3770",
+   "properties": {
+    "amount": [
+     "8400"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-12-27"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "12/27/2011 $8,400 JP Morgan 3770"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8900"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-12-27"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "12/27/2011 $8,900 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "4500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2011-12-30"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "12/30/2011 $4,500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-jp-morgan-3770",
+   "properties": {
+    "amount": [
+     "7600"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-03"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "1/03/2012 $7,600 JP Morgan 3770"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "1000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-03"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "1/03/2012 $1,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-6876",
+   "properties": {
+    "amount": [
+     "5700"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-17"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "1/17/2012 $5,700 Banco Popular 6876"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "8800"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-23"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "1/23/2012 $8,800 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "9000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-26"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "1/26/2012 $9,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "5000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-27"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "1/27/2012 $5,000 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-banco-popular-6876",
+   "properties": {
+    "amount": [
+     "7900"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-30"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "1/30/2012 $7,900 Banco Popular 6876"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "Payment",
+   "source": "anise",
+   "target": "acct-bank-of-america-2315",
+   "properties": {
+    "amount": [
+     "500"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-01-30"
+    ],
+    "description": [
+     "Cash deposit (Count Two)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 11, Count Two table",
+     "quote": "1/30/2012 $500 Bank of America 2315"
+    }
+   ],
+   "note": "Count Two structured deposit. The indictment states no purpose for the money."
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "anise",
+   "target": "boca-raton",
+   "properties": {
+    "role": [
+     "Property the Government seeks to forfeit from him"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 13, Forfeiture Allegation, para. 2(b)",
+     "quote": "in the property located at 17147 Avenue Le Rivage, Boca Raton, Florida 33496."
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 13, Forfeiture Allegation, para. 2",
+     "quote": "the Government will seek forfeiture from defendant ANISE"
+    }
+   ]
+  }
+ ],
+ "events": [
+  {
+   "date": "2009",
+   "precision": "year",
+   "title": "Cash kickbacks for client referrals begin",
+   "description": "From in or about 2009 through in or about 2011 (alleged).",
+   "entity": "anise",
+   "evidence": {
+    "doc": "anise-indictment",
+    "locator": "page 2, Count One, para. 2",
+    "quote": "From in or about 2009 through in or about 2011, defendant ANISE received cash kickbacks from doctors and others in exchange for ref erring his personal-injury clients to them."
+   },
+   "date_end": "2011"
+  },
+  {
+   "date": "2009",
+   "precision": "year",
+   "title": "About $800,000 in cash accumulated",
+   "description": "From in or about 2009 through in or about 2012 (alleged).",
+   "entity": "anise",
+   "evidence": {
+    "doc": "anise-indictment",
+    "locator": "page 2, Count One, para. 3",
+    "quote": "From in or about 2009 through in or about 2012, defendant ANISE accumulated approximately $800,000 in cash, including cash from the kickback scheme mentioned above."
+   },
+   "date_end": "2012"
+  },
+  {
+   "date": "2010-04-06",
+   "precision": "day",
+   "title": "JP Morgan warns about cash transactions under $10,000",
+   "description": "Letter about the account ending in 6100.",
+   "entity": "acct-jp-morgan-6100",
+   "evidence": {
+    "doc": "anise-indictment",
+    "locator": "page 2, Count One, para. 4",
+    "quote": "In a letter dated on or about April 6, 2010, JP Morgan informed defendant ANISE that a review of his JP Morgan account ending in 6100 showed a pattern of cash transactions under $10,000"
+   }
+  },
+  {
+   "date": "2010-02-02",
+   "precision": "day",
+   "title": "Count One structuring period begins",
+   "description": "From on or about February 2, 2010, through on or about January 17, 2012.",
+   "entity": "anise",
+   "evidence": {
+    "doc": "anise-indictment",
+    "locator": "page 3, Count One, para. 5",
+    "quote": "From on or about February 2, 2010, through on or about January 17, 2012, in Hudson and Monmouth Counties"
+   },
+   "date_end": "2012-01-17"
+  },
+  {
+   "date": "2015-05-07",
+   "precision": "day",
+   "title": "Indictment filed (D.N.J., Crim. No. 2:15-cr-00218)",
+   "description": "Document 29 on the docket.",
+   "entity": "anise",
+   "evidence": {
+    "doc": "anise-indictment",
+    "locator": "page 1, court header",
+    "quote": "Case 2:15-cr-00218-WHW Document 29 Filed 05/07/15 Page 1 of 15 PageID: 78"
+   }
+  }
+ ],
+ "claims": [
+  {
+   "text": "Anise made cash deposits just under $10,000 into five accounts in his name to keep his banks from filing currency transaction reports.",
+   "status": "unverified",
+   "rationale": "Charged in a grand jury indictment; an indictment is an allegation, and this record does not say how the case ended.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 4, Count Two, para. 2",
+     "quote": "by breaking down amounts of United States currency into amounts of less than $10,000 prior to depositing such currency with said financial institutions",
+     "stance": "supports"
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 4, Count Two, para. 2",
+     "quote": "including the following structured deposits into two Banco Popular accounts, two JP Morgan accounts, and one Bank of America account in the name of defendant ANISE",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "After JP Morgan's April 2010 letter, Anise stopped structuring deposits into the JP Morgan account ending in 6100 but kept doing so at Banco Popular 0979, JP Morgan 3770 and Bank of America 2315.",
+   "status": "unverified",
+   "rationale": "Alleged in the indictment; the deposit table shows no JP Morgan 6100 deposits after the letter.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 2, Count One, para. 4",
+     "quote": "After defendant ANISE received the letter, he ceased structuring cash deposits into the JP Morgan account ending in 6100, but continued to structure cash",
+     "stance": "supports"
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 3, Count One, para. 4 (cont.)",
+     "quote": "deposits into the Banco Popular account ending in 0979, the JP Morgan account ending in 3770, and the Bank of America account ending in 2315.",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "The money Anise deposited came in part from cash kickbacks doctors paid him for referring personal-injury clients.",
+   "status": "unverified",
+   "rationale": "Alleged in the indictment; the deposit table itself does not say where each deposit's cash came from.",
+   "evidence": [
+    {
+     "doc": "anise-indictment",
+     "locator": "page 2, Count One, para. 3",
+     "quote": "From in or about 2009 through in or about 2012, defendant ANISE accumulated approximately $800,000 in cash, including cash from the kickback scheme mentioned above.",
+     "stance": "supports"
+    },
+    {
+     "doc": "anise-indictment",
+     "locator": "page 2, Count One, para. 2",
+     "quote": "From in or about 2009 through in or about 2011, defendant ANISE received cash kickbacks from doctors and others in exchange for ref erring his personal-injury clients to them.",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "How the case ended: plea, verdict, sentence and what was forfeited.",
+   "status": "lead",
+   "rationale": "Not in this record."
+  }
+ ],
+ "leads": [
+  {
+   "title": "Find how the case ended",
+   "priority": "high",
+   "detail": "Check the D.N.J. docket for Crim. No. 2:15-cr-00218 (plea, verdict, sentence, forfeiture order). This demo holds only the indictment."
+  },
+  {
+   "title": "Check the forfeiture allegation",
+   "priority": "normal",
+   "detail": "The indictment seeks at least $795,750 and the property at 17147 Avenue Le Rivage, Boca Raton. Find whether either was forfeited."
+  }
+ ],
+ "watchlist": [
+  "Magdy Fouad Anise"
+ ]
+}

@@ -1,0 +1,53 @@
+{
+ "_about": "The public records the Vekselberg demo case is read from (app/services/demo_cases.py). Downloaded when the demo is loaded and pinned by sha256.",
+ "documents": [
+  {
+   "id": "vekselberg-complaint",
+   "title": "United States v. 19 Duck Pond Lane, Southampton NY, et al. - Verified Civil Complaint for Forfeiture (S.D.N.Y.), with Exhibit: Indictment United States v. Vladimir Voronchenko, 1:23-cr-00073-MKV",
+   "kind": "complaint",
+   "publisher": "U.S. Attorney's Office, S.D.N.Y. (filed in U.S. District Court, S.D.N.Y.)",
+   "date": "2023-02-24",
+   "url": "https://www.justice.gov/usao-sdny/press-release/file/1569761/dl",
+   "filename": "vekselberg-properties-forfeiture-complaint-2023.pdf",
+   "sha256": "1c2b36f5a14218cc1844221952f75c64ec6abce7a2869f0de498ae5e4f6d3f19",
+   "bytes": 1332116,
+   "pages": 42,
+   "source_type": "public_record",
+   "why_it_matters": "Describes the five-layer chain from Vekselberg to the shell companies that bought the US properties, and the payments that kept them after his designation.",
+   "licence_note": "US federal government work, public domain (17 U.S.C. § 105)",
+   "admitted": false
+  },
+  {
+   "id": "tango-affidavit",
+   "title": "In the Matter of the Seizure of the Motor Yacht Tango (IMO 1010703) - Application, Seizure Warrant and Affidavit (D.D.C.)",
+   "kind": "affidavit",
+   "publisher": "U.S. Department of Justice (filed in U.S. District Court, D.D.C.)",
+   "date": "2022-03-25",
+   "url": "https://www.justice.gov/opa/press-release/file/1490356/download",
+   "filename": "tango-seizure-warrant-affidavit-2022.pdf",
+   "sha256": "460aa9be82049e6c2e08c876b44572bfae2e314ff922f693216639ead68bce2d",
+   "bytes": 1017111,
+   "pages": 33,
+   "source_type": "public_record",
+   "why_it_matters": "The TANGO's owning company, its nominee directors, the Lamesa chain and the payments through shell companies and accounts.",
+   "licence_note": "US federal government work, public domain (17 U.S.C. § 105)",
+   "admitted": false
+  },
+  {
+   "id": "fr-ofac-2018-09147",
+   "title": "Notice of OFAC Sanctions Actions (April 6, 2018 designations), 83 Fed. Reg. 19138-19140, FR Doc. 2018-09147",
+   "kind": "federal_register_notice",
+   "publisher": "U.S. Treasury, Office of Foreign Assets Control (Federal Register)",
+   "date": "2018-05-01",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2018-05-01/pdf/2018-09147.pdf",
+   "filename": "fr-2018-09147-ofac-sdn-notice.pdf",
+   "sha256": "555394c10b5fad2def5d5364a4da63d6affac7303336d5cfc24c6b4181ee253b",
+   "bytes": 217931,
+   "pages": 3,
+   "source_type": "public_record",
+   "why_it_matters": "OFAC's published designations of 6 April 2018, with Vekselberg's and Renova Group's identifiers.",
+   "licence_note": "US federal government work, public domain (17 U.S.C. § 105)",
+   "admitted": true
+  }
+ ]
+}

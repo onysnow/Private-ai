@@ -89,6 +89,7 @@ import {
   getCorpusSync,
   getDecisions,
   getDeckEndpoint,
+  getDemoCase,
   getDocument,
   getDocumentEmail,
   getDocumentFormats,
@@ -159,6 +160,7 @@ import {
   listCorpusEntitySets,
   listCrossProviderDecisions,
   listDecksEndpoint,
+  listDemoCases,
   listDocumentCandidatesEndpoint,
   listDocuments,
   listDocumentTableMappings,
@@ -188,6 +190,7 @@ import {
   listTermHints,
   listWriteupsEndpoint,
   load1Mdb,
+  loadDemoCase,
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
@@ -486,6 +489,9 @@ import type {
   GetDeckEndpointData,
   GetDeckEndpointError,
   GetDeckEndpointResponse,
+  GetDemoCaseData,
+  GetDemoCaseError,
+  GetDemoCaseResponse,
   GetDocumentData,
   GetDocumentEmailData,
   GetDocumentEmailError,
@@ -696,6 +702,9 @@ import type {
   ListDecksEndpointData,
   ListDecksEndpointError,
   ListDecksEndpointResponse,
+  ListDemoCasesData,
+  ListDemoCasesError,
+  ListDemoCasesResponse,
   ListDocumentCandidatesEndpointData,
   ListDocumentCandidatesEndpointError,
   ListDocumentCandidatesEndpointResponse,
@@ -783,6 +792,9 @@ import type {
   Load1MdbData,
   Load1MdbError,
   Load1MdbResponse,
+  LoadDemoCaseData,
+  LoadDemoCaseError,
+  LoadDemoCaseResponse,
   MakeLeadFromHitData,
   MakeLeadFromHitError,
   MakeLeadFromHitResponse,
@@ -2386,6 +2398,91 @@ export const load1MdbMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await load1Mdb({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listDemoCasesQueryKey = (options?: Options<ListDemoCasesData>) =>
+  createQueryKey('listDemoCases', options);
+
+/**
+ * List Demo Cases
+ *
+ * The small real cases that can be loaded, each with how far it is loaded.
+ */
+export const listDemoCasesOptions = (options?: Options<ListDemoCasesData>) =>
+  queryOptions<
+    ListDemoCasesResponse,
+    ListDemoCasesError,
+    ListDemoCasesResponse,
+    ReturnType<typeof listDemoCasesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listDemoCases({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listDemoCasesQueryKey(options),
+  });
+
+export const getDemoCaseQueryKey = (options: Options<GetDemoCaseData>) =>
+  createQueryKey('getDemoCase', options);
+
+/**
+ * Get Demo Case
+ *
+ * Whether this case is loaded, and how far its documents are read.
+ */
+export const getDemoCaseOptions = (options: Options<GetDemoCaseData>) =>
+  queryOptions<
+    GetDemoCaseResponse,
+    GetDemoCaseError,
+    GetDemoCaseResponse,
+    ReturnType<typeof getDemoCaseQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDemoCase({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDemoCaseQueryKey(options),
+  });
+
+/**
+ * Load Demo Case
+ *
+ * Download the case's public documents, make it as its own investigation
+ * with its records, and start reading the documents. Loading again while it
+ * exists changes nothing.
+ */
+export const loadDemoCaseMutation = (
+  options?: Partial<Options<LoadDemoCaseData>>,
+): UseMutationOptions<
+  LoadDemoCaseResponse,
+  LoadDemoCaseError,
+  Options<LoadDemoCaseData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LoadDemoCaseResponse,
+    LoadDemoCaseError,
+    Options<LoadDemoCaseData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await loadDemoCase({
         ...options,
         ...fnOptions,
         throwOnError: true,

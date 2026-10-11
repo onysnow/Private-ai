@@ -220,6 +220,8 @@ _NOT_INVESTIGATION_RECORDS = {
     "z", "x", "y", "stack", "glyph_range",
     # The indicator catalogue (routes_catalogue.py): the same for every investigation.
     "indicator_id",
+    # A small real demo case (routes_demo.py, app/services/demo_cases.py): one of three fixed names.
+    "case_id",
 }
 
 

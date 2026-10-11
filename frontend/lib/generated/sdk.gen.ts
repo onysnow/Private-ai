@@ -252,6 +252,9 @@ import type {
   GetDeckEndpointData,
   GetDeckEndpointErrors,
   GetDeckEndpointResponses,
+  GetDemoCaseData,
+  GetDemoCaseErrors,
+  GetDemoCaseResponses,
   GetDocumentData,
   GetDocumentEmailData,
   GetDocumentEmailErrors,
@@ -462,6 +465,9 @@ import type {
   ListDecksEndpointData,
   ListDecksEndpointErrors,
   ListDecksEndpointResponses,
+  ListDemoCasesData,
+  ListDemoCasesErrors,
+  ListDemoCasesResponses,
   ListDocumentCandidatesEndpointData,
   ListDocumentCandidatesEndpointErrors,
   ListDocumentCandidatesEndpointResponses,
@@ -549,6 +555,9 @@ import type {
   Load1MdbData,
   Load1MdbErrors,
   Load1MdbResponses,
+  LoadDemoCaseData,
+  LoadDemoCaseErrors,
+  LoadDemoCaseResponses,
   MakeLeadFromHitData,
   MakeLeadFromHitErrors,
   MakeLeadFromHitResponses,
@@ -901,6 +910,8 @@ import {
   zGetDecisionsResponse,
   zGetDeckEndpointPath,
   zGetDeckEndpointResponse,
+  zGetDemoCasePath,
+  zGetDemoCaseResponse,
   zGetDocumentEmailPath,
   zGetDocumentEmailResponse,
   zGetDocumentFormatsResponse,
@@ -1054,6 +1065,7 @@ import {
   zListCrossProviderDecisionsResponse,
   zListDecksEndpointPath,
   zListDecksEndpointResponse,
+  zListDemoCasesResponse,
   zListDocumentCandidatesEndpointPath,
   zListDocumentCandidatesEndpointQuery,
   zListDocumentCandidatesEndpointResponse,
@@ -1120,6 +1132,8 @@ import {
   zListWriteupsEndpointQuery,
   zListWriteupsEndpointResponse,
   zLoad1MdbResponse,
+  zLoadDemoCasePath,
+  zLoadDemoCaseResponse,
   zMakeLeadFromHitPath,
   zMakeLeadFromHitResponse,
   zMakeLeadFromNotePath,
@@ -2740,6 +2754,89 @@ export const load1Mdb = <ThrowOnError extends boolean = false>(
         .parseAsync(data),
     responseValidator: async (data) => await zLoad1MdbResponse.parseAsync(data),
     url: '/api/demo/1mdb',
+    ...options,
+  });
+
+/**
+ * List Demo Cases
+ *
+ * The small real cases that can be loaded, each with how far it is loaded.
+ */
+export const listDemoCases = <ThrowOnError extends boolean = false>(
+  options?: Options<ListDemoCasesData, ThrowOnError>,
+): RequestResult<ListDemoCasesResponses, ListDemoCasesErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ListDemoCasesResponses,
+    ListDemoCasesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListDemoCasesResponse.parseAsync(data),
+    url: '/api/demo/cases',
+    ...options,
+  });
+
+/**
+ * Get Demo Case
+ *
+ * Whether this case is loaded, and how far its documents are read.
+ */
+export const getDemoCase = <ThrowOnError extends boolean = false>(
+  options: Options<GetDemoCaseData, ThrowOnError>,
+): RequestResult<GetDemoCaseResponses, GetDemoCaseErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetDemoCaseResponses,
+    GetDemoCaseErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDemoCasePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDemoCaseResponse.parseAsync(data),
+    url: '/api/demo/cases/{case_id}',
+    ...options,
+  });
+
+/**
+ * Load Demo Case
+ *
+ * Download the case's public documents, make it as its own investigation
+ * with its records, and start reading the documents. Loading again while it
+ * exists changes nothing.
+ */
+export const loadDemoCase = <ThrowOnError extends boolean = false>(
+  options: Options<LoadDemoCaseData, ThrowOnError>,
+): RequestResult<LoadDemoCaseResponses, LoadDemoCaseErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    LoadDemoCaseResponses,
+    LoadDemoCaseErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zLoadDemoCasePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zLoadDemoCaseResponse.parseAsync(data),
+    url: '/api/demo/cases/{case_id}',
     ...options,
   });
 

@@ -1985,7 +1985,8 @@ export const zDeletionUnsafePath = z.object({
 /**
  * DemoCaseProgressOut
  *
- * The 1MDB demo case (app/services/demo_1mdb.py): loading, reading or ready.
+ * A demo case (the 1MDB case, app/services/demo_1mdb.py, or one of the small
+ * real cases, app/services/demo_cases.py): loading, reading or ready.
  */
 export const zDemoCaseProgressOut = z.object({
   claims: z.number().int().nullish(),
@@ -2008,6 +2009,22 @@ export const zDemoCaseProgressOut = z.object({
     'failed',
   ]),
   step: z.string().nullish(),
+});
+
+/**
+ * DemoCaseOut
+ *
+ * One of the small real demo cases (app/services/demo_cases.py), before and after it is loaded.
+ */
+export const zDemoCaseOut = z.object({
+  bytes: z.number().int(),
+  description: z.string(),
+  documents: z.number().int(),
+  id: z.string(),
+  progress: zDemoCaseProgressOut,
+  publishers: z.array(z.string()),
+  question: z.string(),
+  title: z.string(),
 });
 
 /**
@@ -7774,6 +7791,39 @@ export const zGet1MdbResponse = zDemoCaseProgressOut;
  * Successful Response
  */
 export const zLoad1MdbResponse = zDemoCaseProgressOut;
+
+/**
+ * Response List Demo Cases
+ *
+ * Successful Response
+ */
+export const zListDemoCasesResponse = z.array(zDemoCaseOut);
+
+export const zGetDemoCasePath = z.object({
+  case_id: z.enum([
+    'us-v-anise-structuring',
+    'vekselberg-shell-network',
+    'deripaska-en-rusal',
+  ]),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDemoCaseResponse = zDemoCaseProgressOut;
+
+export const zLoadDemoCasePath = z.object({
+  case_id: z.enum([
+    'us-v-anise-structuring',
+    'vekselberg-shell-network',
+    'deripaska-en-rusal',
+  ]),
+});
+
+/**
+ * Successful Response
+ */
+export const zLoadDemoCaseResponse = zDemoCaseProgressOut;
 
 /**
  * Successful Response

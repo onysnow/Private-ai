@@ -5007,9 +5007,47 @@ export type DeletionUnsafePath = {
 };
 
 /**
+ * DemoCaseOut
+ *
+ * One of the small real demo cases (app/services/demo_cases.py), before and after it is loaded.
+ */
+export type DemoCaseOut = {
+  /**
+   * Bytes
+   */
+  bytes: number;
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Documents
+   */
+  documents: number;
+  /**
+   * Id
+   */
+  id: string;
+  progress: DemoCaseProgressOut;
+  /**
+   * Publishers
+   */
+  publishers: Array<string>;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * DemoCaseProgressOut
  *
- * The 1MDB demo case (app/services/demo_1mdb.py): loading, reading or ready.
+ * A demo case (the 1MDB case, app/services/demo_1mdb.py, or one of the small
+ * real cases, app/services/demo_cases.py): loading, reading or ready.
  */
 export type DemoCaseProgressOut = {
   /**
@@ -17099,6 +17137,114 @@ export type Load1MdbResponses = {
 };
 
 export type Load1MdbResponse = Load1MdbResponses[keyof Load1MdbResponses];
+
+export type ListDemoCasesData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/demo/cases';
+};
+
+export type ListDemoCasesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListDemoCasesError = ListDemoCasesErrors[keyof ListDemoCasesErrors];
+
+export type ListDemoCasesResponses = {
+  /**
+   * Response List Demo Cases
+   *
+   * Successful Response
+   */
+  200: Array<DemoCaseOut>;
+};
+
+export type ListDemoCasesResponse =
+  ListDemoCasesResponses[keyof ListDemoCasesResponses];
+
+export type GetDemoCaseData = {
+  body?: never;
+  path: {
+    /**
+     * Case Id
+     */
+    case_id:
+      | 'us-v-anise-structuring'
+      | 'vekselberg-shell-network'
+      | 'deripaska-en-rusal';
+  };
+  query?: never;
+  url: '/api/demo/cases/{case_id}';
+};
+
+export type GetDemoCaseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDemoCaseError = GetDemoCaseErrors[keyof GetDemoCaseErrors];
+
+export type GetDemoCaseResponses = {
+  /**
+   * Successful Response
+   */
+  200: DemoCaseProgressOut;
+};
+
+export type GetDemoCaseResponse =
+  GetDemoCaseResponses[keyof GetDemoCaseResponses];
+
+export type LoadDemoCaseData = {
+  body?: never;
+  path: {
+    /**
+     * Case Id
+     */
+    case_id:
+      | 'us-v-anise-structuring'
+      | 'vekselberg-shell-network'
+      | 'deripaska-en-rusal';
+  };
+  query?: never;
+  url: '/api/demo/cases/{case_id}';
+};
+
+export type LoadDemoCaseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type LoadDemoCaseError = LoadDemoCaseErrors[keyof LoadDemoCaseErrors];
+
+export type LoadDemoCaseResponses = {
+  /**
+   * Successful Response
+   */
+  200: DemoCaseProgressOut;
+};
+
+export type LoadDemoCaseResponse =
+  LoadDemoCaseResponses[keyof LoadDemoCaseResponses];
 
 export type SeedDemoData = {
   body?: never;

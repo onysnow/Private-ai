@@ -4356,7 +4356,8 @@ class SuiteCoverageOut(ResponseModel):
 
 
 class DemoCaseProgressOut(ResponseModel):
-    """The 1MDB demo case (app/services/demo_1mdb.py): loading, reading or ready."""
+    """A demo case (the 1MDB case, app/services/demo_1mdb.py, or one of the small
+    real cases, app/services/demo_cases.py): loading, reading or ready."""
     state: Literal["idle", "downloading", "building", "reading", "ready", "failed"]
     step: str | None = None
     error: str | None = None
@@ -4368,3 +4369,15 @@ class DemoCaseProgressOut(ResponseModel):
     leads: int | None = None
     # Web pages the publisher did not serve when the case was loaded: kept as links.
     not_downloaded: list[dict[str, str | None]] = []
+
+
+class DemoCaseOut(ResponseModel):
+    """One of the small real demo cases (app/services/demo_cases.py), before and after it is loaded."""
+    id: str
+    title: str
+    question: str
+    description: str
+    documents: int
+    bytes: int
+    publishers: list[str]
+    progress: DemoCaseProgressOut

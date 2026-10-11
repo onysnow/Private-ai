@@ -1,0 +1,21 @@
+{
+ "_about": "The public record the Anise demo case is read from (app/services/demo_cases.py). Downloaded when the demo is loaded and pinned by sha256.",
+ "documents": [
+  {
+   "id": "anise-indictment",
+   "title": "United States v. Magdy Fouad Anise, a/k/a \"Michael Anise\" - Indictment (Crim. No. 2:15-cr-00218-WHW, Doc. 29)",
+   "kind": "indictment",
+   "publisher": "U.S. Attorney's Office, District of New Jersey (filed in U.S. District Court, D.N.J.)",
+   "date": "2015-05-07",
+   "url": "https://www.justice.gov/usao-nj/file/451941/dl",
+   "filename": "anise-indictment-2015.pdf",
+   "sha256": "b9876a347eb7effe6e2f80c1cd19074cd931590c474ebd91019e1a8f5b947dc0",
+   "bytes": 249686,
+   "pages": 15,
+   "source_type": "public_record",
+   "why_it_matters": "Lists every structured cash deposit (date, amount, account) that the two structuring counts charge.",
+   "licence_note": "US federal government work, public domain (17 U.S.C. § 105)",
+   "admitted": false
+  }
+ ]
+}
