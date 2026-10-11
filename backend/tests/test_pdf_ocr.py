@@ -26,6 +26,20 @@ def test_image_only_pdf_uses_ocr(tmp_path):
     assert 'infrastructure program' in ocr_text
 
 
+def test_a_scan_with_a_filing_stamp_is_still_read_by_ocr(tmp_path):
+    import fitz
+    scan = tmp_path / 'scan.pdf'
+    make_scan(scan, 'The prosecution proved the funds came from 1MDB on 22 March 2013.')
+    p = tmp_path / 'stamped.pdf'
+    doc = fitz.open(scan)
+    doc[0].insert_text((20, 20), 'WA-45-7-11-2018 filed 26/12/2025 serial 7f3a9c', fontsize=6)
+    doc.save(p); doc.close()
+    result = extract_pdf_chunks(p)
+    assert result.ocr_pages == 1
+    assert result.chunks[0]['locator'] == 'page 1 (OCR)'
+    assert 'prosecution proved' in result.chunks[0]['text']
+
+
 def test_native_pdf_does_not_get_reclassified_as_ocr(tmp_path):
     import fitz
     p = tmp_path / 'native.pdf'

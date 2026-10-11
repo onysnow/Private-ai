@@ -60,11 +60,11 @@ def get_1mdb(db: Session = Depends(get_db)) -> Any:
 
 @router.post("/demo/1mdb", response_model=DemoCaseProgressOut)
 async def load_1mdb(request: Request, db: Session = Depends(get_db)) -> Any:
-    """Download the 11 public documents, make the case and its records, and start
+    """Download the case's documents and media, make the case and its records, and start
     reading the documents. Loading again while it exists changes nothing."""
     if demo_1mdb.existing(db) is not None:
         return demo_1mdb.progress(db)
-    demo_1mdb.set_state(state="downloading", step="Downloading 11 public documents")
+    demo_1mdb.set_state(state="downloading", step="Downloading the court records, regulator findings, articles, photos and media")
     try:
         documents = await run_in_threadpool(demo_1mdb.fetch_documents)
     except demo_1mdb.DemoDownloadError as exc:

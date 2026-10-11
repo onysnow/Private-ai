@@ -32,9 +32,11 @@ export function OneMdbLoader({onOpen, compact = false}: {onOpen?: (investigation
   };
   const loaded = Boolean(p?.investigation_id);
   return <div className={`one-mdb${compact ? ' compact' : ''}`} data-testid="one-mdb">
-    {!compact && <p className="one-mdb-what"><b>The 1MDB case.</b> Malaysia’s state fund, about $4.5 billion diverted from 2009 to 2015. Built from 11 public
+    {!compact && <p className="one-mdb-what"><b>The 1MDB case.</b> Malaysia’s state fund, about $4.5 billion diverted from 2009 to 2015. Built from public
       records: US Justice Department complaints, the Low and Ng indictment, Leissner’s charges, Goldman Sachs’s admitted statement of facts, a Federal
-      Reserve order, and Singapore and Swiss regulators’ findings. Allegations stay allegations; what was admitted or found is Supported.</p>}
+      Reserve order, Singapore and Swiss regulators’ findings, Malaysian, Singapore and Swiss judgments (some scanned, some in Malay, French or German),
+      news articles and posts, photos, video and a podcast, a payments table, and emails rebuilt word for word from the filings. Allegations stay
+      allegations; what was admitted or found is Supported.</p>}
     {loaded ? <p className="one-mdb-state">
       {p?.state === 'reading' ? <>Reading the documents: <b>{p.read} of {p.documents}</b> read{p.failed ? `, ${p.failed} could not be read` : ''}. </> : <>Loaded: {p?.documents} documents, {p?.claims} claims, {p?.leads} leads. </>}
       <a href={caseHref('/', p?.investigation_id ?? '')} onClick={e => { if (onOpen && p?.investigation_id) { e.preventDefault(); onOpen(p.investigation_id); } }}>Open the 1MDB case</a>

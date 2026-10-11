@@ -84,6 +84,27 @@ def ocr_runtime_status(language: str = "eng") -> OcrRuntimeStatus:
         return OcrRuntimeStatus(False, None, requested, requested, f"{type(exc).__name__}: {exc}")
 
 
+# A scanned page can still carry a few words of real text: a court's filing
+# stamp or a serial number laid over the picture of the page. Such a page is read
+# by OCR all the same, or everything but the stamp is lost (the 810-page Najib
+# 1MDB judgment, Oct 2026). "Mostly picture" means images cover over half the page.
+_STAMP_MAX_CHARS = 400
+
+
+def _scan_with_stamp(page, native: str) -> bool:
+    if len(native) >= _STAMP_MAX_CHARS:
+        return False
+    area = abs(page.rect)
+    if not area:
+        return False
+    covered = 0.0
+    for info in page.get_image_info():
+        r = page.rect & info["bbox"]
+        if not r.is_empty:
+            covered += abs(r)
+    return covered / area > 0.5
+
+
 def extract_pdf_chunks(
     path: Path,
     *,
@@ -109,7 +130,7 @@ def extract_pdf_chunks(
     with fitz.open(path) as doc:
         for page_no, page in enumerate(doc, 1):
             native = _clean(strip_page_furniture(page.get_text("text") or "", page_no))
-            if len(native) >= min_native_chars:
+            if len(native) >= min_native_chars and not _scan_with_stamp(page, native):
                 native_pages += 1
                 chunks.append({
                     "locator": f"page {page_no}",

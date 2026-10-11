@@ -118,3 +118,11 @@ def test_amount_statistic_needs_enough_amounts():
     assert fam["amount_statistic"].measure(g, fam["amount_statistic"].Params(test="round_share", min_count=100)) == []
     benford = fam["amount_statistic"].measure(g, fam["amount_statistic"].Params(test="benford_mad", min_count=30))[0]
     assert benford.value > 0.015, "amounts piled on 1s and 2s stray far from Benford"
+
+
+def test_a_name_ending_in_a_full_stop_does_not_end_the_summary_twice():
+    spec = Spec(indicator="BO-002", family="chain_depth", level="faint", summary="{name} sits {depth} layers down.")
+    assert spec.text({"name": "Lamesa Holding S.A.", "depth": 4}) == "Lamesa Holding S.A. sits 4 layers down."
+    assert spec.text({"name": "Lamesa Holding S.A", "depth": 4}) == "Lamesa Holding S.A sits 4 layers down."
+    spec_end = Spec(indicator="BO-002", family="chain_depth", level="faint", summary="Owned by {name}.")
+    assert spec_end.text({"name": "Lamesa Holding S.A."}) == "Owned by Lamesa Holding S.A."

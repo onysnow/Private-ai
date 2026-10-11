@@ -1,4 +1,4 @@
-"""The 1MDB demo case: a real, closed investigation built from 11 public records
+"""The 1MDB demo case: a real, closed investigation built from 11 core public records
 (app/demo/one_mdb/documents.json) so every part of the app can be checked on
 real material (Ony, 11 Oct 2026).
 

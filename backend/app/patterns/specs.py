@@ -79,7 +79,9 @@ class Spec(BaseModel):
         return (best.level, best.reason) if best else None
 
     def text(self, facts: dict[str, Any]) -> str:
-        return re.sub(r"\{([a-z_]+)\}", lambda m: str(facts.get(m.group(1), m.group(0))), self.summary)
+        out = re.sub(r"\{([a-z_]+)\}", lambda m: str(facts.get(m.group(1), m.group(0))), self.summary)
+        # A name that ends in a full stop ("Lamesa Holding S.A.") must not end the sentence twice.
+        return re.sub(r"\.\.(?=\s|$)", ".", out)
 
 
 class Result(BaseModel):

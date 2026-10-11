@@ -2,7 +2,7 @@
  "investigation": {
   "name": "1MDB",
   "question": "How was money raised by Malaysia's state fund 1MDB between 2009 and 2014 diverted, through which companies, banks and people, and who has been held to account for it?",
-  "description": "A demo investigation of the 1MDB scandal built only from 11 public records: US Justice Department complaints, the Low/Ng indictment, Leissner's criminal information, Goldman Sachs's 2020 deferred prosecution agreement, a Federal Reserve order, and Singapore (MAS) and Swiss (FINMA) regulator releases. Facts in the DOJ civil forfeiture complaints are allegations unless a guilty plea, an admitted statement of facts or a regulator finding supports them."
+  "description": "A demo investigation of the 1MDB scandal built only from public material: US Justice Department complaints, the Low/Ng indictment, Leissner's criminal information, Goldman Sachs's 2020 deferred prosecution agreement, a Federal Reserve order, Singapore (MAS) and Swiss (FINMA) regulator releases, Malaysian, Singapore and Swiss judgments, news articles and posts, photos, video and audio, and emails rebuilt word for word from the filings. Facts in the DOJ civil forfeiture complaints are allegations unless a guilty plea, an admitted statement of facts or a regulator finding supports them."
  },
  "entities": [
   {
