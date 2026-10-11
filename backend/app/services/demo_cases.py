@@ -1,4 +1,4 @@
-"""Small real demo cases (Ony, 11 Oct 2026): three closed public cases, each
+"""Small real demo cases (Ony, 11 Oct 2026): four closed public cases, each
 loaded as its own investigation, so the red-flag rules the 1MDB case cannot
 trigger are tried on real records too.
 
@@ -11,15 +11,19 @@ trigger are tried on real records too.
   euro payments, and sanctions identifiers;
 - deripaska-en-rusal: the same OFAC notice and Treasury's December 2018 letter
   to Congress: one Jersey address written two ways and a Moscow one written three ways (BO-032), ownership
-  percentages, sanctions and politically exposed persons.
+  percentages, sanctions and politically exposed persons;
+- jardine-cross-holding: the Supreme Court of Bermuda's judgment of 12 November
+  2021 in the Jardine Strategic appraisal actions: Jardine Matheson held about
+  84.9% of Jardine Strategic, and Jardine Strategic 59.3% of Jardine Matheson,
+  an ownership loop (BO-001) stated by a court.
 
 Each case is app/demo/<case-id>/case.json and documents.json, in the same form
 as the 1MDB case (app/demo/one_mdb, app/services/demo_1mdb.py), and loads the
 same way: the documents are downloaded from their public addresses and must
 match their pinned sha256; the records drawn from them are added, every piece
 of evidence an exact quote with its page; then the documents are read as
-background jobs. None of these records holds an ownership loop, so BO-001 has
-no real case here.
+background jobs. Only the Jardine record holds an ownership loop: the other
+three must not be made to raise BO-001.
 """
 
 from __future__ import annotations
@@ -55,7 +59,7 @@ from app.services.demo_1mdb import DemoDownloadError, Fetch, download
 logger = logging.getLogger("journalism.demo")
 
 ROOT = Path(__file__).resolve().parents[1] / "demo"
-CASE_IDS = ("us-v-anise-structuring", "vekselberg-shell-network", "deripaska-en-rusal")
+CASE_IDS = ("us-v-anise-structuring", "vekselberg-shell-network", "deripaska-en-rusal", "jardine-cross-holding")
 
 __all__ = ["CASE_IDS", "DemoDownloadError", "build", "existing", "fetch_documents", "manifest", "progress", "records", "set_state", "summary"]
 

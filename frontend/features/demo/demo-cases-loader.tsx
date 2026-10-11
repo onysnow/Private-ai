@@ -14,7 +14,7 @@ import {listDemoCasesOptions, listDemoCasesQueryKey, listInvestigationsQueryKey}
 import {loadDemoCase} from '../../lib/generated/sdk.gen';
 import type {DemoCaseOut} from '../../lib/generated/types.gen';
 
-type CaseId = 'us-v-anise-structuring' | 'vekselberg-shell-network' | 'deripaska-en-rusal';
+type CaseId = 'us-v-anise-structuring' | 'vekselberg-shell-network' | 'deripaska-en-rusal' | 'jardine-cross-holding';
 
 function megabytes(bytes: number): string {
   return bytes >= 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1000))} KB`;

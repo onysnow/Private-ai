@@ -30,7 +30,7 @@ router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resour
 logger = logging.getLogger("journalism.demo")
 
 # The small real cases, by id (demo_cases.CASE_IDS): a path that names none of them is refused.
-DemoCaseId = Literal["us-v-anise-structuring", "vekselberg-shell-network", "deripaska-en-rusal"]
+DemoCaseId = Literal["us-v-anise-structuring", "vekselberg-shell-network", "deripaska-en-rusal", "jardine-cross-holding"]
 assert set(DemoCaseId.__args__) == set(demo_cases.CASE_IDS)  # type: ignore[attr-defined]
 
 

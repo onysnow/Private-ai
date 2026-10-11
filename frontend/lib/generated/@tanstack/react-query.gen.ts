@@ -2381,7 +2381,7 @@ export const get1MdbOptions = (options?: Options<Get1MdbData>) =>
 /**
  * Load 1Mdb
  *
- * Download the 11 public documents, make the case and its records, and start
+ * Download the case's documents and media, make the case and its records, and start
  * reading the documents. Loading again while it exists changes nothing.
  */
 export const load1MdbMutation = (

@@ -40054,7 +40054,7 @@
         "summary": "Get 1Mdb"
       },
       "post": {
-        "description": "Download the 11 public documents, make the case and its records, and start\nreading the documents. Loading again while it exists changes nothing.",
+        "description": "Download the case's documents and media, make the case and its records, and start\nreading the documents. Loading again while it exists changes nothing.",
         "operationId": "load_1mdb",
         "responses": {
           "200": {
@@ -40147,7 +40147,8 @@
               "enum": [
                 "us-v-anise-structuring",
                 "vekselberg-shell-network",
-                "deripaska-en-rusal"
+                "deripaska-en-rusal",
+                "jardine-cross-holding"
               ],
               "title": "Case Id",
               "type": "string"
@@ -40200,7 +40201,8 @@
               "enum": [
                 "us-v-anise-structuring",
                 "vekselberg-shell-network",
-                "deripaska-en-rusal"
+                "deripaska-en-rusal",
+                "jardine-cross-holding"
               ],
               "title": "Case Id",
               "type": "string"
