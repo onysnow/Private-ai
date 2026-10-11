@@ -10,7 +10,7 @@ trigger are tried on real records too.
   Man address shared by an organisation and a bank account (BO-032), dollar and
   euro payments, and sanctions identifiers;
 - deripaska-en-rusal: the same OFAC notice and Treasury's December 2018 letter
-  to Congress: one Jersey address written two ways (BO-032), ownership
+  to Congress: one Jersey address written two ways and a Moscow one written three ways (BO-032), ownership
   percentages, sanctions and politically exposed persons.
 
 Each case is app/demo/<case-id>/case.json and documents.json, in the same form

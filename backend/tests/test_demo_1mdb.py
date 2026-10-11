@@ -104,3 +104,22 @@ def test_a_web_page_that_is_not_the_expected_page_is_kept_as_a_link(tmp_path):
         assert db.query(RelationshipEdge).filter_by(investigation_id=inv.id).count() >= len(demo_1mdb.records()["relationships"])
         shown = demo_1mdb.progress(db)["not_downloaded"]
         assert {d["url"] for d in pages} <= {p["url"] for p in shown}
+
+
+def test_a_1mdb_load_that_stops_halfway_keeps_nothing(monkeypatch):
+    """As for the small cases: a half-made 1MDB case would pass for the loaded one,
+    so it is removed and the progress says what stopped the load."""
+    monkeypatch.setattr(demo_1mdb, "fetch_documents", lambda: [(meta, b"stand-in") for meta in demo_1mdb.manifest()])
+    real_build = demo_1mdb.build
+
+    def broken_build(db, documents, *, storage_dir):
+        from app.services import entities
+        monkeypatch.setattr(entities, "create_entity", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("database is locked")))
+        return real_build(db, documents, storage_dir=storage_dir)
+
+    monkeypatch.setattr(demo_1mdb, "build", broken_build)
+    body = client.post("/api/demo/1mdb").json()
+    assert body["state"] == "failed" and "database is locked" in body["error"] and body.get("investigation_id") is None
+    with SessionLocal() as db:
+        assert demo_1mdb.existing(db) is None
+    demo_1mdb.set_state(state="idle")

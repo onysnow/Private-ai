@@ -131,16 +131,27 @@ def test_vekselberg_raises_layering_and_shared_address(tmp_path):
     assert "BO-001" not in _counts(flags)
 
 
-def test_deripaska_raises_shared_address_on_the_exact_spelling_only(tmp_path):
+def test_deripaska_raises_shared_address_however_it_is_written(tmp_path):
     """Basic Element and En+ give "Esplanade 44, Saint Helier JE4 9WG, Jersey";
-    Rusal gives "44 Esplanade, St. Helier JE4 9WG, Jersey". The rule's matching
-    (lower case, punctuation folded) treats only the first two as one address."""
+    Rusal gives "44 Esplanade, St. Helier JE4 9WG, Jersey": one address. En+ owns
+    Rusal, but no link joins Basic Element to either, so all three stand, and the
+    flag says which pairs are unlinked. The Moscow address is written "St.", "Str."
+    and "Street": En+ is linked to both other holders and drops out; Rusal and
+    EuroSibEnergo (both En+'s, with no link between them) share it."""
     flags = _load("deripaska-en-rusal", tmp_path)
-    shared = [f for f in flags["flags"] if f["indicator_id"] == "BO-032"]
-    assert len(shared) == 1
-    assert {p["name"] for p in shared[0]["parties"]} == {"Basic Element Limited", "En+ Group plc"}
-    assert shared[0]["facts"]["value"] == "Esplanade 44, Saint Helier JE4 9WG, Jersey"
-    assert not {"BO-001", "BO-002", "ML-021"} & set(_counts(flags))
+    shared = {f["facts"]["value"]: f for f in flags["flags"] if f["indicator_id"] == "BO-032"}
+    assert set(shared) == {"Esplanade 44, Saint Helier JE4 9WG, Jersey", "1 Vasilisy Kozhinoy Street, Moscow 121096, Russia"}
+    jersey = shared["Esplanade 44, Saint Helier JE4 9WG, Jersey"]
+    assert [p["name"] for p in jersey["parties"]] == ["Basic Element Limited", "En+ Group plc", "United Company Rusal plc (Rusal)"]
+    assert jersey["facts"]["spellings"] == ["Esplanade 44, Saint Helier JE4 9WG, Jersey", "44 Esplanade, St. Helier JE4 9WG, Jersey"]
+    assert "United Company Rusal plc (Rusal): “44 Esplanade, St. Helier JE4 9WG, Jersey”" in jersey["facts"]["as_written"]
+    assert jersey["facts"]["no_link"] == ("no link in the records joins Basic Element Limited and En+ Group plc; "
+                                          "Basic Element Limited and United Company Rusal plc (Rusal)")
+    moscow = shared["1 Vasilisy Kozhinoy Street, Moscow 121096, Russia"]
+    assert [p["name"] for p in moscow["parties"]] == ["JSC EuroSibEnergo (ESE)", "United Company Rusal plc (Rusal)"]
+    assert moscow["facts"]["spellings"] == ["1 Vasilisy Kozhinoy Street, Moscow 121096, Russia", "1 Vasilisy Kozhinoy Str., Moscow 121096, Russia"]
+    assert "also written “1 Vasilisy Kozhinoy Str., Moscow 121096, Russia”" in moscow["summary"]
+    assert set(_counts(flags)) == {"BO-032"}
 
 
 def test_the_routes_list_and_follow_each_case(tmp_path):
@@ -178,3 +189,39 @@ def test_a_load_that_stops_halfway_keeps_nothing(monkeypatch):
     with SessionLocal() as db:
         assert demo_cases.existing(db, case_id) is None
     demo_cases.set_state(case_id, state="idle")
+
+
+def test_one_demo_loads_at_a_time(monkeypatch):
+    """Two builds at once can break SQLite. While one case loads, asking for it
+    again answers with its progress; asking for another is refused, naming it."""
+    from app.api import routes_demo
+    monkeypatch.setattr(demo_cases, "fetch_documents", lambda cid: (_ for _ in ()).throw(AssertionError("must not start")))
+    with routes_demo._one_build_at_a_time("deripaska-en-rusal"):
+        demo_cases.set_state("deripaska-en-rusal", state="building", step="Adding the parties, links, events and claims")
+        again = client.post("/api/demo/cases/deripaska-en-rusal")
+        assert again.status_code == 200 and again.json()["state"] == "building"
+        other = client.post("/api/demo/cases/us-v-anise-structuring")
+        assert other.status_code == 409
+        assert "Deripaska" in other.json()["detail"] or demo_cases.summary("deripaska-en-rusal")["title"] in other.json()["detail"]
+        one_mdb = client.post("/api/demo/1mdb")
+        assert one_mdb.status_code == 409 and "still loading" in one_mdb.json()["detail"]
+    with routes_demo._one_build_at_a_time(routes_demo.ONE_MDB):
+        assert "1MDB" in client.post("/api/demo/cases/us-v-anise-structuring").json()["detail"]
+    demo_cases.set_state("deripaska-en-rusal", state="idle")
+
+
+def test_a_failed_load_lets_the_next_one_start(monkeypatch):
+    """The lock is let go however a load ends."""
+    from app.api import routes_demo
+    calls = []
+
+    def failing_fetch(cid):
+        calls.append(cid)
+        raise demo_cases.DemoDownloadError("offline")
+
+    monkeypatch.setattr(demo_cases, "fetch_documents", failing_fetch)
+    for case_id in ("us-v-anise-structuring", "vekselberg-shell-network"):
+        assert client.post(f"/api/demo/cases/{case_id}").json()["state"] == "failed"
+        demo_cases.set_state(case_id, state="idle")
+    assert calls == ["us-v-anise-structuring", "vekselberg-shell-network"]
+    assert not routes_demo._build_lock.locked() and routes_demo._building is None

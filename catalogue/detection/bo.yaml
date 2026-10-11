@@ -58,9 +58,10 @@
 
 - indicator: BO-032
   family: shared_property
+  version: 2   # 2: one address written two ways is one address; a linked third holder no longer hides an unlinked pair
   params: {properties: {address: address, phone: phone, email: email}, unlinked_only: true}
   level: textbook   # a shared detail between unlinked parties meets the definition as worded
-  summary: "{names} share the {kind} “{value}” and no link joins them in the records."
+  summary: "{names} share the {kind} “{value}”{also_written}; {no_link}."
   examples:
     - name: two unlinked companies at one address
       parties: [{id: a, schema: Company, properties: {address: ["1 Harbour Road"]}}, {id: b, schema: Company, properties: {address: ["1 harbour road"]}}]
@@ -72,6 +73,16 @@
     - name: only the same city
       parties: [{id: a, schema: Company, properties: {address: ["New York, New York"]}}, {id: b, schema: RealEstate, properties: {address: ["New York, New York"]}}]
       expect: null
+    - name: one address written two ways
+      parties: [{id: a, schema: Company, properties: {address: ["Esplanade 44, Saint Helier JE4 9WG, Jersey"]}}, {id: b, schema: Company, properties: {address: ["44 Esplanade, St. Helier JE4 9WG, Jersey"]}}]
+      expect: textbook
+    - name: two house numbers on one street
+      parties: [{id: a, schema: Company, properties: {address: ["44 Esplanade, St. Helier JE4 9WG, Jersey"]}}, {id: b, schema: Company, properties: {address: ["45 Esplanade, St. Helier JE4 9WG, Jersey"]}}]
+      expect: null
+    - name: a third holder linked to one of two unlinked holders
+      parties: [{id: a, schema: Company, properties: {address: ["1 Harbour Road"]}}, {id: b, schema: Company, properties: {address: ["1 Harbour Rd."]}}, {id: c, schema: Company, properties: {address: ["Harbour Road 1"]}}]
+      links: [{schema: Ownership, source: b, target: c}]
+      expect: textbook
 
 - indicator: BO-033
   family: missing_property

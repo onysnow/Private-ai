@@ -126,3 +126,42 @@ def test_a_name_ending_in_a_full_stop_does_not_end_the_summary_twice():
     assert spec.text({"name": "Lamesa Holding S.A", "depth": 4}) == "Lamesa Holding S.A sits 4 layers down."
     spec_end = Spec(indicator="BO-002", family="chain_depth", level="faint", summary="Owned by {name}.")
     assert spec_end.text({"name": "Lamesa Holding S.A."}) == "Owned by Lamesa Holding S.A."
+
+
+def _shared(addresses: dict[str, str], links: list[tuple[str, str]] = ()) -> list:
+    fam = families()["shared_property"]
+    g = graph_of(Example(name="x", expect=None,
+                         parties=[{"id": k, "name": k.upper(), "schema": "Company", "properties": {"address": [v]}} for k, v in addresses.items()],
+                         links=[{"schema": "Ownership", "source": a, "target": b} for a, b in links]))
+    return fam.measure(g, fam.Params(properties={"address": "address"}))
+
+
+def test_one_address_written_two_ways_is_one_address():
+    from app.patterns.detectors.shared_property import address_key
+    jersey = ("44 Esplanade, St. Helier JE4 9WG, Jersey", "Esplanade 44, Saint Helier JE4 9WG, Jersey")
+    assert address_key(jersey[0]) == address_key(jersey[1])
+    moscow = [f"1 Vasilisy Kozhinoy {s}, Moscow 121096, Russia" for s in ("St.", "Str.", "Street")]
+    assert len({address_key(a) for a in moscow}) == 1
+    got = _shared({"a": jersey[0], "b": jersey[1]})
+    assert len(got) == 1 and got[0].facts["spellings"] == [jersey[0], jersey[1]]
+    assert got[0].facts["as_written"] == f"A: “{jersey[0]}”; B: “{jersey[1]}”"
+
+
+def test_two_house_numbers_or_postcodes_stay_two_addresses():
+    assert _shared({"a": "44 Esplanade, St. Helier JE4 9WG, Jersey", "b": "45 Esplanade, St. Helier JE4 9WG, Jersey"}) == []
+    assert _shared({"a": "Esplanade 44, Saint Helier JE4 9WG", "b": "Esplanade 44, Saint Helier JE4 9WH"}) == []
+    assert _shared({"a": "Unit 21, 515 Park Avenue, New York 10022", "b": "Unit 2I, 515 Park Avenue, New York 10022"}) == []
+
+
+def test_a_city_alone_still_does_not_count_however_written():
+    assert _shared({"a": "New York, New York", "b": "new york  new york."}) == []
+    assert _shared({"a": "St. Petersburg, Russia", "b": "Saint Petersburg, Russia"}) == []
+
+
+def test_a_linked_holder_does_not_hide_an_unlinked_pair():
+    """Three holders of one address, two of them linked: the third is unlinked to
+    both, so the flag stands and says which pairs no link joins."""
+    got = _shared({"a": "1 Harbour Road", "b": "1 Harbour Rd.", "c": "Harbour Road 1"}, links=[("b", "c")])
+    assert len(got) == 1 and got[0].parties == ["a", "b", "c"]
+    assert got[0].facts["no_link"] == "no link in the records joins A and B; A and C"
+    assert _shared({"a": "1 Harbour Road", "b": "1 Harbour Rd."}, links=[("a", "b")]) == []
