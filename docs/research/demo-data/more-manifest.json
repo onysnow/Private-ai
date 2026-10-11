@@ -1,0 +1,974 @@
+{
+ "generated": "2026-10-11",
+ "base_dir": "scratchpad/1mdb/more",
+ "notes": [
+  "All files fetched with curl + desktop Chrome User-Agent from the URL shown; sha256 is of the bytes saved. Pages are dynamic (ads/related links) so a re-fetch at app load time may hash differently even when the article is unchanged.",
+  "Quote \"location\" = 1-based index of the non-empty line in the extracted text file (<id>.txt) that contains the quote; quotes are verbatim substrings of the page text."
+ ],
+ "articles": [
+  {
+   "id": "sr-2015-heist",
+   "outlet": "Sarawak Report",
+   "url": "https://www.sarawakreport.org/2015/02/heist-of-the-century-how-jho-low-used-petrosaudi-as-a-front-to-siphon-billions-out-of-1mdb-world-exclusive/",
+   "headline": "HEIST OF THE CENTURY – How Jho Low Used PetroSaudi As “A Front” To Siphon Billions Out Of 1MDB!",
+   "date": "2015-02-28",
+   "author": "unknown (no byline on page; site lists \"Editor: Clare Rewcastle Brown\")",
+   "stance": "supports",
+   "file": "articles/sr-2015-heist.html",
+   "text_file": "articles/sr-2015-heist.txt",
+   "bytes": 256444,
+   "sha256": "f3ffea03b5af4158a900d28ac05242cd4698ee4d6744d0afbeb4361278b6595e",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "the USD$700 million so-called “loan” that was supposedly repaid to PetroSaudi as part of the joint venture agreement, was in fact directed into the Swiss bank account of a company called Good Star",
+     "words": 33,
+     "location": "text line 60 of sr-2015-heist.txt"
+    },
+    {
+     "text": "YAB PM has confirmed that he looks forward to the signing ceremony on 28 September 2009 to be attended by HRH Prince Turki Al-Saud.",
+     "words": 24,
+     "location": "text line 250 of sr-2015-heist.txt"
+    }
+   ]
+  },
+  {
+   "id": "sr-2015-goodstar-330m",
+   "outlet": "Sarawak Report",
+   "url": "https://www.sarawakreport.org/2015/04/further-usd330-million-went-straight-to-jho-lows-good-star-from-1mdb-new-exclusive/",
+   "headline": "Further USD$330 million Went Straight To Jho Low’s Good Star Limited From 1MDB! NEW EXCLUSIVE",
+   "date": "2015-04-25",
+   "author": "unknown (no byline on page; site lists \"Editor: Clare Rewcastle Brown\")",
+   "stance": "supports",
+   "links_to": "more/tables/doj-2016-park-laurel-transfers.csv rows 1-4 (DOJ Table 1: $30m/$65m/$110m/$125m to Good Star Account, 2011)",
+   "file": "articles/sr-2015-goodstar-330m.html",
+   "text_file": "articles/sr-2015-goodstar-330m.txt",
+   "bytes": 173305,
+   "sha256": "1fb7b3f961301a7ae9f1775fdc28480e5106e27822eac830d7f478c58e0cec05",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "Good Star Limited is based in the Seychelles, but incorporated in the Cayman Islands and it has a bank account in Zurich. A signatory is Seet Li Lin, who is Jho Low’s deputy.",
+     "words": 33,
+     "location": "text line 59 of sr-2015-goodstar-330m.txt"
+    },
+    {
+     "text": "The money was transferred in four separate tranches in the form of USD currency ($30 million",
+     "words": 16,
+     "location": "text line 67 of sr-2015-goodstar-330m.txt"
+    }
+   ]
+  },
+  {
+   "id": "edge-2015-najib-denial",
+   "outlet": "The Edge (The Edge Financial Daily; credited The Malaysian Insider/Bernama)",
+   "url": "https://theedgemalaysia.com/article/%E2%80%98if-i-wanted-steal-money-i-won%E2%80%99t-put-it-malaysia%E2%80%99",
+   "headline": "‘If I wanted to steal money, I won’t put it in Malaysia’",
+   "date": "2015-07-06",
+   "author": "Anisah Shukry of The Malaysian Insider",
+   "stance": "contradicts",
+   "stance_note": "Najib denies stealing 1MDB funds / receiving them for personal gain",
+   "file": "articles/edge-2015-najib-denial.html",
+   "text_file": "articles/edge-2015-najib-denial.txt",
+   "bytes": 166986,
+   "sha256": "ddef0e19e53afa2445b2c21fc31934e8f190cfbacb2203eaab0dcec692334891",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "If I wanted to steal, surely I won’t steal the money and bring it into an account in Malaysia.",
+     "words": 19,
+     "location": "text line 9 of edge-2015-najib-denial.txt"
+    },
+    {
+     "text": "Last Thursday, the Wall Street Journal (WSJ) alleged that up to US$700 million was transferred to Najib’s personal bank accounts with AmBank in 2013, just before the 13th general election.",
+     "words": 30,
+     "location": "text line 10 of edge-2015-najib-denial.txt"
+    }
+   ]
+  },
+  {
+   "id": "edge-2016-ag-clears",
+   "outlet": "The Edge (The Edge Financial Daily; credited The Malaysian Insider)",
+   "url": "https://theedgemalaysia.com/article/ag-clears-pm-wrongdoing-rm26b-affair",
+   "headline": "AG clears PM of wrongdoing in RM2.6b affair",
+   "date": "2016-01-27",
+   "author": "V. Anbalagan",
+   "stance": "contradicts",
+   "stance_note": "Attorney-General says US$681m was a personal Saudi royal donation, no offence",
+   "note": "Second quote prints \"RM2.03 million\" verbatim (apparent source typo for billion); do not correct.",
+   "file": "articles/edge-2016-ag-clears.html",
+   "text_file": "articles/edge-2016-ag-clears.txt",
+   "bytes": 166447,
+   "sha256": "3503d698c6fac7c904c38c8335b421a89ea345288204dca4175f85b2d82ebba2",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "the sum of US$681 million (RM2.08 billion) deposited into personal accounts of the prime minister between March 22, 2013 and April 10, 2013 was a personal donation to Najib from the Saudi royal family",
+     "words": 34,
+     "location": "text line 10 of edge-2016-ag-clears.txt"
+    },
+    {
+     "text": "Najib returned US$620 million (RM2.03 million) to the Saudi royal family in August 2013 because the money was not utilised.",
+     "words": 20,
+     "location": "text line 13 of edge-2016-ag-clears.txt"
+    }
+   ]
+  },
+  {
+   "id": "grd-2016-cleared",
+   "outlet": "The Guardian",
+   "url": "https://www.theguardian.com/world/2016/jan/26/malaysian-pm-najib-razak-cleared-corruption-gift-saudi-royals",
+   "headline": "Malaysian prime minister cleared of corruption over $681m Saudi 'gift'",
+   "date": "2016-01-26",
+   "author": "Oliver Holmes (and agencies)",
+   "stance": "contradicts",
+   "stance_note": "Reports AG/Najib position that $681m was a Saudi gift and no crime committed",
+   "file": "articles/grd-2016-cleared.html",
+   "text_file": "articles/grd-2016-cleared.txt",
+   "bytes": 318020,
+   "sha256": "38948b5b02bce73f0ec0b4d4346be8eaf04b5754b8f778b293dd7e9b9c78a022",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "Malaysia’s attorney general said on Tuesday that $681m transferred into prime minister Najib Razak’s personal bank account was a gift from the royal family in Saudi Arabia, and there were no criminal offences or corruption involved.",
+     "words": 36,
+     "location": "text line 128 of grd-2016-cleared.txt"
+    },
+    {
+     "text": "Najib said he welcomed the attorney general’s comments that “confirmed what I have maintained all along: that no crime was committed.”",
+     "words": 21,
+     "location": "text line 138 of grd-2016-cleared.txt"
+    }
+   ]
+  },
+  {
+   "id": "sbs-2016-cleared-gift",
+   "outlet": "SBS News (Reuters wire copy)",
+   "url": "https://www.sbs.com.au/news/article/malaysian-pm-cleared-of-corruption-over-681m-gift/hg06guvwa",
+   "headline": "Malaysian PM cleared of corruption over $681m 'gift'",
+   "date": "2016-01-26",
+   "author": "unknown (no byline; text is Reuters wire copy)",
+   "stance": "contradicts",
+   "stance_note": "AG says transfer was a Saudi royal gift",
+   "file": "articles/sbs-2016-cleared-gift.html",
+   "text_file": "articles/sbs-2016-cleared-gift.txt",
+   "bytes": 477357,
+   "sha256": "acf93895134238f4f6886bcb7783c9850d5f4f655f4237b98858124465b71784",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "Apandi said in a statement that $620 million was returned to the Saudi royal family in August 2013, about five months after the transfer, because it had not been utilised.",
+     "words": 30,
+     "location": "text line 74 of sbs-2016-cleared-gift.txt"
+    }
+   ]
+  },
+  {
+   "id": "grd-2016-swiss-4bn",
+   "outlet": "The Guardian (AFP)",
+   "url": "https://www.theguardian.com/world/2016/jan/30/swiss-investigators-say-us4bn-stolen-from-malaysian-state-owned-companies",
+   "headline": "Swiss investigators say US$4bn stolen from Malaysian state-owned companies",
+   "date": "2016-01-30",
+   "author": "Agence France-Presse in Geneva (structured data: \"Guardian staff reporter\")",
+   "stance": "supports",
+   "links_to": "more/docs/oag-2016-01-29-entraide-fr.html (Swiss OAG press release this article reports)",
+   "file": "articles/grd-2016-swiss-4bn.html",
+   "text_file": "articles/grd-2016-swiss-4bn.txt",
+   "bytes": 322576,
+   "sha256": "413c8dbabbe065669e5bb2b3e3cf62e1599560ea1ff77bce303cebba553c0d0a",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "Swiss investigators said they believed around US$4bn had been stolen from Malaysian state-owned companies, funding that was earmarked for economic and social development projects in Malaysia.",
+     "words": 26,
+     "location": "text line 130 of grd-2016-swiss-4bn.txt"
+    },
+    {
+     "text": "criminal proceedings opened in August 2015 against two former officials of Malaysian state-owned fund 1MDB (1Malaysia Development Berhad) and “persons unknown”.",
+     "words": 21,
+     "location": "text line 137 of grd-2016-swiss-4bn.txt"
+    }
+   ]
+  },
+  {
+   "id": "grd-2016-misinformation",
+   "outlet": "The Guardian",
+   "url": "https://www.theguardian.com/world/2016/feb/02/malaysia-accuses-switzerland-of-misinformation-over-stolen-1mbd-billions",
+   "headline": "Malaysia accuses Switzerland of 'misinformation' over stolen 1MDB billions",
+   "date": "2016-02-02",
+   "author": "Oliver Holmes",
+   "stance": "contradicts",
+   "stance_note": "Malaysian minister disputes Swiss US$4bn figure",
+   "file": "articles/grd-2016-misinformation.html",
+   "text_file": "articles/grd-2016-misinformation.txt",
+   "bytes": 330363,
+   "sha256": "6eb12395d414c501bf6f3dad6b2fec6547ea577ff4d8e4f29119b5308aa7d75f",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "Salleh said 1MDB had undergone extensive audits since 2009 and the $4bn figure “simply could not have been misappropriated under such conditions.”",
+     "words": 22,
+     "location": "text line 140 of grd-2016-misinformation.txt"
+    },
+    {
+     "text": "The premier’s critics allege the transfers was in fact linked to the 1MDB, an accusation that 1MDB, the attorney general and the prime minister deny.",
+     "words": 25,
+     "location": "text line 136 of grd-2016-misinformation.txt"
+    }
+   ]
+  },
+  {
+   "id": "mkini-2018-ag-report",
+   "outlet": "Malaysiakini",
+   "url": "https://www.malaysiakini.com/news/425115",
+   "headline": "Auditor-general declassifies 1MDB audit report",
+   "date": "2018-05-15",
+   "author": "unknown (structured data names organisation \"Malaysiakini\")",
+   "stance": "supports",
+   "paywalled": "partial (isAccessibleForFree=False; only opening paragraphs in HTML)",
+   "file": "articles/mkini-2018-ag-report.html",
+   "text_file": "articles/mkini-2018-ag-report.txt",
+   "bytes": 115132,
+   "sha256": "ecefb4b11f8237e1c79c1809e3e01b097ca74bf4df4b905cbad06cb9253eceed",
+   "fetched": true,
+   "http_status": 200,
+   "quotes": [
+    {
+     "text": "I refer to the 1MDB audit report which was classified as secret on Jan 22, 2016 and was presented to the Public Accounts Committee on March 4, 2016.",
+     "words": 28,
+     "location": "text line 76 of mkini-2018-ag-report.txt"
+    }
+   ]
+  },
+  {
+   "id": "aj-2018-jholow-charged",
+   "outlet": "Al Jazeera",
+   "url": "https://www.aljazeera.com/news/2018/8/24/malaysian-financier-jho-low-charged-over-massive-1mdb-scandal",
+   "headline": "Malaysian financier Jho Low charged over massive 1MDB scandal",
+   "date": "2018-08-24",
+   "author": "unknown (no byline; organisation Al Jazeera; cites AFP)",
+   "stance": "mixed",
+   "stance_note": "Reports charges; quotes Jho Low spokesman disputing fairness",
+   "file": "articles/aj-2018-jholow-charged.html",
+   "text_file": "articles/aj-2018-jholow-charged.txt",
+   "bytes": 185623,
+   "sha256": "663511fd0dc2ce8266ee1b66521f97cc8a83bf7bb051fd63be5955e702164ebe",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "has been charged with eight counts of money-laundering charges, police said.",
+     "words": 11,
+     "location": "text line 42 of aj-2018-jholow-charged.txt"
+    },
+    {
+     "text": "It is abundantly clear that it would be impossible for Mr Low to get a fair trial in Malaysia, where the government has proven time and time again that they have no interest in the rule of law",
+     "words": 38,
+     "location": "text line 52 of aj-2018-jholow-charged.txt"
+    }
+   ]
+  },
+  {
+   "id": "grd-2018-doj-goldman",
+   "outlet": "The Guardian",
+   "url": "https://www.theguardian.com/world/2018/nov/01/malaysia-1mdb-scandal-us-justice-department-charges-former-goldman-bankers",
+   "headline": "US justice department charges former Goldman bankers in 1MDB scandal",
+   "date": "2018-11-01",
+   "author": "Dominic Rushe",
+   "stance": "mixed",
+   "stance_note": "Reports charges; carries Goldman's earlier position (no knowledge of misuse)",
+   "file": "articles/grd-2018-doj-goldman.html",
+   "text_file": "articles/grd-2018-doj-goldman.txt",
+   "bytes": 328916,
+   "sha256": "d99379af085e09fa686bf377ea2bfae11f48800cf5ce564a3e3a577dce1a0195",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "Leissner has been ordered to forfeit $43.7m as a result of his crimes.",
+     "words": 13,
+     "location": "text line 134 of grd-2018-doj-goldman.txt"
+    },
+    {
+     "text": "Goldman Sachs has said it is fully cooperating with the investigation and that it had no knowledge of how the money from the fund was being used.",
+     "words": 27,
+     "location": "text line 137 of grd-2018-doj-goldman.txt"
+    }
+   ]
+  },
+  {
+   "id": "fmt-2018-jholow-innocence",
+   "outlet": "Free Malaysia Today",
+   "url": "https://www.freemalaysiatoday.com/category/nation/2018/11/02/jho-low-maintains-innocence-amid-1mdb-charges",
+   "headline": "Jho Low maintains innocence amid 1MDB charges",
+   "date": "2018-11-02",
+   "date_note": "published_time 2018-11-01T23:34:30Z (= 2018-11-02 07:34 MYT)",
+   "author": "FMT Reporters",
+   "stance": "contradicts",
+   "stance_note": "Jho Low's spokesman denies wrongdoing",
+   "file": "articles/fmt-2018-jholow-innocence.html",
+   "text_file": "articles/fmt-2018-jholow-innocence.txt",
+   "bytes": 219188,
+   "sha256": "57de637d01dcbfcd9fcf42d2d38186c94f4cb5df8b6b0f67dd543c88052ec082",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "the bond offerings detailed in the indictment were undertaken openly and lawfully between experienced, well-regulated financial institutions and government entities.",
+     "words": 20,
+     "location": "text line 69 of fmt-2018-jholow-innocence.txt"
+    },
+    {
+     "text": "the businessman held no formal position at 1MDB, nor was he ever employed by Goldman Sachs or the governments of Malaysia or Abu Dhabi.",
+     "words": 24,
+     "location": "text line 68 of fmt-2018-jholow-innocence.txt"
+    }
+   ]
+  },
+  {
+   "id": "grd-2018-goldman-boss",
+   "outlet": "The Guardian",
+   "url": "https://www.theguardian.com/business/2018/nov/09/new-goldman-sachs-boss-faces-1mdb-fallout",
+   "headline": "New Goldman Sachs boss faces 1MDB fallout",
+   "date": "2018-11-09",
+   "author": "Kalyeena Makortoff",
+   "stance": "supports",
+   "file": "articles/grd-2018-goldman-boss.html",
+   "text_file": "articles/grd-2018-goldman-boss.txt",
+   "bytes": 319424,
+   "sha256": "7533f9598a2f9ac442f3ee92e8e183699dac9687051fc1c7fd7d80575a03d2f7",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "the Wall Street Journal published documents showing Najib received at least $681m (£518m) in payments to his personal bank accounts.",
+     "words": 20,
+     "location": "text line 141 of grd-2018-goldman-boss.txt"
+    },
+    {
+     "text": "charging fees of about $600m (£460m) for its efforts.",
+     "words": 9,
+     "location": "text line 130 of grd-2018-goldman-boss.txt"
+    }
+   ]
+  },
+  {
+   "id": "bbc-2020-najib-guilty",
+   "outlet": "BBC News",
+   "url": "https://www.bbc.com/news/world-asia-53563065",
+   "headline": "Najib Razak: Malaysian ex-PM gets 12-year jail term in 1MDB corruption trial",
+   "date": "2020-07-28",
+   "author": "unknown (BBC News, no byline)",
+   "stance": "supports",
+   "file": "articles/bbc-2020-najib-guilty.html",
+   "text_file": "articles/bbc-2020-najib-guilty.txt",
+   "bytes": 283763,
+   "sha256": "a714c00601eb79e77af8dc66ee66f3251e711e84a8f2e42a77c9bacd0dc35f7b",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "Tuesday's verdicts centred on 42 million ringgit ($10m; £7.7m) transferred from the fund to the then-prime minister's private accounts.",
+     "words": 19,
+     "location": "text line 52 of bbc-2020-najib-guilty.txt"
+    },
+    {
+     "text": "Najib denies all wrongdoing and says he was misled by financial advisers - in particular fugitive financier Jho Low.",
+     "words": 19,
+     "location": "text line 53 of bbc-2020-najib-guilty.txt"
+    }
+   ]
+  },
+  {
+   "id": "edge-2020-src-guilty",
+   "outlet": "The Edge (theedgemarkets.com)",
+   "url": "https://theedgemalaysia.com/article/src-trial-najib-found-guilty-all-charges",
+   "url_requested": "https://theedgemarkets.com/article/523798",
+   "headline": "SRC Trial: Najib found guilty of all charges",
+   "date": "2020-07-28",
+   "author": "Hafiz Yatim",
+   "stance": "supports",
+   "file": "articles/edge-2020-src-guilty.html",
+   "text_file": "articles/edge-2020-src-guilty.txt",
+   "bytes": 168525,
+   "sha256": "2b6c1049ca2924ac849ac377e9cb752f3738c5cffd6b611ab216242ee338702d",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "for misappropriating RM27 million and RM5 million in December 2014, and another RM10 million in February 2015.",
+     "words": 17,
+     "location": "text line 10 of edge-2020-src-guilty.txt"
+    },
+    {
+     "text": "The funds were part of two loans from the Retirement Fund, Inc (KWAP) to SRC worth a total of RM4 billion.",
+     "words": 21,
+     "location": "text line 11 of edge-2020-src-guilty.txt"
+    }
+   ]
+  },
+  {
+   "id": "malaymail-2020-guilty",
+   "outlet": "Malay Mail",
+   "url": "https://www.malaymail.com/news/malaysia/2020/07/28/high-court-finds-najib-guilty-of-misappropriation-of-rm42m-src-internationa/1888749",
+   "headline": "High Court finds Najib guilty of all seven charges in misappropriation of RM42m SRC International funds",
+   "date": "2020-07-28",
+   "author": "Kenneth Tee",
+   "stance": "supports",
+   "file": "articles/malaymail-2020-guilty.html",
+   "text_file": "articles/malaymail-2020-guilty.txt",
+   "bytes": 151048,
+   "sha256": "707415e31f47e8aea9a3f9dbe9080a449a5ea8e957719ae9fb48480284eaee01",
+   "fetched": true,
+   "http_status": 200,
+   "paywalled": "no",
+   "quotes": [
+    {
+     "text": "Najib was complicit in the deposits of RM42 million from SRC International in his private account.",
+     "words": 16,
+     "location": "text line 86 of malaymail-2020-guilty.txt"
+    }
+   ]
+  }
+ ],
+ "articles_failed": [
+  {
+   "outlet": "Wall Street Journal",
+   "url": "https://www.wsj.com/articles/SB10130211234592774869404581083700187014570",
+   "headline": "unknown (not fetched; July 2015 $700m-to-Najib story)",
+   "http_status": 401,
+   "reason": "paywall/bot block (HTTP 401); dropped. WSJ's own tweet of 2015-07-07 linking the documents is recorded under social_posts."
+  },
+  {
+   "outlet": "New York Times",
+   "url": "https://www.nytimes.com/2015/02/09/nyregion/stream-of-foreign-wealth-flows-to-time-warner-condos.html",
+   "http_status": 403,
+   "reason": "blocked (HTTP 403); dropped"
+  },
+  {
+   "outlet": "Bloomberg",
+   "url": "https://www.bloomberg.com/news/articles/2015-07-08/malaysia-premier-najib-under-fire-what-you-need-to-know",
+   "http_status": 403,
+   "reason": "blocked (HTTP 403); dropped"
+  },
+  {
+   "outlet": "CNBC",
+   "url": "https://www.cnbc.com/2015/07/03/probe-finds-700m-flowed-from-1mdb-to-najib-razaks-accounts-wsj.html",
+   "http_status": 403,
+   "reason": "blocked (HTTP 403); dropped"
+  },
+  {
+   "outlet": "Reuters",
+   "url": "https://www.reuters.com/world/asia-pacific/",
+   "http_status": 401,
+   "reason": "whole site returns 401 to curl; no Reuters URL fetched. Reuters wire copy obtained via SBS (sbs-2016-cleared-gift)."
+  },
+  {
+   "outlet": "Associated Press",
+   "url": "https://apnews.com/hub/1mdb",
+   "http_status": 403,
+   "reason": "blocked (HTTP 403); dropped"
+  }
+ ],
+ "social_posts": [
+  {
+   "id": "tw-wsj-2015-07-07",
+   "platform": "X/Twitter",
+   "account": "@WSJ (The Wall Street Journal)",
+   "url": "https://x.com/WSJ/status/618337593449676800",
+   "date": "2015-07-07",
+   "text": "The documents showing alleged transfers of almost $700 million to Najib’s bank accounts  http://t.co/0cfxTOBsWf pic.twitter.com/ff4PWnuQIO",
+   "live": true,
+   "verified_via": "publish.twitter.com oEmbed (HTTP 200), 2026-10-11",
+   "relevance": "WSJ publishes the documents behind its $700m-to-Najib story (the WSJ article itself returned 401)."
+  },
+  {
+   "id": "tw-najib-2018-07-03",
+   "platform": "X/Twitter",
+   "account": "@NajibRazak (Mohd Najib Tun Razak)",
+   "url": "https://x.com/NajibRazak/status/1014163646459465729",
+   "date": "2018-07-03",
+   "language": "ms",
+   "text": "Saya terima bahawa hari ini adalah hari saya dan keluarga menjalani dugaan dunia. pic.twitter.com/UbjGK9GBDb",
+   "translation_note": "Malay; roughly \"I accept that today is the day my family and I face a worldly trial.\" (our gloss, not official)",
+   "live": true,
+   "verified_via": "oEmbed HTTP 200, 2026-10-11",
+   "relevance": "Posted on day of his MACC arrest in the SRC/1MDB probe (embedded in Malay Mail 2018-07-03 report)."
+  },
+  {
+   "id": "tw-najib-2024-07-12",
+   "platform": "X/Twitter",
+   "account": "@NajibRazak (Mohd Najib Tun Razak)",
+   "url": "https://x.com/NajibRazak/status/1811708244735504874",
+   "date": "2024-07-12",
+   "language": "ms",
+   "text": "Najib tahu lah. Dia orang minyak, dulu kerja Petronas. pic.twitter.com/eKv3hbetvV",
+   "live": true,
+   "verified_via": "oEmbed HTTP 200, 2026-10-11",
+   "relevance": "Focus Malaysia (2024-07-13) reports users tying this \"orang minyak\" post to the RM2.6b money flow; tweet itself does not mention 1MDB."
+  },
+  {
+   "id": "tw-jasonng-2017-10-24",
+   "platform": "X/Twitter",
+   "account": "@ByJasonNg (Jason Ng)",
+   "url": "https://x.com/ByJasonNg/status/922765390303784960",
+   "date": "2017-10-24",
+   "text": "Oh? What \"issues\" were solved? What about the \"issues\" created by 1MDB then? https://t.co/tP3GWE13eT",
+   "live": true,
+   "verified_via": "oEmbed HTTP 200, 2026-10-11",
+   "relevance": "Public reaction to Najib's 2017-10-24 blog post claiming 1MDB funds solved earlier \"issues\" (cited in The Malaysian Insider 2017-10-24)."
+  },
+  {
+   "id": "fb-najib-2018-09-10",
+   "platform": "Facebook",
+   "account": "Najib Razak (facebook.com/najibrazak)",
+   "url": "https://www.facebook.com/najibrazak/posts/10155580409135952",
+   "date": "2018-09-10",
+   "date_note": "per SAYS (published 2018-09-10T21:01Z): \"uploaded last night around 8pm\"; exact timestamp unverified",
+   "text": "For example, I had given these funds to UMNO Johor to buy some vans. Unfortunately, the PH government has recently confiscated these vans,",
+   "text_source": "as quoted by SAYS (Sadho Ram, 2018-09-10) https://says.com/my/news/najib-shares-documents-claiming-usd100-million-came-as-gift-from-saudi-arabian-royalty — original post language and wording not seen",
+   "live": "unverified (facebook.com returns HTTP 400 / login wall to non-logged-in requests)",
+   "stance": "contradicts",
+   "relevance": "Najib posts letters he says show a USD100 million gift from the late Saudi King Abdullah in 2011."
+  },
+  {
+   "id": "web-jholow-2018-09",
+   "platform": "Personal website (jho-low.com)",
+   "account": "Low Taek Jho (Jho Low)",
+   "url": "https://www.jho-low.com/",
+   "date": "2018-09 (site launch reported 2018-09-17)",
+   "text": "Let me be clear: I am innocent,",
+   "text_source": "as quoted by Malay Mail (Debra Chong, 2018-09-17) https://www.malaymail.com/news/malaysia/2018/09/17/in-new-website-fugitive-jho-low-proclaims-innocence-in-1mdb-scandal/1673425",
+   "live": false,
+   "live_check": "https://www.jho-low.com/ TLS certificate does not match host; http://jho-low.com/ returns HTTP 404 (2026-10-11)",
+   "stance": "contradicts"
+  }
+ ],
+ "official_docs_non_english": [
+  {
+   "id": "oag-2016-01-29-entraide-fr",
+   "file": "docs/oag-2016-01-29-entraide-fr.html",
+   "url": "https://www.bundesanwaltschaft.ch/fr/nsb?id=60510",
+   "bytes": 98775,
+   "sha256": "5b1ebdd5bfe55fc077dac41441a8da2b0e96039b6395871dce603badc8ca05b8",
+   "format": "html",
+   "pages": null,
+   "text_layer": "n/a (HTML)",
+   "publisher": "Ministère public de la Confédération (Swiss Office of the Attorney General)",
+   "title": "Affaire 1MDB: Le Ministère public de la Confédération requiert l’entraide judiciaire de la part des autorités malaisiennes",
+   "date": "2016-01-29",
+   "language": "fr",
+   "type": "press release",
+   "scanned": false,
+   "note": "Same release is mirrored on admin.ch (msg-id-60510) but admin.ch returned HTTP 403; this is the OAG's own domain. Body text is embedded as JSON in the HTML.",
+   "quotes": [
+    {
+     "text": "Le montant des détournements investigués est d’environ USD 4 milliards",
+     "location": "press-release text"
+    },
+    {
+     "text": "procédure pénale ouverte le 14 août 2015 contre deux anciens organes du fonds souverain malaisien 1MDB",
+     "location": "press-release text"
+    }
+   ]
+  },
+  {
+   "id": "oag-2016-01-29-rechtshilfe-de",
+   "file": "docs/oag-2016-01-29-rechtshilfe-de.html",
+   "url": "https://www.bundesanwaltschaft.ch/de/nsb?id=60510",
+   "bytes": 83414,
+   "sha256": "3ae65fb70314cc933d7e4f6b69bb7ecd965be14e7bb2fcd56e959e94d2466ba1",
+   "format": "html",
+   "pages": null,
+   "text_layer": "n/a (HTML)",
+   "publisher": "Bundesanwaltschaft (Swiss Office of the Attorney General)",
+   "title": "German version of the 29.1.2016 1MDB mutual-legal-assistance release",
+   "date": "2016-01-29",
+   "language": "de",
+   "type": "press release",
+   "scanned": false,
+   "quotes": [
+    {
+     "text": "Im Rahmen des am 14. August 2015 eröffneten Strafverfahrens gegen zwei ehemalige Organe des malaysischen Staatsfonds 1MDB",
+     "location": "press-release text"
+    }
+   ]
+  },
+  {
+   "id": "oag-2023-04-25-anklage-petrosaudi-de",
+   "file": "docs/oag-2023-04-25-anklage-petrosaudi-de.html",
+   "url": "https://www.bundesanwaltschaft.ch/de/nsb?id=94524",
+   "bytes": 93657,
+   "sha256": "1386ca7bc39abc7d52182798119f2cbc4f4cbc3fbd5905b8ecc74796a36ec46e",
+   "format": "html",
+   "pages": null,
+   "text_layer": "n/a (HTML)",
+   "publisher": "Bundesanwaltschaft (Swiss Office of the Attorney General)",
+   "title": "1MDB-Komplex: Bundesanwaltschaft klagt zwei PETROSAUDI- Führungspersonen an",
+   "date": "2023-04-25",
+   "language": "de",
+   "type": "press release",
+   "scanned": false,
+   "quotes": [
+    {
+     "text": "mindestens USD 1.8 Milliarden veruntreut und gewaschen zu haben",
+     "location": "press-release text"
+    },
+    {
+     "text": "Die Zusammenkunft fand im August 2009 auf der Yacht «Alfa Nero» in der Nähe von Cannes statt.",
+     "location": "press-release text"
+    }
+   ]
+  },
+  {
+   "id": "bstger-2024-sk-2023-24-dispositif-fr",
+   "file": "docs/bstger-2024-sk-2023-24-dispositif-fr.pdf",
+   "url": "https://www.bstger.ch/uploads/2024-08-28_SK.2023.24_Dispositif_anonymise.pdf",
+   "bytes": 296357,
+   "sha256": "0aa36911706702a0f597e5d7e057f0b4934dc43a9132b720aac97e606f5f03dc",
+   "format": "pdf",
+   "pages": 11,
+   "text_chars_per_page_min": 223,
+   "text_chars_per_page_max": 3369,
+   "pages_with_text_gt_200_chars": 11,
+   "embedded_images": 0,
+   "publisher": "Bundesstrafgericht / Tribunal pénal fédéral (Swiss Federal Criminal Court), Cour des affaires pénales",
+   "title": "Jugement du 28 août 2024, SK.2023.24 (dispositif, anonymisé) – PetroSaudi managers",
+   "date": "2024-08-28",
+   "language": "fr",
+   "type": "court judgment (operative part)",
+   "scanned": false,
+   "text_layer": true,
+   "note": "Anonymised: defendants appear as A. and B.; plaintiffs as C. BHD and D. LTD.",
+   "quotes": [
+    {
+     "text": "A. est condamné à une peine privative de liberté de 7 ans.",
+     "location": "page 4"
+    },
+    {
+     "text": "escroquerie (art. 146 al. 1 CP)",
+     "location": "page 4"
+    }
+   ]
+  },
+  {
+   "id": "mykh-2020-wa-44-125-06-2019-pp-v-rohaizah",
+   "file": "docs/mykh-2020-wa-44-125-06-2019-pp-v-rohaizah.pdf",
+   "url": "https://efs.kehakiman.gov.my/EFSWeb/DocDownloader.aspx?DocumentID=b13a9726-ffa2-400b-97d8-63cf64619911&Inline=true",
+   "bytes": 634725,
+   "sha256": "d8c8db510c8385d139afb973f4373312defebc181827f300ae8e4032ea321684",
+   "format": "pdf",
+   "pages": 30,
+   "text_chars_per_page_min": 0,
+   "text_chars_per_page_max": 0,
+   "pages_with_text_gt_200_chars": 0,
+   "embedded_images": 30,
+   "publisher": "Mahkamah Tinggi Malaya, Kuala Lumpur (via Malaysian Judiciary eJudgment portal)",
+   "title": "Pendakwa Raya lwn Rohaizah binti Ahmad & 6 lagi, Permohonan Jenayah No. WA-44-125-06/2019 – Penghakiman",
+   "date": "2020-06-30",
+   "date_note": "eJudgment DateOfResult",
+   "language": "ms",
+   "type": "court judgment (forfeiture application)",
+   "scanned": true,
+   "text_layer": false,
+   "scanner": "DocuCentre-V 3065 (PDF producer)",
+   "note": "Genuinely scanned: every page is an image with 0 extractable characters. Para [1] says the money was allegedly given by the former Prime Minister (sentence continues on p.2).",
+   "quotes": [
+    {
+     "text": "Pendakwa Raya telah memohon untuk melucuthak wang berjumlah RM265,146.16 di dalam akaun bank Allahyarham Abdul Manan bin Ismail",
+     "location": "page 1, para [1] – transcribed by eye from the page image (NO text layer; verify after OCR)"
+    }
+   ]
+  }
+ ],
+ "court_and_records": [
+  {
+   "id": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+   "file": "docs/mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb.pdf",
+   "url": "https://efs.kehakiman.gov.my/EFSWeb/DocDownloader.aspx?DocumentID=aaef5199-3cde-40b7-853a-56dea01311a8&Inline=true",
+   "bytes": 21099186,
+   "sha256": "7d571d594c7d953e1d619758f204950e797719632c9cecba2d84664ded925387",
+   "format": "pdf",
+   "pages": 810,
+   "text_chars_per_page_min": 124,
+   "text_chars_per_page_max": 170,
+   "pages_with_text_gt_200_chars": 0,
+   "embedded_images": 1620,
+   "publisher": "High Court of Malaya, Kuala Lumpur (Malaysian Judiciary eJudgment portal)",
+   "title": "Public Prosecutor v Mohd Najib bin Hj Abd Razak, WA-45-7-11/2018 – grounds of judgment (1MDB trial)",
+   "date": "2025-12-26",
+   "date_note": "eJudgment DateOfResult",
+   "language": "en",
+   "type": "court judgment",
+   "scanned": true,
+   "text_layer": "stamp only",
+   "note": "810 pages, 21 MB. Each page is an image; the only text layer is the eFiling serial-number stamp (124–170 chars/page), so body text needs OCR. Very large – consider loading a page range.",
+   "quotes": [
+    {
+     "text": "A total of 50 prosecution witnesses and 26 witnesses for the defence were called.",
+     "location": "page 3, para [5] – transcribed by eye from page image (no body text layer)"
+    }
+   ]
+  },
+  {
+   "id": "mykh-2020-wa-44-117-06-2020-najib-v-pp",
+   "file": "docs/mykh-2020-wa-44-117-06-2020-najib-v-pp.pdf",
+   "url": "https://efs.kehakiman.gov.my/EFSWeb/DocDownloader.aspx?DocumentID=43ef81ed-baf6-4cbb-a468-59cbf401e348&Inline=true",
+   "bytes": 620861,
+   "sha256": "46968160f349fa798802f9c12ec4dbdca126cb691295848d34a9a4b80092114d",
+   "format": "pdf",
+   "pages": 25,
+   "text_chars_per_page_min": 0,
+   "text_chars_per_page_max": 0,
+   "pages_with_text_gt_200_chars": 0,
+   "embedded_images": 25,
+   "publisher": "High Court of Malaya, Kuala Lumpur (Criminal Division)",
+   "title": "Dato' Sri Mohd Najib bin Hj Abdul Razak v Public Prosecutor, Criminal Application No. WA-44-117-06/2020 – Judgment (application to quash 1MDB audit-report charge)",
+   "date": "2020-08-14",
+   "date_note": "eJudgment DateOfResult",
+   "language": "en",
+   "type": "court judgment",
+   "scanned": true,
+   "text_layer": false,
+   "scanner": "DocuCentre-V 3065 (PDF producer)",
+   "quotes": [
+    {
+     "text": "The charge against the applicant was in relation to the audit report done by the Auditor General then (Tan Sri Ambrin Buang)",
+     "location": "page 1, para [2] – transcribed by eye from page image (NO text layer)"
+    }
+   ]
+  },
+  {
+   "id": "mykh-2022-pa-21ncvc-1-01-2021-govt-v-low-taek-jho",
+   "file": "docs/mykh-2022-pa-21ncvc-1-01-2021-govt-v-low-taek-jho.pdf",
+   "url": "https://efs.kehakiman.gov.my/EFSWeb/DocDownloader.aspx?DocumentID=8f7dd8eb-e0be-462b-8008-6867920bbe77&Inline=true",
+   "bytes": 1038036,
+   "sha256": "be8c02fbae70e1d844b2164edb8765f9297db82a3b897d2a2095c4ecd4ac65d7",
+   "format": "pdf",
+   "pages": 59,
+   "text_chars_per_page_min": 352,
+   "text_chars_per_page_max": 2594,
+   "pages_with_text_gt_200_chars": 59,
+   "embedded_images": 62,
+   "publisher": "High Court of Malaya at Pulau Pinang",
+   "title": "Government of Malaysia v Low Taek Jho, Civil Suit PA-21NCVC-1-01/2021 – Judgment (summary judgment, tax claim)",
+   "date": "2022-09-08",
+   "date_note": "eJudgment DateOfResult; PDF stamp 17/10/2022",
+   "language": "en",
+   "type": "court judgment",
+   "scanned": false,
+   "text_layer": true,
+   "quotes": [
+    {
+     "text": "This is a tax claim—for RM1,053,972,936.58.",
+     "location": "page 1"
+    }
+   ]
+  },
+  {
+   "id": "sg-2025-sghc-191-blackstone-v-scb",
+   "file": "docs/sg-2025-sghc-191-blackstone-v-scb.pdf",
+   "url": "https://www.elitigation.sg/gd/gd/2025_SGHC_191/pdf",
+   "bytes": 218369,
+   "sha256": "a609d9606fbc5fb6d0982718310af9bdbbce79866876a785e743edd40876b0cc",
+   "format": "pdf",
+   "pages": 25,
+   "text_chars_per_page_min": 148,
+   "text_chars_per_page_max": 2064,
+   "pages_with_text_gt_200_chars": 24,
+   "embedded_images": 0,
+   "publisher": "High Court of the Republic of Singapore (eLitigation)",
+   "title": "Blackstone Asia Real Estate Partners Ltd (in liquidation) & 2 Ors [2025] SGHC 191",
+   "date": "unknown (PDF shows \"Version No 2: 11 Feb 2026\")",
+   "language": "en",
+   "type": "court judgment",
+   "scanned": false,
+   "text_layer": true,
+   "links_to": "Blackstone = payee in DOJ Table 5 (more/tables rows 5-9)",
+   "landing_url": "https://www.elitigation.sg/gd/s/2025_SGHC_191",
+   "quotes": []
+  },
+  {
+   "id": "sg-2026-sgca-12-blackstone-v-scb",
+   "file": "docs/sg-2026-sgca-12-blackstone-v-scb.pdf",
+   "url": "https://www.elitigation.sg/gd/gd/2026_SGCA_12/pdf",
+   "bytes": 343731,
+   "sha256": "5fa79f48a45310d4f01e663638cba065dedf704d08e16c1a79eacc33a9124d01",
+   "format": "pdf",
+   "pages": 53,
+   "text_chars_per_page_min": 589,
+   "text_chars_per_page_max": 2452,
+   "pages_with_text_gt_200_chars": 53,
+   "embedded_images": 0,
+   "publisher": "Court of Appeal of the Republic of Singapore (eLitigation)",
+   "title": "Blackstone Asia Real Estate Partners Limited (In Liquidation) & 2 Ors v Standard Chartered Bank (Singapore) Limited [2026] SGCA 12",
+   "date": "2026-03-10",
+   "date_note": "eLitigation decision date; PDF \"Version No 1: 11 Mar 2026\"",
+   "language": "en",
+   "type": "court judgment",
+   "scanned": false,
+   "text_layer": true,
+   "landing_url": "https://www.elitigation.sg/gd/s/2026_SGCA_12",
+   "quotes": []
+  },
+  {
+   "id": "bstger-2024-sk-2023-24-press-release",
+   "file": "docs/bstger-2024-sk-2023-24-press-release.pdf",
+   "url": "https://www.bstger.ch/uploads/2024-08-27_Press_Release_SK.2023.24.pdf",
+   "bytes": 184296,
+   "sha256": "6a7ca993da628132417856b148e9461d31907db357dc6508ec14c2e0a3841ddf",
+   "format": "pdf",
+   "pages": 3,
+   "text_chars_per_page_min": 2258,
+   "text_chars_per_page_max": 3520,
+   "pages_with_text_gt_200_chars": 3,
+   "embedded_images": 1,
+   "publisher": "Swiss Federal Criminal Court, General Secretariat",
+   "title": "Press release – SK.2023.24 PetroSaudi managers sentenced to 6 and 7 years",
+   "date": "2024-08-28",
+   "language": "en",
+   "type": "court press release",
+   "scanned": false,
+   "text_layer": true,
+   "note": "English version (multilingual header).",
+   "quotes": [
+    {
+     "text": "The Criminal Chamber sentences two managers of Geneva-based",
+     "location": "page 1"
+    }
+   ]
+  },
+  {
+   "id": "ch-07580823-petrosaudi-energy-trading-uk",
+   "type": "company registry record (URL only, not downloaded)",
+   "url": "https://find-and-update.company-information.service.gov.uk/company/07580823",
+   "publisher": "UK Companies House",
+   "title": "PETROSAUDI ENERGY AND TRADING (UK) LTD",
+   "facts_on_page": {
+    "company_number": "07580823",
+    "status": "Dissolved",
+    "dissolved_on": "2019-11-09",
+    "incorporated_on": "2011-03-28",
+    "type": "Private limited Company",
+    "sic": "66120 - Security and commodity contracts dealing activities"
+   },
+   "note": "Name match to the PetroSaudi group only; no case record read here ties this UK entity to the 1MDB flows."
+  }
+ ],
+ "tables": [
+  {
+   "id": "doj-2016-park-laurel-transfers",
+   "csv": "tables/doj-2016-park-laurel-transfers.csv",
+   "xlsx": "tables/doj-2016-park-laurel-transfers.xlsx",
+   "csv_sha256": "e8f6d0fa346768e8873849fb15d309464284f37b9a5106e8f8021cc0a2b82cee",
+   "xlsx_sha256": "e600b1aeeb715f47905259260e6bf22c4d34dbefba976c48d3d6e44e97155f79",
+   "rows": 12,
+   "source_doc": "doj-2016-complaint-park-laurel (C.D. Cal. 2:16-cv-05371 Doc 1, filed 2016-07-20)",
+   "source_url": "https://www.justice.gov/media/887166/dl",
+   "source_text": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "tables_transcribed": [
+    "Table 1: 2011 Transfers from 1MDB to the Good Star Account (PDF p.31) – 4 rows, total $330,000,000",
+    "Table 5: Wire Transfers from Aabar-BVI Swiss Account to Blackstone (PDF p.52) – 5 rows",
+    "Table 8: Wire Transfers from Aabar-BVI to Red Granite Capital (PDF p.61) – 3 rows, total $238,000,000"
+   ],
+   "source_discrepancies": [
+    "Table 5 rows sum to $637,000,000 but para 167 says \"totaling $636,000,000\".",
+    "Para 202 gives the range \"June 18, 2012, and November 4, 2012\" but Table 8 lists 11/14/2012."
+   ],
+   "cross_links": [
+    "Table 1 amounts match Sarawak Report 2015-04-25 ($30m, $65m, $110m, $125m into Good Star).",
+    "Table 5 payee Blackstone = applicant in Singapore [2025] SGHC 191 / [2026] SGCA 12."
+   ],
+   "note": "payer_account/payee_account combine the table with the paragraph that introduces it (paras 94, 167, 202-203); purpose not stated in any table."
+  }
+ ],
+ "word_docs": {
+  "found": false,
+  "note": "No official .docx/.doc on 1MDB found (searched filetype:docx / filetype:doc across gov.my, gov.sg, admin.ch). Malaysian Hansard and PAC material is published as PDF on parlimen.gov.my, which was unreachable (TLS failure via proxy)."
+ },
+ "court_and_records_failed": [
+  {
+   "item": "PP v Dato' Sri Mohd Najib (SRC International), High Court 28 Jul 2020, WA-45-3-07/2018",
+   "reason": "Not returned by the Malaysian Judiciary eJudgment portal (searched case number, \"SRC International\", \"Mohd Najib\"); no official copy found. Not substituted with an unofficial copy."
+  },
+  {
+   "item": "Singapore: PP v Yak Yew Chee; PP v Yeo Jiawei; PP v Kevin Swampillai",
+   "reason": "Not found in eLitigation searches (names and \"BSI Bank\"); state-court sentencing grounds from 2016-17 do not appear to be published there. Substituted with the two Blackstone v Standard Chartered judgments."
+  },
+  {
+   "item": "Malaysian PAC report 2016 / PAC media statements (parlimen.gov.my)",
+   "reason": "parlimen.gov.my fails TLS verification through the egress proxy (incomplete certificate chain); not retried with verification disabled. Civil-society copies exist (govdocs.sinarproject.org) but were not used."
+  },
+  {
+   "item": "National Audit Department 1MDB statements and press-clipping PDFs (lkan.audit.gov.my, audit.gov.my/images/...)",
+   "reason": "WAF returns \"Request Rejected\" for the PDF paths; dropped."
+  },
+  {
+   "item": "admin.ch copies of Swiss OAG releases",
+   "reason": "HTTP 403; used the OAG's own domain (bundesanwaltschaft.ch) instead."
+  }
+ ],
+ "social_posts_failed": [
+  {
+   "item": "Clare Rewcastle Brown (@RewcastleBrown) / @sarawak_report tweets on 1MDB",
+   "reason": "No specific status URL found via search or embeds in fetched pages; x.com profile pages need JS. Not recorded rather than guessed."
+  },
+  {
+   "item": "Leonardo DiCaprio / foundation statement on returning gifts",
+   "reason": "leonardodicaprio.org connection reset; no social-post URL found. (Statement was given to press, not located as a social post.)"
+  },
+  {
+   "item": "Najib 3 July 2015 Facebook denial ('never taken funds for personal gain')",
+   "reason": "Post URL not located; facebook.com is login-walled to curl. Reported in edge-2015-najib-denial article."
+  },
+  {
+   "item": "Najib \"cash is king\"",
+   "reason": "No source found attributing this phrase to Najib on 1MDB; not recorded."
+  }
+ ],
+ "summary": {
+  "scanned_pdfs": [
+   "mykh-2020-wa-44-125-06-2019-pp-v-rohaizah (Malay, 30pp, zero text)",
+   "mykh-2020-wa-44-117-06-2020-najib-v-pp (English, 25pp, zero text)",
+   "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb (English, 810pp, image pages + stamp-only text)"
+  ],
+  "non_english": [
+   "oag-2016-01-29-entraide-fr (fr)",
+   "oag-2016-01-29-rechtshilfe-de (de)",
+   "oag-2023-04-25-anklage-petrosaudi-de (de)",
+   "bstger-2024-sk-2023-24-dispositif-fr (fr)",
+   "mykh-2020-wa-44-125-06-2019-pp-v-rohaizah (ms, scanned)",
+   "tw-najib-2018-07-03 / tw-najib-2024-07-12 (ms tweets)"
+  ],
+  "contradicts_articles": [
+   "edge-2015-najib-denial",
+   "edge-2016-ag-clears",
+   "grd-2016-cleared",
+   "sbs-2016-cleared-gift",
+   "grd-2016-misinformation",
+   "fmt-2018-jholow-innocence"
+  ]
+ }
+}
