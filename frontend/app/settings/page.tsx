@@ -13,6 +13,7 @@ import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 import {AppearancePanel} from '../../features/appearance/appearance-panel';
 import {SuiteCoverage} from '../../features/suite-coverage/suite-coverage';
+import {OneMdbLoader} from '../../features/demo/one-mdb-loader';
 
 // Phase 1 scope: the bearer-token API access card only, reusing the shared
 // `api` singleton (lib/api-instance.ts) so a token entered here is the same
@@ -79,7 +80,8 @@ function Settings(): ReactElement {
   // the same preview-then-type-to-confirm deletion flow the main workbench
   // uses for any investigation.
   const investigationsQuery = useQuery(listInvestigationsOptions());
-  const demoInv = investigationsQuery.data?.find(inv => inv.is_demo) ?? null;
+  // The small made-up demo; the 1MDB case (also a demo) has its own control below.
+  const demoInv = investigationsQuery.data?.find(inv => inv.is_demo && inv.name !== '1MDB') ?? null;
   // Shown once the list has answered (or failed to), as before.
   const demoChecked = !investigationsQuery.isPending;
   const [demoStatus, setDemoStatus] = useState('');
@@ -285,6 +287,13 @@ function Settings(): ReactElement {
           </p>
         )}
         {status?.ai?.authority_suite?.present && <SuiteCoverage/>}
+      </div>
+
+      <div className="mt-8 rounded-xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
+          A real case to look around
+        </h2>
+        <OneMdbLoader/>
       </div>
 
       <div className="mt-8 rounded-xl border border-border bg-card p-5">

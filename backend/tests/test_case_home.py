@@ -68,7 +68,7 @@ def test_the_case_question_is_set_changed_and_cleared():
 def test_standing_counts_on_the_server():
     inv = _inv("Standing")
     empty = ok(client.get(f"/api/investigations/{inv}/standing"))
-    assert empty["claims"]["total"] == 0 and empty["to_decide"] == 0 and empty["money"] == {"currency": None, "amount": 0.0, "payments": 0, "other_currencies": []}
+    assert empty["claims"]["total"] == 0 and empty["to_decide"] == 0 and empty["money"] == {"currency": None, "amount": 0.0, "payments": 0, "from_sources": 0, "other_currencies": []}
     assert empty["timeline"] == {"events": 0, "from": None, "to": None, "years": []}
     for status in ("supported", "confirmed", "disputed", "lead"):
         ok(client.post("/api/claims", json={"investigation_id": inv, "text": f"A {status} claim", "status": status, "confidence": 0.5}))
@@ -165,3 +165,13 @@ def test_the_done_rules_for_supported_run_on_the_stored_records(tmp_path):
     path.write_bytes(b"tampered")
     rules = {r["key"]: r for r in ok(client.get(f"/api/claims/{claim['id']}/review-workspace"))["done"]["supported"]["rules"]}
     assert rules["file"]["state"] == "not_met" and "minutes.txt" in rules["file"]["detail"]
+
+
+def test_money_traced_counts_each_sum_once_where_it_starts():
+    inv = _inv("Layers")
+    a, b, c = (_party(inv, n) for n in ("Fund", "Shell One", "Shell Two"))
+    for src, dst in ((a, b), (b, c)):
+        ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": src, "target_entity_id": dst,
+                                                   "properties": {"amount": ["700000000"], "currency": ["USD"], "date": ["2009-09-30"]}}))
+    money = ok(client.get(f"/api/investigations/{inv}/standing"))["money"]
+    assert money == {"currency": "USD", "amount": 700000000.0, "payments": 2, "from_sources": 1, "other_currencies": []}

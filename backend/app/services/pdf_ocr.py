@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -25,6 +26,39 @@ class OcrRuntimeStatus:
 def _clean(text: str) -> str:
     import re
     return re.sub(r"[ \t]+", " ", (text or "").replace("\x00", "")).strip()
+
+
+_COURT_HEADER = re.compile(r"^\s*Case\s+\S+\s+Document\s+\S+\s+Filed\s+\S+\s+Page\s+\d+\s+of\s+\d+(\s+Page\s*ID\s*#:\s*\S+)?\s*$", re.I)
+
+
+def strip_page_furniture(text: str, page_no: int | None = None) -> str:
+    """Drop what is printed on a page but is not what the page says: the line
+    numbers down the margin of US pleading paper (1 to 28, one per line) and the
+    court's running header ("Case 2:17-cv-04441 Document 1 Filed 06/15/17 Page 4
+    of 250 Page ID #:4"). Found on the 1MDB case, where both were read in as text
+    and the header was proposed as a claim. With ``page_no``, a first line that is
+    only that page's number (or one less, for an unnumbered cover) goes too."""
+    lines = text.split("\n")
+    if page_no is not None:
+        first = next((k for k, line in enumerate(lines) if line.strip()), None)
+        if first is not None and lines[first].strip() in (str(page_no), str(page_no - 1)):
+            lines = lines[first + 1:]
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        if lines[i].strip() == "1":
+            j, n = i, 1
+            while j < len(lines) and lines[j].strip() == str(n):
+                j, n = j + 1, n + 1
+            if n - 1 >= 10:  # a run of margin numbers, not a list item "1"
+                i = j
+                continue
+        if _COURT_HEADER.match(lines[i]):
+            i += 1
+            continue
+        out.append(lines[i])
+        i += 1
+    return "\n".join(out)
 
 
 def _requested_languages(language: str) -> tuple[str, ...]:
@@ -74,7 +108,7 @@ def extract_pdf_chunks(
 
     with fitz.open(path) as doc:
         for page_no, page in enumerate(doc, 1):
-            native = _clean(page.get_text("text") or "")
+            native = _clean(strip_page_furniture(page.get_text("text") or "", page_no))
             if len(native) >= min_native_chars:
                 native_pages += 1
                 chunks.append({

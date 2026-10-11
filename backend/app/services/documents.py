@@ -86,6 +86,12 @@ def extract_chunks(path: Path) -> tuple[list[dict], list[str]]:
                    'review the original file directly for that content.' if has_tables
                    else ' If it contains only images or text boxes, that content is not extracted.')
             )
+    elif ext in ('.html', '.htm'):
+        from app.services.html_reader import html_blocks
+        for i, block in enumerate(html_blocks(path.read_text(encoding='utf-8', errors='replace')), 1):
+            rows.append({'locator': f'paragraph {i}', 'page_number': None, 'text': block})
+        if not rows:
+            issues.append('This page has no readable text outside its markup.')
     else:
         text = path.read_text(encoding='utf-8', errors='replace')
         # Paragraphs retain useful deterministic line ranges when possible.

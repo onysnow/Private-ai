@@ -23,3 +23,15 @@ def day(props: dict[str, list[Any]], key: str = "date") -> date | None:
         return date.fromisoformat(raw) if len(raw) == 10 else None
     except ValueError:
         return None
+
+
+def amount_words(props: dict[str, list[Any]]) -> str:
+    """A payment's amount as a reader writes it: "375,000,000 USD", not
+    "375000000 USD". Empty when the record has no amount."""
+    value = number(props)
+    currency = str(first(props, "currency") or "").strip()
+    if value is None:
+        raw = str(first(props, "amount") or "").strip()
+        return f"{raw} {currency}".strip()
+    shown = f"{value:,.2f}".removesuffix(".00")
+    return f"{shown} {currency}".strip()

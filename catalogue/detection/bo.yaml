@@ -69,6 +69,9 @@
       parties: [{id: a, schema: Company, properties: {address: ["1 Harbour Road"]}}, {id: b, schema: Company, properties: {address: ["1 Harbour Road"]}}]
       links: [{schema: Ownership, source: a, target: b}]
       expect: null
+    - name: only the same city
+      parties: [{id: a, schema: Company, properties: {address: ["New York, New York"]}}, {id: b, schema: RealEstate, properties: {address: ["New York, New York"]}}]
+      expect: null
 
 - indicator: BO-033
   family: missing_property

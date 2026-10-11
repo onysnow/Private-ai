@@ -4159,9 +4159,12 @@ class CaseClaimCountsOut(ResponseModel):
 
 
 class CaseMoneyOut(ResponseModel):
+    """Money traced, counted once where it starts (payments whose payer received
+    nothing in the case), and how many payments carry it."""
     currency: str | None
     amount: float
     payments: int
+    from_sources: int = 0
     other_currencies: list[str]
 
 
@@ -4282,8 +4285,11 @@ class DecisionItemOut(ResponseModel):
 
 
 class CaseDecisionsOut(ResponseModel):
+    """One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind."""
     investigation_id: str
     counts: dict[str, int]
+    total: int
+    offset: int
     items: list[DecisionItemOut]
 
 
@@ -4347,3 +4353,18 @@ class SuiteCoverageOut(ResponseModel):
     mappings: list[SuiteMappingOut]
     unmapped: list[SuiteUnmappedOut]
     suite_requires_app_lacks: list[SuiteRequirementOut]
+
+
+class DemoCaseProgressOut(ResponseModel):
+    """The 1MDB demo case (app/services/demo_1mdb.py): loading, reading or ready."""
+    state: Literal["idle", "downloading", "building", "reading", "ready", "failed"]
+    step: str | None = None
+    error: str | None = None
+    investigation_id: str | None = None
+    documents: int | None = None
+    read: int | None = None
+    failed: int | None = None
+    claims: int | None = None
+    leads: int | None = None
+    # Web pages the publisher did not serve when the case was loaded: kept as links.
+    not_downloaded: list[dict[str, str | None]] = []

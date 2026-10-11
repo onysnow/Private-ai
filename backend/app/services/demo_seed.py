@@ -51,7 +51,8 @@ DEMO_DESCRIPTION = (
 
 
 def find_demo_investigation(db: Session) -> Investigation | None:
-    return db.scalar(select(Investigation).where(Investigation.is_demo.is_(True)))
+    # The 1MDB case (app/services/demo_1mdb.py) is a demo too; this is the small made-up one.
+    return db.scalar(select(Investigation).where(Investigation.is_demo.is_(True), Investigation.name == DEMO_INVESTIGATION_NAME))
 
 
 def seed_demo_investigation(db: Session) -> tuple[Investigation, bool]:

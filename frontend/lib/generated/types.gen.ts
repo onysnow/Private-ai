@@ -1492,6 +1492,8 @@ export type CaseClaimCountsOut = {
 
 /**
  * CaseDecisionsOut
+ *
+ * One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind.
  */
 export type CaseDecisionsOut = {
   /**
@@ -1508,6 +1510,14 @@ export type CaseDecisionsOut = {
    * Items
    */
   items: Array<DecisionItemOut>;
+  /**
+   * Offset
+   */
+  offset: number;
+  /**
+   * Total
+   */
+  total: number;
 };
 
 /**
@@ -1562,6 +1572,9 @@ export type CaseLeadCountsOut = {
 
 /**
  * CaseMoneyOut
+ *
+ * Money traced, counted once where it starts (payments whose payer received
+ * nothing in the case), and how many payments carry it.
  */
 export type CaseMoneyOut = {
   /**
@@ -1572,6 +1585,10 @@ export type CaseMoneyOut = {
    * Currency
    */
   currency: string | null;
+  /**
+   * From Sources
+   */
+  from_sources?: number;
   /**
    * Other Currencies
    */
@@ -4987,6 +5004,56 @@ export type DeletionUnsafePath = {
    * Storage Path
    */
   storage_path?: string | null;
+};
+
+/**
+ * DemoCaseProgressOut
+ *
+ * The 1MDB demo case (app/services/demo_1mdb.py): loading, reading or ready.
+ */
+export type DemoCaseProgressOut = {
+  /**
+   * Claims
+   */
+  claims?: number | null;
+  /**
+   * Documents
+   */
+  documents?: number | null;
+  /**
+   * Error
+   */
+  error?: string | null;
+  /**
+   * Failed
+   */
+  failed?: number | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id?: string | null;
+  /**
+   * Leads
+   */
+  leads?: number | null;
+  /**
+   * Not Downloaded
+   */
+  not_downloaded?: Array<{
+    [key: string]: string | null;
+  }>;
+  /**
+   * Read
+   */
+  read?: number | null;
+  /**
+   * State
+   */
+  state: 'idle' | 'downloading' | 'building' | 'reading' | 'ready' | 'failed';
+  /**
+   * Step
+   */
+  step?: string | null;
 };
 
 /**
@@ -16975,6 +17042,64 @@ export type ExportDeckPptxResponses = {
 export type ExportDeckPptxResponse =
   ExportDeckPptxResponses[keyof ExportDeckPptxResponses];
 
+export type Get1MdbData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/demo/1mdb';
+};
+
+export type Get1MdbErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type Get1MdbError = Get1MdbErrors[keyof Get1MdbErrors];
+
+export type Get1MdbResponses = {
+  /**
+   * Successful Response
+   */
+  200: DemoCaseProgressOut;
+};
+
+export type Get1MdbResponse = Get1MdbResponses[keyof Get1MdbResponses];
+
+export type Load1MdbData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/demo/1mdb';
+};
+
+export type Load1MdbErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type Load1MdbError = Load1MdbErrors[keyof Load1MdbErrors];
+
+export type Load1MdbResponses = {
+  /**
+   * Successful Response
+   */
+  200: DemoCaseProgressOut;
+};
+
+export type Load1MdbResponse = Load1MdbResponses[keyof Load1MdbResponses];
+
 export type SeedDemoData = {
   body?: never;
   path?: never;
@@ -20191,6 +20316,14 @@ export type GetDecisionsData = {
      * Order
      */
     order?: 'consequence' | 'source' | 'oldest';
+    /**
+     * Offset
+     */
+    offset?: number;
+    /**
+     * Limit
+     */
+    limit?: number;
   };
   url: '/api/investigations/{investigation_id}/decisions';
 };

@@ -55,9 +55,16 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
     flags = list(db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == inv, PatternFlag.status == "open",
                                                       PatternFlag.gone_at.is_(None))))
     ledger = investigation_financial_ledger(db, inv)
+    # Money traced counts each sum once, where it starts: a payment whose payer
+    # received nothing in the case. Adding every hop would count layered money
+    # again at each layer (on the 1MDB case, $12.4B for about $4.6B moved).
+    paid_to = {t["to_entity_id"] for t in ledger["transactions"]}
     by_currency: dict[str, list[float]] = {}
+    all_payments: dict[str, int] = {}
     for t in ledger["transactions"]:
-        by_currency.setdefault(t["currency"], []).append(float(t["amount"]))
+        all_payments[t["currency"]] = all_payments.get(t["currency"], 0) + 1
+        if t["from_entity_id"] not in paid_to:
+            by_currency.setdefault(t["currency"], []).append(float(t["amount"]))
     currency = max(by_currency, key=lambda c: len(by_currency[c])) if by_currency else None
     waiting = decision_counts(db, inv)
     return {
@@ -69,7 +76,8 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
         "to_decide": sum(waiting.values()),
         "to_decide_by_kind": waiting,
         "money": {"currency": currency, "amount": round(sum(by_currency[currency]), 2) if currency else 0.0,
-                  "payments": len(by_currency[currency]) if currency else 0,
+                  "payments": all_payments.get(currency, 0) if currency else 0,
+                  "from_sources": len(by_currency[currency]) if currency else 0,
                   "other_currencies": sorted(c for c in by_currency if c != currency)},
         "timeline": {"events": sum(years.values()), "from": min(years) if years else None, "to": max(years) if years else None,
                      "years": [{"year": y, "events": n} for y, n in sorted(years.items())]},
@@ -126,6 +134,7 @@ def _parties(ids: list[str], names: dict[str, tuple[str, str]]) -> list[dict[str
 
 
 def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
+    from app.patterns.checks import as_question
     from app.patterns.engine import _name
 
     rows = list(db.scalars(select(CheckItem).where(CheckItem.investigation_id == inv, CheckItem.status == "open",
@@ -147,7 +156,8 @@ def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
                         "excerpt": r.excerpt, "terms": list(r.terms or [])}
         path = f"/api/checks/{r.id}/decide"
         out.append({
-            "kind": "to_check", "id": r.id, "question": r.question, "actor": "Red Flags", "actor_kind": "app",
+            "kind": "to_check", "id": r.id, "question": as_question(r.question) if r.kind == "checklist" else r.question,
+            "actor": "Red Flags", "actor_kind": "app",
             "created_at": r.first_seen_at, "rank": 100 * LEVEL_RANK.get(level or "", 0) + (20 if r.kind == "passage" else 10),
             "reason": reason, "level": level,
             "group": {"key": f"doc:{r.document_id}" if r.document_id else f"flag:{r.flag_id or r.indicator_id}",
@@ -193,9 +203,29 @@ def _missing(db: Session, inv: str) -> list[dict[str, Any]]:
 PROPOSAL_RANK = {"claim": 60, "relationship": 55, "entity": 50, "evidence": 45, "identifier": 40}
 
 
-def _proposals(db: Session, inv: str, *, match_limit: int = 200) -> list[dict[str, Any]]:
-    from app.services.documents import preview_entity_candidate_matches
+def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> None:
+    """A name proposal asks "add it?", or "same as this record?" when the case has a record of that name."""
+    row: ExtractionCandidate = item["_entity_row"]
+    p = row.payload if isinstance(row.payload, dict) else {}
+    caption = str(p.get("caption") or "").strip()
+    schema = str(p.get("suggested_schema") or "Thing")
+    path = f"/api/extraction-candidates/{row.id}/review"
+    if strong:
+        other = strong.get("caption") or strong.get("entity_id")
+        item["question"] = f"Is “{caption}” in this passage the record {other}?"
+        item["consequences"] = [f"Same: the passage is added to {other}; no new record.",
+                                f"Different: “{caption}” becomes a new {schema}, kept apart from {other}."]
+        base = {"decision": "accept", "entity_schema": schema, "matched_entity_id": strong.get("entity_id")}
+        item["choices"] = [_choice("yes", "Same record", path, {**base, "entity_identity_decision": "same"}),
+                           _choice("no", "A different one", path, {**base, "entity_identity_decision": "different"})]
+    else:
+        item["question"] = f"Add “{caption}” as a {schema}?"
+        item["consequences"] = [f"Creates the record {caption} ({schema}) with this passage as its source."]
+        item["choices"] = [_choice("yes", "Add it", path, {"decision": "accept", "entity_schema": schema}),
+                           _choice("no", "Not a name", path, {"decision": "reject"})]
 
+
+def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
     rows = list(db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.investigation_id == inv,
                                                              ExtractionCandidate.review_status == "proposed")
                            .order_by(ExtractionCandidate.document_id, ExtractionCandidate.created_at)))
@@ -205,7 +235,6 @@ def _proposals(db: Session, inv: str, *, match_limit: int = 200) -> list[dict[st
     chunk_ids = {r.chunk_id for r in rows if r.chunk_id}
     chunks = {c.id: c for c in db.scalars(select(DocumentChunk).where(DocumentChunk.id.in_(chunk_ids)))} if chunk_ids else {}
     out: list[dict[str, Any]] = []
-    previewed = 0
     for r in rows:
         p = r.payload if isinstance(r.payload, dict) else {}
         path = f"/api/extraction-candidates/{r.id}/review"
@@ -225,27 +254,9 @@ def _proposals(db: Session, inv: str, *, match_limit: int = 200) -> list[dict[st
             "open": {"href": f"/review?document={r.document_id}", "label": "Open in Review"},
         }
         if r.candidate_type == "entity":
-            schema = str(p.get("suggested_schema") or "Thing")
-            strong = None
-            if previewed < match_limit:
-                previewed += 1
-                try:
-                    strong = preview_entity_candidate_matches(db, r).get("strong_match")
-                except ValueError:
-                    strong = None
-            if strong:
-                other = strong.get("caption") or strong.get("entity_id")
-                item["question"] = f"Is “{caption}” in this passage the record {other}?"
-                item["consequences"] = [f"Same: the passage is added to {other}; no new record.",
-                                        f"Different: “{caption}” becomes a new {schema}, kept apart from {other}."]
-                base = {"decision": "accept", "entity_schema": schema, "matched_entity_id": strong.get("entity_id")}
-                item["choices"] = [_choice("yes", "Same record", path, {**base, "entity_identity_decision": "same"}),
-                                   _choice("no", "A different one", path, {**base, "entity_identity_decision": "different"})]
-            else:
-                item["question"] = f"Add “{caption}” as a {schema}?"
-                item["consequences"] = [f"Creates the record {caption} ({schema}) with this passage as its source."]
-                item["choices"] = [_choice("yes", "Add it", path, {"decision": "accept", "entity_schema": schema}),
-                                   _choice("no", "Not a name", path, {"decision": "reject"})]
+            # Whether the case already holds a record of this name is asked only for the items shown (decisions()).
+            item["_entity_row"] = r
+            _entity_question(item, None)
         elif r.candidate_type == "identifier":
             # Whose email or phone it is needs a pick from the case's records: the Review page asks it.
             item["question"] = f"Whose is “{caption}”?"
@@ -352,7 +363,8 @@ def _watchlist(db: Session, inv: str) -> list[dict[str, Any]]:
     return out
 
 
-def decisions(db: Session, investigation_id: str, *, kind: str | None = None, order: str = "consequence") -> dict[str, Any]:
+def decisions(db: Session, investigation_id: str, *, kind: str | None = None, order: str = "consequence",
+              offset: int = 0, limit: int = 200) -> dict[str, Any]:
     readers: dict[str, Callable[[Session, str], list[dict[str, Any]]]] = {"to_check": _check_items, "missing": _missing, "proposal": _proposals, "match": _matches, "outside": _outside, "ai": _ai, "watchlist": _watchlist}
     items: list[dict[str, Any]] = []
     for k, read in readers.items():
@@ -364,7 +376,22 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
         items.sort(key=lambda i: (i["group"]["key"], -i["rank"], i["created_at"]))
     else:
         items.sort(key=lambda i: (-i["rank"], i["created_at"]))
-    return {"investigation_id": investigation_id, "counts": decision_counts(db, investigation_id), "items": items}
+    total = len(items)
+    page = items[offset:offset + limit]
+    if any("_entity_row" in i for i in page):
+        from app.services.documents import preview_entity_candidate_matches
+
+        for item in page:
+            if "_entity_row" in item:
+                try:
+                    strong = preview_entity_candidate_matches(db, item["_entity_row"]).get("strong_match")
+                except ValueError:
+                    strong = None
+                _entity_question(item, strong)
+    for item in page:
+        item.pop("_entity_row", None)
+    return {"investigation_id": investigation_id, "counts": decision_counts(db, investigation_id), "total": total,
+            "offset": offset, "items": page}
 
 
 # --- Since -------------------------------------------------------------------------------------------------------

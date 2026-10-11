@@ -27,7 +27,7 @@ const INV = {id: 'inv-1', name: 'Kestrel SA', description: null, question: 'Who 
 
 const standing = {
   investigation_id: 'inv-1', claims: {total: 22, supported: 11, disputed: 3, unshown: 8, ruled_out: 0}, to_check: 1, missing: 1, to_decide: 2,
-  to_decide_by_kind: {to_check: 1, missing: 1}, money: {currency: 'EUR', amount: 29400, payments: 3, other_currencies: []},
+  to_decide_by_kind: {to_check: 1, missing: 1}, money: {currency: 'EUR', amount: 29400, payments: 3, from_sources: 1, other_currencies: []},
   timeline: {events: 46, from: '2016', to: '2023', years: [{year: '2016', events: 4}, {year: '2017', events: 9}]},
   documents: {total: 14, unread: 2, failed: 0}, sources: 5, evidence: 9, network: {parties: 31, links: 46},
   flags: {open: 1, textbook: 1, strong: 0, faint: 0}, leads: {open: 2}, watchlist: {names: 1, new_hits: 0},
@@ -61,7 +61,7 @@ const missingItem = {
 function routes(extra: Record<string, unknown> = {}) {
   return mockApi({
     'GET /api/investigations/inv-1/standing': standing,
-    'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {to_check: 1, missing: 1}, items: [checkItem, missingItem]},
+    'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {to_check: 1, missing: 1}, total: 2, offset: 0, items: [checkItem, missingItem]},
     'GET /api/investigations/inv-1/claims': [{id: 'c1', investigation_id: 'inv-1', text: 'Kestrel SA bought the harbour land in 2020 with its own funds.', status: 'disputed', confidence: 0.3, created_at: '2026-10-01T00:00:00'}],
     'GET /api/investigations/inv-1/red-flags': {investigation_id: 'inv-1', flags: [], gone: [], rules: [], cannot_run: [], type: null},
     'GET /api/investigations/inv-1/documents': [],

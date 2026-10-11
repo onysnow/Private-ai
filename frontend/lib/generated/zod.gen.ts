@@ -656,10 +656,14 @@ export const zCaseLeadCountsOut = z.object({
 
 /**
  * CaseMoneyOut
+ *
+ * Money traced, counted once where it starts (payments whose payer received
+ * nothing in the case), and how many payments carry it.
  */
 export const zCaseMoneyOut = z.object({
   amount: z.number(),
   currency: z.string().nullable(),
+  from_sources: z.number().int().optional().default(0),
   other_currencies: z.array(z.string()),
   payments: z.number().int(),
 });
@@ -1834,11 +1838,15 @@ export const zDecisionItemOut = z.object({
 
 /**
  * CaseDecisionsOut
+ *
+ * One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind.
  */
 export const zCaseDecisionsOut = z.object({
   counts: z.record(z.number().int()),
   investigation_id: z.string(),
   items: z.array(zDecisionItemOut),
+  offset: z.number().int(),
+  total: z.number().int(),
 });
 
 /**
@@ -1972,6 +1980,34 @@ export const zDeletionUnsafePath = z.object({
   document_id: z.string(),
   error: z.string(),
   storage_path: z.string().nullish(),
+});
+
+/**
+ * DemoCaseProgressOut
+ *
+ * The 1MDB demo case (app/services/demo_1mdb.py): loading, reading or ready.
+ */
+export const zDemoCaseProgressOut = z.object({
+  claims: z.number().int().nullish(),
+  documents: z.number().int().nullish(),
+  error: z.string().nullish(),
+  failed: z.number().int().nullish(),
+  investigation_id: z.string().nullish(),
+  leads: z.number().int().nullish(),
+  not_downloaded: z
+    .array(z.record(z.string().nullable()))
+    .optional()
+    .default([]),
+  read: z.number().int().nullish(),
+  state: z.enum([
+    'idle',
+    'downloading',
+    'building',
+    'reading',
+    'ready',
+    'failed',
+  ]),
+  step: z.string().nullish(),
 });
 
 /**
@@ -7732,6 +7768,16 @@ export const zExportDeckPptxResponse = z.string();
 /**
  * Successful Response
  */
+export const zGet1MdbResponse = zDemoCaseProgressOut;
+
+/**
+ * Successful Response
+ */
+export const zLoad1MdbResponse = zDemoCaseProgressOut;
+
+/**
+ * Successful Response
+ */
 export const zSeedDemoResponse = zDemoSeedOut;
 
 /**
@@ -8643,6 +8689,8 @@ export const zGetDecisionsQuery = z.object({
     .enum(['consequence', 'source', 'oldest'])
     .optional()
     .default('consequence'),
+  offset: z.number().int().gte(0).optional().default(0),
+  limit: z.number().int().gte(1).lte(500).optional().default(200),
 });
 
 /**

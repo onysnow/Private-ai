@@ -12,7 +12,7 @@ from app.patterns.detectors import Measure
 from app.patterns.graph import CaseGraph
 
 NAME = "shared_property"
-VERSION = 1
+VERSION = 2  # 2: a city or country alone is not a shared address
 
 
 class Params(BaseModel):
@@ -30,6 +30,14 @@ def _norm(kind: str, value: str) -> str:
     return re.sub(r"\D", "", v) if kind == "phone" else re.sub(r"[\s,.]+", " ", v).strip()
 
 
+def _specific(kind: str, key: str) -> bool:
+    """A city or a country is not a shared address: an address counts only when it
+    names a place a party could be found at, which in practice carries a number
+    (a street number, a postcode, a PO box). Found on the 1MDB case: "New York,
+    New York" joined Goldman Sachs and two apartments."""
+    return kind != "address" or any(ch.isdigit() for ch in key)
+
+
 def measure(graph: CaseGraph, p: Params) -> list[Measure]:
     linked = {frozenset((l.source, l.target)) for l in graph.links}
     holders: dict[tuple[str, str], dict[str, str]] = defaultdict(dict)
@@ -37,7 +45,7 @@ def measure(graph: CaseGraph, p: Params) -> list[Measure]:
         for prop, kind in p.properties.items():
             for value in party.properties.get(prop) or []:
                 key = _norm(kind, str(value))
-                if len(key) >= p.min_length:
+                if len(key) >= p.min_length and _specific(kind, key):
                     holders[(kind, key)][party.id] = str(value)
     out = []
     for (kind, _), who in sorted(holders.items()):

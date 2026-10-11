@@ -22,7 +22,8 @@ export function linkSure(edge: RelationshipOut): Sure {
 }
 
 export function MiniNetwork({investigationId}: {investigationId: string}): ReactElement {
-  const graph = useQuery({...getInvestigationGraphOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const graphQuery = useQuery({...getInvestigationGraphOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  const graph = graphQuery.data;
   const pointed = useWorkbenchStore(state => state.pointedParty);
   const point = useWorkbenchStore(state => state.setPointedParty);
   const nodes = graph?.nodes ?? [];
@@ -35,6 +36,7 @@ export function MiniNetwork({investigationId}: {investigationId: string}): React
     return [n.id, {x: W / 2 + Math.cos(angle) * (W / 2 - 62), y: H / 2 + Math.sin(angle) * (H / 2 - 26)}];
   }));
   const shownEdges = edges.filter(e => at.has(e.source!.id) && at.has(e.target!.id));
+  if (graphQuery.isPending && investigationId) return <div className="ch-skeleton" aria-busy="true" aria-label="Drawing who is linked"/>;
   if (!top.length) return <p className="ch-empty">No parties linked yet. Links appear here once records are linked in Check.</p>;
   return <figure className="ch-net">
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`The ${top.length} most-linked parties and ${shownEdges.length} links between them`}>

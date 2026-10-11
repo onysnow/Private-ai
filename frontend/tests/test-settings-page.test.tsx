@@ -21,8 +21,11 @@ const LIST = 'GET /api/investigations';
 const DEMO = investigationRecord({id: 'inv-demo', name: 'Demo Investigation', is_demo: true});
 const CASE = investigationRecord({id: 'inv-1', name: 'Harbor contracts'});
 
+/** The 1MDB loader on Settings asks how far that case has got; it is not loaded here. */
+const ONE_MDB = {'GET /api/demo/1mdb': {state: 'idle', not_downloaded: []}};
+
 async function renderSettings(routes: Routes) {
-  const api = mockApi(routes);
+  const api = mockApi({...ONE_MDB, ...routes});
   vi.resetModules();
   const {default: Settings} = await import('../app/settings/page');
   render(<Settings/>);
@@ -163,5 +166,23 @@ describe('Settings: demo mode', () => {
     await renderSettings({[STATUS]: validSettingsStatus, [LIST]: {status: 500, body: {detail: 'Database unavailable'}}});
     await screen.findByText(/Database unavailable/);
     expect(screen.getByText('No demo investigation yet.')).toBeInTheDocument();
+  });
+});
+
+describe('Settings: the 1MDB case', () => {
+  it('names the pages kept as links when the publisher did not serve them', async () => {
+    await renderSettings({[STATUS]: validSettingsStatus, [LIST]: [],
+      'GET /api/demo/1mdb': {state: 'ready', investigation_id: 'inv-1mdb', documents: 9, read: 9, failed: 0, claims: 27, leads: 9,
+        not_downloaded: [{title: 'MAS directs BSI Bank to shut down', url: 'https://www.mas.gov.sg/x'}]}});
+    expect(await screen.findByText(/did not come back from the publisher/)).toHaveTextContent('One page did not come back');
+    expect(screen.getByRole('link', {name: 'MAS directs BSI Bank to shut down'})).toHaveAttribute('href', 'https://www.mas.gov.sg/x');
+  });
+
+  it('says why loading failed', async () => {
+    const api = await renderSettings({[STATUS]: validSettingsStatus, [LIST]: [],
+      'POST /api/demo/1mdb': {state: 'failed', error: 'Could not download the Park Laurel complaint', not_downloaded: []}});
+    await userEvent.click(await screen.findByRole('button', {name: 'Load the 1MDB case'}));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not download the Park Laurel complaint');
+    expect(api.calls('POST /api/demo/1mdb')).toHaveLength(1);
   });
 });

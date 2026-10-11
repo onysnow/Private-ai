@@ -34,3 +34,18 @@ def test_native_pdf_does_not_get_reclassified_as_ocr(tmp_path):
     assert result.native_pages == 1
     assert result.ocr_pages == 0
     assert result.chunks[0]['locator'] == 'page 1'
+
+
+def test_pleading_line_numbers_and_the_court_header_are_not_read_as_text():
+    from app.services.pdf_ocr import strip_page_furniture
+    margin = "\n".join(str(n) for n in range(1, 29))
+    page = (f" \n{margin}\nDEBORAH CONNOR, Acting Chief\n1. The defendant is a yacht.\n2. It was bought.\n"
+            "Case 2:17-cv-04441-DSF-PLA   Document 1   Filed 06/15/17   Page 4 of 250   Page ID #:4\n")
+    out = strip_page_furniture(page)
+    assert "DEBORAH CONNOR" in out and "1. The defendant" in out
+    assert "\n2\n" not in out and "Page ID" not in out
+    # a short numbered list on its own lines is kept
+    assert strip_page_furniture("1\n2\n3\nitems") == "1\n2\n3\nitems"
+    # the page's own number at the top goes; another number stays
+    assert strip_page_furniture(" \n6 \n" + margin + "\nIndirectly, by Symphony", 6) == "Indirectly, by Symphony"
+    assert strip_page_furniture("2018 was the year", 6) == "2018 was the year"

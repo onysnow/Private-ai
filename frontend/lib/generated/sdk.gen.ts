@@ -204,6 +204,9 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenErrors,
   FindOpenalephChildrenResponses,
+  Get1MdbData,
+  Get1MdbErrors,
+  Get1MdbResponses,
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointErrors,
   GetAiAnalysisCandidateEndpointResponses,
@@ -543,6 +546,9 @@ import type {
   ListWriteupsEndpointData,
   ListWriteupsEndpointErrors,
   ListWriteupsEndpointResponses,
+  Load1MdbData,
+  Load1MdbErrors,
+  Load1MdbResponses,
   MakeLeadFromHitData,
   MakeLeadFromHitErrors,
   MakeLeadFromHitResponses,
@@ -864,6 +870,7 @@ import {
   zFindingCandidatesResponse,
   zFindOpenalephChildrenPath,
   zFindOpenalephChildrenResponse,
+  zGet1MdbResponse,
   zGetAiAnalysisCandidateEndpointPath,
   zGetAiAnalysisCandidateEndpointResponse,
   zGetAllRecordTagsPath,
@@ -1112,6 +1119,7 @@ import {
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
   zListWriteupsEndpointResponse,
+  zLoad1MdbResponse,
   zMakeLeadFromHitPath,
   zMakeLeadFromHitResponse,
   zMakeLeadFromNotePath,
@@ -2679,6 +2687,59 @@ export const exportDeckPptx = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zExportDeckPptxResponse.parseAsync(data),
     url: '/api/decks/{deck_id}/export.pptx',
+    ...options,
+  });
+
+/**
+ * Get 1Mdb
+ *
+ * Whether the 1MDB case is loaded, and how far its documents are read.
+ */
+export const get1Mdb = <ThrowOnError extends boolean = false>(
+  options?: Options<Get1MdbData, ThrowOnError>,
+): RequestResult<Get1MdbResponses, Get1MdbErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    Get1MdbResponses,
+    Get1MdbErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGet1MdbResponse.parseAsync(data),
+    url: '/api/demo/1mdb',
+    ...options,
+  });
+
+/**
+ * Load 1Mdb
+ *
+ * Download the 11 public documents, make the case and its records, and start
+ * reading the documents. Loading again while it exists changes nothing.
+ */
+export const load1Mdb = <ThrowOnError extends boolean = false>(
+  options?: Options<Load1MdbData, ThrowOnError>,
+): RequestResult<Load1MdbResponses, Load1MdbErrors, ThrowOnError> =>
+  (options?.client ?? client).post<
+    Load1MdbResponses,
+    Load1MdbErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zLoad1MdbResponse.parseAsync(data),
+    url: '/api/demo/1mdb',
     ...options,
   });
 

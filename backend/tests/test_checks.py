@@ -133,3 +133,15 @@ def test_a_checklist_spec_gives_one_item_per_party_of_its_kind():
 
 def test_the_catalogue_check_specs_pass_the_lint():
     assert checks.problems(checks.load(), _catalogue()) == []
+
+
+@pytest.mark.parametrize(("part", "question"), [
+    ("whether there was a business reason for the payments", "Was there a business reason for the payments?"),
+    ("whether the fund is still trading.", "Is the fund still trading?"),
+    ("whether they were related", "Were they related?"),
+    ("who signed the transfer", "Who signed the transfer?"),
+    ("", ""),
+])
+def test_a_whether_clause_reads_as_a_question(part: str, question: str) -> None:
+    from app.patterns.checks import as_question
+    assert as_question(part) == question

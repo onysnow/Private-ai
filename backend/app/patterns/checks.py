@@ -108,6 +108,20 @@ def problems(specs: tuple[CheckSpec, ...], known_indicators: dict[str, Any]) -> 
     return out
 
 
+def as_question(part: str) -> str:
+    """A spec's "whether ..." clause as the question a person answers:
+    "whether there was a business reason for the payments" -> "Was there a
+    business reason for the payments?"."""
+    text = part.strip().rstrip(".?")
+    m = re.fullmatch(r"whether there (is|was|are|were) (.+)", text, re.I)
+    if m:
+        return f"{m.group(1).capitalize()} there {m.group(2)}?"
+    m = re.fullmatch(r"whether (it|they|the [\w-]+|this [\w-]+|these [\w-]+) (is|was|are|were) (.+)", text, re.I)
+    if m:
+        return f"{m.group(2).capitalize()} {m.group(1)} {m.group(3)}?"
+    return f"{text[:1].upper()}{text[1:]}?" if text else text
+
+
 def _fp(*parts: str) -> str:
     return hashlib.sha256("|".join(parts).encode()).hexdigest()[:32]
 

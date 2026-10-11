@@ -131,6 +131,7 @@ export function DecideScreen({investigationId, investigationName, active = true}
           <option value="oldest">oldest first</option>
         </select>
       </label>
+      {(all.query.data?.total ?? 0) > (all.query.data?.items.length ?? 0) && <p className="ch-quiet">Showing the first {all.query.data?.items.length} of {all.query.data?.total}; each one you decide makes room for the next.</p>}
       <div className="dc-list">
         {all.query.isError && <p role="alert">{errorMessage(all.query.error, 'Could not load what waits for you')}</p>}
         {groups.map(g => <div key={g.key} className="dc-group">

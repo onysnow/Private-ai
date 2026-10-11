@@ -70,6 +70,7 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
       <span>{item.reason}</span>
     </p>
     <h3 className="ch-question">{item.question}</h3>
+    <div className="ch-card-body">
     {ev?.excerpt ? <blockquote className="ch-excerpt"><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></blockquote>
       : <p className="ch-proposal">{item.proposal}</p>}
     {ev && <p className="ch-locator">{[ev.filename, ev.locator].filter(Boolean).join(' · ')}</p>}
@@ -78,6 +79,7 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
       <p className="ch-eyebrow">If you answer</p>
       <ul>{item.consequences.map(c => <li key={c}>{c}</li>)}</ul>
     </div>}
+    </div>
     {item.choices.length > 0 ? <>
       <div className="ch-choices" role="group" aria-label="Your answer">
         {item.choices.map(c => <button key={c.key} type="button" className={`ch-choice ch-${c.key}`} aria-keyshortcuts={keyOf[c.key].toUpperCase()}

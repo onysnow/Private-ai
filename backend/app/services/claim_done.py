@@ -55,10 +55,13 @@ def _file_matches(doc: Document) -> bool | None:
     return digest.hexdigest() == doc.sha256
 
 
-def _says_it(db: Session, doc: Document, quote: str) -> bool:
+def _says_it(db: Session, doc: Document, quote: str) -> bool | None:
+    """Whether the quote is in the document's text; None while the document is still being read."""
     wanted = _norm(quote)
     if not wanted:
         return False
+    if doc.extraction_status != "complete":
+        return None
     text = " ".join(c.text for c in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id).order_by(DocumentChunk.ordinal)))
     return wanted in _norm(text)
 
@@ -91,9 +94,10 @@ def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict
     hashes_ok, hash_failed, hash_unknown = 0, [], 0
     for ev, src in supporting:
         doc = _document_of(db, ev, src)
-        if doc is None or not (ev.quote or "").strip():
+        found = _says_it(db, doc, ev.quote or "") if doc is not None and (ev.quote or "").strip() else None
+        if found is None:
             unknown_says += 1
-        elif _says_it(db, doc, ev.quote or ""):
+        elif found:
             says += 1
         else:
             failed_says.append(ev.locator or ev.id)
@@ -110,7 +114,7 @@ def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict
              f"The quote is not in the document's text at {', '.join(failed_says[:3])}.")
     elif unknown_says == n:
         rule("says_it", "Every supporting quote says it, in its document", "unknown",
-             "No supporting item comes from a document read here, so the words cannot be matched.")
+             "No supporting item comes from a document read here yet, so the words cannot be matched.")
     else:
         rule("says_it", "Every supporting quote says it, in its document", "met",
              f"{says} found word for word" + (f"; {unknown_says} not from a document read here" if unknown_says else ""))

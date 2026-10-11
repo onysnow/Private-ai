@@ -43,11 +43,12 @@ def get_decisions(
     investigation_id: str, db: Session = Depends(get_db),
     kind: Literal["to_check", "missing", "proposal", "match", "outside", "ai", "watchlist"] | None = None,
     order: Literal["consequence", "source", "oldest"] = "consequence",
+    offset: int = Query(0, ge=0), limit: int = Query(200, ge=1, le=500),
 ) -> Any:
     _case(db, investigation_id)
     # Brings the Red Flags and To check items up to date first, as GET .../checks does.
     engine.bring_up_to_date(db, investigation_id)
-    return case_home.decisions(db, investigation_id, kind=kind, order=order)
+    return case_home.decisions(db, investigation_id, kind=kind, order=order, offset=offset, limit=limit)
 
 
 @router.get("/investigations/{investigation_id}/since", response_model=CaseSinceOut)

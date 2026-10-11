@@ -1,4 +1,5 @@
 import logging
+import threading
 from contextlib import asynccontextmanager
 from time import monotonic
 from typing import Any, AsyncIterator, Awaitable, Callable, Iterator
@@ -38,6 +39,7 @@ from app.api.routes_annotations import router as annotations_router
 from app.api.routes_red_flags import router as red_flags_router
 from app.api.routes_checks import router as checks_router
 from app.api.routes_case_home import router as case_home_router
+from app.api.routes_demo import router as demo_router
 from app.api.routes_catalogue import router as catalogue_router
 from app.api.routes_table_mappings import router as table_mappings_router
 from app.api.routes_basemap import router as basemap_router
@@ -98,6 +100,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(red_flags_router)
     app.include_router(checks_router)
     app.include_router(case_home_router)
+    app.include_router(demo_router)
     app.include_router(catalogue_router)
     app.include_router(table_mappings_router)
     app.include_router(basemap_router)
@@ -118,6 +121,15 @@ def _holds_nul_character(exc: Exception) -> bool:
     own check (its message) or the server's (SQLSTATE 22P05)."""
     original = getattr(exc, "orig", None)
     return getattr(original, "sqlstate", None) == "22P05" or "NUL (0x00)" in str(original)
+
+
+def _warm_catalogue() -> None:
+    try:
+        from app.patterns.engine import _catalogue
+
+        _catalogue()
+    except Exception:  # pragma: no cover - the first request reads it instead
+        logging.getLogger("journalism").warning("could not read the indicator catalogue ahead of time", exc_info=True)
 
 
 def create_app(
@@ -169,6 +181,9 @@ def create_app(
         if bootstrap_schema:
             ensure_database_schema(app_engine)
         await jobs.start()
+        # The indicator catalogue takes seconds to read; reading it now, off the
+        # loop, keeps the first Red Flags or Case home request from waiting on it.
+        threading.Thread(target=_warm_catalogue, name="warm-catalogue", daemon=True).start()
         try:
             yield
         finally:

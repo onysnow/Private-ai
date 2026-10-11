@@ -24,6 +24,7 @@ import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../l
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
 import {upload} from '../documents/documents-panel';
+import {OneMdbLoader} from '../demo/one-mdb-loader';
 import {DecisionCard} from './decision-card';
 import {MiniNetwork} from './mini-network';
 import {HOLD_MS, useDecisions} from './use-decisions';
@@ -37,9 +38,14 @@ const LEVEL_ORDER: Record<string, number> = {textbook: 0, strong: 1, faint: 2};
 const UNREAD = new Set(['queued', 'pending', 'extracting']);
 const VISIT_KEY = (id: string) => `pai:last-visit:${id}`;
 
-function money(amount: number, currency: string | null): string {
+export function money(amount: number, currency: string | null): string {
   if (!currency) return '—';
-  try { return new Intl.NumberFormat('en-GB', {style: 'currency', currency, maximumFractionDigits: 0}).format(amount); } catch { return `${currency} ${Math.round(amount).toLocaleString('en-GB')}`; }
+  // Large sums are shortened ($5.82bn); the exact figure is in the ledger.
+  const compact = Math.abs(amount) >= 1_000_000;
+  try {
+    return new Intl.NumberFormat('en-US', {style: 'currency', currency, currencyDisplay: 'narrowSymbol', notation: compact ? 'compact' : 'standard',
+      maximumFractionDigits: compact ? 2 : 0}).format(amount);
+  } catch { return `${currency} ${Math.round(amount).toLocaleString('en-GB')}`; }
 }
 
 function readVisit(id: string): string | null {
@@ -63,11 +69,12 @@ function Module({n, name, href, extra, children, className = '', label}: {
   </section>;
 }
 
-function Stepper({index, count, onStep, label}: {index: number; count: number; onStep: (i: number) => void; label: string}): ReactElement | null {
-  if (count < 2) return count === 1 ? <span className="ch-step">1 of 1</span> : null;
-  return <span className="ch-step" aria-label={`${label}: ${index + 1} of ${count}`}>
+function Stepper({index, count, total, onStep, label}: {index: number; count: number; total?: number; onStep: (i: number) => void; label: string}): ReactElement | null {
+  const all = Math.max(count, total ?? 0);
+  if (count < 2) return count === 1 ? <span className="ch-step">1 of {all.toLocaleString('en-GB')}</span> : null;
+  return <span className="ch-step" aria-label={`${label}: ${index + 1} of ${all}`}>
     <button type="button" aria-label="Previous" onClick={() => onStep(Math.max(0, index - 1))} disabled={index === 0}>‹</button>
-    {index + 1} of {count} · scroll
+    {index + 1} of {all.toLocaleString('en-GB')}
     <button type="button" aria-label="Next" onClick={() => onStep(Math.min(count - 1, index + 1))} disabled={index >= count - 1}>›</button>
   </span>;
 }
@@ -96,7 +103,7 @@ function CaseQuestion({investigation}: {investigation: InvestigationOut}): React
   return <div className="ch-q">
     <p className="ch-eyebrow">The question</p>
     {investigation.question
-      ? <button type="button" className="ch-q-text" onClick={() => setEditing(true)} title="Change the question">{investigation.question}</button>
+      ? <button type="button" className={`ch-q-text${investigation.question.length > 110 ? ' long' : ''}`} onClick={() => setEditing(true)} title={`${investigation.question} (click to change)`}>{investigation.question}</button>
       : <button type="button" className="ch-q-empty" onClick={() => setEditing(true)}>Write the question this case answers</button>}
   </div>;
 }
@@ -114,7 +121,7 @@ function StandingStrip({investigationId}: {investigationId: string}): ReactEleme
     {cell('dis', s?.claims.disputed ?? '·', 'claims disputed', '/check#claim-verification', '✕', 'bad')}
     {cell('uns', s?.claims.unshown ?? '·', 'not yet shown', '/check#claim-verification', '○')}
     {cell('dec', s?.to_decide ?? '·', 'to decide · need a person', '/decide', undefined, 'need')}
-    {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? `money traced · ${s.money.payments} payment${s.money.payments === 1 ? '' : 's'}` : 'money traced', '/see#money-flows')}
+    {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? `money traced from ${s.money.from_sources ?? 0} source${s.money.from_sources === 1 ? '' : 's'} · ${s.money.payments} payment${s.money.payments === 1 ? '' : 's'}` : 'money traced', '/see#money-flows')}
     {cell('yrs', s?.timeline.from ? (s.timeline.from === s.timeline.to ? s.timeline.from : `${s.timeline.from}–${s.timeline.to?.slice(2)}`) : '—',
       s ? `${s.timeline.events} events · ${s.timeline.years.length} years` : 'events', '/see#timeline')}
     {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread` : 'documents', '/bring-in#document-ingestion')}
@@ -187,7 +194,8 @@ function CheckModule({investigationId}: {investigationId: string}): ReactElement
 }
 
 function ActModule({investigationId}: {investigationId: string}): ReactElement {
-  const flags = useQuery({...getRedFlagsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const flagsQuery = useQuery({...getRedFlagsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  const flags = flagsQuery.data;
   const openFlag = useWorkbenchStore(state => state.openFlag);
   const [index, setIndex] = useState(0);
   const open = useMemo(() => (flags?.flags ?? []).filter(f => f.status === 'open' && !f.gone_at)
@@ -196,10 +204,10 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
   const at = Math.min(index, Math.max(0, open.length - 2));
   return <Module n="04" name="Act · Red Flags" href="/act#red-flags" extra={<Stepper index={index} count={open.length} onStep={setIndex} label="Red Flags"/>}>
     <div className="ch-list" {...wheel}>
-      {open.length ? open.slice(at, at + 2).map(f => {
+      {flagsQuery.isPending ? <div className="ch-skeleton" aria-busy="true" aria-label="Looking for Red Flags"/> : flagsQuery.isError ? <p role="alert" className="ch-quiet">{errorMessage(flagsQuery.error, 'Could not look for Red Flags')} <button type="button" onClick={() => void flagsQuery.refetch()}>Retry</button></p> : open.length ? open.slice(at, at + 2).map(f => {
         const innocent = f.indicator?.innocent_explanations?.[0];
         return <button key={f.id} type="button" className={`ch-flag ch-flag-${f.level}`} onClick={() => openFlag(f.id)}>
-          <span className="ch-flag-top"><LevelChip level={f.level}/><span className="ch-since">since {f.first_seen_at.slice(0, 10)}</span></span>
+          <span className="ch-flag-top"><LevelChip level={f.level}/><span className="ch-since">flagged {new Date(`${f.first_seen_at.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})}</span></span>
           <b>{f.indicator?.name ?? f.indicator_id}</b>
           <span className="ch-flag-parties">{f.parties.map(p => p.name).join(' → ')}</span>
           {innocent && <span className="ch-innocent"><em>Could be innocent</em>{innocent}</span>}
@@ -249,7 +257,7 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
   return <section className="ch-mod ch-next" aria-label="Next up" {...wheel}>
     <header className="ch-mod-head">
       <h2><span className="ch-eyebrow">Next up</span>{item?.kind === 'to_check' ? 'One thing only you can check' : 'One thing only you can decide'}</h2>
-      <Stepper index={index} count={items.length} onStep={setIndex} label="Decisions"/>
+      <Stepper index={index} count={items.length} total={query.data?.total} onStep={setIndex} label="Decisions"/>
     </header>
     {query.isError ? <p role="alert">{errorMessage(query.error, 'Could not load what waits for you')} <button type="button" onClick={() => void query.refetch()}>Retry</button></p>
       : query.isPending && investigationId ? <div className="ch-skeleton" aria-busy="true"/>
@@ -265,11 +273,13 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
 }
 
 function YearRail({investigationId}: {investigationId: string}): ReactElement {
-  const standing = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const standingQuery = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  const standing = standingQuery.data;
   const asOf = useWorkbenchStore(state => state.asOf);
   const setAsOf = useWorkbenchStore(state => state.setAsOf);
   const years = standing?.timeline.years ?? [];
   const most = Math.max(1, ...years.map(y => y.events));
+  if (standingQuery.isPending && investigationId) return <div className="ch-years" aria-busy="true"/>;
   if (!years.length) return <div className="ch-years ch-quiet">Dated events place the case in time here.</div>;
   return <nav className="ch-years" aria-label="Years in the case">
     {years.slice(-10).map(y => {
@@ -328,6 +338,7 @@ function FirstCase({onSwitch}: {onSwitch: (id: string) => void}): ReactElement {
       <button type="submit" disabled={!name.trim() || busy}>Start the case</button>
     </form>
     <button type="button" className="ch-sample" onClick={() => void sample()} disabled={busy}>Or open the sample case to look around</button>
+    <OneMdbLoader onOpen={onSwitch}/>
     {problem && <p role="alert">{problem}</p>}
   </div>;
 }

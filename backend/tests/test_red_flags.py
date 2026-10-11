@@ -79,7 +79,7 @@ def test_payment_with_no_purpose_and_shared_contact_between_unlinked_parties():
     c = _party(inv, "Gamma")
     _link(inv, "Payment", c, a, amount=["5000"], currency=["EUR"])
     flags = {f["indicator_id"]: f for f in _flags(inv)["flags"]}
-    assert flags["BO-033"]["summary"].startswith("Gamma paid Alpha 5000 EUR")
+    assert flags["BO-033"]["summary"].startswith("Gamma paid Alpha 5,000 EUR")
     assert flags["BO-032"]["facts"]["kind"] == "phone"
     assert {p["name"] for p in flags["BO-032"]["parties"]} == {"Alpha", "Beta"}
     # Once the two are linked, the shared phone is no longer unexplained: the flag stops firing.

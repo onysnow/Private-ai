@@ -2514,6 +2514,7 @@
         "type": "object"
       },
       "CaseDecisionsOut": {
+        "description": "One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind.",
         "properties": {
           "counts": {
             "additionalProperties": {
@@ -2532,11 +2533,21 @@
             },
             "title": "Items",
             "type": "array"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
           }
         },
         "required": [
           "investigation_id",
           "counts",
+          "total",
+          "offset",
           "items"
         ],
         "title": "CaseDecisionsOut",
@@ -2607,6 +2618,7 @@
         "type": "object"
       },
       "CaseMoneyOut": {
+        "description": "Money traced, counted once where it starts (payments whose payer received\nnothing in the case), and how many payments carry it.",
         "properties": {
           "amount": {
             "title": "Amount",
@@ -2622,6 +2634,11 @@
               }
             ],
             "title": "Currency"
+          },
+          "from_sources": {
+            "default": 0,
+            "title": "From Sources",
+            "type": "integer"
           },
           "other_currencies": {
             "items": {
@@ -12550,6 +12567,134 @@
           "error"
         ],
         "title": "DeletionUnsafePath",
+        "type": "object"
+      },
+      "DemoCaseProgressOut": {
+        "description": "The 1MDB demo case (app/services/demo_1mdb.py): loading, reading or ready.",
+        "properties": {
+          "claims": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Claims"
+          },
+          "documents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Documents"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "failed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failed"
+          },
+          "investigation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigation Id"
+          },
+          "leads": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Leads"
+          },
+          "not_downloaded": {
+            "default": [],
+            "items": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            "title": "Not Downloaded",
+            "type": "array"
+          },
+          "read": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read"
+          },
+          "state": {
+            "enum": [
+              "idle",
+              "downloading",
+              "building",
+              "reading",
+              "ready",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "DemoCaseProgressOut",
         "type": "object"
       },
       "DemoSeedOut": {
@@ -39819,6 +39964,82 @@
         "summary": "Export Deck Pptx"
       }
     },
+    "/api/demo/1mdb": {
+      "get": {
+        "description": "Whether the 1MDB case is loaded, and how far its documents are read.",
+        "operationId": "get_1mdb",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoCaseProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get 1Mdb"
+      },
+      "post": {
+        "description": "Download the 11 public documents, make the case and its records, and start\nreading the documents. Loading again while it exists changes nothing.",
+        "operationId": "load_1mdb",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoCaseProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Load 1Mdb"
+      }
+    },
     "/api/demo/seed": {
       "post": {
         "description": "Create the one demo investigation (sample entities, relationships,\nclaims/evidence, leads, and a timeline) if it doesn't already exist.\nIdempotent -- calling this again just returns the existing one.",
@@ -44728,6 +44949,29 @@
               ],
               "title": "Order",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
             }
           }
         ],

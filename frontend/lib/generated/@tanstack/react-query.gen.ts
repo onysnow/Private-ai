@@ -73,6 +73,7 @@ import {
   findExtractionLineageEndpoint,
   findingCandidates,
   findOpenalephChildren,
+  get1Mdb,
   getAiAnalysisCandidateEndpoint,
   getAllRecordTags,
   getBasemapFont,
@@ -186,6 +187,7 @@ import {
   listSources,
   listTermHints,
   listWriteupsEndpoint,
+  load1Mdb,
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
@@ -436,6 +438,9 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenError,
   FindOpenalephChildrenResponse,
+  Get1MdbData,
+  Get1MdbError,
+  Get1MdbResponse,
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointError,
   GetAiAnalysisCandidateEndpointResponse,
@@ -775,6 +780,9 @@ import type {
   ListWriteupsEndpointData,
   ListWriteupsEndpointError,
   ListWriteupsEndpointResponse,
+  Load1MdbData,
+  Load1MdbError,
+  Load1MdbResponse,
   MakeLeadFromHitData,
   MakeLeadFromHitError,
   MakeLeadFromHitResponse,
@@ -2330,6 +2338,63 @@ export const exportDeckPptxOptions = (options: Options<ExportDeckPptxData>) =>
     },
     queryKey: exportDeckPptxQueryKey(options),
   });
+
+export const get1MdbQueryKey = (options?: Options<Get1MdbData>) =>
+  createQueryKey('get1Mdb', options);
+
+/**
+ * Get 1Mdb
+ *
+ * Whether the 1MDB case is loaded, and how far its documents are read.
+ */
+export const get1MdbOptions = (options?: Options<Get1MdbData>) =>
+  queryOptions<
+    Get1MdbResponse,
+    Get1MdbError,
+    Get1MdbResponse,
+    ReturnType<typeof get1MdbQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await get1Mdb({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: get1MdbQueryKey(options),
+  });
+
+/**
+ * Load 1Mdb
+ *
+ * Download the 11 public documents, make the case and its records, and start
+ * reading the documents. Loading again while it exists changes nothing.
+ */
+export const load1MdbMutation = (
+  options?: Partial<Options<Load1MdbData>>,
+): UseMutationOptions<
+  Load1MdbResponse,
+  Load1MdbError,
+  Options<Load1MdbData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    Load1MdbResponse,
+    Load1MdbError,
+    Options<Load1MdbData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await load1Mdb({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Seed Demo
@@ -5047,6 +5112,58 @@ export const getDecisionsOptions = (options: Options<GetDecisionsData>) =>
     },
     queryKey: getDecisionsQueryKey(options),
   });
+
+export const getDecisionsInfiniteQueryKey = (
+  options: Options<GetDecisionsData>,
+): QueryKey<Options<GetDecisionsData>> =>
+  createQueryKey('getDecisions', options, true);
+
+/**
+ * Get Decisions
+ */
+export const getDecisionsInfiniteOptions = (
+  options: Options<GetDecisionsData>,
+) => {
+  const opts = infiniteQueryOptions<
+    GetDecisionsResponse,
+    GetDecisionsError,
+    InfiniteData<GetDecisionsResponse>,
+    QueryKey<Options<GetDecisionsData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetDecisionsData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetDecisionsData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getDecisions({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getDecisionsInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
 
 export const listDecksEndpointQueryKey = (
   options: Options<ListDecksEndpointData>,
