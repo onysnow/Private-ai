@@ -4,6 +4,8 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
 `timeline-wip`.
 
 ## How Ony wants to work
+- Commands for him to run: always one single line starting with the `cd` to the folder, joined
+  with `;` for PowerShell, e.g. `cd C:\Users\Wigi\Documents\Private-ai; git push origin timeline-wip-cloud:timeline-wip`.
 - Mockups first; he approves before the app changes. When he gives feedback, discuss the change
   with him and edit only after he agrees.
 - Execute instructions rather than acknowledging them. No unrequested recommendations. Never
