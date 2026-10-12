@@ -23,8 +23,8 @@
   --ai-mark: #B7A6E0;
   --font-ui: 'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, sans-serif;
   --font-read: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, serif;
-  --font-display: 'Fraunces Variable', 'IBM Plex Sans Variable', serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-display: 'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --background: 212 49% 15%;
   --foreground: 40 57% 91%;
   --card: 209 41% 20%;
@@ -63,10 +63,10 @@
   --flag-textbook-fill: #831B16;
   --flag-textbook-edge: #FF6557;
   --ai-mark: #C3A6E0;
-  --font-ui: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif;
+  --font-ui: 'Manrope Variable', 'Work Sans Variable', system-ui, sans-serif;
   --font-read: 'Source Serif 4 Variable', Georgia, serif;
-  --font-display: 'Work Sans Variable', sans-serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-display: 'Jost Variable', 'Manrope Variable', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --background: 20 23% 8%;
   --foreground: 36 33% 91%;
   --card: 22 20% 11%;
@@ -106,9 +106,9 @@
   --flag-textbook-edge: #FF746C;
   --ai-mark: #C9B2E6;
   --font-ui: 'Public Sans Variable', 'Public Sans', system-ui, sans-serif;
-  --font-read: 'Literata Variable', 'Noto Serif Variable', Georgia, serif;
-  --font-display: 'Literata Variable', serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-read: 'Domine Variable', 'Noto Serif Variable', Georgia, serif;
+  --font-display: 'Domine Variable', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --background: 23 24% 11%;
   --foreground: 40 60% 88%;
   --card: 25 24% 14%;
@@ -150,7 +150,7 @@
   --font-ui: 'Inter Variable', Inter, system-ui, sans-serif;
   --font-read: 'Newsreader Variable', Georgia, serif;
   --font-display: 'Newsreader Variable', serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --background: 189 48% 11%;
   --foreground: 45 52% 91%;
   --card: 189 44% 15%;
@@ -189,10 +189,10 @@
   --flag-textbook-fill: #A0182A;
   --flag-textbook-edge: #FF9090;
   --ai-mark: #D3C6F5;
-  --font-ui: 'Atkinson Hyperlegible', 'Inter Variable', system-ui, sans-serif;
-  --font-read: 'Literata Variable', Georgia, serif;
-  --font-display: 'Inter Variable', sans-serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-ui: 'Inclusive Sans', 'Inter Variable', system-ui, sans-serif;
+  --font-read: 'Lexend Variable', 'Inter Variable', sans-serif;
+  --font-display: 'Lexend Variable', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --background: 240 48% 14%;
   --foreground: 42 68% 95%;
   --card: 240 44% 19%;
@@ -225,6 +225,8 @@
 html { background: var(--ground); color-scheme: dark; }
 body { background: transparent; color: var(--text); font-family: var(--font-ui); }
 h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
+/* Rain Noir's titles are Jost 300 (THEMES-1). */
+[data-theme='rain-noir'] h1 { font-weight: 300; }
 /* Calm motion: the operating-system setting or the switch in Settings. Everything becomes a short fade. */
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 120ms !important; scroll-behavior: auto !important; } }
 html[data-motion='calm'] *, html[data-motion='calm'] *::before, html[data-motion='calm'] *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 120ms !important; scroll-behavior: auto !important; }
@@ -253,6 +255,8 @@ html[data-theme='rain-noir'] body::after, html[data-theme='archive'] body::after
 @keyframes wb-bokeh-drift { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-2%, 1.5%, 0) scale(1.04); } }
 html[data-effects='light'] body::before { animation: none; }
 html[data-effects='off'] body::before, html[data-effects='off'] body::after { display: none; }
+html[data-theme='rain-noir'][data-fx-off~='bokeh'] body::before { display: none; }
+html[data-fx-off~='grain'] body::after { display: none; }
 
 /* Status grammar: shape + word + colour, never colour alone. */
 .st, .lv, .ai-tag { display: inline-flex; align-items: center; gap: 6px; font: 600 10.5px/1 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
@@ -270,51 +274,19 @@ html[data-effects='off'] body::before, html[data-effects='off'] body::after { di
 .ai-tag { padding: 3px 7px; border-radius: 5px; color: var(--ai-mark); border: 1px solid var(--ai-mark); font-family: var(--font-mono); letter-spacing: .04em; text-transform: none; }
 
 /* Settings › Appearance */
-.ap h2 { font: 700 26px var(--font-display); margin: 0 0 4px; color: var(--text); }
-.ap-sub { color: var(--text-muted); margin: 0 0 18px; font-size: 14px; }
-.ap-h { font: 600 11px var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 10px; }
-.ap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
-.ap-card { background: var(--surface-1); color: var(--text); border-radius: 16px; padding: 16px; box-shadow: var(--shadow-panel); border: 1.5px solid transparent; display: flex; flex-direction: column; gap: 9px; font-family: var(--font-ui); transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
-.ap-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lifted); }
-.ap-card.on { border-color: var(--accent-1); }
-.ap-card.looking { box-shadow: 0 0 0 2px var(--accent-2), var(--shadow-panel); }
 .ap-compare { margin: 4px 0 10px; }
 .ap-compare-box { width: 100%; max-width: 980px; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-lifted); }
 .ap-compare-box > * { height: 100%; }
 .ap-live { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--ground); color: var(--text); font-family: var(--font-ui); }
 .ap-live-screen { position: absolute; top: 0; left: 0; transform-origin: 0 0; padding: 60px 28px 20px; box-sizing: border-box; pointer-events: none; }
-.ap-compare figcaption { display: flex; justify-content: space-between; max-width: 980px; margin-top: 6px; font-size: 12.5px; color: var(--text); }
-.ap-compare figcaption small { color: var(--text-muted); margin-left: 4px; }
 .ap-live-none { color: var(--text-muted); font-size: 13px; }
-.ap-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; max-width: 980px; margin: 0 0 18px; }
-.ap-facts div { padding: 10px 12px; border-radius: 12px; background: var(--surface-1); }
-.ap-facts dt { font: 500 10.5px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
-.ap-facts dd { margin: 3px 0 0; font-size: 13px; }
 .ap-format { flex: 0 0 72px; width: 72px; height: 46px; border-radius: 6px; background: var(--surface-2); }
 .ap-format rect { fill: color-mix(in srgb, var(--accent-2) 55%, var(--surface-3)); }
-.ap-card header { display: flex; align-items: center; gap: 8px; font: 700 17px var(--font-display); }
-.ap-tag { font: 600 10px var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ground); background: var(--accent-1); padding: 3px 7px; border-radius: 99px; }
-.ap-tag.try { background: var(--accent-2); }
-.ap-mood { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.45; }
-.ap-sw { display: flex; gap: 4px; } .ap-sw i { flex: 1; height: 26px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .1); }
-.ap-sample { display: flex; flex-direction: column; gap: 2px; background: var(--surface-2); border-radius: 8px; padding: 8px 10px; }
-.ap-read { font: 500 15px var(--font-read); } .ap-mono { font: 12px var(--font-mono); color: var(--text-muted); }
-.ap-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-.ap-meta { margin: 0; font-size: 11.5px; color: var(--text-muted); }
-.ap-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 4px; }
 .ap-btn { all: unset; cursor: pointer; box-sizing: border-box; padding: 8px 12px; border-radius: 9px; border: 1px solid var(--line); color: var(--text); font: 600 12.5px var(--font-ui); min-height: 36px; display: inline-flex; align-items: center; transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast); }
 .ap-btn:hover { border-color: var(--accent-1); transform: translateY(-1px); } .ap-btn:active { transform: scale(.97); }
 .ap-btn.p { background: var(--accent-1); color: var(--ground); border-color: var(--accent-1); }
 .ap-btn[disabled] { opacity: .55; cursor: default; transform: none; }
 .ap-btn:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
-.ap-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 18px; }
-.ap-set { border: 0; margin: 0; padding: 14px 16px; background: var(--surface-1); border-radius: 14px; box-shadow: var(--shadow-panel); display: flex; flex-direction: column; gap: 8px; }
-.ap-set legend { float: left; width: 100%; padding: 0 0 6px; font: 600 11px var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
-.ap-opt { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text); cursor: pointer; line-height: 1.4; }
-.ap-opt input { margin-top: 3px; accent-color: var(--accent-1); }
-.ap-opt.off { opacity: .6; cursor: default; }
-.ap-trying { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 90; display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 16px; border-radius: 14px; background: var(--surface-2); color: var(--text); box-shadow: var(--shadow-lifted); font-size: 13px; animation: ap-rise var(--dur-base) var(--ease-out); }
-@keyframes ap-rise { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
 /* The app frame: breadcrumb always visible; the left and top edges hide until wanted (components/frame). */
 .fr-main { min-height: 100vh; padding-top: 52px; }
@@ -379,18 +351,6 @@ kbd { font: 500 11px var(--font-mono); padding: 1px 6px; border-radius: 5px; bor
 .fr-help table { width: 100%; font-size: 14px; } .fr-help td { padding: 6px 4px; }
 
 /* Settings at a glance (features/settings/settings-index.tsx) */
-.st-index { margin: 26px 0 8px; padding: 16px; border-radius: 16px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
-.st-search { width: 100%; max-width: 420px; box-sizing: border-box; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: 14px var(--font-ui); }
-.st-search:focus-visible { outline: 2px solid var(--accent-1); }
-.st-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px 24px; margin-top: 14px; }
-.st-groups h2 { margin: 0 0 6px; font: 500 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
-.st-groups ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.st-groups button { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; gap: 12px; padding: 6px 8px; border-radius: 8px; font-size: 13.5px; color: var(--text); }
-.st-groups button:hover, .st-groups button:focus-visible { background: var(--surface-2); }
-.st-groups button:focus-visible { outline: 2px solid var(--accent-1); }
-.st-groups button b { font-weight: 600; color: var(--accent-1); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 55%; }
-.st-none { color: var(--text-muted); font-size: 13px; }
-.st-group { margin: 44px 0 14px; padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--text-muted) 30%, transparent); font: 500 12px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); scroll-margin-top: 70px; }
 
 /* Edges: first-use labels, pins, where you have been (components/frame/app-frame.tsx) */
 .fr-hint { position: fixed; z-index: 74; padding: 4px 9px; border-radius: 8px; background: var(--surface-2); color: var(--text-muted); font-size: 11.5px; pointer-events: none; box-shadow: var(--shadow-panel); }

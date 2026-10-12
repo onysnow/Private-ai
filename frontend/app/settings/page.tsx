@@ -5,16 +5,22 @@ import {useEffect, useRef, useState} from 'react';
 import Link from 'next/link';
 import {api, API} from '../../lib/api-instance';
 import {ApiHttpError, errorMessage} from '../../lib/api-client';
-import {listInvestigationsOptions, settingsStatusOptions, settingsStatusQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {connectorsOptions, listInvestigationsOptions, listInvestigationsQueryKey, settingsStatusOptions, settingsStatusQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {investigationDeletionPreview, removeInvestigation, seedDemo as seedDemoInvestigation} from '../../lib/generated/sdk.gen';
 import type {InvestigationDeletionPreview, SettingsStatusOut} from '../../lib/generated/types.gen';
 import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
 import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 import {AppearancePanel, useAppearance} from '../../features/appearance/appearance-panel';
-import {SettingsIndex, type SettingRow} from '../../features/settings/settings-index';
-import {singleKeysOn} from '../../lib/shortcuts';
-import {FORMATS, THEMES} from '../../lib/theme';
+import {SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
+import {HIDE_SCREEN_EVENT, NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
+import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
+import {SecurityPanel} from '../../features/security/security-panel';
+import {BackupPanel} from '../../features/backups/backup-panel';
+import {LevelChip, LEVEL_WORDS} from '../../components/status';
+import {useWorkbenchStore} from '../../lib/workbench-store';
+import {setSingleKeys, singleKeysOn} from '../../lib/shortcuts';
+import {THEMES} from '../../lib/theme';
 import {SuiteCoverage} from '../../features/suite-coverage/suite-coverage';
 import {DemoCasesLoader} from '../../features/demo/demo-cases-loader';
 import {OneMdbLoader} from '../../features/demo/one-mdb-loader';
@@ -192,44 +198,87 @@ function Settings(): ReactElement {
     error: 'border-destructive/40 bg-destructive/15 text-destructive-foreground'
   };
 
-  const look = useAppearance().kept;
+  const look = useAppearance();
   const [keysOn, setKeysOn] = useState(true);
   useEffect(() => { setKeysOn(singleKeysOn()); }, []);
   const cases = investigationsQuery.data ?? [];
+  const connectors = Object.values(status?.connectors ?? {});
+  const theme = THEMES.find(t => t.id === (look.trying ?? look.kept.theme))?.name ?? look.kept.theme;
+  const inv = useWorkbenchStore(state => state.investigationId) || cases[0]?.id || '';
   const settingRows: SettingRow[] = [
-    {group: 'You', label: 'Theme', value: THEMES.find(t => t.id === look.theme)?.name ?? look.theme, target: 'st-appearance', words: 'colour color dark'},
-    {group: 'You', label: 'Effects', value: look.effects === 'full' ? 'Full' : look.effects === 'light' ? 'Light' : 'Off', target: 'st-appearance'},
-    {group: 'You', label: 'Calm motion', value: look.motion === 'calm' ? 'On' : 'Off', target: 'st-appearance', words: 'animation reduce'},
-    {group: 'You', label: 'Single-key shortcuts', value: keysOn ? 'On' : 'Off', target: 'st-appearance', words: 'keyboard keys'},
-    {group: 'You', label: 'Format', value: FORMATS.find(f => f.id === look.format)?.name ?? look.format, target: 'st-appearance', words: 'layout'},
-    {group: 'Cases', label: 'Cases on this computer', value: String(cases.filter(c => !c.is_demo).length), target: 'st-cases'},
-    {group: 'Cases', label: '1MDB demo', value: cases.some(c => c.is_demo && c.name === '1MDB') ? 'Loaded' : 'Not loaded', target: 'st-cases', words: 'sample real'},
-    {group: 'Cases', label: 'Demo investigation', value: demoInv ? (hideDemo ? 'Hidden here' : 'Shown') : 'None', target: 'st-demo', words: 'sample seed delete'},
-    {group: 'This computer', label: 'API access', value: state === 'local' ? 'Local' : state === 'authenticated' ? 'Token saved' : state === 'needs_token' ? 'Token needed'
-      : state === 'remote_disabled' ? 'Remote off' : state === 'error' ? 'Not reached' : 'Checking', target: 'st-computer', words: 'token bearer'},
-    {group: 'This computer', label: 'Private AI', value: status?.ai?.model ?? (status ? 'Off' : 'Checking'), target: 'st-ai', words: 'model ollama'},
-    {group: 'This computer', label: 'Operator console', value: 'Loopback only', target: 'st-computer'},
+    {group: 'You', id: 'appearance', label: 'Appearance', value: theme, words: 'theme colour color dark effects motion format fonts',
+      note: 'Appearance is yours alone: it is saved on this device and never changes what a teammate sees.'},
+    {group: 'You', id: 'notifications', label: 'Notifications', value: 'in app', words: 'inbox bell snooze'},
+    {group: 'You', id: 'keyboard', label: 'Keyboard', value: keysOn ? 'on' : 'off', words: 'keys shortcuts single-key'},
+    {group: 'You', id: 'safety', label: 'Your safety', value: '', words: 'hide screen cover'},
+    {group: 'Cases', id: 'new-case', label: 'New-case setup', value: '', words: 'start create'},
+    {group: 'Cases', id: 'lookups', label: 'Outside lookups', value: 'ask', words: 'connectors aleph opensanctions search outside'},
+    {group: 'Cases', id: 'ai', label: 'AI and research', value: status?.ai?.enabled ? 'ask first' : status ? 'off' : '', words: 'private ai model ollama'},
+    {group: 'Cases', id: 'levels', label: 'Red Flag levels', value: '', words: 'faint strong textbook'},
+    {group: 'Cases', id: 'demo', label: 'Demo case', value: demoInv ? (hideDemo ? 'hidden' : 'shown') : 'none', words: 'sample seed delete 1mdb'},
+    {group: 'This computer', id: 'access', label: 'Access and token', value: state === 'local' ? 'local' : state === 'authenticated' ? 'token' : state === 'needs_token' ? 'token needed'
+      : state === 'remote_disabled' ? 'remote off' : state === 'error' ? 'not reached' : '', words: 'api bearer'},
+    {group: 'This computer', id: 'keys', label: 'Connector keys', value: status ? `${connectors.filter(c => c.configured).length} of ${connectors.length}` : '', words: 'credentials secret'},
+    {group: 'This computer', id: 'backups', label: 'Backups', value: '', words: 'restore archive'},
+    {group: 'This computer', id: 'log', label: 'Security log', value: status?.security.needs_attention ? 'look' : '', words: 'audit denials'},
+    {group: 'This computer', id: 'console', label: 'Operator console', value: '', href: '/console/', words: 'backend'},
   ];
+  const [section, go] = useSection(settingRows.filter(r => !r.href).map(r => r.id), 'appearance');
+  const row = settingRows.find(r => r.id === section)!;
+  const providersQuery = useQuery({...connectorsOptions(), enabled: Boolean(status) && ['lookups', 'keys', 'log'].includes(section)});
+  const providers = providersQuery.data?.providers ?? Object.keys(status?.connectors ?? {});
+  const card = 'rounded-xl border border-border bg-card p-5';
 
-  return (
-    <div className="mx-auto max-w-[1180px] px-6 py-14">
-      <h1 className="text-3xl font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
-        Settings
-      </h1>
-      <p className="mt-2 max-w-[640px] text-sm text-muted-foreground">
-        Everything you can set, under You, Cases and This computer. Connector credentials, backups, and the security audit log are on the{' '}
-        <Link href="/" className="text-primary hover:underline">
-          main workbench
-        </Link>
-        .
-      </p>
-      <SettingsIndex rows={settingRows}/>
-
-      <h2 className="st-group" id="st-you">You</h2>
-      <div id="st-appearance" tabIndex={-1}><AppearancePanel/></div>
-
-      <h2 className="st-group" id="st-cases" tabIndex={-1}>Cases</h2>
-      <div className="mt-4 rounded-xl border border-border bg-card p-5">
+  const sections: Record<string, ReactElement> = {
+    appearance: <AppearancePanel/>,
+    notifications: <div className={card}>
+      <p className="text-sm">Notifications stay inside the app: the bell counts what needs you, and its inbox lists that first, then everything else from this week. Nothing is sent by email or to your phone.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Any row can be snoozed on this computer for a day or a week; it comes back by itself.</p>
+      <button type="button" className="ap-btn mt-4" onClick={() => window.dispatchEvent(new Event(OPEN_INBOX_EVENT))}>Open the inbox</button>
+    </div>,
+    keyboard: <div className={card}>
+      <label className="ap-switch"><span><b>Single-key shortcuts</b><small>[ opens the steps, ] the tools, ? the list of keys. They never fire while you type.</small></span>
+        <input type="checkbox" role="switch" checked={keysOn} onChange={e => { setSingleKeys(e.target.checked); setKeysOn(e.target.checked); }}/><i aria-hidden="true"/></label>
+      <p className="mt-3 text-sm text-muted-foreground">Keys with ⌘ or Ctrl always work: ⌘K search and commands, ⌘O switch case, ⌘⇧H hide the screen.</p>
+    </div>,
+    safety: <div className={card}>
+      <p className="text-sm">Hide screen covers everything at once with a plain page, for when someone walks up. ⌘⇧H from anywhere, or the button on Case home; your place is kept until you ask for it back.</p>
+      <button type="button" className="ap-btn mt-4" onClick={() => window.dispatchEvent(new Event(HIDE_SCREEN_EVENT))}>Hide the screen now</button>
+    </div>,
+    'new-case': <div className={card}>
+      <p className="text-sm">A new case starts with its name and the question it answers, what kind of case it is, and what you have so far. The same setup opens from the case switcher (⌘O).</p>
+      <button type="button" className="ap-btn p mt-4" onClick={() => window.dispatchEvent(new Event(NEW_CASE_EVENT))}>Start a new case</button>
+    </div>,
+    lookups: inv ? <div className={card}>
+      <p className="mb-3 text-sm text-muted-foreground">Nothing is looked up outside without you: a name goes to an outside source only when you ask here or on a record.</p>
+      <ConnectorsPanel investigationId={inv} providers={providers}/>
+    </div> : <p className="text-sm text-muted-foreground">Open or start a case to look names up outside.</p>,
+    ai: <div className="rounded-xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
+          Private AI
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">{describeAiStatus(status?.ai)}</p>
+        {status?.ai?.model && (
+          <p className="mt-2 text-sm">
+            Model: <code>{status.ai.model}</code>{whereModelRuns(status.ai)}
+            {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}
+          </p>
+        )}
+        {status?.ai?.authority_suite?.present && (
+          <p className="mt-2 text-sm" data-testid="authority-suite">
+            Rules the AI works under: the Authority System Suite{status.ai.authority_suite.source ? <> (<code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code>)</> : null}, TAS v{status.ai.authority_suite.tas_version ?? '?'}.
+            Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.
+          </p>
+        )}
+        {status?.ai?.authority_suite?.present && <SuiteCoverage/>}
+      </div>,
+    levels: <div className={card}>
+      <p className="text-sm">Every Red Flag has three levels. The rules that set them are written down per indicator, with the numbers they come from.</p>
+      <dl className="st-levels">{(['faint', 'strong', 'textbook'] as const).map(l => <div key={l}><dt><LevelChip level={l}/></dt><dd>{LEVEL_WORDS[l].meaning}</dd></div>)}</dl>
+      <Link href="/glossary" className="mt-3 inline-block text-sm text-primary hover:underline">Each indicator’s levels in the Glossary</Link>
+    </div>,
+    demo: <div className="flex flex-col gap-8">
+      <div className="rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           A real case to look around
         </h2>
@@ -247,7 +296,7 @@ function Settings(): ReactElement {
         <DemoCasesLoader/>
       </div>
 
-      <div id="st-demo" tabIndex={-1} className="mt-8 rounded-xl border border-border bg-card p-5">
+      <div className="mt-8 rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           Demo mode
         </h2>
@@ -345,14 +394,8 @@ function Settings(): ReactElement {
           </div>
         )}
       </div>
-      <h2 className="st-group" id="st-computer" tabIndex={-1}>This computer</h2>
-
-      {/* API access and the operator console are both short, self-contained
-          cards -- pairing them in a 2-column grid on desktop instead of
-          stacking each full-width, one per row, like "Demo mode" below,
-          which genuinely needs the room. */}
-      <div className="mt-4 grid items-start gap-6 sm:grid-cols-2">
-      <div className="rounded-xl border border-border bg-card p-5">
+    </div>,
+    access: <div className="rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           API access
         </h2>
@@ -398,9 +441,25 @@ function Settings(): ReactElement {
             </div>
           )}
         </div>
-      </div>
+      </div>,
+    keys: status ? <SecurityPanel settingsStatus={status} providers={providers} part="keys"/> : <p className="text-sm text-muted-foreground">Checking…</p>,
+    backups: inv ? <div className={card}><BackupPanel investigationId={inv} onRestored={async id => {
+      useWorkbenchStore.getState().setInvestigationId(id);
+      await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
+    }}/></div> : <p className="text-sm text-muted-foreground">Open or start a case to back it up.</p>,
+    log: status ? <SecurityPanel settingsStatus={status} providers={providers} part="log"/> : <p className="text-sm text-muted-foreground">Checking…</p>,
+  };
 
-      <div className="rounded-xl border border-border bg-card p-5">
+  return <div className="st-shell">
+    <header className="st-head">
+      <h1>{row.label}</h1>
+      <SettingsSearch rows={settingRows} onGo={go}/>
+    </header>
+    <div className="st-body">
+      <SettingsNav rows={settingRows} current={section} onGo={go}/>
+      <div className="st-section" id={`st-${section}`} tabIndex={-1}>
+        {sections[section]}
+        {section === 'access' && <div className="mt-6"><div className="rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           Operator console
         </h2>
@@ -411,29 +470,8 @@ function Settings(): ReactElement {
         <a href="/console/" className="mt-3 inline-block text-sm text-primary hover:underline">
           Open console
         </a>
+      </div></div>}
       </div>
-      </div>
-
-      <div id="st-ai" tabIndex={-1} className="mt-8 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
-          Private AI
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{describeAiStatus(status?.ai)}</p>
-        {status?.ai?.model && (
-          <p className="mt-2 text-sm">
-            Model: <code>{status.ai.model}</code>{whereModelRuns(status.ai)}
-            {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}
-          </p>
-        )}
-        {status?.ai?.authority_suite?.present && (
-          <p className="mt-2 text-sm" data-testid="authority-suite">
-            Rules the AI works under: the Authority System Suite{status.ai.authority_suite.source ? <> (<code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code>)</> : null}, TAS v{status.ai.authority_suite.tas_version ?? '?'}.
-            Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.
-          </p>
-        )}
-        {status?.ai?.authority_suite?.present && <SuiteCoverage/>}
-      </div>
-
     </div>
-  );
+  </div>;
 }

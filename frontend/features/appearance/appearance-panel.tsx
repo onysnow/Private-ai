@@ -1,22 +1,23 @@
 'use client';
-// Settings › Appearance (Workbench-redesign-2026.pdf, chapter 03 and "The case home, navigation and settings" §11):
-// theme, effects and motion chosen separately. A theme can be tried on the real app for this session before it is
-// kept ("Try, then keep"); the bar at the top of every screen offers Keep or Go back while one is on trial.
-// Formats other than Board are listed as planned.
+// Settings › Appearance, as mockup HOME_2 draws it: on the left the five themes as small
+// specimen cards (each drawn in its own theme) and the effects; on the right the open
+// case's real Case home, split between the theme you use and the one you point at, its
+// four facts, and the formats. Pointing at a card previews it there; choosing a card tries
+// it on the whole app for this session, and the bar at the top keeps it or goes back.
 import type {ReactElement} from 'react';
 import {useEffect, useState} from 'react';
 
-import {StatusChip, LevelChip} from '../../components/status';
+import {STATUS_WORDS, LEVEL_WORDS} from '../../components/status';
 import {ThemeCompare} from './theme-compare';
-import {setSingleKeys, singleKeysOn} from '../../lib/shortcuts';
 import {
-  currentAppearance, FORMATS, keepAppearance, keptAppearance, onAppearanceChange, THEMES, tryingTheme, tryTheme,
-  type Appearance, type Effects, type Format, type ThemeId,
+  currentAppearance, DEFAULT_APPEARANCE, FORMATS, keepAppearance, keptAppearance, onAppearanceChange, THEMES, tryingTheme, tryTheme,
+  type Appearance, type Effects, type Format, type NamedEffect, type ThemeId,
 } from '../../lib/theme';
 
 /** The appearance on screen now, kept up to date when it changes anywhere. */
 export function useAppearance(): {now: Appearance; kept: Appearance; trying: ThemeId | null} {
-  const [state, setState] = useState(() => ({now: currentAppearance(), kept: keptAppearance(), trying: tryingTheme()}));
+  // The first render matches the server's (stored choices are read after mounting), so hydration never disagrees.
+  const [state, setState] = useState<{now: Appearance; kept: Appearance; trying: ThemeId | null}>({now: DEFAULT_APPEARANCE, kept: DEFAULT_APPEARANCE, trying: null});
   useEffect(() => {
     const read = () => setState({now: currentAppearance(), kept: keptAppearance(), trying: tryingTheme()});
     read();
@@ -25,22 +26,40 @@ export function useAppearance(): {now: Appearance; kept: Appearance; trying: The
   return state;
 }
 
-/** The slim bar while a theme is on trial: Keep or Go back. Shown on every screen. */
+const themeName = (id: ThemeId): string => THEMES.find(t => t.id === id)?.name ?? id;
+
+/** The bar at the top of every screen while a theme is on trial: Keep it, or go back (Esc). */
 export function TryingBar(): ReactElement | null {
-  const {trying} = useAppearance();
+  const {trying, kept} = useAppearance();
+  useEffect(() => {
+    if (!trying) return undefined;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented || document.querySelector('[role="dialog"]')) return;
+      tryTheme(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [trying]);
   if (!trying) return null;
-  const name = THEMES.find(t => t.id === trying)?.name ?? trying;
+  const name = themeName(trying);
   return <div className="ap-trying" role="status">
-    <span>Trying <b>{name}</b>. Nothing is saved until you keep it.</span>
+    <i className="ap-trying-dot" aria-hidden="true"/>
+    <span>Trying <b>{name}</b> · nothing is saved until you keep it</span>
     <button type="button" className="ap-btn p" onClick={() => keepAppearance({theme: trying})}>Keep {name}</button>
-    <button type="button" className="ap-btn" onClick={() => tryTheme(null)}>Go back</button>
+    <button type="button" className="ap-btn" onClick={() => tryTheme(null)}>Go back to {themeName(kept.theme)} <kbd>Esc</kbd></button>
   </div>;
 }
 
-const EFFECTS: {id: Effects; name: string; line: string}[] = [
-  {id: 'full', name: 'Full', line: 'The theme\'s board effects, moving.'},
-  {id: 'light', name: 'Light', line: 'The same effects, still.'},
-  {id: 'off', name: 'Off', line: 'A plain board.'},
+const EFFECTS: {id: Effects; name: string}[] = [{id: 'full', name: 'Full'}, {id: 'light', name: 'Light'}, {id: 'off', name: 'Off'}];
+
+/** The named effects. Only bokeh and grain are built; the rest wait for the Rain Noir effects port. */
+const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeId[]}[] = [
+  {id: 'bokeh', name: 'Bokeh lights on the board', line: 'CSS only · drifts 34 s', themes: ['rain-noir']},
+  {id: null, name: 'Rain on the case-home pane', line: 'Not built yet', themes: []},
+  {id: 'grain', name: 'Film grain', line: 'Never on documents', themes: ['rain-noir', 'archive']},
+  {id: null, name: 'Iris when a feature opens', line: 'Not built yet', themes: []},
+  {id: null, name: 'Shutter corners on save', line: 'Not built yet', themes: []},
+  {id: null, name: 'Neon title on Textbook flags', line: 'Not built yet', themes: []},
 ];
 
 /** A format drawn small: where its panels sit. */
@@ -55,72 +74,93 @@ function FormatThumb({id}: {id: Format}): ReactElement {
   return <svg className="ap-format" viewBox="0 0 72 46" aria-hidden="true">{parts[id]}</svg>;
 }
 
+/** WCAG grade of a contrast ratio written "4.66:1". */
+export function contrastGrade(ratio: string): string {
+  const n = Number.parseFloat(ratio);
+  return n >= 7 ? 'AAA' : n >= 4.5 ? 'AA' : 'below AA';
+}
+
+function Switch({on, label, line, disabled, onChange}: {on: boolean; label: string; line: string; disabled?: boolean; onChange: (on: boolean) => void}): ReactElement {
+  return <label className={`ap-switch${disabled ? ' off' : ''}`}>
+    <span><b>{label}</b><small>{line}</small></span>
+    <input type="checkbox" role="switch" checked={on} disabled={disabled} onChange={e => onChange(e.target.checked)}/>
+    <i aria-hidden="true"/>
+  </label>;
+}
+
 export function AppearancePanel(): ReactElement {
   const {now, kept, trying} = useAppearance();
-  const [singleKeys, setSingle] = useState(true);
-  const [picked, setPicked] = useState<ThemeId | null>(null);
-  const looking: ThemeId = picked ?? trying ?? THEMES.find(t => t.id !== kept.theme)!.id;
-  const lookingInfo = THEMES.find(t => t.id === looking)!;
-  useEffect(() => setSingle(singleKeysOn()), []);
-  return <section className="ap" aria-labelledby="ap-title">
-    <h2 id="ap-title">Appearance</h2>
-    <p className="ap-sub">Theme, effects and motion are separate choices, kept in this browser only. Status always shows a shape and a word, in every theme.</p>
-
-    <h3 className="ap-h">Theme</h3>
-    <ThemeCompare before={kept.theme} after={looking}/>
-    <dl className="ap-facts" aria-label={`${lookingInfo.name} in four facts`}>
-      <div><dt>Contrast</dt><dd>Lowest text pair {lookingInfo.lowestContrast}</dd></div>
-      <div><dt>Calm zones</dt><dd>{lookingInfo.calm}</dd></div>
-      <div><dt>Fonts</dt><dd>{lookingInfo.fonts}</dd></div>
-      <div><dt>Cost</dt><dd>{lookingInfo.cost}</dd></div>
-    </dl>
-    <div className="ap-grid" role="list">
-      {THEMES.map(t => {
-        const on = now.theme === t.id;
-        return <article key={t.id} role="listitem" className={`ap-card${on ? ' on' : ''}${looking === t.id ? ' looking' : ''}`} data-theme={t.id} aria-label={`${t.name} theme`}>
-          <header><b>{t.name}</b>{kept.theme === t.id && <span className="ap-tag">In use</span>}{trying === t.id && <span className="ap-tag try">Trying</span>}</header>
-          <p className="ap-mood">{t.mood}</p>
-          <div className="ap-sw" aria-hidden="true">{t.swatches.map(c => <i key={c} style={{background: c}}/>)}</div>
-          <div className="ap-sample">
-            <span className="ap-read">Board minutes, 4 March 2019</span>
-            <span className="ap-mono">€9,800.00 · 3× Feb–Apr 2018</span>
+  const [pointed, setPointed] = useState<ThemeId | null>(null);
+  const looking: ThemeId = pointed ?? trying ?? kept.theme;
+  const info = THEMES.find(t => t.id === looking)!;
+  const lookingWord = trying === looking ? 'trying' : looking === kept.theme ? 'now' : 'pointed at';
+  return <section className="ap" aria-label="Appearance">
+    <div className="ap-two">
+      <div className="ap-pane">
+        <header className="ap-pane-head"><h2>Theme</h2><span>colours, fonts, shadows, motion speed</span><em>Point at a card to preview ›</em></header>
+        <div className="ap-cards" onMouseLeave={() => setPointed(null)}>
+          {THEMES.map(t => {
+            const current = kept.theme === t.id;
+            return <button key={t.id} type="button" data-theme={t.id} aria-pressed={now.theme === t.id}
+              className={`ap-card${now.theme === t.id ? ' on' : ''}${trying === t.id ? ' trying' : ''}`}
+              aria-label={`${t.name} theme${current ? ', in use' : ''}${trying === t.id ? ', trying' : ''}`}
+              onMouseEnter={() => setPointed(t.id)} onFocus={() => setPointed(t.id)} onBlur={() => setPointed(null)}
+              onClick={() => tryTheme(current ? null : t.id)}>
+              <span className="ap-card-head"><b>{t.name}</b>{current && <span className="ap-tag">Current</span>}{trying === t.id && <span className="ap-tag try">Trying</span>}</span>
+              <span className="ap-mood">{t.mood}</span>
+              <span className="ap-sw" aria-hidden="true">{t.swatches.slice(1).map(c => <i key={c} style={{background: c}}/>)}</span>
+              <span className="ap-type" aria-hidden="true"><span className="ap-type-h">Header</span><span className="ap-type-b">Body copy</span><span className="ap-type-m">€29,400</span></span>
+              <span className="ap-marks" aria-hidden="true">
+                {(['supported', 'disputed', 'unshown', 'ruled_out'] as const).map(s => <i key={s} className={`st-${s}`} title={STATUS_WORDS[s].word}>{STATUS_WORDS[s].mark}</i>)}
+                {(['faint', 'strong', 'textbook'] as const).map(l => <i key={l} className={`lv-${l}`} title={LEVEL_WORDS[l].word}>{LEVEL_WORDS[l].bars}</i>)}
+              </span>
+              <span className="ap-meta">Lowest pair {t.lowestContrast} · {contrastGrade(t.lowestContrast)}</span>
+            </button>;
+          })}
+          <div className="ap-card ap-own" aria-disabled="true">
+            <b>+ Make your own</b>
+            <span className="ap-mood">Start from any theme and change colours. Each colour is checked for contrast before it can be saved.</span>
+            <span className="ap-meta">Not built yet</span>
           </div>
-          <div className="ap-chips"><StatusChip status="supported"/><StatusChip status="disputed"/><StatusChip status="unshown"/><StatusChip status="ruled_out"/>
-            <LevelChip level="textbook"/><LevelChip level="strong"/></div>
-          <p className="ap-meta">{t.fonts} · lowest text pair {t.lowestContrast}</p>
-          <p className="ap-meta">{t.effects}</p>
-          <div className="ap-actions">
-            {kept.theme !== t.id && looking !== t.id && <button type="button" className="ap-btn" onClick={() => setPicked(t.id)}>Compare</button>}
-            {kept.theme === t.id && !trying ? <span className="ap-meta">This is your theme.</span> : <>
-              <button type="button" className="ap-btn" onClick={() => tryTheme(t.id)} disabled={trying === t.id}>Try for this session</button>
-              <button type="button" className="ap-btn p" onClick={() => keepAppearance({theme: t.id})}>Use {t.name}</button>
-            </>}
-          </div>
-        </article>;
-      })}
-    </div>
+        </div>
 
-    <div className="ap-row">
-      <fieldset className="ap-set">
-        <legend>Effects</legend>
-        {EFFECTS.map(e => <label key={e.id} className="ap-opt"><input type="radio" name="ap-effects" checked={now.effects === e.id}
-          onChange={() => keepAppearance({effects: e.id})}/><span><b>{e.name}</b> {e.line}</span></label>)}
-      </fieldset>
-      <fieldset className="ap-set">
-        <legend>Motion</legend>
-        <label className="ap-opt"><input type="checkbox" checked={now.motion === 'calm'} onChange={ev => keepAppearance({motion: ev.target.checked ? 'calm' : 'normal'})}/>
-          <span><b>Calm motion</b> Every movement becomes a short fade. Your computer&apos;s reduce-motion setting does the same.</span></label>
-      </fieldset>
-      <fieldset className="ap-set">
-        <legend>Keys</legend>
-        <label className="ap-opt"><input type="checkbox" checked={singleKeys} onChange={ev => { setSingleKeys(ev.target.checked); setSingle(ev.target.checked); }}/>
-          <span><b>Single-key shortcuts</b> [ opens the steps, ] the tools, ? the list of keys. They never fire while you type.</span></label>
-      </fieldset>
-      <fieldset className="ap-set">
-        <legend>Format</legend>
-        {FORMATS.map(f => <label key={f.id} className={`ap-opt${f.ready ? '' : ' off'}`}><input type="radio" name="ap-format" checked={now.format === f.id} disabled={!f.ready}
-          onChange={() => keepAppearance({format: f.id})}/><FormatThumb id={f.id}/><span><b>{f.name}</b> {f.line}{f.ready ? '' : ' Planned.'}</span></label>)}
-      </fieldset>
+        <header className="ap-pane-head"><h2>Effects</h2><span>only on the board behind panels, never over text</span></header>
+        <div className="ap-seg" role="radiogroup" aria-label="Effects">
+          {EFFECTS.map(e => <button key={e.id} type="button" role="radio" aria-checked={now.effects === e.id} className={now.effects === e.id ? 'on' : ''}
+            onClick={() => keepAppearance({effects: e.id})}>{e.name}</button>)}
+          <span>{now.effects === 'light' ? 'Light: the same effects, standing still.' : now.effects === 'off' ? 'Off: a plain board.' : 'Full: the theme’s board effects, moving.'}</span>
+        </div>
+        <div className="ap-switches">
+          {NAMED.map(n => {
+            const usable = n.id !== null && now.effects !== 'off';
+            const forTheme = n.id === null || n.themes.includes(now.theme);
+            return <Switch key={n.name} label={n.name} disabled={!usable}
+              line={n.id === null ? n.line : forTheme ? n.line : `${n.line} · only in ${n.themes.map(themeName).join(' and ')}`}
+              on={n.id !== null && now.effects !== 'off' && !now.off.includes(n.id)}
+              onChange={on => { if (n.id) keepAppearance({off: on ? now.off.filter(x => x !== n.id) : [...now.off, n.id]}); }}/>;
+          })}
+        </div>
+        <Switch on={now.motion === 'calm'} label="Calm motion" line="Slides become fades and moving effects stand still. Your computer’s reduce-motion setting does the same."
+          onChange={on => keepAppearance({motion: on ? 'calm' : 'normal'})}/>
+      </div>
+
+      <div className="ap-pane">
+        <ThemeCompare before={kept.theme} after={looking} afterWord={lookingWord}/>
+        <p className="ap-note">Drag the divider, or use ← → while it is focused. The preview is your real case, not a sample.</p>
+        <dl className="ap-facts" aria-label={`${info.name} in four facts`}>
+          <div><dt>{Number.parseFloat(info.lowestContrast) >= 4.5 ? '✓ Passes every check' : 'Fails a contrast check'}</dt><dd>Lowest text pair {info.lowestContrast} · {contrastGrade(info.lowestContrast)}</dd></div>
+          <div><dt>Calm zones untouched</dt><dd>{info.calm}</dd></div>
+          <div><dt>Fonts on this computer</dt><dd>{info.fonts}</dd></div>
+          <div><dt>Cost on this laptop</dt><dd>{info.cost}</dd></div>
+        </dl>
+        <header className="ap-pane-head"><h2>Format</h2><span>how home is laid out · chosen apart from theme</span></header>
+        <div className="ap-formats" role="radiogroup" aria-label="Format">
+          {FORMATS.map(f => <button key={f.id} type="button" role="radio" aria-checked={now.format === f.id} disabled={!f.ready} title={f.line}
+            className={`ap-fmt${now.format === f.id ? ' on' : ''}`} onClick={() => keepAppearance({format: f.id})}>
+            <FormatThumb id={f.id}/><b>{f.name}</b><small>{f.ready ? f.line.split(';')[0] : 'Planned'}</small>
+          </button>)}
+        </div>
+      </div>
     </div>
   </section>;
 }

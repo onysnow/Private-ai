@@ -1,35 +1,42 @@
 // @vitest-environment jsdom
-// Settings at a glance: rows under You / Cases / This computer with their values; search narrows them.
+// Settings' sidebar (mockup HOME_2): every setting under You / Cases / This computer with its
+// value, the open one marked; search lists matches and Enter opens the first.
 import {cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import {SettingsIndex} from '../features/settings/settings-index';
+import {SettingsNav, SettingsSearch, type SettingRow} from '../features/settings/settings-index';
 
 afterEach(() => cleanup());
 
-const rows = [
-  {group: 'You' as const, label: 'Theme', value: 'Case Night', target: 't1', words: 'colour'},
-  {group: 'You' as const, label: 'Calm motion', value: 'Off', target: 't1'},
-  {group: 'This computer' as const, label: 'Private AI', value: 'qwen3:8b', target: 't2', words: 'model'},
+const rows: SettingRow[] = [
+  {group: 'You', id: 'appearance', label: 'Appearance', value: 'Case Night', words: 'theme colour', note: 'Yours alone.'},
+  {group: 'You', id: 'keyboard', label: 'Keyboard', value: 'on'},
+  {group: 'Cases', id: 'ai', label: 'AI and research', value: 'ask first', words: 'model'},
+  {group: 'This computer', id: 'console', label: 'Operator console', value: '', href: '/console/'},
 ];
 
-describe('SettingsIndex', () => {
-  it('shows each setting with its value, and search narrows them and jumps to the first', async () => {
-    document.body.insertAdjacentHTML('beforeend', '<section id="t2" tabindex="-1">AI</section>');
-    const target = document.getElementById('t2')!;
-    target.scrollIntoView = vi.fn();
-    render(<SettingsIndex rows={rows}/>);
-    expect(within(screen.getByRole('region', {name: 'You'})).getByRole('button', {name: 'Theme: Case Night'})).toBeInTheDocument();
+describe('Settings sidebar', () => {
+  it('shows each setting with its value, marks the open one, and opens another', async () => {
+    const go = vi.fn();
+    render(<SettingsNav rows={rows} current="appearance" onGo={go}/>);
+    const you = screen.getByRole('region', {name: 'You'});
+    expect(within(you).getByRole('button', {name: 'Appearance: Case Night'})).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('Yours alone.')).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: /Operator console/})).toHaveAttribute('href', '/console/');
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Keyboard: on'}));
+    expect(go).toHaveBeenCalledWith('keyboard');
+  });
+
+  it('searches every setting and opens the first match with Enter', async () => {
+    const go = vi.fn();
+    render(<SettingsSearch rows={rows} onGo={go}/>);
     const user = userEvent.setup();
-    await user.type(screen.getByRole('searchbox', {name: 'Search settings'}), 'model{Enter}');
-    expect(screen.queryByRole('region', {name: 'You'})).not.toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Private AI: qwen3:8b'})).toBeInTheDocument();
-    expect(target.scrollIntoView).toHaveBeenCalled();
-    expect(document.activeElement).toBe(target);
-    await user.clear(screen.getByRole('searchbox', {name: 'Search settings'}));
+    await user.type(screen.getByRole('searchbox', {name: 'Search settings'}), 'model');
+    expect(within(screen.getByRole('list', {name: 'Matching settings'})).getByRole('button', {name: /AI and research/})).toBeInTheDocument();
+    await user.keyboard('{Enter}');
+    expect(go).toHaveBeenCalledWith('ai');
     await user.type(screen.getByRole('searchbox', {name: 'Search settings'}), 'zzz');
     expect(screen.getByText('No setting matches “zzz”.')).toBeInTheDocument();
-    target.remove();
   });
 });

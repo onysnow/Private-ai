@@ -2,6 +2,7 @@ import type {ReactNode} from 'react';
 import './globals.css';
 import '../styles/themes.css';
 import '../styles/case.css';
+import '../styles/settings.css';
 import '../styles/wire.css';
 import '../styles/drop.css';
 import '../styles/reading-room.css';
@@ -23,6 +24,16 @@ import '@fontsource-variable/work-sans';
 import '@fontsource-variable/noto-serif';
 import '@fontsource-variable/noto-sans';
 import '@fontsource/spectral';
+// The themes' own fonts (mockups THEMES-1 and THEMES-2).
+import '@fontsource-variable/manrope';
+import '@fontsource-variable/jost';
+import '@fontsource-variable/domine';
+import '@fontsource-variable/lexend';
+import '@fontsource/inclusive-sans/400.css';
+import '@fontsource/inclusive-sans/700.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/600.css';
 import {AppShell} from '../components/layout/app-shell';
 import {APPEARANCE_BOOT_SCRIPT} from '../lib/theme';
 

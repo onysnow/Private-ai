@@ -16,14 +16,15 @@ async function renderSettings(ai: Record<string, unknown>) {
     'GET /api/settings/status': {...validSettingsStatus, ai: {...validSettingsStatus.ai, ...ai}},
     'GET /api/investigations': [],
   });
+  window.history.replaceState(null, '', '/settings#ai');
   vi.resetModules();
   const mod = await import('../app/settings/page');
   const Page = mod.default;
   render(<Page/>);
   await screen.findByRole('heading', {name: 'Private AI'});
-  // The status has arrived once the access line shows it (the page reads it
+  // The status has arrived once the sidebar shows its value (the page reads it
   // through TanStack Query, which answers a moment after the render).
-  await screen.findByText(/Access mode:/);
+  await screen.findByRole('button', {name: /^AI and research: /});
 }
 
 describe('Settings: Private AI', () => {
@@ -31,7 +32,7 @@ describe('Settings: Private AI', () => {
     await renderSettings({enabled: true, provider: 'ollama', provider_key_configured: true, endpoints_callable: true, model: 'qwen2.5:7b', runs_on_this_computer: true,
       authority_suite: {present: true, source: 'onysnow/Authority-System-Suite@b1c71e8', tas_version: '1.12', modules: {presentation_draft: {spec_file: 'PRESENTATION_DRAFT.md', available: true, vendored_tas: false}}, control_surface: {spec_file: 'x', available: true, flags: {}}}});
     expect(within(document.getElementById('st-ai')!).getByText('qwen2.5:7b')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Private AI: qwen2.5:7b'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'AI and research: ask first'})).toBeInTheDocument();
     expect(screen.getAllByText(/runs on this computer/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/remote endpoints allowed/)).not.toBeInTheDocument();
     expect(screen.getByTestId('authority-suite')).toHaveTextContent('Rules the AI works under: the Authority System Suite (b1c71e8), TAS v1.12. Default source floor: tier D; tier C never counts toward corroboration.');

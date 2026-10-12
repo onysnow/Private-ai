@@ -32,7 +32,7 @@ function useScale(): [(el: HTMLDivElement | null) => void, number] {
   return [ref, scale];
 }
 
-export function ThemeCompare({before, after}: {before: ThemeId; after: ThemeId}): ReactElement {
+export function ThemeCompare({before, after, afterWord = 'trying'}: {before: ThemeId; after: ThemeId; afterWord?: string}): ReactElement {
   const inv = useWorkbenchStore(state => state.investigationId);
   const cases = useQuery(listInvestigationsOptions()).data ?? [];
   const investigation = cases.find(c => c.id === inv) ?? cases[0] ?? null;
@@ -45,10 +45,12 @@ export function ThemeCompare({before, after}: {before: ThemeId; after: ThemeId})
     </div>
   </div>;
   return <figure className="ap-compare">
+    <figcaption className="ap-pane-head"><h2>Your case, live</h2><span>{investigation.name} · Case home</span></figcaption>
     <div ref={box} className="ap-compare-box" style={{aspectRatio: `${SCREEN_W} / ${SCREEN_H}`}}>
       <ReactCompareSlider itemOne={shot(before)} itemTwo={shot(after)} defaultPosition={50}
         aria-label={`Divider between ${name(before)} and ${name(after)}`}/>
+      <span className="ap-corner ap-corner-l" aria-hidden="true">{name(before)} · now</span>
+      <span className="ap-corner ap-corner-r" aria-hidden="true">{name(after)} · {afterWord}</span>
     </div>
-    <figcaption><span>{name(before)} <small>you use now</small></span><span>{name(after)} <small>you are looking at</small></span></figcaption>
   </figure>;
 }

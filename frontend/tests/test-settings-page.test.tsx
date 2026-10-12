@@ -24,7 +24,8 @@ const CASE = investigationRecord({id: 'inv-1', name: 'Harbor contracts'});
 /** The 1MDB loader and the small real cases on Settings ask how far each has got; none is loaded here. */
 const ONE_MDB = {'GET /api/demo/1mdb': {state: 'idle', not_downloaded: []}, 'GET /api/demo/cases': []};
 
-async function renderSettings(routes: Routes) {
+async function renderSettings(routes: Routes, section = 'demo') {
+  window.history.replaceState(null, '', `/settings#${section}`);
   // Appearance draws the first case's Case home as a preview.
   const api = mockApi({...ONE_MDB, ...emptyCaseHomeRoutes('inv-1'), ...routes});
   vi.resetModules();
@@ -43,7 +44,7 @@ function behindToken(call: RouteCall): unknown {
 
 describe('Settings: API access', () => {
   it('says the API is local-only and how the backend is configured', async () => {
-    const api = await renderSettings({[STATUS]: validSettingsStatus, [LIST]: []});
+    const api = await renderSettings({[STATUS]: validSettingsStatus, [LIST]: []}, 'access');
     await screen.findByText('Local-only API access. No bearer token is required on loopback.');
     expect(screen.getByText(/Access mode: local only/)).toHaveTextContent('Access mode: local only · token configured on backend: no');
     expect(screen.queryByPlaceholderText('Bearer token')).not.toBeInTheDocument();
@@ -52,7 +53,7 @@ describe('Settings: API access', () => {
   });
 
   it('asks for a token, uses it for this session, and forgets it again', async () => {
-    const api = await renderSettings({[STATUS]: behindToken, [LIST]: []});
+    const api = await renderSettings({[STATUS]: behindToken, [LIST]: []}, 'access');
     await screen.findByText('This API requires a bearer token for non-local access. Enter it below.');
     const user = userEvent.setup();
     expect(screen.getByRole('button', {name: 'Save token'})).toBeDisabled();
@@ -70,13 +71,13 @@ describe('Settings: API access', () => {
   });
 
   it('says when remote access is switched off on the backend', async () => {
-    await renderSettings({[STATUS]: {status: 403, body: {detail: 'Remote API access is disabled'}}, [LIST]: []});
+    await renderSettings({[STATUS]: {status: 403, body: {detail: 'Remote API access is disabled'}}, [LIST]: []}, 'access');
     await screen.findByText('Remote API access is disabled on the backend.');
     expect(screen.queryByPlaceholderText('Bearer token')).not.toBeInTheDocument();
   });
 
   it('says why the API could not be reached', async () => {
-    await renderSettings({[STATUS]: {status: 500, body: {detail: 'Internal server error (request r-1)'}}, [LIST]: []});
+    await renderSettings({[STATUS]: {status: 500, body: {detail: 'Internal server error (request r-1)'}}, [LIST]: []}, 'access');
     await screen.findByText(/Internal server error \(request r-1\)/);
   });
 });

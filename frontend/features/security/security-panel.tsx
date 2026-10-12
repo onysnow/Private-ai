@@ -28,6 +28,8 @@ type Props = {
   settingsStatus: SettingsStatusOut;
   /** The connector names the server reported. */
   providers: string[];
+  /** All of it (the workbench), or Settings' "Connector keys" or "Security log" alone. */
+  part?: 'all' | 'keys' | 'log';
 };
 
 // A display label for any connector provider name, so a new connector needs
@@ -38,7 +40,7 @@ const AUDIT_PAGE = 100;
 const RETENTION = {keep_days: 90, max_records: 5000};
 const PRUNE_CONFIRMATION = 'PRUNE SECURITY AUDIT';
 
-export function SecurityPanel({settingsStatus, providers}: Props): ReactElement {
+export function SecurityPanel({settingsStatus, providers, part = 'all'}: Props): ReactElement {
   const queryClient = useQueryClient();
   const [credentialProvider, setCredentialProvider] = useState('aleph');
   const [credentialValue, setCredentialValue] = useState('');
@@ -156,8 +158,7 @@ export function SecurityPanel({settingsStatus, providers}: Props): ReactElement 
   const security = settingsStatus.security;
   const busiest = security.remote_hosts[0];
 
-  return <details>
-    <summary>Local security/settings status</summary>
+  const statusLines = <>
     <div><small>Environment: {settingsStatus.environment}</small></div>
     <div><small>Database: {settingsStatus.database}</small></div>
     <div><small>Document storage: {settingsStatus.document_storage_dir}</small></div>
@@ -169,7 +170,8 @@ export function SecurityPanel({settingsStatus, providers}: Props): ReactElement 
     <div><small>Restore API: {settingsStatus.restore_api_enabled ? 'enabled' : 'disabled by default'}</small></div>
     <div><small>API access: {settingsStatus.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} · token configured: {settingsStatus.access.token_configured ? 'yes' : 'no'}</small></div>
     <div data-testid="security-alerts"><small>{security.needs_attention ? '⚠ ' : ''}Access denials in the last {security.window_hours}h: {security.total_denials}{security.by_event.auth_rate_limited ? ` · ${security.by_event.auth_rate_limited} lockout(s)` : ''}{busiest ? ` · busiest remote host ${busiest.client_host} (${busiest.count})` : ''}{security.needs_attention ? ' — worth a look at the audit log' : ''}</small></div>
-    <hr/>
+  </>;
+  const keys = <>
     <h4>Connector credentials</h4>
     <p className="muted">Credentials are local-only. The API reports status but never returns the saved secret.</p>
     <Select value={credentialProvider} onValueChange={setCredentialProvider}>
@@ -180,6 +182,8 @@ export function SecurityPanel({settingsStatus, providers}: Props): ReactElement 
     <Button onClick={saveCredential} disabled={!credentialValue.trim()}>Save local credential</Button>
     <Button onClick={removeCredential}>Remove local credential</Button>
     {credentialStatus && <div><small>{credentialStatus}</small></div>}
+  </>;
+  const log = <>
     <hr/>
     <h4>Unreferenced document files</h4>
     <Button onClick={previewOrphans}>Preview retained orphan files</Button>
@@ -213,5 +217,14 @@ export function SecurityPanel({settingsStatus, providers}: Props): ReactElement 
       <div><small>Showing {securityAudit.records.length} of {securityAudit.total_matched} matching event(s).</small></div>
     </div>}
     {securityAuditStatus && <div><small>{securityAuditStatus}</small></div>}
+  </>;
+  if (part === 'keys') return <div className="st-panel">{keys}</div>;
+  if (part === 'log') return <div className="st-panel">{statusLines}{log}</div>;
+  return <details>
+    <summary>Local security/settings status</summary>
+    {statusLines}
+    <hr/>
+    {keys}
+    {log}
   </details>;
 }

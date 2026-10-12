@@ -42,46 +42,61 @@ describe('theme storage', () => {
 
   it('ignores unknown or unready values', () => {
     window.localStorage.setItem('pai:appearance', JSON.stringify({theme: 'neon-pink', format: 'desk', effects: 'loud'}));
-    expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board'});
+    expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: []});
   });
 });
 
 describe('Settings › Appearance', () => {
-  it('tries a theme, shows the bar, and keeps it', async () => {
+  it('tries a theme by choosing its card, shows the bar, and keeps it', async () => {
     connectGeneratedClient(new ApiClient('http://api.test'));
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/><TryingBar/></QueryProvider>);
     const user = userEvent.setup();
-    const card = screen.getByRole('listitem', {name: 'Rain Noir theme'});
-    await user.click(within(card).getByRole('button', {name: 'Try for this session'}));
+    await user.click(screen.getByRole('button', {name: 'Rain Noir theme'}));
     const bar = screen.getByRole('status');
-    expect(bar).toHaveTextContent('Trying Rain Noir. Nothing is saved until you keep it.');
+    expect(bar).toHaveTextContent('Trying Rain Noir · nothing is saved until you keep it');
+    expect(within(bar).getByRole('button', {name: /Go back to Case Night/})).toBeInTheDocument();
     await user.click(within(bar).getByRole('button', {name: 'Keep Rain Noir'}));
     expect(keptAppearance().theme).toBe('rain-noir');
     expect(screen.queryByRole('status')).toBeNull();
   });
 
-  it('turns calm motion and effects on and off', async () => {
+  it('goes back from a trial with Esc', async () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': []});
+    render(<QueryProvider><AppearancePanel/><TryingBar/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: 'Archive theme'}));
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(keptAppearance().theme).toBe('case-night');
+  });
+
+  it('turns calm motion, effects and a named effect on and off', async () => {
     connectGeneratedClient(new ApiClient('http://api.test'));
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/></QueryProvider>);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('checkbox', {name: /Calm motion/}));
+    await user.click(screen.getByRole('switch', {name: /Calm motion/}));
     expect(document.documentElement.dataset.motion).toBe('calm');
-    await user.click(screen.getByRole('radio', {name: /Off A plain board/}));
+    await user.click(screen.getByRole('switch', {name: /Film grain/}));
+    expect(document.documentElement.dataset.fxOff).toBe('grain');
+    expect(screen.getByRole('switch', {name: /Iris when a feature opens/})).toBeDisabled();
+    await user.click(screen.getByRole('radio', {name: 'Off'}));
     expect(document.documentElement.dataset.effects).toBe('off');
+    expect(screen.getByRole('switch', {name: /Film grain/})).toBeDisabled();
     expect(screen.getByRole('radio', {name: /Desk/})).toBeDisabled();
   });
 
-  it('compares the theme you use with the one you pick, in four facts', async () => {
+  it('shows the four facts of the theme pointed at', async () => {
     connectGeneratedClient(new ApiClient('http://api.test'));
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/></QueryProvider>);
-    const user = userEvent.setup();
-    await user.click(within(screen.getByRole('listitem', {name: 'Indigo Clarity theme'})).getByRole('button', {name: 'Compare'}));
-    const facts = screen.getByText('Lowest text pair 6.39:1').closest('dl')!;
+    await userEvent.setup().hover(screen.getByRole('button', {name: 'Indigo Clarity theme'}));
+    const facts = screen.getByText('Lowest text pair 6.39:1 · AA').closest('dl')!;
     expect(facts).toHaveAttribute('aria-label', 'Indigo Clarity in four facts');
-    expect(within(facts).getByText('Lowest text pair 6.39:1')).toBeInTheDocument();
+    expect(within(facts).getByText('Inclusive Sans · Lexend · Plex Mono')).toBeInTheDocument();
     expect(await screen.findByText('Open or start a case to see its Case home here in each theme.')).toBeInTheDocument();
   });
 });

@@ -30,6 +30,7 @@ export const SWITCH_CASE_EVENT = 'pai:switch-case';
 export const OPEN_PALETTE_EVENT = 'pai:open-palette';
 export const OPEN_INBOX_EVENT = 'pai:open-inbox';
 export const HIDE_SCREEN_EVENT = 'pai:hide-screen';
+export const NEW_CASE_EVENT = 'pai:new-case';
 
 const DWELL_MS = 250;
 const PIN_KEY = 'pai:edge-pins';
@@ -329,7 +330,8 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     const openPalette = () => setPalette(true);
     const openInbox = () => setInbox(true);
     const hide = () => setHidden(true);
-    const events: [string, () => void][] = [[SWITCH_CASE_EVENT, openCases], [OPEN_PALETTE_EVENT, openPalette], [OPEN_INBOX_EVENT, openInbox], [HIDE_SCREEN_EVENT, hide]];
+    const openNewCase = () => setNewCase(true);
+    const events: [string, () => void][] = [[SWITCH_CASE_EVENT, openCases], [OPEN_PALETTE_EVENT, openPalette], [OPEN_INBOX_EVENT, openInbox], [HIDE_SCREEN_EVENT, hide], [NEW_CASE_EVENT, openNewCase]];
     window.addEventListener('keydown', onKey);
     for (const [name, fn] of events) window.addEventListener(name, fn);
     return () => { window.removeEventListener('keydown', onKey); for (const [name, fn] of events) window.removeEventListener(name, fn); };
