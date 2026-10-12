@@ -240,7 +240,16 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
             return _check_watchlist_after_read(db, document_id, message)
 
     report(5, "Reading the document")
-    doc = extract_document(db, document_id)
+    from app.services.pdf_ocr import PAGE_PROGRESS
+
+    def page_read(page_no: int, total: int, ocr: bool) -> None:
+        report(5 + int(70 * page_no / max(total, 1)), f"Reading{' with OCR' if ocr else ''} · page {page_no} of {total}")
+
+    token = PAGE_PROGRESS.set(page_read)
+    try:
+        doc = extract_document(db, document_id)
+    finally:
+        PAGE_PROGRESS.reset(token)
     if doc is None:
         return "The document was deleted before it was read"
     if doc.extraction_status == "failed":

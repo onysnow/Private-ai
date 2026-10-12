@@ -114,6 +114,19 @@ describe('Case home', () => {
     expect(within(rail).getByRole('button', {name: /2016/})).not.toHaveClass('lit');
   });
 
+  it('says where the document being read is, page by page', async () => {
+    routes({
+      'GET /api/investigations/inv-1/documents': [{id: 'd9', investigation_id: 'inv-1', filename: 'minutes.pdf', source_id: 'src-d9', mime_type: null, sha256: 'abc', extraction_status: 'extracting',
+        extraction_error: null, extraction_issues: [], created_at: '2026-10-12T00:00:00', chunk_count: 0, candidate_counts: {}, parent_document_id: null}],
+      'GET /api/jobs': [{id: 'j1', kind: 'extract_document', investigation_id: 'inv-1', subject_type: 'document', subject_id: 'd9', status: 'running', finished: false, progress: 43,
+        message: 'Reading with OCR · page 6 of 11', error: null, attempts: 1, runner: 'inline', result: null, created_at: '2026-10-12T00:00:00',
+        started_at: '2026-10-12T00:00:01', finished_at: null, updated_at: '2026-10-12T00:00:02'}],
+    });
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    expect(await screen.findByText('Reading with OCR · page 6 of 11')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'Reading'})).toHaveAttribute('aria-valuenow', '43');
+  });
+
   it('writes the question in place', async () => {
     const api = routes({'PATCH /api/investigations/inv-1': {...INV, question: 'Who paid for the parcel?'}, 'GET /api/investigations': [INV]});
     wrap(<CaseHome investigation={{...INV, question: null}} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);

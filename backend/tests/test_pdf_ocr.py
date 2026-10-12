@@ -63,3 +63,21 @@ def test_pleading_line_numbers_and_the_court_header_are_not_read_as_text():
     # the page's own number at the top goes; another number stays
     assert strip_page_furniture(" \n6 \n" + margin + "\nIndirectly, by Symphony", 6) == "Indirectly, by Symphony"
     assert strip_page_furniture("2018 was the year", 6) == "2018 was the year"
+
+
+def test_each_page_is_told_as_it_is_read(tmp_path):
+    import fitz
+
+    from app.services.pdf_ocr import PAGE_PROGRESS
+    p = tmp_path / 'two.pdf'
+    doc = fitz.open()
+    for n in (1, 2):
+        doc.new_page().insert_text((72, 72), f'Page {n} of the board minutes, with enough native text to be read without OCR.')
+    doc.save(p); doc.close()
+    told = []
+    token = PAGE_PROGRESS.set(lambda page, total, ocr: told.append((page, total, ocr)))
+    try:
+        extract_pdf_chunks(p)
+    finally:
+        PAGE_PROGRESS.reset(token)
+    assert told == [(1, 2, False), (2, 2, False)]

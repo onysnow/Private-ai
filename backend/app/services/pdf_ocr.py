@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
+from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -59,6 +61,20 @@ def strip_page_furniture(text: str, page_no: int | None = None) -> str:
         out.append(lines[i])
         i += 1
     return "\n".join(out)
+
+
+# Told each page as it is read: (page number, page count, whether it needs OCR). The
+# extract job sets it, so the job's message can say "Reading with OCR · page 6 of 11".
+PAGE_PROGRESS: ContextVar[Callable[[int, int, bool], None] | None] = ContextVar("pdf_page_progress", default=None)
+
+
+def _tell(page_no: int, total: int, ocr: bool) -> None:
+    told = PAGE_PROGRESS.get()
+    if told is not None:
+        try:
+            told(page_no, total, ocr)
+        except Exception:  # progress is a courtesy; it never stops a read
+            pass
 
 
 def _requested_languages(language: str) -> tuple[str, ...]:
@@ -128,9 +144,11 @@ def extract_pdf_chunks(
     runtime = ocr_runtime_status(language) if enable_ocr else None
 
     with fitz.open(path) as doc:
+        total = doc.page_count
         for page_no, page in enumerate(doc, 1):
             native = _clean(strip_page_furniture(page.get_text("text") or "", page_no))
             if len(native) >= min_native_chars and not _scan_with_stamp(page, native):
+                _tell(page_no, total, False)
                 native_pages += 1
                 chunks.append({
                     "locator": f"page {page_no}",
@@ -140,6 +158,7 @@ def extract_pdf_chunks(
                 continue
 
             text = native
+            _tell(page_no, total, enable_ocr)
             if enable_ocr:
                 if runtime is not None and not runtime.available:
                     if ocr_error is None:

@@ -16,7 +16,7 @@ import {LevelChip, StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {
-  getInvestigationGraphOptions, getPartyYearsOptions, getRedFlagsOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
+  getInvestigationGraphOptions, getPartyYearsOptions, listJobsEndpointOptions, getRedFlagsOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
   listInvestigationsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {createInvestigation, patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
@@ -156,6 +156,11 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
   const reading = docs.find(d => d.extraction_status === 'extracting') ?? docs.find(d => UNREAD.has(d.extraction_status));
   const unread = docs.filter(d => UNREAD.has(d.extraction_status)).length;
   const kinds = standing?.to_decide_by_kind ?? {};
+  // The reading job says where it is ("Reading with OCR · page 6 of 11"; backend app/jobs/handlers.py).
+  const job = useQuery({...listJobsEndpointOptions({query: {investigation_id: investigationId, subject_id: reading?.id ?? '', limit: 1}}),
+    enabled: Boolean(investigationId && reading), refetchInterval: reading?.extraction_status === 'extracting' ? 1500 : false}).data?.[0];
+  const busy = reading?.extraction_status === 'extracting';
+  const progress = busy && job?.status === 'running' && typeof job.progress === 'number' ? job.progress : null;
   const onDrop = async (event: DragEvent) => {
     event.preventDefault(); setOver(false);
     const files = Array.from(event.dataTransfer.files);
@@ -173,8 +178,10 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
   return <Module n="01" name="Bring in" href="/bring-in">
     {reading ? <div className="ch-reading">
       <div className="ch-thumb" aria-hidden="true"><i/><i/><i/><i/></div>
-      <div><b>{reading.filename}</b><span>{reading.extraction_status === 'extracting' ? 'Reading now' : 'Waiting to be read'}</span>
-        <span className="ch-progress" aria-hidden="true"><i className={reading.extraction_status === 'extracting' ? 'busy' : ''}/></span></div>
+      <div><b>{reading.filename}</b><span>{busy ? (job?.status === 'running' && job.message ? job.message : 'Reading now') : 'Waiting to be read'}</span>
+        <span className="ch-progress" role={progress === null ? undefined : 'progressbar'} aria-label={progress === null ? undefined : 'Reading'}
+          aria-valuenow={progress ?? undefined} aria-valuemin={progress === null ? undefined : 0} aria-valuemax={progress === null ? undefined : 100} aria-hidden={progress === null}>
+          <i className={busy && progress === null ? 'busy' : ''} style={progress === null ? undefined : {width: `${progress}%`}}/></span></div>
     </div> : <p className="ch-quiet">Nothing is being read now.</p>}
     <ul className="ch-rows">
       {row(unread, `document${unread === 1 ? '' : 's'} not read yet`, '/bring-in#document-ingestion', 'Read')}
