@@ -7,6 +7,7 @@
 // reporter adds it to leads or sets it aside with a reason; pointing at a
 // party lights it in every chart.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {NeonTitle} from '../effects/board-effects';
 import type {UseQueryResult} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
@@ -116,7 +117,7 @@ export function FlagDetail({flag, ...actions}: {flag: RedFlagOut} & FlagActions)
   const name = ind?.name ?? flag.indicator_id;
   return <>
     <p className="rf-drawer-level">{LEVEL[flag.level].name} · {LEVEL[flag.level].meaning}</p>
-    <h3>{name}</h3>
+    <h3>{flag.level === 'textbook' ? <NeonTitle text={name}/> : name}</h3>
     <p className="sv-muted">{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}{ind && <> · <a href={`/glossary?indicator=${encodeURIComponent(ind.id)}`}>Full entry in the glossary</a></>}</p>
     <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
     <PartyButtons parties={flag.parties}/>

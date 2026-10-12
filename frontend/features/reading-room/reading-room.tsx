@@ -28,6 +28,7 @@ import type {DocumentChunkOut, DocumentDetailOut, ExtractionCandidateOut} from '
 import {singleKeysOn} from '../../lib/shortcuts';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {PagePicture} from '../case-home/decision-card';
+import {FEATURE_OPEN_EVENT, SHUTTER_EVENT} from '../effects/board-effects';
 import {confidenceBand} from '../documents/confidence';
 import {DocumentTranslation} from '../documents/document-translation';
 import {needsSchemaAnswer} from '../documents/schema-question';
@@ -438,6 +439,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
       if (what === 'evidence' || what === 'claim') {
         const ev = (await createEvidenceEndpoint({body: {source_id: doc.source_id, quote, locator: chunk.locator, document_id: doc.id}, throwOnError: true})).data;
         setClips(cs => [clipOf(chunk, start, end, quote, doc.sha256, ev.id), ...cs]);
+        window.dispatchEvent(new Event(SHUTTER_EVENT));
         if (what === 'claim') {
           const claim = (await createClaimEndpoint({body: {investigation_id: investigationId, text: quote, status: 'unverified', confidence: 0.5}, throwOnError: true})).data;
           await linkClaimEvidenceEndpoint({path: {claim_id: claim.id}, body: {evidence_id: ev.id, stance: 'supports'}, throwOnError: true});
@@ -621,6 +623,9 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
 export function ReadingRoom({investigationId}: {investigationId: string}): ReactElement | null {
   const request = useWorkbenchStore(state => state.document);
   const close = useWorkbenchStore(state => state.closeDocument);
+  // The reading room is a whole-screen feature: opening it plays the iris (Rain Noir).
+  const opened = request ? `${request.documentId}:${request.serial}` : '';
+  useEffect(() => { if (opened) window.dispatchEvent(new Event(FEATURE_OPEN_EVENT)); }, [opened]);
   if (!request || !investigationId) return null;
   return <Room key={`${request.documentId}:${request.serial}`} investigationId={investigationId} documentId={request.documentId} startPage={request.pageNumber} onClose={close}/>;
 }

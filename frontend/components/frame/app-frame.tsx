@@ -15,6 +15,7 @@ import {useQuery} from '@tanstack/react-query';
 
 import {Dialog, DialogContent, DialogDescription, DialogTitle} from '@/components/ui/dialog';
 import {TryingBar} from '../../features/appearance/appearance-panel';
+import {BoardEffects} from '../../features/effects/board-effects';
 import {STAGES, hrefOfAnchor} from '../../lib/stages';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {handOffSearch} from '../../lib/search-handoff';
@@ -387,6 +388,7 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
 
     <div id="fr-main" className="fr-main">{children}</div>
     <TryingBar/>
+    <BoardEffects/>
     <CommandPalette open={palette} onOpenChange={setPalette}/>
     <ShortcutsHelp open={help} onOpenChange={setHelp}/>
     <CaseSwitcher open={cases} onOpenChange={setCases} onNewCase={() => setNewCase(true)}/>

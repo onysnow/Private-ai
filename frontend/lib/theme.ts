@@ -36,10 +36,12 @@ export const FORMATS: {id: Format; name: string; line: string; ready: boolean}[]
 ];
 
 /** The named board effects that can be switched off one by one (mockup HOME_2). */
-export type NamedEffect = 'bokeh' | 'grain';
-export const NAMED_EFFECTS: NamedEffect[] = ['bokeh', 'grain'];
+export type NamedEffect = 'bokeh' | 'grain' | 'iris' | 'shutter' | 'neon';
+export const NAMED_EFFECTS: NamedEffect[] = ['bokeh', 'grain', 'iris', 'shutter', 'neon'];
+/** Neon starts off (research §04.11: "steady only, off by default"). */
+const OFF_AT_FIRST: NamedEffect[] = ['neon'];
 export type Appearance = {theme: ThemeId; effects: Effects; motion: Motion; format: Format; off: NamedEffect[]};
-export const DEFAULT_APPEARANCE: Appearance = {theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: []};
+export const DEFAULT_APPEARANCE: Appearance = {theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon']};
 
 const KEY = 'pai:appearance';
 const TRY_KEY = 'pai:appearance-trying';
@@ -61,7 +63,7 @@ function valid(a: Partial<Appearance>): Appearance {
     effects: a.effects === 'light' || a.effects === 'off' ? a.effects : 'full',
     motion: a.motion === 'calm' ? 'calm' : 'normal',
     format: FORMATS.some(f => f.id === a.format && f.ready) ? a.format as Format : 'board',
-    off: Array.isArray(a.off) ? NAMED_EFFECTS.filter(e => a.off!.includes(e)) : [],
+    off: Array.isArray(a.off) ? NAMED_EFFECTS.filter(e => a.off!.includes(e)) : [...OFF_AT_FIRST],
   };
 }
 
@@ -121,4 +123,4 @@ export function onAppearanceChange(fn: () => void): () => void {
 }
 
 /** Runs before the first paint (in <head>), so a kept theme never flashes the default. Must stay self-contained. */
-export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var a=JSON.parse(localStorage.getItem('${KEY}')||'{}');var t=sessionStorage.getItem('${TRY_KEY}');var h=document.documentElement;h.dataset.theme=t||a.theme||'case-night';h.dataset.effects=a.effects||'full';h.dataset.motion=a.motion||'normal';h.dataset.format='board';h.dataset.fxOff=(a.off||[]).join(' ');}catch(e){}})();`;
+export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var a=JSON.parse(localStorage.getItem('${KEY}')||'{}');var t=sessionStorage.getItem('${TRY_KEY}');var h=document.documentElement;h.dataset.theme=t||a.theme||'case-night';h.dataset.effects=a.effects||'full';h.dataset.motion=a.motion||'normal';h.dataset.format='board';h.dataset.fxOff=(a.off||['neon']).join(' ');}catch(e){}})();`;

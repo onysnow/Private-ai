@@ -84,7 +84,8 @@ To finish:
 - [x] Notifications inbox (12 Oct; snooze is per computer, a day or a week) (Needs you / Everything else, snooze)
 - [x] New-case setup (12 Oct; also from the case switcher) (name + question, "what kind of case", "what do you have so far")
 - [x] Cases shelf (⌘O) (12 Oct: the switcher, each case's last place) with per-case place memory
-- [ ] Rain Noir effects port (ADR first): bokeh field, rain pane on the case-home hero, iris on feature open, shutter corners on save
+- [x] Rain Noir effects from the OnySnow Studios site (12 Oct; ADR-0009): BokehField, the 8-blade iris on opening the reading room, shutter corners on saving evidence, steady neon on an opened Textbook flag (off by default), each with its switch
+- [ ] The WebGL part of the OnySnow Studios effects (ADR-0009 step 2): rain pane on the case-home hero (WaterDrops), frosted glass panels (Glass, GlassLight)
 
 ## 4. Bring in — mockups INTAKE_1 (The Drop) and INTAKE_2 (reading room) (§05)
 
@@ -110,6 +111,7 @@ Also from the backlog: watchlist highlights redesign; Sources & evidence as a br
 ## 5. See — mockups SEE_1 (network) and SEE_2 (money) (§07), plus Timeline and Places
 
 SEE_1 "Who controls Kestrel SA": The Wire is now See's map; SEE_1's parts go into it.
+**Ony, 12 Oct: the two screenshots of The Wire he sent with the mockups are work in progress and need much more design work than the other screens; they are not targets. The Wire is redesigned from SEE_1, SEE_2 and research chapter 07, as a mockup for Ony to approve first.**
 - [ ] Every link labelled with its sentence and certainty glyph ("✓ owns 60%", "? signs for · not yet shown", "ƒ owns 40% · worked out")
 - [ ] Certainty line styles: solid shown / dashed not yet shown / double disputed / dotted worked out / faint ended, with the key always on
 - [ ] Flag rings with level and count; lettered stubs for long links

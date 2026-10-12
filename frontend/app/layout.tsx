@@ -3,6 +3,7 @@ import './globals.css';
 import '../styles/themes.css';
 import '../styles/case.css';
 import '../styles/settings.css';
+import '../styles/effects.css';
 import '../styles/wire.css';
 import '../styles/drop.css';
 import '../styles/reading-room.css';
@@ -34,6 +35,7 @@ import '@fontsource/inclusive-sans/700.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '@fontsource/ibm-plex-mono/600.css';
+import '@fontsource/tilt-neon';
 import {AppShell} from '../components/layout/app-shell';
 import {APPEARANCE_BOOT_SCRIPT} from '../lib/theme';
 

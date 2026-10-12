@@ -52,14 +52,14 @@ export function TryingBar(): ReactElement | null {
 
 const EFFECTS: {id: Effects; name: string}[] = [{id: 'full', name: 'Full'}, {id: 'light', name: 'Light'}, {id: 'off', name: 'Off'}];
 
-/** The named effects. Only bokeh and grain are built; the rest wait for the Rain Noir effects port. */
+/** The named effects, ported from the OnySnow Studios site; the rain pane waits for the WebGL engine (ADR-0009). */
 const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeId[]}[] = [
-  {id: 'bokeh', name: 'Bokeh lights on the board', line: 'CSS only · drifts 34 s', themes: ['rain-noir']},
-  {id: null, name: 'Rain on the case-home pane', line: 'Not built yet', themes: []},
+  {id: 'bokeh', name: 'Bokeh lights on the board', line: 'CSS only · drifts 23–34 s', themes: ['rain-noir']},
+  {id: null, name: 'Rain on the case-home pane', line: 'Needs the WebGL engine (ADR-0009)', themes: []},
   {id: 'grain', name: 'Film grain', line: 'Never on documents', themes: ['rain-noir', 'archive']},
-  {id: null, name: 'Iris when a feature opens', line: 'Not built yet', themes: []},
-  {id: null, name: 'Shutter corners on save', line: 'Not built yet', themes: []},
-  {id: null, name: 'Neon title on Textbook flags', line: 'Not built yet', themes: []},
+  {id: 'iris', name: 'Iris when a feature opens', line: '8-blade shutter · fades if calm', themes: ['rain-noir']},
+  {id: 'shutter', name: 'Shutter corners on save', line: 'Brackets only, no flash', themes: ['rain-noir']},
+  {id: 'neon', name: 'Neon title on Textbook flags', line: 'Steady only, never flicker', themes: ['rain-noir']},
 ];
 
 /** A format drawn small: where its panels sit. */
