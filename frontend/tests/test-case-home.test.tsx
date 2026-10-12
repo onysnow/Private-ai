@@ -170,16 +170,16 @@ describe('A table-row card', () => {
     const {DecisionCard} = await import('../features/case-home/decision-card');
     const item = {
       ...checkItem, kind: 'proposal', id: 'p-1', level: null, choices: [], parties: [],
-      question: 'Does row 2 show a payment of $65,000,000 from 1MDB to Good Star Limited on 23 May 2011?',
+      question: 'Does row 2 show a payment of $65,000,000 from Meridian Holdings Ltd to Bellcastle Trading Group on 23 May 2011?',
       evidence: {document_id: 'd2', filename: 'ledger.csv', locator: 'row 2', excerpt: null, terms: [],
-                 rows: [{number: 2, cells: {Date: '2011-05-23', Payer: '1MDB', Amount: '65000000'}}]},
-      known: ['Already in the case: $330,000,000 from 1MDB to Good Star Limited, no date'],
+                 rows: [{number: 2, cells: {Date: '2011-05-23', Payer: 'Meridian Holdings Ltd', Amount: '65000000'}}]},
+      known: ['Already in the case: $330,000,000 from Meridian Holdings Ltd to Bellcastle Trading Group, no date'],
     } as unknown as Parameters<typeof DecisionCard>[0]['item'];
     wrap(<DecisionCard item={item} position={1} total={1} keys="decide" active={false} onDecide={() => undefined}/>);
     const table = screen.getByRole('table');
     expect(within(table).getByRole('columnheader', {name: 'Payer'})).toBeTruthy();
     expect(within(table).getByRole('cell', {name: '65000000'})).toBeTruthy();
     expect(screen.queryByText('No passage is stored with this item.')).toBeNull();
-    expect(within(screen.getByRole('list', {name: 'Already in the case'})).getByText(/\$330,000,000 from 1MDB/)).toBeTruthy();
+    expect(within(screen.getByRole('list', {name: 'Already in the case'})).getByText(/\$330,000,000 from Meridian/)).toBeTruthy();
   });
 });
