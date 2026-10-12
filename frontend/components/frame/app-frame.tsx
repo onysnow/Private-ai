@@ -20,7 +20,8 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {handOffSearch} from '../../lib/search-handoff';
 import {applyAppearance, currentAppearance, keepAppearance, THEMES, tryTheme} from '../../lib/theme';
 import {singleKeysOn} from '../../lib/shortcuts';
-import {getStandingOptions, listInvestigationsOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {listInvestigationsOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {Inbox, useNeedsYouCount} from '../../features/inbox/inbox';
 
 /** Any screen can ask the frame to open the case switcher. */
 export const SWITCH_CASE_EVENT = 'pai:switch-case';
@@ -248,13 +249,12 @@ function CaseSwitcher({open, onOpenChange}: {open: boolean; onOpenChange: (open:
   </Dialog>;
 }
 
-/** What waits for a person in the open case: the bell's count, linking to Decide. */
-function Bell({href}: {href: string}): ReactElement {
-  const inv = useWorkbenchStore(state => state.investigationId);
-  const waiting = useQuery({...getStandingOptions({path: {investigation_id: inv}}), enabled: Boolean(inv)}).data?.to_decide ?? 0;
-  return <Link href={href} className="fr-tool fr-bell" aria-label={`${waiting} waiting for you to decide`}>
+/** The bell: how many need you (less what is snoozed here); it opens the inbox. */
+function Bell({onOpen}: {onOpen: () => void}): ReactElement {
+  const waiting = useNeedsYouCount();
+  return <button type="button" className="fr-tool fr-bell" aria-label={`Inbox: ${waiting} need${waiting === 1 ? 's' : ''} you`} onClick={onOpen}>
     <span aria-hidden="true">🔔</span>{waiting > 0 && <b className="fr-count">{waiting > 99 ? '99+' : waiting}</b>}
-  </Link>;
+  </button>;
 }
 
 /** Hide screen: covers everything at once (someone at your shoulder); a click or Enter brings it back. */
@@ -292,6 +292,8 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   const [help, setHelp] = useState(false);
   const [cases, setCases] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [inbox, setInbox] = useState(false);
+  const closeInbox = useCallback(() => setInbox(false), []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -345,7 +347,7 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     <div id="fr-top" className={`fr-top${top ? ' open' : ''}`} role="toolbar" aria-label="Tools" aria-hidden={!top} onMouseLeave={() => setTop(false)} inert={!top ? true : undefined}>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setCases(true); }}>Switch case <kbd>⌘O</kbd></button>
       <button type="button" className="fr-tool wide" onClick={() => { setTop(false); setPalette(true); }}>Search the case, or type a command… <kbd>⌘K</kbd></button>
-      <Bell href={caseHref('/decide')}/>
+      <Bell onOpen={() => { setTop(false); setInbox(true); }}/>
       <Link href="/settings" className="fr-tool" aria-label="Settings" title="Settings"><span aria-hidden="true">⚙</span></Link>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setHelp(true); }}>Keys <kbd>?</kbd></button>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setHidden(true); }} title="Cover the screen at once (⌘⇧H)">Hide screen</button>
@@ -358,6 +360,7 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     <CommandPalette open={palette} onOpenChange={setPalette}/>
     <ShortcutsHelp open={help} onOpenChange={setHelp}/>
     <CaseSwitcher open={cases} onOpenChange={setCases}/>
+    <Inbox open={inbox} onClose={closeInbox}/>
     {hidden && <HiddenCover onShow={() => setHidden(false)}/>}
   </div>;
 }

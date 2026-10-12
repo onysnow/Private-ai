@@ -79,7 +79,7 @@ To finish:
 - [x] Appearance (12 Oct: six chips, Compare, live before/after of the real Case home, four facts, Format thumbnails; the named effect switches wait for the Rain Noir effects port below): specimen cards drawn in their own theme with six status chips and the lowest contrast pair; **live before/after divider of the real Case home** (react-compare-slider is installed); the four facts under it (contrast, calm zones, fonts, cost); effects as named switches (bokeh, rain pane, grain, iris, shutter corners, neon); Format thumbnails (Board, Editorial, Desk, Story)
 - [x] Settings regrouped (12 Oct; values for API, AI, cases, theme, effects, motion, keys, format): You / Cases / This computer, each row showing its current value; settings search
 - [x] Edge rules (12 Oct; Alt → / ← for the left edge, Alt ↓ / ↑ for the top): dwell ~250 ms, visible 5 px handles labelled on first use, Alt+arrows, pin per device; trail of the last five places on the left edge
-- [ ] Notifications inbox (Needs you / Everything else, snooze)
+- [x] Notifications inbox (12 Oct; snooze is per computer, a day or a week) (Needs you / Everything else, snooze)
 - [ ] New-case setup (name + question, "what kind of case", "what do you have so far")
 - [ ] Cases shelf (⌘O) with per-case place memory
 - [ ] Rain Noir effects port (ADR first): bokeh field, rain pane on the case-home hero, iris on feature open, shutter corners on save
