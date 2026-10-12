@@ -25,6 +25,18 @@ export function Excerpt({text, terms}: {text: string; terms: string[]}): ReactEl
   return <>{markTerms(text, terms).map((part, i) => (part.hit ? <mark key={i}>{part.text}</mark> : <span key={i}>{part.text}</span>))}</>;
 }
 
+/** The table rows a proposal was read from: one row a line, its cells under their column names. */
+export function RowCells({rows, compact = false}: {rows: NonNullable<NonNullable<DecisionItemOut['evidence']>['rows']>; compact?: boolean}): ReactElement | null {
+  if (!rows.length) return null;
+  const columns = [...new Set(rows.flatMap(r => Object.keys(r.cells)))];
+  return <div className={`ch-rows${compact ? ' ch-rows-compact' : ''}`}>
+    <table>
+      <thead><tr><th scope="col">Row</th>{columns.map(c => <th key={c} scope="col">{c}</th>)}</tr></thead>
+      <tbody>{rows.map(r => <tr key={r.number}><th scope="row">{r.number}</th>{columns.map(c => <td key={c}>{r.cells[c] ?? ''}</td>)}</tr>)}</tbody>
+    </table>
+  </div>;
+}
+
 export function PartyChips({parties}: {parties: DecisionItemOut['parties']}): ReactElement | null {
   const pointed = useWorkbenchStore(state => state.pointedParty);
   const point = useWorkbenchStore(state => state.setPointedParty);
@@ -71,10 +83,12 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
     </p>
     <h3 className="ch-question">{item.question}</h3>
     <div className="ch-card-body">
-    {ev?.excerpt ? <blockquote className="ch-excerpt"><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></blockquote>
+    {ev?.rows?.length ? <RowCells rows={ev.rows} compact/>
+      : ev?.excerpt ? <blockquote className="ch-excerpt"><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></blockquote>
       : <p className="ch-proposal">{item.proposal}</p>}
     {ev && <p className="ch-locator">{[ev.filename, ev.locator].filter(Boolean).join(' · ')}</p>}
     <PartyChips parties={item.parties}/>
+    {item.known && item.known.length > 0 && <ul className="ch-known" aria-label="Already in the case">{item.known.map(k => <li key={k}>{k}</li>)}</ul>}
     {showWhatHappens && item.consequences.length > 0 && <div className="ch-happens">
       <p className="ch-eyebrow">If you answer</p>
       <ul>{item.consequences.map(c => <li key={c}>{c}</li>)}</ul>

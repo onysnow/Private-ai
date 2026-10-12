@@ -4,12 +4,11 @@ Read START_HERE.md first. Ony's rule still holds: **mockups first, he approves, 
 The "approved" items below may be built straight away.
 
 ## Approved: build now
-1. **Table-row decision cards.**
-   - The question names the row's facts, e.g. "Does row 3 show a payment of $65,000,000 from 1MDB to Good Star Limited on 23 May 2011?"
-   - The card shows the row's cells instead of an empty passage. The payload has `rows`, `row_text`, `properties` and `locator`; see `backend/app/services/case_home.py` `_proposals`, the else-branch near line 317.
-   - It notes any payment already in the case between the same parties. For example, 1MDB → Good Star $330,000,000 with no date, which the four 2011 rows add up to.
-2. **The type mark in the Decide list.** Replace the "≡" for proposals (`frontend/features/case-home/decide-screen.tsx` `KIND_ICON`) with a mark that doesn't look clickable, and add a hover label naming the type.
+1. **Done 12 Oct: table-row decision cards.** A mapped row's card asks with the row's facts ("Does row 2 show a payment of $65,000,000 from 1MDB to Good Star Limited on 23 May 2011?"), shows the row's cells as a table in place of a passage (on the card and in Decide's middle pane), and lists payments already in the case between the same payer and beneficiary. Name cards from a table say "in row 2" instead of "in this passage". `case_home.py` `_proposals`, `_known_payments`; `decision-card.tsx` `RowCells`.
+2. **Done 12 Oct: the type mark in the Decide list.** Proposals use ◇ instead of ≡; every type mark is a plain sign (no tile), with its type named on hover.
 3. **Done 11 Oct:** .eml/.mbox/.zip/.xlsx are read by the app's own reader (commit 14b748e).
+4. **Approved 12 Oct: build The Wire (See)** from the prototype https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3.
+5. **Approved 12 Oct: close the app-side Authority Suite gaps** (the 25 suite requirements the app lacks, `docs/authority-suite/SUITE_GAPS.md`) before step 4.
 
 ## Ony's standing requirement for every card
 Wherever a card appears (decision, dashboard widget, flag, timeline row, to-check item), it must:

@@ -329,6 +329,7 @@ def _add_row(item: dict[str, Any], table: Table, row: MappedRow, properties: dic
     item["rows"].append(row.number)
     item["locator"] = _where(table, item["rows"])
     item["row_text"] = "\n".join(filter(None, [item.get("row_text"), _row_text(row.cells)]))
+    item.setdefault("row_cells", []).append({"number": row.number, "cells": {k: v for k, v in row.cells.items() if v}})
     for prop, values in properties.items():
         kept = item["properties"].setdefault(prop, [])
         kept += [v for v in values if v not in kept]

@@ -4237,12 +4237,19 @@ class DecisionChoiceOut(ResponseModel):
     body: dict[str, Any]
 
 
+class DecisionRowOut(ResponseModel):
+    """One table row a proposal was read from: its number and its filled cells."""
+    number: int
+    cells: dict[str, str]
+
+
 class DecisionEvidenceOut(ResponseModel):
     document_id: str | None = None
     filename: str | None = None
     locator: str | None = None
     excerpt: str | None = None
     terms: list[str]
+    rows: list[DecisionRowOut] = []
 
 
 class DecisionPartyOut(ResponseModel):
@@ -4282,6 +4289,7 @@ class DecisionItemOut(ResponseModel):
     consequences: list[str]
     choices: list[DecisionChoiceOut]
     open: DecisionLinkOut
+    known: list[str] = []
 
 
 class CaseDecisionsOut(ResponseModel):

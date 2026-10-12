@@ -11749,6 +11749,14 @@
             ],
             "title": "Locator"
           },
+          "rows": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DecisionRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
           "terms": {
             "items": {
               "type": "string"
@@ -11847,6 +11855,14 @@
             ],
             "title": "Kind",
             "type": "string"
+          },
+          "known": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Known",
+            "type": "array"
           },
           "level": {
             "anyOf": [
@@ -11949,6 +11965,28 @@
           "schema"
         ],
         "title": "DecisionPartyOut",
+        "type": "object"
+      },
+      "DecisionRowOut": {
+        "description": "One table row a proposal was read from: its number and its filled cells.",
+        "properties": {
+          "cells": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Cells",
+            "type": "object"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "number",
+          "cells"
+        ],
+        "title": "DecisionRowOut",
         "type": "object"
       },
       "DeckOut": {

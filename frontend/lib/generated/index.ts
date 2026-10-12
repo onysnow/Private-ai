@@ -582,6 +582,7 @@ export type {
   DecisionItemOut,
   DecisionLinkOut,
   DecisionPartyOut,
+  DecisionRowOut,
   DeckOut,
   DeckSlideIn,
   DeckSlideOut,

@@ -1763,17 +1763,6 @@ export const zDecisionChoiceOut = z.object({
 });
 
 /**
- * DecisionEvidenceOut
- */
-export const zDecisionEvidenceOut = z.object({
-  document_id: z.string().nullish(),
-  excerpt: z.string().nullish(),
-  filename: z.string().nullish(),
-  locator: z.string().nullish(),
-  terms: z.array(z.string()),
-});
-
-/**
  * DecisionGroupOut
  */
 export const zDecisionGroupOut = z.object({
@@ -1796,6 +1785,28 @@ export const zDecisionPartyOut = z.object({
   id: z.string(),
   name: z.string(),
   schema: z.string(),
+});
+
+/**
+ * DecisionRowOut
+ *
+ * One table row a proposal was read from: its number and its filled cells.
+ */
+export const zDecisionRowOut = z.object({
+  cells: z.record(z.string()),
+  number: z.number().int(),
+});
+
+/**
+ * DecisionEvidenceOut
+ */
+export const zDecisionEvidenceOut = z.object({
+  document_id: z.string().nullish(),
+  excerpt: z.string().nullish(),
+  filename: z.string().nullish(),
+  locator: z.string().nullish(),
+  rows: z.array(zDecisionRowOut).optional().default([]),
+  terms: z.array(z.string()),
 });
 
 /**
@@ -1827,6 +1838,7 @@ export const zDecisionItemOut = z.object({
     'ai',
     'watchlist',
   ]),
+  known: z.array(z.string()).optional().default([]),
   level: z.enum(['faint', 'strong', 'textbook']).nullish(),
   open: zDecisionLinkOut,
   parties: z.array(zDecisionPartyOut),

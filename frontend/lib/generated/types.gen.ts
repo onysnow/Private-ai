@@ -4475,6 +4475,10 @@ export type DecisionEvidenceOut = {
    */
   locator?: string | null;
   /**
+   * Rows
+   */
+  rows?: Array<DecisionRowOut>;
+  /**
    * Terms
    */
   terms: Array<string>;
@@ -4542,6 +4546,10 @@ export type DecisionItemOut = {
     | 'ai'
     | 'watchlist';
   /**
+   * Known
+   */
+  known?: Array<string>;
+  /**
    * Level
    */
   level?: 'faint' | 'strong' | 'textbook' | null;
@@ -4598,6 +4606,24 @@ export type DecisionPartyOut = {
    * Schema
    */
   schema: string;
+};
+
+/**
+ * DecisionRowOut
+ *
+ * One table row a proposal was read from: its number and its filled cells.
+ */
+export type DecisionRowOut = {
+  /**
+   * Cells
+   */
+  cells: {
+    [key: string]: string;
+  };
+  /**
+   * Number
+   */
+  number: number;
 };
 
 /**

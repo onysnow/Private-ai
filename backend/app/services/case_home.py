@@ -27,6 +27,7 @@ from app.models.domain import (
     DocumentChunk, Entity, Evidence, ExtractionCandidate, Investigation, Lead, PatternFlag, RelationshipEdge, Source,
     TimelineEvent, WatchlistEntry, WatchlistHit,
 )
+from app.services.relationships import RELATIONSHIP_SCHEMAS, investigation_relationships
 
 LEVEL_RANK = {"textbook": 3, "strong": 2, "faint": 1}
 CLAIM_SURE = {"supported": "supported", "confirmed": "supported", "disputed": "disputed", "rejected": "ruled_out",
@@ -245,6 +246,116 @@ def around(text: str, start: int, end: int, before: int = 160, after: int = 260)
     return f"{'… ' if lo > 0 else ''}{text[lo:hi].strip()}{' …' if hi < len(text) else ''}"
 
 
+# --- table rows (a proposal made by a table mapping, app/services/table_mappings.py) ---------------------------------
+
+TABLE_ROWS_SHOWN = 20
+CURRENCY_SIGN = {"USD": "$", "EUR": "€", "GBP": "£"}
+MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+
+
+def _rows_phrase(numbers: list[int]) -> str:
+    """"row 3", "rows 3 and 4", "rows 3, 4 and 5"; past six rows only the count."""
+    if len(numbers) == 1:
+        return f"row {numbers[0]}"
+    if len(numbers) > 6:
+        return f"{len(numbers)} rows"
+    return "rows " + ", ".join(str(n) for n in numbers[:-1]) + f" and {numbers[-1]}"
+
+
+def _amount_text(amount: str | None, currency: str | None) -> str | None:
+    """"$65,000,000", "MYR 2,000,000"; the amount as written when it is not a number."""
+    if not amount:
+        return None
+    try:
+        value = float(amount.replace(",", ""))
+        number = f"{value:,.0f}" if value.is_integer() else f"{value:,.2f}"
+    except ValueError:
+        number = amount
+    code = (currency or "").upper()
+    if code in CURRENCY_SIGN:
+        return f"{CURRENCY_SIGN[code]}{number}"
+    return f"{code} {number}" if code else number
+
+
+def _date_text(value: str | None) -> str | None:
+    """An ISO date as people write it: "23 May 2011", "May 2011", "2011". Only
+    the parts the date has; nothing is filled in."""
+    if not value:
+        return None
+    parts = value[:10].split("-")
+    try:
+        if len(parts) == 3:
+            return f"{int(parts[2])} {MONTHS[int(parts[1]) - 1]} {parts[0]}"
+        if len(parts) == 2:
+            return f"{MONTHS[int(parts[1]) - 1]} {parts[0]}"
+    except (ValueError, IndexError):
+        return value
+    return parts[0]
+
+
+def _first(props: dict[str, Any], *names: str) -> str | None:
+    for name in names:
+        for value in props.get(name) or []:
+            if str(value).strip():
+                return str(value).strip()
+    return None
+
+
+def _table_rows(p: dict[str, Any]) -> list[dict[str, Any]]:
+    """The cells of the rows a table proposal came from. Older proposals kept
+    only the joined text ("column: value; column: value", one line a row)."""
+    kept = p.get("row_cells")
+    if isinstance(kept, list):
+        return [r for r in kept if isinstance(r, dict)][:TABLE_ROWS_SHOWN]
+    numbers = [n for n in p.get("rows") or [] if isinstance(n, int)]
+    out = []
+    for number, line in zip(numbers, str(p.get("row_text") or "").split("\n")):
+        cells = dict(part.partition(": ")[::2] for part in line.split("; ") if ": " in part)
+        out.append({"number": number, "cells": cells})
+    return out[:TABLE_ROWS_SHOWN]
+
+
+def _link_facts(schema: str, source: str, target: str, props: dict[str, Any]) -> str:
+    """What a table link says, in words: "a payment of $65,000,000 from 1MDB to
+    Good Star Limited on 23 May 2011", "Jho Low as owner of Good Star Limited"."""
+    if schema == "Payment":
+        amount = _amount_text(_first(props, "amount"), _first(props, "currency"))
+        start, end = _date_text(_first(props, "date", "startDate")), _date_text(_first(props, "endDate"))
+        when = f" between {start} and {end}" if start and end and start != end else (f" on {start}" if start else "")
+        return f"a payment{f' of {amount}' if amount else ''} from {source} to {target}{when}"
+    info = RELATIONSHIP_SCHEMAS.get(schema)
+    if info and schema != "UnknownLink":
+        return f"{source} as {info['source_label'].lower()} of {target}"
+    return f"a link between {source} and {target}"
+
+
+def _known_payments(db: Session, inv: str, page: list[dict[str, Any]]) -> None:
+    """Notes on each table payment card the payments the case already holds
+    between the same payer and beneficiary (by name), so a row is not added
+    twice or a total is seen beside its parts. Found on the 1MDB case: four
+    2011 rows add up to the $330,000,000 from 1MDB to Good Star already held
+    without a date. Run only for the items shown."""
+    wanted = [i for i in page if "_payment_ends" in i]
+    if not wanted:
+        return
+    held: dict[tuple[str, str], list[str]] = {}
+    for row in investigation_relationships(db, inv, {"Payment"}, include_reconciled_duplicates=False):
+        source, target = row.get("source"), row.get("target")
+        if not source or not target:
+            continue
+        props = row.get("properties") or {}
+        amount = _amount_text(_first(props, "amount"), _first(props, "currency")) or "no amount"
+        when = _date_text(_first(props, "date", "startDate")) or "no date"
+        key = (str(source["caption"]).casefold().strip(), str(target["caption"]).casefold().strip())
+        held.setdefault(key, []).append(f"{amount} from {source['caption']} to {target['caption']}, {when}")
+    for item in wanted:
+        source, target = item["_payment_ends"]
+        found = held.get((source.casefold().strip(), target.casefold().strip()), [])
+        item["known"] = [f"Already in the case: {text}" for text in found[:3]]
+        if len(found) > 3:
+            item["known"].append(f"and {len(found) - 3} more payments between them")
+
+
 def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> None:
     """A name proposal asks "add it?", or "same as this record?" when the case has a record of that name."""
     row: ExtractionCandidate = item["_entity_row"]
@@ -252,17 +363,19 @@ def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> Non
     caption = str(p.get("caption") or "").strip()
     schema = str(p.get("suggested_schema") or "Thing")
     path = f"/api/extraction-candidates/{row.id}/review"
+    numbers = [n for n in p.get("rows") or [] if isinstance(n, int)]
+    where, source = (f"in {_rows_phrase(numbers)}", "these rows") if numbers else ("in this passage", "this passage")
     if strong:
         other = strong.get("caption") or strong.get("entity_id")
-        item["question"] = f"Is “{caption}” in this passage the record {other}?"
-        item["consequences"] = [f"Same: the passage is added to {other}; no new record.",
+        item["question"] = f"Is “{caption}” {where} the record {other}?"
+        item["consequences"] = [f"Same: {source} {'are' if numbers else 'is'} added to {other}; no new record.",
                                 f"Different: “{caption}” becomes a new {schema}, kept apart from {other}."]
         base = {"decision": "accept", "entity_schema": schema, "matched_entity_id": strong.get("entity_id")}
         item["choices"] = [_choice("yes", "Same record", path, {**base, "entity_identity_decision": "same"}),
                            _choice("no", "A different one", path, {**base, "entity_identity_decision": "different"})]
     else:
         item["question"] = f"Add “{caption}” as a {schema}?"
-        item["consequences"] = [f"Creates the record {caption} ({schema}) with this passage as its source."]
+        item["consequences"] = [f"Creates the record {caption} ({schema}) with {source} as its source."]
         item["choices"] = [_choice("yes", "Add it", path, {"decision": "accept", "entity_schema": schema}),
                            _choice("no", "Not a name", path, {"decision": "reject"})]
 
@@ -276,6 +389,11 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
     docs = {d.id: d.filename for d in db.scalars(select(Document).where(Document.id.in_({r.document_id for r in rows})))}
     chunk_ids = {r.chunk_id for r in rows if r.chunk_id}
     chunks = {c.id: c for c in db.scalars(select(DocumentChunk).where(DocumentChunk.id.in_(chunk_ids)))} if chunk_ids else {}
+    # A table link names its ends by their own proposals (app/services/table_mappings.py).
+    end_ids = {str(v) for r in rows if isinstance(r.payload, dict) for k, v in r.payload.items()
+               if k in ("source_candidate_id", "target_candidate_id") and v}
+    ends = {c.id: str((c.payload or {}).get("caption") or "") for c in
+            db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.id.in_(end_ids)))} if end_ids else {}
     out: list[dict[str, Any]] = []
     for r in rows:
         p = r.payload if isinstance(r.payload, dict) else {}
@@ -297,6 +415,11 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
             "parties": [], "proposal": f"{r.candidate_type.capitalize()}: {caption}" if caption else r.candidate_type.capitalize(),
             "open": {"href": f"/review?document={r.document_id}", "label": "Open in Review"},
         }
+        numbers = [n for n in p.get("rows") or [] if isinstance(n, int)]
+        if numbers:
+            # Read from a table: the rows' cells are what it rests on, not a passage.
+            item["evidence"]["rows"] = _table_rows(p)
+            item["evidence"]["terms"] = []
         if r.candidate_type == "entity":
             # Whether the case already holds a record of this name is asked only for the items shown (decisions()).
             item["_entity_row"] = r
@@ -314,6 +437,17 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
             item["question"] = "Keep this passage as evidence?"
             item["consequences"] = ["Saves the exact words and where they are as evidence of this document's source."]
             item["choices"] = [_choice("yes", "Keep it", path, {"decision": "accept"}), _choice("no", "Not useful", path, {"decision": "reject"})]
+        elif numbers:
+            schema = str(p.get("schema") or "")
+            source = ends.get(str(p.get("source_candidate_id"))) or caption.partition(" → ")[0]
+            target = ends.get(str(p.get("target_candidate_id"))) or caption.partition(" → ")[2]
+            props = p.get("properties") if isinstance(p.get("properties"), dict) else {}
+            phrase = _rows_phrase(numbers)
+            item["question"] = f"Do{'es' if len(numbers) == 1 else ''} {phrase} show {_link_facts(schema, source, target, props)}?"
+            item["consequences"] = [f"Adds the link between the two records with {'this row' if len(numbers) == 1 else 'these rows'} as evidence."]
+            item["choices"] = [_choice("yes", "Link them", path, {"decision": "accept"}), _choice("no", "No", path, {"decision": "reject"})]
+            if schema == "Payment" and source and target:
+                item["_payment_ends"] = (source, target)
         else:
             label = str(p.get("label") or p.get("schema") or "link")
             item["question"] = f"Does this passage show the {label.lower()} {caption}?".replace("  ", " ")
@@ -432,8 +566,10 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
                 except ValueError:
                     strong = None
                 _entity_question(item, strong)
+    _known_payments(db, investigation_id, page)
     for item in page:
         item.pop("_entity_row", None)
+        item.pop("_payment_ends", None)
     return {"investigation_id": investigation_id, "counts": decision_counts(db, investigation_id), "total": total,
             "offset": offset, "items": page}
 

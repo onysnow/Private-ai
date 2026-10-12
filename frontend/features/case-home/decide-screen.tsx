@@ -13,11 +13,11 @@ import {singleKeysOn} from '../../lib/shortcuts';
 import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
-import {DecisionCard, Excerpt, PartyChips} from './decision-card';
+import {DecisionCard, Excerpt, PartyChips, RowCells} from './decision-card';
 import {HOLD_MS, KIND_LABEL, useDecisions} from './use-decisions';
 import type {DecisionKind, DecisionOrder} from './use-decisions';
 
-const KIND_ICON: Record<DecisionKind, string> = {to_check: '?', missing: '∅', proposal: '≡', match: '⇄', outside: '◎', ai: 'AI', watchlist: '◉'};
+const KIND_ICON: Record<DecisionKind, string> = {to_check: '?', missing: '∅', proposal: '◇', match: '⇄', outside: '◎', ai: 'AI', watchlist: '◉'};
 const SHAPE: Record<DecisionChoiceOut['key'], string> = {yes: '✓', no: '✕', unsure: '○'};
 
 function age(iso: string): string {
@@ -48,7 +48,8 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
         </div>}
       </header>
       <div className="dc-read">
-        {ev.excerpt ? <p><Excerpt text={ev.excerpt} terms={ev.terms}/></p> : <p className="ch-quiet">No passage is stored with this item.</p>}
+        {ev.rows?.length ? <RowCells rows={ev.rows}/>
+          : ev.excerpt ? <p><Excerpt text={ev.excerpt} terms={ev.terms}/></p> : <p className="ch-quiet">No passage is stored with this item.</p>}
         {ev.terms.length > 0 && <p className="dc-legend"><mark>words</mark> this rests on</p>}
       </div>
     </> : <div className="dc-read dc-noevidence">
@@ -140,7 +141,7 @@ export function DecideScreen({investigationId, investigationName, active = true}
           {g.label && <p className="dc-group-name">{g.label}<span>{g.items.length} left</span></p>}
           <ul>{g.items.map(i => <li key={i.id}>
             <button type="button" className={`dc-row${item?.id === i.id ? ' on' : ''}`} aria-current={item?.id === i.id ? 'true' : undefined} onClick={() => setSelected(i.id)}>
-              <span className={`dc-kind dc-kind-${i.kind}`} aria-hidden="true">{KIND_ICON[i.kind]}</span>
+              <span className={`dc-kind dc-kind-${i.kind}`} aria-hidden="true" title={KIND_LABEL[i.kind]}>{KIND_ICON[i.kind]}</span>
               <span className="dc-row-text"><span>{i.question}</span>
                 <small>{i.actor_kind === 'ai' ? 'AI draft' : i.actor} · {KIND_LABEL[i.kind].toLowerCase()} · {age(i.created_at)}{i.level ? ' · ' : ''}{i.level && <LevelChip level={i.level}/>}</small></span>
             </button>

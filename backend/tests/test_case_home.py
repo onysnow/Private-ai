@@ -194,3 +194,43 @@ def test_a_checklist_question_names_its_parties():
     assert _with_parties(q, ["a", "b", "c"], names) == "Was there a business reason for the payments (Granton, Tanore and Tan Kim Loong)?"
     assert _with_parties(q, ["a", "b", "c", "d"], names).endswith("(Granton, Tanore and Tan Kim Loong and 1 more)?")
     assert _with_parties(q, [], names) == q
+
+
+def test_a_table_row_card_names_the_rows_facts_shows_its_cells_and_what_the_case_already_holds():
+    inv = _inv("Ledger rows")
+    payer, payee = _party(inv, "Meridian Holdings Ltd"), _party(inv, "Bellcastle Trading Group")
+    ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": payer, "target_entity_id": payee,
+                                               "properties": {"amount": ["5000000"], "currency": ["GBP"]}}))
+    ledger = b"Date;Payer;Payee;Amount;Currency\n2011-05-23;Meridian Holdings Ltd;Bellcastle Trading Group;2400000;USD\n"
+    doc = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "ledger.csv"},
+                         files={"file": ("ledger.csv", ledger, "text/csv")}))
+    mapping = {
+        "payer": {"schema": "Company", "keys": ["Payer"], "properties": {"name": {"column": "Payer"}}},
+        "payee": {"schema": "LegalEntity", "keys": ["Payee"], "properties": {"name": {"column": "Payee"}}},
+        "payment": {"schema": "Payment", "keys": ["Date", "Payer", "Payee", "Amount"], "properties": {
+            "payer": {"entity": "payer"}, "beneficiary": {"entity": "payee"}, "amount": {"column": "Amount"},
+            "currency": {"column": "Currency"}, "date": {"column": "Date"}}},
+    }
+    ok(client.post(f"/api/documents/{doc['id']}/table-mappings", json={"entities": mapping}))
+    items = [i for i in ok(client.get(f"/api/investigations/{inv}/decisions", params={"kind": "proposal"}))["items"]
+             if i["evidence"] and i["evidence"]["filename"] == "ledger.csv"]
+    link = next(i for i in items if i["question"].startswith("Does row"))
+    assert link["question"] == "Does row 2 show a payment of $2,400,000 from Meridian Holdings Ltd to Bellcastle Trading Group on 23 May 2011?"
+    assert link["evidence"]["rows"] == [{"number": 2, "cells": {"Date": "2011-05-23", "Payer": "Meridian Holdings Ltd",
+                                                                "Payee": "Bellcastle Trading Group", "Amount": "2400000", "Currency": "USD"}}]
+    assert link["known"] == ["Already in the case: £5,000,000 from Meridian Holdings Ltd to Bellcastle Trading Group, no date"]
+    name = next(i for i in items if "Bellcastle" in i["question"] and i is not link and i["evidence"]["rows"])
+    assert name["question"] == "Is “Bellcastle Trading Group” in row 2 the record Bellcastle Trading Group?"
+    assert name["consequences"][0] == "Same: these rows are added to Bellcastle Trading Group; no new record."
+    assert name["evidence"]["rows"][0]["number"] == 2 and name["known"] == []
+
+
+def test_table_text_helpers_write_only_what_the_values_hold():
+    from app.services.case_home import _amount_text, _date_text, _rows_phrase, _table_rows
+    assert _amount_text("65000000", "usd") == "$65,000,000" and _amount_text("12.5", "MYR") == "MYR 12.50" and _amount_text("lots", None) == "lots"
+    assert (_date_text("2011-05-23"), _date_text("2011-05"), _date_text("2011")) == ("23 May 2011", "May 2011", "2011")
+    assert (_rows_phrase([3]), _rows_phrase([3, 4]), _rows_phrase([3, 4, 5]), _rows_phrase(list(range(1, 9)))) == (
+        "row 3", "rows 3 and 4", "rows 3, 4 and 5", "8 rows")
+    # Proposals made before the cells were kept: read back from the joined text.
+    assert _table_rows({"rows": [2, 5], "row_text": "Payer: A; Amount: 1\nPayer: B"}) == [
+        {"number": 2, "cells": {"Payer": "A", "Amount": "1"}}, {"number": 5, "cells": {"Payer": "B"}}]
