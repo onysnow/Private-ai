@@ -11,7 +11,16 @@ export type SettingRow = {
   note?: string;
   /** Opens elsewhere instead of on the right. */
   href?: string;
+  /** Where the setting is kept, and what leaves the computer because of it (research §9). */
+  stored?: string;
+  leaves?: string;
 };
+
+/** The one line under a section's title: where it is kept and what leaves. */
+export function KeptLine({row}: {row: SettingRow}): ReactElement | null {
+  if (!row.stored && !row.leaves) return null;
+  return <p className="st-kept">{row.stored && <span>Kept: {row.stored}</span>}{row.leaves && <span>Leaves this computer: {row.leaves}</span>}</p>;
+}
 
 const GROUPS: SettingRow['group'][] = ['You', 'Cases', 'This computer'];
 

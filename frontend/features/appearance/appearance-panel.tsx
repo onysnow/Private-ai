@@ -98,10 +98,19 @@ export function AppearancePanel(): ReactElement {
     <div className="ap-two">
       <div className="ap-pane">
         <header className="ap-pane-head"><h2>Theme</h2><span>colours, fonts, shadows, motion speed</span><em>Point at a card to preview ›</em></header>
-        <div className="ap-cards" onMouseLeave={() => setPointed(null)}>
+        <div className="ap-cards" role="radiogroup" aria-label="Themes: arrows preview, Enter tries, K keeps" onMouseLeave={() => setPointed(null)}
+          onKeyDown={e => {
+            const cards = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('[role=radio]'));
+            const at = cards.indexOf(document.activeElement as HTMLButtonElement);
+            if (at < 0) return;
+            const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+            if (step) { e.preventDefault(); cards[(at + step + cards.length) % cards.length].focus(); return; }
+            if ((e.key === 'k' || e.key === 'K') && !e.metaKey && !e.ctrlKey) { e.preventDefault(); keepAppearance({theme: THEMES[at].id}); }
+          }}>
           {THEMES.map(t => {
             const current = kept.theme === t.id;
-            return <button key={t.id} type="button" data-theme={t.id} aria-pressed={now.theme === t.id}
+            return <button key={t.id} type="button" data-theme={t.id} role="radio" aria-checked={now.theme === t.id}
+              tabIndex={now.theme === t.id ? 0 : -1}
               className={`ap-card${now.theme === t.id ? ' on' : ''}${trying === t.id ? ' trying' : ''}`}
               aria-label={`${t.name} theme${current ? ', in use' : ''}${trying === t.id ? ', trying' : ''}`}
               onMouseEnter={() => setPointed(t.id)} onFocus={() => setPointed(t.id)} onBlur={() => setPointed(null)}

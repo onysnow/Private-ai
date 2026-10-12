@@ -52,7 +52,7 @@ describe('Settings › Appearance', () => {
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/><TryingBar/></QueryProvider>);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', {name: 'Rain Noir theme'}));
+    await user.click(screen.getByRole('radio', {name: 'Rain Noir theme'}));
     const bar = screen.getByRole('status');
     expect(bar).toHaveTextContent('Trying Rain Noir · nothing is saved until you keep it');
     expect(within(bar).getByRole('button', {name: /Go back to Case Night/})).toBeInTheDocument();
@@ -61,12 +61,25 @@ describe('Settings › Appearance', () => {
     expect(screen.queryByRole('status')).toBeNull();
   });
 
+  it('moves through the themes with arrows, previewing each, and keeps one with K', async () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': []});
+    render(<QueryProvider><AppearancePanel/></QueryProvider>);
+    const user = userEvent.setup();
+    screen.getByRole('radio', {name: /Case Night theme/}).focus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('radio', {name: 'Rain Noir theme'})).toHaveFocus();
+    expect(screen.getByText('Lowest text pair 5.90:1 · AA').closest('dl')).toHaveAttribute('aria-label', 'Rain Noir in four facts');
+    await user.keyboard('k');
+    expect(keptAppearance().theme).toBe('rain-noir');
+  });
+
   it('goes back from a trial with Esc', async () => {
     connectGeneratedClient(new ApiClient('http://api.test'));
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/><TryingBar/></QueryProvider>);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', {name: 'Archive theme'}));
+    await user.click(screen.getByRole('radio', {name: 'Archive theme'}));
     expect(screen.getByRole('status')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('status')).toBeNull();
@@ -93,7 +106,7 @@ describe('Settings › Appearance', () => {
     connectGeneratedClient(new ApiClient('http://api.test'));
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/></QueryProvider>);
-    await userEvent.setup().hover(screen.getByRole('button', {name: 'Indigo Clarity theme'}));
+    await userEvent.setup().hover(screen.getByRole('radio', {name: 'Indigo Clarity theme'}));
     const facts = screen.getByText('Lowest text pair 6.39:1 · AA').closest('dl')!;
     expect(facts).toHaveAttribute('aria-label', 'Indigo Clarity in four facts');
     expect(within(facts).getByText('Inclusive Sans · Lexend · Plex Mono')).toBeInTheDocument();

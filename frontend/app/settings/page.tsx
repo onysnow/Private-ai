@@ -12,7 +12,7 @@ import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
 import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 import {AppearancePanel, useAppearance} from '../../features/appearance/appearance-panel';
-import {SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
+import {KeptLine, SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
 import {HIDE_SCREEN_EVENT, NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
 import {SecurityPanel} from '../../features/security/security-panel';
@@ -206,21 +206,21 @@ function Settings(): ReactElement {
   const theme = THEMES.find(t => t.id === (look.trying ?? look.kept.theme))?.name ?? look.kept.theme;
   const inv = useWorkbenchStore(state => state.investigationId) || cases[0]?.id || '';
   const settingRows: SettingRow[] = [
-    {group: 'You', id: 'appearance', label: 'Appearance', value: theme, words: 'theme colour color dark effects motion format fonts',
+    {group: 'You', id: 'appearance', stored: 'this browser on this device', leaves: 'nothing', label: 'Appearance', value: theme, words: 'theme colour color dark effects motion format fonts',
       note: 'Appearance is yours alone: it is saved on this device and never changes what a teammate sees.'},
-    {group: 'You', id: 'notifications', label: 'Notifications', value: 'in app', words: 'inbox bell snooze'},
-    {group: 'You', id: 'keyboard', label: 'Keyboard', value: keysOn ? 'on' : 'off', words: 'keys shortcuts single-key'},
-    {group: 'You', id: 'safety', label: 'Your safety', value: '', words: 'hide screen cover'},
-    {group: 'Cases', id: 'new-case', label: 'New-case setup', value: '', words: 'start create'},
-    {group: 'Cases', id: 'lookups', label: 'Outside lookups', value: 'ask', words: 'connectors aleph opensanctions search outside'},
-    {group: 'Cases', id: 'ai', label: 'AI and research', value: status?.ai?.enabled ? 'ask first' : status ? 'off' : '', words: 'private ai model ollama'},
-    {group: 'Cases', id: 'levels', label: 'Red Flag levels', value: '', words: 'faint strong textbook'},
-    {group: 'Cases', id: 'demo', label: 'Demo case', value: demoInv ? (hideDemo ? 'hidden' : 'shown') : 'none', words: 'sample seed delete 1mdb'},
-    {group: 'This computer', id: 'access', label: 'Access and token', value: state === 'local' ? 'local' : state === 'authenticated' ? 'token' : state === 'needs_token' ? 'token needed'
+    {group: 'You', id: 'notifications', stored: 'the server on this computer; snoozes in this browser', leaves: 'nothing', label: 'Notifications', value: 'in app', words: 'inbox bell snooze'},
+    {group: 'You', id: 'keyboard', stored: 'this browser on this device', leaves: 'nothing', label: 'Keyboard', value: keysOn ? 'on' : 'off', words: 'keys shortcuts single-key'},
+    {group: 'You', id: 'safety', stored: 'nothing is stored', leaves: 'nothing', label: 'Your safety', value: '', words: 'hide screen cover'},
+    {group: 'Cases', id: 'new-case', stored: 'the server on this computer', leaves: 'nothing', label: 'New-case setup', value: '', words: 'start create'},
+    {group: 'Cases', id: 'lookups', stored: 'the server on this computer', leaves: 'the name or number you look up, to the service you choose, only when you ask', label: 'Outside lookups', value: 'ask', words: 'connectors aleph opensanctions search outside'},
+    {group: 'Cases', id: 'ai', stored: 'the server’s settings file', leaves: 'nothing with a local model; the passages you ask about, if a remote model is set', label: 'AI and research', value: status?.ai?.enabled ? 'ask first' : status ? 'off' : '', words: 'private ai model ollama'},
+    {group: 'Cases', id: 'levels', stored: 'the catalogue that ships with the app', leaves: 'nothing', label: 'Red Flag levels', value: '', words: 'faint strong textbook'},
+    {group: 'Cases', id: 'demo', stored: 'the server on this computer; hiding is per browser', leaves: 'loading a real case fetches its public pages from their publishers', label: 'Demo case', value: demoInv ? (hideDemo ? 'hidden' : 'shown') : 'none', words: 'sample seed delete 1mdb'},
+    {group: 'This computer', id: 'access', stored: 'the token is held in this browser’s memory only', leaves: 'nothing', label: 'Access and token', value: state === 'local' ? 'local' : state === 'authenticated' ? 'token' : state === 'needs_token' ? 'token needed'
       : state === 'remote_disabled' ? 'remote off' : state === 'error' ? 'not reached' : '', words: 'api bearer'},
-    {group: 'This computer', id: 'keys', label: 'Connector keys', value: status ? `${connectors.filter(c => c.configured).length} of ${connectors.length}` : '', words: 'credentials secret'},
-    {group: 'This computer', id: 'backups', label: 'Backups', value: '', words: 'restore archive'},
-    {group: 'This computer', id: 'log', label: 'Security log', value: status?.security.needs_attention ? 'look' : '', words: 'audit denials'},
+    {group: 'This computer', id: 'keys', stored: 'the server on this computer, never shown again', leaves: 'a key goes only to its own service, with each request you make', label: 'Connector keys', value: status ? `${connectors.filter(c => c.configured).length} of ${connectors.length}` : '', words: 'credentials secret'},
+    {group: 'This computer', id: 'backups', stored: 'the file you save, wherever you put it', leaves: 'nothing', label: 'Backups', value: '', words: 'restore archive'},
+    {group: 'This computer', id: 'log', stored: 'the server on this computer', leaves: 'nothing', label: 'Security log', value: status?.security.needs_attention ? 'look' : '', words: 'audit denials'},
     {group: 'This computer', id: 'console', label: 'Operator console', value: '', href: '/console/', words: 'backend'},
   ];
   const [section, go] = useSection(settingRows.filter(r => !r.href).map(r => r.id), 'appearance');
@@ -458,6 +458,7 @@ function Settings(): ReactElement {
     <div className="st-body">
       <SettingsNav rows={settingRows} current={section} onGo={go}/>
       <div className="st-section" id={`st-${section}`} tabIndex={-1}>
+        <KeptLine row={row}/>
         {sections[section]}
         {section === 'access' && <div className="mt-6"><div className="rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
