@@ -30,6 +30,7 @@ import {CaseHome} from '../../features/case-home/case-home';
 import {DecideScreen} from '../../features/case-home/decide-screen';
 import {TheWire} from '../../features/the-wire/the-wire';
 import {TheDrop} from '../../features/the-drop/the-drop';
+import {ReadingRoom} from '../../features/reading-room/reading-room';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
@@ -307,6 +308,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
   return <div className="cv" data-view={view}>
     {body}
     {drawer}
+    <PanelErrorBoundary name="Reading room"><ReadingRoom investigationId={inv}/></PanelErrorBoundary>
     <Toaster/>
   </div>;
 }

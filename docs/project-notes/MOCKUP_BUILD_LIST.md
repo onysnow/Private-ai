@@ -94,11 +94,11 @@ INTAKE_1 The Drop:
 - [x] (12 Oct; problems sort first; no filmstrip yet) Ready for you (63 proposals by kind) and Problems first list; bottom filmstrip "1 / 34"
 - [ ] Library and History tabs; per-file event stream (SSE) instead of three pollers; Stop reading — 12 Oct: Stop reading done (stops at the next page, keeps nothing half-read); the old Documents panel is the Library tab; History and the event stream still to do
 INTAKE_2 Reading room:
-- [ ] Page strip with proposal marks; calm serif text 40–60 ch/line; tabs Text / Original / Translation / Details; find in document
-- [ ] Selection bar: Evidence E · Claim C · Name N · To check X · Tag T
-- [ ] Margin of proposal cards linked to their spans by leader lines; "Is this already in the case?" inline; questions with number keys; Why?
-- [ ] Evidence clip card (quote + 32 chars either side, SHA, anchor) — self-checking quotes
-- [ ] Footer keys and counts (accepted / rejected / waiting), Document n of N
+- [x] (12 Oct) Page strip with proposal marks; calm serif text 40–60 ch/line; tabs Text / Original / Translation / Details; find in document
+- [x] (12 Oct; To check makes a lead, Tag tags the document) Selection bar: Evidence E · Claim C · Name N · To check X · Tag T
+- [x] (12 Oct; "already in the case" still to do on the card) Margin of proposal cards linked to their spans by leader lines; "Is this already in the case?" inline; questions with number keys; Why?
+- [x] (12 Oct) Evidence clip card (quote + 32 chars either side, SHA, anchor) — self-checking quotes
+- [x] (12 Oct) Footer keys and counts (accepted / rejected / waiting), Document n of N
 Also from the backlog: watchlist highlights redesign; Sources & evidence as a browsable list of all sources and evidence; .mbox children titled properly; audio/video intake; web links fetched; manual entity/event forms.
 
 ## 5. See — mockups SEE_1 (network) and SEE_2 (money) (§07), plus Timeline and Places

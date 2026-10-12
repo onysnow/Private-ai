@@ -63,6 +63,7 @@ type WorkbenchState = {
    * search hit, a similar document), at the page that matched if known. */
   document: {serial: number; documentId: string; pageNumber: number | null} | null;
   openDocument: (documentId: string, pageNumber?: number | null) => void;
+  closeDocument: () => void;
   /** The Red Flag whose details were last asked for (a "To check" item's flag). */
   flag: {serial: number; flagId: string} | null;
   openFlag: (flagId: string) => void;
@@ -105,6 +106,7 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   openRelationship: request => set({relationship: {serial: nextSerial(), request}}),
   document: null,
   openDocument: (documentId, pageNumber = null) => set({document: {serial: nextSerial(), documentId, pageNumber}}),
+  closeDocument: () => set({document: null}),
   flag: null,
   openFlag: flagId => set({flag: {serial: nextSerial(), flagId}}),
   check: null,
