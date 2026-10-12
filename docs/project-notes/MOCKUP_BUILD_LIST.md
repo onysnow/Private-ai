@@ -23,7 +23,7 @@ screen · disabled controls say why.
 |---|---|---|
 | The Wire (See prototype) | **built** 12 Oct | Whole case / around a party / one link, lens, follow the money, time strip. Remaining: label links with sentences and certainty line styles from SEE_1 (see §5). Not yet run on 1MDB (downloads blocked in the cloud). |
 | Decide (CHECK_1) table-row cards | **built** 12 Oct | Row facts in the question, cells shown, "already in the case". |
-| App-side suite gaps | **next** | §1 below. |
+| App-side suite gaps | **data built** 12 Oct | §1 below; each shown on its screen with that screen's section. |
 
 ## 1. Authority Suite gaps (approved 12 Oct; data, then the screens that show it)
 
@@ -31,20 +31,29 @@ No mockup of its own: these are records the mockups already show (Chain of Custo
 claim card's classification and likelihood word, the story tree's right-of-reply gate, Before you
 run's tier floor). Build each as a field or record with tests; surface it where the mockups put it.
 
-- [ ] Source tier A–F on sources/evidence (shown: Chain of Custody source band; Before you run)
-- [ ] Claim classification (the eight) and likelihood term (seven ICD 203 words) + confidence basis, warrant, assumptions, limitations (claim card; trace drawer)
-- [ ] Restatement link between evidence items ("repeats, does not establish")
-- [ ] Authenticity status, issuer/author, and separate record / event / publication / retrieval dates on evidence
-- [ ] Relationship evidence status: direct / inferred / alleged (network line styles)
-- [ ] Event date precision kept apart from evidence status (timeline bands)
-- [ ] Partly-verified verdict with corrected wording
-- [ ] Reviewer type on review events (automated / AI-assisted / human / legal)
-- [ ] Right-of-reply record (OFFERED … EXCEPTION) — story tree gate
-- [ ] Gap record (GAP-) tied to a claim; negative-search-result record with its scope; retrieval log
-- [ ] Hypothesis records with kind (working theory / innocent explanation / …) and viable
-- [ ] Conflict record with the same-proposition test and resolving evidence
-- [ ] Gathering outcome per lead (obtained / refused / not held / no reply / unable)
-- [ ] Hash + custody log for online captures; CP-02 source-protection and CP-03 publication-ethics records
+**Data and API built 12 Oct** (all 25 now recorded; `docs/authority-suite/SUITE_GAPS.md`): fields on
+sources, evidence, claims, links and leads (`PATCH /api/{claims,sources,evidence,relationships}/{id}/suite`,
+claim changes kept as review events), and the suite's own records (GAP, ROR, HYP, CFLT, RLOG, ESRC, EPIT,
+CAPT) at `/api/investigations/{id}/case-records`, amended with history. The Confirmed rule now reads the
+tier (A alone; A/B/D independent; C never; E/F leads) and counts a restatement as its original. Each value
+list is checked against the vendored suite (`tests/test_suite_records.py`). **Still to do:** show each one
+where its mockup puts it, in the sections below (§5 line styles, §6 claim card and Chain of Custody,
+§7 story-tree reply gate, §8 tier floor).
+
+- [x] Source tier A–F on sources/evidence (shown: Chain of Custody source band; Before you run)
+- [x] Claim classification (the eight) and likelihood term (seven ICD 203 words) + confidence basis, warrant, assumptions, limitations (claim card; trace drawer)
+- [x] Restatement link between evidence items ("repeats, does not establish")
+- [x] Authenticity status, issuer/author, and separate record / event / publication / retrieval dates on evidence
+- [x] Relationship evidence status: direct / inferred / alleged (network line styles)
+- [x] Event date precision kept apart from evidence status (timeline bands)
+- [x] Partly-verified verdict with corrected wording
+- [x] Reviewer type on review events (automated / AI-assisted / human / legal)
+- [x] Right-of-reply record (OFFERED … EXCEPTION) — story tree gate
+- [x] Gap record (GAP-) tied to a claim; negative-search-result record with its scope; retrieval log
+- [x] Hypothesis records with kind (working theory / innocent explanation / …) and viable
+- [x] Conflict record with the same-proposition test and resolving evidence
+- [x] Gathering outcome per lead (obtained / refused / not held / no reply / unable)
+- [x] Hash + custody log for online captures; CP-02 source-protection and CP-03 publication-ethics records
 
 ## 2. Case home — mockup HOME_1 (redesign §04.1)
 

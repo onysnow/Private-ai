@@ -16,6 +16,7 @@ import {
   addNote,
   addTag,
   addWatchlistEntry,
+  amendCaseRecord,
   analyzeOpenalephDocument,
   assessStatement,
   attachRelationshipEvidenceEndpoint,
@@ -28,6 +29,7 @@ import {
   convertLeadEndpoint,
   createAppUser,
   createCanonicalRelationship,
+  createCaseRecord,
   createClaimEndpoint,
   createClaimReview,
   createEntity,
@@ -80,6 +82,7 @@ import {
   getBasemapSprite,
   getBasemapStatus,
   getBasemapTile,
+  getCaseRecord,
   getChecks,
   getClaimReviewWorkspace,
   getCollection,
@@ -154,6 +157,7 @@ import {
   listAppUsers,
   listAreas,
   listAssessments,
+  listCaseRecords,
   listClaimEvidenceEndpoint,
   listClaims,
   listConnectorFindings,
@@ -197,7 +201,11 @@ import {
   makeLeadFromRedFlag,
   openalephIntegrationStatus,
   type Options,
+  patchClaimSuite,
+  patchEvidenceSuite,
   patchInvestigation,
+  patchRelationshipSuite,
+  patchSourceSuite,
   peekAtRecord,
   presentationStyles,
   previewBackupRestore,
@@ -271,6 +279,9 @@ import type {
   AddWatchlistEntryData,
   AddWatchlistEntryError,
   AddWatchlistEntryResponse,
+  AmendCaseRecordData,
+  AmendCaseRecordError,
+  AmendCaseRecordResponse,
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentError,
   AnalyzeOpenalephDocumentResponse,
@@ -307,6 +318,9 @@ import type {
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipError,
   CreateCanonicalRelationshipResponse,
+  CreateCaseRecordData,
+  CreateCaseRecordError,
+  CreateCaseRecordResponse,
   CreateClaimEndpointData,
   CreateClaimEndpointError,
   CreateClaimEndpointResponse,
@@ -463,6 +477,9 @@ import type {
   GetBasemapTileData,
   GetBasemapTileError,
   GetBasemapTileResponse,
+  GetCaseRecordData,
+  GetCaseRecordError,
+  GetCaseRecordResponse,
   GetChecksData,
   GetChecksError,
   GetChecksResponse,
@@ -685,6 +702,9 @@ import type {
   ListAssessmentsData,
   ListAssessmentsError,
   ListAssessmentsResponse,
+  ListCaseRecordsData,
+  ListCaseRecordsError,
+  ListCaseRecordsResponse,
   ListClaimEvidenceEndpointData,
   ListClaimEvidenceEndpointError,
   ListClaimEvidenceEndpointResponse,
@@ -811,9 +831,20 @@ import type {
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
+  PatchClaimSuiteData,
+  PatchClaimSuiteError,
+  PatchClaimSuiteResponse,
+  PatchEvidenceSuiteData,
+  PatchEvidenceSuiteError,
+  PatchEvidenceSuiteResponse,
   PatchInvestigationData,
   PatchInvestigationError,
   PatchInvestigationResponse,
+  PatchRelationshipSuiteData,
+  PatchRelationshipSuiteError,
+  PatchSourceSuiteData,
+  PatchSourceSuiteError,
+  PatchSourceSuiteResponse,
   PeekAtRecordData,
   PeekAtRecordError,
   PeekAtRecordResponse,
@@ -1371,6 +1402,58 @@ export const capabilitiesOptions = (options?: Options<CapabilitiesData>) =>
     queryKey: capabilitiesQueryKey(options),
   });
 
+export const getCaseRecordQueryKey = (options: Options<GetCaseRecordData>) =>
+  createQueryKey('getCaseRecord', options);
+
+/**
+ * Get Case Record
+ */
+export const getCaseRecordOptions = (options: Options<GetCaseRecordData>) =>
+  queryOptions<
+    GetCaseRecordResponse,
+    GetCaseRecordError,
+    GetCaseRecordResponse,
+    ReturnType<typeof getCaseRecordQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaseRecord({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaseRecordQueryKey(options),
+  });
+
+/**
+ * Amend Case Record
+ */
+export const amendCaseRecordMutation = (
+  options?: Partial<Options<AmendCaseRecordData>>,
+): UseMutationOptions<
+  AmendCaseRecordResponse,
+  AmendCaseRecordError,
+  Options<AmendCaseRecordData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AmendCaseRecordResponse,
+    AmendCaseRecordError,
+    Options<AmendCaseRecordData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await amendCaseRecord({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const listAreasQueryKey = (options?: Options<ListAreasData>) =>
   createQueryKey('listAreas', options);
 
@@ -1777,6 +1860,36 @@ export const createClaimReviewMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createClaimReview({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Patch Claim Suite
+ *
+ * Classification, likelihood term, confidence level and basis, warrant, assumptions,
+ * limits, Module 02's verdict and corrected wording; written as a review event.
+ */
+export const patchClaimSuiteMutation = (
+  options?: Partial<Options<PatchClaimSuiteData>>,
+): UseMutationOptions<
+  PatchClaimSuiteResponse,
+  PatchClaimSuiteError,
+  Options<PatchClaimSuiteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PatchClaimSuiteResponse,
+    PatchClaimSuiteError,
+    Options<PatchClaimSuiteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await patchClaimSuite({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -3880,6 +3993,33 @@ export const createEvidenceEndpointMutation = (
 };
 
 /**
+ * Patch Evidence Suite
+ */
+export const patchEvidenceSuiteMutation = (
+  options?: Partial<Options<PatchEvidenceSuiteData>>,
+): UseMutationOptions<
+  PatchEvidenceSuiteResponse,
+  PatchEvidenceSuiteError,
+  Options<PatchEvidenceSuiteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PatchEvidenceSuiteResponse,
+    PatchEvidenceSuiteError,
+    Options<PatchEvidenceSuiteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await patchEvidenceSuite({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Promote External Relationship
  */
 export const promoteExternalRelationshipMutation = (
@@ -4480,6 +4620,59 @@ export const investigationPresentationDraftMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await investigationPresentationDraft({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listCaseRecordsQueryKey = (
+  options: Options<ListCaseRecordsData>,
+) => createQueryKey('listCaseRecords', options);
+
+/**
+ * List Case Records
+ */
+export const listCaseRecordsOptions = (options: Options<ListCaseRecordsData>) =>
+  queryOptions<
+    ListCaseRecordsResponse,
+    ListCaseRecordsError,
+    ListCaseRecordsResponse,
+    ReturnType<typeof listCaseRecordsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listCaseRecords({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listCaseRecordsQueryKey(options),
+  });
+
+/**
+ * Create Case Record
+ */
+export const createCaseRecordMutation = (
+  options?: Partial<Options<CreateCaseRecordData>>,
+): UseMutationOptions<
+  CreateCaseRecordResponse,
+  CreateCaseRecordError,
+  Options<CreateCaseRecordData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateCaseRecordResponse,
+    CreateCaseRecordError,
+    Options<CreateCaseRecordData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createCaseRecord({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -7585,6 +7778,33 @@ export const createLeadFromRelationshipContextMutation = (
 };
 
 /**
+ * Patch Relationship Suite
+ */
+export const patchRelationshipSuiteMutation = (
+  options?: Partial<Options<PatchRelationshipSuiteData>>,
+): UseMutationOptions<
+  unknown,
+  PatchRelationshipSuiteError,
+  Options<PatchRelationshipSuiteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    PatchRelationshipSuiteError,
+    Options<PatchRelationshipSuiteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await patchRelationshipSuite({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Create Reporting Task Endpoint
  */
 export const createReportingTaskEndpointMutation = (
@@ -8218,6 +8438,33 @@ export const listSourceEvidenceEndpointOptions = (
     },
     queryKey: listSourceEvidenceEndpointQueryKey(options),
   });
+
+/**
+ * Patch Source Suite
+ */
+export const patchSourceSuiteMutation = (
+  options?: Partial<Options<PatchSourceSuiteData>>,
+): UseMutationOptions<
+  PatchSourceSuiteResponse,
+  PatchSourceSuiteError,
+  Options<PatchSourceSuiteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PatchSourceSuiteResponse,
+    PatchSourceSuiteError,
+    Options<PatchSourceSuiteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await patchSourceSuite({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Promote Statement Assessment

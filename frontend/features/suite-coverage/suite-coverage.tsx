@@ -2,7 +2,7 @@
 // What the app's values mean in the Authority System Suite (backend app/ai/suite_map.py).
 // A value the app needs that the suite does not define is a problem, shown first; then the
 // values the suite defines only nearly; then what the suite requires that the app does not
-// record yet; then the values the suite defines.
+// record yet, and what it now records; then the values the suite defines.
 import {useQuery} from '@tanstack/react-query';
 import type {ReactElement} from 'react';
 
@@ -26,6 +26,8 @@ export function SuiteCoverage(): ReactElement {
   const none = c.mappings.filter(m => m.match === 'none');
   const close = c.mappings.filter(m => m.match === 'close');
   const same = c.mappings.filter(m => m.match === 'same');
+  const lacks = c.suite_requires_app_lacks.filter(m => !m.recorded_in);
+  const recorded = c.suite_requires_app_lacks.filter(m => m.recorded_in);
   return <section className="sc" aria-labelledby="sc-title" data-testid="suite-coverage">
     <h3 id="sc-title">The app’s values in the Authority System Suite</h3>
     <p className="sc-quiet">Every value the app decides with is matched to the suite term that defines it ({c.source?.replace(/^.*@/, 'commit ')}, TAS {c.tas_version}).
@@ -43,9 +45,14 @@ export function SuiteCoverage(): ReactElement {
           <span className="sc-term"><em>Not mapped yet.</em></span><span className="sc-note">A value the app added without checking the suite.</span></li>)}</ul>
     </details>
     <details><summary>Defined only nearly ({close.length})</summary><ul className="sc-list">{close.map(m => <Row key={`${m.vocabulary}:${m.value}`} m={m}/>)}</ul></details>
-    <details><summary>The suite needs, the app does not record ({c.suite_requires_app_lacks.length})</summary>
-      <ul className="sc-list">{c.suite_requires_app_lacks.map(m => <li key={m.what} className="sc-row sc-lacks">
+    <details><summary>The suite needs, the app does not record ({lacks.length})</summary>
+      <ul className="sc-list">{lacks.map(m => <li key={m.what} className="sc-row sc-lacks">
         <span className="sc-value"><b>{m.what}</b></span><span className="sc-term"><code>{m.suite_term}</code><small>{m.file}</small></span><span className="sc-note">{m.why}</span>
+      </li>)}</ul>
+    </details>
+    <details><summary>The suite needs, the app now records ({recorded.length})</summary>
+      <ul className="sc-list">{recorded.map(m => <li key={m.what} className="sc-row sc-same">
+        <span className="sc-value"><b>{m.what}</b></span><span className="sc-term"><code>{m.suite_term}</code><small>{m.file}</small></span><span className="sc-note">Recorded in <code>{m.recorded_in}</code>.</span>
       </li>)}</ul>
     </details>
     <details><summary>Defined ({same.length})</summary><ul className="sc-list">{same.map(m => <Row key={`${m.vocabulary}:${m.value}`} m={m}/>)}</ul></details>

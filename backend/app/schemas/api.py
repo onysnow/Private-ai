@@ -99,6 +99,8 @@ class LeadUpdate(BaseModel):
     owner: str | None = None
     next_action: str | None = None
     note: str | None = None
+    # What gathering got (app/ai/suite_vocab.py GATHERING_OUTCOMES); null clears it.
+    gathering_outcome: str | None = None
 
 
 class LeadLinkCreate(BaseModel):
@@ -260,6 +262,8 @@ class RelationshipEvidenceAttachRequest(BaseModel):
 class RelationshipEvidenceReviewRequest(BaseModel):
     stance: str
     rationale: str
+    # Who reviewed (app/ai/suite_vocab.py REVIEWER_TYPES); a person unless said otherwise.
+    reviewer_type: str = "HUMAN"
 
 
 class ExtractedRelationshipProposalCreate(BaseModel):
@@ -359,6 +363,7 @@ class ClaimReviewRequest(BaseModel):
     status: str
     confidence: float
     rationale: str
+    reviewer_type: str = "HUMAN"
     # The confidence grade on the IPCC AR5 grid (app/services/claims.py):
     # both or neither; left out, the claim keeps the grade it has.
     evidence_grade: Literal["limited", "medium", "robust"] | None = None
@@ -567,3 +572,53 @@ class CheckDecide(BaseModel):
 
 class FlagDismiss(BaseModel):
     reason: str = Field(min_length=1, max_length=2000, description="Why the flag is not relevant; it stays with the flag.")
+
+
+# --- The Authority System Suite's fields and records (app/services/suite_fields.py, case_records.py)
+
+class ClaimSuiteFields(BaseModel):
+    """Set any of a claim's suite fields; each change is a review event with its reason."""
+    model_config = ConfigDict(extra="forbid")
+    classification: str | None = None
+    confidence_term: str | None = None
+    confidence_level: str | None = None
+    confidence_basis: str | None = None
+    warrant: str | None = None
+    assumptions: list[str] | None = None
+    limitations: list[str] | None = None
+    verification_verdict: str | None = None
+    corrected_wording: str | None = None
+    rationale: str
+    reviewer_type: str = "HUMAN"
+
+
+class SourceSuiteFields(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    source_tier: str | None = None
+    issuer_or_author: str | None = None
+
+
+class EvidenceSuiteFields(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    issuer_or_author: str | None = None
+    authenticity_status: str | None = None
+    restates_evidence_id: str | None = None
+    created_on: str | None = None
+    event_on: str | None = None
+    published_on: str | None = None
+    retrieved_on: str | None = None
+    limitations: list[str] | None = None
+
+
+class RelationshipSuiteFields(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    evidence_status: str | None = None
+
+
+class CaseRecordCreate(BaseModel):
+    kind: Literal["GAP", "ROR", "HYP", "CFLT", "RLOG", "ESRC", "EPIT", "CAPT"]
+    body: dict[str, Any]
+
+
+class CaseRecordAmend(BaseModel):
+    body: dict[str, Any]

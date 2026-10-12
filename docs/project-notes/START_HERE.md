@@ -1,6 +1,6 @@
 # Start here (12 Oct 2026)
 
-**The work plan is `MOCKUP_BUILD_LIST.md`** (Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct: table-row Decide cards, The Wire (See). Next: the app-side Authority Suite gaps, then Case home to its mockup. The cloud session can push to onysnow/Private-ai now (PR #58 into timeline-wip).
+**The work plan is `MOCKUP_BUILD_LIST.md`** (Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct: table-row Decide cards, The Wire (See), the app-side Authority Suite gaps (data and API; each is shown on its screen as that screen is built). Next: Case home to its mockup (build list §2). The cloud session can push to onysnow/Private-ai now (PR #58 into timeline-wip).
 
 This is where the Workbench redesign stands, for a new session picking it up. The branch is
 `timeline-wip`.

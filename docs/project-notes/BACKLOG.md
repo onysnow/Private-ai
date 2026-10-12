@@ -8,7 +8,7 @@ The "approved" items below may be built straight away.
 2. **Done 12 Oct: the type mark in the Decide list.** Proposals use ◇ instead of ≡; every type mark is a plain sign (no tile), with its type named on hover.
 3. **Done 11 Oct:** .eml/.mbox/.zip/.xlsx are read by the app's own reader (commit 14b748e).
 4. **Done 12 Oct: The Wire (See)**, built from the approved prototype (https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3) as See's first section: `GET /api/investigations/{id}/wire` (`app/services/wire.py`, groups and layout by networkx) and `features/the-wire/` (the prototype's drawing code ported, scoped to its panel). Changes from the prototype: amounts under a million written in full (9,800 not "10 k"); the time strip spans the case's own dates; the drawer opens the dossier and flags; tags offer Trace. Not yet tested on 1MDB (its records cannot be downloaded in the cloud session).
-5. **Approved 12 Oct: close the app-side Authority Suite gaps** (the 25 suite requirements the app lacks, `docs/authority-suite/SUITE_GAPS.md`) before step 4.
+5. **Done 12 Oct (data and API): the app-side Authority Suite gaps** — all 25 suite requirements are now recorded (`docs/authority-suite/SUITE_GAPS.md`; details in `MOCKUP_BUILD_LIST.md` §1). Each is shown on screen as its mockup's section is built.
 
 ## Ony's standing requirement for every card
 Wherever a card appears (decision, dashboard widget, flag, timeline row, to-check item), it must:

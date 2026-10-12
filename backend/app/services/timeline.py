@@ -346,7 +346,8 @@ def validate_timeline_refs(db: Session, row: TimelineEvent) -> None:
             raise ValueError("relationship_entity_id must reference a canonical relationship entity")
 
 
-TIMELINE_EVENT_PRECISIONS = {"day", "month", "year", "range", "unknown"}
+# The suite's date_precision values (app/ai/suite_vocab.py DATE_PRECISIONS) plus the app's "year".
+TIMELINE_EVENT_PRECISIONS = {"exact", "day", "month", "year", "range", "before", "after", "estimated", "unknown"}
 TIMELINE_EVENT_VERIFICATION_STATUSES = {"asserted", "verified", "approximate", "disputed", "unresolved"}
 
 # How well an event is substantiated: Bellingcat's incident grading scale

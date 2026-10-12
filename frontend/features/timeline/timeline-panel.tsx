@@ -29,7 +29,8 @@ const CaseTimeline = dynamic(() => import('../../components/charts/case-timeline
 
 type Props = {investigationId: string};
 
-const PRECISIONS = ['day', 'month', 'year', 'range', 'unknown'];
+// The suite's date precisions (backend app/ai/suite_vocab.py DATE_PRECISIONS) plus 'year'.
+const PRECISIONS = ['exact', 'day', 'month', 'year', 'range', 'before', 'after', 'estimated', 'unknown'];
 const STATUSES = ['asserted', 'verified', 'approximate', 'disputed', 'unresolved'];
 // How well an event is substantiated: Bellingcat's grading scale (ADR-0005,
 // line 5; backend app/services/timeline.py EVENT_GRADES, which these words

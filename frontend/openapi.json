@@ -2679,6 +2679,133 @@
         "title": "CaseNetworkCountsOut",
         "type": "object"
       },
+      "CaseRecordAmend": {
+        "properties": {
+          "body": {
+            "additionalProperties": true,
+            "title": "Body",
+            "type": "object"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "CaseRecordAmend",
+        "type": "object"
+      },
+      "CaseRecordCreate": {
+        "properties": {
+          "body": {
+            "additionalProperties": true,
+            "title": "Body",
+            "type": "object"
+          },
+          "kind": {
+            "enum": [
+              "GAP",
+              "ROR",
+              "HYP",
+              "CFLT",
+              "RLOG",
+              "ESRC",
+              "EPIT",
+              "CAPT"
+            ],
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "body"
+        ],
+        "title": "CaseRecordCreate",
+        "type": "object"
+      },
+      "CaseRecordOut": {
+        "description": "One of the suite's own records for a case, with its earlier bodies.",
+        "properties": {
+          "body": {
+            "additionalProperties": true,
+            "title": "Body",
+            "type": "object"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "history": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "GAP",
+              "ROR",
+              "HYP",
+              "CFLT",
+              "RLOG",
+              "ESRC",
+              "EPIT",
+              "CAPT"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_name": {
+            "title": "Kind Name",
+            "type": "string"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "updated_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "kind",
+          "kind_name",
+          "record_id",
+          "body",
+          "history",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "CaseRecordOut",
+        "type": "object"
+      },
       "CaseSinceOut": {
         "properties": {
           "after": {
@@ -4386,9 +4513,78 @@
             ],
             "title": "Agreement Grade"
           },
+          "assumptions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assumptions"
+          },
+          "classification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classification"
+          },
           "confidence": {
             "title": "Confidence",
             "type": "number"
+          },
+          "confidence_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Basis"
+          },
+          "confidence_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Level"
+          },
+          "confidence_term": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Term"
+          },
+          "corrected_wording": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Wording"
           },
           "created_at": {
             "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
@@ -4420,6 +4616,20 @@
             "title": "Investigation Id",
             "type": "string"
           },
+          "limitations": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitations"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -4427,6 +4637,28 @@
           "text": {
             "title": "Text",
             "type": "string"
+          },
+          "verification_verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Verdict"
+          },
+          "warrant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warrant"
           }
         },
         "required": [
@@ -4500,6 +4732,26 @@
           "rationale": {
             "title": "Rationale",
             "type": "string"
+          },
+          "reviewer_type": {
+            "default": "HUMAN",
+            "title": "Reviewer Type",
+            "type": "string"
+          },
+          "suite_changes": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "items": {},
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suite Changes"
           },
           "to_agreement_grade": {
             "anyOf": [
@@ -4613,6 +4865,11 @@
             "title": "Rationale",
             "type": "string"
           },
+          "reviewer_type": {
+            "default": "HUMAN",
+            "title": "Reviewer Type",
+            "type": "string"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -4694,6 +4951,131 @@
           "done"
         ],
         "title": "ClaimReviewWorkspaceOut",
+        "type": "object"
+      },
+      "ClaimSuiteFields": {
+        "additionalProperties": false,
+        "description": "Set any of a claim's suite fields; each change is a review event with its reason.",
+        "properties": {
+          "assumptions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assumptions"
+          },
+          "classification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classification"
+          },
+          "confidence_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Basis"
+          },
+          "confidence_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Level"
+          },
+          "confidence_term": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Term"
+          },
+          "corrected_wording": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Wording"
+          },
+          "limitations": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitations"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "reviewer_type": {
+            "default": "HUMAN",
+            "title": "Reviewer Type",
+            "type": "string"
+          },
+          "verification_verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Verdict"
+          },
+          "warrant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warrant"
+          }
+        },
+        "required": [
+          "rationale"
+        ],
+        "title": "ClaimSuiteFields",
         "type": "object"
       },
       "ClaimUpdate": {
@@ -15028,6 +15410,17 @@
             "title": "Direction",
             "type": "string"
           },
+          "evidence_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Status"
+          },
           "ftm_id": {
             "anyOf": [
               {
@@ -15506,6 +15899,17 @@
       },
       "EvidenceOut": {
         "properties": {
+          "authenticity_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Authenticity Status"
+          },
           "captured_on": {
             "anyOf": [
               {
@@ -15516,6 +15920,17 @@
               }
             ],
             "title": "Captured On"
+          },
+          "created_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created On"
           },
           "document_id": {
             "anyOf": [
@@ -15528,9 +15943,45 @@
             ],
             "title": "Document Id"
           },
+          "event_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event On"
+          },
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "issuer_or_author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer Or Author"
+          },
+          "limitations": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitations"
           },
           "locator": {
             "anyOf": [
@@ -15554,6 +16005,17 @@
             ],
             "title": "Notes"
           },
+          "published_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published On"
+          },
           "quote": {
             "anyOf": [
               {
@@ -15564,6 +16026,28 @@
               }
             ],
             "title": "Quote"
+          },
+          "restates_evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restates Evidence Id"
+          },
+          "retrieved_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrieved On"
           },
           "source_id": {
             "title": "Source Id",
@@ -15632,6 +16116,104 @@
           "title"
         ],
         "title": "EvidenceSourceOut",
+        "type": "object"
+      },
+      "EvidenceSuiteFields": {
+        "additionalProperties": false,
+        "properties": {
+          "authenticity_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Authenticity Status"
+          },
+          "created_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created On"
+          },
+          "event_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event On"
+          },
+          "issuer_or_author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer Or Author"
+          },
+          "limitations": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitations"
+          },
+          "published_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published On"
+          },
+          "restates_evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restates Evidence Id"
+          },
+          "retrieved_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrieved On"
+          }
+        },
+        "title": "EvidenceSuiteFields",
         "type": "object"
       },
       "EvidenceWithSourceOut": {
@@ -19498,6 +20080,17 @@
             ],
             "title": "Detail"
           },
+          "gathering_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gathering Outcome"
+          },
           "history": {
             "items": {
               "$ref": "#/components/schemas/LeadWorkflowEventOut"
@@ -19666,6 +20259,17 @@
             ],
             "title": "Detail"
           },
+          "gathering_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gathering Outcome"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -19798,6 +20402,17 @@
               }
             ],
             "title": "Detail"
+          },
+          "gathering_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gathering Outcome"
           },
           "next_action": {
             "anyOf": [
@@ -24241,6 +24856,11 @@
             "title": "Relationship Edge Id",
             "type": "string"
           },
+          "reviewer_type": {
+            "default": "HUMAN",
+            "title": "Reviewer Type",
+            "type": "string"
+          },
           "stance": {
             "title": "Stance",
             "type": "string"
@@ -24260,6 +24880,11 @@
         "properties": {
           "rationale": {
             "title": "Rationale",
+            "type": "string"
+          },
+          "reviewer_type": {
+            "default": "HUMAN",
+            "title": "Reviewer Type",
             "type": "string"
           },
           "stance": {
@@ -24336,6 +24961,17 @@
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
             "title": "Created At",
             "type": "string"
+          },
+          "evidence_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Status"
           },
           "ftm_id": {
             "anyOf": [
@@ -24605,6 +25241,24 @@
           "schemas"
         ],
         "title": "RelationshipSchemasOut",
+        "type": "object"
+      },
+      "RelationshipSuiteFields": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Status"
+          }
+        },
+        "title": "RelationshipSuiteFields",
         "type": "object"
       },
       "ReportingTaskCreate": {
@@ -26243,6 +26897,17 @@
             "title": "Investigation Id",
             "type": "string"
           },
+          "issuer_or_author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer Or Author"
+          },
           "metadata_json": {
             "anyOf": [
               {
@@ -26254,6 +26919,17 @@
               }
             ],
             "title": "Metadata Json"
+          },
+          "source_tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Tier"
           },
           "source_type": {
             "title": "Source Type",
@@ -26283,6 +26959,35 @@
           "created_at"
         ],
         "title": "SourceOut",
+        "type": "object"
+      },
+      "SourceSuiteFields": {
+        "additionalProperties": false,
+        "properties": {
+          "issuer_or_author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer Or Author"
+          },
+          "source_tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Tier"
+          }
+        },
+        "title": "SourceSuiteFields",
         "type": "object"
       },
       "StanceCountsOut": {
@@ -26727,6 +27432,11 @@
             "title": "App Lacks",
             "type": "integer"
           },
+          "app_recorded": {
+            "default": 0,
+            "title": "App Recorded",
+            "type": "integer"
+          },
           "close": {
             "title": "Close",
             "type": "integer"
@@ -26910,6 +27620,17 @@
               }
             ],
             "title": "Found"
+          },
+          "recorded_in": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded In"
           },
           "suite_term": {
             "title": "Suite Term",
@@ -31396,6 +32117,112 @@
         "summary": "Capabilities"
       }
     },
+    "/api/case-records/{case_record_id}": {
+      "get": {
+        "operationId": "get_case_record",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_record_id",
+            "required": true,
+            "schema": {
+              "title": "Case Record Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseRecordOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Case Record"
+      },
+      "patch": {
+        "operationId": "amend_case_record",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_record_id",
+            "required": true,
+            "schema": {
+              "title": "Case Record Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseRecordAmend"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseRecordOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Amend Case Record"
+      }
+    },
     "/api/catalogue/areas": {
       "get": {
         "description": "Every area of the catalogue, with how many indicators and terms it holds.",
@@ -32066,6 +32893,66 @@
           }
         },
         "summary": "Create Claim Review"
+      }
+    },
+    "/api/claims/{claim_id}/suite": {
+      "patch": {
+        "description": "Classification, likelihood term, confidence level and basis, warrant, assumptions,\nlimits, Module 02's verdict and corrected wording; written as a review event.",
+        "operationId": "patch_claim_suite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "claim_id",
+            "required": true,
+            "schema": {
+              "title": "Claim Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimSuiteFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Patch Claim Suite"
       }
     },
     "/api/collections/{collection_id}": {
@@ -43322,6 +44209,65 @@
         "summary": "Create Evidence Endpoint"
       }
     },
+    "/api/evidence/{evidence_id}/suite": {
+      "patch": {
+        "operationId": "patch_evidence_suite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evidence_id",
+            "required": true,
+            "schema": {
+              "title": "Evidence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvidenceSuiteFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Patch Evidence Suite"
+      }
+    },
     "/api/external-relationship-reviews/{review_id}/promote": {
       "post": {
         "operationId": "promote_external_relationship",
@@ -44460,6 +45406,132 @@
           }
         },
         "summary": "Investigation Presentation Draft"
+      }
+    },
+    "/api/investigations/{investigation_id}/case-records": {
+      "get": {
+        "operationId": "list_case_records",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaseRecordOut"
+                  },
+                  "title": "Response List Case Records",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Case Records"
+      },
+      "post": {
+        "operationId": "create_case_record",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseRecordCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseRecordOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Create Case Record"
       }
     },
     "/api/investigations/{investigation_id}/checks": {
@@ -49723,6 +50795,65 @@
         "summary": "Create Lead From Relationship Context"
       }
     },
+    "/api/relationships/{relationship_id}/suite": {
+      "patch": {
+        "operationId": "patch_relationship_suite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relationship_id",
+            "required": true,
+            "schema": {
+              "title": "Relationship Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationshipSuiteFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Patch Relationship Suite"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Patch Relationship Suite"
+      }
+    },
     "/api/reporting-tasks": {
       "post": {
         "operationId": "create_reporting_task_endpoint",
@@ -51019,6 +52150,65 @@
           }
         },
         "summary": "List Source Evidence Endpoint"
+      }
+    },
+    "/api/sources/{source_id}/suite": {
+      "patch": {
+        "operationId": "patch_source_suite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SourceSuiteFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Patch Source Suite"
       }
     },
     "/api/statement-assessments/{assessment_id}/promote": {

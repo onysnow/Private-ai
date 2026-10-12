@@ -33,6 +33,9 @@ import type {
   AddWatchlistEntryData,
   AddWatchlistEntryErrors,
   AddWatchlistEntryResponses,
+  AmendCaseRecordData,
+  AmendCaseRecordErrors,
+  AmendCaseRecordResponses,
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentErrors,
   AnalyzeOpenalephDocumentResponses,
@@ -69,6 +72,9 @@ import type {
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipErrors,
   CreateCanonicalRelationshipResponses,
+  CreateCaseRecordData,
+  CreateCaseRecordErrors,
+  CreateCaseRecordResponses,
   CreateClaimEndpointData,
   CreateClaimEndpointErrors,
   CreateClaimEndpointResponses,
@@ -225,6 +231,9 @@ import type {
   GetBasemapTileData,
   GetBasemapTileErrors,
   GetBasemapTileResponses,
+  GetCaseRecordData,
+  GetCaseRecordErrors,
+  GetCaseRecordResponses,
   GetChecksData,
   GetChecksErrors,
   GetChecksResponses,
@@ -447,6 +456,9 @@ import type {
   ListAssessmentsData,
   ListAssessmentsErrors,
   ListAssessmentsResponses,
+  ListCaseRecordsData,
+  ListCaseRecordsErrors,
+  ListCaseRecordsResponses,
   ListClaimEvidenceEndpointData,
   ListClaimEvidenceEndpointErrors,
   ListClaimEvidenceEndpointResponses,
@@ -573,9 +585,21 @@ import type {
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
+  PatchClaimSuiteData,
+  PatchClaimSuiteErrors,
+  PatchClaimSuiteResponses,
+  PatchEvidenceSuiteData,
+  PatchEvidenceSuiteErrors,
+  PatchEvidenceSuiteResponses,
   PatchInvestigationData,
   PatchInvestigationErrors,
   PatchInvestigationResponses,
+  PatchRelationshipSuiteData,
+  PatchRelationshipSuiteErrors,
+  PatchRelationshipSuiteResponses,
+  PatchSourceSuiteData,
+  PatchSourceSuiteErrors,
+  PatchSourceSuiteResponses,
   PeekAtRecordData,
   PeekAtRecordErrors,
   PeekAtRecordResponses,
@@ -749,6 +773,9 @@ import {
   zAddWatchlistEntryBody,
   zAddWatchlistEntryPath,
   zAddWatchlistEntryResponse,
+  zAmendCaseRecordBody,
+  zAmendCaseRecordPath,
+  zAmendCaseRecordResponse,
   zAnalyzeOpenalephDocumentPath,
   zAnalyzeOpenalephDocumentResponse,
   zAssessStatementBody,
@@ -776,6 +803,9 @@ import {
   zCreateAppUserResponse,
   zCreateCanonicalRelationshipBody,
   zCreateCanonicalRelationshipResponse,
+  zCreateCaseRecordBody,
+  zCreateCaseRecordPath,
+  zCreateCaseRecordResponse,
   zCreateClaimEndpointBody,
   zCreateClaimEndpointResponse,
   zCreateClaimReviewBody,
@@ -894,6 +924,8 @@ import {
   zGetBasemapStatusResponse,
   zGetBasemapTilePath,
   zGetBasemapTileResponse,
+  zGetCaseRecordPath,
+  zGetCaseRecordResponse,
   zGetChecksPath,
   zGetChecksResponse,
   zGetClaimReviewWorkspacePath,
@@ -1053,6 +1085,9 @@ import {
   zListAreasResponse,
   zListAssessmentsPath,
   zListAssessmentsResponse,
+  zListCaseRecordsPath,
+  zListCaseRecordsQuery,
+  zListCaseRecordsResponse,
   zListClaimEvidenceEndpointPath,
   zListClaimEvidenceEndpointResponse,
   zListClaimsPath,
@@ -1146,9 +1181,20 @@ import {
   zMakeLeadFromRedFlagPath,
   zMakeLeadFromRedFlagResponse,
   zOpenalephIntegrationStatusResponse,
+  zPatchClaimSuiteBody,
+  zPatchClaimSuitePath,
+  zPatchClaimSuiteResponse,
+  zPatchEvidenceSuiteBody,
+  zPatchEvidenceSuitePath,
+  zPatchEvidenceSuiteResponse,
   zPatchInvestigationBody,
   zPatchInvestigationPath,
   zPatchInvestigationResponse,
+  zPatchRelationshipSuiteBody,
+  zPatchRelationshipSuitePath,
+  zPatchSourceSuiteBody,
+  zPatchSourceSuitePath,
+  zPatchSourceSuiteResponse,
   zPeekAtRecordPath,
   zPeekAtRecordQuery,
   zPeekAtRecordResponse,
@@ -1707,6 +1753,64 @@ export const capabilities = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Case Record
+ */
+export const getCaseRecord = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaseRecordData, ThrowOnError>,
+): RequestResult<GetCaseRecordResponses, GetCaseRecordErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCaseRecordResponses,
+    GetCaseRecordErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCaseRecordPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCaseRecordResponse.parseAsync(data),
+    url: '/api/case-records/{case_record_id}',
+    ...options,
+  });
+
+/**
+ * Amend Case Record
+ */
+export const amendCaseRecord = <ThrowOnError extends boolean = false>(
+  options: Options<AmendCaseRecordData, ThrowOnError>,
+): RequestResult<
+  AmendCaseRecordResponses,
+  AmendCaseRecordErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    AmendCaseRecordResponses,
+    AmendCaseRecordErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAmendCaseRecordBody,
+          path: zAmendCaseRecordPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAmendCaseRecordResponse.parseAsync(data),
+    url: '/api/case-records/{case_record_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * List Areas
  *
  * Every area of the catalogue, with how many indicators and terms it holds.
@@ -2063,6 +2167,42 @@ export const createClaimReview = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCreateClaimReviewResponse.parseAsync(data),
     url: '/api/claims/{claim_id}/reviews',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Patch Claim Suite
+ *
+ * Classification, likelihood term, confidence level and basis, warrant, assumptions,
+ * limits, Module 02's verdict and corrected wording; written as a review event.
+ */
+export const patchClaimSuite = <ThrowOnError extends boolean = false>(
+  options: Options<PatchClaimSuiteData, ThrowOnError>,
+): RequestResult<
+  PatchClaimSuiteResponses,
+  PatchClaimSuiteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    PatchClaimSuiteResponses,
+    PatchClaimSuiteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPatchClaimSuiteBody,
+          path: zPatchClaimSuitePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPatchClaimSuiteResponse.parseAsync(data),
+    url: '/api/claims/{claim_id}/suite',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -4350,6 +4490,39 @@ export const createEvidenceEndpoint = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Patch Evidence Suite
+ */
+export const patchEvidenceSuite = <ThrowOnError extends boolean = false>(
+  options: Options<PatchEvidenceSuiteData, ThrowOnError>,
+): RequestResult<
+  PatchEvidenceSuiteResponses,
+  PatchEvidenceSuiteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    PatchEvidenceSuiteResponses,
+    PatchEvidenceSuiteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPatchEvidenceSuiteBody,
+          path: zPatchEvidenceSuitePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPatchEvidenceSuiteResponse.parseAsync(data),
+    url: '/api/evidence/{evidence_id}/suite',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Promote External Relationship
  */
 export const promoteExternalRelationship = <
@@ -4970,6 +5143,68 @@ export const investigationPresentationDraft = <
     responseValidator: async (data) =>
       await zInvestigationPresentationDraftResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/presentation-draft',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * List Case Records
+ */
+export const listCaseRecords = <ThrowOnError extends boolean = false>(
+  options: Options<ListCaseRecordsData, ThrowOnError>,
+): RequestResult<
+  ListCaseRecordsResponses,
+  ListCaseRecordsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListCaseRecordsResponses,
+    ListCaseRecordsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListCaseRecordsPath,
+          query: zListCaseRecordsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListCaseRecordsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/case-records',
+    ...options,
+  });
+
+/**
+ * Create Case Record
+ */
+export const createCaseRecord = <ThrowOnError extends boolean = false>(
+  options: Options<CreateCaseRecordData, ThrowOnError>,
+): RequestResult<
+  CreateCaseRecordResponses,
+  CreateCaseRecordErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateCaseRecordResponses,
+    CreateCaseRecordErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateCaseRecordBody,
+          path: zCreateCaseRecordPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateCaseRecordResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/case-records',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -7443,6 +7678,37 @@ export const createLeadFromRelationshipContext = <
   });
 
 /**
+ * Patch Relationship Suite
+ */
+export const patchRelationshipSuite = <ThrowOnError extends boolean = false>(
+  options: Options<PatchRelationshipSuiteData, ThrowOnError>,
+): RequestResult<
+  PatchRelationshipSuiteResponses,
+  PatchRelationshipSuiteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    PatchRelationshipSuiteResponses,
+    PatchRelationshipSuiteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPatchRelationshipSuiteBody,
+          path: zPatchRelationshipSuitePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/relationships/{relationship_id}/suite',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Create Reporting Task Endpoint
  */
 export const createReportingTaskEndpoint = <
@@ -8092,6 +8358,39 @@ export const listSourceEvidenceEndpoint = <
       await zListSourceEvidenceEndpointResponse.parseAsync(data),
     url: '/api/sources/{source_id}/evidence',
     ...options,
+  });
+
+/**
+ * Patch Source Suite
+ */
+export const patchSourceSuite = <ThrowOnError extends boolean = false>(
+  options: Options<PatchSourceSuiteData, ThrowOnError>,
+): RequestResult<
+  PatchSourceSuiteResponses,
+  PatchSourceSuiteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    PatchSourceSuiteResponses,
+    PatchSourceSuiteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPatchSourceSuiteBody,
+          path: zPatchSourceSuitePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPatchSourceSuiteResponse.parseAsync(data),
+    url: '/api/sources/{source_id}/suite',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

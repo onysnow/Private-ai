@@ -29,7 +29,7 @@ def validate_grade(*, evidence_grade: str | None, agreement_grade: str | None) -
 
 def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, rationale: str,
                  evidence_grade: str | None = None, agreement_grade: str | None = None,
-                 override_reason: str | None = None) -> Any:
+                 override_reason: str | None = None, reviewer_type: str = "HUMAN") -> Any:
     """Record a reporter's review: the claim's status, confidence and, when
     given, its grade (both halves together; a review without one keeps the
     grade the claim has). Supported and Confirmed are held to the Done rules
@@ -42,6 +42,9 @@ def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, r
         raise ValueError("Reporter rationale is required for a claim review")
     validate_claim_fields(status=status, confidence=confidence)
     validate_grade(evidence_grade=evidence_grade, agreement_grade=agreement_grade)
+    from app.ai.suite_vocab import REVIEWER_TYPES
+    if reviewer_type not in REVIEWER_TYPES:
+        raise ValueError(f"reviewer_type must be one of: {', '.join(REVIEWER_TYPES)}")
     unmet = require_done(db, claim, status, override_reason)
     new_evidence = evidence_grade if evidence_grade is not None else claim.evidence_grade
     new_agreement = agreement_grade if agreement_grade is not None else claim.agreement_grade
@@ -52,6 +55,7 @@ def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, r
         from_agreement_grade=claim.agreement_grade, to_agreement_grade=new_agreement,
         override_reason=(override_reason or "").strip() or None if unmet else None,
         unmet_rules=[r["key"] for r in unmet["rules"] if r["state"] == "not_met"] if unmet else None,
+        reviewer_type=reviewer_type,
     )
     claim.status = status
     claim.confidence = confidence

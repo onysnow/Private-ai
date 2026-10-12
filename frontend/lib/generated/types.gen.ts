@@ -1614,6 +1614,90 @@ export type CaseNetworkCountsOut = {
 };
 
 /**
+ * CaseRecordAmend
+ */
+export type CaseRecordAmend = {
+  /**
+   * Body
+   */
+  body: {
+    [key: string]: unknown;
+  };
+};
+
+/**
+ * CaseRecordCreate
+ */
+export type CaseRecordCreate = {
+  /**
+   * Body
+   */
+  body: {
+    [key: string]: unknown;
+  };
+  /**
+   * Kind
+   */
+  kind: 'GAP' | 'ROR' | 'HYP' | 'CFLT' | 'RLOG' | 'ESRC' | 'EPIT' | 'CAPT';
+};
+
+/**
+ * CaseRecordOut
+ *
+ * One of the suite's own records for a case, with its earlier bodies.
+ */
+export type CaseRecordOut = {
+  /**
+   * Body
+   */
+  body: {
+    [key: string]: unknown;
+  };
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by?: string | null;
+  /**
+   * History
+   */
+  history: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Kind
+   */
+  kind: 'GAP' | 'ROR' | 'HYP' | 'CFLT' | 'RLOG' | 'ESRC' | 'EPIT' | 'CAPT';
+  /**
+   * Kind Name
+   */
+  kind_name: string;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+};
+
+/**
  * CaseSinceOut
  */
 export type CaseSinceOut = {
@@ -2646,9 +2730,33 @@ export type ClaimOut = {
    */
   agreement_grade?: 'low' | 'medium' | 'high' | null;
   /**
+   * Assumptions
+   */
+  assumptions?: Array<string> | null;
+  /**
+   * Classification
+   */
+  classification?: string | null;
+  /**
    * Confidence
    */
   confidence: number;
+  /**
+   * Confidence Basis
+   */
+  confidence_basis?: string | null;
+  /**
+   * Confidence Level
+   */
+  confidence_level?: string | null;
+  /**
+   * Confidence Term
+   */
+  confidence_term?: string | null;
+  /**
+   * Corrected Wording
+   */
+  corrected_wording?: string | null;
   /**
    * Created At
    *
@@ -2668,6 +2776,10 @@ export type ClaimOut = {
    */
   investigation_id: string;
   /**
+   * Limitations
+   */
+  limitations?: Array<string> | null;
+  /**
    * Status
    */
   status: string;
@@ -2675,6 +2787,14 @@ export type ClaimOut = {
    * Text
    */
   text: string;
+  /**
+   * Verification Verdict
+   */
+  verification_verdict?: string | null;
+  /**
+   * Warrant
+   */
+  warrant?: string | null;
 };
 
 /**
@@ -2719,6 +2839,16 @@ export type ClaimReviewEventOut = {
    * Rationale
    */
   rationale: string;
+  /**
+   * Reviewer Type
+   */
+  reviewer_type?: string;
+  /**
+   * Suite Changes
+   */
+  suite_changes?: {
+    [key: string]: Array<unknown>;
+  } | null;
   /**
    * To Agreement Grade
    */
@@ -2766,6 +2896,10 @@ export type ClaimReviewRequest = {
    */
   rationale: string;
   /**
+   * Reviewer Type
+   */
+  reviewer_type?: string;
+  /**
    * Status
    */
   status: string;
@@ -2806,6 +2940,58 @@ export type ClaimReviewWorkspaceOut = {
    */
   source_count?: number;
   stance_counts: StanceCountsOut;
+};
+
+/**
+ * ClaimSuiteFields
+ *
+ * Set any of a claim's suite fields; each change is a review event with its reason.
+ */
+export type ClaimSuiteFields = {
+  /**
+   * Assumptions
+   */
+  assumptions?: Array<string> | null;
+  /**
+   * Classification
+   */
+  classification?: string | null;
+  /**
+   * Confidence Basis
+   */
+  confidence_basis?: string | null;
+  /**
+   * Confidence Level
+   */
+  confidence_level?: string | null;
+  /**
+   * Confidence Term
+   */
+  confidence_term?: string | null;
+  /**
+   * Corrected Wording
+   */
+  corrected_wording?: string | null;
+  /**
+   * Limitations
+   */
+  limitations?: Array<string> | null;
+  /**
+   * Rationale
+   */
+  rationale: string;
+  /**
+   * Reviewer Type
+   */
+  reviewer_type?: string;
+  /**
+   * Verification Verdict
+   */
+  verification_verdict?: string | null;
+  /**
+   * Warrant
+   */
+  warrant?: string | null;
 };
 
 /**
@@ -6444,6 +6630,10 @@ export type EntityRelationshipOut = {
    */
   direction: 'outgoing' | 'incoming';
   /**
+   * Evidence Status
+   */
+  evidence_status?: string | null;
+  /**
    * Ftm Id
    */
   ftm_id?: string | null;
@@ -6708,17 +6898,37 @@ export type EvidenceCreate = {
  */
 export type EvidenceOut = {
   /**
+   * Authenticity Status
+   */
+  authenticity_status?: string | null;
+  /**
    * Captured On
    */
   captured_on?: string | null;
+  /**
+   * Created On
+   */
+  created_on?: string | null;
   /**
    * Document Id
    */
   document_id?: string | null;
   /**
+   * Event On
+   */
+  event_on?: string | null;
+  /**
    * Id
    */
   id: string;
+  /**
+   * Issuer Or Author
+   */
+  issuer_or_author?: string | null;
+  /**
+   * Limitations
+   */
+  limitations?: Array<string> | null;
   /**
    * Locator
    */
@@ -6728,9 +6938,21 @@ export type EvidenceOut = {
    */
   notes?: string | null;
   /**
+   * Published On
+   */
+  published_on?: string | null;
+  /**
    * Quote
    */
   quote?: string | null;
+  /**
+   * Restates Evidence Id
+   */
+  restates_evidence_id?: string | null;
+  /**
+   * Retrieved On
+   */
+  retrieved_on?: string | null;
   /**
    * Source Id
    */
@@ -6767,6 +6989,44 @@ export type EvidenceSourceOut = {
    * Url
    */
   url?: string | null;
+};
+
+/**
+ * EvidenceSuiteFields
+ */
+export type EvidenceSuiteFields = {
+  /**
+   * Authenticity Status
+   */
+  authenticity_status?: string | null;
+  /**
+   * Created On
+   */
+  created_on?: string | null;
+  /**
+   * Event On
+   */
+  event_on?: string | null;
+  /**
+   * Issuer Or Author
+   */
+  issuer_or_author?: string | null;
+  /**
+   * Limitations
+   */
+  limitations?: Array<string> | null;
+  /**
+   * Published On
+   */
+  published_on?: string | null;
+  /**
+   * Restates Evidence Id
+   */
+  restates_evidence_id?: string | null;
+  /**
+   * Retrieved On
+   */
+  retrieved_on?: string | null;
 };
 
 /**
@@ -8965,6 +9225,10 @@ export type LeadOut = {
    */
   detail?: string | null;
   /**
+   * Gathering Outcome
+   */
+  gathering_outcome?: string | null;
+  /**
    * History
    */
   history: Array<LeadWorkflowEventOut>;
@@ -9062,6 +9326,10 @@ export type LeadRowOut = {
    */
   detail?: string | null;
   /**
+   * Gathering Outcome
+   */
+  gathering_outcome?: string | null;
+  /**
    * Id
    */
   id: string;
@@ -9143,6 +9411,10 @@ export type LeadUpdate = {
    * Detail
    */
   detail?: string | null;
+  /**
+   * Gathering Outcome
+   */
+  gathering_outcome?: string | null;
   /**
    * Next Action
    */
@@ -11925,6 +12197,10 @@ export type RelationshipEvidenceReviewOut = {
    */
   relationship_edge_id: string;
   /**
+   * Reviewer Type
+   */
+  reviewer_type?: string;
+  /**
    * Stance
    */
   stance: string;
@@ -11938,6 +12214,10 @@ export type RelationshipEvidenceReviewRequest = {
    * Rationale
    */
   rationale: string;
+  /**
+   * Reviewer Type
+   */
+  reviewer_type?: string;
   /**
    * Stance
    */
@@ -11985,6 +12265,10 @@ export type RelationshipOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
+  /**
+   * Evidence Status
+   */
+  evidence_status?: string | null;
   /**
    * Ftm Id
    */
@@ -12134,6 +12418,16 @@ export type RelationshipSchemasOut = {
   schemas: {
     [key: string]: RelationshipSchemaOut;
   };
+};
+
+/**
+ * RelationshipSuiteFields
+ */
+export type RelationshipSuiteFields = {
+  /**
+   * Evidence Status
+   */
+  evidence_status?: string | null;
 };
 
 /**
@@ -13112,11 +13406,19 @@ export type SourceOut = {
    */
   investigation_id: string;
   /**
+   * Issuer Or Author
+   */
+  issuer_or_author?: string | null;
+  /**
    * Metadata Json
    */
   metadata_json?: {
     [key: string]: unknown;
   } | null;
+  /**
+   * Source Tier
+   */
+  source_tier?: string | null;
   /**
    * Source Type
    */
@@ -13129,6 +13431,20 @@ export type SourceOut = {
    * Url
    */
   url?: string | null;
+};
+
+/**
+ * SourceSuiteFields
+ */
+export type SourceSuiteFields = {
+  /**
+   * Issuer Or Author
+   */
+  issuer_or_author?: string | null;
+  /**
+   * Source Tier
+   */
+  source_tier?: string | null;
 };
 
 /**
@@ -13418,6 +13734,10 @@ export type SuiteCoverageCountsOut = {
    */
   app_lacks: number;
   /**
+   * App Recorded
+   */
+  app_recorded?: number;
+  /**
    * Close
    */
   close: number;
@@ -13520,6 +13840,10 @@ export type SuiteRequirementOut = {
    * Found
    */
   found: boolean | null;
+  /**
+   * Recorded In
+   */
+  recorded_in?: string | null;
   /**
    * Suite Term
    */
@@ -16124,6 +16448,77 @@ export type CapabilitiesResponses = {
 export type CapabilitiesResponse =
   CapabilitiesResponses[keyof CapabilitiesResponses];
 
+export type GetCaseRecordData = {
+  body?: never;
+  path: {
+    /**
+     * Case Record Id
+     */
+    case_record_id: string;
+  };
+  query?: never;
+  url: '/api/case-records/{case_record_id}';
+};
+
+export type GetCaseRecordErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaseRecordError = GetCaseRecordErrors[keyof GetCaseRecordErrors];
+
+export type GetCaseRecordResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseRecordOut;
+};
+
+export type GetCaseRecordResponse =
+  GetCaseRecordResponses[keyof GetCaseRecordResponses];
+
+export type AmendCaseRecordData = {
+  body: CaseRecordAmend;
+  path: {
+    /**
+     * Case Record Id
+     */
+    case_record_id: string;
+  };
+  query?: never;
+  url: '/api/case-records/{case_record_id}';
+};
+
+export type AmendCaseRecordErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AmendCaseRecordError =
+  AmendCaseRecordErrors[keyof AmendCaseRecordErrors];
+
+export type AmendCaseRecordResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseRecordOut;
+};
+
+export type AmendCaseRecordResponse =
+  AmendCaseRecordResponses[keyof AmendCaseRecordResponses];
+
 export type ListAreasData = {
   body?: never;
   path?: never;
@@ -16553,6 +16948,42 @@ export type CreateClaimReviewResponses = {
 
 export type CreateClaimReviewResponse =
   CreateClaimReviewResponses[keyof CreateClaimReviewResponses];
+
+export type PatchClaimSuiteData = {
+  body: ClaimSuiteFields;
+  path: {
+    /**
+     * Claim Id
+     */
+    claim_id: string;
+  };
+  query?: never;
+  url: '/api/claims/{claim_id}/suite';
+};
+
+export type PatchClaimSuiteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PatchClaimSuiteError =
+  PatchClaimSuiteErrors[keyof PatchClaimSuiteErrors];
+
+export type PatchClaimSuiteResponses = {
+  /**
+   * Successful Response
+   */
+  200: ClaimOut;
+};
+
+export type PatchClaimSuiteResponse =
+  PatchClaimSuiteResponses[keyof PatchClaimSuiteResponses];
 
 export type RemoveCollectionData = {
   body?: never;
@@ -19299,6 +19730,42 @@ export type CreateEvidenceEndpointResponses = {
 export type CreateEvidenceEndpointResponse =
   CreateEvidenceEndpointResponses[keyof CreateEvidenceEndpointResponses];
 
+export type PatchEvidenceSuiteData = {
+  body: EvidenceSuiteFields;
+  path: {
+    /**
+     * Evidence Id
+     */
+    evidence_id: string;
+  };
+  query?: never;
+  url: '/api/evidence/{evidence_id}/suite';
+};
+
+export type PatchEvidenceSuiteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PatchEvidenceSuiteError =
+  PatchEvidenceSuiteErrors[keyof PatchEvidenceSuiteErrors];
+
+export type PatchEvidenceSuiteResponses = {
+  /**
+   * Successful Response
+   */
+  200: EvidenceOut;
+};
+
+export type PatchEvidenceSuiteResponse =
+  PatchEvidenceSuiteResponses[keyof PatchEvidenceSuiteResponses];
+
 export type PromoteExternalRelationshipData = {
   body?: never;
   path: {
@@ -20020,6 +20487,85 @@ export type InvestigationPresentationDraftResponses = {
 
 export type InvestigationPresentationDraftResponse =
   InvestigationPresentationDraftResponses[keyof InvestigationPresentationDraftResponses];
+
+export type ListCaseRecordsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Kind
+     */
+    kind?: string | null;
+  };
+  url: '/api/investigations/{investigation_id}/case-records';
+};
+
+export type ListCaseRecordsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListCaseRecordsError =
+  ListCaseRecordsErrors[keyof ListCaseRecordsErrors];
+
+export type ListCaseRecordsResponses = {
+  /**
+   * Response List Case Records
+   *
+   * Successful Response
+   */
+  200: Array<CaseRecordOut>;
+};
+
+export type ListCaseRecordsResponse =
+  ListCaseRecordsResponses[keyof ListCaseRecordsResponses];
+
+export type CreateCaseRecordData = {
+  body: CaseRecordCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/case-records';
+};
+
+export type CreateCaseRecordErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateCaseRecordError =
+  CreateCaseRecordErrors[keyof CreateCaseRecordErrors];
+
+export type CreateCaseRecordResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseRecordOut;
+};
+
+export type CreateCaseRecordResponse =
+  CreateCaseRecordResponses[keyof CreateCaseRecordResponses];
 
 export type GetChecksData = {
   body?: never;
@@ -23327,6 +23873,41 @@ export type CreateLeadFromRelationshipContextResponses = {
 export type CreateLeadFromRelationshipContextResponse =
   CreateLeadFromRelationshipContextResponses[keyof CreateLeadFromRelationshipContextResponses];
 
+export type PatchRelationshipSuiteData = {
+  body: RelationshipSuiteFields;
+  path: {
+    /**
+     * Relationship Id
+     */
+    relationship_id: string;
+  };
+  query?: never;
+  url: '/api/relationships/{relationship_id}/suite';
+};
+
+export type PatchRelationshipSuiteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PatchRelationshipSuiteError =
+  PatchRelationshipSuiteErrors[keyof PatchRelationshipSuiteErrors];
+
+export type PatchRelationshipSuiteResponses = {
+  /**
+   * Response Patch Relationship Suite
+   *
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type CreateReportingTaskEndpointData = {
   body: ReportingTaskCreate;
   path?: never;
@@ -24132,6 +24713,42 @@ export type ListSourceEvidenceEndpointResponses = {
 
 export type ListSourceEvidenceEndpointResponse =
   ListSourceEvidenceEndpointResponses[keyof ListSourceEvidenceEndpointResponses];
+
+export type PatchSourceSuiteData = {
+  body: SourceSuiteFields;
+  path: {
+    /**
+     * Source Id
+     */
+    source_id: string;
+  };
+  query?: never;
+  url: '/api/sources/{source_id}/suite';
+};
+
+export type PatchSourceSuiteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PatchSourceSuiteError =
+  PatchSourceSuiteErrors[keyof PatchSourceSuiteErrors];
+
+export type PatchSourceSuiteResponses = {
+  /**
+   * Successful Response
+   */
+  200: SourceOut;
+};
+
+export type PatchSourceSuiteResponse =
+  PatchSourceSuiteResponses[keyof PatchSourceSuiteResponses];
 
 export type PromoteStatementAssessmentData = {
   body: StatementPromotionRequest;

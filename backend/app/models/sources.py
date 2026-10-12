@@ -19,6 +19,10 @@ class Source(Base):
     url: Mapped[str | None] = mapped_column(Text, nullable=True)
     source_type: Mapped[str] = mapped_column(String(64), default="web")
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict)
+    # The Authority System Suite's source tier, A (strongest) to F, set by a person
+    # (app/ai/suite_vocab.py); None until assessed. Read by the Done rules.
+    source_tier: Mapped[str | None] = mapped_column(String(1), nullable=True)
+    issuer_or_author: Mapped[str | None] = mapped_column(String(512), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 
@@ -34,3 +38,15 @@ class Evidence(Base):
     # states it (YYYY, YYYY-MM or YYYY-MM-DD). The quote is its caption.
     document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
     captured_on: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    # The suite's Evidence record (TAS OUTPUT_SCHEMAS): who issued it, whether it is
+    # authentic (kept apart from whether it is true), the record it restates (a copy
+    # counts as one source with its original), the dates the Standard keeps apart
+    # (made, the event, published, retrieved: YYYY, YYYY-MM or YYYY-MM-DD) and its limits.
+    issuer_or_author: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    authenticity_status: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    restates_evidence_id: Mapped[str | None] = mapped_column(ForeignKey("evidence.id"), nullable=True, index=True)
+    created_on: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    event_on: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    published_on: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    retrieved_on: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    limitations: Mapped[list | None] = mapped_column(JSON, nullable=True)

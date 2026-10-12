@@ -9,7 +9,12 @@ written reason, kept on the review event; an unknown never blocks, it is shown.
 
 Confirmed adds independence: two supporting sources from different origins, or
 one primary official record (a source captured as a public record: the
-Authority System Suite's Tier A, the only tier that can carry a fact alone)."""
+Authority System Suite's Tier A, the only tier that can carry a fact alone).
+
+When a person has set a source's suite tier it decides: E and F are leads only, A
+carries a fact alone, and only A, B and D count as independent origins (C never
+does). Evidence that restates another item counts as its original's origin, so a
+repeat is not a second source. A source with no tier falls back to its type."""
 
 from __future__ import annotations
 
@@ -23,6 +28,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.domain import Claim, ClaimEvidenceLink, Document, DocumentChunk, Evidence, Source
+from app.services.suite_fields import original_of
 
 DONE_STATUSES = {"supported", "confirmed"}
 # Every rule's key, in the order shown; "independent" is Confirmed's alone.
@@ -30,6 +36,19 @@ DONE_RULES = ("supporting", "says_it", "locator", "file", "contradictions", "not
 # Sources the suite keeps as leads only (Tier E/F): they never carry a claim alone.
 LEADS_ONLY = {"social"}
 PRIMARY_OFFICIAL = {"public_record"}
+INDEPENDENT_TIERS = {"A", "B", "D"}
+
+
+def _leads_only(src: Source) -> bool:
+    return src.source_tier in {"E", "F"} if src.source_tier else src.source_type in LEADS_ONLY
+
+
+def _official(src: Source) -> bool:
+    return src.source_tier == "A" if src.source_tier else src.source_type in PRIMARY_OFFICIAL
+
+
+def _counts_for_independence(src: Source) -> bool:
+    return src.source_tier in INDEPENDENT_TIERS if src.source_tier else src.source_type not in LEADS_ONLY
 
 
 def _norm(text: str) -> str:
@@ -137,14 +156,18 @@ def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict
          f"{len(unanswered)} contradicting item{'s' if len(unanswered) != 1 else ''} without an answer; answer it, or the claim is Disputed."
          if unanswered else (f"{len(contradicting)} answered" if contradicting else "None linked."))
 
-    strong = [src for _, src in supporting if src is not None and src.source_type not in LEADS_ONLY]
+    strong = [src for _, src in supporting if src is not None and not _leads_only(src)]
     rule("not_leads_only", "Not resting on leads-only sources alone", "met" if strong else "not_met",
          "At least one supporting source is above the leads-only tier." if strong
          else "Social posts and anonymous tips stay leads until something else shows the same thing.")
 
     if target == "confirmed":
-        origins = {_origin(src) for _, src in supporting if src is not None and src.source_type not in LEADS_ONLY}
-        official = any(src is not None and src.source_type in PRIMARY_OFFICIAL for _, src in supporting)
+        origins = set()
+        for ev, _ in supporting:
+            src = db.get(Source, original_of(db, ev).source_id)
+            if src is not None and _counts_for_independence(src):
+                origins.add(_origin(src))
+        official = any(src is not None and _official(src) for _, src in supporting)
         rule("independent", "Two independent sources, or one primary official record", "met" if (len(origins) >= 2 or official) else "not_met",
              "A public record supports it." if official else (f"{len(origins)} separate origin{'s' if len(origins) != 1 else ''}."))
 

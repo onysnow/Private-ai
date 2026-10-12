@@ -207,7 +207,8 @@ def relationship_evidence_attachments(db: Session, edge: RelationshipEdge) -> li
 
 RELATIONSHIP_EVIDENCE_STANCES = {"supports", "contradicts", "context", "superseded", "unresolved"}
 
-def review_relationship_evidence(db: Session, edge: RelationshipEdge, *, evidence_id: str, stance: str, rationale: str) -> RelationshipEvidenceReviewEvent:
+def review_relationship_evidence(db: Session, edge: RelationshipEdge, *, evidence_id: str, stance: str, rationale: str,
+                                 reviewer_type: str = "HUMAN") -> RelationshipEvidenceReviewEvent:
     if stance not in RELATIONSHIP_EVIDENCE_STANCES:
         raise ValueError(f"Unsupported relationship evidence stance: {stance}")
     if not rationale.strip():
@@ -221,13 +222,17 @@ def review_relationship_evidence(db: Session, edge: RelationshipEdge, *, evidenc
     attached = db.scalar(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.relationship_edge_id == edge.id, RelationshipEvidenceAttachment.evidence_id == evidence_id))
     if attached is None:
         raise ValueError("Evidence is not directly attached to this relationship")
-    event = RelationshipEvidenceReviewEvent(relationship_edge_id=edge.id, evidence_id=evidence_id, stance=stance, rationale=rationale.strip())
+    from app.ai.suite_vocab import REVIEWER_TYPES
+    if reviewer_type not in REVIEWER_TYPES:
+        raise ValueError(f"reviewer_type must be one of: {', '.join(REVIEWER_TYPES)}")
+    event = RelationshipEvidenceReviewEvent(relationship_edge_id=edge.id, evidence_id=evidence_id, stance=stance, rationale=rationale.strip(),
+                                            reviewer_type=reviewer_type)
     db.add(event); db.commit(); db.refresh(event)
     return event
 
 def relationship_evidence_review_history(db: Session, edge: RelationshipEdge) -> list[dict]:
     rows = db.scalars(select(RelationshipEvidenceReviewEvent).where(RelationshipEvidenceReviewEvent.relationship_edge_id == edge.id).order_by(RelationshipEvidenceReviewEvent.created_at, RelationshipEvidenceReviewEvent.id)).all()
-    return [{"id": r.id, "relationship_edge_id": r.relationship_edge_id, "evidence_id": r.evidence_id, "stance": r.stance, "rationale": r.rationale, "created_at": r.created_at} for r in rows]
+    return [{"id": r.id, "relationship_edge_id": r.relationship_edge_id, "evidence_id": r.evidence_id, "stance": r.stance, "rationale": r.rationale, "reviewer_type": r.reviewer_type, "created_at": r.created_at} for r in rows]
 
 def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
     source = db.get(Entity, edge.source_entity_id)
@@ -304,6 +309,7 @@ def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
         "relationship_entity_id": edge.relationship_entity_id,
         "ftm_id": rel.ftm_id if rel else None,
         "schema": edge.schema,
+        "evidence_status": edge.evidence_status,
         "source_prop": edge.source_prop,
         "target_prop": edge.target_prop,
         "source": None if source is None else {

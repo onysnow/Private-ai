@@ -24,6 +24,19 @@ class Claim(Base):
     # None until a review grades the claim.
     evidence_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
     agreement_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    # The suite's Claim record (app/ai/suite_vocab.py): which of the eight kinds of
+    # statement it is, the likelihood word carried across systems (never a bare
+    # number), why it is that sure, why the evidence bears on it, what it assumes,
+    # its limits, and Module 02's verdict with wording that does not exceed the evidence.
+    classification: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    confidence_term: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    confidence_level: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    confidence_basis: Mapped[str | None] = mapped_column(Text, nullable=True)
+    warrant: Mapped[str | None] = mapped_column(Text, nullable=True)
+    assumptions: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    limitations: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    verification_verdict: Mapped[str | None] = mapped_column(String(48), nullable=True)
+    corrected_wording: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 
@@ -56,4 +69,9 @@ class ClaimReviewEvent(Base):
     # the reporter's written reason, and which rules were not met at the time.
     override_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     unmet_rules: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # Who reviewed (the suite's reviewer_type): a person, legal counsel, an AI-assisted
+    # step or the app itself. A review from the API is a person's unless it says otherwise.
+    reviewer_type: Mapped[str] = mapped_column(String(16), default="HUMAN")
+    # Suite fields a review changed: {field: [from, to]}.
+    suite_changes: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

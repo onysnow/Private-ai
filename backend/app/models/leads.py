@@ -20,6 +20,9 @@ class Lead(Base):
     provider: Mapped[str | None] = mapped_column(String(128), nullable=True)
     provider_record_id: Mapped[str | None] = mapped_column(String(512), nullable=True)
     status: Mapped[str] = mapped_column(String(64), default="unreviewed")
+    # What gathering got (the suite's EGS outcome): obtained, refused, not held, no
+    # reply or unable to obtain. What was not obtained is itself a finding.
+    gathering_outcome: Mapped[str | None] = mapped_column(String(24), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

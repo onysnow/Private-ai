@@ -677,6 +677,47 @@ export const zCaseNetworkCountsOut = z.object({
 });
 
 /**
+ * CaseRecordAmend
+ */
+export const zCaseRecordAmend = z.object({
+  body: z.record(z.unknown()),
+});
+
+/**
+ * CaseRecordCreate
+ */
+export const zCaseRecordCreate = z.object({
+  body: z.record(z.unknown()),
+  kind: z.enum(['GAP', 'ROR', 'HYP', 'CFLT', 'RLOG', 'ESRC', 'EPIT', 'CAPT']),
+});
+
+/**
+ * CaseRecordOut
+ *
+ * One of the suite's own records for a case, with its earlier bodies.
+ */
+export const zCaseRecordOut = z.object({
+  body: z.record(z.unknown()),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullish(),
+  history: z.array(z.record(z.unknown())),
+  id: z.string(),
+  investigation_id: z.string(),
+  kind: z.enum(['GAP', 'ROR', 'HYP', 'CFLT', 'RLOG', 'ESRC', 'EPIT', 'CAPT']),
+  kind_name: z.string(),
+  record_id: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
  * CaseSinceOut
  */
 export const zCaseSinceOut = z.object({
@@ -1035,7 +1076,13 @@ export const zClaimEvidenceLinkOut = z.object({
  */
 export const zClaimOut = z.object({
   agreement_grade: z.enum(['low', 'medium', 'high']).nullish(),
+  assumptions: z.array(z.string()).nullish(),
+  classification: z.string().nullish(),
   confidence: z.number(),
+  confidence_basis: z.string().nullish(),
+  confidence_level: z.string().nullish(),
+  confidence_term: z.string().nullish(),
+  corrected_wording: z.string().nullish(),
   created_at: z
     .string()
     .regex(
@@ -1044,8 +1091,11 @@ export const zClaimOut = z.object({
   evidence_grade: z.enum(['limited', 'medium', 'robust']).nullish(),
   id: z.string(),
   investigation_id: z.string(),
+  limitations: z.array(z.string()).nullish(),
   status: z.string(),
   text: z.string(),
+  verification_verdict: z.string().nullish(),
+  warrant: z.string().nullish(),
 });
 
 /**
@@ -1065,6 +1115,8 @@ export const zClaimReviewEventOut = z.object({
   id: z.string(),
   override_reason: z.string().nullish(),
   rationale: z.string(),
+  reviewer_type: z.string().optional().default('HUMAN'),
+  suite_changes: z.record(z.array(z.unknown())).nullish(),
   to_agreement_grade: z.string().nullish(),
   to_confidence: z.number(),
   to_evidence_grade: z.string().nullish(),
@@ -1081,7 +1133,27 @@ export const zClaimReviewRequest = z.object({
   evidence_grade: z.enum(['limited', 'medium', 'robust']).nullish(),
   override_reason: z.string().max(2000).nullish(),
   rationale: z.string(),
+  reviewer_type: z.string().optional().default('HUMAN'),
   status: z.string(),
+});
+
+/**
+ * ClaimSuiteFields
+ *
+ * Set any of a claim's suite fields; each change is a review event with its reason.
+ */
+export const zClaimSuiteFields = z.object({
+  assumptions: z.array(z.string()).nullish(),
+  classification: z.string().nullish(),
+  confidence_basis: z.string().nullish(),
+  confidence_level: z.string().nullish(),
+  confidence_term: z.string().nullish(),
+  corrected_wording: z.string().nullish(),
+  limitations: z.array(z.string()).nullish(),
+  rationale: z.string(),
+  reviewer_type: z.string().optional().default('HUMAN'),
+  verification_verdict: z.string().nullish(),
+  warrant: z.string().nullish(),
 });
 
 /**
@@ -2580,12 +2652,20 @@ export const zEvidenceCreate = z.object({
  * EvidenceOut
  */
 export const zEvidenceOut = z.object({
+  authenticity_status: z.string().nullish(),
   captured_on: z.string().nullish(),
+  created_on: z.string().nullish(),
   document_id: z.string().nullish(),
+  event_on: z.string().nullish(),
   id: z.string(),
+  issuer_or_author: z.string().nullish(),
+  limitations: z.array(z.string()).nullish(),
   locator: z.string().nullish(),
   notes: z.string().nullish(),
+  published_on: z.string().nullish(),
   quote: z.string().nullish(),
+  restates_evidence_id: z.string().nullish(),
+  retrieved_on: z.string().nullish(),
   source_id: z.string(),
 });
 
@@ -2597,6 +2677,20 @@ export const zEvidenceSourceOut = z.object({
   source_type: z.string().nullish(),
   title: z.string(),
   url: z.string().nullish(),
+});
+
+/**
+ * EvidenceSuiteFields
+ */
+export const zEvidenceSuiteFields = z.object({
+  authenticity_status: z.string().nullish(),
+  created_on: z.string().nullish(),
+  event_on: z.string().nullish(),
+  issuer_or_author: z.string().nullish(),
+  limitations: z.array(z.string()).nullish(),
+  published_on: z.string().nullish(),
+  restates_evidence_id: z.string().nullish(),
+  retrieved_on: z.string().nullish(),
 });
 
 /**
@@ -3624,6 +3718,7 @@ export const zLeadRowOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
   detail: z.string().nullish(),
+  gathering_outcome: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
   provider: z.string().nullish(),
@@ -3645,6 +3740,7 @@ export const zDossierLeadOut = z.object({
  */
 export const zLeadUpdate = z.object({
   detail: z.string().nullish(),
+  gathering_outcome: z.string().nullish(),
   next_action: z.string().nullish(),
   note: z.string().nullish(),
   owner: z.string().nullish(),
@@ -5028,6 +5124,7 @@ export const zRelationshipEvidenceReviewOut = z.object({
   id: z.string(),
   rationale: z.string().nullish(),
   relationship_edge_id: z.string(),
+  reviewer_type: z.string().optional().default('HUMAN'),
   stance: z.string(),
 });
 
@@ -5074,6 +5171,7 @@ export const zRelationshipEvidenceAttachmentOut = z.object({
  */
 export const zRelationshipEvidenceReviewRequest = z.object({
   rationale: z.string(),
+  reviewer_type: z.string().optional().default('HUMAN'),
   stance: z.string(),
 });
 
@@ -5139,6 +5237,13 @@ export const zRelationshipSchemaOut = z.object({
  */
 export const zRelationshipSchemasOut = z.object({
   schemas: z.record(zRelationshipSchemaOut),
+});
+
+/**
+ * RelationshipSuiteFields
+ */
+export const zRelationshipSuiteFields = z.object({
+  evidence_status: z.string().nullish(),
 });
 
 /**
@@ -5518,7 +5623,9 @@ export const zSourceOut = z.object({
     ),
   id: z.string(),
   investigation_id: z.string(),
+  issuer_or_author: z.string().nullish(),
   metadata_json: z.record(z.unknown()).nullish(),
+  source_tier: z.string().nullish(),
   source_type: z.string(),
   title: z.string(),
   url: z.string().nullish(),
@@ -5561,6 +5668,14 @@ export const zDossierEvidenceOut = z.object({
 export const zEvidencePoolRow = z.object({
   evidence: zEvidenceOut,
   source: zSourceOut,
+});
+
+/**
+ * SourceSuiteFields
+ */
+export const zSourceSuiteFields = z.object({
+  issuer_or_author: z.string().nullish(),
+  source_tier: z.string().nullish(),
 });
 
 /**
@@ -5707,6 +5822,7 @@ export const zEntityRelationshipOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
   direction: z.enum(['outgoing', 'incoming']),
+  evidence_status: z.string().nullish(),
   ftm_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
@@ -5743,6 +5859,7 @@ export const zRelationshipOut = z.object({
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+  evidence_status: z.string().nullish(),
   ftm_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
@@ -5870,6 +5987,7 @@ export const zStyleWarningOut = z.object({
  */
 export const zSuiteCoverageCountsOut = z.object({
   app_lacks: z.number().int(),
+  app_recorded: z.number().int().optional().default(0),
   close: z.number().int(),
   drifted: z.number().int(),
   none: z.number().int(),
@@ -5897,6 +6015,7 @@ export const zSuiteMappingOut = z.object({
 export const zSuiteRequirementOut = z.object({
   file: z.string(),
   found: z.boolean().nullable(),
+  recorded_in: z.string().nullish(),
   suite_term: z.string(),
   what: z.string(),
   why: z.string(),
@@ -6191,6 +6310,7 @@ export const zLeadOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
   detail: z.string().nullish(),
+  gathering_outcome: z.string().nullish(),
   history: z.array(zLeadWorkflowEventOut),
   id: z.string(),
   investigation_id: z.string(),
@@ -7534,6 +7654,26 @@ export const zGetBasemapTileResponse = z.string();
  */
 export const zCapabilitiesResponse = zCapabilitiesOut;
 
+export const zGetCaseRecordPath = z.object({
+  case_record_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCaseRecordResponse = zCaseRecordOut;
+
+export const zAmendCaseRecordBody = zCaseRecordAmend;
+
+export const zAmendCaseRecordPath = z.object({
+  case_record_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAmendCaseRecordResponse = zCaseRecordOut;
+
 /**
  * Response List Areas
  *
@@ -7655,6 +7795,17 @@ export const zCreateClaimReviewPath = z.object({
  * Successful Response
  */
 export const zCreateClaimReviewResponse = zClaimReviewResultOut;
+
+export const zPatchClaimSuiteBody = zClaimSuiteFields;
+
+export const zPatchClaimSuitePath = z.object({
+  claim_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPatchClaimSuiteResponse = zClaimOut;
 
 export const zRemoveCollectionPath = z.object({
   collection_id: z.string(),
@@ -8445,6 +8596,17 @@ export const zCreateEvidenceEndpointBody = zEvidenceCreate;
  */
 export const zCreateEvidenceEndpointResponse = zEvidenceOut;
 
+export const zPatchEvidenceSuiteBody = zEvidenceSuiteFields;
+
+export const zPatchEvidenceSuitePath = z.object({
+  evidence_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPatchEvidenceSuiteResponse = zEvidenceOut;
+
 export const zPromoteExternalRelationshipPath = z.object({
   review_id: z.string(),
 });
@@ -8630,6 +8792,32 @@ export const zInvestigationPresentationDraftPath = z.object({
  * Successful Response
  */
 export const zInvestigationPresentationDraftResponse = zAiReasoningRunOut;
+
+export const zListCaseRecordsPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zListCaseRecordsQuery = z.object({
+  kind: z.string().nullish(),
+});
+
+/**
+ * Response List Case Records
+ *
+ * Successful Response
+ */
+export const zListCaseRecordsResponse = z.array(zCaseRecordOut);
+
+export const zCreateCaseRecordBody = zCaseRecordCreate;
+
+export const zCreateCaseRecordPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateCaseRecordResponse = zCaseRecordOut;
 
 export const zGetChecksPath = z.object({
   investigation_id: z.string(),
@@ -9639,6 +9827,12 @@ export const zCreateLeadFromRelationshipContextPath = z.object({
  */
 export const zCreateLeadFromRelationshipContextResponse = zLeadOut;
 
+export const zPatchRelationshipSuiteBody = zRelationshipSuiteFields;
+
+export const zPatchRelationshipSuitePath = z.object({
+  relationship_id: z.string(),
+});
+
 export const zCreateReportingTaskEndpointBody = zReportingTaskCreate;
 
 /**
@@ -9852,6 +10046,17 @@ export const zListSourceEvidenceEndpointPath = z.object({
  * Successful Response
  */
 export const zListSourceEvidenceEndpointResponse = z.array(zEvidenceOut);
+
+export const zPatchSourceSuiteBody = zSourceSuiteFields;
+
+export const zPatchSourceSuitePath = z.object({
+  source_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPatchSourceSuiteResponse = zSourceOut;
 
 export const zPromoteStatementAssessmentBody = zStatementPromotionRequest;
 

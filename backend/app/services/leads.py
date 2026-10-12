@@ -346,6 +346,7 @@ def serialize_lead(db: Session, lead: Lead) -> dict:
         "provider_record_id": lead.provider_record_id,
         "kind": "connector" if lead.provider else "question",
         "status": lead.status,
+        "gathering_outcome": lead.gathering_outcome,
         "priority": profile.priority if profile else "normal",
         "owner": profile.owner if profile else None,
         "next_action": profile.next_action if profile else None,
@@ -406,6 +407,7 @@ def list_leads_serialized(db: Session, leads: list[Lead]) -> list[dict]:
             "provider_record_id": lead.provider_record_id,
             "kind": "connector" if lead.provider else "question",
             "status": lead.status,
+            "gathering_outcome": lead.gathering_outcome,
             "priority": profile.priority if profile else "normal",
             "owner": profile.owner if profile else None,
             "next_action": profile.next_action if profile else None,
@@ -692,6 +694,11 @@ def update_lead(db: Session, row: Lead, data: dict) -> Lead:
         raise ValueError("Invalid lead status")
     if data.get("priority") is not None and data["priority"] not in PRIORITIES:
         raise ValueError("Invalid lead priority")
+    if "gathering_outcome" in data:
+        from app.ai.suite_vocab import GATHERING_OUTCOMES
+        if data["gathering_outcome"] is not None and data["gathering_outcome"] not in GATHERING_OUTCOMES:
+            raise ValueError(f"gathering_outcome must be one of: {', '.join(GATHERING_OUTCOMES)}")
+        row.gathering_outcome = data["gathering_outcome"]
     profile = get_profile(db, row.id, create=True)
     old_status = row.status
     for field in ("title", "detail", "status"):

@@ -22,6 +22,9 @@ class RelationshipEdge(Base):
     target_entity_id: Mapped[str] = mapped_column(ForeignKey("entities.id"), index=True)
     source_prop: Mapped[str] = mapped_column(String(128))
     target_prop: Mapped[str] = mapped_column(String(128))
+    # Whether the link is documented, inferred or alleged (the suite's Relationship
+    # record, Standard §9); None until a person says.
+    evidence_status: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 
@@ -45,4 +48,5 @@ class RelationshipEvidenceReviewEvent(Base):
     evidence_id: Mapped[str] = mapped_column(ForeignKey("evidence.id"), index=True)
     stance: Mapped[str] = mapped_column(String(32), index=True)
     rationale: Mapped[str] = mapped_column(Text)
+    reviewer_type: Mapped[str] = mapped_column(String(16), default="HUMAN")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

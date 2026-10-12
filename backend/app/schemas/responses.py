@@ -60,6 +60,8 @@ class SourceOut(ResponseModel):
     url: str | None = None
     source_type: str
     metadata_json: dict[str, Any] | None = None
+    source_tier: str | None = None        # the suite's tier, A–F; null until assessed
+    issuer_or_author: str | None = None
     created_at: Timestamp
 
 
@@ -71,6 +73,15 @@ class EvidenceOut(ResponseModel):
     notes: str | None = None
     document_id: str | None = None     # the picture this record is, if it is one
     captured_on: str | None = None     # when that picture was taken, as its source states it
+    # The suite's Evidence record (app/ai/suite_vocab.py).
+    issuer_or_author: str | None = None
+    authenticity_status: str | None = None
+    restates_evidence_id: str | None = None
+    created_on: str | None = None
+    event_on: str | None = None
+    published_on: str | None = None
+    retrieved_on: str | None = None
+    limitations: list[str] | None = None
 
 
 class EvidencePoolRow(ResponseModel):
@@ -400,6 +411,7 @@ class RelationshipEvidenceReviewOut(ResponseModel):
     evidence_id: str
     stance: str
     rationale: str | None = None
+    reviewer_type: str = "HUMAN"
     created_at: Timestamp
 
 
@@ -526,6 +538,7 @@ class RelationshipOut(ResponseModel):
     relationship_entity_id: str | None = None
     ftm_id: str | None = None
     schema_: str = Field(alias="schema")
+    evidence_status: str | None = None   # DIRECT | INFERRED | ALLEGED (the suite's Relationship record)
     source_prop: str | None = None
     target_prop: str | None = None
     source: RelationshipEndpointOut | None = None
@@ -1630,6 +1643,16 @@ class ClaimOut(ResponseModel):
     # The confidence grade on the IPCC AR5 grid; null until a review gives it.
     evidence_grade: Literal["limited", "medium", "robust"] | None = None
     agreement_grade: Literal["low", "medium", "high"] | None = None
+    # The suite's Claim record (app/ai/suite_vocab.py); null until a person sets it.
+    classification: str | None = None
+    confidence_term: str | None = None
+    confidence_level: str | None = None
+    confidence_basis: str | None = None
+    warrant: str | None = None
+    assumptions: list[str] | None = None
+    limitations: list[str] | None = None
+    verification_verdict: str | None = None
+    corrected_wording: str | None = None
     created_at: Timestamp
 
 
@@ -1684,6 +1707,8 @@ class ClaimReviewEventOut(ResponseModel):
     rationale: str
     override_reason: str | None = None
     unmet_rules: list[str] | None = None
+    reviewer_type: str = "HUMAN"
+    suite_changes: dict[str, list[Any]] | None = None
     created_at: Timestamp
 
 
@@ -1800,6 +1825,7 @@ class LeadOut(ResponseModel):
     provider_record_id: str | None = None
     kind: Literal["connector", "question"]
     status: str  # unreviewed | active | blocked | resolved | rejected
+    gathering_outcome: str | None = None  # the suite's EGS outcome
     priority: str
     owner: str | None = None
     next_action: str | None = None
@@ -2435,6 +2461,7 @@ class LeadRowOut(ResponseModel):
     provider: str | None = None
     provider_record_id: str | None = None
     status: str
+    gathering_outcome: str | None = None
     created_at: Timestamp
 
 
@@ -4340,6 +4367,7 @@ class SuiteRequirementOut(ResponseModel):
     file: str
     why: str
     found: bool | None
+    recorded_in: str | None = None  # "Model.column" or "record:KIND" once the app records it
 
 
 class SuiteCoverageCountsOut(ResponseModel):
@@ -4348,6 +4376,7 @@ class SuiteCoverageCountsOut(ResponseModel):
     none: int
     unmapped: int
     app_lacks: int
+    app_recorded: int = 0
     drifted: int
 
 
@@ -4461,3 +4490,19 @@ class WireOut(ResponseModel):
     entities: list[WireEntityOut]
     links: list[WireLinkOut]
     events: list[WireEventOut]
+
+
+# --- The Authority System Suite's records (app/services/case_records.py) --------------
+
+class CaseRecordOut(ResponseModel):
+    """One of the suite's own records for a case, with its earlier bodies."""
+    id: str
+    investigation_id: str
+    kind: Literal["GAP", "ROR", "HYP", "CFLT", "RLOG", "ESRC", "EPIT", "CAPT"]
+    kind_name: str
+    record_id: str
+    body: dict[str, Any]
+    history: list[dict[str, Any]]
+    created_by: str | None = None
+    created_at: Timestamp
+    updated_at: Timestamp
