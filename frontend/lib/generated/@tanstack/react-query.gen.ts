@@ -205,6 +205,7 @@ import {
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
+  markRedFlagInnocent,
   openalephIntegrationStatus,
   type Options,
   patchClaimSuite,
@@ -853,6 +854,9 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagError,
   MakeLeadFromRedFlagResponse,
+  MarkRedFlagInnocentData,
+  MarkRedFlagInnocentError,
+  MarkRedFlagInnocentResponse,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
@@ -7832,6 +7836,35 @@ export const dismissRedFlagMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await dismissRedFlag({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Mark Red Flag Innocent
+ *
+ * Before you call it: one innocent explanation ruled out (with what ruled it out), could apply, or not looked at.
+ */
+export const markRedFlagInnocentMutation = (
+  options?: Partial<Options<MarkRedFlagInnocentData>>,
+): UseMutationOptions<
+  MarkRedFlagInnocentResponse,
+  MarkRedFlagInnocentError,
+  Options<MarkRedFlagInnocentData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MarkRedFlagInnocentResponse,
+    MarkRedFlagInnocentError,
+    Options<MarkRedFlagInnocentData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await markRedFlagInnocent({
         ...options,
         ...fnOptions,
         throwOnError: true,

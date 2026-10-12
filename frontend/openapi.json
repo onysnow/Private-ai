@@ -19035,6 +19035,80 @@
         "title": "FlagIndicatorOut",
         "type": "object"
       },
+      "FlagInnocent": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What ruled it out, or why it could apply.",
+            "title": "Note"
+          },
+          "state": {
+            "enum": [
+              "not_looked_at",
+              "ruled_out",
+              "could_apply"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "text": {
+            "description": "The innocent explanation, as the catalogue words it.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "state"
+        ],
+        "title": "FlagInnocent",
+        "type": "object"
+      },
+      "FlagInnocentOut": {
+        "description": "One innocent explanation and what a person found about it.",
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "state": {
+            "enum": [
+              "not_looked_at",
+              "ruled_out",
+              "could_apply"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "state"
+        ],
+        "title": "FlagInnocentOut",
+        "type": "object"
+      },
       "FlagLevelsOut": {
         "properties": {
           "faint": {
@@ -25423,6 +25497,14 @@
           "indicator_id": {
             "title": "Indicator Id",
             "type": "string"
+          },
+          "innocent": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FlagInnocentOut"
+            },
+            "title": "Innocent",
+            "type": "array"
           },
           "last_seen_at": {
             "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
@@ -51978,6 +52060,66 @@
           }
         },
         "summary": "Dismiss Red Flag"
+      }
+    },
+    "/api/red-flags/{flag_id}/innocent": {
+      "post": {
+        "description": "Before you call it: one innocent explanation ruled out (with what ruled it out), could apply, or not looked at.",
+        "operationId": "mark_red_flag_innocent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "flag_id",
+            "required": true,
+            "schema": {
+              "title": "Flag Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlagInnocent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedFlagsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Mark Red Flag Innocent"
       }
     },
     "/api/red-flags/{flag_id}/lead": {

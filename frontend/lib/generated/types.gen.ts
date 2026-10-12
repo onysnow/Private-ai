@@ -8632,6 +8632,48 @@ export type FlagIndicatorOut = {
 };
 
 /**
+ * FlagInnocent
+ */
+export type FlagInnocent = {
+  /**
+   * Note
+   *
+   * What ruled it out, or why it could apply.
+   */
+  note?: string | null;
+  /**
+   * State
+   */
+  state: 'not_looked_at' | 'ruled_out' | 'could_apply';
+  /**
+   * Text
+   *
+   * The innocent explanation, as the catalogue words it.
+   */
+  text: string;
+};
+
+/**
+ * FlagInnocentOut
+ *
+ * One innocent explanation and what a person found about it.
+ */
+export type FlagInnocentOut = {
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * State
+   */
+  state: 'not_looked_at' | 'ruled_out' | 'could_apply';
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * FlagLevelsOut
  */
 export type FlagLevelsOut = {
@@ -12544,6 +12586,10 @@ export type RedFlagOut = {
    * Indicator Id
    */
   indicator_id: string;
+  /**
+   * Innocent
+   */
+  innocent?: Array<FlagInnocentOut>;
   /**
    * Last Seen At
    *
@@ -24590,6 +24636,42 @@ export type DismissRedFlagResponses = {
 
 export type DismissRedFlagResponse =
   DismissRedFlagResponses[keyof DismissRedFlagResponses];
+
+export type MarkRedFlagInnocentData = {
+  body: FlagInnocent;
+  path: {
+    /**
+     * Flag Id
+     */
+    flag_id: string;
+  };
+  query?: never;
+  url: '/api/red-flags/{flag_id}/innocent';
+};
+
+export type MarkRedFlagInnocentErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MarkRedFlagInnocentError =
+  MarkRedFlagInnocentErrors[keyof MarkRedFlagInnocentErrors];
+
+export type MarkRedFlagInnocentResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedFlagsOut;
+};
+
+export type MarkRedFlagInnocentResponse =
+  MarkRedFlagInnocentResponses[keyof MarkRedFlagInnocentResponses];
 
 export type MakeLeadFromRedFlagData = {
   body?: never;

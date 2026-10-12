@@ -39,6 +39,8 @@ class PatternFlag(Base):
     first_seen_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     gone_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # The state of each innocent explanation, keyed by its text: {"state": ruled_out | could_apply, "note", "at"}.
+    innocent: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
 
 class CheckItem(Base):

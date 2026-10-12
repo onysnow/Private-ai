@@ -183,3 +183,23 @@ def test_the_investigation_type_comes_from_flags_and_records_and_the_reporter_ca
     assert client.put(f"/api/investigations/{inv}/type", json={"areas": ["XX"]}).status_code == 400
     assert client.put(f"/api/investigations/{inv}/type", json={"areas": ["SA"]}).status_code == 400, "the reporter's safety is not a type"
     assert ok(client.put(f"/api/investigations/{inv}/type", json={"areas": None}))["set_by"] == "app"
+
+
+def test_innocent_explanations_are_a_checklist_kept_on_the_flag_across_runs():
+    inv = _inv("Before you call it")
+    a, b, c = _party(inv, "A Ltd"), _party(inv, "B Ltd"), _party(inv, "C Ltd")
+    for x, y in ((a, b), (b, c), (c, a)):
+        _link(inv, "Ownership", x, y)
+    flag = next(f for f in _flags(inv)["flags"] if f["indicator_id"] == "BO-001")
+    first = flag["innocent"][0]["text"]
+    assert {i["state"] for i in flag["innocent"]} == {"not_looked_at"}
+    refused = client.post(f"/api/red-flags/{flag['id']}/innocent", json={"text": first, "state": "ruled_out"})
+    assert refused.status_code == 400 and "ruled it out" in refused.json()["detail"]
+    assert client.post(f"/api/red-flags/{flag['id']}/innocent", json={"text": "made up", "state": "could_apply"}).status_code == 400
+    done = client.post(f"/api/red-flags/{flag['id']}/innocent", json={"text": first, "state": "ruled_out", "note": "No treasury shares in the filings"})
+    assert done.status_code == 200, done.text
+    # Kept when the rules run again (the flag is the same row, found by its fingerprint).
+    again = next(f for f in _flags(inv)["flags"] if f["indicator_id"] == "BO-001")
+    assert again["innocent"][0] == {"text": first, "state": "ruled_out", "note": "No treasury shares in the filings"}
+    client.post(f"/api/red-flags/{flag['id']}/innocent", json={"text": first, "state": "not_looked_at"})
+    assert next(f for f in _flags(inv)["flags"] if f["indicator_id"] == "BO-001")["innocent"][0]["state"] == "not_looked_at"

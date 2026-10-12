@@ -3396,6 +3396,26 @@ export const zFlagDismiss = z.object({
 });
 
 /**
+ * FlagInnocent
+ */
+export const zFlagInnocent = z.object({
+  note: z.string().max(2000).nullish(),
+  state: z.enum(['not_looked_at', 'ruled_out', 'could_apply']),
+  text: z.string().min(1).max(2000),
+});
+
+/**
+ * FlagInnocentOut
+ *
+ * One innocent explanation and what a person found about it.
+ */
+export const zFlagInnocentOut = z.object({
+  note: z.string().nullish(),
+  state: z.enum(['not_looked_at', 'ruled_out', 'could_apply']),
+  text: z.string(),
+});
+
+/**
  * FlagLevelsOut
  */
 export const zFlagLevelsOut = z.object({
@@ -7673,6 +7693,7 @@ export const zRedFlagOut = z.object({
   id: z.string(),
   indicator: zFlagIndicatorOut.nullable(),
   indicator_id: z.string(),
+  innocent: z.array(zFlagInnocentOut).optional().default([]),
   last_seen_at: z
     .string()
     .regex(
@@ -10167,6 +10188,17 @@ export const zDismissRedFlagPath = z.object({
  * Successful Response
  */
 export const zDismissRedFlagResponse = zRedFlagsOut;
+
+export const zMarkRedFlagInnocentBody = zFlagInnocent;
+
+export const zMarkRedFlagInnocentPath = z.object({
+  flag_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMarkRedFlagInnocentResponse = zRedFlagsOut;
 
 export const zMakeLeadFromRedFlagPath = z.object({
   flag_id: z.string(),

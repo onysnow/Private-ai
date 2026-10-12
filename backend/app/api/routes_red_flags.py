@@ -11,7 +11,7 @@ from app.db.session import get_db
 from app.models.domain import Investigation, PatternFlag
 from app.patterns import engine
 from app.patterns import investigation_type
-from app.schemas.api import FlagDismiss, InvestigationTypeSet
+from app.schemas.api import FlagDismiss, FlagInnocent, InvestigationTypeSet
 from app.schemas.responses import InvestigationTypeOut, LeadOut, RedFlagsOut
 from app.services.leads import serialize_lead
 
@@ -63,6 +63,17 @@ def dismiss_red_flag(flag_id: str, body: FlagDismiss, db: Session = Depends(get_
     row = _flag(db, flag_id)
     try:
         engine.dismiss(db, row, body.reason)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return engine.flags(db, row.investigation_id, refresh=False)
+
+
+@router.post("/red-flags/{flag_id}/innocent", response_model=RedFlagsOut)
+def mark_red_flag_innocent(flag_id: str, body: FlagInnocent, db: Session = Depends(get_db)) -> Any:
+    """Before you call it: one innocent explanation ruled out (with what ruled it out), could apply, or not looked at."""
+    row = _flag(db, flag_id)
+    try:
+        engine.mark_innocent(db, row, body.text, body.state, body.note)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
     return engine.flags(db, row.investigation_id, refresh=False)

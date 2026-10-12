@@ -190,6 +190,9 @@ def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]],
         "checks": (checks or {}).get(row.id, []),
         "years": flag_years(row, by_link or {}),
         "first_seen_at": row.first_seen_at, "last_seen_at": row.last_seen_at, "gone_at": row.gone_at,
+        # Before you call it: each innocent explanation with what a person found (not looked at until they say).
+        "innocent": [{"text": text, "state": (row.innocent or {}).get(text, {}).get("state", "not_looked_at"),
+                      "note": (row.innocent or {}).get(text, {}).get("note")} for text in (ind.innocent_explanations if ind else [])],
         "indicator": None if ind is None else {
             "id": ind.id, "name": ind.name, "definition": ind.definition, "area": ind.areas[0], "area_name": area,
             "levels": {"faint": ind.levels.faint, "strong": ind.levels.strong, "textbook": ind.levels.textbook,
@@ -293,3 +296,24 @@ def make_lead(db: Session, row: PatternFlag) -> Lead:
     row.status, row.lead_id = "made_lead", lead.id
     db.commit()
     return lead
+
+
+INNOCENT_STATES = ("not_looked_at", "ruled_out", "could_apply")
+
+
+def mark_innocent(db: Session, row: PatternFlag, text: str, state: str, note: str | None) -> None:
+    """Records what a person found about one innocent explanation. Ruling one out needs a note."""
+    found = indicator(row.indicator_id)
+    if found is None or text not in found[0].innocent_explanations:
+        raise ValueError("That is not one of this flag's innocent explanations")
+    if state not in INNOCENT_STATES:
+        raise ValueError(f"state must be one of {', '.join(INNOCENT_STATES)}")
+    if state == "ruled_out" and not (note or "").strip():
+        raise ValueError("Say what ruled it out")
+    current = dict(row.innocent or {})
+    if state == "not_looked_at":
+        current.pop(text, None)
+    else:
+        current[text] = {"state": state, "note": (note or "").strip() or None, "at": utcnow_naive().isoformat()}
+    row.innocent = current
+    db.commit()

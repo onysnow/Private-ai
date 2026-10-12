@@ -600,6 +600,9 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagErrors,
   MakeLeadFromRedFlagResponses,
+  MarkRedFlagInnocentData,
+  MarkRedFlagInnocentErrors,
+  MarkRedFlagInnocentResponses,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
@@ -1215,6 +1218,9 @@ import {
   zMakeLeadFromNoteResponse,
   zMakeLeadFromRedFlagPath,
   zMakeLeadFromRedFlagResponse,
+  zMarkRedFlagInnocentBody,
+  zMarkRedFlagInnocentPath,
+  zMarkRedFlagInnocentResponse,
   zOpenalephIntegrationStatusResponse,
   zPatchClaimSuiteBody,
   zPatchClaimSuitePath,
@@ -7661,6 +7667,41 @@ export const dismissRedFlag = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zDismissRedFlagResponse.parseAsync(data),
     url: '/api/red-flags/{flag_id}/dismiss',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Mark Red Flag Innocent
+ *
+ * Before you call it: one innocent explanation ruled out (with what ruled it out), could apply, or not looked at.
+ */
+export const markRedFlagInnocent = <ThrowOnError extends boolean = false>(
+  options: Options<MarkRedFlagInnocentData, ThrowOnError>,
+): RequestResult<
+  MarkRedFlagInnocentResponses,
+  MarkRedFlagInnocentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MarkRedFlagInnocentResponses,
+    MarkRedFlagInnocentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMarkRedFlagInnocentBody,
+          path: zMarkRedFlagInnocentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMarkRedFlagInnocentResponse.parseAsync(data),
+    url: '/api/red-flags/{flag_id}/innocent',
     ...options,
     headers: {
       'Content-Type': 'application/json',

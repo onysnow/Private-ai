@@ -4095,6 +4095,13 @@ class FlagCheckOut(ResponseModel):
     status: Literal["open", "shows", "does_not", "unclear"]
 
 
+class FlagInnocentOut(ResponseModel):
+    """One innocent explanation and what a person found about it."""
+    text: str
+    state: Literal["not_looked_at", "ruled_out", "could_apply"]
+    note: str | None = None
+
+
 class RedFlagOut(ResponseModel):
     """One occurrence of a pattern. A flag is a lead, not a finding."""
     id: str
@@ -4116,6 +4123,7 @@ class RedFlagOut(ResponseModel):
     first_seen_at: Timestamp
     last_seen_at: Timestamp
     gone_at: Timestamp | None
+    innocent: list[FlagInnocentOut] = []
     indicator: FlagIndicatorOut | None
 
 

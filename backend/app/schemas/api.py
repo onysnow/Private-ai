@@ -570,6 +570,12 @@ class CheckDecide(BaseModel):
     note: str | None = Field(default=None, max_length=4000, description="What the person saw; it stays with the item.")
 
 
+class FlagInnocent(BaseModel):
+    text: str = Field(min_length=1, max_length=2000, description="The innocent explanation, as the catalogue words it.")
+    state: Literal["not_looked_at", "ruled_out", "could_apply"]
+    note: str | None = Field(default=None, max_length=2000, description="What ruled it out, or why it could apply.")
+
+
 class FlagDismiss(BaseModel):
     reason: str = Field(min_length=1, max_length=2000, description="Why the flag is not relevant; it stays with the flag.")
 

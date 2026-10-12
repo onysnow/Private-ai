@@ -151,12 +151,13 @@ CHECK_2 Chain of Custody (12 Oct: Check › Chain of Custody, `features/custody`
 
 ## 7. Act — mockups ACT_1 (Red Flags) and ACT_2 (story tree + write-up) (§08)
 
-ACT_1 Red Flags: **partial** (board with list and detail on one screen).
-- [ ] Top bar: type line with "why?", coverage ("5 of 7 record rules ran · 2 need data · 2,875 more need a lookup or a person"), level filter chips with counts, Set aside / No longer fire / Area / Party / New since, "6 of 8 flags · Reset"
-- [ ] Ranked list by level then weight (fix the rank bug); "rests on 1 unshown link" mark; new dot
-- [ ] Open flag: summary with values, the pattern picture (payments chart with the $10,000 line), **level ladder** (met / not set / needs n facts)
-- [ ] Before you call it: innocent explanations as a checklist (ruled out / could apply), records can't show, sources
-- [ ] Parties carrying flags rings; actions Add to leads / Set aside with a reason / Show in money flows; reading never writes (split GET / POST run)
+ACT_1 Red Flags (12 Oct: rebuilt as three columns, `features/act/red-flags-board.tsx`, `styles/act.css`):
+- [x] Top bar: type line, "n of n record rules ran · n need data" (with what each needs), level chips with counts, Set aside, No longer fire, Area, Party, New since last visit (per computer), "6 of 8 flags · Reset"
+- [x] Ranked list (level then weight; a kind that fires many times is one row with its count): rank, level chip with id, party chips, new dot, "○ rests on n links not yet shown"; J / K; parties carrying flags as rings (click filters)
+- [x] Open flag: id · area · rule version · first seen, summary, the picture it rests on (payments in the band with the reporting line for ML-021; the loop for a cycle; the chain otherwise), level ladder (met / next / not set / needs n facts, with To check), About the numbers, Add to leads (A), Set aside with a reason (X, asked in place), Show in money flows, Share disabled with its reason
+- [x] Before you call it: innocent explanations as a checklist kept on the flag (not looked at / ruled out with what ruled it out / could apply; backend `POST /red-flags/{id}/innocent`, migration a9c3e7f1d204), the records can't show with their To check status, the sources as quotes
+- [ ] Reading never writes (split GET / POST run); hover-preview; scroll over the picture to step through payments; "What changed" replay
+
 ACT_2 Story: **missing**.
 - [ ] Thesis diamond → sections → claims → evidence tree; branch styles by weakest child; critical path
 - [ ] Gates (every sentence has a source, innocent explanations, single-source marked, right of reply, legal read)
