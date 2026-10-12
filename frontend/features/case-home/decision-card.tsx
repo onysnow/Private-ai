@@ -2,12 +2,14 @@
 // One decision as the same five-part card everywhere (FEATURE_CHECK §2):
 // question, proposal with who proposed it, evidence, choices, what happens.
 // Three tall answers, each a shape, a word and a key; No offers reason chips.
+import {useQuery} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {AiTag, LevelChip} from '../../components/status';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {api} from '../../lib/api-instance';
 import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
@@ -51,6 +53,35 @@ export function PartyChips({parties}: {parties: DecisionItemOut['parties']}): Re
   </ul>;
 }
 
+/** The page number a locator names: "p. 4", "page 12", "pp. 3–4". */
+export function pageOf(locator?: string | null): number | null {
+  const m = /\bp(?:age|p)?\.?\s*(\d+)/i.exec(locator ?? '');
+  return m ? Number(m[1]) : null;
+}
+
+/** The page the passage is on, drawn with the passage marked (backend
+ *  GET /api/documents/{id}/page-image); "View full page" opens the reader there. */
+function PageThumb({documentId, page, passage}: {documentId: string; page: number; passage: string}): ReactElement | null {
+  const openDocument = useWorkbenchStore(state => state.openDocument);
+  const query = new URLSearchParams({page: String(page), width: '320', highlight: passage.slice(0, 1500)});
+  const image = useQuery({queryKey: ['page-image', documentId, page, passage], queryFn: () => api.blob(`/api/documents/${documentId}/page-image?${query}`),
+    staleTime: Infinity, retry: false});
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!image.data) return undefined;
+    const made = URL.createObjectURL(image.data);
+    setUrl(made);
+    return () => URL.revokeObjectURL(made);
+  }, [image.data]);
+  if (image.isError) return null;
+  return <figure className="ch-page">
+    {/* A blob of the page the API drew, so next/image has nothing to optimise. */}
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    {url ? <img src={url} alt={`Page ${page}, the passage marked`}/> : <span className="ch-page-wait" aria-busy="true"/>}
+    <button type="button" onClick={() => openDocument(documentId, page)}>View full page <span aria-hidden="true">↗</span></button>
+  </figure>;
+}
+
 export function DecisionCard({item, position, total, keys, active, onDecide, showWhatHappens = true}: {
   item: DecisionItemOut; position: number; total: number; keys: 'home' | 'decide'; active: boolean;
   onDecide: (choice: DecisionChoiceOut, note: string) => void; showWhatHappens?: boolean;
@@ -84,7 +115,11 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
     <h3 className="ch-question">{item.question}</h3>
     <div className="ch-card-body">
     {ev?.rows?.length ? <RowCells rows={ev.rows} compact/>
-      : ev?.excerpt ? <blockquote className="ch-excerpt"><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></blockquote>
+      : ev?.excerpt ? <div className="ch-passage">
+        <blockquote className="ch-excerpt"><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></blockquote>
+        {ev.document_id && /\.pdf$/i.test(ev.filename ?? '') && pageOf(ev.locator) !== null
+          && <PageThumb documentId={ev.document_id} page={pageOf(ev.locator)!} passage={ev.excerpt.trim()}/>}
+      </div>
       : <p className="ch-proposal">{item.proposal}</p>}
     {ev && <p className="ch-locator">{[ev.filename, ev.locator].filter(Boolean).join(' · ')}</p>}
     <PartyChips parties={item.parties}/>

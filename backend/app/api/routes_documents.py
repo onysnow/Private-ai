@@ -402,6 +402,28 @@ def get_document_picture(document_id: str, db: Session = Depends(get_db)) -> Res
         "Content-Disposition": "inline"})
 
 
+@router.get("/documents/{document_id}/page-image", response_class=Response,
+            responses=file_response("image/png", "One page of the document drawn as a picture, the passage marked"))
+def get_document_page_image(document_id: str, page: int = Query(1, ge=1), width: int = Query(360, ge=120, le=1600),
+                            highlight: str = Query("", max_length=2000), db: Session = Depends(get_db)) -> Response:
+    """A page of a PDF as PNG, with the passage's words highlighted where they are
+    found (X-Passage-Found says whether they were), for Next up's page beside the question."""
+    from app.services.page_image import NoPage, page_png
+
+    row = db.get(Document, document_id)
+    if row is None:
+        raise HTTPException(404, "Document not found")
+    try:
+        data, pages, found = page_png(row.storage_path, resolve_storage_root(settings.document_storage_dir), page, width=width, highlight=highlight)
+    except NoPage as exc:
+        raise HTTPException(415 if "Only a PDF" in str(exc) else 404, str(exc)) from exc
+    except OSError as exc:
+        raise HTTPException(404, "The document's stored file is not available") from exc
+    return Response(content=data, media_type="image/png", headers={
+        "X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'", "Cache-Control": "private, max-age=300",
+        "Content-Disposition": "inline", "X-Page-Count": str(pages), "X-Passage-Found": "1" if found else "0"})
+
+
 @router.get("/documents/{document_id}/translation", response_model=DocumentTranslationOut)
 def get_document_translation(document_id: str, db: Session = Depends(get_db)) -> Any:
     """OpenAleph's machine translation of the document, page by page beside the

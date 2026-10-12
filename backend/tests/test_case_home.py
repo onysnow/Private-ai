@@ -264,3 +264,32 @@ def test_each_claim_names_the_source_it_rests_on_first():
     ok(client.post(f"/api/claims/{claim}/evidence", json={"evidence_id": evidence("Board minutes", "p. 4"), "stance": "supports"}))
     assert ok(client.get(f"/api/investigations/{inv}/claim-sources")) == [
         {"claim_id": claim, "source": "Board minutes", "locator": "p. 4", "count": 2}]
+
+
+def test_a_page_is_drawn_with_its_passage_marked(tmp_path, monkeypatch):
+    import fitz
+
+    from app.core.config import settings
+    from app.services.page_image import _phrases
+
+    assert _phrases("") == []
+    assert _phrases("one two three four five six seven")[1:] == ["one two three four five six", "seven"]
+    monkeypatch.setattr(settings, "document_storage_dir", str(tmp_path))
+    path = tmp_path / "minutes.pdf"
+    pdf = fitz.open()
+    for n in (1, 2):
+        pdf.new_page().insert_text((72, 72), f"Page {n}. The parcel was bought on behalf of Fernhill Ltd.")
+    pdf.save(path); pdf.close()
+    inv = _inv("Pages")
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Minutes", source_type="document")
+        db.add(src); db.flush()
+        doc = Document(investigation_id=inv, source_id=src.id, filename="minutes.pdf", sha256="x", storage_path=str(path), extraction_status="complete")
+        db.add(doc); db.commit()
+        doc_id = doc.id
+    reply = client.get(f"/api/documents/{doc_id}/page-image", params={"page": 2, "width": 200, "highlight": "on behalf of Fernhill"})
+    assert reply.status_code == 200 and reply.headers["content-type"] == "image/png"
+    assert reply.headers["x-page-count"] == "2" and reply.headers["x-passage-found"] == "1"
+    assert fitz.Pixmap(reply.content).width == 200
+    assert client.get(f"/api/documents/{doc_id}/page-image", params={"highlight": "not on the page"}).headers["x-passage-found"] == "0"
+    assert client.get(f"/api/documents/{doc_id}/page-image", params={"page": 3}).status_code == 404

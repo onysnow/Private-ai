@@ -8239,6 +8239,21 @@ export const zFindOpenalephChildrenPath = z.object({
  */
 export const zFindOpenalephChildrenResponse = zBackgroundJobOut;
 
+export const zGetDocumentPageImagePath = z.object({
+  document_id: z.string(),
+});
+
+export const zGetDocumentPageImageQuery = z.object({
+  page: z.number().int().gte(1).optional().default(1),
+  width: z.number().int().gte(120).lte(1600).optional().default(360),
+  highlight: z.string().max(2000).optional().default(''),
+});
+
+/**
+ * One page of the document drawn as a picture, the passage marked
+ */
+export const zGetDocumentPageImageResponse = z.string();
+
 export const zGetDocumentPicturePath = z.object({
   document_id: z.string(),
 });

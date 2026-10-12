@@ -9,6 +9,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {CaseHome, yearSpan} from '../features/case-home/case-home';
 import {DecideScreen} from '../features/case-home/decide-screen';
+import {pageOf} from '../features/case-home/decision-card';
 import {HOLD_MS, markTerms} from '../features/case-home/use-decisions';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -65,6 +66,7 @@ function routes(extra: Record<string, unknown> = {}) {
     'GET /api/investigations/inv-1/claims': [{id: 'c1', investigation_id: 'inv-1', text: 'Kestrel SA bought the harbour land in 2020 with its own funds.', status: 'disputed', confidence: 0.3, created_at: '2026-10-01T00:00:00'}],
     'GET /api/investigations/inv-1/red-flags': {investigation_id: 'inv-1', flags: [], gone: [], rules: [], cannot_run: [], type: null},
     'GET /api/investigations/inv-1/documents': [],
+    'GET /api/documents/d1/page-image': () => new Response(new Uint8Array([137, 80, 78, 71]), {headers: {'content-type': 'image/png'}}),
     'GET /api/investigations/inv-1/claim-sources': [{claim_id: 'c1', source: 'Board minutes', locator: 'p. 4', count: 3}],
     'GET /api/investigations/inv-1/graph': {nodes: [], edges: [], schemas: [], reconciliation: {hidden_duplicate_edges: 0}},
     'GET /api/investigations/inv-1/since': {investigation_id: 'inv-1', after: '2026-10-01T00:00:00', changes: [{key: 'ai', count: 1, label: 'AI draft to review', actor_kind: 'ai', href: '/decide?kind=ai', level: null}]},
@@ -95,6 +97,8 @@ describe('Case home', () => {
     expect(within(card).getByText('From the Textbook Red Flag Circular ownership')).toBeInTheDocument();
     expect(within(card).getByText('nominee arrangement', {selector: 'mark'})).toBeInTheDocument();
     expect(within(card).getByRole('button', {name: /Shows it/})).toHaveAttribute('aria-keyshortcuts', 'S');
+    await userEvent.setup().click(await within(card).findByRole('button', {name: /View full page/}));
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1', pageNumber: 4});
     expect(await screen.findByText('AI draft to review')).toBeInTheDocument();
     expect(screen.getByText('Kestrel SA bought the harbour land in 2020 with its own funds.')).toBeInTheDocument();
     expect(await screen.findByText('Board minutes · p. 4 · +2 more')).toBeInTheDocument();
@@ -186,6 +190,16 @@ describe('Decide', () => {
     fireEvent.click(screen.getByRole('button', {name: 'Not public'}));
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     await waitFor(() => expect(api.lastBody('POST /api/checks/mv-1/decide')).toEqual({status: 'unknowable', note: 'Not public'}));
+  });
+});
+
+describe('pageOf', () => {
+  it('reads the page a locator names', () => {
+    expect(pageOf('p. 4')).toBe(4);
+    expect(pageOf('page 12 (OCR)')).toBe(12);
+    expect(pageOf('pp. 3–4')).toBe(3);
+    expect(pageOf('row 2')).toBeNull();
+    expect(pageOf(null)).toBeNull();
   });
 });
 

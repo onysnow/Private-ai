@@ -42396,6 +42396,91 @@
         "summary": "Find Openaleph Children"
       }
     },
+    "/api/documents/{document_id}/page-image": {
+      "get": {
+        "description": "A page of a PDF as PNG, with the passage's words highlighted where they are\nfound (X-Passage-Found says whether they were), for Next up's page beside the question.",
+        "operationId": "get_document_page_image",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "width",
+            "required": false,
+            "schema": {
+              "default": 360,
+              "maximum": 1600,
+              "minimum": 120,
+              "title": "Width",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "highlight",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 2000,
+              "title": "Highlight",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "One page of the document drawn as a picture, the passage marked"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Page Image"
+      }
+    },
     "/api/documents/{document_id}/picture": {
       "get": {
         "description": "The picture a document is (app/services/image_reader.py), for the app to\nshow beside its evidence. Its type is read from its bytes; it is sent so\na browser shows it and never runs it as anything else.",

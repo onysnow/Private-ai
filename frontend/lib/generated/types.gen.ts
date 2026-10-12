@@ -18510,6 +18510,55 @@ export type FindOpenalephChildrenResponses = {
 export type FindOpenalephChildrenResponse =
   FindOpenalephChildrenResponses[keyof FindOpenalephChildrenResponses];
 
+export type GetDocumentPageImageData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: {
+    /**
+     * Page
+     */
+    page?: number;
+    /**
+     * Width
+     */
+    width?: number;
+    /**
+     * Highlight
+     */
+    highlight?: string;
+  };
+  url: '/api/documents/{document_id}/page-image';
+};
+
+export type GetDocumentPageImageErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentPageImageError =
+  GetDocumentPageImageErrors[keyof GetDocumentPageImageErrors];
+
+export type GetDocumentPageImageResponses = {
+  /**
+   * One page of the document drawn as a picture, the passage marked
+   */
+  200: Blob | File;
+};
+
+export type GetDocumentPageImageResponse =
+  GetDocumentPageImageResponses[keyof GetDocumentPageImageResponses];
+
 export type GetDocumentPictureData = {
   body?: never;
   path: {

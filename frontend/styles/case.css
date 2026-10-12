@@ -131,6 +131,14 @@
 /* The decision card (Case home and Decide). */
 .ch-card { display: flex; flex-direction: column; gap: 10px; min-height: 0; flex: 1; animation: ch-card-in var(--dur-base) var(--ease-out); }
 /* What the card rests on scrolls inside it (a feature made for reading); the question and the answers stay in view. */
+.ch-passage { display: flex; gap: 14px; align-items: flex-start; }
+.ch-passage .ch-excerpt { flex: 1 1 auto; min-width: 0; }
+.ch-page { flex: 0 0 132px; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+.ch-page img { width: 132px; height: auto; border-radius: 4px; box-shadow: var(--shadow-panel); background: #fff; }
+.ch-page-wait { display: block; width: 132px; height: 170px; border-radius: 4px; background: var(--surface-3); }
+.ch-page button { all: unset; cursor: pointer; font-size: 11.5px; color: var(--accent-2); }
+.ch-page button:focus-visible { outline: 2px solid var(--accent-1); }
+@media (max-width: 720px) { .ch-page { display: none; } }
 .ch-card-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 10px;
   mask-image: linear-gradient(#000 calc(100% - 18px), transparent); padding-bottom: 10px; }
 .ch-card .ch-choices, .ch-card .ch-reasons, .ch-card .ch-elsewhere { flex: 0 0 auto; }

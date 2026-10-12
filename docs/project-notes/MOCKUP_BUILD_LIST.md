@@ -61,7 +61,7 @@ Today: **partial**. Built: question, standing strip, Next up card with three key
 Check / See / Act modules, Since strip, year rail, Pointing-at bar.
 To finish:
 - [x] Top band (12 Oct; the top edge, still hidden until called): breadcrumb "Cases › case › Home"; **Switch case ⌘O** button (not a dropdown); centred ⌘K bar; bell with count; settings; **Hide screen**
-- [ ] Next up: the page thumbnail with the highlighted region and "View full page"; locator line in mono ("Minutes of the board · p. 4 · lines 18–21 · scanned, OCR"); "4 of 7 · scroll" with dots; the reason line ("From the Textbook Red Flag …"); no empty area for kinds without a passage
+- [x] Next up (12 Oct: the page drawn with the passage marked, View full page, locator, scroll hint): the page thumbnail with the highlighted region and "View full page"; locator line in mono ("Minutes of the board · p. 4 · lines 18–21 · scanned, OCR"); "4 of 7 · scroll" with dots; the reason line ("From the Textbook Red Flag …"); no empty area for kinds without a passage
 - [x] Bring in module (12 Oct: real page progress from the reader; "what it proposed so far" still to do — proposals are made at the end of a read): the document being read now with real progress ("Reading with OCR · page 6 of 11"), what it proposed so far, rows with Read → / Review → / See →, a permanent drop target
 - [x] Check module (12 Oct): "2 of 22 · scroll", segmented status bar, disputed / not-yet-shown claim cards with their source line
 - [x] Act · Red Flags module (12 Oct: "lights 2018" from the flag's dated links): level-chip cards with parties joined by arrows, "lights 2017", the could-be-innocent box, faint flags on one row, "1 of 3 · scroll"

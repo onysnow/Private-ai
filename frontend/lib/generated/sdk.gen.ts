@@ -275,6 +275,9 @@ import type {
   GetDocumentFormatsData,
   GetDocumentFormatsErrors,
   GetDocumentFormatsResponses,
+  GetDocumentPageImageData,
+  GetDocumentPageImageErrors,
+  GetDocumentPageImageResponses,
   GetDocumentPictureData,
   GetDocumentPictureErrors,
   GetDocumentPictureResponses,
@@ -958,6 +961,9 @@ import {
   zGetDocumentEmailPath,
   zGetDocumentEmailResponse,
   zGetDocumentFormatsResponse,
+  zGetDocumentPageImagePath,
+  zGetDocumentPageImageQuery,
+  zGetDocumentPageImageResponse,
   zGetDocumentPath,
   zGetDocumentPicturePath,
   zGetDocumentPictureResponse,
@@ -3439,6 +3445,38 @@ export const findOpenalephChildren = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zFindOpenalephChildrenResponse.parseAsync(data),
     url: '/api/documents/{document_id}/openaleph/children',
+    ...options,
+  });
+
+/**
+ * Get Document Page Image
+ *
+ * A page of a PDF as PNG, with the passage's words highlighted where they are
+ * found (X-Passage-Found says whether they were), for Next up's page beside the question.
+ */
+export const getDocumentPageImage = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentPageImageData, ThrowOnError>,
+): RequestResult<
+  GetDocumentPageImageResponses,
+  GetDocumentPageImageErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentPageImageResponses,
+    GetDocumentPageImageErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentPageImagePath,
+          query: zGetDocumentPageImageQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentPageImageResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/page-image',
     ...options,
   });
 

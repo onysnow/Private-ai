@@ -97,6 +97,7 @@ import {
   getDocument,
   getDocumentEmail,
   getDocumentFormats,
+  getDocumentPageImage,
   getDocumentPicture,
   getDocumentTable,
   getDocumentTranslation,
@@ -523,6 +524,9 @@ import type {
   GetDocumentFormatsData,
   GetDocumentFormatsError,
   GetDocumentFormatsResponse,
+  GetDocumentPageImageData,
+  GetDocumentPageImageError,
+  GetDocumentPageImageResponse,
   GetDocumentPictureData,
   GetDocumentPictureError,
   GetDocumentPictureResponse,
@@ -3036,6 +3040,92 @@ export const findOpenalephChildrenMutation = (
     },
   };
   return mutationOptions;
+};
+
+export const getDocumentPageImageQueryKey = (
+  options: Options<GetDocumentPageImageData>,
+) => createQueryKey('getDocumentPageImage', options);
+
+/**
+ * Get Document Page Image
+ *
+ * A page of a PDF as PNG, with the passage's words highlighted where they are
+ * found (X-Passage-Found says whether they were), for Next up's page beside the question.
+ */
+export const getDocumentPageImageOptions = (
+  options: Options<GetDocumentPageImageData>,
+) =>
+  queryOptions<
+    GetDocumentPageImageResponse,
+    GetDocumentPageImageError,
+    GetDocumentPageImageResponse,
+    ReturnType<typeof getDocumentPageImageQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentPageImage({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentPageImageQueryKey(options),
+  });
+
+export const getDocumentPageImageInfiniteQueryKey = (
+  options: Options<GetDocumentPageImageData>,
+): QueryKey<Options<GetDocumentPageImageData>> =>
+  createQueryKey('getDocumentPageImage', options, true);
+
+/**
+ * Get Document Page Image
+ *
+ * A page of a PDF as PNG, with the passage's words highlighted where they are
+ * found (X-Passage-Found says whether they were), for Next up's page beside the question.
+ */
+export const getDocumentPageImageInfiniteOptions = (
+  options: Options<GetDocumentPageImageData>,
+) => {
+  const opts = infiniteQueryOptions<
+    GetDocumentPageImageResponse,
+    GetDocumentPageImageError,
+    InfiniteData<GetDocumentPageImageResponse>,
+    QueryKey<Options<GetDocumentPageImageData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetDocumentPageImageData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetDocumentPageImageData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  page: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getDocumentPageImage({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getDocumentPageImageInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
 };
 
 export const getDocumentPictureQueryKey = (
