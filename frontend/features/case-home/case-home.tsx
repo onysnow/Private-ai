@@ -265,16 +265,17 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
 
 const ACTOR: Record<string, string> = {person: 'by a person', app: 'found by the app', ai: 'drafted, to review', connector: 'from outside records'};
 
-function SinceStrip({investigationId}: {investigationId: string}): ReactElement {
+function SinceStrip({investigationId, markVisit = true}: {investigationId: string; markVisit?: boolean}): ReactElement {
   const [after, setAfter] = useState<string | null>(null);
   useEffect(() => {
     if (!investigationId) return undefined;
     setAfter(readVisit(investigationId));
+    if (!markVisit) return undefined;
     const mark = () => writeVisit(investigationId);
     const timer = window.setTimeout(mark, 60_000);
     window.addEventListener('pagehide', mark);
     return () => { window.clearTimeout(timer); window.removeEventListener('pagehide', mark); mark(); };
-  }, [investigationId]);
+  }, [investigationId, markVisit]);
   const since = useQuery({...getSinceOptions({path: {investigation_id: investigationId}, query: {after: after ?? ''}}), enabled: Boolean(investigationId && after)}).data;
   const when = after ? new Date(after).toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short'}) : '';
   return <section className="ch-since-strip" aria-label="What changed while you were away">
@@ -400,8 +401,10 @@ function FirstCase({onSwitch}: {onSwitch: (id: string) => void}): ReactElement {
   </div>;
 }
 
-export function CaseHome({investigation, investigations, onSwitch, loading, active = true}: {
+export function CaseHome({investigation, investigations, onSwitch, loading, active = true, preview = false}: {
   investigation: InvestigationOut | null; investigations: InvestigationOut[]; onSwitch: (id: string) => void; loading: boolean; active?: boolean;
+  /** A picture of the page (Appearance's before/after): it never marks the case as visited. */
+  preview?: boolean;
 }): ReactElement {
   const id = investigation?.id ?? '';
   if (!investigation) return loading ? <div className="ch-home ch-loading" aria-busy="true"><div className="ch-skeleton"/></div> : <div className="ch-home"><FirstCase onSwitch={onSwitch}/></div>;
@@ -417,7 +420,7 @@ export function CaseHome({investigation, investigations, onSwitch, loading, acti
     </header>
     <div className="ch-grid">
       <div className="ch-col"><BringIn investigationId={id}/><CheckModule investigationId={id}/></div>
-      <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id}/></div>
+      <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id} markVisit={!preview}/></div>
       <div className="ch-col"><ActModule investigationId={id}/>
         <Module n="03" name="See · who is linked" href="/see#relationship-graph"><MiniNetwork investigationId={id}/></Module></div>
     </div>

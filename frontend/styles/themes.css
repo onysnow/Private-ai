@@ -277,6 +277,21 @@ html[data-effects='off'] body::before, html[data-effects='off'] body::after { di
 .ap-card { background: var(--surface-1); color: var(--text); border-radius: 16px; padding: 16px; box-shadow: var(--shadow-panel); border: 1.5px solid transparent; display: flex; flex-direction: column; gap: 9px; font-family: var(--font-ui); transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
 .ap-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lifted); }
 .ap-card.on { border-color: var(--accent-1); }
+.ap-card.looking { box-shadow: 0 0 0 2px var(--accent-2), var(--shadow-panel); }
+.ap-compare { margin: 4px 0 10px; }
+.ap-compare-box { width: 100%; max-width: 980px; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-lifted); }
+.ap-compare-box > * { height: 100%; }
+.ap-live { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--ground); color: var(--text); font-family: var(--font-ui); }
+.ap-live-screen { position: absolute; top: 0; left: 0; transform-origin: 0 0; padding: 60px 28px 20px; box-sizing: border-box; pointer-events: none; }
+.ap-compare figcaption { display: flex; justify-content: space-between; max-width: 980px; margin-top: 6px; font-size: 12.5px; color: var(--text); }
+.ap-compare figcaption small { color: var(--text-muted); margin-left: 4px; }
+.ap-live-none { color: var(--text-muted); font-size: 13px; }
+.ap-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; max-width: 980px; margin: 0 0 18px; }
+.ap-facts div { padding: 10px 12px; border-radius: 12px; background: var(--surface-1); }
+.ap-facts dt { font: 500 10.5px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+.ap-facts dd { margin: 3px 0 0; font-size: 13px; }
+.ap-format { flex: 0 0 72px; width: 72px; height: 46px; border-radius: 6px; background: var(--surface-2); }
+.ap-format rect { fill: color-mix(in srgb, var(--accent-2) 55%, var(--surface-3)); }
 .ap-card header { display: flex; align-items: center; gap: 8px; font: 700 17px var(--font-display); }
 .ap-tag { font: 600 10px var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ground); background: var(--accent-1); padding: 3px 7px; border-radius: 99px; }
 .ap-tag.try { background: var(--accent-2); }

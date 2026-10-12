@@ -57,7 +57,7 @@ where its mockup puts it, in the sections below (§5 line styles, §6 claim card
 
 ## 2. Case home — mockup HOME_1 (redesign §04.1)
 
-Today: **partial**. Built: question, standing strip, Next up card with three keys and undo, Bring in /
+Today: **built 12 Oct** except Bring in's "what it proposed so far". Built earlier: question, standing strip, Next up card with three keys and undo, Bring in /
 Check / See / Act modules, Since strip, year rail, Pointing-at bar.
 To finish:
 - [x] Top band (12 Oct; the top edge, still hidden until called): breadcrumb "Cases › case › Home"; **Switch case ⌘O** button (not a dropdown); centred ⌘K bar; bell with count; settings; **Hide screen**
@@ -69,14 +69,14 @@ To finish:
 - [x] Since strip (12 Oct): four count tiles with the actor (AI tile tagged AI)
 - [x] Year rail (12 Oct): events and flags per year, flagged years marked; pointing at a party lights its years
 - [x] Pointing at (12 Oct): party chip + "lights 2017–18 everywhere" + Clear
-- [ ] Scroll-over rule in every module (wheel moves inside after a pause, releases at the ends)
+- [x] Scroll-over rule in every module (built earlier: features/case-home/wheel-step.ts; Case home has no page scroll, so the ends have nothing to release to) (wheel moves inside after a pause, releases at the ends)
 
 ## 3. App frame and Appearance — mockup HOME_2 (§04.2–4.11)
 
 Today: **partial**. Built: five themes as tokens, Appearance with try-then-keep, effects full/light/off,
 edge-hidden frame, ⌘K palette, breadcrumb.
 To finish:
-- [ ] Appearance: specimen cards drawn in their own theme with six status chips and the lowest contrast pair; **live before/after divider of the real Case home** (react-compare-slider is installed); the four facts under it (contrast, calm zones, fonts, cost); effects as named switches (bokeh, rain pane, grain, iris, shutter corners, neon); Format thumbnails (Board, Editorial, Desk, Story)
+- [x] Appearance (12 Oct: six chips, Compare, live before/after of the real Case home, four facts, Format thumbnails; the named effect switches wait for the Rain Noir effects port below): specimen cards drawn in their own theme with six status chips and the lowest contrast pair; **live before/after divider of the real Case home** (react-compare-slider is installed); the four facts under it (contrast, calm zones, fonts, cost); effects as named switches (bokeh, rain pane, grain, iris, shutter corners, neon); Format thumbnails (Board, Editorial, Desk, Story)
 - [ ] Settings regrouped: You / Cases / This computer, each row showing its current value; settings search
 - [ ] Edge rules: dwell ~250 ms, visible 5 px handles labelled on first use, Alt+arrows, pin per device; trail of the last five places on the left edge
 - [ ] Notifications inbox (Needs you / Everything else, snooze)

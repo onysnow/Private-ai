@@ -48,7 +48,9 @@ describe('theme storage', () => {
 
 describe('Settings › Appearance', () => {
   it('tries a theme, shows the bar, and keeps it', async () => {
-    render(<><AppearancePanel/><TryingBar/></>);
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': []});
+    render(<QueryProvider><AppearancePanel/><TryingBar/></QueryProvider>);
     const user = userEvent.setup();
     const card = screen.getByRole('listitem', {name: 'Rain Noir theme'});
     await user.click(within(card).getByRole('button', {name: 'Try for this session'}));
@@ -60,13 +62,27 @@ describe('Settings › Appearance', () => {
   });
 
   it('turns calm motion and effects on and off', async () => {
-    render(<AppearancePanel/>);
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': []});
+    render(<QueryProvider><AppearancePanel/></QueryProvider>);
     const user = userEvent.setup();
     await user.click(screen.getByRole('checkbox', {name: /Calm motion/}));
     expect(document.documentElement.dataset.motion).toBe('calm');
     await user.click(screen.getByRole('radio', {name: /Off A plain board/}));
     expect(document.documentElement.dataset.effects).toBe('off');
     expect(screen.getByRole('radio', {name: /Desk/})).toBeDisabled();
+  });
+
+  it('compares the theme you use with the one you pick, in four facts', async () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': []});
+    render(<QueryProvider><AppearancePanel/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(within(screen.getByRole('listitem', {name: 'Indigo Clarity theme'})).getByRole('button', {name: 'Compare'}));
+    const facts = screen.getByText('Lowest text pair 6.39:1').closest('dl')!;
+    expect(facts).toHaveAttribute('aria-label', 'Indigo Clarity in four facts');
+    expect(within(facts).getByText('Lowest text pair 6.39:1')).toBeInTheDocument();
+    expect(await screen.findByText('Open or start a case to see its Case home here in each theme.')).toBeInTheDocument();
   });
 });
 

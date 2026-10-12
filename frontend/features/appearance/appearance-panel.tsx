@@ -7,10 +7,11 @@ import type {ReactElement} from 'react';
 import {useEffect, useState} from 'react';
 
 import {StatusChip, LevelChip} from '../../components/status';
+import {ThemeCompare} from './theme-compare';
 import {setSingleKeys, singleKeysOn} from '../../lib/shortcuts';
 import {
   currentAppearance, FORMATS, keepAppearance, keptAppearance, onAppearanceChange, THEMES, tryingTheme, tryTheme,
-  type Appearance, type Effects, type ThemeId,
+  type Appearance, type Effects, type Format, type ThemeId,
 } from '../../lib/theme';
 
 /** The appearance on screen now, kept up to date when it changes anywhere. */
@@ -42,19 +43,41 @@ const EFFECTS: {id: Effects; name: string; line: string}[] = [
   {id: 'off', name: 'Off', line: 'A plain board.'},
 ];
 
+/** A format drawn small: where its panels sit. */
+function FormatThumb({id}: {id: Format}): ReactElement {
+  const box = (x: number, y: number, w: number, h: number, k = 0) => <rect key={`${x}${y}${k}`} x={x} y={y} width={w} height={h} rx={2}/>;
+  const parts: Record<Format, ReactElement[]> = {
+    board: [box(4, 6, 16, 26), box(23, 6, 26, 26, 1), box(52, 6, 16, 26, 2), box(4, 36, 64, 6, 3)],
+    editorial: [box(6, 7, 44, 6), box(6, 17, 54, 6, 1), box(6, 27, 38, 6, 2), box(6, 37, 48, 4, 3)],
+    desk: [box(5, 8, 14, 12), box(23, 5, 16, 14, 1), box(44, 10, 13, 12, 2), box(9, 26, 15, 13, 3), box(30, 24, 22, 17, 4)],
+    story: [box(4, 6, 64, 4), box(4, 14, 20, 28, 1), box(27, 14, 20, 28, 2), box(50, 14, 18, 28, 3)],
+  };
+  return <svg className="ap-format" viewBox="0 0 72 46" aria-hidden="true">{parts[id]}</svg>;
+}
+
 export function AppearancePanel(): ReactElement {
   const {now, kept, trying} = useAppearance();
   const [singleKeys, setSingle] = useState(true);
+  const [picked, setPicked] = useState<ThemeId | null>(null);
+  const looking: ThemeId = picked ?? trying ?? THEMES.find(t => t.id !== kept.theme)!.id;
+  const lookingInfo = THEMES.find(t => t.id === looking)!;
   useEffect(() => setSingle(singleKeysOn()), []);
   return <section className="ap" aria-labelledby="ap-title">
     <h2 id="ap-title">Appearance</h2>
     <p className="ap-sub">Theme, effects and motion are separate choices, kept in this browser only. Status always shows a shape and a word, in every theme.</p>
 
     <h3 className="ap-h">Theme</h3>
+    <ThemeCompare before={kept.theme} after={looking}/>
+    <dl className="ap-facts" aria-label={`${lookingInfo.name} in four facts`}>
+      <div><dt>Contrast</dt><dd>Lowest text pair {lookingInfo.lowestContrast}</dd></div>
+      <div><dt>Calm zones</dt><dd>{lookingInfo.calm}</dd></div>
+      <div><dt>Fonts</dt><dd>{lookingInfo.fonts}</dd></div>
+      <div><dt>Cost</dt><dd>{lookingInfo.cost}</dd></div>
+    </dl>
     <div className="ap-grid" role="list">
       {THEMES.map(t => {
         const on = now.theme === t.id;
-        return <article key={t.id} role="listitem" className={`ap-card${on ? ' on' : ''}`} data-theme={t.id} aria-label={`${t.name} theme`}>
+        return <article key={t.id} role="listitem" className={`ap-card${on ? ' on' : ''}${looking === t.id ? ' looking' : ''}`} data-theme={t.id} aria-label={`${t.name} theme`}>
           <header><b>{t.name}</b>{kept.theme === t.id && <span className="ap-tag">In use</span>}{trying === t.id && <span className="ap-tag try">Trying</span>}</header>
           <p className="ap-mood">{t.mood}</p>
           <div className="ap-sw" aria-hidden="true">{t.swatches.map(c => <i key={c} style={{background: c}}/>)}</div>
@@ -62,10 +85,12 @@ export function AppearancePanel(): ReactElement {
             <span className="ap-read">Board minutes, 4 March 2019</span>
             <span className="ap-mono">€9,800.00 · 3× Feb–Apr 2018</span>
           </div>
-          <div className="ap-chips"><StatusChip status="supported"/><StatusChip status="disputed"/><StatusChip status="unshown"/><LevelChip level="textbook"/></div>
+          <div className="ap-chips"><StatusChip status="supported"/><StatusChip status="disputed"/><StatusChip status="unshown"/><StatusChip status="ruled_out"/>
+            <LevelChip level="textbook"/><LevelChip level="strong"/></div>
           <p className="ap-meta">{t.fonts} · lowest text pair {t.lowestContrast}</p>
           <p className="ap-meta">{t.effects}</p>
           <div className="ap-actions">
+            {kept.theme !== t.id && looking !== t.id && <button type="button" className="ap-btn" onClick={() => setPicked(t.id)}>Compare</button>}
             {kept.theme === t.id && !trying ? <span className="ap-meta">This is your theme.</span> : <>
               <button type="button" className="ap-btn" onClick={() => tryTheme(t.id)} disabled={trying === t.id}>Try for this session</button>
               <button type="button" className="ap-btn p" onClick={() => keepAppearance({theme: t.id})}>Use {t.name}</button>
@@ -94,7 +119,7 @@ export function AppearancePanel(): ReactElement {
       <fieldset className="ap-set">
         <legend>Format</legend>
         {FORMATS.map(f => <label key={f.id} className={`ap-opt${f.ready ? '' : ' off'}`}><input type="radio" name="ap-format" checked={now.format === f.id} disabled={!f.ready}
-          onChange={() => keepAppearance({format: f.id})}/><span><b>{f.name}</b> {f.line}{f.ready ? '' : ' Planned.'}</span></label>)}
+          onChange={() => keepAppearance({format: f.id})}/><FormatThumb id={f.id}/><span><b>{f.name}</b> {f.line}{f.ready ? '' : ' Planned.'}</span></label>)}
       </fieldset>
     </div>
   </section>;
