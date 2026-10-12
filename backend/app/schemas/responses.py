@@ -2644,6 +2644,90 @@ class MoneyChecksOut(ResponseModel):
     currencies: list[CurrencyMoneyChecksOut]
 
 
+class CustodyCheckOut(ResponseModel):
+    label: str
+    ok: bool | None = None
+
+
+class CustodyWireOut(ResponseModel):
+    style: Literal["confirmed", "proposed", "worked_out", "against", "ai"]
+    words: str
+
+
+class CustodyCardOut(ResponseModel):
+    """One custodian step: what it holds, who acted, when, its checks, and the line into the next step."""
+    id: str
+    kind: Literal["file", "source", "reading", "passage", "decision"]
+    title: str
+    lines: list[str]
+    who: str | None = None
+    actor: Literal["person", "app", "outside", "ai"]
+    when: Timestamp | None = None
+    checks: list[CustodyCheckOut]
+    wire: CustodyWireOut
+    document_id: str | None = None
+    sha256: str | None = None
+    text: str | None = None
+    quote: str | None = None
+    page: int | None = None
+
+
+class CustodyRowOut(ResponseModel):
+    evidence_id: str
+    stance: Literal["supports", "contradicts"]
+    cards: list[CustodyCardOut]
+
+
+class CustodyAiOut(ResponseModel):
+    id: str
+    module: str
+    status: str
+    when: Timestamp
+
+
+class CustodyLogOut(ResponseModel):
+    when: Timestamp
+    who: str
+    actor: Literal["person", "app", "outside", "ai"]
+    what: str
+    card: str
+
+
+class CustodySealOut(ResponseModel):
+    steps: int
+    people: int
+    app_services: int
+    outside_services: int
+    hashes_intact: bool | None = None
+    hashes_checked: int
+    ai_uses: int
+    sources_for: int
+    against: int
+
+
+class CustodyClaimOut(ResponseModel):
+    id: str
+    text: str
+    status: str
+    confidence: float | None = None
+
+
+class CustodyChainOut(ResponseModel):
+    claim: CustodyClaimOut
+    rows: list[CustodyRowOut]
+    ai: list[CustodyAiOut]
+    log: list[CustodyLogOut]
+    seal: CustodySealOut
+    checked_at: Timestamp
+
+
+class HashRecheckOut(ResponseModel):
+    document_id: str
+    sha256: str
+    matches: bool | None = None
+    checked_at: Timestamp
+
+
 # --- Settings, credentials and the security audit ------------------------------------------
 
 class SettingsLimitsOut(ResponseModel):

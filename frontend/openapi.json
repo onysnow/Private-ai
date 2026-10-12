@@ -11955,6 +11955,437 @@
         "title": "CurrencyMoneyChecksOut",
         "type": "object"
       },
+      "CustodyAiOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "when": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "When",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "module",
+          "status",
+          "when"
+        ],
+        "title": "CustodyAiOut",
+        "type": "object"
+      },
+      "CustodyCardOut": {
+        "description": "One custodian step: what it holds, who acted, when, its checks, and the line into the next step.",
+        "properties": {
+          "actor": {
+            "enum": [
+              "person",
+              "app",
+              "outside",
+              "ai"
+            ],
+            "title": "Actor",
+            "type": "string"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/CustodyCheckOut"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "file",
+              "source",
+              "reading",
+              "passage",
+              "decision"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "when": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "When"
+          },
+          "who": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Who"
+          },
+          "wire": {
+            "$ref": "#/components/schemas/CustodyWireOut"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "lines",
+          "actor",
+          "checks",
+          "wire"
+        ],
+        "title": "CustodyCardOut",
+        "type": "object"
+      },
+      "CustodyChainOut": {
+        "properties": {
+          "ai": {
+            "items": {
+              "$ref": "#/components/schemas/CustodyAiOut"
+            },
+            "title": "Ai",
+            "type": "array"
+          },
+          "checked_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "claim": {
+            "$ref": "#/components/schemas/CustodyClaimOut"
+          },
+          "log": {
+            "items": {
+              "$ref": "#/components/schemas/CustodyLogOut"
+            },
+            "title": "Log",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/CustodyRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "seal": {
+            "$ref": "#/components/schemas/CustodySealOut"
+          }
+        },
+        "required": [
+          "claim",
+          "rows",
+          "ai",
+          "log",
+          "seal",
+          "checked_at"
+        ],
+        "title": "CustodyChainOut",
+        "type": "object"
+      },
+      "CustodyCheckOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ok"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "CustodyCheckOut",
+        "type": "object"
+      },
+      "CustodyClaimOut": {
+        "properties": {
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "status"
+        ],
+        "title": "CustodyClaimOut",
+        "type": "object"
+      },
+      "CustodyLogOut": {
+        "properties": {
+          "actor": {
+            "enum": [
+              "person",
+              "app",
+              "outside",
+              "ai"
+            ],
+            "title": "Actor",
+            "type": "string"
+          },
+          "card": {
+            "title": "Card",
+            "type": "string"
+          },
+          "what": {
+            "title": "What",
+            "type": "string"
+          },
+          "when": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "When",
+            "type": "string"
+          },
+          "who": {
+            "title": "Who",
+            "type": "string"
+          }
+        },
+        "required": [
+          "when",
+          "who",
+          "actor",
+          "what",
+          "card"
+        ],
+        "title": "CustodyLogOut",
+        "type": "object"
+      },
+      "CustodyRowOut": {
+        "properties": {
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/CustodyCardOut"
+            },
+            "title": "Cards",
+            "type": "array"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "stance": {
+            "enum": [
+              "supports",
+              "contradicts"
+            ],
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "stance",
+          "cards"
+        ],
+        "title": "CustodyRowOut",
+        "type": "object"
+      },
+      "CustodySealOut": {
+        "properties": {
+          "against": {
+            "title": "Against",
+            "type": "integer"
+          },
+          "ai_uses": {
+            "title": "Ai Uses",
+            "type": "integer"
+          },
+          "app_services": {
+            "title": "App Services",
+            "type": "integer"
+          },
+          "hashes_checked": {
+            "title": "Hashes Checked",
+            "type": "integer"
+          },
+          "hashes_intact": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hashes Intact"
+          },
+          "outside_services": {
+            "title": "Outside Services",
+            "type": "integer"
+          },
+          "people": {
+            "title": "People",
+            "type": "integer"
+          },
+          "sources_for": {
+            "title": "Sources For",
+            "type": "integer"
+          },
+          "steps": {
+            "title": "Steps",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "steps",
+          "people",
+          "app_services",
+          "outside_services",
+          "hashes_checked",
+          "ai_uses",
+          "sources_for",
+          "against"
+        ],
+        "title": "CustodySealOut",
+        "type": "object"
+      },
+      "CustodyWireOut": {
+        "properties": {
+          "style": {
+            "enum": [
+              "confirmed",
+              "proposed",
+              "worked_out",
+              "against",
+              "ai"
+            ],
+            "title": "Style",
+            "type": "string"
+          },
+          "words": {
+            "title": "Words",
+            "type": "string"
+          }
+        },
+        "required": [
+          "style",
+          "words"
+        ],
+        "title": "CustodyWireOut",
+        "type": "object"
+      },
       "DataTableOut": {
         "properties": {
           "columns": {
@@ -18974,6 +19405,42 @@
           "visible_edge_count"
         ],
         "title": "GraphReconciliationOut",
+        "type": "object"
+      },
+      "HashRecheckOut": {
+        "properties": {
+          "checked_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "matches": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matches"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "sha256",
+          "checked_at"
+        ],
+        "title": "HashRecheckOut",
         "type": "object"
       },
       "HealthOut": {
@@ -33339,6 +33806,56 @@
         "summary": "Update Claim Endpoint"
       }
     },
+    "/api/claims/{claim_id}/custody-chain": {
+      "get": {
+        "description": "How this claim got here, from the file to the sentence (mockup CHECK_2). Re-hashes the files it shows.",
+        "operationId": "get_claim_custody_chain",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "claim_id",
+            "required": true,
+            "schema": {
+              "title": "Claim Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustodyChainOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Claim Custody Chain"
+      }
+    },
     "/api/claims/{claim_id}/evidence": {
       "get": {
         "operationId": "list_claim_evidence_endpoint",
@@ -43181,6 +43698,56 @@
           }
         },
         "summary": "Get Document Picture"
+      }
+    },
+    "/api/documents/{document_id}/recheck-hash": {
+      "post": {
+        "description": "Re-reads the stored file and compares its SHA-256 with the one recorded at intake. Changes nothing.",
+        "operationId": "recheck_hash",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HashRecheckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Recheck Hash"
       }
     },
     "/api/documents/{document_id}/similar": {

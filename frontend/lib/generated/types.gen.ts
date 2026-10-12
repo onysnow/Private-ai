@@ -4589,6 +4589,255 @@ export type CurrencyMoneyChecksOut = {
 };
 
 /**
+ * CustodyAiOut
+ */
+export type CustodyAiOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * When
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  when: string;
+};
+
+/**
+ * CustodyCardOut
+ *
+ * One custodian step: what it holds, who acted, when, its checks, and the line into the next step.
+ */
+export type CustodyCardOut = {
+  /**
+   * Actor
+   */
+  actor: 'person' | 'app' | 'outside' | 'ai';
+  /**
+   * Checks
+   */
+  checks: Array<CustodyCheckOut>;
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'file' | 'source' | 'reading' | 'passage' | 'decision';
+  /**
+   * Lines
+   */
+  lines: Array<string>;
+  /**
+   * Page
+   */
+  page?: number | null;
+  /**
+   * Quote
+   */
+  quote?: string | null;
+  /**
+   * Sha256
+   */
+  sha256?: string | null;
+  /**
+   * Text
+   */
+  text?: string | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * When
+   */
+  when?: string | null;
+  /**
+   * Who
+   */
+  who?: string | null;
+  wire: CustodyWireOut;
+};
+
+/**
+ * CustodyChainOut
+ */
+export type CustodyChainOut = {
+  /**
+   * Ai
+   */
+  ai: Array<CustodyAiOut>;
+  /**
+   * Checked At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  checked_at: string;
+  claim: CustodyClaimOut;
+  /**
+   * Log
+   */
+  log: Array<CustodyLogOut>;
+  /**
+   * Rows
+   */
+  rows: Array<CustodyRowOut>;
+  seal: CustodySealOut;
+};
+
+/**
+ * CustodyCheckOut
+ */
+export type CustodyCheckOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Ok
+   */
+  ok?: boolean | null;
+};
+
+/**
+ * CustodyClaimOut
+ */
+export type CustodyClaimOut = {
+  /**
+   * Confidence
+   */
+  confidence?: number | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * CustodyLogOut
+ */
+export type CustodyLogOut = {
+  /**
+   * Actor
+   */
+  actor: 'person' | 'app' | 'outside' | 'ai';
+  /**
+   * Card
+   */
+  card: string;
+  /**
+   * What
+   */
+  what: string;
+  /**
+   * When
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  when: string;
+  /**
+   * Who
+   */
+  who: string;
+};
+
+/**
+ * CustodyRowOut
+ */
+export type CustodyRowOut = {
+  /**
+   * Cards
+   */
+  cards: Array<CustodyCardOut>;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Stance
+   */
+  stance: 'supports' | 'contradicts';
+};
+
+/**
+ * CustodySealOut
+ */
+export type CustodySealOut = {
+  /**
+   * Against
+   */
+  against: number;
+  /**
+   * Ai Uses
+   */
+  ai_uses: number;
+  /**
+   * App Services
+   */
+  app_services: number;
+  /**
+   * Hashes Checked
+   */
+  hashes_checked: number;
+  /**
+   * Hashes Intact
+   */
+  hashes_intact?: boolean | null;
+  /**
+   * Outside Services
+   */
+  outside_services: number;
+  /**
+   * People
+   */
+  people: number;
+  /**
+   * Sources For
+   */
+  sources_for: number;
+  /**
+   * Steps
+   */
+  steps: number;
+};
+
+/**
+ * CustodyWireOut
+ */
+export type CustodyWireOut = {
+  /**
+   * Style
+   */
+  style: 'confirmed' | 'proposed' | 'worked_out' | 'against' | 'ai';
+  /**
+   * Words
+   */
+  words: string;
+};
+
+/**
  * DataTableOut
  */
 export type DataTableOut = {
@@ -8635,6 +8884,30 @@ export type GraphReconciliationOut = {
    * Visible Edge Count
    */
   visible_edge_count: number;
+};
+
+/**
+ * HashRecheckOut
+ */
+export type HashRecheckOut = {
+  /**
+   * Checked At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  checked_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Matches
+   */
+  matches?: boolean | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
 };
 
 /**
@@ -17225,6 +17498,42 @@ export type UpdateClaimEndpointResponses = {
 export type UpdateClaimEndpointResponse =
   UpdateClaimEndpointResponses[keyof UpdateClaimEndpointResponses];
 
+export type GetClaimCustodyChainData = {
+  body?: never;
+  path: {
+    /**
+     * Claim Id
+     */
+    claim_id: string;
+  };
+  query?: never;
+  url: '/api/claims/{claim_id}/custody-chain';
+};
+
+export type GetClaimCustodyChainErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetClaimCustodyChainError =
+  GetClaimCustodyChainErrors[keyof GetClaimCustodyChainErrors];
+
+export type GetClaimCustodyChainResponses = {
+  /**
+   * Successful Response
+   */
+  200: CustodyChainOut;
+};
+
+export type GetClaimCustodyChainResponse =
+  GetClaimCustodyChainResponses[keyof GetClaimCustodyChainResponses];
+
 export type ListClaimEvidenceEndpointData = {
   body?: never;
   path: {
@@ -19004,6 +19313,41 @@ export type GetDocumentPictureResponses = {
 
 export type GetDocumentPictureResponse =
   GetDocumentPictureResponses[keyof GetDocumentPictureResponses];
+
+export type RecheckHashData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/recheck-hash';
+};
+
+export type RecheckHashErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecheckHashError = RecheckHashErrors[keyof RecheckHashErrors];
+
+export type RecheckHashResponses = {
+  /**
+   * Successful Response
+   */
+  200: HashRecheckOut;
+};
+
+export type RecheckHashResponse =
+  RecheckHashResponses[keyof RecheckHashResponses];
 
 export type GetSimilarDocumentsData = {
   body?: never;

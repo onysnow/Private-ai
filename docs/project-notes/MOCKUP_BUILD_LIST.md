@@ -138,12 +138,16 @@ CHECK_1 Decide: **partial** (queue, evidence pane, card, keys, undo built).
 - [ ] Queue filters work past the first 200 (backlog P1); grouped by source with "pages read"
 - [ ] "What happens" preview per kind; reason chips under No; Last 10 strip; bulk "Accept all 38 high"
 - [ ] Sort by what it unlocks; "Open the document" opens the reader, not Search
-CHECK_2 Chain of Custody: **missing** (old drawer).
-- [ ] Whole-screen chain: Files → Reading → Passage → Decision → The claim as wired cards with check glyphs (✓ hash, ✓ says it, OCR %)
-- [ ] Wire styles (confirmed / proposed / worked out / against / AI step) and the key
-- [ ] Custody log (who held it, what was done, when) with export for an editor or lawyer
-- [ ] Detail panel: source / file / content checks, anchor, SHA re-check, "What if this breaks?"
-- [ ] Claim card with the Done checklist for Supported (server-enforced rules)
+CHECK_2 Chain of Custody (12 Oct: Check › Chain of Custody, `features/custody`; backend `GET /claims/{id}/custody-chain`, `POST /documents/{id}/recheck-hash`):
+- [x] Whole-screen chain: Files → Reading → Passage → Decision → The claim as wired cards with check glyphs (✓ hash re-checked on load, ✓ says it, OCR / text layer), one row per piece of evidence, against rows in red; AI drafts that quote the claim as plum cards
+- [x] Wire styles (confirmed / proposed / worked out / against / AI) with the action word on each line
+- [x] Custody log (who, what, when) with "Export for an editor or lawyer" (a tab-separated table) and L for the chain as a plain list; the custody seal, copyable for a methods note
+- [x] Detail panel: the passage with the quote lit, checks, SHA-256, Decided, who and when; Open page n, Re-check hash
+- [x] Opened from a claim in Claims ("Chain of Custody: how this got here"); Esc back to the claim
+- [ ] OCR legibility % (not stored by the reader), who decided by name (review events keep only "a person")
+- [ ] "What if this breaks?" (what rests on a step); scroll-over replay; draw-in motion
+- [x] Decide: "Open the document" opens the reader at the evidence's page; the filters work past the first 200 (the server filters by kind before paging)
+- [ ] Claim card with the Done checklist for Supported (server-enforced rules) in the chain
 
 ## 7. Act — mockups ACT_1 (Red Flags) and ACT_2 (story tree + write-up) (§08)
 

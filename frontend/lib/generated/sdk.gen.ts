@@ -237,6 +237,9 @@ import type {
   GetChecksData,
   GetChecksErrors,
   GetChecksResponses,
+  GetClaimCustodyChainData,
+  GetClaimCustodyChainErrors,
+  GetClaimCustodyChainResponses,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
@@ -645,6 +648,9 @@ import type {
   PutInvestigationMembershipData,
   PutInvestigationMembershipErrors,
   PutInvestigationMembershipResponses,
+  RecheckHashData,
+  RecheckHashErrors,
+  RecheckHashResponses,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewErrors,
   RefreshOpenalephDocumentReviewResponses,
@@ -943,6 +949,8 @@ import {
   zGetCaseRecordResponse,
   zGetChecksPath,
   zGetChecksResponse,
+  zGetClaimCustodyChainPath,
+  zGetClaimCustodyChainResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
   zGetClaimSourcesPath,
@@ -1247,6 +1255,8 @@ import {
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
   zPutInvestigationMembershipResponse,
+  zRecheckHashPath,
+  zRecheckHashResponse,
   zRefreshOpenalephDocumentReviewPath,
   zRefreshOpenalephDocumentReviewResponse,
   zRelationshipSchemasResponse,
@@ -2040,6 +2050,37 @@ export const updateClaimEndpoint = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Claim Custody Chain
+ *
+ * How this claim got here, from the file to the sentence (mockup CHECK_2). Re-hashes the files it shows.
+ */
+export const getClaimCustodyChain = <ThrowOnError extends boolean = false>(
+  options: Options<GetClaimCustodyChainData, ThrowOnError>,
+): RequestResult<
+  GetClaimCustodyChainResponses,
+  GetClaimCustodyChainErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetClaimCustodyChainResponses,
+    GetClaimCustodyChainErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetClaimCustodyChainPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetClaimCustodyChainResponse.parseAsync(data),
+    url: '/api/claims/{claim_id}/custody-chain',
+    ...options,
   });
 
 /**
@@ -3521,6 +3562,33 @@ export const getDocumentPicture = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetDocumentPictureResponse.parseAsync(data),
     url: '/api/documents/{document_id}/picture',
+    ...options,
+  });
+
+/**
+ * Recheck Hash
+ *
+ * Re-reads the stored file and compares its SHA-256 with the one recorded at intake. Changes nothing.
+ */
+export const recheckHash = <ThrowOnError extends boolean = false>(
+  options: Options<RecheckHashData, ThrowOnError>,
+): RequestResult<RecheckHashResponses, RecheckHashErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RecheckHashResponses,
+    RecheckHashErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRecheckHashPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRecheckHashResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/recheck-hash',
     ...options,
   });
 

@@ -13,8 +13,9 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.core.authorization import require_scope_investigation, scope_for_request
 from app.db.session import get_db
+from app.services.custody_chain import claim_custody_chain, recheck_document_hash
 from app.services.provenance import find_extraction_lineage, record_provenance_trace
-from app.schemas.responses import ExtractionLineageLookupOut, ProvenanceTraceOut
+from app.schemas.responses import CustodyChainOut, ExtractionLineageLookupOut, HashRecheckOut, ProvenanceTraceOut
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -47,3 +48,21 @@ def find_extraction_lineage_endpoint(record_type: str, record_id: str, request: 
         return result
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+
+
+@router.get("/claims/{claim_id}/custody-chain", response_model=CustodyChainOut)
+def get_claim_custody_chain(claim_id: str, db: Session = Depends(get_db)) -> Any:
+    """How this claim got here, from the file to the sentence (mockup CHECK_2). Re-hashes the files it shows."""
+    chain = claim_custody_chain(db, claim_id)
+    if chain is None:
+        raise HTTPException(404, "Claim not found")
+    return chain
+
+
+@router.post("/documents/{document_id}/recheck-hash", response_model=HashRecheckOut)
+def recheck_hash(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Re-reads the stored file and compares its SHA-256 with the one recorded at intake. Changes nothing."""
+    result = recheck_document_hash(db, document_id)
+    if result is None:
+        raise HTTPException(404, "Document not found")
+    return result

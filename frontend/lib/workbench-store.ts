@@ -51,6 +51,9 @@ type WorkbenchState = {
    * twice still reopens it. The workspace itself decides whether it holds
    * that claim. */
   claim: {serial: number; claimId: string} | null;
+  /** The claim whose full Chain of Custody was last asked for (Check › Chain of Custody, mockup CHECK_2). */
+  chain: {serial: number; claimId: string} | null;
+  openChain: (claimId: string) => void;
   openClaim: (claimId: string) => void;
   /** The entity whose dossier was last asked for (the "Open dossier" button,
    * a graph node, a relationship endpoint, the record a merge kept). */
@@ -89,7 +92,7 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   investigationId: '',
   // A new case means a new trace, claim, dossier and relationship: nothing from the old one applies.
   setInvestigationId: id => set(state => (state.investigationId === id ? {investigationId: id}
-    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, flag: null, check: null, asOf: null, pointedParty: null})),
+    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, flag: null, check: null, chain: null, asOf: null, pointedParty: null})),
   investigationName: '',
   setInvestigationName: name => set(state => (state.investigationName === name ? state : {investigationName: name})),
   entityId: '',
@@ -99,6 +102,8 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   clearProvenance: () => set({provenance: null}),
   claim: null,
   openClaim: claimId => set({claim: {serial: nextSerial(), claimId}}),
+  chain: null,
+  openChain: claimId => set({chain: {serial: nextSerial(), claimId}}),
   dossier: null,
   // Opening a dossier also selects its entity, as clicking a graph node did.
   openDossier: entityId => set({entityId, dossier: {serial: nextSerial(), entityId}}),

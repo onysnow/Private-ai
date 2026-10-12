@@ -30,6 +30,7 @@ import {CaseHome} from '../../features/case-home/case-home';
 import {DecideScreen} from '../../features/case-home/decide-screen';
 import {TheWire} from '../../features/the-wire/the-wire';
 import {MoneyView} from '../../features/money/money-view';
+import {ChainOfCustody} from '../../features/custody/chain-of-custody';
 import {TheDrop} from '../../features/the-drop/the-drop';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
@@ -276,6 +277,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
           <ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>},
         {anchor: 'to-check', label: 'To check', render: () => <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'review-queue', label: 'Connector findings', render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'chain-of-custody', label: 'Chain of Custody', render: () => <PanelErrorBoundary name="Chain of Custody (full)"><ChainOfCustody investigationId={inv} active={view === 'verify'}/></PanelErrorBoundary>},
       ])}
       {screen('map', [
         {anchor: 'the-wire', label: 'The Wire', fill: true, render: () => <PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},

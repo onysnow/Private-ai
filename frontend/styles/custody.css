@@ -1,0 +1,84 @@
+/* Check › Chain of Custody (features/custody/chain-of-custody.tsx, mockup CHECK_2). Cards are plain surfaces (a calm
+   zone, research LOOK-B5); the lines carry the status grammar: solid confirmed, dashed proposed, dotted worked out,
+   red against, plum AI. */
+.cc { display: grid; gap: 12px; padding: 6px clamp(14px, 2vw, 28px) 18px; color: var(--text); font-family: var(--font-ui); }
+.cc-head { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; align-items: flex-end; }
+.cc-head h2 { margin: 0; font: 400 clamp(22px, 2.3vw, 30px)/1.15 var(--font-display, var(--font-ui)); }
+.cc-seal { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 500 12px var(--font-mono); color: var(--text-muted); }
+.cc-seal span { padding: 3px 10px; border-radius: 999px; background: var(--surface-1); box-shadow: inset 0 0 0 1px var(--line); user-select: all; }
+.cc-seal button, .cc-log header button { all: unset; cursor: pointer; color: var(--accent-2); font: 500 12px var(--font-ui); }
+.cc-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cc-pick { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; color: var(--text-muted); }
+.cc-pick select { max-width: 340px; padding: 5px 8px; border-radius: 8px; background: var(--surface-1); color: var(--text); border: 1px solid var(--line); font: inherit; font-size: 12.5px; }
+.cc-btn { all: unset; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; padding: 5px 11px; border-radius: 999px; font-size: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.cc-btn[aria-pressed='true'] { background: var(--surface-3); }
+.cc-btn kbd { padding: 0 5px; border-radius: 4px; background: var(--surface-2); font: 600 10.5px var(--font-mono); }
+.cc-muted { margin: 0; color: var(--text-muted); font-size: 12.5px; }
+.cc-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.cc-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, 320px); gap: 14px; align-items: start; }
+@media (max-width: 1100px) { .cc-body { grid-template-columns: 1fr; } }
+.cc-main { display: grid; gap: 14px; min-width: 0; }
+
+.cc-wires { position: relative; display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)) minmax(170px, 1.15fr); column-gap: 44px; row-gap: 18px;
+  padding: 12px 14px 16px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel, none); overflow-x: auto; align-items: center; }
+.cc-col { margin: 0; grid-row: 1; font: 600 10px var(--font-mono); letter-spacing: .12em; color: var(--text-muted); }
+.cc-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.cc-wire path { fill: none; stroke-width: 1.6; stroke: var(--status-supported); }
+.cc-wire text { font: 500 10px var(--font-ui); fill: var(--text-muted); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; }
+.cc-wire.w-proposed path { stroke: var(--text-muted); stroke-dasharray: 6 4; }
+.cc-wire.w-worked_out path { stroke: var(--text-muted); stroke-dasharray: 1.5 4; stroke-linecap: round; }
+.cc-wire.w-against path { stroke: var(--status-disputed); stroke-dasharray: 8 3 2 3; }
+.cc-wire.w-against text { fill: var(--status-disputed); }
+.cc-wire.w-ai path { stroke: var(--ai-mark); stroke-dasharray: 2 3; }
+.cc-wire.lit path { stroke-width: 2.6; }
+.cc-card { all: unset; box-sizing: border-box; position: relative; z-index: 1; display: grid; gap: 4px; padding: 9px 11px; border-radius: 10px; background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line); font-size: 12px; cursor: pointer; min-width: 0; }
+.cc-card b { font-size: 12.5px; font-weight: 600; overflow-wrap: anywhere; }
+.cc-card small { color: var(--text-muted); font-size: 11px; }
+.cc-card:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.cc-card.picked { box-shadow: inset 0 0 0 1.5px var(--accent-1); }
+.cc-card.lit { box-shadow: inset 0 0 0 1.5px var(--accent-2); }
+.cc-card.against { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--status-disputed) 70%, transparent); }
+.cc-card-top { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; justify-content: space-between; }
+.cc-kind { font: 600 9.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.cc-check { display: inline-flex; gap: 3px; padding: 0 7px; border-radius: 999px; font: 600 9.5px var(--font-mono); text-transform: uppercase; letter-spacing: .04em; box-shadow: inset 0 0 0 1px currentColor; }
+.cc-check.ok { color: var(--status-supported); } .cc-check.bad { color: var(--status-disputed); } .cc-check.unknown { color: var(--status-unshown); }
+.cc-thumb { display: grid; gap: 4px; padding: 7px 9px; border-radius: 4px; background: color-mix(in srgb, var(--text) 85%, var(--surface-2)); width: 84px; }
+.cc-thumb i { display: block; height: 3px; border-radius: 2px; background: color-mix(in srgb, var(--surface-1) 55%, transparent); }
+.cc-thumb i:nth-child(2) { width: 70%; }
+.cc-text { font: 400 12px/1.4 var(--font-read); }
+.cc-text mark, .cc-detail mark { background: color-mix(in srgb, var(--accent-1) 30%, transparent); color: inherit; border-radius: 2px; box-shadow: 0 1px 0 var(--accent-1); }
+.cc-claim { cursor: default; align-self: stretch; align-content: start; padding: 12px 14px; box-shadow: inset 0 0 0 1.5px var(--status-supported); }
+.cc-claim b { font: 600 15px/1.3 var(--font-read); }
+.cc-claim ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 2px; font-size: 11.5px; color: var(--text-muted); }
+.cc-claim.st-disputed { box-shadow: inset 0 0 0 1.5px var(--status-disputed); }
+.cc-claim.st-unshown { box-shadow: inset 0 0 0 1px var(--line); border: 1px dashed var(--status-unshown); }
+.cc-ai { cursor: default; box-shadow: inset 0 0 0 1px var(--ai-mark); border: 1px dashed var(--ai-mark); }
+.cc-ai .cc-kind { color: var(--ai-mark); }
+
+.cc-log { padding: 10px 14px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel, none); }
+.cc-log header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.cc-log h3 { margin: 0 0 6px; font: 600 13px var(--font-ui); }
+.cc-log h3 small { font: 600 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); margin-left: 6px; }
+.cc-log table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cc-log td { padding: 5px 8px; border-top: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.cc-log td:first-child { width: 150px; color: var(--text-muted); white-space: nowrap; }
+.cc-log td:nth-child(2) { width: 150px; }
+.cc-log tr.lit td { background: color-mix(in srgb, var(--accent-1) 12%, transparent); }
+.cc-log tr.actor-ai td:last-child { color: var(--ai-mark); }
+.cc-list { margin: 0; padding: 12px 14px 12px 32px; border-radius: 14px; background: var(--surface-1); display: grid; gap: 6px; font-size: 13px; }
+
+.cc-detail { display: grid; gap: 8px; padding: 14px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel, none); position: sticky; top: 8px; }
+.cc-eyebrow { margin: 0; font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.cc-detail h3 { margin: 0; font: 600 16px var(--font-ui); overflow-wrap: anywhere; }
+.cc-detail blockquote { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font: 400 14px/1.5 var(--font-read); }
+.cc-detail dl { margin: 0; display: grid; gap: 6px; font-size: 12px; }
+.cc-detail dl div { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 8px; }
+.cc-detail dt { font: 600 10px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); padding-top: 2px; }
+.cc-detail dd { margin: 0; overflow-wrap: anywhere; }
+.cc-checks { display: flex; flex-wrap: wrap; gap: 4px; }
+.cc-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.cc-acts button { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 10px; font-size: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.cc-acts button.primary { background: var(--accent-1); color: var(--ground); box-shadow: none; font-weight: 600; }
+.cc-acts button:disabled { cursor: default; opacity: .55; }
+.cc-acts button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }

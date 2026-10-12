@@ -1839,6 +1839,128 @@ export const zCrossReferenceMatchOut = z.object({
 });
 
 /**
+ * CustodyAiOut
+ */
+export const zCustodyAiOut = z.object({
+  id: z.string(),
+  module: z.string(),
+  status: z.string(),
+  when: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * CustodyCheckOut
+ */
+export const zCustodyCheckOut = z.object({
+  label: z.string(),
+  ok: z.boolean().nullish(),
+});
+
+/**
+ * CustodyClaimOut
+ */
+export const zCustodyClaimOut = z.object({
+  confidence: z.number().nullish(),
+  id: z.string(),
+  status: z.string(),
+  text: z.string(),
+});
+
+/**
+ * CustodyLogOut
+ */
+export const zCustodyLogOut = z.object({
+  actor: z.enum(['person', 'app', 'outside', 'ai']),
+  card: z.string(),
+  what: z.string(),
+  when: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  who: z.string(),
+});
+
+/**
+ * CustodySealOut
+ */
+export const zCustodySealOut = z.object({
+  against: z.number().int(),
+  ai_uses: z.number().int(),
+  app_services: z.number().int(),
+  hashes_checked: z.number().int(),
+  hashes_intact: z.boolean().nullish(),
+  outside_services: z.number().int(),
+  people: z.number().int(),
+  sources_for: z.number().int(),
+  steps: z.number().int(),
+});
+
+/**
+ * CustodyWireOut
+ */
+export const zCustodyWireOut = z.object({
+  style: z.enum(['confirmed', 'proposed', 'worked_out', 'against', 'ai']),
+  words: z.string(),
+});
+
+/**
+ * CustodyCardOut
+ *
+ * One custodian step: what it holds, who acted, when, its checks, and the line into the next step.
+ */
+export const zCustodyCardOut = z.object({
+  actor: z.enum(['person', 'app', 'outside', 'ai']),
+  checks: z.array(zCustodyCheckOut),
+  document_id: z.string().nullish(),
+  id: z.string(),
+  kind: z.enum(['file', 'source', 'reading', 'passage', 'decision']),
+  lines: z.array(z.string()),
+  page: z.number().int().nullish(),
+  quote: z.string().nullish(),
+  sha256: z.string().nullish(),
+  text: z.string().nullish(),
+  title: z.string(),
+  when: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  who: z.string().nullish(),
+  wire: zCustodyWireOut,
+});
+
+/**
+ * CustodyRowOut
+ */
+export const zCustodyRowOut = z.object({
+  cards: z.array(zCustodyCardOut),
+  evidence_id: z.string(),
+  stance: z.enum(['supports', 'contradicts']),
+});
+
+/**
+ * CustodyChainOut
+ */
+export const zCustodyChainOut = z.object({
+  ai: z.array(zCustodyAiOut),
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  claim: zCustodyClaimOut,
+  log: z.array(zCustodyLogOut),
+  rows: z.array(zCustodyRowOut),
+  seal: zCustodySealOut,
+});
+
+/**
  * DecisionChoiceOut
  *
  * One answer: the existing endpoint it posts to and the body it sends.
@@ -3424,6 +3546,20 @@ export const zGraphReconciliationOut = z.object({
   suppressed_duplicate_count: z.number().int(),
   underlying_edge_count: z.number().int(),
   visible_edge_count: z.number().int(),
+});
+
+/**
+ * HashRecheckOut
+ */
+export const zHashRecheckOut = z.object({
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  document_id: z.string(),
+  matches: z.boolean().nullish(),
+  sha256: z.string(),
 });
 
 /**
@@ -7945,6 +8081,15 @@ export const zUpdateClaimEndpointPath = z.object({
  */
 export const zUpdateClaimEndpointResponse = zClaimOut;
 
+export const zGetClaimCustodyChainPath = z.object({
+  claim_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetClaimCustodyChainResponse = zCustodyChainOut;
+
 export const zListClaimEvidenceEndpointPath = z.object({
   claim_id: z.string(),
 });
@@ -8442,6 +8587,15 @@ export const zGetDocumentPicturePath = z.object({
  * The picture this document is, as uploaded (PNG or JPEG)
  */
 export const zGetDocumentPictureResponse = z.string();
+
+export const zRecheckHashPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRecheckHashResponse = zHashRecheckOut;
 
 export const zGetSimilarDocumentsPath = z.object({
   document_id: z.string(),

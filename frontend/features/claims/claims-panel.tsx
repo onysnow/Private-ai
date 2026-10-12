@@ -74,6 +74,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const evidenceQuery = useQuery({...listInvestigationEvidenceOptions({path}), enabled: Boolean(investigationId)});
   const claims: ClaimOut[] = claimsQuery.data ?? NO_CLAIMS;
   const evidencePool: EvidencePoolRow[] = evidenceQuery.data ?? [];
+  const openChain = useWorkbenchStore(state => state.openChain);
   const selectedClaim = selectedId ? claims.find(c => c.id === selectedId) ?? null : null;
   const workspaceQuery = useQuery({...getClaimReviewWorkspaceOptions({path: {claim_id: selectedId ?? ''}}), enabled: Boolean(selectedClaim)});
   const workspace: ClaimReviewWorkspaceOut | null = selectedClaim ? workspaceQuery.data ?? null : null;
@@ -183,6 +184,8 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
         <div>
           {!selectedClaim ? <p className="muted">Choose a claim to inspect its evidence and verification state.</p> : <>
             <h4>{selectedClaim.text}</h4>
+            <p><Button variant="outline" size="sm" onClick={() => { openChain(selectedClaim.id); window.location.hash = 'chain-of-custody'; }}>
+              Chain of Custody: how this got here</Button></p>
             <div className="searchrow">
               <Select value={claimStatus} onValueChange={setClaimStatus}>
                 <SelectTrigger className="w-auto"><SelectValue/></SelectTrigger>

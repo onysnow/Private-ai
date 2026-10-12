@@ -8,6 +8,7 @@ import '../vendor/onysnow-effects/effects.css';
 import '../styles/effects.css';
 import '../styles/wire.css';
 import '../styles/money.css';
+import '../styles/custody.css';
 import '../styles/drop.css';
 import '../styles/reading-room.css';
 // Deck font pairings (SIL OFL, served by the app itself -- see

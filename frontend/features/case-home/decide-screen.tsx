@@ -13,7 +13,7 @@ import {singleKeysOn} from '../../lib/shortcuts';
 import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
-import {DecisionCard, Excerpt, PartyChips, RowCells} from './decision-card';
+import {DecisionCard, Excerpt, PartyChips, RowCells, pageOf} from './decision-card';
 import {HOLD_MS, KIND_LABEL, useDecisions} from './use-decisions';
 import type {DecisionKind, DecisionOrder} from './use-decisions';
 
@@ -44,7 +44,7 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
         <div><b>{ev.filename || 'Document'}</b><span>{ev.locator || 'no locator'}</span></div>
         {ev.document_id && <div className="dc-doc-actions">
           <button type="button" onClick={() => openProvenance({title: ev.filename || 'Document', kind: 'document', documentId: ev.document_id!, locator: ev.locator || undefined})}>Trace</button>
-          <button type="button" onClick={() => openDocument(ev.document_id!)}>Open the document</button>
+          <button type="button" onClick={() => openDocument(ev.document_id!, pageOf(ev.locator))}>Open the document</button>
         </div>}
       </header>
       <div className="dc-read">

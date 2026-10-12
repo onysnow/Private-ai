@@ -71,7 +71,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 
 ## Found by the browser walkthrough (11 Oct) — not yet discussed with Ony
 - **P1:**
-  - The Decide filter chips only look at the first 200 items, so "Missing 176" shows nothing.
+  - ~~The Decide filter chips only look at the first 200 items, so "Missing 176" shows nothing.~~ Checked 12 Oct: the server filters by kind before paging.
   - On an API error, Decide shows "Failed to fetch" beside "Nothing waits for you".
   - Decide's "Open the document" goes to Bring in › Search.
   - The Home mini-network's nodes can't be clicked with the mouse (an SVG overlay sits on them).

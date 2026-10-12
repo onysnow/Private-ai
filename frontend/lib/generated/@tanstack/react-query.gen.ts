@@ -84,6 +84,7 @@ import {
   getBasemapTile,
   getCaseRecord,
   getChecks,
+  getClaimCustodyChain,
   getClaimReviewWorkspace,
   getClaimSources,
   getCollection,
@@ -221,6 +222,7 @@ import {
   promoteStatementAssessment,
   pruneSecurityAudit,
   putInvestigationMembership,
+  recheckHash,
   refreshOpenalephDocumentReview,
   relationshipSchemas,
   removeCollection,
@@ -488,6 +490,9 @@ import type {
   GetChecksData,
   GetChecksError,
   GetChecksResponse,
+  GetClaimCustodyChainData,
+  GetClaimCustodyChainError,
+  GetClaimCustodyChainResponse,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
@@ -895,6 +900,9 @@ import type {
   PutInvestigationMembershipData,
   PutInvestigationMembershipError,
   PutInvestigationMembershipResponse,
+  RecheckHashData,
+  RecheckHashError,
+  RecheckHashResponse,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewError,
   RefreshOpenalephDocumentReviewResponse,
@@ -1752,6 +1760,36 @@ export const updateClaimEndpointMutation = (
   };
   return mutationOptions;
 };
+
+export const getClaimCustodyChainQueryKey = (
+  options: Options<GetClaimCustodyChainData>,
+) => createQueryKey('getClaimCustodyChain', options);
+
+/**
+ * Get Claim Custody Chain
+ *
+ * How this claim got here, from the file to the sentence (mockup CHECK_2). Re-hashes the files it shows.
+ */
+export const getClaimCustodyChainOptions = (
+  options: Options<GetClaimCustodyChainData>,
+) =>
+  queryOptions<
+    GetClaimCustodyChainResponse,
+    GetClaimCustodyChainError,
+    GetClaimCustodyChainResponse,
+    ReturnType<typeof getClaimCustodyChainQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getClaimCustodyChain({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getClaimCustodyChainQueryKey(options),
+  });
 
 export const listClaimEvidenceEndpointQueryKey = (
   options: Options<ListClaimEvidenceEndpointData>,
@@ -3167,6 +3205,35 @@ export const getDocumentPictureOptions = (
     },
     queryKey: getDocumentPictureQueryKey(options),
   });
+
+/**
+ * Recheck Hash
+ *
+ * Re-reads the stored file and compares its SHA-256 with the one recorded at intake. Changes nothing.
+ */
+export const recheckHashMutation = (
+  options?: Partial<Options<RecheckHashData>>,
+): UseMutationOptions<
+  RecheckHashResponse,
+  RecheckHashError,
+  Options<RecheckHashData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RecheckHashResponse,
+    RecheckHashError,
+    Options<RecheckHashData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await recheckHash({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getSimilarDocumentsQueryKey = (
   options: Options<GetSimilarDocumentsData>,
