@@ -33,14 +33,15 @@ from app.models.domain import BackgroundJob, Investigation
 from app.schemas.responses import (
     AiAnalysisCandidatesOut, AiModelFailedOut, AiOutputRejectedOut, AiReasoningRunOut, ClaimOut, ErrorOut, ConnectorFindingOut, ConnectorRunOut, CorpusSearchOut, CorpusStatusOut, DemoSeedOut, DocumentOut,
     EvidencePoolRow, FinancialLedgerOut, GraphOut, MoneyChecksOut, InvestigationDeletionPreview, InvestigationDeletionResult,
-    InvestigationOut, LeadOut, LeadQueueOut, OpenAlephCorpusBindingOut, OpenAlephOperationFailureOut,
+    InvestigationOut, LeadOut, LeadQueueOut, RunPlanOut, RunProfileOut, OpenAlephCorpusBindingOut, OpenAlephOperationFailureOut,
     QuestionContextOut, RelationshipOut, ReportingTaskOut, SourceOut, TimelineOut, ValidationErrorOut, file_response, upstream,
 )
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
-    InvestigationQuestionContextRequest, PresentationDraftRequest,
+    InvestigationQuestionContextRequest, PresentationDraftRequest, RunPlanRequest, RunProfileIn,
 )
 from app.services.assistant_context import build_question_context
+from app.services.run_plan import build_run_plan, get_profile as get_run_profile, save_profile as save_run_profile
 from app.services.exports import build_investigation_export
 from app.services.investigations import (
     create_investigation as _create_investigation,
@@ -176,7 +177,7 @@ def investigation_question_context(
         raise HTTPException(404, str(exc))
 
 
-async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None) -> dict[str, Any]:
+async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None, run_options: dict | None = None, premises: list[str] | None = None, changes: list[dict] | None = None) -> dict[str, Any]:
     """Validate, then run as a background job (Foundation Fixes fix 4).
 
     In the Docker stack the run is queued and this answers 202 with the job
@@ -189,7 +190,7 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
     try:
         resolved_flags = validate_reasoning_request(
             investigation_id=investigation_id, module=module, working_theory=working_theory,
-            control_flags=control_flags, record_refs=record_refs,
+            control_flags=control_flags, record_refs=record_refs, run_options=run_options, premises=premises,
         )
     except ReasoningInputError as exc:
         raise HTTPException(400, str(exc))
@@ -201,6 +202,7 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
             "module": module, "question": question, "working_theory": working_theory, "max_results": max_results,
             "include_external_leads": include_external_leads, "record_refs": record_refs,
             "control_flags": control_flags if module in TAS_MODULES else None, "resolved_control_flags": resolved_flags,
+            "run_options": run_options, "premises": premises, "changes": changes,
             "actor_id": scope.actor_id if scope is not None else "local-owner",
         },
         message="Waiting for the model",
@@ -219,6 +221,54 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
     return {"candidate_id": None, "job": serialize_job(row)}
 
 
+def _run_extras(body: CaseSynthesisRequest | HypothesisTestRequest) -> dict[str, Any]:
+    return {
+        "run_options": body.options.model_dump(exclude_none=True) if body.options else None,
+        "premises": body.premises,
+        "changes": [c.model_dump() for c in body.changes] if body.changes else None,
+    }
+
+
+@router.post("/investigations/{investigation_id}/assistant/plan", response_model=RunPlanOut)
+def investigation_run_plan(investigation_id: str, body: RunPlanRequest, db: Session = Depends(get_db)) -> Any:
+    """Before you run (mockup AI_2): the plan, the settings, the model and what would leave the computer.
+    Retrieval only; no model is called."""
+    try:
+        return build_run_plan(
+            db, investigation_id, module=body.module, question=body.question, working_theory=body.working_theory,
+            max_results=body.max_results, include_external_leads=body.include_external_leads,
+            flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
+            options=body.options.model_dump(exclude_none=True) if body.options else None, premises=body.premises,
+        )
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))
+    except ReasoningInputError as exc:
+        raise HTTPException(400, str(exc))
+
+
+@router.get("/investigations/{investigation_id}/assistant/profile", response_model=RunProfileOut)
+def investigation_run_profile(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """This case's default AI run settings."""
+    try:
+        return get_run_profile(db, investigation_id)
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))
+
+
+@router.put("/investigations/{investigation_id}/assistant/profile", response_model=RunProfileOut)
+def save_investigation_run_profile(investigation_id: str, body: RunProfileIn, db: Session = Depends(get_db)) -> Any:
+    """Save this case's default run settings, with the one-line reason for them."""
+    try:
+        return save_run_profile(
+            db, investigation_id, flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
+            options=body.options.model_dump(exclude_none=True) if body.options else None, premises=body.premises, reason=body.reason,
+        )
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))
+    except ReasoningInputError as exc:
+        raise HTTPException(400, str(exc))
+
+
 @router.post("/investigations/{investigation_id}/assistant/case-synthesis", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
 async def investigation_case_synthesis(
     investigation_id: str, body: CaseSynthesisRequest, request: Request, response: Response, db: Session = Depends(get_db),
@@ -232,6 +282,7 @@ async def investigation_case_synthesis(
         request, response, db, investigation_id=investigation_id, module="case_synthesis", question=body.question,
         max_results=body.max_results, include_external_leads=body.include_external_leads,
         control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
+        **_run_extras(body),
     )
 
 
@@ -248,6 +299,7 @@ async def investigation_hypothesis_test(
         max_results=body.max_results, include_external_leads=body.include_external_leads,
         working_theory=body.working_theory,
         control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
+        **_run_extras(body),
     )
 
 

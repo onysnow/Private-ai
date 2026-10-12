@@ -1768,6 +1768,10 @@ export type CaseStandingOut = {
  */
 export type CaseSynthesisRequest = {
   /**
+   * Changes
+   */
+  changes?: Array<RunChangeIn> | null;
+  /**
    * Include External Leads
    */
   include_external_leads?: boolean;
@@ -1775,6 +1779,11 @@ export type CaseSynthesisRequest = {
    * Max Results
    */
   max_results?: number;
+  options?: RunOptionsIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
   /**
    * Question
    */
@@ -8983,6 +8992,10 @@ export type HighlightSegmentOut = {
  */
 export type HypothesisTestRequest = {
   /**
+   * Changes
+   */
+  changes?: Array<RunChangeIn> | null;
+  /**
    * Include External Leads
    */
   include_external_leads?: boolean;
@@ -8990,6 +9003,11 @@ export type HypothesisTestRequest = {
    * Max Results
    */
   max_results?: number;
+  options?: RunOptionsIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
   /**
    * Question
    */
@@ -13475,6 +13493,498 @@ export type RuleOut = {
    * Version
    */
   version: number;
+};
+
+/**
+ * RunChangeIn
+ *
+ * One settings change echoed before the run (mockup AI_2), kept with it.
+ */
+export type RunChangeIn = {
+  /**
+   * At
+   */
+  at: string;
+  /**
+   * Kind
+   */
+  kind?: 'SETTING' | 'FLAG';
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * RunOptionsIn
+ *
+ * The run options beyond the two TAS §4 flags (app/ai/reasoning.py RUN_OPTIONS). None = the suite's default.
+ */
+export type RunOptionsIn = {
+  /**
+   * Devils Advocate
+   */
+  devils_advocate?: 'OFF' | 'ON' | null;
+  /**
+   * Live Events
+   */
+  live_events?: 'FULL' | 'SUMMARY' | 'OFF' | null;
+  /**
+   * Outside Lookups
+   */
+  outside_lookups?: 'AUTOMATIC' | 'ASK' | 'OFF' | null;
+  /**
+   * Research Depth
+   */
+  research_depth?: 'NORMAL' | 'EXHAUSTIVE' | null;
+  /**
+   * Show Reasoning Chain
+   */
+  show_reasoning_chain?: 'OFF' | 'ON' | null;
+};
+
+/**
+ * RunPlanInjectionOut
+ */
+export type RunPlanInjectionOut = {
+  /**
+   * Quote
+   */
+  quote: string;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * RunPlanLimitsOut
+ */
+export type RunPlanLimitsOut = {
+  /**
+   * Concurrent
+   */
+  concurrent: number;
+  /**
+   * Per Minute
+   */
+  per_minute: number;
+};
+
+/**
+ * RunPlanLockedOut
+ */
+export type RunPlanLockedOut = {
+  /**
+   * By
+   */
+  by: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * RunPlanOut
+ *
+ * Before you run (mockup AI_2): the plan, what it may use, what leaves the computer. Nothing is sent.
+ */
+export type RunPlanOut = {
+  /**
+   * Changed From Case Default
+   */
+  changed_from_case_default: Array<string>;
+  /**
+   * Injections
+   */
+  injections: Array<RunPlanInjectionOut>;
+  /**
+   * Locked
+   */
+  locked: Array<RunPlanLockedOut>;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Module Label
+   */
+  module_label: string;
+  packet: RunPlanPacketOut;
+  /**
+   * Premises
+   */
+  premises: Array<string>;
+  profile: RunProfileOut;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Resolved
+   */
+  resolved: {
+    [key: string]: string;
+  };
+  /**
+   * Safety Limits
+   */
+  safety_limits: Array<string>;
+  /**
+   * Settings
+   */
+  settings: Array<RunSettingOut>;
+  /**
+   * Steps
+   */
+  steps: Array<RunPlanStepOut>;
+  /**
+   * Suite Defaults
+   */
+  suite_defaults: {
+    [key: string]: string;
+  };
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Systems
+   */
+  systems: Array<RunPlanSystemOut>;
+  where: RunPlanWhereOut;
+  /**
+   * Working Theory
+   */
+  working_theory: string | null;
+};
+
+/**
+ * RunPlanPacketOut
+ */
+export type RunPlanPacketOut = {
+  /**
+   * By Type
+   */
+  by_type: Array<RunPlanTypeCountOut>;
+  /**
+   * First
+   */
+  first: Array<RunPlanRecordOut>;
+  /**
+   * Leads Only
+   */
+  leads_only: number;
+  /**
+   * Records
+   */
+  records: number;
+};
+
+/**
+ * RunPlanRecordOut
+ */
+export type RunPlanRecordOut = {
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * RunPlanRequest
+ *
+ * What a run would do, before it runs (mockup AI_2).
+ */
+export type RunPlanRequest = {
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module?: 'case_synthesis' | 'hypothesis_test';
+  options?: RunOptionsIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Severity Floor
+   */
+  severity_floor?: 'ALL' | 'MATERIAL' | 'BLOCKING' | null;
+  /**
+   * Source Tier Floor
+   */
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
+};
+
+/**
+ * RunPlanStepOut
+ */
+export type RunPlanStepOut = {
+  /**
+   * Changed
+   */
+  changed: boolean;
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * N
+   */
+  n: number;
+  /**
+   * System
+   */
+  system?: string | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Who
+   */
+  who: string;
+};
+
+/**
+ * RunPlanSystemOut
+ */
+export type RunPlanSystemOut = {
+  /**
+   * State
+   */
+  state: string;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Why
+   */
+  why: string;
+};
+
+/**
+ * RunPlanTypeCountOut
+ */
+export type RunPlanTypeCountOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Record Type
+   */
+  record_type: string;
+};
+
+/**
+ * RunPlanWhereOut
+ */
+export type RunPlanWhereOut = {
+  /**
+   * Callable
+   */
+  callable: boolean;
+  /**
+   * Enabled
+   */
+  enabled: boolean;
+  /**
+   * Leaves
+   */
+  leaves: string;
+  limits: RunPlanLimitsOut;
+  /**
+   * Minutes
+   */
+  minutes: Array<number>;
+  /**
+   * Model
+   */
+  model: string | null;
+  /**
+   * Money
+   */
+  money: string;
+  /**
+   * Nothing Leaves
+   */
+  nothing_leaves: boolean;
+  /**
+   * Provider
+   */
+  provider: string | null;
+  /**
+   * Runs On This Computer
+   */
+  runs_on_this_computer: boolean | null;
+  /**
+   * Words In
+   */
+  words_in: number;
+  /**
+   * Words Out Max
+   */
+  words_out_max: number;
+};
+
+/**
+ * RunProfileIn
+ *
+ * This case's default run settings, with the reason for them.
+ */
+export type RunProfileIn = {
+  options?: RunOptionsIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Severity Floor
+   */
+  severity_floor?: 'ALL' | 'MATERIAL' | 'BLOCKING' | null;
+  /**
+   * Source Tier Floor
+   */
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
+};
+
+/**
+ * RunProfileOut
+ *
+ * This case's default AI run settings (mockup AI_2).
+ */
+export type RunProfileOut = {
+  /**
+   * Flags
+   */
+  flags: {
+    [key: string]: string;
+  };
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Options
+   */
+  options: {
+    [key: string]: string;
+  };
+  /**
+   * Premises
+   */
+  premises: Array<string>;
+  /**
+   * Reason
+   */
+  reason: string | null;
+  /**
+   * Saved
+   */
+  saved: boolean;
+  /**
+   * Saved At
+   */
+  saved_at: string | null;
+};
+
+/**
+ * RunSettingOut
+ */
+export type RunSettingOut = {
+  /**
+   * Allowed
+   */
+  allowed: Array<RunSettingValueOut>;
+  /**
+   * Case Default
+   */
+  case_default: string;
+  /**
+   * Effect
+   */
+  effect: string;
+  /**
+   * Group
+   */
+  group: string;
+  /**
+   * Help
+   */
+  help: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Source
+   */
+  source: string;
+  /**
+   * Suite Default
+   */
+  suite_default: string;
+};
+
+/**
+ * RunSettingValueOut
+ */
+export type RunSettingValueOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Value
+   */
+  value: string;
 };
 
 /**
@@ -21701,6 +22211,42 @@ export type InvestigationHypothesisTestResponses = {
 export type InvestigationHypothesisTestResponse =
   InvestigationHypothesisTestResponses[keyof InvestigationHypothesisTestResponses];
 
+export type InvestigationRunPlanData = {
+  body: RunPlanRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/plan';
+};
+
+export type InvestigationRunPlanErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationRunPlanError =
+  InvestigationRunPlanErrors[keyof InvestigationRunPlanErrors];
+
+export type InvestigationRunPlanResponses = {
+  /**
+   * Successful Response
+   */
+  200: RunPlanOut;
+};
+
+export type InvestigationRunPlanResponse =
+  InvestigationRunPlanResponses[keyof InvestigationRunPlanResponses];
+
 export type InvestigationPresentationDraftData = {
   body: PresentationDraftRequest;
   path: {
@@ -21748,6 +22294,78 @@ export type InvestigationPresentationDraftResponses = {
 
 export type InvestigationPresentationDraftResponse =
   InvestigationPresentationDraftResponses[keyof InvestigationPresentationDraftResponses];
+
+export type InvestigationRunProfileData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/profile';
+};
+
+export type InvestigationRunProfileErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationRunProfileError =
+  InvestigationRunProfileErrors[keyof InvestigationRunProfileErrors];
+
+export type InvestigationRunProfileResponses = {
+  /**
+   * Successful Response
+   */
+  200: RunProfileOut;
+};
+
+export type InvestigationRunProfileResponse =
+  InvestigationRunProfileResponses[keyof InvestigationRunProfileResponses];
+
+export type SaveInvestigationRunProfileData = {
+  body: RunProfileIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/profile';
+};
+
+export type SaveInvestigationRunProfileErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SaveInvestigationRunProfileError =
+  SaveInvestigationRunProfileErrors[keyof SaveInvestigationRunProfileErrors];
+
+export type SaveInvestigationRunProfileResponses = {
+  /**
+   * Successful Response
+   */
+  200: RunProfileOut;
+};
+
+export type SaveInvestigationRunProfileResponse =
+  SaveInvestigationRunProfileResponses[keyof SaveInvestigationRunProfileResponses];
 
 export type ListCaseRecordsData = {
   body?: never;

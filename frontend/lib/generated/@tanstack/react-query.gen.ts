@@ -157,6 +157,8 @@ import {
   investigationHypothesisTest,
   investigationPresentationDraft,
   investigationQuestionContext,
+  investigationRunPlan,
+  investigationRunProfile,
   investigationVisualCatalog,
   investigationVisualPreview,
   investigationVisualRestyle,
@@ -252,6 +254,7 @@ import {
   rotateAppUserToken,
   runTableMapping,
   saveConnectorCredential,
+  saveInvestigationRunProfile,
   searchGlossary,
   searchInvestigationCorpus,
   searchWorkbench,
@@ -720,6 +723,12 @@ import type {
   InvestigationQuestionContextData,
   InvestigationQuestionContextError,
   InvestigationQuestionContextResponse,
+  InvestigationRunPlanData,
+  InvestigationRunPlanError,
+  InvestigationRunPlanResponse,
+  InvestigationRunProfileData,
+  InvestigationRunProfileError,
+  InvestigationRunProfileResponse,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogError,
   InvestigationVisualCatalogResponse,
@@ -1001,6 +1010,9 @@ import type {
   SaveConnectorCredentialData,
   SaveConnectorCredentialError,
   SaveConnectorCredentialResponse,
+  SaveInvestigationRunProfileData,
+  SaveInvestigationRunProfileError,
+  SaveInvestigationRunProfileResponse,
   SearchGlossaryData,
   SearchGlossaryError,
   SearchGlossaryResponse,
@@ -4839,6 +4851,36 @@ export const investigationHypothesisTestMutation = (
 };
 
 /**
+ * Investigation Run Plan
+ *
+ * Before you run (mockup AI_2): the plan, the settings, the model and what would leave the computer.
+ * Retrieval only; no model is called.
+ */
+export const investigationRunPlanMutation = (
+  options?: Partial<Options<InvestigationRunPlanData>>,
+): UseMutationOptions<
+  InvestigationRunPlanResponse,
+  InvestigationRunPlanError,
+  Options<InvestigationRunPlanData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    InvestigationRunPlanResponse,
+    InvestigationRunPlanError,
+    Options<InvestigationRunPlanData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await investigationRunPlan({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Investigation Presentation Draft
  *
  * Draft a brief/deck from a reporter-selected evidence set and a goal.
@@ -4864,6 +4906,65 @@ export const investigationPresentationDraftMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await investigationPresentationDraft({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const investigationRunProfileQueryKey = (
+  options: Options<InvestigationRunProfileData>,
+) => createQueryKey('investigationRunProfile', options);
+
+/**
+ * Investigation Run Profile
+ *
+ * This case's default AI run settings.
+ */
+export const investigationRunProfileOptions = (
+  options: Options<InvestigationRunProfileData>,
+) =>
+  queryOptions<
+    InvestigationRunProfileResponse,
+    InvestigationRunProfileError,
+    InvestigationRunProfileResponse,
+    ReturnType<typeof investigationRunProfileQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await investigationRunProfile({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: investigationRunProfileQueryKey(options),
+  });
+
+/**
+ * Save Investigation Run Profile
+ *
+ * Save this case's default run settings, with the one-line reason for them.
+ */
+export const saveInvestigationRunProfileMutation = (
+  options?: Partial<Options<SaveInvestigationRunProfileData>>,
+): UseMutationOptions<
+  SaveInvestigationRunProfileResponse,
+  SaveInvestigationRunProfileError,
+  Options<SaveInvestigationRunProfileData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SaveInvestigationRunProfileResponse,
+    SaveInvestigationRunProfileError,
+    Options<SaveInvestigationRunProfileData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await saveInvestigationRunProfile({
         ...options,
         ...fnOptions,
         throwOnError: true,

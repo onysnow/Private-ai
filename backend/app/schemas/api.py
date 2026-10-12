@@ -303,12 +303,32 @@ SeverityFloor = Literal["ALL", "MATERIAL", "BLOCKING"]
 SourceTierFloor = Literal["A", "B", "C", "D"]
 
 
+class RunOptionsIn(BaseModel):
+    """The run options beyond the two TAS §4 flags (app/ai/reasoning.py RUN_OPTIONS). None = the suite's default."""
+    model_config = ConfigDict(extra="forbid")
+    devils_advocate: Literal["OFF", "ON"] | None = None
+    research_depth: Literal["NORMAL", "EXHAUSTIVE"] | None = None
+    show_reasoning_chain: Literal["ON", "OFF"] | None = None
+    live_events: Literal["FULL", "SUMMARY", "OFF"] | None = None
+    outside_lookups: Literal["AUTOMATIC", "ASK", "OFF"] | None = None
+
+
+class RunChangeIn(BaseModel):
+    """One settings change echoed before the run (mockup AI_2), kept with it."""
+    at: str = Field(max_length=40)
+    kind: Literal["SETTING", "FLAG"] = "SETTING"
+    text: str = Field(max_length=300)
+
+
 class CaseSynthesisRequest(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
     max_results: int = Field(default=30, ge=1, le=100)
     include_external_leads: bool = True
     severity_floor: SeverityFloor | None = None
     source_tier_floor: SourceTierFloor | None = None
+    options: RunOptionsIn | None = None
+    premises: list[str] | None = Field(default=None, max_length=10)
+    changes: list[RunChangeIn] | None = Field(default=None, max_length=50)
 
 
 class HypothesisTestRequest(BaseModel):
@@ -320,6 +340,31 @@ class HypothesisTestRequest(BaseModel):
     # app/ai/reasoning.py (ALL|MATERIAL|BLOCKING; A-D). None = the suite's default.
     severity_floor: SeverityFloor | None = None
     source_tier_floor: SourceTierFloor | None = None
+    options: RunOptionsIn | None = None
+    premises: list[str] | None = Field(default=None, max_length=10)
+    changes: list[RunChangeIn] | None = Field(default=None, max_length=50)
+
+
+class RunPlanRequest(BaseModel):
+    """What a run would do, before it runs (mockup AI_2)."""
+    module: Literal["case_synthesis", "hypothesis_test"] = "case_synthesis"
+    question: str = Field(min_length=1, max_length=4000)
+    working_theory: str | None = Field(default=None, max_length=2000)
+    max_results: int = Field(default=30, ge=1, le=100)
+    include_external_leads: bool = True
+    severity_floor: SeverityFloor | None = None
+    source_tier_floor: SourceTierFloor | None = None
+    options: RunOptionsIn | None = None
+    premises: list[str] | None = Field(default=None, max_length=10)
+
+
+class RunProfileIn(BaseModel):
+    """This case's default run settings, with the reason for them."""
+    severity_floor: SeverityFloor | None = None
+    source_tier_floor: SourceTierFloor | None = None
+    options: RunOptionsIn | None = None
+    premises: list[str] | None = Field(default=None, max_length=10)
+    reason: str = Field(min_length=1, max_length=300)
 
 
 class AIAnalysisCandidateReviewRequest(BaseModel):

@@ -456,6 +456,12 @@ import type {
   InvestigationQuestionContextData,
   InvestigationQuestionContextErrors,
   InvestigationQuestionContextResponses,
+  InvestigationRunPlanData,
+  InvestigationRunPlanErrors,
+  InvestigationRunPlanResponses,
+  InvestigationRunProfileData,
+  InvestigationRunProfileErrors,
+  InvestigationRunProfileResponses,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogErrors,
   InvestigationVisualCatalogResponses,
@@ -738,6 +744,9 @@ import type {
   SaveConnectorCredentialData,
   SaveConnectorCredentialErrors,
   SaveConnectorCredentialResponses,
+  SaveInvestigationRunProfileData,
+  SaveInvestigationRunProfileErrors,
+  SaveInvestigationRunProfileResponses,
   SearchGlossaryData,
   SearchGlossaryErrors,
   SearchGlossaryResponses,
@@ -1139,6 +1148,11 @@ import {
   zInvestigationQuestionContextBody,
   zInvestigationQuestionContextPath,
   zInvestigationQuestionContextResponse,
+  zInvestigationRunPlanBody,
+  zInvestigationRunPlanPath,
+  zInvestigationRunPlanResponse,
+  zInvestigationRunProfilePath,
+  zInvestigationRunProfileResponse,
   zInvestigationVisualCatalogPath,
   zInvestigationVisualCatalogResponse,
   zInvestigationVisualPreviewBody,
@@ -1362,6 +1376,9 @@ import {
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
   zSaveConnectorCredentialResponse,
+  zSaveInvestigationRunProfileBody,
+  zSaveInvestigationRunProfilePath,
+  zSaveInvestigationRunProfileResponse,
   zSearchGlossaryQuery,
   zSearchGlossaryResponse,
   zSearchInvestigationCorpusPath,
@@ -5323,6 +5340,42 @@ export const investigationHypothesisTest = <
   });
 
 /**
+ * Investigation Run Plan
+ *
+ * Before you run (mockup AI_2): the plan, the settings, the model and what would leave the computer.
+ * Retrieval only; no model is called.
+ */
+export const investigationRunPlan = <ThrowOnError extends boolean = false>(
+  options: Options<InvestigationRunPlanData, ThrowOnError>,
+): RequestResult<
+  InvestigationRunPlanResponses,
+  InvestigationRunPlanErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    InvestigationRunPlanResponses,
+    InvestigationRunPlanErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zInvestigationRunPlanBody,
+          path: zInvestigationRunPlanPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationRunPlanResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/assistant/plan',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Investigation Presentation Draft
  *
  * Draft a brief/deck from a reporter-selected evidence set and a goal.
@@ -5359,6 +5412,74 @@ export const investigationPresentationDraft = <
     responseValidator: async (data) =>
       await zInvestigationPresentationDraftResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/presentation-draft',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Investigation Run Profile
+ *
+ * This case's default AI run settings.
+ */
+export const investigationRunProfile = <ThrowOnError extends boolean = false>(
+  options: Options<InvestigationRunProfileData, ThrowOnError>,
+): RequestResult<
+  InvestigationRunProfileResponses,
+  InvestigationRunProfileErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    InvestigationRunProfileResponses,
+    InvestigationRunProfileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zInvestigationRunProfilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationRunProfileResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/assistant/profile',
+    ...options,
+  });
+
+/**
+ * Save Investigation Run Profile
+ *
+ * Save this case's default run settings, with the one-line reason for them.
+ */
+export const saveInvestigationRunProfile = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<SaveInvestigationRunProfileData, ThrowOnError>,
+): RequestResult<
+  SaveInvestigationRunProfileResponses,
+  SaveInvestigationRunProfileErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    SaveInvestigationRunProfileResponses,
+    SaveInvestigationRunProfileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSaveInvestigationRunProfileBody,
+          path: zSaveInvestigationRunProfilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSaveInvestigationRunProfileResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/assistant/profile',
     ...options,
     headers: {
       'Content-Type': 'application/json',

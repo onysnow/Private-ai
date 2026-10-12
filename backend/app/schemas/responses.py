@@ -4813,3 +4813,119 @@ class DropOut(ResponseModel):
     ready_from: int = 0
     ready_unsure: int = 0
     watchlist: DropWatchlistOut | None = None
+
+
+class RunProfileOut(ResponseModel):
+    """This case's default AI run settings (mockup AI_2)."""
+    name: str
+    flags: dict[str, str]
+    options: dict[str, str]
+    premises: list[str]
+    reason: str | None
+    saved_at: str | None
+    saved: bool
+
+
+class RunSettingValueOut(ResponseModel):
+    value: str
+    label: str
+
+
+class RunSettingOut(ResponseModel):
+    key: str
+    label: str
+    group: str
+    help: str
+    suite_default: str
+    case_default: str
+    allowed: list[RunSettingValueOut]
+    source: str
+    effect: str
+
+
+class RunPlanStepOut(ResponseModel):
+    key: str
+    n: int
+    who: str
+    title: str
+    detail: str
+    changed: bool
+    system: str | None = None
+
+
+class RunPlanRecordOut(ResponseModel):
+    record_type: str
+    record_id: str
+    title: str
+
+
+class RunPlanTypeCountOut(ResponseModel):
+    record_type: str
+    count: int
+
+
+class RunPlanPacketOut(ResponseModel):
+    records: int
+    by_type: list[RunPlanTypeCountOut]
+    leads_only: int
+    first: list[RunPlanRecordOut]
+
+
+class RunPlanSystemOut(ResponseModel):
+    system: str
+    why: str
+    state: str
+
+
+class RunPlanInjectionOut(ResponseModel):
+    record_type: str
+    record_id: str
+    title: str
+    quote: str
+
+
+class RunPlanLimitsOut(ResponseModel):
+    concurrent: int
+    per_minute: int
+
+
+class RunPlanWhereOut(ResponseModel):
+    enabled: bool
+    callable: bool
+    provider: str | None
+    model: str | None
+    runs_on_this_computer: bool | None
+    leaves: str
+    nothing_leaves: bool
+    words_in: int
+    words_out_max: int
+    minutes: list[float]
+    money: str
+    limits: RunPlanLimitsOut
+
+
+class RunPlanLockedOut(ResponseModel):
+    text: str
+    by: str
+
+
+class RunPlanOut(ResponseModel):
+    """Before you run (mockup AI_2): the plan, what it may use, what leaves the computer. Nothing is sent."""
+    module: str
+    module_label: str
+    system: str
+    question: str
+    working_theory: str | None
+    packet: RunPlanPacketOut
+    steps: list[RunPlanStepOut]
+    systems: list[RunPlanSystemOut]
+    injections: list[RunPlanInjectionOut]
+    where: RunPlanWhereOut
+    settings: list[RunSettingOut]
+    resolved: dict[str, str]
+    premises: list[str]
+    changed_from_case_default: list[str]
+    suite_defaults: dict[str, str]
+    profile: RunProfileOut
+    locked: list[RunPlanLockedOut]
+    safety_limits: list[str]

@@ -731,17 +731,6 @@ export const zCaseSinceOut = z.object({
 });
 
 /**
- * CaseSynthesisRequest
- */
-export const zCaseSynthesisRequest = z.object({
-  include_external_leads: z.boolean().optional().default(true),
-  max_results: z.number().int().gte(1).lte(100).optional().default(30),
-  question: z.string().min(1).max(4000),
-  severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
-  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
-});
-
-/**
  * CaseWatchlistCountsOut
  */
 export const zCaseWatchlistCountsOut = z.object({
@@ -3631,18 +3620,6 @@ export const zCorpusSearchOut = z.object({
 });
 
 /**
- * HypothesisTestRequest
- */
-export const zHypothesisTestRequest = z.object({
-  include_external_leads: z.boolean().optional().default(true),
-  max_results: z.number().int().gte(1).lte(100).optional().default(30),
-  question: z.string().min(1).max(4000),
-  severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
-  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
-  working_theory: z.string().min(1).max(2000),
-});
-
-/**
  * IdentifierTargetEntityOut
  */
 export const zIdentifierTargetEntityOut = z.object({
@@ -5725,6 +5702,249 @@ export const zRuleOut = z.object({
   indicator_id: z.string(),
   name: z.string(),
   version: z.number().int(),
+});
+
+/**
+ * RunChangeIn
+ *
+ * One settings change echoed before the run (mockup AI_2), kept with it.
+ */
+export const zRunChangeIn = z.object({
+  at: z.string().max(40),
+  kind: z.enum(['SETTING', 'FLAG']).optional().default('SETTING'),
+  text: z.string().max(300),
+});
+
+/**
+ * RunOptionsIn
+ *
+ * The run options beyond the two TAS §4 flags (app/ai/reasoning.py RUN_OPTIONS). None = the suite's default.
+ */
+export const zRunOptionsIn = z.object({
+  devils_advocate: z.enum(['OFF', 'ON']).nullish(),
+  live_events: z.enum(['FULL', 'SUMMARY', 'OFF']).nullish(),
+  outside_lookups: z.enum(['AUTOMATIC', 'ASK', 'OFF']).nullish(),
+  research_depth: z.enum(['NORMAL', 'EXHAUSTIVE']).nullish(),
+  show_reasoning_chain: z.enum(['OFF', 'ON']).nullish(),
+});
+
+/**
+ * CaseSynthesisRequest
+ */
+export const zCaseSynthesisRequest = z.object({
+  changes: z.array(zRunChangeIn).max(50).nullish(),
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.number().int().gte(1).lte(100).optional().default(30),
+  options: zRunOptionsIn.nullish(),
+  premises: z.array(z.string()).max(10).nullish(),
+  question: z.string().min(1).max(4000),
+  severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
+  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
+});
+
+/**
+ * HypothesisTestRequest
+ */
+export const zHypothesisTestRequest = z.object({
+  changes: z.array(zRunChangeIn).max(50).nullish(),
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.number().int().gte(1).lte(100).optional().default(30),
+  options: zRunOptionsIn.nullish(),
+  premises: z.array(z.string()).max(10).nullish(),
+  question: z.string().min(1).max(4000),
+  severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
+  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
+  working_theory: z.string().min(1).max(2000),
+});
+
+/**
+ * RunPlanInjectionOut
+ */
+export const zRunPlanInjectionOut = z.object({
+  quote: z.string(),
+  record_id: z.string(),
+  record_type: z.string(),
+  title: z.string(),
+});
+
+/**
+ * RunPlanLimitsOut
+ */
+export const zRunPlanLimitsOut = z.object({
+  concurrent: z.number().int(),
+  per_minute: z.number().int(),
+});
+
+/**
+ * RunPlanLockedOut
+ */
+export const zRunPlanLockedOut = z.object({
+  by: z.string(),
+  text: z.string(),
+});
+
+/**
+ * RunPlanRecordOut
+ */
+export const zRunPlanRecordOut = z.object({
+  record_id: z.string(),
+  record_type: z.string(),
+  title: z.string(),
+});
+
+/**
+ * RunPlanRequest
+ *
+ * What a run would do, before it runs (mockup AI_2).
+ */
+export const zRunPlanRequest = z.object({
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.number().int().gte(1).lte(100).optional().default(30),
+  module: z
+    .enum(['case_synthesis', 'hypothesis_test'])
+    .optional()
+    .default('case_synthesis'),
+  options: zRunOptionsIn.nullish(),
+  premises: z.array(z.string()).max(10).nullish(),
+  question: z.string().min(1).max(4000),
+  severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
+  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
+  working_theory: z.string().max(2000).nullish(),
+});
+
+/**
+ * RunPlanStepOut
+ */
+export const zRunPlanStepOut = z.object({
+  changed: z.boolean(),
+  detail: z.string(),
+  key: z.string(),
+  n: z.number().int(),
+  system: z.string().nullish(),
+  title: z.string(),
+  who: z.string(),
+});
+
+/**
+ * RunPlanSystemOut
+ */
+export const zRunPlanSystemOut = z.object({
+  state: z.string(),
+  system: z.string(),
+  why: z.string(),
+});
+
+/**
+ * RunPlanTypeCountOut
+ */
+export const zRunPlanTypeCountOut = z.object({
+  count: z.number().int(),
+  record_type: z.string(),
+});
+
+/**
+ * RunPlanPacketOut
+ */
+export const zRunPlanPacketOut = z.object({
+  by_type: z.array(zRunPlanTypeCountOut),
+  first: z.array(zRunPlanRecordOut),
+  leads_only: z.number().int(),
+  records: z.number().int(),
+});
+
+/**
+ * RunPlanWhereOut
+ */
+export const zRunPlanWhereOut = z.object({
+  callable: z.boolean(),
+  enabled: z.boolean(),
+  leaves: z.string(),
+  limits: zRunPlanLimitsOut,
+  minutes: z.array(z.number()),
+  model: z.string().nullable(),
+  money: z.string(),
+  nothing_leaves: z.boolean(),
+  provider: z.string().nullable(),
+  runs_on_this_computer: z.boolean().nullable(),
+  words_in: z.number().int(),
+  words_out_max: z.number().int(),
+});
+
+/**
+ * RunProfileIn
+ *
+ * This case's default run settings, with the reason for them.
+ */
+export const zRunProfileIn = z.object({
+  options: zRunOptionsIn.nullish(),
+  premises: z.array(z.string()).max(10).nullish(),
+  reason: z.string().min(1).max(300),
+  severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
+  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
+});
+
+/**
+ * RunProfileOut
+ *
+ * This case's default AI run settings (mockup AI_2).
+ */
+export const zRunProfileOut = z.object({
+  flags: z.record(z.string()),
+  name: z.string(),
+  options: z.record(z.string()),
+  premises: z.array(z.string()),
+  reason: z.string().nullable(),
+  saved: z.boolean(),
+  saved_at: z.string().nullable(),
+});
+
+/**
+ * RunSettingValueOut
+ */
+export const zRunSettingValueOut = z.object({
+  label: z.string(),
+  value: z.string(),
+});
+
+/**
+ * RunSettingOut
+ */
+export const zRunSettingOut = z.object({
+  allowed: z.array(zRunSettingValueOut),
+  case_default: z.string(),
+  effect: z.string(),
+  group: z.string(),
+  help: z.string(),
+  key: z.string(),
+  label: z.string(),
+  source: z.string(),
+  suite_default: z.string(),
+});
+
+/**
+ * RunPlanOut
+ *
+ * Before you run (mockup AI_2): the plan, what it may use, what leaves the computer. Nothing is sent.
+ */
+export const zRunPlanOut = z.object({
+  changed_from_case_default: z.array(z.string()),
+  injections: z.array(zRunPlanInjectionOut),
+  locked: z.array(zRunPlanLockedOut),
+  module: z.string(),
+  module_label: z.string(),
+  packet: zRunPlanPacketOut,
+  premises: z.array(z.string()),
+  profile: zRunProfileOut,
+  question: z.string(),
+  resolved: z.record(z.string()),
+  safety_limits: z.array(z.string()),
+  settings: z.array(zRunSettingOut),
+  steps: z.array(zRunPlanStepOut),
+  suite_defaults: z.record(z.string()),
+  system: z.string(),
+  systems: z.array(zRunPlanSystemOut),
+  where: zRunPlanWhereOut,
+  working_theory: z.string().nullable(),
 });
 
 /**
@@ -9346,6 +9566,17 @@ export const zInvestigationHypothesisTestPath = z.object({
  */
 export const zInvestigationHypothesisTestResponse = zAiReasoningRunOut;
 
+export const zInvestigationRunPlanBody = zRunPlanRequest;
+
+export const zInvestigationRunPlanPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationRunPlanResponse = zRunPlanOut;
+
 export const zInvestigationPresentationDraftBody = zPresentationDraftRequest;
 
 export const zInvestigationPresentationDraftPath = z.object({
@@ -9356,6 +9587,26 @@ export const zInvestigationPresentationDraftPath = z.object({
  * Successful Response
  */
 export const zInvestigationPresentationDraftResponse = zAiReasoningRunOut;
+
+export const zInvestigationRunProfilePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationRunProfileResponse = zRunProfileOut;
+
+export const zSaveInvestigationRunProfileBody = zRunProfileIn;
+
+export const zSaveInvestigationRunProfilePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSaveInvestigationRunProfileResponse = zRunProfileOut;
 
 export const zListCaseRecordsPath = z.object({
   investigation_id: z.string(),

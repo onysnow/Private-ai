@@ -26,6 +26,9 @@ class Investigation(Base):
     # The investigation's type as the reporter chose it: catalogue area keys
     # (app/patterns/investigation_type.py). None while the app chooses.
     type_areas: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    # This case's default AI run settings (mockup AI_2 "Save as this case's default"): flags, run options,
+    # premises, the reason given and when (app/services/run_plan.py).
+    ai_run_profile: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

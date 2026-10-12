@@ -167,10 +167,11 @@ ACT_2 Story (12 Oct: Act › Story, `features/story`; backend `app/services/stor
 
 ## 8. The AI — mockups AI_1 (Watch the run) and AI_2 (Before you run) (§09)
 
-Both **missing**.
+AI_2 built 12 Oct (Act › AI runs, `features/ai/before-you-run.tsx`; backend `app/services/run_plan.py`, `POST /investigations/{id}/assistant/plan`, `GET/PUT …/assistant/profile`, migration `c7d1f3a8e520`). AI_1 **missing**.
 - [ ] Run events table + SSE stream (ADR); events emitted at each step of run_reasoning_module
 - [ ] AI_1: input → router → app checks → RAS/TAS/QAS/LAS/DAS → output map with travelling lights, verdict shapes, umbrella and support bands, transport strip with lanes and ledgers, trace drawer (input / steps / output / ledger; Accept · Reject with reason · To check · Copy cite)
-- [ ] AI_2: operating instructions in plain words (tier floor D, problems to list, devil's advocate, research depth, reasoning chain, live events, outside lookups, take as given, overlays planned), the editable plan, likely-to-run systems, injection notice, where it runs / what leaves / cost, echo log, cannot-be-turned-off list
+- [x] AI_2: operating instructions in plain words, suite name in the tooltip (tier floor D with C hatched "never counts", problems to list, devil's advocate = the suite's /devils-advocate pass, research depth, reasoning chain, live events, outside lookups, take as given = USER_STIPULATED premises in the prompt, overlays greyed PLANNED); changed rows and the steps they add edged amber, hover a setting to light its step; the plan from the server (packet counts, numbered steps with APP / MODEL / YOU); likely-to-run systems by the suite's trigger table; instructions found inside the evidence flagged and echoed; what leaves this computer with the three boxes, model, size in words, time from past runs, money, limits; echo log sent with the run and stored on it; cannot-be-turned-off list; Run and watch ⌘↵ / in the background; Save as this case's default asks for a reason; safety limits refused with 400
+- [ ] AI_2 still to do: the "More" row (umbrella session flags have no runtime in the app), Edit plan beyond the question, the same panel as a drawer inside the live view (needs AI_1). Steps 3–4 show the job's progress and a link to AI drafts until AI_1 is built
 - [ ] "Ask the case" four-step entry; per-claim review of AI candidates with grounded/guessed underlines
 
 ## 9. Knowledge and safety — mockups KNOWLEDGE_KEEP_1 (catalogue) and _2 (Safety & data) (§10)

@@ -22,6 +22,7 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Toaster} from '@/components/ui/sonner';
 import {AiReasoningPanel} from '../ai-reasoning-panel';
+import {BeforeYouRun} from '../../features/ai/before-you-run';
 import {PanelErrorBoundary} from '../panel-error-boundary';
 import {ApiAccessPanel} from '../../features/api-access/api-access-panel';
 import {useApiAccess} from '../../features/api-access/use-api-access';
@@ -293,6 +294,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'story', label: 'Story', render: () => <PanelErrorBoundary name="Story"><StoryScreen investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
         {anchor: 'leads', label: 'Leads', render: () => <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'chart-builder', label: 'Charts', render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'ai-runs', label: 'AI runs', render: () => <PanelErrorBoundary name="AI runs"><BeforeYouRun investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
         {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},
       ])}
       {screen('keep', [

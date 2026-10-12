@@ -2915,6 +2915,21 @@
       },
       "CaseSynthesisRequest": {
         "properties": {
+          "changes": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RunChangeIn"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changes"
+          },
           "include_external_leads": {
             "default": true,
             "title": "Include External Leads",
@@ -2926,6 +2941,31 @@
             "minimum": 1.0,
             "title": "Max Results",
             "type": "integer"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunOptionsIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "premises": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premises"
           },
           "question": {
             "maxLength": 4000,
@@ -19552,6 +19592,21 @@
       },
       "HypothesisTestRequest": {
         "properties": {
+          "changes": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RunChangeIn"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changes"
+          },
           "include_external_leads": {
             "default": true,
             "title": "Include External Leads",
@@ -19563,6 +19618,31 @@
             "minimum": 1.0,
             "title": "Max Results",
             "type": "integer"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunOptionsIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "premises": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premises"
           },
           "question": {
             "maxLength": 4000,
@@ -27038,6 +27118,878 @@
           "name"
         ],
         "title": "RuleOut",
+        "type": "object"
+      },
+      "RunChangeIn": {
+        "description": "One settings change echoed before the run (mockup AI_2), kept with it.",
+        "properties": {
+          "at": {
+            "maxLength": 40,
+            "title": "At",
+            "type": "string"
+          },
+          "kind": {
+            "default": "SETTING",
+            "enum": [
+              "SETTING",
+              "FLAG"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 300,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "text"
+        ],
+        "title": "RunChangeIn",
+        "type": "object"
+      },
+      "RunOptionsIn": {
+        "additionalProperties": false,
+        "description": "The run options beyond the two TAS §4 flags (app/ai/reasoning.py RUN_OPTIONS). None = the suite's default.",
+        "properties": {
+          "devils_advocate": {
+            "anyOf": [
+              {
+                "enum": [
+                  "OFF",
+                  "ON"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Devils Advocate"
+          },
+          "live_events": {
+            "anyOf": [
+              {
+                "enum": [
+                  "FULL",
+                  "SUMMARY",
+                  "OFF"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Events"
+          },
+          "outside_lookups": {
+            "anyOf": [
+              {
+                "enum": [
+                  "AUTOMATIC",
+                  "ASK",
+                  "OFF"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outside Lookups"
+          },
+          "research_depth": {
+            "anyOf": [
+              {
+                "enum": [
+                  "NORMAL",
+                  "EXHAUSTIVE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Research Depth"
+          },
+          "show_reasoning_chain": {
+            "anyOf": [
+              {
+                "enum": [
+                  "OFF",
+                  "ON"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Show Reasoning Chain"
+          }
+        },
+        "title": "RunOptionsIn",
+        "type": "object"
+      },
+      "RunPlanInjectionOut": {
+        "properties": {
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id",
+          "title",
+          "quote"
+        ],
+        "title": "RunPlanInjectionOut",
+        "type": "object"
+      },
+      "RunPlanLimitsOut": {
+        "properties": {
+          "concurrent": {
+            "title": "Concurrent",
+            "type": "integer"
+          },
+          "per_minute": {
+            "title": "Per Minute",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "concurrent",
+          "per_minute"
+        ],
+        "title": "RunPlanLimitsOut",
+        "type": "object"
+      },
+      "RunPlanLockedOut": {
+        "properties": {
+          "by": {
+            "title": "By",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "by"
+        ],
+        "title": "RunPlanLockedOut",
+        "type": "object"
+      },
+      "RunPlanOut": {
+        "description": "Before you run (mockup AI_2): the plan, what it may use, what leaves the computer. Nothing is sent.",
+        "properties": {
+          "changed_from_case_default": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Changed From Case Default",
+            "type": "array"
+          },
+          "injections": {
+            "items": {
+              "$ref": "#/components/schemas/RunPlanInjectionOut"
+            },
+            "title": "Injections",
+            "type": "array"
+          },
+          "locked": {
+            "items": {
+              "$ref": "#/components/schemas/RunPlanLockedOut"
+            },
+            "title": "Locked",
+            "type": "array"
+          },
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "module_label": {
+            "title": "Module Label",
+            "type": "string"
+          },
+          "packet": {
+            "$ref": "#/components/schemas/RunPlanPacketOut"
+          },
+          "premises": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Premises",
+            "type": "array"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/RunProfileOut"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "resolved": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Resolved",
+            "type": "object"
+          },
+          "safety_limits": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Safety Limits",
+            "type": "array"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/RunSettingOut"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/RunPlanStepOut"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "suite_defaults": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Suite Defaults",
+            "type": "object"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/RunPlanSystemOut"
+            },
+            "title": "Systems",
+            "type": "array"
+          },
+          "where": {
+            "$ref": "#/components/schemas/RunPlanWhereOut"
+          },
+          "working_theory": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working Theory"
+          }
+        },
+        "required": [
+          "module",
+          "module_label",
+          "system",
+          "question",
+          "working_theory",
+          "packet",
+          "steps",
+          "systems",
+          "injections",
+          "where",
+          "settings",
+          "resolved",
+          "premises",
+          "changed_from_case_default",
+          "suite_defaults",
+          "profile",
+          "locked",
+          "safety_limits"
+        ],
+        "title": "RunPlanOut",
+        "type": "object"
+      },
+      "RunPlanPacketOut": {
+        "properties": {
+          "by_type": {
+            "items": {
+              "$ref": "#/components/schemas/RunPlanTypeCountOut"
+            },
+            "title": "By Type",
+            "type": "array"
+          },
+          "first": {
+            "items": {
+              "$ref": "#/components/schemas/RunPlanRecordOut"
+            },
+            "title": "First",
+            "type": "array"
+          },
+          "leads_only": {
+            "title": "Leads Only",
+            "type": "integer"
+          },
+          "records": {
+            "title": "Records",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "records",
+          "by_type",
+          "leads_only",
+          "first"
+        ],
+        "title": "RunPlanPacketOut",
+        "type": "object"
+      },
+      "RunPlanRecordOut": {
+        "properties": {
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id",
+          "title"
+        ],
+        "title": "RunPlanRecordOut",
+        "type": "object"
+      },
+      "RunPlanRequest": {
+        "description": "What a run would do, before it runs (mockup AI_2).",
+        "properties": {
+          "include_external_leads": {
+            "default": true,
+            "title": "Include External Leads",
+            "type": "boolean"
+          },
+          "max_results": {
+            "default": 30,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "module": {
+            "default": "case_synthesis",
+            "enum": [
+              "case_synthesis",
+              "hypothesis_test"
+            ],
+            "title": "Module",
+            "type": "string"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunOptionsIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "premises": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premises"
+          },
+          "question": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          },
+          "severity_floor": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ALL",
+                  "MATERIAL",
+                  "BLOCKING"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity Floor"
+          },
+          "source_tier_floor": {
+            "anyOf": [
+              {
+                "enum": [
+                  "A",
+                  "B",
+                  "C",
+                  "D"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Tier Floor"
+          },
+          "working_theory": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working Theory"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "RunPlanRequest",
+        "type": "object"
+      },
+      "RunPlanStepOut": {
+        "properties": {
+          "changed": {
+            "title": "Changed",
+            "type": "boolean"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "system": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "who": {
+            "title": "Who",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "n",
+          "who",
+          "title",
+          "detail",
+          "changed"
+        ],
+        "title": "RunPlanStepOut",
+        "type": "object"
+      },
+      "RunPlanSystemOut": {
+        "properties": {
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "why",
+          "state"
+        ],
+        "title": "RunPlanSystemOut",
+        "type": "object"
+      },
+      "RunPlanTypeCountOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "count"
+        ],
+        "title": "RunPlanTypeCountOut",
+        "type": "object"
+      },
+      "RunPlanWhereOut": {
+        "properties": {
+          "callable": {
+            "title": "Callable",
+            "type": "boolean"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "string"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/RunPlanLimitsOut"
+          },
+          "minutes": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Minutes",
+            "type": "array"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "money": {
+            "title": "Money",
+            "type": "string"
+          },
+          "nothing_leaves": {
+            "title": "Nothing Leaves",
+            "type": "boolean"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "runs_on_this_computer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Runs On This Computer"
+          },
+          "words_in": {
+            "title": "Words In",
+            "type": "integer"
+          },
+          "words_out_max": {
+            "title": "Words Out Max",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "enabled",
+          "callable",
+          "provider",
+          "model",
+          "runs_on_this_computer",
+          "leaves",
+          "nothing_leaves",
+          "words_in",
+          "words_out_max",
+          "minutes",
+          "money",
+          "limits"
+        ],
+        "title": "RunPlanWhereOut",
+        "type": "object"
+      },
+      "RunProfileIn": {
+        "description": "This case's default run settings, with the reason for them.",
+        "properties": {
+          "options": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunOptionsIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "premises": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premises"
+          },
+          "reason": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "severity_floor": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ALL",
+                  "MATERIAL",
+                  "BLOCKING"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity Floor"
+          },
+          "source_tier_floor": {
+            "anyOf": [
+              {
+                "enum": [
+                  "A",
+                  "B",
+                  "C",
+                  "D"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Tier Floor"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "RunProfileIn",
+        "type": "object"
+      },
+      "RunProfileOut": {
+        "description": "This case's default AI run settings (mockup AI_2).",
+        "properties": {
+          "flags": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "object"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "options": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Options",
+            "type": "object"
+          },
+          "premises": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Premises",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "saved": {
+            "title": "Saved",
+            "type": "boolean"
+          },
+          "saved_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saved At"
+          }
+        },
+        "required": [
+          "name",
+          "flags",
+          "options",
+          "premises",
+          "reason",
+          "saved_at",
+          "saved"
+        ],
+        "title": "RunProfileOut",
+        "type": "object"
+      },
+      "RunSettingOut": {
+        "properties": {
+          "allowed": {
+            "items": {
+              "$ref": "#/components/schemas/RunSettingValueOut"
+            },
+            "title": "Allowed",
+            "type": "array"
+          },
+          "case_default": {
+            "title": "Case Default",
+            "type": "string"
+          },
+          "effect": {
+            "title": "Effect",
+            "type": "string"
+          },
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "help": {
+            "title": "Help",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "suite_default": {
+            "title": "Suite Default",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "group",
+          "help",
+          "suite_default",
+          "case_default",
+          "allowed",
+          "source",
+          "effect"
+        ],
+        "title": "RunSettingOut",
+        "type": "object"
+      },
+      "RunSettingValueOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "RunSettingValueOut",
         "type": "object"
       },
       "SavedIn": {
@@ -47349,6 +48301,66 @@
         "summary": "Investigation Hypothesis Test"
       }
     },
+    "/api/investigations/{investigation_id}/assistant/plan": {
+      "post": {
+        "description": "Before you run (mockup AI_2): the plan, the settings, the model and what would leave the computer.\nRetrieval only; no model is called.",
+        "operationId": "investigation_run_plan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunPlanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunPlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Investigation Run Plan"
+      }
+    },
     "/api/investigations/{investigation_id}/assistant/presentation-draft": {
       "post": {
         "description": "Draft a brief/deck from a reporter-selected evidence set and a goal.\n\nApp-local reasoning module (not vendored TAS -- see\napp/ai/presentation_modules/PRESENTATION_DRAFT.md), reusing the same\ncitation-validated LLM pipeline and non-canonical-write guarantee as\n/assistant/case-synthesis and /assistant/hypothesis-test above: the\nresult is a review_status=\"proposed\" AIAnalysisCandidate, promoted to\na Writeup and/or Deck only by a separate, human action.",
@@ -47443,6 +48455,114 @@
           }
         },
         "summary": "Investigation Presentation Draft"
+      }
+    },
+    "/api/investigations/{investigation_id}/assistant/profile": {
+      "get": {
+        "description": "This case's default AI run settings.",
+        "operationId": "investigation_run_profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunProfileOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Investigation Run Profile"
+      },
+      "put": {
+        "description": "Save this case's default run settings, with the one-line reason for them.",
+        "operationId": "save_investigation_run_profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunProfileIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunProfileOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Save Investigation Run Profile"
       }
     },
     "/api/investigations/{investigation_id}/case-records": {

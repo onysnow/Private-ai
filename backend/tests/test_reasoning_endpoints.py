@@ -262,6 +262,8 @@ def test_candidate_queue_list_get_and_filters(monkeypatch):
     assert body["request"] == {
         "question": "What did Ada North sign?", "working_theory": None, "max_results": 30, "include_external_leads": True,
         "control_flags": {"severity_floor": "ALL", "source_tier_floor": "D"},  # the suite's CONTROL_SURFACE defaults when omitted
+        "run_options": {name: spec["default"] for name, spec in reasoning_module.RUN_OPTIONS.items()},
+        "premises": [], "changes": [],
         "provider": "anthropic", "model": "unknown",  # the fake client returns a bare str, so no model id is known
         "record_refs": None,
     }

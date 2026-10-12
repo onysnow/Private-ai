@@ -179,8 +179,8 @@ def test_presentation_draft_prompt_is_not_framed_as_tas_and_ignores_control_flag
     captured: dict = {}
     original_build = reasoning_module.build_system_prompt
 
-    def _spy(module, contract, flags=None):
-        prompt = original_build(module, contract, flags)
+    def _spy(module, contract, flags=None, *rest):
+        prompt = original_build(module, contract, flags, *rest)
         captured["prompt"] = prompt
         return prompt
 
