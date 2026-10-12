@@ -159,7 +159,7 @@ def wire(db: Session, investigation_id: str) -> dict[str, Any]:
             "c": group_of.get(eid, -1), "x": x, "y": y, "jur": _first(props, "jurisdiction", "country", "nationality").lower(),
             "flags": flags.get(eid),
         })
-    out_entities.sort(key=lambda e: e["id"])
+    out_entities.sort(key=lambda e: str(e["id"]))
 
     events = [{"date": ev.date_start[:10], "title": ev.title, "entity": ev.entity_id}
               for ev in db.scalars(select(TimelineEvent).where(TimelineEvent.investigation_id == investigation_id)

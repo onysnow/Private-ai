@@ -102,7 +102,8 @@ def set_evidence_fields(db: Session, evidence: Evidence, data: dict[str, Any]) -
         if other is None or other_source is None or source is None or other_source.investigation_id != source.investigation_id:
             raise ValueError("restates_evidence_id must name an evidence record in this case")
         # A restatement points at the original, never round in a loop.
-        seen, cur = {evidence.id}, other
+        seen: set[str] = {evidence.id}
+        cur: Evidence | None = other
         while cur is not None:
             if cur.id in seen:
                 raise ValueError("That would make a loop of restatements: point at the original record")

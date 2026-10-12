@@ -445,7 +445,8 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
             schema = str(p.get("schema") or "")
             source = ends.get(str(p.get("source_candidate_id"))) or caption.partition(" → ")[0]
             target = ends.get(str(p.get("target_candidate_id"))) or caption.partition(" → ")[2]
-            props = p.get("properties") if isinstance(p.get("properties"), dict) else {}
+            raw_props = p.get("properties")
+            props: dict[str, Any] = raw_props if isinstance(raw_props, dict) else {}
             phrase = _rows_phrase(numbers)
             item["question"] = f"Do{'es' if len(numbers) == 1 else ''} {phrase} show {_link_facts(schema, source, target, props)}?"
             item["consequences"] = [f"Adds the link between the two records with {'this row' if len(numbers) == 1 else 'these rows'} as evidence."]
