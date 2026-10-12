@@ -19,13 +19,14 @@ import {
   getClaimSourcesOptions, getInvestigationGraphOptions, getPartyYearsOptions, listJobsEndpointOptions, getRedFlagsOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
   listInvestigationsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import {createInvestigation, patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
+import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
 import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
 import {caseHref} from '../../lib/case-href';
 import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
+import {NewCaseSetup} from '../new-case/new-case-setup';
 import {DecisionCard} from './decision-card';
 import {MiniNetwork} from './mini-network';
 import {HOLD_MS, useDecisions} from './use-decisions';
@@ -365,21 +366,11 @@ function PointingAt({investigationId}: {investigationId: string}): ReactElement 
   </div>;
 }
 
-/** No case yet: four first actions, each one line (FEATURE_HOME §1 "Empty case"). */
+/** No case yet: start one (name, question, kind, what you have), or open a sample (FEATURE_HOME §1 "Empty case"). */
 function FirstCase({onSwitch}: {onSwitch: (id: string) => void}): ReactElement {
   const queryClient = useQueryClient();
-  const [name, setName] = useState('');
-  const [question, setQuestion] = useState('');
   const [problem, setProblem] = useState('');
   const [busy, setBusy] = useState(false);
-  const start = async () => {
-    setBusy(true);
-    try {
-      const created = (await createInvestigation({body: {name: name.trim(), question: question.trim() || null}, throwOnError: true})).data;
-      await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
-      onSwitch(created.id);
-    } catch (error) { setProblem(errorMessage(error, 'Could not start the case')); } finally { setBusy(false); }
-  };
   const sample = async () => {
     setBusy(true);
     try {
@@ -390,11 +381,7 @@ function FirstCase({onSwitch}: {onSwitch: (id: string) => void}): ReactElement {
   return <div className="ch-first">
     <h1>Start a case</h1>
     <p>A case holds what you bring in, what you check, and what you can show. Nothing leaves this computer unless you send it.</p>
-    <form onSubmit={e => { e.preventDefault(); if (name.trim()) void start(); }} className="ch-first-form">
-      <label>Name<input value={name} onChange={e => setName(e.target.value)} placeholder="Kestrel harbour land" required/></label>
-      <label>The question it answers <small>(you can write it later)</small><input value={question} onChange={e => setQuestion(e.target.value)} placeholder="Who really owns the harbour land?"/></label>
-      <button type="submit" disabled={!name.trim() || busy}>Start the case</button>
-    </form>
+    <NewCaseSetup onCreated={onSwitch}/>
     <button type="button" className="ch-sample" onClick={() => void sample()} disabled={busy}>Or open the sample case to look around</button>
     <OneMdbLoader onOpen={onSwitch}/>
     {problem && <p role="alert">{problem}</p>}

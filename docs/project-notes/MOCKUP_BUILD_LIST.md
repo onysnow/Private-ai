@@ -80,8 +80,8 @@ To finish:
 - [x] Settings regrouped (12 Oct; values for API, AI, cases, theme, effects, motion, keys, format): You / Cases / This computer, each row showing its current value; settings search
 - [x] Edge rules (12 Oct; Alt → / ← for the left edge, Alt ↓ / ↑ for the top): dwell ~250 ms, visible 5 px handles labelled on first use, Alt+arrows, pin per device; trail of the last five places on the left edge
 - [x] Notifications inbox (12 Oct; snooze is per computer, a day or a week) (Needs you / Everything else, snooze)
-- [ ] New-case setup (name + question, "what kind of case", "what do you have so far")
-- [ ] Cases shelf (⌘O) with per-case place memory
+- [x] New-case setup (12 Oct; also from the case switcher) (name + question, "what kind of case", "what do you have so far")
+- [x] Cases shelf (⌘O) (12 Oct: the switcher, each case's last place) with per-case place memory
 - [ ] Rain Noir effects port (ADR first): bokeh field, rain pane on the case-home hero, iris on feature open, shutter corners on save
 
 ## 4. Bring in — mockups INTAKE_1 (The Drop) and INTAKE_2 (reading room) (§05)

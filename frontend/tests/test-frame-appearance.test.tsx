@@ -157,12 +157,15 @@ describe('AppFrame', () => {
     mockApi({'GET /api/investigations': [
       {id: 'inv-1', name: 'Kestrel SA', description: null, question: 'Who owns the harbour land?', is_demo: false, type_areas: null, created_at: '2026-10-01T00:00:00'},
       {id: 'inv-2', name: 'Meridian payments', description: null, question: null, is_demo: false, type_areas: null, created_at: '2026-10-02T00:00:00'}]});
+    window.localStorage.setItem('pai:case-places', JSON.stringify({'inv-2': {href: '/check?inv=inv-2#claim-verification', label: 'Cases › Meridian payments › Check › Claims'}}));
     render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
     fireEvent.keyDown(window, {key: 'o', ctrlKey: true});
     const user = userEvent.setup();
     await user.type(await screen.findByRole('combobox', {name: 'Find a case'}), 'meridian');
-    await user.click(await screen.findByRole('option', {name: 'Meridian payments'}));
-    expect(push).toHaveBeenCalledWith('/?inv=inv-2');
+    const option = await screen.findByRole('option', {name: /Meridian payments/});
+    expect(option).toHaveTextContent('last at Check › Claims');
+    await user.click(option);
+    expect(push).toHaveBeenCalledWith('/check?inv=inv-2#claim-verification');
     expect(useWorkbenchStore.getState().investigationId).toBe('inv-2');
     act(() => useWorkbenchStore.getState().setInvestigationId(''));
 

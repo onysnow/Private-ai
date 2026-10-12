@@ -22,6 +22,7 @@ import {applyAppearance, currentAppearance, keepAppearance, THEMES, tryTheme} fr
 import {singleKeysOn} from '../../lib/shortcuts';
 import {listInvestigationsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {Inbox, useNeedsYouCount} from '../../features/inbox/inbox';
+import {NewCaseSetup} from '../../features/new-case/new-case-setup';
 
 /** Any screen can ask the frame to open the case switcher. */
 export const SWITCH_CASE_EVENT = 'pai:switch-case';
@@ -39,6 +40,16 @@ function readPins(): Pins {
 function writePins(p: Pins): void { try { window.localStorage.setItem(PIN_KEY, JSON.stringify(p)); } catch { /* private window */ } }
 function learned(): boolean { try { return window.localStorage.getItem(LEARNED_KEY) === '1'; } catch { return true; } }
 function markLearned(): void { try { window.localStorage.setItem(LEARNED_KEY, '1'); } catch { /* private window */ } }
+
+/** Where you last were in each case, so opening it again goes back there. */
+const CASE_PLACE_KEY = 'pai:case-places';
+function readCasePlaces(): Record<string, Place> {
+  try { const v = JSON.parse(window.localStorage.getItem(CASE_PLACE_KEY) ?? '{}') as Record<string, Place>; return v && typeof v === 'object' ? v : {}; }
+  catch { return {}; }
+}
+function rememberCasePlace(inv: string, place: Place): void {
+  try { window.localStorage.setItem(CASE_PLACE_KEY, JSON.stringify({...readCasePlaces(), [inv]: place})); } catch { /* private window */ }
+}
 
 /** The last five places, newest first: a place is its address and the trail's words for it. */
 type Place = {href: string; label: string};
@@ -210,7 +221,7 @@ function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open
 }
 
 /** Open another case (⌘O / Ctrl O): type to narrow, Enter opens its home. */
-function CaseSwitcher({open, onOpenChange}: {open: boolean; onOpenChange: (open: boolean) => void}): ReactElement {
+function CaseSwitcher({open, onOpenChange, onNewCase}: {open: boolean; onOpenChange: (open: boolean) => void; onNewCase: () => void}): ReactElement {
   const router = useRouter();
   const current = useWorkbenchStore(state => state.investigationId);
   const cases = useQuery({...listInvestigationsOptions(), enabled: open}).data ?? [];
@@ -219,11 +230,13 @@ function CaseSwitcher({open, onOpenChange}: {open: boolean; onOpenChange: (open:
   useEffect(() => { if (open) { setQ(''); setActive(0); } }, [open]);
   const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   const shown = cases.filter(c => words.every(w => `${c.name} ${c.question ?? ''}`.toLowerCase().includes(w)));
+  const [placeOf, setPlaceOf] = useState<Record<string, Place>>({});
+  useEffect(() => { if (open) setPlaceOf(readCasePlaces()); }, [open]);
   const pick = (id?: string) => {
     if (!id) return;
     onOpenChange(false);
     useWorkbenchStore.getState().setInvestigationId(id);
-    router.push(`/?inv=${encodeURIComponent(id)}`);
+    router.push(placeOf[id]?.href ?? `/?inv=${encodeURIComponent(id)}`);
   };
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="fr-palette" aria-describedby="fr-cases-help">
@@ -240,10 +253,12 @@ function CaseSwitcher({open, onOpenChange}: {open: boolean; onOpenChange: (open:
       <div id="fr-cases-list" role="listbox" className="fr-palette-list" aria-label="Cases">
         {shown.map((c, i) => <div key={c.id} id={`fr-case-${c.id}`} role="option" aria-selected={i === active} className={`fr-cmd${i === active ? ' on' : ''}`}
           onMouseEnter={() => setActive(i)} onClick={() => pick(c.id)}>
-          <span>{c.name}{c.id === current ? ' · open now' : ''}</span>{c.question && <small>{c.question}</small>}
+          <span>{c.name}{c.id === current ? ' · open now' : ''}</span>
+          {(c.question || placeOf[c.id]) && <small>{[c.question, placeOf[c.id] && `last at ${placeOf[c.id].label.split(' › ').slice(2).join(' › ') || 'Home'}`].filter(Boolean).join(' · ')}</small>}
         </div>)}
         {!shown.length && <p className="fr-palette-empty">{cases.length ? 'No case matches.' : 'No cases yet.'}</p>}
       </div>
+      <button type="button" className="fr-new-case" onClick={() => { onOpenChange(false); onNewCase(); }}>+ Start a new case</button>
       <div className="fr-palette-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open · <kbd>Esc</kbd> close</div>
     </DialogContent>
   </Dialog>;
@@ -286,13 +301,17 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   const trailLabel = trail.map(t => t.label).join(' › ');
   useEffect(() => {
     if (!trailLabel || typeof window === 'undefined') return;
-    setPlaces(rememberPlace({href: `${window.location.pathname}${window.location.search}${window.location.hash}`, label: trailLabel}));
-  }, [trailLabel]);
+    const place = {href: `${window.location.pathname}${window.location.search}${window.location.hash}`, label: trailLabel};
+    setPlaces(rememberPlace(place));
+    const inv = new URLSearchParams(window.location.search).get('inv');
+    if (inv && trail[0]?.label === 'Cases') rememberCasePlace(inv, place);
+  }, [trailLabel]); // eslint-disable-line react-hooks/exhaustive-deps -- a new place is a new trail
   const [palette, setPalette] = useState(false);
   const [help, setHelp] = useState(false);
   const [cases, setCases] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [inbox, setInbox] = useState(false);
+  const [newCase, setNewCase] = useState(false);
   const closeInbox = useCallback(() => setInbox(false), []);
 
   useEffect(() => {
@@ -359,7 +378,14 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     <TryingBar/>
     <CommandPalette open={palette} onOpenChange={setPalette}/>
     <ShortcutsHelp open={help} onOpenChange={setHelp}/>
-    <CaseSwitcher open={cases} onOpenChange={setCases}/>
+    <CaseSwitcher open={cases} onOpenChange={setCases} onNewCase={() => setNewCase(true)}/>
+    <Dialog open={newCase} onOpenChange={setNewCase}>
+      <DialogContent className="fr-new">
+        <DialogTitle>Start a case</DialogTitle>
+        <DialogDescription>Its name and question, what kind of case it is, and what you have so far.</DialogDescription>
+        <NewCaseSetup onCreated={() => setNewCase(false)}/>
+      </DialogContent>
+    </Dialog>
     <Inbox open={inbox} onClose={closeInbox}/>
     {hidden && <HiddenCover onShow={() => setHidden(false)}/>}
   </div>;
