@@ -55,6 +55,9 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
             years[start[:4]] += 1
     flags = list(db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == inv, PatternFlag.status == "open",
                                                       PatternFlag.gone_at.is_(None))))
+    from app.services.case_years import flag_years, link_years
+    by_link = link_years(db, inv)
+    flag_year_counts: Counter[str] = Counter(str(y) for f in flags for y in flag_years(f, by_link))
     ledger = investigation_financial_ledger(db, inv)
     # Money traced counts each sum once, where it starts: a payment whose payer
     # received nothing in the case. Adding every hop would count layered money
@@ -81,7 +84,8 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
                   "from_sources": len(by_currency[currency]) if currency else 0,
                   "other_currencies": sorted(c for c in by_currency if c != currency)},
         "timeline": {"events": sum(years.values()), "from": min(years) if years else None, "to": max(years) if years else None,
-                     "years": [{"year": y, "events": n} for y, n in sorted(years.items())]},
+                     "years": [{"year": y, "events": years.get(y, 0), "flags": flag_year_counts.get(y, 0)}
+                               for y in sorted(set(years) | set(flag_year_counts))]},
         "documents": {"total": len(documents), "unread": sum(1 for (s,) in documents if s in UNREAD),
                       "failed": sum(1 for (s,) in documents if s == "failed")},
         "sources": _count(db, select(func.count()).select_from(Source).where(Source.investigation_id == inv)),

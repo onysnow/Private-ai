@@ -9,11 +9,11 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
-from app.models.domain import Investigation
+from app.models.domain import Entity, Investigation
 from app.patterns import engine
 from app.schemas.api import InvestigationUpdate
-from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, InvestigationOut, WireOut
-from app.services import case_home, wire
+from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, InvestigationOut, PartyYearsOut, WireOut
+from app.services import case_home, case_years, wire
 from app.services.investigations import update_investigation
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -63,3 +63,12 @@ def get_wire(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     _case(db, investigation_id)
     engine.bring_up_to_date(db, investigation_id)
     return wire.wire(db, investigation_id)
+
+
+@router.get("/entities/{entity_id}/years", response_model=PartyYearsOut)
+def get_party_years(entity_id: str, db: Session = Depends(get_db)) -> Any:
+    """The years a party's dated events and links touch: pointing at it lights them on the year rail."""
+    entity = db.get(Entity, entity_id)
+    if entity is None:
+        raise HTTPException(404, "Party not found")
+    return {"entity_id": entity.id, "years": case_years.party_years(db, entity.investigation_id, entity.id)}

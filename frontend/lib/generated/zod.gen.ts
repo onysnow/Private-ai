@@ -754,6 +754,7 @@ export const zCaseWatchlistCountsOut = z.object({
  */
 export const zCaseYearOut = z.object({
   events: z.number().int(),
+  flags: z.number().int().optional().default(0),
   year: z.string(),
 });
 
@@ -4623,6 +4624,16 @@ export const zOwnershipChainOut = z.object({
 });
 
 /**
+ * PartyYearsOut
+ *
+ * The years a party's dated events and links touch (pointing at it lights them).
+ */
+export const zPartyYearsOut = z.object({
+  entity_id: z.string(),
+  years: z.array(z.number().int()),
+});
+
+/**
  * PeekEventOut
  */
 export const zPeekEventOut = z.object({
@@ -7349,6 +7360,7 @@ export const zRedFlagOut = z.object({
   summary: z.string(),
   weight: z.number(),
   weight_parts: z.array(zWeightPartOut),
+  years: z.array(z.number().int()).optional().default([]),
 });
 
 /**
@@ -8588,6 +8600,15 @@ export const zListEntityStatementsPath = z.object({
  * Successful Response
  */
 export const zListEntityStatementsResponse = z.array(zEntityStatementOut);
+
+export const zGetPartyYearsPath = z.object({
+  entity_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetPartyYearsResponse = zPartyYearsOut;
 
 export const zCreateEvidenceEndpointBody = zEvidenceCreate;
 

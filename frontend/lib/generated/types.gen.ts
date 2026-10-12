@@ -1834,6 +1834,10 @@ export type CaseYearOut = {
    */
   events: number;
   /**
+   * Flags
+   */
+  flags?: number;
+  /**
    * Year
    */
   year: string;
@@ -10958,6 +10962,22 @@ export type OwnershipChainOwnerOut = {
 };
 
 /**
+ * PartyYearsOut
+ *
+ * The years a party's dated events and links touch (pointing at it lights them).
+ */
+export type PartyYearsOut = {
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Years
+   */
+  years: Array<number>;
+};
+
+/**
  * PeekEventOut
  */
 export type PeekEventOut = {
@@ -11905,6 +11925,10 @@ export type RedFlagOut = {
    * Weight Parts
    */
   weight_parts: Array<WeightPartOut>;
+  /**
+   * Years
+   */
+  years?: Array<number>;
 };
 
 /**
@@ -19698,6 +19722,41 @@ export type ListEntityStatementsResponses = {
 
 export type ListEntityStatementsResponse =
   ListEntityStatementsResponses[keyof ListEntityStatementsResponses];
+
+export type GetPartyYearsData = {
+  body?: never;
+  path: {
+    /**
+     * Entity Id
+     */
+    entity_id: string;
+  };
+  query?: never;
+  url: '/api/entities/{entity_id}/years';
+};
+
+export type GetPartyYearsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetPartyYearsError = GetPartyYearsErrors[keyof GetPartyYearsErrors];
+
+export type GetPartyYearsResponses = {
+  /**
+   * Successful Response
+   */
+  200: PartyYearsOut;
+};
+
+export type GetPartyYearsResponse =
+  GetPartyYearsResponses[keyof GetPartyYearsResponses];
 
 export type CreateEvidenceEndpointData = {
   body: EvidenceCreate;

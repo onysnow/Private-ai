@@ -3040,6 +3040,11 @@
             "title": "Events",
             "type": "integer"
           },
+          "flags": {
+            "default": 0,
+            "title": "Flags",
+            "type": "integer"
+          },
           "year": {
             "title": "Year",
             "type": "string"
@@ -22867,6 +22872,28 @@
         "title": "OwnershipChainOwnerOut",
         "type": "object"
       },
+      "PartyYearsOut": {
+        "description": "The years a party's dated events and links touch (pointing at it lights them).",
+        "properties": {
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "years": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Years",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entity_id",
+          "years"
+        ],
+        "title": "PartyYearsOut",
+        "type": "object"
+      },
       "PeekEventOut": {
         "properties": {
           "date": {
@@ -24377,6 +24404,14 @@
               "$ref": "#/components/schemas/WeightPartOut"
             },
             "title": "Weight Parts",
+            "type": "array"
+          },
+          "years": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Years",
             "type": "array"
           }
         },
@@ -44159,6 +44194,56 @@
           }
         },
         "summary": "List Entity Statements"
+      }
+    },
+    "/api/entities/{entity_id}/years": {
+      "get": {
+        "description": "The years a party's dated events and links touch: pointing at it lights them on the year rail.",
+        "operationId": "get_party_years",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "title": "Entity Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartyYearsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Party Years"
       }
     },
     "/api/evidence": {

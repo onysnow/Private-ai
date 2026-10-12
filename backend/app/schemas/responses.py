@@ -3985,6 +3985,7 @@ class RedFlagOut(ResponseModel):
     summary: str
     not_shown: list[str]
     checks: list[FlagCheckOut] = []
+    years: list[int] = []  # the years its links are dated in (Case home's year rail)
     first_seen_at: Timestamp
     last_seen_at: Timestamp
     gone_at: Timestamp | None
@@ -4198,6 +4199,13 @@ class CaseMoneyOut(ResponseModel):
 class CaseYearOut(ResponseModel):
     year: str
     events: int
+    flags: int = 0  # open Red Flags whose links are dated in this year
+
+
+class PartyYearsOut(ResponseModel):
+    """The years a party's dated events and links touch (pointing at it lights them)."""
+    entity_id: str
+    years: list[int]
 
 
 class CaseTimelineCountsOut(ResponseModel):

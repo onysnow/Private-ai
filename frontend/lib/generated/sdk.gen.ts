@@ -348,6 +348,9 @@ import type {
   GetOwnershipChainData,
   GetOwnershipChainErrors,
   GetOwnershipChainResponses,
+  GetPartyYearsData,
+  GetPartyYearsErrors,
+  GetPartyYearsResponses,
   GetRecordMarksData,
   GetRecordMarksErrors,
   GetRecordMarksResponses,
@@ -1004,6 +1007,8 @@ import {
   zGetOrphanStoragePreviewResponse,
   zGetOwnershipChainPath,
   zGetOwnershipChainResponse,
+  zGetPartyYearsPath,
+  zGetPartyYearsResponse,
   zGetRecordMarksPath,
   zGetRecordMarksQuery,
   zGetRecordMarksResponse,
@@ -4453,6 +4458,33 @@ export const listEntityStatements = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListEntityStatementsResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/statements',
+    ...options,
+  });
+
+/**
+ * Get Party Years
+ *
+ * The years a party's dated events and links touch: pointing at it lights them on the year rail.
+ */
+export const getPartyYears = <ThrowOnError extends boolean = false>(
+  options: Options<GetPartyYearsData, ThrowOnError>,
+): RequestResult<GetPartyYearsResponses, GetPartyYearsErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetPartyYearsResponses,
+    GetPartyYearsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetPartyYearsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetPartyYearsResponse.parseAsync(data),
+    url: '/api/entities/{entity_id}/years',
     ...options,
   });
 

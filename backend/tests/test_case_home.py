@@ -234,3 +234,18 @@ def test_table_text_helpers_write_only_what_the_values_hold():
     # Proposals made before the cells were kept: read back from the joined text.
     assert _table_rows({"rows": [2, 5], "row_text": "Payer: A; Amount: 1\nPayer: B"}) == [
         {"number": 2, "cells": {"Payer": "A", "Amount": "1"}}, {"number": 5, "cells": {"Payer": "B"}}]
+
+
+def test_a_party_lights_the_years_of_its_links_and_events():
+    from app.services.case_years import years_of_properties
+    assert years_of_properties({"startDate": ["2014-02"], "endDate": ["2016"]}) == {2014, 2015, 2016}
+    assert years_of_properties({"date": ["unknown"]}) == set()
+    inv = _inv("Years")
+    a, b, c = (_party(inv, n) for n in ("Meridian", "Bellcastle", "Harbour Trust"))
+    ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Ownership", "source_entity_id": a, "target_entity_id": b,
+                                               "properties": {"startDate": ["2015-03-01"], "endDate": ["2017-06-30"]}}))
+    ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": b, "target_entity_id": c,
+                                               "properties": {"amount": ["9800"], "currency": ["USD"], "date": ["2019-01-04"]}}))
+    assert ok(client.get(f"/api/entities/{a}/years"))["years"] == [2015, 2016, 2017]
+    assert ok(client.get(f"/api/entities/{b}/years"))["years"] == [2015, 2016, 2017, 2019]
+    assert client.get("/api/entities/nope/years").status_code == 404

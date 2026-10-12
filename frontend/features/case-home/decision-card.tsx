@@ -29,7 +29,7 @@ export function Excerpt({text, terms}: {text: string; terms: string[]}): ReactEl
 export function RowCells({rows, compact = false}: {rows: NonNullable<NonNullable<DecisionItemOut['evidence']>['rows']>; compact?: boolean}): ReactElement | null {
   if (!rows.length) return null;
   const columns = [...new Set(rows.flatMap(r => Object.keys(r.cells)))];
-  return <div className={`ch-rows${compact ? ' ch-rows-compact' : ''}`}>
+  return <div className={`ch-cells${compact ? ' ch-cells-compact' : ''}`}>
     <table>
       <thead><tr><th scope="col">Row</th>{columns.map(c => <th key={c} scope="col">{c}</th>)}</tr></thead>
       <tbody>{rows.map(r => <tr key={r.number}><th scope="row">{r.number}</th>{columns.map(c => <td key={c}>{r.cells[c] ?? ''}</td>)}</tr>)}</tbody>

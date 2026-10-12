@@ -121,6 +121,7 @@ import {
   getOpenalephDocumentSync,
   getOrphanStoragePreview,
   getOwnershipChain,
+  getPartyYears,
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
@@ -594,6 +595,9 @@ import type {
   GetOwnershipChainData,
   GetOwnershipChainError,
   GetOwnershipChainResponse,
+  GetPartyYearsData,
+  GetPartyYearsError,
+  GetPartyYearsResponse,
   GetRecordMarksData,
   GetRecordMarksError,
   GetRecordMarksResponse,
@@ -3963,6 +3967,33 @@ export const listEntityStatementsOptions = (
       return data;
     },
     queryKey: listEntityStatementsQueryKey(options),
+  });
+
+export const getPartyYearsQueryKey = (options: Options<GetPartyYearsData>) =>
+  createQueryKey('getPartyYears', options);
+
+/**
+ * Get Party Years
+ *
+ * The years a party's dated events and links touch: pointing at it lights them on the year rail.
+ */
+export const getPartyYearsOptions = (options: Options<GetPartyYearsData>) =>
+  queryOptions<
+    GetPartyYearsResponse,
+    GetPartyYearsError,
+    GetPartyYearsResponse,
+    ReturnType<typeof getPartyYearsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPartyYears({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPartyYearsQueryKey(options),
   });
 
 /**

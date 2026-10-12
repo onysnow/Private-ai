@@ -16,7 +16,7 @@ import {LevelChip, StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {
-  getInvestigationGraphOptions, getRedFlagsOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
+  getInvestigationGraphOptions, getPartyYearsOptions, getRedFlagsOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
   listInvestigationsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {createInvestigation, patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
@@ -46,6 +46,25 @@ export function money(amount: number, currency: string | null): string {
     return new Intl.NumberFormat('en-US', {style: 'currency', currency, currencyDisplay: 'narrowSymbol', notation: compact ? 'compact' : 'standard',
       maximumFractionDigits: compact ? 2 : 0}).format(amount);
   } catch { return `${currency} ${Math.round(amount).toLocaleString('en-GB')}`; }
+}
+
+/** Years in a line: [2015, 2017, 2018] → "2015, 2017–18". */
+export function yearSpan(years: number[]): string {
+  const sorted = [...new Set(years)].sort((a, b) => a - b);
+  const runs: [number, number][] = [];
+  for (const y of sorted) {
+    const last = runs[runs.length - 1];
+    if (last && y === last[1] + 1) last[1] = y; else runs.push([y, y]);
+  }
+  return runs.map(([a, b]) => a === b ? String(a)
+    : `${a}–${Math.floor(a / 100) === Math.floor(b / 100) ? String(b).slice(2) : b}`).join(', ');
+}
+
+/** The years the party pointed at touches, for lighting them everywhere. */
+function usePointedYears(): {party: string | null; years: number[]} {
+  const party = useWorkbenchStore(state => state.pointedParty);
+  const years = useQuery({...getPartyYearsOptions({path: {entity_id: party ?? ''}}), enabled: Boolean(party)}).data?.years ?? [];
+  return {party, years: party ? years : []};
 }
 
 function readVisit(id: string): string | null {
@@ -207,7 +226,8 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
       {flagsQuery.isPending ? <div className="ch-skeleton" aria-busy="true" aria-label="Looking for Red Flags"/> : flagsQuery.isError ? <p role="alert" className="ch-quiet">{errorMessage(flagsQuery.error, 'Could not look for Red Flags')} <button type="button" onClick={() => void flagsQuery.refetch()}>Retry</button></p> : open.length ? open.slice(at, at + 2).map(f => {
         const innocent = f.indicator?.innocent_explanations?.[0];
         return <button key={f.id} type="button" className={`ch-flag ch-flag-${f.level}`} onClick={() => openFlag(f.id)}>
-          <span className="ch-flag-top"><LevelChip level={f.level}/><span className="ch-since">flagged {new Date(`${f.first_seen_at.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})}</span></span>
+          <span className="ch-flag-top"><LevelChip level={f.level}/><span className="ch-since">{f.years?.length ? `lights ${yearSpan(f.years)}`
+            : `flagged ${new Date(`${f.first_seen_at.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})}`}</span></span>
           <b>{f.indicator?.name ?? f.indicator_id}</b>
           <span className="ch-flag-parties">{f.parties.map(p => p.name).join(' → ')}</span>
           {innocent && <span className="ch-innocent"><em>Could be innocent</em>{innocent}</span>}
@@ -279,14 +299,19 @@ function YearRail({investigationId}: {investigationId: string}): ReactElement {
   const setAsOf = useWorkbenchStore(state => state.setAsOf);
   const years = standing?.timeline.years ?? [];
   const most = Math.max(1, ...years.map(y => y.events));
+  const pointed = usePointedYears();
+  const lit = new Set(pointed.years);
   if (standingQuery.isPending && investigationId) return <div className="ch-years" aria-busy="true"/>;
   if (!years.length) return <div className="ch-years ch-quiet">Dated events place the case in time here.</div>;
   return <nav className="ch-years" aria-label="Years in the case">
     {years.slice(-10).map(y => {
       const on = asOf === Number(y.year);
-      return <button key={y.year} type="button" className={on ? 'on' : ''} aria-pressed={on} onClick={() => setAsOf(on ? null : Number(y.year))}
+      const flags = y.flags ?? 0;
+      const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit'].filter(Boolean).join(' ');
+      return <button key={y.year} type="button" className={cls} aria-pressed={on} onClick={() => setAsOf(on ? null : Number(y.year))}
         title={on ? 'Show all years again' : `Show the case as of ${y.year}`}>
-        <b>{y.year}</b><small>{y.events} event{y.events === 1 ? '' : 's'}</small><i style={{width: `${(100 * y.events) / most}%`}}/>
+        <b>{y.year}</b><small>{y.events} event{y.events === 1 ? '' : 's'}{flags ? <> · <span className="ch-year-flags">{flags} flag{flags === 1 ? '' : 's'}</span></> : null}</small>
+        <i style={{width: `${(100 * y.events) / most}%`}}/>
       </button>;
     })}
   </nav>;
@@ -298,10 +323,11 @@ function PointingAt({investigationId}: {investigationId: string}): ReactElement 
   const asOf = useWorkbenchStore(state => state.asOf);
   const graph = useQuery({...getInvestigationGraphOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
   const name = graph?.nodes.find(n => n.id === pointed)?.caption;
+  const {years} = usePointedYears();
   return <div className="ch-pointing" aria-live="polite">
     <p className="ch-eyebrow">Pointing at</p>
     {pointed ? <><span className="ch-party on">{name ?? 'a party'}</span>
-      <span>lit in every part{asOf ? ` · as of ${asOf}` : ''}</span>
+      <span>{years.length ? `lights ${yearSpan(years)} everywhere` : 'lit in every part'}{asOf ? ` · as of ${asOf}` : ''}</span>
       <button type="button" onClick={() => point(null)}>Clear ×</button></>
       : <span className="ch-quiet">Nothing. Point at a party to light it everywhere{asOf ? ` · showing ${asOf}` : ''}.</span>}
   </div>;

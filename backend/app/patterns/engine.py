@@ -20,6 +20,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.services.case_years import link_years
 from app.catalogue.loader import Catalogue, load
 from app.catalogue.models import AREA_SUMMARIES, Indicator
 from app.core.time import utcnow_naive
@@ -174,7 +175,9 @@ def _rank(rows: list[PatternFlag]) -> None:
 
 
 def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]],
-              checks: dict[str, list[dict[str, str]]] | None = None) -> dict[str, Any]:
+              checks: dict[str, list[dict[str, str]]] | None = None, by_link: dict[str, set[int]] | None = None) -> dict[str, Any]:
+    from app.services.case_years import flag_years
+
     found = indicator(row.indicator_id)
     ind, area = found if found else (None, "")
     return {
@@ -185,6 +188,7 @@ def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]],
         "links": row.links, "facts": row.facts, "summary": (row.facts or {}).get("summary", ""),
         "not_shown": list((row.facts or {}).get("not_shown") or []),
         "checks": (checks or {}).get(row.id, []),
+        "years": flag_years(row, by_link or {}),
         "first_seen_at": row.first_seen_at, "last_seen_at": row.last_seen_at, "gone_at": row.gone_at,
         "indicator": None if ind is None else {
             "id": ind.id, "name": ind.name, "definition": ind.definition, "area": ind.areas[0], "area_name": area,
@@ -243,6 +247,7 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
     current = sorted((r for r in rows if r.gone_at is None), key=lambda r: (-r.weight, r.indicator_id, r.fingerprint))
     gone = sorted((r for r in rows if r.gone_at is not None), key=lambda r: r.gone_at or r.last_seen_at, reverse=True)
     inv = db.get(Investigation, investigation_id)
+    by_link = link_years(db, investigation_id)
     linked: dict[str, list[dict[str, str]]] = {}
     for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id, CheckItem.flag_id.is_not(None),
                                                 CheckItem.gone_at.is_(None))):
@@ -251,8 +256,8 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
         "investigation_id": investigation_id,
         "rules": [{"indicator_id": s.indicator, "version": s.version, "name": _name(s.indicator)} for s in detection.load()],
         "cannot_run": cannot,
-        "flags": [serialize(db, r, names, linked) for r in current],
-        "gone": [serialize(db, r, names) for r in gone],
+        "flags": [serialize(db, r, names, linked, by_link) for r in current],
+        "gone": [serialize(db, r, names, by_link=by_link) for r in gone],
         "investigation_type": investigation_type.current(db, inv) if inv else {"set_by": "app", "areas": [], "suggested": []},
     }
 

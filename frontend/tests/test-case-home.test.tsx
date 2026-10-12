@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {CaseHome} from '../features/case-home/case-home';
+import {CaseHome, yearSpan} from '../features/case-home/case-home';
 import {DecideScreen} from '../features/case-home/decide-screen';
 import {HOLD_MS, markTerms} from '../features/case-home/use-decisions';
 import {ApiClient} from '../lib/api-client';
@@ -98,6 +98,22 @@ describe('Case home', () => {
     expect(screen.getByText('Kestrel SA bought the harbour land in 2020 with its own funds.')).toBeInTheDocument();
   });
 
+  it('marks flagged years and lights the years of the party pointed at', async () => {
+    routes({
+      'GET /api/investigations/inv-1/standing': {...standing, timeline: {...standing.timeline, years: [{year: '2016', events: 4, flags: 0}, {year: '2017', events: 9, flags: 1}, {year: '2018', events: 2, flags: 0}]}},
+      'GET /api/investigations/inv-1/graph': {nodes: [{id: 'e1', caption: 'Fernhill Ltd', schema: 'Company'}], edges: [], schemas: [], reconciliation: {hidden_duplicate_edges: 0}},
+      'GET /api/entities/e1/years': {entity_id: 'e1', years: [2017, 2018]},
+    });
+    useWorkbenchStore.setState({pointedParty: 'e1'});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const rail = await screen.findByRole('navigation', {name: 'Years in the case'});
+    expect(await within(rail).findByText('1 flag')).toBeInTheDocument();
+    expect(within(rail).getByRole('button', {name: /2017/})).toHaveClass('flagged');
+    expect(await screen.findByText('lights 2017–18 everywhere')).toBeInTheDocument();
+    await waitFor(() => expect(within(rail).getByRole('button', {name: /2018/})).toHaveClass('lit'));
+    expect(within(rail).getByRole('button', {name: /2016/})).not.toHaveClass('lit');
+  });
+
   it('writes the question in place', async () => {
     const api = routes({'PATCH /api/investigations/inv-1': {...INV, question: 'Who paid for the parcel?'}, 'GET /api/investigations': [INV]});
     wrap(<CaseHome investigation={{...INV, question: null}} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
@@ -155,6 +171,13 @@ describe('Decide', () => {
     fireEvent.click(screen.getByRole('button', {name: 'Not public'}));
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     await waitFor(() => expect(api.lastBody('POST /api/checks/mv-1/decide')).toEqual({status: 'unknowable', note: 'Not public'}));
+  });
+});
+
+describe('yearSpan', () => {
+  it('joins runs of years', () => {
+    expect(yearSpan([2018, 2015, 2017])).toBe('2015, 2017–18');
+    expect(yearSpan([1999, 2000])).toBe('1999–2000');
   });
 });
 
