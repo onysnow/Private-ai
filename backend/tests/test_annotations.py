@@ -22,9 +22,11 @@ def _setup() -> dict[str, str]:
         a = Entity(investigation_id=inv.id, ftm_id="a", schema="Company", caption="Bellcastle Ltd", properties={})
         b = Entity(investigation_id=inv.id, ftm_id="b", schema="Person", caption="Jane Doe", properties={})
         stranger = Entity(investigation_id=other.id, ftm_id="c", schema="Person", caption="Not here", properties={})
-        db.add_all([a, b, stranger])
+        # The link's own entity, which PostgreSQL requires (a foreign key; SQLite does not check it).
+        own = Entity(investigation_id=inv.id, ftm_id="own-1", schema="Ownership", caption="Ownership", properties={})
+        db.add_all([a, b, stranger, own])
         db.flush()
-        edge = RelationshipEdge(investigation_id=inv.id, relationship_entity_id="own-1", schema="Ownership",
+        edge = RelationshipEdge(investigation_id=inv.id, relationship_entity_id=own.id, schema="Ownership",
                                 source_entity_id=b.id, target_entity_id=a.id, source_prop="owner", target_prop="asset")
         claim = Claim(investigation_id=inv.id, text="Jane Doe owns Bellcastle through a nominee.")
         db.add_all([edge, claim])

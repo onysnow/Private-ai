@@ -348,6 +348,7 @@ def delete_collection(db: Session, collection: Collection) -> None:
     """The collection and its list go; the records in it stay."""
     for item in db.scalars(select(CollectionItem).where(CollectionItem.collection_id == collection.id)):
         db.delete(item)
+    db.flush()  # the items go first: PostgreSQL checks their foreign key at each statement
     db.delete(collection)
     db.commit()
 

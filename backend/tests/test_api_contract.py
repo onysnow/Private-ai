@@ -363,6 +363,14 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     picture = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Market hall"}, files={
         "file": ("hall.png", picture_bytes, "image/png")}))
     # A ledger, which can be mapped to entities (app/services/table_mappings.py).
+    # A PDF, whose pages Next up draws (GET .../page-image).
+    import fitz
+    pdf = fitz.open()
+    pdf.new_page().insert_text((72, 72), "Minutes of the board: the parcel was bought on behalf of Fernhill Ltd.")
+    pdf_bytes = pdf.tobytes()
+    pdf.close()
+    minutes = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Board minutes"}, files={
+        "file": ("minutes.pdf", pdf_bytes, "application/pdf")}))
     ledger = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Ledger"}, files={
         "file": ("ledger.csv", b"Payer,Payee,Amount\nMeridian Holdings Ltd,Bellcastle Trading Group,2400000\n", "text/csv")}))
     # A watched name and a document it was found in.
@@ -422,6 +430,10 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     saved = ok(client.post("/api/console/query/saved", json={"name": "Investigations", "sql": "SELECT id FROM investigations"}))
     collection = ok(client.post("/api/console/api/collections", json={"name": "Smoke", "requests": [{"method": "GET", "path": "/api/health"}]}))
 
+    # One of the Authority System Suite's own records for the case (app/services/case_records.py).
+    case_record = ok(client.post(f"/api/investigations/{inv}/case-records", json={
+        "kind": "GAP", "body": {"unresolved_question": "Who signed the transfer?", "bears_on": [claim["id"]]}}))
+
     return Seeded(
         ids={
             "investigation_id": inv, "entity_id": meridian, "claim_id": claim["id"], "lead_id": lead, "relationship_id": relationship,
@@ -433,7 +445,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
             "indicator_id": "BO-001", "case_id": "deripaska-en-rusal", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
-            "check_id": _check_item(client),
+            "check_id": _check_item(client), "case_record_id": case_record["id"],
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={
@@ -446,6 +458,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
             ("GET", "/api/documents/{document_id}/email"): {"document_id": email},
             ("GET", "/api/documents/{document_id}/picture"): {"document_id": picture["id"]},
+            ("GET", "/api/documents/{document_id}/page-image"): {"document_id": minutes["id"]},
             **{(method, path): {"document_id": ledger["id"]} for method, path in (
                 ("GET", "/api/documents/{document_id}/table"),
                 ("POST", "/api/documents/{document_id}/table-mappings/preview"),

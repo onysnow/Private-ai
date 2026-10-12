@@ -27,7 +27,7 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem,
+    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -43,7 +43,7 @@ MODEL_BY_TABLE = {
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
-        WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem,
+        WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
     ]
 }
 
@@ -74,6 +74,8 @@ RESTORE_ORDER = [
     "pattern_flags",
     # What a person checks, with their decisions; an item may point at its flag and its document.
     "check_items",
+    # The Authority System Suite's own records for the case (gaps, replies, hypotheses, ...).
+    "case_records",
     # The TAS reasoning review queue travels with the investigation: a restored
     # backup keeps every proposed/accepted/rejected analysis and its reviewer note,
     # exactly as extraction_candidates keeps the document review trail.
@@ -147,7 +149,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
-        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem,
+        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -190,6 +192,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "collections": direct["collections"], "collection_items": direct["collection_items"],
         "pattern_flags": direct["pattern_flags"],
         "check_items": direct["check_items"],
+        "case_records": direct["case_records"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -285,17 +288,19 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
     return summary
 
 
-def _parents_first(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Documents ordered so an archive or email comes before the files found
-    in it (parent_document_id, ADR-0006): PostgreSQL checks the foreign key
-    as each row goes in. Rows keep their order otherwise."""
+def _parents_first(rows: list[dict[str, Any]], parent_key: str = "parent_document_id") -> list[dict[str, Any]]:
+    """Rows ordered so the row another points at goes in first: an archive or
+    email before the files found in it (parent_document_id, ADR-0006), an
+    evidence item before the one that restates it (restates_evidence_id).
+    PostgreSQL checks the foreign key as each row goes in. Rows keep their
+    order otherwise."""
     placed: set[Any] = set()
     ordered: list[dict[str, Any]] = []
     waiting = list(rows)
     ids = {row.get("id") for row in rows}
     while waiting:
-        ready = [row for row in waiting if row.get("parent_document_id") in placed
-                 or row.get("parent_document_id") is None or row.get("parent_document_id") not in ids]
+        ready = [row for row in waiting if row.get(parent_key) in placed
+                 or row.get(parent_key) is None or row.get(parent_key) not in ids]
         if not ready:          # a cycle cannot be restored in any order; the insert will say so
             ordered.extend(waiting)
             break
@@ -610,6 +615,8 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 rows = records.get(table, [])
                 if table == "documents":
                     rows = _parents_first(rows)
+                elif table == "evidence":
+                    rows = _parents_first(rows, "restates_evidence_id")
                 for raw_row in rows:
                     row = dict(raw_row)
                     if table == "documents" and row["id"] in raw_locations:

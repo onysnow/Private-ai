@@ -14468,6 +14468,276 @@
         "title": "DossierSummaryOut",
         "type": "object"
       },
+      "DropLaneOut": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "in_progress": {
+            "title": "In Progress",
+            "type": "boolean"
+          },
+          "issues": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Issues",
+            "type": "array"
+          },
+          "problem": {
+            "title": "Problem",
+            "type": "boolean"
+          },
+          "receipt": {
+            "$ref": "#/components/schemas/DropReceiptOut"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/DropStageOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document_id",
+          "filename",
+          "stages",
+          "problem",
+          "in_progress",
+          "issues",
+          "receipt"
+        ],
+        "title": "DropLaneOut",
+        "type": "object"
+      },
+      "DropOut": {
+        "description": "Every file brought into the case, one lane of seven stages each.",
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "lanes": {
+            "items": {
+              "$ref": "#/components/schemas/DropLaneOut"
+            },
+            "title": "Lanes",
+            "type": "array"
+          },
+          "ready_for_you": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Ready For You",
+            "type": "object"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/DropStageNameOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/DropTotalsOut"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "stages",
+          "lanes",
+          "totals",
+          "ready_for_you"
+        ],
+        "title": "DropOut",
+        "type": "object"
+      },
+      "DropReceiptOut": {
+        "properties": {
+          "files_inside": {
+            "title": "Files Inside",
+            "type": "integer"
+          },
+          "fingerprint": {
+            "title": "Fingerprint",
+            "type": "string"
+          },
+          "flags_fed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags Fed",
+            "type": "array"
+          },
+          "how_read": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "How Read"
+          },
+          "pages": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages"
+          },
+          "passages": {
+            "title": "Passages",
+            "type": "integer"
+          },
+          "proposals": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Proposals",
+            "type": "object"
+          },
+          "waiting": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Waiting",
+            "type": "object"
+          },
+          "watchlist_hits": {
+            "title": "Watchlist Hits",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fingerprint",
+          "passages",
+          "proposals",
+          "waiting",
+          "watchlist_hits",
+          "flags_fed",
+          "files_inside"
+        ],
+        "title": "DropReceiptOut",
+        "type": "object"
+      },
+      "DropStageNameOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label"
+        ],
+        "title": "DropStageNameOut",
+        "type": "object"
+      },
+      "DropStageOut": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "key": {
+            "enum": [
+              "received",
+              "checked",
+              "read",
+              "passages",
+              "inside",
+              "names",
+              "ready"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "done",
+              "active",
+              "waiting",
+              "stopped",
+              "needs_you",
+              "skipped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "state",
+          "detail"
+        ],
+        "title": "DropStageOut",
+        "type": "object"
+      },
+      "DropTotalsOut": {
+        "properties": {
+          "files": {
+            "title": "Files",
+            "type": "integer"
+          },
+          "files_inside": {
+            "title": "Files Inside",
+            "type": "integer"
+          },
+          "passages": {
+            "title": "Passages",
+            "type": "integer"
+          },
+          "problems": {
+            "title": "Problems",
+            "type": "integer"
+          },
+          "read": {
+            "title": "Read",
+            "type": "integer"
+          },
+          "unread": {
+            "title": "Unread",
+            "type": "integer"
+          },
+          "waiting": {
+            "title": "Waiting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "files",
+          "files_inside",
+          "read",
+          "unread",
+          "problems",
+          "passages",
+          "waiting"
+        ],
+        "title": "DropTotalsOut",
+        "type": "object"
+      },
       "DuplicateDocumentDetailOut": {
         "properties": {
           "document": {
@@ -47122,6 +47392,56 @@
           }
         },
         "summary": "List Documents"
+      }
+    },
+    "/api/investigations/{investigation_id}/drop": {
+      "get": {
+        "description": "The Drop (Bring in): each file brought in as a lane of seven stages, with its read receipt.",
+        "operationId": "get_drop",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DropOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Drop"
       }
     },
     "/api/investigations/{investigation_id}/entities": {

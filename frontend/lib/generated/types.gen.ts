@@ -6072,6 +6072,187 @@ export type DossierSummaryOut = {
 };
 
 /**
+ * DropLaneOut
+ */
+export type DropLaneOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * In Progress
+   */
+  in_progress: boolean;
+  /**
+   * Issues
+   */
+  issues: Array<string>;
+  /**
+   * Problem
+   */
+  problem: boolean;
+  receipt: DropReceiptOut;
+  /**
+   * Stages
+   */
+  stages: Array<DropStageOut>;
+};
+
+/**
+ * DropOut
+ *
+ * Every file brought into the case, one lane of seven stages each.
+ */
+export type DropOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Lanes
+   */
+  lanes: Array<DropLaneOut>;
+  /**
+   * Ready For You
+   */
+  ready_for_you: {
+    [key: string]: number;
+  };
+  /**
+   * Stages
+   */
+  stages: Array<DropStageNameOut>;
+  totals: DropTotalsOut;
+};
+
+/**
+ * DropReceiptOut
+ */
+export type DropReceiptOut = {
+  /**
+   * Files Inside
+   */
+  files_inside: number;
+  /**
+   * Fingerprint
+   */
+  fingerprint: string;
+  /**
+   * Flags Fed
+   */
+  flags_fed: Array<string>;
+  /**
+   * How Read
+   */
+  how_read?: string | null;
+  /**
+   * Pages
+   */
+  pages?: number | null;
+  /**
+   * Passages
+   */
+  passages: number;
+  /**
+   * Proposals
+   */
+  proposals: {
+    [key: string]: number;
+  };
+  /**
+   * Waiting
+   */
+  waiting: {
+    [key: string]: number;
+  };
+  /**
+   * Watchlist Hits
+   */
+  watchlist_hits: number;
+};
+
+/**
+ * DropStageNameOut
+ */
+export type DropStageNameOut = {
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
+ * DropStageOut
+ */
+export type DropStageOut = {
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Key
+   */
+  key:
+    | 'received'
+    | 'checked'
+    | 'read'
+    | 'passages'
+    | 'inside'
+    | 'names'
+    | 'ready';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * State
+   */
+  state: 'done' | 'active' | 'waiting' | 'stopped' | 'needs_you' | 'skipped';
+};
+
+/**
+ * DropTotalsOut
+ */
+export type DropTotalsOut = {
+  /**
+   * Files
+   */
+  files: number;
+  /**
+   * Files Inside
+   */
+  files_inside: number;
+  /**
+   * Passages
+   */
+  passages: number;
+  /**
+   * Problems
+   */
+  problems: number;
+  /**
+   * Read
+   */
+  read: number;
+  /**
+   * Unread
+   */
+  unread: number;
+  /**
+   * Waiting
+   */
+  waiting: number;
+};
+
+/**
  * DuplicateDocumentDetailOut
  */
 export type DuplicateDocumentDetailOut = {
@@ -21584,6 +21765,40 @@ export type ListDocumentsResponses = {
 
 export type ListDocumentsResponse =
   ListDocumentsResponses[keyof ListDocumentsResponses];
+
+export type GetDropData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/drop';
+};
+
+export type GetDropErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDropError = GetDropErrors[keyof GetDropErrors];
+
+export type GetDropResponses = {
+  /**
+   * Successful Response
+   */
+  200: DropOut;
+};
+
+export type GetDropResponse = GetDropResponses[keyof GetDropResponses];
 
 export type ListEntitiesData = {
   body?: never;

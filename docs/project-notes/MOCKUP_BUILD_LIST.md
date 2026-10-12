@@ -88,10 +88,10 @@ To finish:
 
 Today: **partial** (old Documents panel; readers built, incl. .eml/.mbox/.zip/.xlsx).
 INTAKE_1 The Drop:
-- [ ] Drop field (files, folders, links, pasted text) that shrinks to a strip once files arrive; This drop card (counts, OCR language, "nothing leaves this computer")
-- [ ] **Digestion line**: one lane per file, seven stage boxes (Received → Checked → Read → Split into passages → Files inside → Names & facts → Ready for you), live detail ("12/48", "OCR"), stopped / waiting / needs-you states, containers collapsed ("18 of 23 read · Show all"), totals row; Problems & in progress filter (F)
-- [ ] Read receipt card (fingerprint, pages, how read, passages, proposals, watchlist hits, flag it fed; Open in reading room · Trace)
-- [ ] Ready for you (63 proposals by kind) and Problems first list; bottom filmstrip "1 / 34"
+- [x] (12 Oct; links still to do — they need web capture) Drop field (files, folders, links, pasted text) that shrinks to a strip once files arrive; This drop card (counts, OCR language, "nothing leaves this computer")
+- [x] (12 Oct; polls every 2 s while reading, no per-file stream yet) **Digestion line**: one lane per file, seven stage boxes (Received → Checked → Read → Split into passages → Files inside → Names & facts → Ready for you), live detail ("12/48", "OCR"), stopped / waiting / needs-you states, containers collapsed ("18 of 23 read · Show all"), totals row; Problems & in progress filter (F)
+- [x] (12 Oct) Read receipt card (fingerprint, pages, how read, passages, proposals, watchlist hits, flag it fed; Open in reading room · Trace)
+- [x] (12 Oct; problems sort first; no filmstrip yet) Ready for you (63 proposals by kind) and Problems first list; bottom filmstrip "1 / 34"
 - [ ] Library and History tabs; per-file event stream (SSE) instead of three pollers; Stop reading
 INTAKE_2 Reading room:
 - [ ] Page strip with proposal marks; calm serif text 40–60 ch/line; tabs Text / Original / Translation / Details; find in document

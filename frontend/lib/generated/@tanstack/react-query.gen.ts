@@ -101,6 +101,7 @@ import {
   getDocumentPicture,
   getDocumentTable,
   getDocumentTranslation,
+  getDrop,
   getEntityDossier,
   getExtractionCandidateExplanation,
   getExtractionCandidateLineage,
@@ -537,6 +538,9 @@ import type {
   GetDocumentTranslationData,
   GetDocumentTranslationError,
   GetDocumentTranslationResponse,
+  GetDropData,
+  GetDropError,
+  GetDropResponse,
   GetEntityDossierData,
   GetEntityDossierError,
   GetEntityDossierResponse,
@@ -5744,6 +5748,33 @@ export const listDocumentsInfiniteOptions = (
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const getDropQueryKey = (options: Options<GetDropData>) =>
+  createQueryKey('getDrop', options);
+
+/**
+ * Get Drop
+ *
+ * The Drop (Bring in): each file brought in as a lane of seven stages, with its read receipt.
+ */
+export const getDropOptions = (options: Options<GetDropData>) =>
+  queryOptions<
+    GetDropResponse,
+    GetDropError,
+    GetDropResponse,
+    ReturnType<typeof getDropQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDrop({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDropQueryKey(options),
+  });
 
 export const listEntitiesQueryKey = (options: Options<ListEntitiesData>) =>
   createQueryKey('listEntities', options);

@@ -4522,3 +4522,58 @@ class CaseRecordOut(ResponseModel):
     created_by: str | None = None
     created_at: Timestamp
     updated_at: Timestamp
+
+
+# --- The Drop (app/services/drop.py) ---------------------------------------------------------
+
+class DropStageOut(ResponseModel):
+    key: Literal["received", "checked", "read", "passages", "inside", "names", "ready"]
+    label: str
+    state: Literal["done", "active", "waiting", "stopped", "needs_you", "skipped"]
+    detail: str
+
+
+class DropStageNameOut(ResponseModel):
+    key: str
+    label: str
+
+
+class DropReceiptOut(ResponseModel):
+    fingerprint: str
+    pages: int | None = None
+    how_read: str | None = None
+    passages: int
+    proposals: dict[str, int]
+    waiting: dict[str, int]
+    watchlist_hits: int
+    flags_fed: list[str]
+    files_inside: int
+
+
+class DropLaneOut(ResponseModel):
+    document_id: str
+    filename: str
+    stages: list[DropStageOut]
+    problem: bool
+    in_progress: bool
+    issues: list[str]
+    receipt: DropReceiptOut
+
+
+class DropTotalsOut(ResponseModel):
+    files: int
+    files_inside: int
+    read: int
+    unread: int
+    problems: int
+    passages: int
+    waiting: int
+
+
+class DropOut(ResponseModel):
+    """Every file brought into the case, one lane of seven stages each."""
+    investigation_id: str
+    stages: list[DropStageNameOut]
+    lanes: list[DropLaneOut]
+    totals: DropTotalsOut
+    ready_for_you: dict[str, int]

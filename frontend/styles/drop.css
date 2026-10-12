@@ -1,0 +1,57 @@
+/* The Drop (features/the-drop/the-drop.tsx; mockup INTAKE_1) */
+.dp { display: flex; flex-direction: column; gap: 12px; height: 100%; min-height: 0; color: var(--text); font-family: var(--font-ui); }
+.dp-field { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px 16px; border-radius: 14px; border: 1.5px dashed color-mix(in srgb, var(--accent-2) 55%, transparent);
+  background: color-mix(in srgb, var(--surface-1) 80%, transparent); transition: background var(--dur-fast), border-color var(--dur-fast); }
+.dp-empty .dp-field { flex: 1 1 auto; min-height: 260px; justify-content: center; flex-direction: column; text-align: center; font-size: 15px; }
+.dp-field.over { background: color-mix(in srgb, var(--accent-2) 16%, var(--surface-1)); border-color: var(--accent-2); }
+.dp-field:focus-visible { outline: 2px solid var(--accent-1); }
+.dp-field p { margin: 0; }
+.dp-pick { display: inline-flex; gap: 8px; }
+.dp-pick button, .dp-actions button, .dp-filter { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 9px; background: var(--surface-2); font-size: 12.5px; color: var(--text); }
+.dp-pick button:hover, .dp-actions button:hover, .dp-filter:hover { background: var(--surface-3); }
+.dp-pick button:focus-visible, .dp-actions button:focus-visible, .dp-filter:focus-visible, .dp-lane button:focus-visible { outline: 2px solid var(--accent-1); }
+.dp-status { width: 100%; font-size: 12.5px; color: var(--text-muted); }
+.dp-card { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 10px 14px; border-radius: 12px; background: var(--surface-1); font-size: 13px; }
+.dp-card b { font: 600 15px var(--font-display); font-variant-numeric: tabular-nums; }
+.dp-card .bad b { color: var(--status-disputed); }
+.dp-local { color: var(--text-muted); font-size: 12px; }
+.dp-filter { margin-left: auto; }
+.dp-filter.on { background: var(--accent-1); color: var(--ground); }
+.dp-body { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; }
+.dp-line { min-height: 0; overflow: auto; overscroll-behavior: contain; border-radius: 14px; background: var(--surface-1); padding: 8px; }
+.dp-head, .dp-lane button { display: grid; grid-template-columns: minmax(150px, 1.6fr) repeat(7, minmax(78px, 1fr)); gap: 4px; align-items: stretch; }
+.dp-head { position: sticky; top: 0; z-index: 1; padding: 4px 6px 6px; background: var(--surface-1); font: 500 10px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); }
+.dp-line ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.dp-lane button { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: minmax(150px, 1.6fr) repeat(7, minmax(78px, 1fr)); gap: 4px; padding: 5px 6px; border-radius: 10px; }
+.dp-lane button:hover { background: var(--surface-2); }
+.dp-lane.on button { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent-1); }
+.dp-file { align-self: center; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dp-lane.problem .dp-file { color: var(--status-disputed); }
+.dp-stage { display: flex; flex-direction: column; gap: 1px; padding: 5px 7px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--text-muted) 22%, transparent); min-width: 0; }
+.dp-stage i { font-style: normal; font-weight: 700; font-size: 12px; }
+.dp-stage small { font: 400 10.5px var(--font-mono); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dp-done { background: color-mix(in srgb, var(--status-supported) 14%, transparent); border-color: color-mix(in srgb, var(--status-supported) 40%, transparent); }
+.dp-done i { color: var(--status-supported); }
+.dp-active { border-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 14%, transparent); }
+.dp-active i { color: var(--accent-2); }
+.dp-waiting { border-style: dashed; }
+.dp-stopped { border-color: var(--status-disputed); background: color-mix(in srgb, var(--status-disputed) 12%, transparent); }
+.dp-stopped i, .dp-stopped small { color: var(--status-disputed); }
+.dp-needs_you { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 16%, transparent); }
+.dp-needs_you i { color: var(--accent-1); }
+.dp-skipped { opacity: .55; }
+.dp-side { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.dp-receipt, .dp-ready { padding: 14px; border-radius: 14px; background: var(--surface-1); }
+.dp-eyebrow { margin: 0; font: 500 10.5px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+.dp-receipt h3 { margin: 4px 0 8px; font: 600 15px var(--font-ui); overflow-wrap: anywhere; }
+.dp-receipt dl { margin: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; }
+.dp-receipt dl div { display: flex; justify-content: space-between; gap: 10px; }
+.dp-receipt dt { color: var(--text-muted); }
+.dp-receipt dd { margin: 0; text-align: right; }
+.dp-issues { margin: 8px 0 0; padding-left: 16px; font-size: 12px; color: var(--status-disputed); }
+.dp-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+.dp-actions a, .dp-ready a { color: var(--accent-2); text-decoration: none; font-size: 12.5px; }
+.dp-ready ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.dp-ready b { font: 600 15px var(--font-display); color: var(--accent-1); margin-right: 4px; }
+.dp-quiet { color: var(--text-muted); font-size: 12.5px; padding: 8px; }
+@media (max-width: 1100px) { .dp-body { grid-template-columns: 1fr; } }

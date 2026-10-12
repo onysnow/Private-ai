@@ -288,6 +288,9 @@ import type {
   GetDocumentTranslationData,
   GetDocumentTranslationErrors,
   GetDocumentTranslationResponses,
+  GetDropData,
+  GetDropErrors,
+  GetDropResponses,
   GetEntityDossierData,
   GetEntityDossierErrors,
   GetEntityDossierResponses,
@@ -973,6 +976,8 @@ import {
   zGetDocumentTableResponse,
   zGetDocumentTranslationPath,
   zGetDocumentTranslationResponse,
+  zGetDropPath,
+  zGetDropResponse,
   zGetEntityDossierPath,
   zGetEntityDossierResponse,
   zGetExtractionCandidateExplanationPath,
@@ -5939,6 +5944,31 @@ export const listDocuments = <ThrowOnError extends boolean = false>(
     url: '/api/investigations/{investigation_id}/documents',
     ...options,
   });
+
+/**
+ * Get Drop
+ *
+ * The Drop (Bring in): each file brought in as a lane of seven stages, with its read receipt.
+ */
+export const getDrop = <ThrowOnError extends boolean = false>(
+  options: Options<GetDropData, ThrowOnError>,
+): RequestResult<GetDropResponses, GetDropErrors, ThrowOnError> =>
+  (options.client ?? client).get<GetDropResponses, GetDropErrors, ThrowOnError>(
+    {
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: zGetDropPath,
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseValidator: async (data) =>
+        await zGetDropResponse.parseAsync(data),
+      url: '/api/investigations/{investigation_id}/drop',
+      ...options,
+    },
+  );
 
 /**
  * List Entities

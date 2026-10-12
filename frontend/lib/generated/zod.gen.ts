@@ -2295,6 +2295,93 @@ export const zDossierSummaryOut = z.object({
 });
 
 /**
+ * DropReceiptOut
+ */
+export const zDropReceiptOut = z.object({
+  files_inside: z.number().int(),
+  fingerprint: z.string(),
+  flags_fed: z.array(z.string()),
+  how_read: z.string().nullish(),
+  pages: z.number().int().nullish(),
+  passages: z.number().int(),
+  proposals: z.record(z.number().int()),
+  waiting: z.record(z.number().int()),
+  watchlist_hits: z.number().int(),
+});
+
+/**
+ * DropStageNameOut
+ */
+export const zDropStageNameOut = z.object({
+  key: z.string(),
+  label: z.string(),
+});
+
+/**
+ * DropStageOut
+ */
+export const zDropStageOut = z.object({
+  detail: z.string(),
+  key: z.enum([
+    'received',
+    'checked',
+    'read',
+    'passages',
+    'inside',
+    'names',
+    'ready',
+  ]),
+  label: z.string(),
+  state: z.enum([
+    'done',
+    'active',
+    'waiting',
+    'stopped',
+    'needs_you',
+    'skipped',
+  ]),
+});
+
+/**
+ * DropLaneOut
+ */
+export const zDropLaneOut = z.object({
+  document_id: z.string(),
+  filename: z.string(),
+  in_progress: z.boolean(),
+  issues: z.array(z.string()),
+  problem: z.boolean(),
+  receipt: zDropReceiptOut,
+  stages: z.array(zDropStageOut),
+});
+
+/**
+ * DropTotalsOut
+ */
+export const zDropTotalsOut = z.object({
+  files: z.number().int(),
+  files_inside: z.number().int(),
+  passages: z.number().int(),
+  problems: z.number().int(),
+  read: z.number().int(),
+  unread: z.number().int(),
+  waiting: z.number().int(),
+});
+
+/**
+ * DropOut
+ *
+ * Every file brought into the case, one lane of seven stages each.
+ */
+export const zDropOut = z.object({
+  investigation_id: z.string(),
+  lanes: z.array(zDropLaneOut),
+  ready_for_you: z.record(z.number().int()),
+  stages: z.array(zDropStageNameOut),
+  totals: zDropTotalsOut,
+});
+
+/**
  * DuplicateDocumentDetailOut
  */
 export const zDuplicateDocumentDetailOut = z.object({
@@ -9138,6 +9225,15 @@ export const zListDocumentsQuery = z.object({
  * Successful Response
  */
 export const zListDocumentsResponse = z.array(zDocumentOut);
+
+export const zGetDropPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDropResponse = zDropOut;
 
 export const zListEntitiesPath = z.object({
   investigation_id: z.string(),

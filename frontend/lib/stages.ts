@@ -14,8 +14,9 @@ export type Stage = {key: StageKey; n: number; name: string; line: string; colou
 
 export const STAGES: Stage[] = [
   {key: 'collect', route: '/bring-in', n: 1, name: 'Bring in', line: 'Bring material in. Nothing here is a finding until it is reviewed.', colour: SWATCH.steelBlue, parts: [
+    {label: 'The Drop', anchor: 'the-drop'},
     {label: 'Search', anchor: 'investigation-search'},
-    {label: 'Documents', anchor: 'document-ingestion'},
+    {label: 'Library', anchor: 'document-ingestion'},
     {label: 'Sources & evidence', anchor: 'source-capture'},
     {label: 'Connectors', anchor: 'connectors'},
     {label: 'OpenAleph corpus', anchor: 'corpus'},

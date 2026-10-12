@@ -29,6 +29,7 @@ import {BackupPanel} from '../../features/backups/backup-panel';
 import {CaseHome} from '../../features/case-home/case-home';
 import {DecideScreen} from '../../features/case-home/decide-screen';
 import {TheWire} from '../../features/the-wire/the-wire';
+import {TheDrop} from '../../features/the-drop/the-drop';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
@@ -259,8 +260,9 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       </>)}
     </> : <>
       {screen('collect', [
+        {anchor: 'the-drop', label: 'The Drop', fill: true, render: () => <PanelErrorBoundary name="The Drop"><TheDrop investigationId={inv} active={view === 'collect'}/></PanelErrorBoundary>},
         {anchor: 'investigation-search', label: 'Search', render: () => <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'document-ingestion', label: 'Documents', render: () => <PanelErrorBoundary name="The Drop"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'document-ingestion', label: 'Library', render: () => <PanelErrorBoundary name="Library"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'source-capture', label: 'Sources & evidence', render: () => <PanelErrorBoundary name="Source & exact evidence capture">
           <SourceCapturePanel investigationId={inv} sourceCount={sourcesQuery.data?.length ?? 0} evidenceCount={evidenceQuery.data?.length ?? 0}/></PanelErrorBoundary>},
         {anchor: 'connectors', label: 'Connectors', render: () => <PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary>},

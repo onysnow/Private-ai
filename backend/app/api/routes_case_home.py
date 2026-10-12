@@ -12,8 +12,8 @@ from app.db.session import get_db
 from app.models.domain import Entity, Investigation
 from app.patterns import engine
 from app.schemas.api import InvestigationUpdate
-from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, InvestigationOut, PartyYearsOut, WireOut
-from app.services import case_home, case_years, wire
+from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
+from app.services import case_home, case_years, drop, wire
 from app.services.investigations import update_investigation
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -79,3 +79,10 @@ def get_claim_sources(investigation_id: str, db: Session = Depends(get_db)) -> A
     """Each claim's lead source and locator, for the source line on its card."""
     _case(db, investigation_id)
     return case_home.claim_sources(db, investigation_id)
+
+
+@router.get("/investigations/{investigation_id}/drop", response_model=DropOut)
+def get_drop(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """The Drop (Bring in): each file brought in as a lane of seven stages, with its read receipt."""
+    _case(db, investigation_id)
+    return drop.drop(db, investigation_id)

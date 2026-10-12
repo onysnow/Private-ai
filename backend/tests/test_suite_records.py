@@ -135,3 +135,24 @@ def test_confirmed_reads_the_tier_and_a_restatement_is_not_a_second_source():
     claim3 = _claim(inv)
     client.post(f"/api/claims/{claim3}/evidence", json={"evidence_id": _evidence(inv, "https://e.example/1", tier="A"), "stance": "supports"})
     assert _confirmed(claim3)["independent"] == "met"
+
+
+def test_suite_records_and_restatements_travel_in_a_backup(tmp_path):
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from app.db.session import Base, SessionLocal
+    from app.services.exports import build_investigation_export, restore_investigation_export
+
+    inv, claim = _case()
+    original, repeat = _evidence(inv, "https://a.example/1"), _evidence(inv, "https://b.example/1")
+    client.patch(f"/api/evidence/{repeat}/suite", json={"restates_evidence_id": original})
+    gap = client.post(f"/api/investigations/{inv}/case-records", json={"kind": "GAP", "body": {"unresolved_question": "Who signed?", "bears_on": [claim]}}).json()
+    with SessionLocal() as db:
+        package, _ = build_investigation_export(db, inv, include_documents=False)
+    engine = create_engine(f"sqlite:///{tmp_path / 'restored.db'}", connect_args={"check_same_thread": False})
+    Base.metadata.create_all(engine)
+    with sessionmaker(bind=engine, autoflush=False, autocommit=False)() as db:
+        restore_investigation_export(db, package, tmp_path / "restored-documents")
+        assert db.get(domain.CaseRecord, gap["id"]).record_id == "GAP-0001"
+        assert db.get(domain.Evidence, repeat).restates_evidence_id == original
