@@ -65,6 +65,7 @@ function routes(extra: Record<string, unknown> = {}) {
     'GET /api/investigations/inv-1/claims': [{id: 'c1', investigation_id: 'inv-1', text: 'Kestrel SA bought the harbour land in 2020 with its own funds.', status: 'disputed', confidence: 0.3, created_at: '2026-10-01T00:00:00'}],
     'GET /api/investigations/inv-1/red-flags': {investigation_id: 'inv-1', flags: [], gone: [], rules: [], cannot_run: [], type: null},
     'GET /api/investigations/inv-1/documents': [],
+    'GET /api/investigations/inv-1/claim-sources': [{claim_id: 'c1', source: 'Board minutes', locator: 'p. 4', count: 3}],
     'GET /api/investigations/inv-1/graph': {nodes: [], edges: [], schemas: [], reconciliation: {hidden_duplicate_edges: 0}},
     'GET /api/investigations/inv-1/since': {investigation_id: 'inv-1', after: '2026-10-01T00:00:00', changes: [{key: 'ai', count: 1, label: 'AI draft to review', actor_kind: 'ai', href: '/decide?kind=ai', level: null}]},
     ...extra,
@@ -96,6 +97,7 @@ describe('Case home', () => {
     expect(within(card).getByRole('button', {name: /Shows it/})).toHaveAttribute('aria-keyshortcuts', 'S');
     expect(await screen.findByText('AI draft to review')).toBeInTheDocument();
     expect(screen.getByText('Kestrel SA bought the harbour land in 2020 with its own funds.')).toBeInTheDocument();
+    expect(await screen.findByText('Board minutes · p. 4 · +2 more')).toBeInTheDocument();
   });
 
   it('marks flagged years and lights the years of the party pointed at', async () => {

@@ -12,7 +12,7 @@ from app.db.session import get_db
 from app.models.domain import Entity, Investigation
 from app.patterns import engine
 from app.schemas.api import InvestigationUpdate
-from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, InvestigationOut, PartyYearsOut, WireOut
+from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, InvestigationOut, PartyYearsOut, WireOut
 from app.services import case_home, case_years, wire
 from app.services.investigations import update_investigation
 
@@ -72,3 +72,10 @@ def get_party_years(entity_id: str, db: Session = Depends(get_db)) -> Any:
     if entity is None:
         raise HTTPException(404, "Party not found")
     return {"entity_id": entity.id, "years": case_years.party_years(db, entity.investigation_id, entity.id)}
+
+
+@router.get("/investigations/{investigation_id}/claim-sources", response_model=list[ClaimSourceLineOut])
+def get_claim_sources(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """Each claim's lead source and locator, for the source line on its card."""
+    _case(db, investigation_id)
+    return case_home.claim_sources(db, investigation_id)

@@ -249,3 +249,18 @@ def test_a_party_lights_the_years_of_its_links_and_events():
     assert ok(client.get(f"/api/entities/{a}/years"))["years"] == [2015, 2016, 2017]
     assert ok(client.get(f"/api/entities/{b}/years"))["years"] == [2015, 2016, 2017, 2019]
     assert client.get("/api/entities/nope/years").status_code == 404
+
+
+def test_each_claim_names_the_source_it_rests_on_first():
+    inv = _inv("Sources")
+    claim = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "Meridian paid Bellcastle", "status": "unverified", "confidence": 0.5}))["id"]
+    ok(client.post("/api/claims", json={"investigation_id": inv, "text": "Nothing linked", "status": "unverified", "confidence": 0.5}))
+
+    def evidence(title, locator):
+        src = ok(client.post("/api/sources", json={"investigation_id": inv, "title": title, "source_type": "document"}))["id"]
+        return ok(client.post("/api/evidence", json={"source_id": src, "quote": "paid", "locator": locator}))["id"]
+
+    ok(client.post(f"/api/claims/{claim}/evidence", json={"evidence_id": evidence("Press release", "para 2"), "stance": "contradicts"}))
+    ok(client.post(f"/api/claims/{claim}/evidence", json={"evidence_id": evidence("Board minutes", "p. 4"), "stance": "supports"}))
+    assert ok(client.get(f"/api/investigations/{inv}/claim-sources")) == [
+        {"claim_id": claim, "source": "Board minutes", "locator": "p. 4", "count": 2}]

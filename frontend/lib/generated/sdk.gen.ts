@@ -240,6 +240,9 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
+  GetClaimSourcesData,
+  GetClaimSourcesErrors,
+  GetClaimSourcesResponses,
   GetCollectionData,
   GetCollectionErrors,
   GetCollectionResponses,
@@ -933,6 +936,8 @@ import {
   zGetChecksResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
+  zGetClaimSourcesPath,
+  zGetClaimSourcesResponse,
   zGetCollectionPath,
   zGetCollectionResponse,
   zGetCollectionsPath,
@@ -5268,6 +5273,37 @@ export const getChecks = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetChecksResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/checks',
+    ...options,
+  });
+
+/**
+ * Get Claim Sources
+ *
+ * Each claim's lead source and locator, for the source line on its card.
+ */
+export const getClaimSources = <ThrowOnError extends boolean = false>(
+  options: Options<GetClaimSourcesData, ThrowOnError>,
+): RequestResult<
+  GetClaimSourcesResponses,
+  GetClaimSourcesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetClaimSourcesResponses,
+    GetClaimSourcesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetClaimSourcesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetClaimSourcesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/claim-sources',
     ...options,
   });
 

@@ -1139,6 +1139,18 @@ export const zClaimReviewRequest = z.object({
 });
 
 /**
+ * ClaimSourceLineOut
+ *
+ * Where a claim's evidence comes from, in one line for its card.
+ */
+export const zClaimSourceLineOut = z.object({
+  claim_id: z.string(),
+  count: z.number().int(),
+  locator: z.string().nullish(),
+  source: z.string(),
+});
+
+/**
  * ClaimSuiteFields
  *
  * Set any of a claim's suite fields; each change is a review event with its reason.
@@ -8848,6 +8860,17 @@ export const zGetChecksPath = z.object({
  * Successful Response
  */
 export const zGetChecksResponse = zChecksOut;
+
+export const zGetClaimSourcesPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response Get Claim Sources
+ *
+ * Successful Response
+ */
+export const zGetClaimSourcesResponse = z.array(zClaimSourceLineOut);
 
 export const zListClaimsPath = z.object({
   investigation_id: z.string(),

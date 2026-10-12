@@ -2947,6 +2947,30 @@ export type ClaimReviewWorkspaceOut = {
 };
 
 /**
+ * ClaimSourceLineOut
+ *
+ * Where a claim's evidence comes from, in one line for its card.
+ */
+export type ClaimSourceLineOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Source
+   */
+  source: string;
+};
+
+/**
  * ClaimSuiteFields
  *
  * Set any of a claim's suite fields; each change is a review event with its reason.
@@ -20659,6 +20683,44 @@ export type GetChecksResponses = {
 };
 
 export type GetChecksResponse = GetChecksResponses[keyof GetChecksResponses];
+
+export type GetClaimSourcesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/claim-sources';
+};
+
+export type GetClaimSourcesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetClaimSourcesError =
+  GetClaimSourcesErrors[keyof GetClaimSourcesErrors];
+
+export type GetClaimSourcesResponses = {
+  /**
+   * Response Get Claim Sources
+   *
+   * Successful Response
+   */
+  200: Array<ClaimSourceLineOut>;
+};
+
+export type GetClaimSourcesResponse =
+  GetClaimSourcesResponses[keyof GetClaimSourcesResponses];
 
 export type ListClaimsData = {
   body?: never;

@@ -16,7 +16,7 @@ import {LevelChip, StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {
-  getInvestigationGraphOptions, getPartyYearsOptions, listJobsEndpointOptions, getRedFlagsOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
+  getClaimSourcesOptions, getInvestigationGraphOptions, getPartyYearsOptions, listJobsEndpointOptions, getRedFlagsOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
   listInvestigationsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {createInvestigation, patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
@@ -194,10 +194,18 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
   </Module>;
 }
 
+function SourceLine({line}: {line?: {source: string; locator?: string | null; count: number}}): ReactElement {
+  if (!line) return <span className="ch-claim-src ch-quiet">No evidence linked yet</span>;
+  const more = line.count - 1;
+  return <span className="ch-claim-src">{line.source}{line.locator ? ` · ${line.locator}` : ''}{more > 0 ? ` · +${more} more` : ''}</span>;
+}
+
 function CheckModule({investigationId}: {investigationId: string}): ReactElement {
   const claimsData = useQuery({...listClaimsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
   const claims = useMemo(() => claimsData ?? [], [claimsData]);
   const openClaim = useWorkbenchStore(state => state.openClaim);
+  const sourcesData = useQuery({...getClaimSourcesOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const sources = useMemo(() => new Map((sourcesData ?? []).map(x => [x.claim_id, x])), [sourcesData]);
   const [index, setIndex] = useState(0);
   const ordered = useMemo(() => [...claims].sort((a, b) => CLAIM_ORDER[CLAIM_STATUS[a.status] ?? 'unshown'] - CLAIM_ORDER[CLAIM_STATUS[b.status] ?? 'unshown']), [claims]);
   const counts = {supported: 0, disputed: 0, unshown: 0, ruled_out: 0} as Record<ClaimStatus, number>;
@@ -214,6 +222,7 @@ function CheckModule({investigationId}: {investigationId: string}): ReactElement
         onClick={() => openClaim(c.id)}>
         <StatusChip status={CLAIM_STATUS[c.status] ?? 'unshown'}/>
         <span className="ch-claim-text">{c.text}</span>
+        <SourceLine line={sources.get(c.id)}/>
       </button>) : <p className="ch-quiet">No claims yet. A claim is a sentence you may publish; add one in Check.</p>}
     </div>
   </Module>;
@@ -244,6 +253,8 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
   </Module>;
 }
 
+const ACTOR: Record<string, string> = {person: 'by a person', app: 'found by the app', ai: 'drafted, to review', connector: 'from outside records'};
+
 function SinceStrip({investigationId}: {investigationId: string}): ReactElement {
   const [after, setAfter] = useState<string | null>(null);
   useEffect(() => {
@@ -260,9 +271,12 @@ function SinceStrip({investigationId}: {investigationId: string}): ReactElement 
     <header><p className="ch-eyebrow">{after ? `Since ${when}` : 'First visit on this computer'}</p><h2>What changed while you were away</h2></header>
     {!after ? <p className="ch-quiet">Next time you open this case, what moved in between shows here: who did it, and where.</p>
       : !since?.changes.length ? <p className="ch-quiet">Nothing has changed since then.</p>
-      : <ul>{since.changes.map(c => <li key={c.key}><Link href={caseHref(c.href, investigationId)} className={`ch-change ch-actor-${c.actor_kind}`}>
-        <b>{c.count}</b><span>{c.label}</span>{c.actor_kind === 'ai' && <span className="ai-tag">AI</span>}
-      </Link></li>)}</ul>}
+      : <ul>{since.changes.slice(0, 4).map(c => <li key={c.key}><Link href={caseHref(c.href, investigationId)} className={`ch-change ch-actor-${c.actor_kind}`}>
+        <b>{c.count}</b><span>{c.label}</span>
+        <small className="ch-actor">{c.actor_kind === 'ai' ? <span className="ai-tag">AI</span> : null}{ACTOR[c.actor_kind]}</small>
+      </Link></li>)}
+        {since.changes.length > 4 && <li><Link href={caseHref('/decide', investigationId)} className="ch-change ch-more">
+          <b>+{since.changes.length - 4}</b><span>more changes</span></Link></li>}</ul>}
   </section>;
 }
 

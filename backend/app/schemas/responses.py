@@ -4202,6 +4202,14 @@ class CaseYearOut(ResponseModel):
     flags: int = 0  # open Red Flags whose links are dated in this year
 
 
+class ClaimSourceLineOut(ResponseModel):
+    """Where a claim's evidence comes from, in one line for its card."""
+    claim_id: str
+    source: str
+    locator: str | None = None
+    count: int
+
+
 class PartyYearsOut(ResponseModel):
     """The years a party's dated events and links touch (pointing at it lights them)."""
     entity_id: str

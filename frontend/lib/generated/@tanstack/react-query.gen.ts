@@ -85,6 +85,7 @@ import {
   getCaseRecord,
   getChecks,
   getClaimReviewWorkspace,
+  getClaimSources,
   getCollection,
   getCollections,
   getCorpusInsights,
@@ -487,6 +488,9 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
+  GetClaimSourcesData,
+  GetClaimSourcesError,
+  GetClaimSourcesResponse,
   GetCollectionData,
   GetCollectionError,
   GetCollectionResponse,
@@ -4739,6 +4743,34 @@ export const getChecksOptions = (options: Options<GetChecksData>) =>
       return data;
     },
     queryKey: getChecksQueryKey(options),
+  });
+
+export const getClaimSourcesQueryKey = (
+  options: Options<GetClaimSourcesData>,
+) => createQueryKey('getClaimSources', options);
+
+/**
+ * Get Claim Sources
+ *
+ * Each claim's lead source and locator, for the source line on its card.
+ */
+export const getClaimSourcesOptions = (options: Options<GetClaimSourcesData>) =>
+  queryOptions<
+    GetClaimSourcesResponse,
+    GetClaimSourcesError,
+    GetClaimSourcesResponse,
+    ReturnType<typeof getClaimSourcesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getClaimSources({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getClaimSourcesQueryKey(options),
   });
 
 export const listClaimsQueryKey = (options: Options<ListClaimsData>) =>

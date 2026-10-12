@@ -4958,6 +4958,41 @@
         "title": "ClaimReviewWorkspaceOut",
         "type": "object"
       },
+      "ClaimSourceLineOut": {
+        "description": "Where a claim's evidence comes from, in one line for its card.",
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "source",
+          "count"
+        ],
+        "title": "ClaimSourceLineOut",
+        "type": "object"
+      },
       "ClaimSuiteFields": {
         "additionalProperties": false,
         "description": "Set any of a claim's suite fields; each change is a review event with its reason.",
@@ -45667,6 +45702,60 @@
           }
         },
         "summary": "Get Checks"
+      }
+    },
+    "/api/investigations/{investigation_id}/claim-sources": {
+      "get": {
+        "description": "Each claim's lead source and locator, for the source line on its card.",
+        "operationId": "get_claim_sources",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClaimSourceLineOut"
+                  },
+                  "title": "Response Get Claim Sources",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Claim Sources"
       }
     },
     "/api/investigations/{investigation_id}/claims": {

@@ -612,3 +612,29 @@ def since(db: Session, investigation_id: str, after: datetime) -> dict[str, Any]
 
 def require(db: Session, investigation_id: str) -> Investigation | None:
     return db.get(Investigation, investigation_id)
+
+
+# --- Where each claim's evidence comes from (Case home's Check cards) --------------------------------------------
+
+STANCE_ORDER = {"supports": 0, "contradicts": 1, "context": 2}
+
+
+def claim_sources(db: Session, investigation_id: str) -> list[dict[str, Any]]:
+    """For each claim with linked evidence: the source it rests on first (supporting
+    before contradicting before context), its locator, and how many items are linked."""
+    from app.models.domain import ClaimEvidenceLink
+
+    rows = db.execute(select(ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance, Evidence.locator, Source.title)
+                      .join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
+                      .join(Evidence, Evidence.id == ClaimEvidenceLink.evidence_id)
+                      .join(Source, Source.id == Evidence.source_id)
+                      .where(Claim.investigation_id == investigation_id))
+    by_claim: dict[str, list[tuple[int, str, str | None]]] = {}
+    for claim_id, stance, locator, title in rows:
+        by_claim.setdefault(claim_id, []).append((STANCE_ORDER.get(stance, 3), title or "", locator))
+    out = []
+    for claim_id, items in by_claim.items():
+        items.sort(key=lambda t: (t[0], t[1], t[2] or ""))
+        _, title, locator = items[0]
+        out.append({"claim_id": claim_id, "source": title, "locator": locator, "count": len(items)})
+    return sorted(out, key=lambda r: r["claim_id"])
