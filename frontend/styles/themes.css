@@ -337,6 +337,13 @@ html[data-effects='off'] body::before, html[data-effects='off'] body::after { di
 .fr-top.open { transform: translate(-50%, 0); }
 .fr-tool { all: unset; cursor: pointer; box-sizing: border-box; display: inline-flex; gap: 8px; align-items: center; padding: 9px 13px; border-radius: 10px; color: var(--text); font-size: 13px; white-space: nowrap; text-decoration: none; background: var(--surface-2); transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-out); }
 .fr-tool:hover { background: var(--surface-3); transform: translateY(-1px); }
+.fr-bell { position: relative; }
+.fr-count { min-width: 18px; padding: 1px 5px; border-radius: 9px; background: var(--accent-1); color: var(--ground); font: 700 11px var(--font-ui); text-align: center; }
+.fr-crumb-cases { all: unset; cursor: pointer; color: var(--text-muted); }
+.fr-crumb-cases:hover, .fr-crumb-cases:focus-visible { color: var(--text); text-decoration: underline; }
+.fr-hidden { position: fixed; inset: 0; z-index: 1000; background: var(--ground); display: grid; place-items: center; }
+.fr-hidden button { all: unset; cursor: pointer; padding: 10px 16px; border-radius: 10px; color: var(--text-muted); font-size: 13px; }
+.fr-hidden button:focus-visible { outline: 2px solid var(--accent-1); }
 .fr-tool.wide { min-width: 340px; color: var(--text-muted); justify-content: space-between; }
 kbd { font: 500 11px var(--font-mono); padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); color: var(--text-muted); background: var(--surface-1); }
 .fr-palette { max-width: 640px !important; padding: 0 !important; overflow: hidden; background: var(--surface-1) !important; color: var(--text); border: 1px solid var(--surface-3) !important; box-shadow: var(--shadow-lifted) !important; border-radius: 18px !important; }

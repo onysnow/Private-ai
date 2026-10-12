@@ -2,6 +2,7 @@
 import type {ReactElement, ReactNode} from 'react';
 import {usePathname} from 'next/navigation';
 import {AppFrame} from '../frame/app-frame';
+import {QueryProvider} from '../../lib/query-client';
 
 // The operator console (/console) embeds the backend's own full-height UI in
 // an iframe and renders its own top bar -- it deliberately opts out of the
@@ -17,5 +18,5 @@ export function AppShell({children}: {children: ReactNode}): ReactElement {
     return <>{children}</>;
   }
 
-  return <AppFrame>{children}</AppFrame>;
+  return <QueryProvider><AppFrame>{children}</AppFrame></QueryProvider>;
 }

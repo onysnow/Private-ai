@@ -25,8 +25,9 @@
 .ch-top { display: grid; grid-template-columns: minmax(220px, .9fr) minmax(0, 3fr); grid-template-areas: 'name strip' 'q strip'; column-gap: 20px; row-gap: 4px; align-items: end; }
 .ch-name { grid-area: name; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
 .ch-name h1 { margin: 0; font: 650 clamp(22px, 2.1vw, 30px)/1.1 var(--font-display); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.ch-switch { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
-.ch-switch select { background: var(--surface-1); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 3px 6px; font: inherit; }
+.ch-switch { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 8px; font-size: 12px; color: var(--text-muted); background: var(--surface-1); }
+.ch-switch:hover, .ch-switch:focus-visible { color: var(--text); background: var(--surface-2); }
+.ch-switch:focus-visible { outline: 2px solid var(--accent-1); }
 .ch-q { grid-area: q; }
 .ch-q-text, .ch-q-empty { all: unset; cursor: text; display: block; margin-top: 4px; font: 500 clamp(17px, 1.5vw, 21px)/1.25 var(--font-read); color: var(--text); }
 .ch-q-empty { color: var(--accent-1); border-bottom: 1px dashed var(--accent-1); }

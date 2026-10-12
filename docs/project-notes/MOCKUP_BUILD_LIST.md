@@ -60,15 +60,15 @@ where its mockup puts it, in the sections below (§5 line styles, §6 claim card
 Today: **partial**. Built: question, standing strip, Next up card with three keys and undo, Bring in /
 Check / See / Act modules, Since strip, year rail, Pointing-at bar.
 To finish:
-- [ ] Top band: breadcrumb "Cases › case › Home"; **Switch case ⌘O** button (not a dropdown); centred ⌘K bar; bell with count; settings; **Hide screen**
+- [x] Top band (12 Oct; the top edge, still hidden until called): breadcrumb "Cases › case › Home"; **Switch case ⌘O** button (not a dropdown); centred ⌘K bar; bell with count; settings; **Hide screen**
 - [ ] Next up: the page thumbnail with the highlighted region and "View full page"; locator line in mono ("Minutes of the board · p. 4 · lines 18–21 · scanned, OCR"); "4 of 7 · scroll" with dots; the reason line ("From the Textbook Red Flag …"); no empty area for kinds without a passage
-- [ ] Bring in module: the document being read now with real progress ("Reading with OCR · page 6 of 11"), what it proposed so far, rows with Read → / Review → / See →, a permanent drop target
-- [ ] Check module: "2 of 22 · scroll", segmented status bar, disputed / not-yet-shown claim cards with their source line
-- [ ] Act · Red Flags module: level-chip cards with parties joined by arrows, "lights 2017", the could-be-innocent box, faint flags on one row, "1 of 3 · scroll"
-- [ ] See module: mini network with edge labels (year, ✓/×), shapes per kind (house for property), legend, "31 parties · 46 links"
-- [ ] Since strip: four count tiles with the actor (AI tile tagged AI)
-- [ ] Year rail: events and flags per year, flagged years marked; pointing at a party lights its years
-- [ ] Pointing at: party chip + "lights 2017–18 everywhere" + Clear
+- [x] Bring in module (12 Oct: real page progress from the reader; "what it proposed so far" still to do — proposals are made at the end of a read): the document being read now with real progress ("Reading with OCR · page 6 of 11"), what it proposed so far, rows with Read → / Review → / See →, a permanent drop target
+- [x] Check module (12 Oct): "2 of 22 · scroll", segmented status bar, disputed / not-yet-shown claim cards with their source line
+- [x] Act · Red Flags module (12 Oct: "lights 2018" from the flag's dated links): level-chip cards with parties joined by arrows, "lights 2017", the could-be-innocent box, faint flags on one row, "1 of 3 · scroll"
+- [x] See module (12 Oct): mini network with edge labels (year, ✓/×), shapes per kind (house for property), legend, "31 parties · 46 links"
+- [x] Since strip (12 Oct): four count tiles with the actor (AI tile tagged AI)
+- [x] Year rail (12 Oct): events and flags per year, flagged years marked; pointing at a party lights its years
+- [x] Pointing at (12 Oct): party chip + "lights 2017–18 everywhere" + Clear
 - [ ] Scroll-over rule in every module (wheel moves inside after a pause, releases at the ends)
 
 ## 3. App frame and Appearance — mockup HOME_2 (§04.2–4.11)

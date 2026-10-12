@@ -13,6 +13,10 @@ import {AppearancePanel, TryingBar} from '../features/appearance/appearance-pane
 import {currentAppearance, keepAppearance, keptAppearance, tryTheme} from '../lib/theme';
 import {setSingleKeys} from '../lib/shortcuts';
 import {useWorkbenchStore} from '../lib/workbench-store';
+import {QueryProvider} from '../lib/query-client';
+import {ApiClient} from '../lib/api-client';
+import {connectGeneratedClient} from '../lib/api-generated';
+import {mockApi} from '../test-support/mock-api';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -68,13 +72,13 @@ describe('Settings › Appearance', () => {
 
 describe('AppFrame', () => {
   it('always shows where you are', () => {
-    render(<AppFrame><p>content</p></AppFrame>);
+    render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
     expect(within(screen.getByRole('navigation', {name: 'You are here'})).getByText('Settings')).toHaveAttribute('aria-current', 'page');
   });
 
   it('keeps the open case in the address of every link into the case', async () => {
     act(() => useWorkbenchStore.getState().setInvestigationId('inv-7'));
-    render(<AppFrame><p>content</p></AppFrame>);
+    render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Open steps and pages'}));
     const left = document.getElementById('fr-left')!;
     expect(within(left).getByRole('link', {name: 'Case home'})).toHaveAttribute('href', '/?inv=inv-7');
@@ -85,7 +89,7 @@ describe('AppFrame', () => {
   });
 
   it('opens the left edge on its handle and by the [ key, but not while typing or with single keys off', async () => {
-    render(<AppFrame><input aria-label="Notes"/></AppFrame>);
+    render(<QueryProvider><AppFrame><input aria-label="Notes"/></AppFrame></QueryProvider>);
     const left = document.getElementById('fr-left')!;
     expect(left).not.toHaveClass('open');
     await userEvent.setup().click(screen.getByRole('button', {name: 'Open steps and pages'}));
@@ -103,7 +107,7 @@ describe('AppFrame', () => {
   });
 
   it('opens the command palette with ⌘K, offers a search of the case, and goes to a place', async () => {
-    render(<AppFrame><p>content</p></AppFrame>);
+    render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
     fireEvent.keyDown(window, {key: 'k', metaKey: true});
     const input = await screen.findByRole('combobox', {name: 'Search or command'});
     const user = userEvent.setup();
@@ -112,6 +116,26 @@ describe('AppFrame', () => {
     const place = screen.getByRole('option', {name: 'Act › Red Flags'});
     await user.click(place);
     expect(push).toHaveBeenCalledWith('/act#red-flags');
+  });
+
+  it('switches case with ⌘O, and Hide screen covers everything until asked back', async () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': [
+      {id: 'inv-1', name: 'Kestrel SA', description: null, question: 'Who owns the harbour land?', is_demo: false, type_areas: null, created_at: '2026-10-01T00:00:00'},
+      {id: 'inv-2', name: 'Meridian payments', description: null, question: null, is_demo: false, type_areas: null, created_at: '2026-10-02T00:00:00'}]});
+    render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
+    fireEvent.keyDown(window, {key: 'o', ctrlKey: true});
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole('combobox', {name: 'Find a case'}), 'meridian');
+    await user.click(await screen.findByRole('option', {name: 'Meridian payments'}));
+    expect(push).toHaveBeenCalledWith('/?inv=inv-2');
+    expect(useWorkbenchStore.getState().investigationId).toBe('inv-2');
+    act(() => useWorkbenchStore.getState().setInvestigationId(''));
+
+    fireEvent.keyDown(window, {key: 'h', ctrlKey: true, shiftKey: true});
+    const cover = screen.getByRole('dialog', {name: 'Screen hidden'});
+    await user.click(within(cover).getByRole('button', {name: 'Show the screen'}));
+    expect(screen.queryByRole('dialog', {name: 'Screen hidden'})).not.toBeInTheDocument();
   });
 });
 

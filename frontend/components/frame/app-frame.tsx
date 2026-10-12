@@ -11,6 +11,7 @@ import type {ReactElement, ReactNode} from 'react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import Link from 'next/link';
 import {usePathname, useRouter} from 'next/navigation';
+import {useQuery} from '@tanstack/react-query';
 
 import {Dialog, DialogContent, DialogDescription, DialogTitle} from '@/components/ui/dialog';
 import {TryingBar} from '../../features/appearance/appearance-panel';
@@ -19,6 +20,10 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {handOffSearch} from '../../lib/search-handoff';
 import {applyAppearance, currentAppearance, keepAppearance, THEMES, tryTheme} from '../../lib/theme';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {getStandingOptions, listInvestigationsOptions} from '../../lib/generated/@tanstack/react-query.gen';
+
+/** Any screen can ask the frame to open the case switcher. */
+export const SWITCH_CASE_EVENT = 'pai:switch-case';
 
 const DWELL_MS = 260;
 const EDGE_PX = 6;
@@ -63,6 +68,7 @@ function useTrail(): {label: string; href?: string}[] {
   const stage = STAGES.find(s => s.route === pathname);
   const inCase = pathname === '/' || pathname === '/decide' || Boolean(stage);
   const trail: {label: string; href?: string}[] = [];
+  if (inCase) trail.push({label: 'Cases'});
   if (inCase && caseName) trail.push({label: caseName, href: '/'});
   if (stage) {
     trail.push({label: stage.name, href: stage.route});
@@ -164,7 +170,7 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
 }
 
 function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open: boolean) => void}): ReactElement {
-  const rows: [string, string][] = [['⌘K / Ctrl K', 'Search the case, or go anywhere'], ['[', 'Open or close the steps (left edge)'], [']', 'Open or close the tools (top edge)'],
+  const rows: [string, string][] = [['⌘K / Ctrl K', 'Search the case, or go anywhere'], ['⌘O / Ctrl O', 'Switch case'], ['⌘⇧H / Ctrl Shift H', 'Hide the screen'], ['[', 'Open or close the steps (left edge)'], [']', 'Open or close the tools (top edge)'],
     ['?', 'This list'], ['Esc', 'Close what is open']];
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="fr-help">
@@ -173,6 +179,64 @@ function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open
       <table><tbody>{rows.map(([k, v]) => <tr key={k}><td><kbd>{k}</kbd></td><td>{v}</td></tr>)}</tbody></table>
     </DialogContent>
   </Dialog>;
+}
+
+/** Open another case (⌘O / Ctrl O): type to narrow, Enter opens its home. */
+function CaseSwitcher({open, onOpenChange}: {open: boolean; onOpenChange: (open: boolean) => void}): ReactElement {
+  const router = useRouter();
+  const current = useWorkbenchStore(state => state.investigationId);
+  const cases = useQuery({...listInvestigationsOptions(), enabled: open}).data ?? [];
+  const [q, setQ] = useState('');
+  const [active, setActive] = useState(0);
+  useEffect(() => { if (open) { setQ(''); setActive(0); } }, [open]);
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const shown = cases.filter(c => words.every(w => `${c.name} ${c.question ?? ''}`.toLowerCase().includes(w)));
+  const pick = (id?: string) => {
+    if (!id) return;
+    onOpenChange(false);
+    useWorkbenchStore.getState().setInvestigationId(id);
+    router.push(`/?inv=${encodeURIComponent(id)}`);
+  };
+  return <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="fr-palette" aria-describedby="fr-cases-help">
+      <DialogTitle className="sr-only">Switch case</DialogTitle>
+      <DialogDescription id="fr-cases-help" className="sr-only">Type part of a case’s name or question. Arrow keys move, Enter opens it.</DialogDescription>
+      <input autoFocus className="fr-palette-input" placeholder="Open a case…" value={q} aria-label="Find a case" role="combobox" aria-expanded="true"
+        aria-controls="fr-cases-list" aria-activedescendant={shown[active] ? `fr-case-${shown[active].id}` : undefined}
+        onChange={e => { setQ(e.target.value); setActive(0); }}
+        onKeyDown={e => {
+          if (e.key === 'ArrowDown') { e.preventDefault(); setActive(a => Math.min(shown.length - 1, a + 1)); }
+          if (e.key === 'ArrowUp') { e.preventDefault(); setActive(a => Math.max(0, a - 1)); }
+          if (e.key === 'Enter') { e.preventDefault(); pick(shown[active]?.id); }
+        }}/>
+      <div id="fr-cases-list" role="listbox" className="fr-palette-list" aria-label="Cases">
+        {shown.map((c, i) => <div key={c.id} id={`fr-case-${c.id}`} role="option" aria-selected={i === active} className={`fr-cmd${i === active ? ' on' : ''}`}
+          onMouseEnter={() => setActive(i)} onClick={() => pick(c.id)}>
+          <span>{c.name}{c.id === current ? ' · open now' : ''}</span>{c.question && <small>{c.question}</small>}
+        </div>)}
+        {!shown.length && <p className="fr-palette-empty">{cases.length ? 'No case matches.' : 'No cases yet.'}</p>}
+      </div>
+      <div className="fr-palette-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open · <kbd>Esc</kbd> close</div>
+    </DialogContent>
+  </Dialog>;
+}
+
+/** What waits for a person in the open case: the bell's count, linking to Decide. */
+function Bell({href}: {href: string}): ReactElement {
+  const inv = useWorkbenchStore(state => state.investigationId);
+  const waiting = useQuery({...getStandingOptions({path: {investigation_id: inv}}), enabled: Boolean(inv)}).data?.to_decide ?? 0;
+  return <Link href={href} className="fr-tool fr-bell" aria-label={`${waiting} waiting for you to decide`}>
+    <span aria-hidden="true">🔔</span>{waiting > 0 && <b className="fr-count">{waiting > 99 ? '99+' : waiting}</b>}
+  </Link>;
+}
+
+/** Hide screen: covers everything at once (someone at your shoulder); a click or Enter brings it back. */
+function HiddenCover({onShow}: {onShow: () => void}): ReactElement {
+  const button = useRef<HTMLButtonElement>(null);
+  useEffect(() => { button.current?.focus(); }, []);
+  return <div className="fr-hidden" role="dialog" aria-modal="true" aria-label="Screen hidden">
+    <button ref={button} type="button" onClick={onShow}>Show the screen</button>
+  </div>;
 }
 
 export function AppFrame({children}: {children: ReactNode}): ReactElement {
@@ -185,14 +249,20 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   const [top, setTop] = useEdge(']', topAt);
   const [palette, setPalette] = useState(false);
   const [help, setHelp] = useState(false);
+  const [cases, setCases] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPalette(p => !p); }
+      else if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'o') { e.preventDefault(); setCases(c => !c); }
+      else if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'h') { e.preventDefault(); setHidden(true); }
       else if (e.key === '?' && !typing(e.target) && singleKeysOn()) { e.preventDefault(); setHelp(true); }
     };
+    const openCases = () => setCases(true);
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener(SWITCH_CASE_EVENT, openCases);
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener(SWITCH_CASE_EVENT, openCases); };
   }, []);
   useEffect(() => { setLeft(false); setTop(false); }, [pathname, setLeft, setTop]);
   // Re-apply the kept (or tried) appearance after every navigation, in case anything reset <html>'s attributes.
@@ -204,7 +274,8 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
       <button type="button" className="fr-crumb-home" onClick={() => setLeft(o => !o)} aria-expanded={left} aria-controls="fr-left" title="Steps and pages ( [ )">
         <span aria-hidden="true">≡</span><span className="sr-only">Steps and pages</span>
       </button>
-      <ol>{trail.map((t, i) => <li key={i}>{t.href && i < trail.length - 1 ? <Link href={caseHref(t.href)}>{t.label}</Link> : <span aria-current={i === trail.length - 1 ? 'page' : undefined}>{t.label}</span>}</li>)}</ol>
+      <ol>{trail.map((t, i) => <li key={i}>{t.label === 'Cases' && i === 0 ? <button type="button" className="fr-crumb-cases" onClick={() => setCases(true)} title="Switch case (⌘O)">Cases</button>
+        : t.href && i < trail.length - 1 ? <Link href={caseHref(t.href)}>{t.label}</Link> : <span aria-current={i === trail.length - 1 ? 'page' : undefined}>{t.label}</span>}</li>)}</ol>
     </nav>
 
     {/* Left edge: where to go. */}
@@ -224,16 +295,19 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     {/* Top edge: tools. */}
     <button type="button" className={`fr-handle fr-handle-top${top ? ' on' : ''}`} aria-label="Open tools" aria-expanded={top} aria-controls="fr-top" onClick={() => setTop(o => !o)}/>
     <div id="fr-top" className={`fr-top${top ? ' open' : ''}`} role="toolbar" aria-label="Tools" aria-hidden={!top} onMouseLeave={() => setTop(false)} inert={!top ? true : undefined}>
+      <button type="button" className="fr-tool" onClick={() => { setTop(false); setCases(true); }}>Switch case <kbd>⌘O</kbd></button>
       <button type="button" className="fr-tool wide" onClick={() => { setTop(false); setPalette(true); }}>Search the case, or type a command… <kbd>⌘K</kbd></button>
-      <Link href={caseHref('/bring-in#document-ingestion')} className="fr-tool">Add documents</Link>
-      <Link href={caseHref('/decide')} className="fr-tool">Decide</Link>
-      <Link href="/settings" className="fr-tool">Settings</Link>
+      <Bell href={caseHref('/decide')}/>
+      <Link href="/settings" className="fr-tool" aria-label="Settings" title="Settings"><span aria-hidden="true">⚙</span></Link>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setHelp(true); }}>Keys <kbd>?</kbd></button>
+      <button type="button" className="fr-tool" onClick={() => { setTop(false); setHidden(true); }} title="Cover the screen at once (⌘⇧H)">Hide screen</button>
     </div>
 
     <div id="fr-main" className="fr-main">{children}</div>
     <TryingBar/>
     <CommandPalette open={palette} onOpenChange={setPalette}/>
     <ShortcutsHelp open={help} onOpenChange={setHelp}/>
+    <CaseSwitcher open={cases} onOpenChange={setCases}/>
+    {hidden && <HiddenCover onShow={() => setHidden(false)}/>}
   </div>;
 }

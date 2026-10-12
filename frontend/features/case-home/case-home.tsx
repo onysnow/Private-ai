@@ -9,7 +9,7 @@
 // inside it; every step also has a click and a key.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {DragEvent, ReactElement, ReactNode} from 'react';
 
 import {LevelChip, StatusChip} from '../../components/status';
@@ -22,6 +22,7 @@ import {
 import {createInvestigation, patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
 import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
 import {caseHref} from '../../lib/case-href';
 import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
@@ -403,16 +404,13 @@ export function CaseHome({investigation, investigations, onSwitch, loading, acti
   investigation: InvestigationOut | null; investigations: InvestigationOut[]; onSwitch: (id: string) => void; loading: boolean; active?: boolean;
 }): ReactElement {
   const id = investigation?.id ?? '';
-  const switcher = useRef<HTMLSelectElement>(null);
   if (!investigation) return loading ? <div className="ch-home ch-loading" aria-busy="true"><div className="ch-skeleton"/></div> : <div className="ch-home"><FirstCase onSwitch={onSwitch}/></div>;
   return <div className="ch-home" data-testid="case-home">
     <header className="ch-top">
       <div className="ch-name">
         <h1>{investigation.name}</h1>
-        {investigations.length > 1 && <label className="ch-switch">
-          <span>Switch case</span>
-          <select ref={switcher} value={id} onChange={e => onSwitch(e.target.value)}>{investigations.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}</select>
-        </label>}
+        {investigations.length > 1 && <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
+          Switch case <kbd>⌘O</kbd></button>}
       </div>
       <CaseQuestion investigation={investigation}/>
       <StandingStrip investigationId={id}/>
