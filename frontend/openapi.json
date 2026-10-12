@@ -30008,6 +30008,346 @@
         "title": "WeightPartOut",
         "type": "object"
       },
+      "WireEntityOut": {
+        "description": "A party on the map: x, y in the map's own units; c is its group (-1: linked to no one).",
+        "properties": {
+          "c": {
+            "title": "C",
+            "type": "integer"
+          },
+          "deg": {
+            "title": "Deg",
+            "type": "integer"
+          },
+          "flags": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WireFlagsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "holder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holder"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "jur": {
+            "title": "Jur",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "person",
+              "company",
+              "org",
+              "vehicle",
+              "property",
+              "account",
+              "other"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "short": {
+            "title": "Short",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "short",
+          "kind",
+          "schema",
+          "note",
+          "deg",
+          "holder",
+          "c",
+          "x",
+          "y",
+          "jur",
+          "flags"
+        ],
+        "title": "WireEntityOut",
+        "type": "object"
+      },
+      "WireEventOut": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "entity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "title",
+          "entity"
+        ],
+        "title": "WireEventOut",
+        "type": "object"
+      },
+      "WireFlagItemOut": {
+        "properties": {
+          "flag_id": {
+            "title": "Flag Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "faint",
+              "strong",
+              "textbook"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "id",
+          "text",
+          "flag_id"
+        ],
+        "title": "WireFlagItemOut",
+        "type": "object"
+      },
+      "WireFlagsOut": {
+        "properties": {
+          "faint": {
+            "title": "Faint",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WireFlagItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "strong": {
+            "title": "Strong",
+            "type": "integer"
+          },
+          "textbook": {
+            "title": "Textbook",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "faint",
+          "strong",
+          "textbook",
+          "items"
+        ],
+        "title": "WireFlagsOut",
+        "type": "object"
+      },
+      "WireLinkOut": {
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "cur": {
+            "title": "Cur",
+            "type": "string"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "ev": {
+            "items": {
+              "$ref": "#/components/schemas/WireQuoteOut"
+            },
+            "title": "Ev",
+            "type": "array"
+          },
+          "fam": {
+            "enum": [
+              "owns",
+              "runs",
+              "money",
+              "other"
+            ],
+            "title": "Fam",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "pct": {
+            "title": "Pct",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "s": {
+            "title": "S",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "t": {
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "s",
+          "t",
+          "schema",
+          "fam",
+          "amount",
+          "cur",
+          "date",
+          "role",
+          "pct",
+          "ev"
+        ],
+        "title": "WireLinkOut",
+        "type": "object"
+      },
+      "WireOut": {
+        "properties": {
+          "entities": {
+            "items": {
+              "$ref": "#/components/schemas/WireEntityOut"
+            },
+            "title": "Entities",
+            "type": "array"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/WireEventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/WireLinkOut"
+            },
+            "title": "Links",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "entities",
+          "links",
+          "events"
+        ],
+        "title": "WireOut",
+        "type": "object"
+      },
+      "WireQuoteOut": {
+        "properties": {
+          "doc": {
+            "title": "Doc",
+            "type": "string"
+          },
+          "evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Id"
+          },
+          "loc": {
+            "title": "Loc",
+            "type": "string"
+          },
+          "q": {
+            "title": "Q",
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc",
+          "loc",
+          "q"
+        ],
+        "title": "WireQuoteOut",
+        "type": "object"
+      },
       "WriteupCreate": {
         "properties": {
           "content_json": {
@@ -47889,6 +48229,56 @@
           }
         },
         "summary": "Check Watchlist Now"
+      }
+    },
+    "/api/investigations/{investigation_id}/wire": {
+      "get": {
+        "description": "The Wire (See): every party placed on one map, its links and Red Flags, and the dated events.",
+        "operationId": "get_wire",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WireOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Wire"
       }
     },
     "/api/investigations/{investigation_id}/writeups": {

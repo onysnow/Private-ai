@@ -7,7 +7,7 @@ The "approved" items below may be built straight away.
 1. **Done 12 Oct: table-row decision cards.** A mapped row's card asks with the row's facts ("Does row 2 show a payment of $65,000,000 from 1MDB to Good Star Limited on 23 May 2011?"), shows the row's cells as a table in place of a passage (on the card and in Decide's middle pane), and lists payments already in the case between the same payer and beneficiary. Name cards from a table say "in row 2" instead of "in this passage". `case_home.py` `_proposals`, `_known_payments`; `decision-card.tsx` `RowCells`.
 2. **Done 12 Oct: the type mark in the Decide list.** Proposals use ◇ instead of ≡; every type mark is a plain sign (no tile), with its type named on hover.
 3. **Done 11 Oct:** .eml/.mbox/.zip/.xlsx are read by the app's own reader (commit 14b748e).
-4. **Approved 12 Oct: build The Wire (See)** from the prototype https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3.
+4. **Done 12 Oct: The Wire (See)**, built from the approved prototype (https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3) as See's first section: `GET /api/investigations/{id}/wire` (`app/services/wire.py`, groups and layout by networkx) and `features/the-wire/` (the prototype's drawing code ported, scoped to its panel). Changes from the prototype: amounts under a million written in full (9,800 not "10 k"); the time strip spans the case's own dates; the drawer opens the dossier and flags; tags offer Trace. Not yet tested on 1MDB (its records cannot be downloaded in the cloud session).
 5. **Approved 12 Oct: close the app-side Authority Suite gaps** (the 25 suite requirements the app lacks, `docs/authority-suite/SUITE_GAPS.md`) before step 4.
 
 ## Ony's standing requirement for every card
@@ -112,3 +112,22 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 ## Still open from before
 - See ("The Wire") prototype awaits approval: SEE_THE_WIRE_PROTOTYPE.md.
 - BO-033 raises one flag per payment. Documents have no kind/language field. Claim evidence can't be "superseded". Payments can't be typed.
+
+## Case home: built vs the approved mockup (Ony sent both, 12 Oct)
+The mockup is the Kestrel SA screen in the redesign PDF; the built one is the Demo Investigation home. To match:
+- **Header:** breadcrumb "Cases › case › Home"; "Switch case ⌘O" as a button, not a dropdown; the search/command bar centred at the top (⌘K); notifications bell with its count; settings; "Hide screen".
+- **Next up:** the page thumbnail with the highlighted region, the locator line under the quote ("Minutes of the board · p. 4 · lines 18–21 · scanned, OCR"). A card with no passage (a missing value) leaves a big empty area; it should fill with what the value is for.
+- **Bring in:** the document being read now, with its progress ("Reading with OCR · page 6 of 11") and what it has proposed so far.
+- **Check:** "2 of 22 · scroll" and the segmented bar.
+- **Act · Red Flags:** cards with the level chip, the summary as parties with arrows, "lights 2017", the "could be innocent" box, and the faint flags on one row.
+- **See · who is linked:** edge labels with year and ✓/×, a shape per kind (a house for property), the legend, the party and link counts.
+- **Since:** the four count tiles.
+- **Year rail:** events and flags per year, with the flagged years marked.
+- **Pointing at:** the party chip and "lights 2017–18 everywhere".
+
+## From Workbench-redesign-2026.pdf (Ony pasted its text on 12 Oct; read in full)
+Both PDFs are on Ony's PC (Documents\Private-ai-design); Ony pasted the text of both on 12 Oct and it was read in full. Design-research-2026.pdf is the evidence base (20 findings, ch. 02); the rules every build follows: never colour alone, one alarm colour, hidden navigation needs a handle + keys + dwell, motion explains change with a reduced-motion fallback, every claim one click from its source, mark grounded vs guessed AI, keep the key on screen.
+- **Build order (§12):** 1 Foundations ✓ · 2 Suite swap ✓ · 3 Case home and Decide ✓ (gaps above) · 4 Bring in · 5 See · 6 Act · 7 AI run view · 8 Knowledge and safety · 9 Themes and effects · 10 Website.
+- **Approved 12 Oct, ahead of the order:** The Wire (See) and closing the app-side suite gaps.
+- **Decisions still Ony's (§12 table):** product name; edge panels on dwell or click only; Next up order; whether Textbook/safety notices may interrupt; Rain Noir rain default and photo; outside lookups default (automatic vs ask first); the seven Supported rules, the written override and the IPCC grid; whether watchlist hits and AI drafts live in Decide; unset Faint/Strong levels ("not set" vs hidden, per-case thresholds); every area's glossary definition; dotted worked-out links and money checks as Red Flags; stories per case, default gates, signed packs; social posting; "Paper Trail" vs "Run record"; website licence, price, telemetry, photos; backup passphrase.
+- **ADRs needed before packages (§12):** motion library, command palette, Rain Noir effects port, local fonts, virtualised list, TipTap, PDF and share-card rendering, AI run event store, evidence anchors and check results; optional d3-sankey, timeline library, C2PA, headless browser.

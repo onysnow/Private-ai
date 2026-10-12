@@ -28,6 +28,7 @@ import {useApiAccess} from '../../features/api-access/use-api-access';
 import {BackupPanel} from '../../features/backups/backup-panel';
 import {CaseHome} from '../../features/case-home/case-home';
 import {DecideScreen} from '../../features/case-home/decide-screen';
+import {TheWire} from '../../features/the-wire/the-wire';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
@@ -272,6 +273,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'review-queue', label: 'Connector findings', render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
       ])}
       {screen('map', [
+        {anchor: 'the-wire', label: 'The Wire', fill: true, render: () => <PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
         {anchor: 'relationship-graph', label: 'Relationships', render: () => <><YearSlider investigationId={inv}/>
           <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary></>},
         {anchor: 'timeline', label: 'Timeline', render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},

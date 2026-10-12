@@ -12,8 +12,8 @@ from app.db.session import get_db
 from app.models.domain import Investigation
 from app.patterns import engine
 from app.schemas.api import InvestigationUpdate
-from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, InvestigationOut
-from app.services import case_home
+from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, InvestigationOut, WireOut
+from app.services import case_home, wire
 from app.services.investigations import update_investigation
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -55,3 +55,11 @@ def get_decisions(
 def get_since(investigation_id: str, after: datetime = Query(...), db: Session = Depends(get_db)) -> Any:
     _case(db, investigation_id)
     return case_home.since(db, investigation_id, after.replace(tzinfo=None))
+
+
+@router.get("/investigations/{investigation_id}/wire", response_model=WireOut)
+def get_wire(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """The Wire (See): every party placed on one map, its links and Red Flags, and the dated events."""
+    _case(db, investigation_id)
+    engine.bring_up_to_date(db, investigation_id)
+    return wire.wire(db, investigation_id)

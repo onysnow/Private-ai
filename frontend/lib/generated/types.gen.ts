@@ -15284,6 +15284,226 @@ export type WeightPartOut = {
 };
 
 /**
+ * WireEntityOut
+ *
+ * A party on the map: x, y in the map's own units; c is its group (-1: linked to no one).
+ */
+export type WireEntityOut = {
+  /**
+   * C
+   */
+  c: number;
+  /**
+   * Deg
+   */
+  deg: number;
+  flags: WireFlagsOut | null;
+  /**
+   * Holder
+   */
+  holder: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Jur
+   */
+  jur: string;
+  /**
+   * Kind
+   */
+  kind:
+    | 'person'
+    | 'company'
+    | 'org'
+    | 'vehicle'
+    | 'property'
+    | 'account'
+    | 'other';
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Note
+   */
+  note: string;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Short
+   */
+  short: string;
+  /**
+   * X
+   */
+  x: number;
+  /**
+   * Y
+   */
+  y: number;
+};
+
+/**
+ * WireEventOut
+ */
+export type WireEventOut = {
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Entity
+   */
+  entity: string | null;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * WireFlagItemOut
+ */
+export type WireFlagItemOut = {
+  /**
+   * Flag Id
+   */
+  flag_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Level
+   */
+  level: 'faint' | 'strong' | 'textbook';
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * WireFlagsOut
+ */
+export type WireFlagsOut = {
+  /**
+   * Faint
+   */
+  faint: number;
+  /**
+   * Items
+   */
+  items: Array<WireFlagItemOut>;
+  /**
+   * Strong
+   */
+  strong: number;
+  /**
+   * Textbook
+   */
+  textbook: number;
+};
+
+/**
+ * WireLinkOut
+ */
+export type WireLinkOut = {
+  /**
+   * Amount
+   */
+  amount: number | null;
+  /**
+   * Cur
+   */
+  cur: string;
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Ev
+   */
+  ev: Array<WireQuoteOut>;
+  /**
+   * Fam
+   */
+  fam: 'owns' | 'runs' | 'money' | 'other';
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Pct
+   */
+  pct: string;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * S
+   */
+  s: string;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * T
+   */
+  t: string;
+};
+
+/**
+ * WireOut
+ */
+export type WireOut = {
+  /**
+   * Entities
+   */
+  entities: Array<WireEntityOut>;
+  /**
+   * Events
+   */
+  events: Array<WireEventOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Links
+   */
+  links: Array<WireLinkOut>;
+};
+
+/**
+ * WireQuoteOut
+ */
+export type WireQuoteOut = {
+  /**
+   * Doc
+   */
+  doc: string;
+  /**
+   * Evidence Id
+   */
+  evidence_id?: string | null;
+  /**
+   * Loc
+   */
+  loc: string;
+  /**
+   * Q
+   */
+  q: string;
+};
+
+/**
  * WriteupCreate
  */
 export type WriteupCreate = {
@@ -22122,6 +22342,40 @@ export type CheckWatchlistNowResponses = {
 
 export type CheckWatchlistNowResponse =
   CheckWatchlistNowResponses[keyof CheckWatchlistNowResponses];
+
+export type GetWireData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/wire';
+};
+
+export type GetWireErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetWireError = GetWireErrors[keyof GetWireErrors];
+
+export type GetWireResponses = {
+  /**
+   * Successful Response
+   */
+  200: WireOut;
+};
+
+export type GetWireResponse = GetWireResponses[keyof GetWireResponses];
 
 export type ListWriteupsEndpointData = {
   body?: never;

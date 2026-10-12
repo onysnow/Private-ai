@@ -132,6 +132,7 @@ import {
   getTaggedRecords,
   getTags,
   getWatchlist,
+  getWire,
   getWriteupEndpoint,
   gradeTimelineEventEndpoint,
   health,
@@ -618,6 +619,9 @@ import type {
   GetWatchlistData,
   GetWatchlistError,
   GetWatchlistResponse,
+  GetWireData,
+  GetWireError,
+  GetWireResponse,
   GetWriteupEndpointData,
   GetWriteupEndpointError,
   GetWriteupEndpointResponse,
@@ -6835,6 +6839,33 @@ export const checkWatchlistNowMutation = (
   };
   return mutationOptions;
 };
+
+export const getWireQueryKey = (options: Options<GetWireData>) =>
+  createQueryKey('getWire', options);
+
+/**
+ * Get Wire
+ *
+ * The Wire (See): every party placed on one map, its links and Red Flags, and the dated events.
+ */
+export const getWireOptions = (options: Options<GetWireData>) =>
+  queryOptions<
+    GetWireResponse,
+    GetWireError,
+    GetWireResponse,
+    ReturnType<typeof getWireQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getWire({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getWireQueryKey(options),
+  });
 
 export const listWriteupsEndpointQueryKey = (
   options: Options<ListWriteupsEndpointData>,

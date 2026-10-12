@@ -381,6 +381,9 @@ import type {
   GetWatchlistData,
   GetWatchlistErrors,
   GetWatchlistResponses,
+  GetWireData,
+  GetWireErrors,
+  GetWireResponses,
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
@@ -998,6 +1001,8 @@ import {
   zGetTagsResponse,
   zGetWatchlistPath,
   zGetWatchlistResponse,
+  zGetWirePath,
+  zGetWireResponse,
   zGetWriteupEndpointPath,
   zGetWriteupEndpointResponse,
   zGradeTimelineEventEndpointBody,
@@ -6630,6 +6635,31 @@ export const checkWatchlistNow = <ThrowOnError extends boolean = false>(
     url: '/api/investigations/{investigation_id}/watchlist/check',
     ...options,
   });
+
+/**
+ * Get Wire
+ *
+ * The Wire (See): every party placed on one map, its links and Red Flags, and the dated events.
+ */
+export const getWire = <ThrowOnError extends boolean = false>(
+  options: Options<GetWireData, ThrowOnError>,
+): RequestResult<GetWireResponses, GetWireErrors, ThrowOnError> =>
+  (options.client ?? client).get<GetWireResponses, GetWireErrors, ThrowOnError>(
+    {
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: zGetWirePath,
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseValidator: async (data) =>
+        await zGetWireResponse.parseAsync(data),
+      url: '/api/investigations/{investigation_id}/wire',
+      ...options,
+    },
+  );
 
 /**
  * List Writeups Endpoint

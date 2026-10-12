@@ -4392,3 +4392,72 @@ class DemoCaseOut(ResponseModel):
     bytes: int
     publishers: list[str]
     progress: DemoCaseProgressOut
+
+
+# --- The Wire (app/services/wire.py) ------------------------------------------------
+
+class WireFlagItemOut(ResponseModel):
+    level: Literal["faint", "strong", "textbook"]
+    id: str
+    text: str
+    flag_id: str
+
+
+class WireFlagsOut(ResponseModel):
+    faint: int
+    strong: int
+    textbook: int
+    items: list[WireFlagItemOut]
+
+
+class WireEntityOut(ResponseModel):
+    """A party on the map: x, y in the map's own units; c is its group (-1: linked to no one)."""
+    id: str
+    name: str
+    short: str
+    kind: Literal["person", "company", "org", "vehicle", "property", "account", "other"]
+    schema_: str = Field(alias="schema")
+    note: str
+    deg: int
+    holder: str | None
+    c: int
+    x: float
+    y: float
+    jur: str
+    flags: WireFlagsOut | None
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class WireQuoteOut(ResponseModel):
+    doc: str
+    loc: str
+    q: str
+    evidence_id: str | None = None
+
+
+class WireLinkOut(ResponseModel):
+    id: str
+    s: str
+    t: str
+    schema_: str = Field(alias="schema")
+    fam: Literal["owns", "runs", "money", "other"]
+    amount: float | None
+    cur: str
+    date: str
+    role: str
+    pct: str
+    ev: list[WireQuoteOut]
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class WireEventOut(ResponseModel):
+    date: str
+    title: str
+    entity: str | None
+
+
+class WireOut(ResponseModel):
+    investigation_id: str
+    entities: list[WireEntityOut]
+    links: list[WireLinkOut]
+    events: list[WireEventOut]

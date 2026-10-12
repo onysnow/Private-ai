@@ -7248,6 +7248,101 @@ export const zRedFlagsOut = z.object({
 });
 
 /**
+ * WireEventOut
+ */
+export const zWireEventOut = z.object({
+  date: z.string(),
+  entity: z.string().nullable(),
+  title: z.string(),
+});
+
+/**
+ * WireFlagItemOut
+ */
+export const zWireFlagItemOut = z.object({
+  flag_id: z.string(),
+  id: z.string(),
+  level: z.enum(['faint', 'strong', 'textbook']),
+  text: z.string(),
+});
+
+/**
+ * WireFlagsOut
+ */
+export const zWireFlagsOut = z.object({
+  faint: z.number().int(),
+  items: z.array(zWireFlagItemOut),
+  strong: z.number().int(),
+  textbook: z.number().int(),
+});
+
+/**
+ * WireEntityOut
+ *
+ * A party on the map: x, y in the map's own units; c is its group (-1: linked to no one).
+ */
+export const zWireEntityOut = z.object({
+  c: z.number().int(),
+  deg: z.number().int(),
+  flags: zWireFlagsOut.nullable(),
+  holder: z.string().nullable(),
+  id: z.string(),
+  jur: z.string(),
+  kind: z.enum([
+    'person',
+    'company',
+    'org',
+    'vehicle',
+    'property',
+    'account',
+    'other',
+  ]),
+  name: z.string(),
+  note: z.string(),
+  schema: z.string(),
+  short: z.string(),
+  x: z.number(),
+  y: z.number(),
+});
+
+/**
+ * WireQuoteOut
+ */
+export const zWireQuoteOut = z.object({
+  doc: z.string(),
+  evidence_id: z.string().nullish(),
+  loc: z.string(),
+  q: z.string(),
+});
+
+/**
+ * WireLinkOut
+ */
+export const zWireLinkOut = z.object({
+  amount: z.number().nullable(),
+  cur: z.string(),
+  date: z.string(),
+  ev: z.array(zWireQuoteOut),
+  fam: z.enum(['owns', 'runs', 'money', 'other']),
+  id: z.string(),
+  pct: z.string(),
+  role: z.string(),
+  s: z.string(),
+  schema: z.string(),
+  t: z.string(),
+});
+
+/**
+ * WireOut
+ */
+export const zWireOut = z.object({
+  entities: z.array(zWireEntityOut),
+  events: z.array(zWireEventOut),
+  investigation_id: z.string(),
+  links: z.array(zWireLinkOut),
+});
+
+/**
  * WriteupCreate
  */
 export const zWriteupCreate = z.object({
@@ -9275,6 +9370,15 @@ export const zCheckWatchlistNowPath = z.object({
  * Successful Response
  */
 export const zCheckWatchlistNowResponse = zWatchlistCheckOut;
+
+export const zGetWirePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetWireResponse = zWireOut;
 
 export const zListWriteupsEndpointPath = z.object({
   investigation_id: z.string(),

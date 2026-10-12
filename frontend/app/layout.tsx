@@ -2,6 +2,7 @@ import type {ReactNode} from 'react';
 import './globals.css';
 import '../styles/themes.css';
 import '../styles/case.css';
+import '../styles/wire.css';
 // Deck font pairings (SIL OFL, served by the app itself -- see
 // backend/app/services/presentation_style.py FONT_PAIRS). Only @font-face
 // rules load here; a font file downloads the first time a slide uses it.
