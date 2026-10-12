@@ -18,6 +18,7 @@
     ".next",
     "node_modules",
     "next-env.d.ts",
-    "lib/generated"
+    "lib/generated",
+    "vendor/onysnow-effects"
   ]
 }

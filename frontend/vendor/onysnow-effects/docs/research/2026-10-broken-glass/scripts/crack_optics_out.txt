@@ -1,0 +1,243 @@
+
+==============================================================================
+A. Basic numbers
+==============================================================================
+critical angle glass->air, n=1.52: 41.14 deg
+  n=1.518: theta_c=41.21 deg, R(normal)=4.23%
+  n=1.52: theta_c=41.14 deg, R(normal)=4.26%
+  n=1.523: theta_c=41.04 deg, R(normal)=4.30%
+Internal (glass->air) unpolarised reflectance vs angle of incidence:
+    0.0 deg: R =   4.26%
+   10.0 deg: R =   4.27%
+   20.0 deg: R =   4.45%
+   30.0 deg: R =   5.96%
+   35.0 deg: R =   9.59%
+   38.0 deg: R =  16.68%
+   40.0 deg: R =  32.08%
+   41.0 deg: R =  65.80%
+   41.1 deg: R =  79.78%
+External (air->glass) unpolarised reflectance vs angle of incidence:
+    0.0 deg: R =   4.26%
+   30.0 deg: R =   4.41%
+   45.0 deg: R =   5.30%
+   60.0 deg: R =   9.25%
+   70.0 deg: R =  17.47%
+   80.0 deg: R =  39.09%
+   85.0 deg: R =  61.49%
+   89.0 deg: R =  90.47%
+
+Minimum angle of incidence on a crack face for ANY ray entering through the front face
+(ray within theta_c of +z; face normal tilted beta out of the pane plane):
+  lean   0.0 deg: min incidence  48.9 deg -> ALWAYS TIR
+  lean  10.0 deg: min incidence  38.9 deg -> partial possible
+  lean  20.0 deg: min incidence  28.9 deg -> partial possible
+  lean  30.0 deg: min incidence  18.9 deg -> partial possible
+  lean  40.0 deg: min incidence   8.9 deg -> partial possible
+  lean  48.9 deg: min incidence   0.0 deg -> partial possible
+  lean  50.0 deg: min incidence   0.0 deg -> partial possible
+  lean  60.0 deg: min incidence   0.0 deg -> partial possible
+  lean  65.0 deg: min incidence   0.0 deg -> partial possible
+  lean  70.0 deg: min incidence   0.0 deg -> partial possible
+
+==============================================================================
+B. What a view ray sees in the crack band (t = 18 px, polished back face assumed for the exit test)
+==============================================================================
+Columns: view angle in air | lean beta | band [x0,x1] at the front face (px) | width | incidence on face | outcome
+  view  0  lean  -30: band [-10.37, -0.03] w=10.34px  alpha_mid= 60.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 60.0 deg
+  view  0  lean  -15: band [ -4.81, -0.03] w= 4.78px  alpha_mid= 75.0  TIR 100%  | back->photo 100% | mid: exit  -49.5 deg, photo sample moved  -12.2 px
+  view  0  lean    0: no band (ray parallel/never meets face inside slab)
+  view  0  lean    5: band [  0.03,  1.57] w= 1.54px  alpha_mid= 85.0  TIR 100%  | back->photo 100% | mid: exit  +15.3 deg, photo sample moved   +3.2 px
+  view  0  lean   10: band [  0.03,  3.16] w= 3.13px  alpha_mid= 80.0  TIR 100%  | back->photo 100% | mid: exit  +31.3 deg, photo sample moved   +6.9 px
+  view  0  lean   15: band [  0.03,  4.81] w= 4.78px  alpha_mid= 75.0  TIR 100%  | back->photo 100% | mid: exit  +49.5 deg, photo sample moved  +12.2 px
+  view  0  lean   20: band [  0.03,  6.53] w= 6.51px  alpha_mid= 70.0  TIR 100%  | back->photo 100% | mid: exit  +77.7 deg, photo sample moved  +35.0 px
+  view  0  lean   25: band [  0.03,  8.37] w= 8.34px  alpha_mid= 65.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 50.0 deg
+  view  0  lean   30: band [  0.03, 10.37] w=10.34px  alpha_mid= 60.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 60.0 deg
+  view  0  lean   40: band [  0.03, 15.09] w=15.07px  alpha_mid= 50.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 80.0 deg
+  view  0  lean   50: band [  0.03, 21.44] w=21.41px  alpha_mid= 40.0  TIR   0%  | trapped(front TIR) 100% | mid: in-glass angle 80.0 deg
+  view  0  lean   60: band [  0.03, 31.16] w=31.13px  alpha_mid= 30.0  TIR   0%  | trapped(front TIR) 100% | mid: in-glass angle 60.0 deg
+  view  0  lean   65: band [  0.03, 38.58] w=38.56px  alpha_mid= 25.0  TIR   0%  | trapped(front TIR) 100% | mid: in-glass angle 50.0 deg
+  view 10  lean  -30: band [-12.45, -0.03] w=12.42px  alpha_mid= 53.4  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 66.6 deg
+  view 10  lean  -15: band [ -6.88, -0.03] w= 6.86px  alpha_mid= 68.4  TIR 100%  | back->photo 100% | mid: exit  -64.9 deg, photo sample moved  -21.5 px
+  view 10  lean    0: band [ -2.05, -0.03] w= 2.02px  alpha_mid= 83.4  TIR 100%  | back->photo 100% | mid: exit  -10.0 deg, photo sample moved   -4.2 px
+  view 10  lean    5: band [ -0.49, -0.03] w= 0.46px  alpha_mid= 88.4  TIR 100%  | back->photo 100% | mid: exit   +5.2 deg, photo sample moved   -1.0 px
+  view 10  lean   10: band [  0.03,  1.08] w= 1.05px  alpha_mid= 86.6  TIR 100%  | back->photo 100% | mid: exit  +20.7 deg, photo sample moved   +2.3 px
+  view 10  lean   15: band [  0.03,  2.73] w= 2.70px  alpha_mid= 81.6  TIR 100%  | back->photo 100% | mid: exit  +37.2 deg, photo sample moved   +6.4 px
+  view 10  lean   20: band [  0.03,  4.45] w= 4.43px  alpha_mid= 76.6  TIR 100%  | back->photo 100% | mid: exit  +56.9 deg, photo sample moved  +13.1 px
+  view 10  lean   25: band [  0.03,  6.32] w= 6.29px  alpha_mid= 71.6  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 43.4 deg
+  view 10  lean   30: band [  0.03,  8.32] w= 8.29px  alpha_mid= 66.6  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 53.4 deg
+  view 10  lean   40: band [  0.03, 13.01] w=12.99px  alpha_mid= 56.6  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 73.4 deg
+  view 10  lean   50: band [  0.03, 19.36] w=19.33px  alpha_mid= 46.6  TIR 100%  | trapped(front TIR) 100% | mid: in-glass angle 86.6 deg
+  view 10  lean   60: band [  0.03, 29.11] w=29.08px  alpha_mid= 36.6  TIR   0%  | trapped(front TIR) 100% | mid: in-glass angle 66.6 deg
+  view 10  lean   65: band [  0.03, 36.53] w=36.50px  alpha_mid= 31.6  TIR   0%  | trapped(front TIR) 100% | mid: in-glass angle 56.6 deg
+  view 20  lean  -30: band [-14.53, -0.03] w=14.50px  alpha_mid= 47.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 73.0 deg
+  view 20  lean  -15: band [ -8.96, -0.03] w= 8.94px  alpha_mid= 62.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 43.0 deg
+  view 20  lean    0: band [ -4.13, -0.03] w= 4.10px  alpha_mid= 77.0  TIR 100%  | back->photo 100% | mid: exit  -20.0 deg, photo sample moved   -8.5 px
+  view 20  lean    5: band [ -2.56, -0.03] w= 2.54px  alpha_mid= 82.0  TIR 100%  | back->photo 100% | mid: exit   -4.6 deg, photo sample moved   -5.2 px
+  view 20  lean   10: band [ -0.97, -0.03] w= 0.95px  alpha_mid= 87.0  TIR 100%  | back->photo 100% | mid: exit  +10.7 deg, photo sample moved   -2.0 px
+  view 20  lean   15: band [  0.03,  0.65] w= 0.62px  alpha_mid= 88.0  TIR 100%  | back->photo 100% | mid: exit  +26.4 deg, photo sample moved   +1.4 px
+  view 20  lean   20: band [  0.03,  2.38] w= 2.35px  alpha_mid= 83.0  TIR 100%  | back->photo 100% | mid: exit  +43.6 deg, photo sample moved   +6.0 px
+  view 20  lean   25: band [  0.03,  4.21] w= 4.18px  alpha_mid= 78.0  TIR 100%  | back->photo 100% | mid: exit  +66.2 deg, photo sample moved  +16.1 px
+  view 20  lean   30: band [  0.03,  6.21] w= 6.18px  alpha_mid= 73.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 47.0 deg
+  view 20  lean   40: band [  0.03, 10.94] w=10.91px  alpha_mid= 63.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 67.0 deg
+  view 20  lean   50: band [  0.03, 17.28] w=17.25px  alpha_mid= 53.0  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 87.0 deg
+  view 20  lean   60: band [  0.03, 27.00] w=26.97px  alpha_mid= 43.0  TIR 100%  | trapped(front TIR) 100% | mid: in-glass angle 73.0 deg
+  view 20  lean   65: band [  0.03, 34.42] w=34.40px  alpha_mid= 38.0  TIR   0%  | trapped(front TIR) 100% | mid: in-glass angle 63.0 deg
+  view 30  lean  -30: band [-16.66, -0.03] w=16.63px  alpha_mid= 40.8  TIR   0%  | trapped(back TIR) 100% | mid: in-glass angle 79.2 deg
+  view 30  lean  -15: band [-11.07, -0.03] w=11.04px  alpha_mid= 55.8  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 49.2 deg
+  view 30  lean    0: band [ -6.26, -0.03] w= 6.24px  alpha_mid= 70.8  TIR 100%  | back->photo 100% | mid: exit  -30.0 deg, photo sample moved  -13.2 px
+  view 30  lean    5: band [ -4.67, -0.03] w= 4.64px  alpha_mid= 75.8  TIR 100%  | back->photo 100% | mid: exit  -14.1 deg, photo sample moved   -9.6 px
+  view 30  lean   10: band [ -3.08, -0.03] w= 3.05px  alpha_mid= 80.8  TIR 100%  | back->photo 100% | mid: exit   +1.2 deg, photo sample moved   -6.4 px
+  view 30  lean   15: band [ -1.43, -0.03] w= 1.40px  alpha_mid= 85.8  TIR 100%  | back->photo 100% | mid: exit  +16.5 deg, photo sample moved   -3.1 px
+  view 30  lean   20: band [  0.03,  0.27] w= 0.24px  alpha_mid= 89.2  TIR 100%  | back->photo 100% | mid: exit  +32.7 deg, photo sample moved   +0.6 px
+  view 30  lean   25: band [  0.03,  2.11] w= 2.08px  alpha_mid= 84.2  TIR 100%  | back->photo 100% | mid: exit  +51.1 deg, photo sample moved   +6.2 px
+  view 30  lean   30: band [  0.03,  4.10] w= 4.08px  alpha_mid= 79.2  TIR 100%  | back->photo 100% | mid: exit  +83.3 deg, photo sample moved  +51.9 px
+  view 30  lean   40: band [  0.03,  8.83] w= 8.80px  alpha_mid= 69.2  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 60.8 deg
+  view 30  lean   50: band [  0.03, 15.17] w=15.15px  alpha_mid= 59.2  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 80.8 deg
+  view 30  lean   60: band [  0.03, 24.89] w=24.87px  alpha_mid= 49.2  TIR 100%  | trapped(front TIR) 100% | mid: in-glass angle 79.2 deg
+  view 30  lean   65: band [  0.03, 32.32] w=32.29px  alpha_mid= 44.2  TIR 100%  | trapped(front TIR) 100% | mid: in-glass angle 69.2 deg
+  view 45  lean  -30: band [-19.84, -0.03] w=19.82px  alpha_mid= 32.3  TIR   0%  | trapped(back TIR) 100% | mid: in-glass angle 87.7 deg
+  view 45  lean  -15: band [-14.26, -0.03] w=14.23px  alpha_mid= 47.3  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 57.7 deg
+  view 45  lean    0: band [ -9.45, -0.03] w= 9.42px  alpha_mid= 62.3  TIR 100%  | back->photo 100% | mid: exit  -45.0 deg, photo sample moved  -21.5 px
+  view 45  lean    5: band [ -7.88, -0.03] w= 7.86px  alpha_mid= 67.3  TIR 100%  | back->photo 100% | mid: exit  -27.6 deg, photo sample moved  -16.7 px
+  view 45  lean   10: band [ -6.26, -0.03] w= 6.24px  alpha_mid= 72.3  TIR 100%  | back->photo 100% | mid: exit  -11.8 deg, photo sample moved  -13.2 px
+  view 45  lean   15: band [ -4.62, -0.03] w= 4.59px  alpha_mid= 77.3  TIR 100%  | back->photo 100% | mid: exit   +3.5 deg, photo sample moved  -10.0 px
+  view 45  lean   20: band [ -2.89, -0.03] w= 2.86px  alpha_mid= 82.3  TIR 100%  | back->photo 100% | mid: exit  +18.9 deg, photo sample moved   -6.7 px
+  view 45  lean   25: band [ -1.05, -0.03] w= 1.03px  alpha_mid= 87.3  TIR 100%  | back->photo 100% | mid: exit  +35.2 deg, photo sample moved   -2.8 px
+  view 45  lean   30: band [  0.03,  0.92] w= 0.89px  alpha_mid= 87.7  TIR 100%  | back->photo 100% | mid: exit  +54.3 deg, photo sample moved   +3.3 px
+  view 45  lean   40: band [  0.03,  5.64] w= 5.62px  alpha_mid= 77.7  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 52.3 deg
+  view 45  lean   50: band [  0.03, 11.99] w=11.96px  alpha_mid= 67.7  TIR 100%  | trapped(back TIR) 100% | mid: in-glass angle 72.3 deg
+  view 45  lean   60: band [  0.03, 21.71] w=21.68px  alpha_mid= 57.7  TIR 100%  | trapped(front TIR) 100% | mid: in-glass angle 87.7 deg
+  view 45  lean   65: band [  0.03, 29.13] w=29.11px  alpha_mid= 52.7  TIR 100%  | trapped(front TIR) 100% | mid: in-glass angle 77.7 deg
+
+==============================================================================
+C. The fold: photo samples seen through a vertical crack (beta=0), view 30 deg
+==============================================================================
+  enter x= -7.00: misses crack, photo sample x=  2.73
+  enter x= -6.06: TIR=True, photo sample x= -3.67  (unbroken would be   3.67; mirror of it =  -3.67)
+  enter x= -5.12: TIR=True, photo sample x= -4.61  (unbroken would be   4.61; mirror of it =  -4.61)
+  enter x= -4.19: TIR=True, photo sample x= -5.55  (unbroken would be   5.55; mirror of it =  -5.55)
+  enter x= -3.25: TIR=True, photo sample x= -6.48  (unbroken would be   6.48; mirror of it =  -6.48)
+  enter x= -2.31: TIR=True, photo sample x= -7.42  (unbroken would be   7.42; mirror of it =  -7.42)
+  enter x= -1.38: TIR=True, photo sample x= -8.36  (unbroken would be   8.36; mirror of it =  -8.36)
+  enter x= -0.44: TIR=True, photo sample x= -9.30  (unbroken would be   9.30; mirror of it =  -9.30)
+  enter x=  0.50: misses crack, photo sample x= 10.23
+  band width t*tan(theta_in) = 6.27 px; hidden photo strip starts at x = g*tan(theta_v) = 3.46 px
+
+==============================================================================
+D. Light reaching the photo under a crack (directional lamp, polished back face)
+==============================================================================
+  lamp 20 deg, lean  0: trapped/lost  0.0%  dark(<0.5x)      [2.2,6.2]  bright(>1.5x)    [-6.2,-2.2]  peak 2.00x  min 0.00x
+  lamp 20 deg, lean 10: trapped/lost  0.0%  dark(<0.5x)      [5.8,6.2]  bright(>1.5x)      [3.8,4.2]  peak 2.02x  min 0.00x
+  lamp 20 deg, lean 20: trapped/lost  0.0%  dark(<0.5x)      [6.8,8.2]  bright(>1.5x)    [12.8,14.8]  peak 1.91x  min 0.00x
+  lamp 20 deg, lean 30: trapped/lost  3.1%  dark(<0.5x)     [6.8,12.2]  bright(>1.5x)              -  peak 1.00x  min 0.00x
+  lamp 45 deg, lean  0: trapped/lost  0.0%  dark(<0.5x)     [6.2,15.2]  bright(>1.5x)   [-15.2,-6.2]  peak 2.00x  min 0.00x
+  lamp 45 deg, lean 10: trapped/lost  0.0%  dark(<0.5x)     [9.2,15.2]  bright(>1.5x)     [-3.2,1.8]  peak 2.13x  min 0.00x
+  lamp 45 deg, lean 20: trapped/lost  0.0%  dark(<0.5x)    [12.8,15.2]  bright(>1.5x)      [6.2,8.2]  peak 2.12x  min 0.00x
+  lamp 45 deg, lean 30: trapped/lost  0.0%  dark(<0.5x)    [15.8,16.2]  bright(>1.5x)    [18.8,19.2]  peak 1.94x  min 0.00x
+  check (lean 0, lamp 45): band width t*tan(theta_in) = 9.46 px, shift g*tan(theta_l) = 6.00 px
+
+==============================================================================
+E. Air gap between two glass faces: thin-film colour and frustrated TIR
+==============================================================================
+Reflectance of a crack's air film at normal incidence (lambda = 550 nm):
+  gap     0 nm: R =   0.00%
+  gap    10 nm: R =   0.24%
+  gap    25 nm: R =   1.45%
+  gap    50 nm: R =   5.15%
+  gap    69 nm: R =   8.54%
+  gap   100 nm: R =  13.33%
+  gap   138 nm: R =  15.67%
+  gap   200 nm: R =   9.59%
+  gap   275 nm: R =   0.00%
+  gap   412 nm: R =  15.67%
+  gap   550 nm: R =   0.00%
+  gap  1000 nm: R =  13.33%
+  incoherent thick-gap limit 2R/(1+R) = 8.17%
+
+Frustrated TIR: reflectance of the gap for light inside the glass beyond the critical angle (550 nm):
+  45 deg: d=10:  0.3%  d=25:  2.1%  d=50:  8.0%  d=100: 26.2%  d=200: 61.8%  d=300: 82.7%  d=500: 97.0%  d=1000:100.0%
+  50 deg: d=10:  0.6%  d=25:  3.4%  d=50: 12.6%  d=100: 39.2%  d=200: 79.9%  d=300: 94.5%  d=500: 99.6%  d=1000:100.0%
+  60 deg: d=10:  1.5%  d=25:  8.9%  d=50: 28.7%  d=100: 65.7%  d=200: 94.4%  d=300: 99.2%  d=500:100.0%  d=1000:100.0%
+  70 deg: d=10:  4.6%  d=25: 22.4%  d=50: 52.4%  d=100: 84.2%  d=200: 98.4%  d=300: 99.8%  d=500:100.0%  d=1000:100.0%
+  80 deg: d=10: 17.9%  d=25: 53.0%  d=50: 80.7%  d=100: 95.8%  d=200: 99.7%  d=300:100.0%  d=500:100.0%  d=1000:100.0%
+
+Colour of the reflection from a crack film (illuminant ~6500K blackbody, normal incidence).
+Linear sRGB normalised to the film's own max channel, plus luminance Y (white = 1.0):
+      0 nm: Y= 0.00%  rgb(norm)=(0.00,0.00,0.00)
+     20 nm: Y= 0.93%  rgb(norm)=(0.49,0.63,1.00)
+     50 nm: Y= 5.09%  rgb(norm)=(0.54,0.67,1.00)
+     80 nm: Y=10.30%  rgb(norm)=(0.64,0.75,1.00)
+    100 nm: Y=13.15%  rgb(norm)=(0.74,0.83,1.00)
+    120 nm: Y=14.95%  rgb(norm)=(0.89,0.94,1.00)
+    150 nm: Y=15.24%  rgb(norm)=(1.00,0.93,0.75)
+    180 nm: Y=12.66%  rgb(norm)=(1.00,0.77,0.34)
+    200 nm: Y= 9.74%  rgb(norm)=(1.00,0.62,0.11)
+    250 nm: Y= 2.30%  rgb(norm)=(1.00,0.11,0.34)
+    300 nm: Y= 2.06%  rgb(norm)=(0.00,0.13,1.00)
+    350 nm: Y= 8.76%  rgb(norm)=(0.04,0.66,1.00)
+    400 nm: Y=13.85%  rgb(norm)=(0.61,1.00,0.43)
+    450 nm: Y=12.45%  rgb(norm)=(1.00,0.67,0.00)
+    500 nm: Y= 6.64%  rgb(norm)=(1.00,0.17,0.40)
+    600 nm: Y= 5.50%  rgb(norm)=(0.00,0.59,1.00)
+    700 nm: Y=12.11%  rgb(norm)=(0.87,1.00,0.24)
+    800 nm: Y= 6.02%  rgb(norm)=(1.00,0.13,0.83)
+   1000 nm: Y=10.00%  rgb(norm)=(1.00,0.68,0.87)
+   1500 nm: Y= 8.34%  rgb(norm)=(0.44,1.00,0.92)
+   3000 nm: Y= 8.20%  rgb(norm)=(1.00,0.95,0.97)
+
+==============================================================================
+F. Guided light meeting a vertical crack (isotropic over guided directions)
+==============================================================================
+  guided directions = |cos(angle to z)| < 0.753
+  flux-weighted fraction transmitted through an open vertical crack: 42.5%
+  flux-weighted fraction reflected back (TIR or Fresnel): 57.5%
+
+==============================================================================
+G. Specular loss from fracture-surface roughness (Davies/Bennett, internal side, n=1.52)
+==============================================================================
+  sigma    1 nm: specular kept at incidence 0/45/60/75/85 deg = 1.00 / 1.00 / 1.00 / 1.00 / 1.00
+  sigma   10 nm: specular kept at incidence 0/45/60/75/85 deg = 0.89 / 0.94 / 0.97 / 0.99 / 1.00
+  sigma   50 nm: specular kept at incidence 0/45/60/75/85 deg = 0.05 / 0.22 / 0.47 / 0.82 / 0.98
+  sigma  100 nm: specular kept at incidence 0/45/60/75/85 deg = 0.00 / 0.00 / 0.05 / 0.45 / 0.91
+  sigma  200 nm: specular kept at incidence 0/45/60/75/85 deg = 0.00 / 0.00 / 0.00 / 0.04 / 0.69
+  sigma  500 nm: specular kept at incidence 0/45/60/75/85 deg = 0.00 / 0.00 / 0.00 / 0.00 / 0.10
+
+==============================================================================
+H. Dispersion
+==============================================================================
+  Rubin 1985 formula: nF=1.5290 nd=1.5234 nC=1.5208 nF-nC=0.0082 Abbe=63.9
+  Wikipedia container soda-lime: nD=1.518, nF-nC=0.00867, Abbe=59.7
+  critical angle F 486: 40.845 deg
+  critical angle d 588: 41.029 deg
+  critical angle C 656: 41.112 deg
+  prism apex 30 deg: min deviation  16.4 deg, F-C spread 0.26 deg
+  prism apex 60 deg: min deviation  39.2 deg, F-C spread 0.72 deg
+  prism apex 90 deg: min deviation   nan deg, F-C spread nan deg
+
+==============================================================================
+I. Tilt of a piece: reflection and transmission
+==============================================================================
+  tilt 0.10 deg: reflected ray turns 0.20 deg; transmitted image shift 0.011 px (t=18px)
+  tilt 0.25 deg: reflected ray turns 0.50 deg; transmitted image shift 0.027 px (t=18px)
+  tilt 0.50 deg: reflected ray turns 1.00 deg; transmitted image shift 0.054 px (t=18px)
+  tilt 1.00 deg: reflected ray turns 2.00 deg; transmitted image shift 0.107 px (t=18px)
+  tilt 2.00 deg: reflected ray turns 4.00 deg; transmitted image shift 0.215 px (t=18px)
+  tilt 4.00 deg: reflected ray turns 8.00 deg; transmitted image shift 0.430 px (t=18px)
+  at 0.6 m from a 96-dpi screen 1 deg of view = 40 CSS px; so a 0.5 deg tilt moves a distant reflection ~40 px
+  lamp 50 px above the pane: a 1 deg tilt moves the lamp's highlight ~1.7 px
+  lamp 100 px above the pane: a 1 deg tilt moves the lamp's highlight ~3.5 px
+  lamp 200 px above the pane: a 1 deg tilt moves the lamp's highlight ~7.0 px
+  lamp 400 px above the pane: a 1 deg tilt moves the lamp's highlight ~14.0 px
+
+==============================================================================
+J. Laminated: doubled crack lines (two plies)
+==============================================================================
+  view  0 deg, crack-line depth difference 2.5 mm: apparent offset 0.00 mm
+  view  0 deg, crack-line depth difference 3.3 mm: apparent offset 0.00 mm
+  view 15 deg, crack-line depth difference 2.5 mm: apparent offset 0.43 mm
+  view 15 deg, crack-line depth difference 3.3 mm: apparent offset 0.57 mm
+  view 30 deg, crack-line depth difference 2.5 mm: apparent offset 0.87 mm
+  view 30 deg, crack-line depth difference 3.3 mm: apparent offset 1.15 mm
+  view 45 deg, crack-line depth difference 2.5 mm: apparent offset 1.31 mm
+  view 45 deg, crack-line depth difference 3.3 mm: apparent offset 1.73 mm
+  glass/PVB reflectance (1.52 vs 1.488): 0.0113%
