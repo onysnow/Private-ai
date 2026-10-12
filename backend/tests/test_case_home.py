@@ -263,7 +263,8 @@ def test_each_claim_names_the_source_it_rests_on_first():
     ok(client.post(f"/api/claims/{claim}/evidence", json={"evidence_id": evidence("Press release", "para 2"), "stance": "contradicts"}))
     ok(client.post(f"/api/claims/{claim}/evidence", json={"evidence_id": evidence("Board minutes", "p. 4"), "stance": "supports"}))
     assert ok(client.get(f"/api/investigations/{inv}/claim-sources")) == [
-        {"claim_id": claim, "source": "Board minutes", "locator": "p. 4", "count": 2}]
+        {"claim_id": claim, "source": "Board minutes", "locator": "p. 4", "count": 2, "sources_for": 1, "sources_against": 1,
+         "names": ["Board minutes", "Press release"], "leads_open": 0}]
 
 
 def test_a_page_is_drawn_with_its_passage_marked(tmp_path, monkeypatch):

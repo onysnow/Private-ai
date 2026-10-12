@@ -22,13 +22,15 @@ import {
 import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
 import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
+import {HIDE_SCREEN_EVENT, OPEN_INBOX_EVENT, OPEN_PALETTE_EVENT, SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
+import {useNeedsYouCount} from '../inbox/inbox';
 import {caseHref} from '../../lib/case-href';
 import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
 import {NewCaseSetup} from '../new-case/new-case-setup';
 import {DecisionCard} from './decision-card';
 import {MiniNetwork} from './mini-network';
+import {PagePicture} from './decision-card';
 import {HOLD_MS, useDecisions} from './use-decisions';
 import {useWheelStep} from './wheel-step';
 
@@ -84,15 +86,15 @@ function writeVisit(id: string): void {
   try { window.localStorage.setItem(VISIT_KEY(id), new Date().toISOString()); } catch { /* private window */ }
 }
 
-function Module({n, name, href, extra, children, className = '', label}: {
-  n: string; name: string; href?: string; extra?: ReactNode; children: ReactNode; className?: string; label?: string;
+function Module({n, name, href, extra, children, className = '', label, openLabel = 'Open'}: {
+  n: string; name: string; href?: string; extra?: ReactNode; children: ReactNode; className?: string; label?: string; openLabel?: string;
 }): ReactElement {
   const inv = useWorkbenchStore(state => state.investigationId);
   return <section className={`ch-mod ${className}`} aria-label={label ?? name}>
     <header className="ch-mod-head">
       <h2><span className="ch-n">{n}</span>{name}</h2>
       {extra}
-      {href && <Link className="ch-open" href={caseHref(href, inv)}>Open <span aria-hidden="true">↗</span></Link>}
+      {href && <Link className="ch-open" href={caseHref(href, inv)}>{openLabel} <span aria-hidden="true">↗</span></Link>}
     </header>
     {children}
   </section>;
@@ -158,6 +160,16 @@ function StandingStrip({investigationId}: {investigationId: string}): ReactEleme
   </ul>;
 }
 
+/** "4 names and 2 dates proposed so far", from a document's proposal counts. */
+export function proposedLine(doc: {candidate_counts?: Record<string, number> | null}): string {
+  const c = doc.candidate_counts ?? {};
+  const parts: string[] = [];
+  const add = (n: number | undefined, one: string, many: string) => { if (n) parts.push(`${n} ${n === 1 ? one : many}`); };
+  add(c.entity, 'name', 'names'); add(c.event, 'date', 'dates'); add(c.claim, 'claim', 'claims'); add(c.relationship, 'link', 'links');
+  if (!parts.length) return '';
+  return `${parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}` : parts[0]} proposed so far`;
+}
+
 function BringIn({investigationId}: {investigationId: string}): ReactElement {
   const queryClient = useQueryClient();
   const docs = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data ?? [];
@@ -165,6 +177,9 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
   const [over, setOver] = useState(false);
   const [dropped, setDropped] = useState('');
   const reading = docs.find(d => d.extraction_status === 'extracting') ?? docs.find(d => UNREAD.has(d.extraction_status));
+  const openDocument = useWorkbenchStore(state => state.openDocument);
+  // The card shows the file being read, else the last one brought in (mockup HOME_1).
+  const shown = reading ?? [...docs].filter(d => !d.parent_document_id).sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
   const unread = docs.filter(d => UNREAD.has(d.extraction_status)).length;
   const kinds = standing?.to_decide_by_kind ?? {};
   // The reading job says where it is ("Reading with OCR · page 6 of 11"; backend app/jobs/handlers.py).
@@ -187,28 +202,44 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
   const row = (count: number, label: string, href: string, verb: string) =>
     <li><b>{count}</b><span>{label}</span><Link href={caseHref(href, investigationId)}>{verb} →</Link></li>;
   return <Module n="01" name="Bring in" href="/bring-in">
-    {reading ? <div className="ch-reading">
-      <div className="ch-thumb" aria-hidden="true"><i/><i/><i/><i/></div>
-      <div><b>{reading.filename}</b><span>{busy ? (job?.status === 'running' && job.message ? job.message : 'Reading now') : 'Waiting to be read'}</span>
-        <span className="ch-progress" role={progress === null ? undefined : 'progressbar'} aria-label={progress === null ? undefined : 'Reading'}
+    {shown ? <button type="button" className="ch-reading" onClick={() => openDocument(shown.id)} aria-label={`Open ${shown.filename} in the reading room`}>
+      <span className="ch-thumb">{/\.pdf$/i.test(shown.filename) && shown.chunk_count > 0
+        ? <PagePicture documentId={shown.id} page={1} width={120} alt=""/> : <span className="ch-thumb-lines" aria-hidden="true"><i/><i/><i/><i/></span>}</span>
+      <span className="ch-reading-words"><b>{shown.filename}</b>
+        <span>{shown === reading ? (busy ? (job?.status === 'running' && job.message ? job.message : 'Reading now') : 'Waiting to be read')
+          : shown.extraction_status === 'failed' ? 'Could not be read' : `Read · ${shown.chunk_count} passage${shown.chunk_count === 1 ? '' : 's'}`}</span>
+        {shown === reading && <span className="ch-progress" role={progress === null ? undefined : 'progressbar'} aria-label={progress === null ? undefined : 'Reading'}
           aria-valuenow={progress ?? undefined} aria-valuemin={progress === null ? undefined : 0} aria-valuemax={progress === null ? undefined : 100} aria-hidden={progress === null}>
-          <i className={busy && progress === null ? 'busy' : ''} style={progress === null ? undefined : {width: `${progress}%`}}/></span></div>
-    </div> : <p className="ch-quiet">Nothing is being read now.</p>}
+          <i className={busy && progress === null ? 'busy' : ''} style={progress === null ? undefined : {width: `${progress}%`}}/></span>}
+        {proposedLine(shown) && <small className="ch-proposed">{proposedLine(shown)}</small>}
+      </span>
+    </button> : <p className="ch-quiet">Nothing brought in yet.</p>}
     <ul className="ch-rows">
       {row(unread, `document${unread === 1 ? '' : 's'} not read yet`, '/bring-in#document-ingestion', 'Read')}
       {row(kinds.outside ?? 0, 'outside findings to review', '/decide?kind=outside', 'Review')}
       {row(kinds.watchlist ?? 0, `watchlist hit${(kinds.watchlist ?? 0) === 1 ? '' : 's'}`, '/decide?kind=watchlist', 'See')}
     </ul>
     <div className={`ch-drop${over ? ' over' : ''}`} onDragOver={e => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={e => void onDrop(e)}>
-      {dropped ? <span role="status">{dropped}</span> : <Link href={caseHref('/bring-in#document-ingestion', investigationId)}>+ Drop documents here</Link>}
+      {dropped ? <span role="status">{dropped}</span> : <Link href={caseHref('/bring-in#the-drop', investigationId)}>+ Drop documents anywhere</Link>}
     </div>
   </Module>;
 }
 
-function SourceLine({line}: {line?: {source: string; locator?: string | null; count: number}}): ReactElement {
-  if (!line) return <span className="ch-claim-src ch-quiet">No evidence linked yet</span>;
-  const more = line.count - 1;
-  return <span className="ch-claim-src">{line.source}{line.locator ? ` · ${line.locator}` : ''}{more > 0 ? ` · +${more} more` : ''}</span>;
+/** "1 source for · 2 against · Harbour Gazette, land register", or "No passage yet · 1 lead open" (mockup HOME_1). */
+export function sourceLine(line?: {sources_for?: number; sources_against?: number; names?: string[]; leads_open?: number; count?: number}): string {
+  if (!line || !line.count) {
+    const leads = line?.leads_open ?? 0;
+    return ['No passage yet', leads ? `${leads} lead${leads === 1 ? '' : 's'} open` : ''].filter(Boolean).join(' · ');
+  }
+  const parts = [`${line.sources_for ?? 0} source${line.sources_for === 1 ? '' : 's'} for`];
+  if (line.sources_against) parts.push(`${line.sources_against} against`);
+  if (line.names?.length) parts.push(line.names.join(', '));
+  if (line.leads_open) parts.push(`${line.leads_open} lead${line.leads_open === 1 ? '' : 's'} open`);
+  return parts.join(' · ');
+}
+
+function SourceLine({line}: {line?: Parameters<typeof sourceLine>[0]}): ReactElement {
+  return <span className="ch-claim-src">{sourceLine(line)}</span>;
 }
 
 function CheckModule({investigationId}: {investigationId: string}): ReactElement {
@@ -224,7 +255,7 @@ function CheckModule({investigationId}: {investigationId: string}): ReactElement
   const wheel = useWheelStep(ordered.length, index, setIndex);
   const at = Math.min(index, Math.max(0, ordered.length - 2));
   const shown = ordered.slice(at, at + 2);
-  return <Module n="02" name="Check" href="/check" extra={<Stepper index={index} count={ordered.length} onStep={setIndex} label="Claims"/>}>
+  return <Module n="02" name="Check" extra={<Stepper index={index} count={ordered.length} onStep={setIndex} label="Claims"/>}>
     <div className="ch-bar" role="img" aria-label={`${counts.supported} supported, ${counts.disputed} disputed, ${counts.unshown} not yet shown`}>
       {(['supported', 'disputed', 'unshown'] as ClaimStatus[]).map(k => counts[k] ? <i key={k} className={`ch-bar-${k}`} style={{flexGrow: counts[k]}}/> : null)}
     </div>
@@ -239,6 +270,11 @@ function CheckModule({investigationId}: {investigationId: string}): ReactElement
   </Module>;
 }
 
+/** A Red Flag's parties as a chain; an ownership loop ends "→ back" (mockup HOME_1). */
+export function flagChain(parties: {name: string}[], loop: boolean): string {
+  return [...parties.map(p => p.name), ...(loop && parties.length > 1 ? ['back'] : [])].join(' → ');
+}
+
 function ActModule({investigationId}: {investigationId: string}): ReactElement {
   const flagsQuery = useQuery({...getRedFlagsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const flags = flagsQuery.data;
@@ -246,20 +282,32 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
   const [index, setIndex] = useState(0);
   const open = useMemo(() => (flags?.flags ?? []).filter(f => f.status === 'open' && !f.gone_at)
     .sort((a, b) => (LEVEL_ORDER[a.level] ?? 9) - (LEVEL_ORDER[b.level] ?? 9) || b.weight - a.weight), [flags]);
-  const wheel = useWheelStep(open.length, index, setIndex);
-  const at = Math.min(index, Math.max(0, open.length - 2));
-  return <Module n="04" name="Act · Red Flags" href="/act#red-flags" extra={<Stepper index={index} count={open.length} onStep={setIndex} label="Red Flags"/>}>
+  // Textbook and strong flags as cards; faint ones each on one line beneath.
+  const cards = open.filter(f => f.level !== 'faint');
+  const faint = open.filter(f => f.level === 'faint');
+  const visit = investigationId ? readVisit(investigationId) : null;
+  const wheel = useWheelStep(cards.length, index, setIndex);
+  const at = Math.min(index, Math.max(0, cards.length - 2));
+  const leadsOf = (f: (typeof open)[number]) => (f.checks ?? []).filter(c => c.status === 'open').length;
+  return <Module n="04" name="Act · Red Flags" extra={<Stepper index={index} count={cards.length} onStep={setIndex} label="Red Flags"/>}>
     <div className="ch-list" {...wheel}>
-      {flagsQuery.isPending ? <div className="ch-skeleton" aria-busy="true" aria-label="Looking for Red Flags"/> : flagsQuery.isError ? <p role="alert" className="ch-quiet">{errorMessage(flagsQuery.error, 'Could not look for Red Flags')} <button type="button" onClick={() => void flagsQuery.refetch()}>Retry</button></p> : open.length ? open.slice(at, at + 2).map(f => {
-        const innocent = f.indicator?.innocent_explanations?.[0];
-        return <button key={f.id} type="button" className={`ch-flag ch-flag-${f.level}`} onClick={() => openFlag(f.id)}>
-          <span className="ch-flag-top"><LevelChip level={f.level}/><span className="ch-since">{f.years?.length ? `lights ${yearSpan(f.years)}`
-            : `flagged ${new Date(`${f.first_seen_at.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})}`}</span></span>
-          <b>{f.indicator?.name ?? f.indicator_id}</b>
-          <span className="ch-flag-parties">{f.parties.map(p => p.name).join(' → ')}</span>
-          {innocent && <span className="ch-innocent"><em>Could be innocent</em>{innocent}</span>}
-        </button>;
-      }) : <p className="ch-quiet">No Red Flags. A flag is a pattern in the records worth a look, never a finding.</p>}
+      {flagsQuery.isPending ? <div className="ch-skeleton" aria-busy="true" aria-label="Looking for Red Flags"/> : flagsQuery.isError ? <p role="alert" className="ch-quiet">{errorMessage(flagsQuery.error, 'Could not look for Red Flags')} <button type="button" onClick={() => void flagsQuery.refetch()}>Retry</button></p> : open.length ? <>
+        {cards.slice(at, at + 2).map(f => {
+          const innocent = f.indicator?.innocent_explanations ?? [];
+          const fresh = Boolean(visit && f.first_seen_at > visit.slice(0, 19));
+          const when = f.years?.length ? `lights ${yearSpan(f.years)}` : '';
+          return <button key={f.id} type="button" className={`ch-flag ch-flag-${f.level}`} onClick={() => openFlag(f.id)}>
+            <span className="ch-flag-top"><LevelChip level={f.level}/><span className="ch-since">{[fresh ? 'new' : '', when].filter(Boolean).join(' · ')}</span></span>
+            <b>{f.indicator?.name ?? f.indicator_id}</b>
+            <span className="ch-flag-parties">{f.summary && f.level !== 'textbook' ? f.summary : flagChain(f.parties, /circular|loop/i.test(f.indicator?.name ?? ''))}</span>
+            {innocent.length > 0 && f.level === 'textbook' && <span className="ch-innocent"><em>Could be innocent</em>{innocent[0]}
+              {innocent.length > 1 && <span className="ch-more"> {innocent.length - 1} more ›</span>}</span>}
+          </button>;
+        })}
+        {faint.slice(0, 2).map(f => <button key={f.id} type="button" className="ch-faint-row" onClick={() => openFlag(f.id)}>
+          <LevelChip level="faint"/><span>{f.indicator?.name ?? f.indicator_id}{leadsOf(f) ? ` · ${leadsOf(f)} to check` : ''}</span></button>)}
+        {faint.length > 2 && <Link className="ch-faint-more" href={caseHref('/act#red-flags', investigationId)}>{faint.length - 2} more faint ›</Link>}
+      </> : <p className="ch-quiet">No Red Flags. A flag is a pattern in the records worth a look, never a finding.</p>}
     </div>
   </Module>;
 }
@@ -279,16 +327,18 @@ function SinceStrip({investigationId, markVisit = true}: {investigationId: strin
   }, [investigationId, markVisit]);
   const since = useQuery({...getSinceOptions({path: {investigation_id: investigationId}, query: {after: after ?? ''}}), enabled: Boolean(investigationId && after)}).data;
   const when = after ? new Date(after).toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short'}) : '';
+  const [all, setAll] = useState(false);
+  const changes = since?.changes ?? [];
   return <section className="ch-since-strip" aria-label="What changed while you were away">
-    <header><p className="ch-eyebrow">{after ? `Since ${when}` : 'First visit on this computer'}</p><h2>What changed while you were away</h2></header>
+    <header><p className="ch-eyebrow">{after ? `Since ${when}` : 'First visit on this computer'}</p><h2>What changed while you were away</h2>
+      {changes.length > 4 && <button type="button" className="ch-show-all" aria-expanded={all} onClick={() => setAll(!all)}>{all ? 'Show fewer' : 'Show all'}</button>}</header>
     {!after ? <p className="ch-quiet">Next time you open this case, what moved in between shows here: who did it, and where.</p>
-      : !since?.changes.length ? <p className="ch-quiet">Nothing has changed since then.</p>
-      : <ul>{since.changes.slice(0, 4).map(c => <li key={c.key}><Link href={caseHref(c.href, investigationId)} className={`ch-change ch-actor-${c.actor_kind}`}>
+      : !changes.length ? <p className="ch-quiet">Nothing has changed since then.</p>
+      : <ul>{(all ? changes : changes.slice(0, 4)).map(c => <li key={c.key}><Link href={caseHref(c.href, investigationId)} className={`ch-change ch-actor-${c.actor_kind}`}
+        title={ACTOR[c.actor_kind]}>
         <b>{c.count}</b><span>{c.label}</span>
-        <small className="ch-actor">{c.actor_kind === 'ai' ? <span className="ai-tag">AI</span> : null}{ACTOR[c.actor_kind]}</small>
-      </Link></li>)}
-        {since.changes.length > 4 && <li><Link href={caseHref('/decide', investigationId)} className="ch-change ch-more">
-          <b>+{since.changes.length - 4}</b><span>more changes</span></Link></li>}</ul>}
+        {c.actor_kind === 'ai' && <span className="ai-tag">AI</span>}
+      </Link></li>)}</ul>}
   </section>;
 }
 
@@ -314,11 +364,12 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
     </header>
     {query.isError ? <p role="alert">{errorMessage(query.error, 'Could not load what waits for you')} <button type="button" onClick={() => void query.refetch()}>Retry</button></p>
       : query.isPending && investigationId ? <div className="ch-skeleton" aria-busy="true"/>
-      : item ? <DecisionCard item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={!item.evidence?.excerpt}/>
+      : item ? <DecisionCard item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}/>
       : <div className="ch-clear"><p>Nothing waits for you.</p><Link href={caseHref('/bring-in#document-ingestion', inv)}>Drop documents</Link></div>}
     <footer className="ch-next-foot">
       <span className="ch-dots" aria-hidden="true">{items.slice(0, 9).map((d, i) => <i key={d.id} className={i === index ? 'on' : ''}/>)}</span>
-      <span aria-live="polite">{held ? <>Saved in a moment: <b>{held.choice.label}</b>. <button type="button" className="ch-undo" onClick={() => undo()}>Undo <kbd>Z</kbd></button></>
+      <span aria-live="polite" title={item?.consequences.join(' ')}>{held ? <>Saved in a moment: <b>{held.choice.label}</b>. <button type="button" className="ch-undo" onClick={() => undo()}>Undo <kbd>Z</kbd></button></>
+        : item?.consequences.length ? `${item.consequences.join(' ').replace(/\.$/, '')}; Undo for ${HOLD_MS / 1000} s.`
         : `${total} to decide in this case. Your answer waits ${HOLD_MS / 1000} s before it is sent, so you can undo it.`}</span>
       <Link href={caseHref('/decide', inv)}>Open Decide <span aria-hidden="true">↗</span></Link>
     </footer>
@@ -343,7 +394,8 @@ function YearRail({investigationId}: {investigationId: string}): ReactElement {
       const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit'].filter(Boolean).join(' ');
       return <button key={y.year} type="button" className={cls} aria-pressed={on} onClick={() => setAsOf(on ? null : Number(y.year))}
         title={on ? 'Show all years again' : `Show the case as of ${y.year}`}>
-        <b>{y.year}</b><small>{y.events} event{y.events === 1 ? '' : 's'}{flags ? <> · <span className="ch-year-flags">{flags} flag{flags === 1 ? '' : 's'}</span></> : null}</small>
+        <b>{y.year}</b><small aria-label={`${y.events} event${y.events === 1 ? '' : 's'}${flags ? `, ${flags} Red Flag${flags === 1 ? '' : 's'}` : ''}`}>
+          {y.events}{flags ? <> · <span className="ch-year-flags">flag</span></> : null}</small>
         <i style={{width: `${(100 * y.events) / most}%`}}/>
       </button>;
     })}
@@ -355,15 +407,34 @@ function PointingAt({investigationId}: {investigationId: string}): ReactElement 
   const point = useWorkbenchStore(state => state.setPointedParty);
   const asOf = useWorkbenchStore(state => state.asOf);
   const graph = useQuery({...getInvestigationGraphOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
-  const name = graph?.nodes.find(n => n.id === pointed)?.caption;
+  const node = graph?.nodes.find(n => n.id === pointed);
+  const name = node?.caption;
   const {years} = usePointedYears();
   return <div className="ch-pointing" aria-live="polite">
     <p className="ch-eyebrow">Pointing at</p>
-    {pointed ? <><span className="ch-party on">{name ?? 'a party'}</span>
+    {pointed ? <><span className="ch-party on"><span aria-hidden="true" className="ch-party-kind">{(node?.schema || 'T')[0]}</span>{name ?? 'a party'}</span>
       <span>{years.length ? `lights ${yearSpan(years)} everywhere` : 'lit in every part'}{asOf ? ` · as of ${asOf}` : ''}</span>
       <button type="button" onClick={() => point(null)}>Clear ×</button></>
       : <span className="ch-quiet">Nothing. Point at a party to light it everywhere{asOf ? ` · showing ${asOf}` : ''}.</span>}
   </div>;
+}
+
+/** The case home's own tools (mockup HOME_1): search, the bell, settings, Hide screen. */
+function HomeTools(): ReactElement {
+  const waiting = useNeedsYouCount();
+  const fire = (name: string) => () => window.dispatchEvent(new Event(name));
+  return <>
+    <button type="button" className="ch-search" onClick={fire(OPEN_PALETTE_EVENT)}>
+      <span aria-hidden="true" className="ch-search-icon">⌕</span><span>Search the case, or type a command…</span><kbd>⌘K</kbd></button>
+    <div className="ch-tools">
+      <button type="button" className="ch-tool ch-bell" onClick={fire(OPEN_INBOX_EVENT)} aria-label={`Inbox: ${waiting} need${waiting === 1 ? 's' : ''} you`}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17h12l-1.6-2.2V10a4.4 4.4 0 0 0-8.8 0v4.8z M10 19.5a2 2 0 0 0 4 0"/></svg>
+        {waiting > 0 && <b className="ch-count">{waiting > 99 ? '99+' : waiting}</b>}</button>
+      <Link href="/settings" className="ch-tool" aria-label="Settings" title="Settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></Link>
+      <button type="button" className="ch-tool ch-hide" onClick={fire(HIDE_SCREEN_EVENT)} title="Cover the screen at once">Hide screen <kbd>⌘⇧H</kbd></button>
+    </div>
+  </>;
 }
 
 /** No case yet: start one (name, question, kind, what you have), or open a sample (FEATURE_HOME §1 "Empty case"). */
@@ -388,7 +459,7 @@ function FirstCase({onSwitch}: {onSwitch: (id: string) => void}): ReactElement {
   </div>;
 }
 
-export function CaseHome({investigation, investigations, onSwitch, loading, active = true, preview = false}: {
+export function CaseHome({investigation, investigations: _cases, onSwitch, loading, active = true, preview = false}: {
   investigation: InvestigationOut | null; investigations: InvestigationOut[]; onSwitch: (id: string) => void; loading: boolean; active?: boolean;
   /** A picture of the page (Appearance's before/after): it never marks the case as visited. */
   preview?: boolean;
@@ -399,9 +470,10 @@ export function CaseHome({investigation, investigations, onSwitch, loading, acti
     <header className="ch-top">
       <div className="ch-name">
         <h1>{investigation.name}</h1>
-        {investigations.length > 1 && <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
-          Switch case <kbd>⌘O</kbd></button>}
+        <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
+          Switch case <kbd>⌘O</kbd></button>
       </div>
+      {!preview && <HomeTools/>}
       <CaseQuestion investigation={investigation}/>
       <StandingStrip investigationId={id}/>
     </header>
@@ -409,7 +481,7 @@ export function CaseHome({investigation, investigations, onSwitch, loading, acti
       <div className="ch-col"><BringIn investigationId={id}/><CheckModule investigationId={id}/></div>
       <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id} markVisit={!preview}/></div>
       <div className="ch-col"><ActModule investigationId={id}/>
-        <Module n="03" name="See · who is linked" href="/see#relationship-graph"><MiniNetwork investigationId={id}/></Module></div>
+        <Module n="03" name="See · who is linked" href="/see#the-wire" openLabel="Open network"><MiniNetwork investigationId={id}/></Module></div>
     </div>
     <footer className="ch-bottom"><YearRail investigationId={id}/><PointingAt investigationId={id}/></footer>
   </div>;

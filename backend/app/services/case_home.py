@@ -620,21 +620,30 @@ STANCE_ORDER = {"supports": 0, "contradicts": 1, "context": 2}
 
 
 def claim_sources(db: Session, investigation_id: str) -> list[dict[str, Any]]:
-    """For each claim with linked evidence: the source it rests on first (supporting
-    before contradicting before context), its locator, and how many items are linked."""
-    from app.models.domain import ClaimEvidenceLink
+    """For each claim with evidence or open leads: how many sources support it and how many
+    go against it, their names, the source it rests on first (supporting before contradicting
+    before context) with its locator, and how many open leads are linked to it."""
+    from app.models.domain import ClaimEvidenceLink, LeadLink
 
-    rows = db.execute(select(ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance, Evidence.locator, Source.title)
+    rows = db.execute(select(ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance, Evidence.locator, Source.id, Source.title)
                       .join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
                       .join(Evidence, Evidence.id == ClaimEvidenceLink.evidence_id)
                       .join(Source, Source.id == Evidence.source_id)
                       .where(Claim.investigation_id == investigation_id))
-    by_claim: dict[str, list[tuple[int, str, str | None]]] = {}
-    for claim_id, stance, locator, title in rows:
-        by_claim.setdefault(claim_id, []).append((STANCE_ORDER.get(stance, 3), title or "", locator))
+    by_claim: dict[str, list[tuple[int, str, str, str | None, str]]] = {}
+    for claim_id, stance, locator, source_id, title in rows:
+        by_claim.setdefault(claim_id, []).append((STANCE_ORDER.get(stance, 3), stance, title or "", locator, source_id))
+    leads: Counter[str] = Counter(claim_id for (claim_id,) in db.execute(
+        select(LeadLink.claim_id).join(Lead, Lead.id == LeadLink.lead_id)
+        .where(Lead.investigation_id == investigation_id, Lead.status.in_(OPEN_LEAD), LeadLink.claim_id.is_not(None))))
     out = []
-    for claim_id, items in by_claim.items():
-        items.sort(key=lambda t: (t[0], t[1], t[2] or ""))
-        _, title, locator = items[0]
-        out.append({"claim_id": claim_id, "source": title, "locator": locator, "count": len(items)})
-    return sorted(out, key=lambda r: r["claim_id"])
+    for claim_id in sorted(set(by_claim) | set(leads)):
+        items = sorted(by_claim.get(claim_id, []), key=lambda t: (t[0], t[2], t[3] or ""))
+        sources_for = {t[4] for t in items if t[1] == "supports"}
+        sources_against = {t[4] for t in items if t[1] == "contradicts"}
+        names = list(dict.fromkeys(t[2] for t in items if t[1] in {"supports", "contradicts"} and t[2]))
+        first = items[0] if items else None
+        out.append({"claim_id": claim_id, "source": first[2] if first else None, "locator": first[3] if first else None,
+                    "count": len(items), "sources_for": len(sources_for), "sources_against": len(sources_against),
+                    "names": names[:3], "leads_open": leads.get(claim_id, 0)})
+    return out

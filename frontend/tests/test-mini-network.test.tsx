@@ -3,7 +3,7 @@
 import {cleanup, render, screen} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
-import {MiniNetwork, linkYear, shapeOf} from '../features/case-home/mini-network';
+import {MiniNetwork, linkWord, linkYear, shapeOf} from '../features/case-home/mini-network';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -27,6 +27,11 @@ describe('MiniNetwork', () => {
     expect(shapeOf('RealEstate')).toBe('property');
     expect(shapeOf('Person')).toBe('person');
     expect(shapeOf('Company')).toBe('company');
+    const pay = (amount: string) => relationshipFixture({schema: 'Payment', properties: {amount: [amount], currency: ['EUR']}}) as RelationshipOut;
+    expect(linkWord([pay('9800'), pay('9800'), pay('9800')])).toBe('paid €29,400');
+    expect(linkWord([pay('2400000'), relationshipFixture({schema: 'Ownership'}) as RelationshipOut])).toBe('owns · paid €2.4M');
+    expect(linkWord([pay('420000'), pay('29400')])).toBe('paid €449k');
+    expect(linkWord(relationshipFixture({schema: 'Directorship'}) as RelationshipOut)).toBe('director');
   });
 
   it('labels each link with its year and whether it is shown or disputed', async () => {
@@ -40,9 +45,8 @@ describe('MiniNetwork', () => {
       link('l2', 'Bellcastle', 'Harbour plot', {startDate: ['2019-05']}, 'challenged_support', 'RealEstate'),
     ]), nodes: [node('Meridian'), node('Bellcastle'), node('Harbour plot', 'RealEstate')]}});
     render(<QueryProvider><MiniNetwork investigationId="inv-1"/></QueryProvider>);
-    expect(await screen.findByText('2017 ✓')).toBeInTheDocument();
-    expect(screen.getByText('2019 ×')).toBeInTheDocument();
-    expect(screen.getByText('property')).toBeInTheDocument();
+    expect(await screen.findByText('owns 2017 ✓')).toBeInTheDocument();
+    expect(screen.getByText('owns 2019 ×')).toBeInTheDocument();
     expect(screen.getByText('3 parties · 2 links')).toBeInTheDocument();
   });
 });

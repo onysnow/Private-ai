@@ -4205,9 +4205,13 @@ class CaseYearOut(ResponseModel):
 class ClaimSourceLineOut(ResponseModel):
     """Where a claim's evidence comes from, in one line for its card."""
     claim_id: str
-    source: str
+    source: str | None = None
     locator: str | None = None
     count: int
+    sources_for: int = 0
+    sources_against: int = 0
+    names: list[str] = []
+    leads_open: int = 0
 
 
 class PartyYearsOut(ResponseModel):

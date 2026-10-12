@@ -2961,13 +2961,29 @@ export type ClaimSourceLineOut = {
    */
   count: number;
   /**
+   * Leads Open
+   */
+  leads_open?: number;
+  /**
    * Locator
    */
   locator?: string | null;
   /**
+   * Names
+   */
+  names?: Array<string>;
+  /**
    * Source
    */
-  source: string;
+  source?: string | null;
+  /**
+   * Sources Against
+   */
+  sources_against?: number;
+  /**
+   * Sources For
+   */
+  sources_for?: number;
 };
 
 /**

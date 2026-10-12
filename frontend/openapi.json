@@ -4969,6 +4969,11 @@
             "title": "Count",
             "type": "integer"
           },
+          "leads_open": {
+            "default": 0,
+            "title": "Leads Open",
+            "type": "integer"
+          },
           "locator": {
             "anyOf": [
               {
@@ -4980,14 +4985,38 @@
             ],
             "title": "Locator"
           },
+          "names": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Names",
+            "type": "array"
+          },
           "source": {
-            "title": "Source",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "sources_against": {
+            "default": 0,
+            "title": "Sources Against",
+            "type": "integer"
+          },
+          "sources_for": {
+            "default": 0,
+            "title": "Sources For",
+            "type": "integer"
           }
         },
         "required": [
           "claim_id",
-          "source",
           "count"
         ],
         "title": "ClaimSourceLineOut",

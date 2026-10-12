@@ -1146,8 +1146,12 @@ export const zClaimReviewRequest = z.object({
 export const zClaimSourceLineOut = z.object({
   claim_id: z.string(),
   count: z.number().int(),
+  leads_open: z.number().int().optional().default(0),
   locator: z.string().nullish(),
-  source: z.string(),
+  names: z.array(z.string()).optional().default([]),
+  source: z.string().nullish(),
+  sources_against: z.number().int().optional().default(0),
+  sources_for: z.number().int().optional().default(0),
 });
 
 /**

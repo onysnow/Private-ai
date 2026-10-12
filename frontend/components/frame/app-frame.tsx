@@ -26,6 +26,10 @@ import {NewCaseSetup} from '../../features/new-case/new-case-setup';
 
 /** Any screen can ask the frame to open the case switcher. */
 export const SWITCH_CASE_EVENT = 'pai:switch-case';
+/** Any screen can open the command palette, the inbox, or cover the screen. */
+export const OPEN_PALETTE_EVENT = 'pai:open-palette';
+export const OPEN_INBOX_EVENT = 'pai:open-inbox';
+export const HIDE_SCREEN_EVENT = 'pai:hide-screen';
 
 const DWELL_MS = 250;
 const PIN_KEY = 'pai:edge-pins';
@@ -322,9 +326,13 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
       else if (e.key === '?' && !typing(e.target) && singleKeysOn()) { e.preventDefault(); setHelp(true); }
     };
     const openCases = () => setCases(true);
+    const openPalette = () => setPalette(true);
+    const openInbox = () => setInbox(true);
+    const hide = () => setHidden(true);
+    const events: [string, () => void][] = [[SWITCH_CASE_EVENT, openCases], [OPEN_PALETTE_EVENT, openPalette], [OPEN_INBOX_EVENT, openInbox], [HIDE_SCREEN_EVENT, hide]];
     window.addEventListener('keydown', onKey);
-    window.addEventListener(SWITCH_CASE_EVENT, openCases);
-    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener(SWITCH_CASE_EVENT, openCases); };
+    for (const [name, fn] of events) window.addEventListener(name, fn);
+    return () => { window.removeEventListener('keydown', onKey); for (const [name, fn] of events) window.removeEventListener(name, fn); };
   }, []);
   useEffect(() => { setLeft(false); setTop(false); }, [pathname, setLeft, setTop]);
   // Re-apply the kept (or tried) appearance after every navigation, in case anything reset <html>'s attributes.
@@ -342,6 +350,7 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
 
     {/* Left edge: where to go. */}
     <button type="button" className={`fr-handle fr-handle-left${left ? ' on' : ''}`} aria-label="Open steps and pages" aria-expanded={left} aria-controls="fr-left" onClick={() => setLeft(o => !o)}/>
+    {!left && <span className="fr-edge-label" aria-hidden="true">▸ Case · Steps</span>}
     {fresh && !left && <span className="fr-hint fr-hint-left" aria-hidden="true">Steps and pages <kbd>[</kbd></span>}
     {fresh && !top && <span className="fr-hint fr-hint-top" aria-hidden="true">Tools <kbd>]</kbd></span>}
     <aside id="fr-left" className={`fr-left${left ? ' open' : ''}`} aria-label="Steps and pages" aria-hidden={!left} onMouseLeave={() => setLeft(false)} inert={!left ? true : undefined}>
