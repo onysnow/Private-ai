@@ -44,7 +44,7 @@ _building: str | None = None  # the case being loaded: ONE_MDB or a DemoCaseId
 
 
 def _title(case_id: str) -> str:
-    return "1MDB" if case_id == ONE_MDB else demo_cases.summary(case_id)["title"]
+    return "1MDB" if case_id == ONE_MDB else str(demo_cases.summary(case_id)["title"])
 
 
 @contextmanager

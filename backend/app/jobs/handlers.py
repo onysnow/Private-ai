@@ -231,7 +231,7 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
             fallback_reason = str(exc)
         else:
             local_text = container and not read.chunks and not _openaleph_package(read.schema)
-            if local_text:
+            if local_text and stored is not None:
                 read = _with_local_text(read, stored.storage_path)
                 local_text = bool(read.chunks)
             message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner)

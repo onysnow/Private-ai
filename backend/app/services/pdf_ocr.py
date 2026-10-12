@@ -4,6 +4,7 @@ import re
 from collections.abc import Callable
 from contextvars import ContextVar
 from dataclasses import dataclass
+from typing import Any
 from pathlib import Path
 
 
@@ -107,7 +108,7 @@ def ocr_runtime_status(language: str = "eng") -> OcrRuntimeStatus:
 _STAMP_MAX_CHARS = 400
 
 
-def _scan_with_stamp(page, native: str) -> bool:
+def _scan_with_stamp(page: Any, native: str) -> bool:
     if len(native) >= _STAMP_MAX_CHARS:
         return False
     area = abs(page.rect)
@@ -118,7 +119,7 @@ def _scan_with_stamp(page, native: str) -> bool:
         r = page.rect & info["bbox"]
         if not r.is_empty:
             covered += abs(r)
-    return covered / area > 0.5
+    return bool(covered / area > 0.5)
 
 
 def extract_pdf_chunks(

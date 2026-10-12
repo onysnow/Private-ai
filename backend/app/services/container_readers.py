@@ -99,11 +99,11 @@ def _header(message: EmailMessage, name: str) -> str:
     return _clean(", ".join(str(value) for value in values))
 
 
-def _part_text(part: EmailMessage) -> str:
+def _part_text(part: Any) -> str:
     """A body part's text, even when its declared character set is wrong
     or unknown."""
     try:
-        return part.get_content()
+        return str(part.get_content())
     except Exception:
         payload = part.get_payload(decode=True) or b""
         return payload.decode("utf-8", errors="replace") if isinstance(payload, bytes) else str(payload)
