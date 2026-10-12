@@ -321,6 +321,9 @@ import type {
   GetInvestigationGraphData,
   GetInvestigationGraphErrors,
   GetInvestigationGraphResponses,
+  GetInvestigationMoneyChecksData,
+  GetInvestigationMoneyChecksErrors,
+  GetInvestigationMoneyChecksResponses,
   GetInvestigationPlacesData,
   GetInvestigationPlacesErrors,
   GetInvestigationPlacesResponses,
@@ -999,6 +1002,9 @@ import {
   zGetInvestigationGraphPath,
   zGetInvestigationGraphQuery,
   zGetInvestigationGraphResponse,
+  zGetInvestigationMoneyChecksPath,
+  zGetInvestigationMoneyChecksQuery,
+  zGetInvestigationMoneyChecksResponse,
   zGetInvestigationPlacesPath,
   zGetInvestigationPlacesResponse,
   zGetInvestigationTimelinePath,
@@ -6255,6 +6261,39 @@ export const getRecordMarks = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetRecordMarksResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/marks',
+    ...options,
+  });
+
+/**
+ * Get Investigation Money Checks
+ *
+ * Where money appears or vanishes, per currency: grey hole, miracle, black hole, round trip. Read-only.
+ */
+export const getInvestigationMoneyChecks = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetInvestigationMoneyChecksData, ThrowOnError>,
+): RequestResult<
+  GetInvestigationMoneyChecksResponses,
+  GetInvestigationMoneyChecksErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetInvestigationMoneyChecksResponses,
+    GetInvestigationMoneyChecksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetInvestigationMoneyChecksPath,
+          query: zGetInvestigationMoneyChecksQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInvestigationMoneyChecksResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/money-checks',
     ...options,
   });
 

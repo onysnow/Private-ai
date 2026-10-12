@@ -370,36 +370,4 @@ describe('Home FollowTheMoney relationship graph', () => {
     });
     expect(api.unmatched()).toEqual([]);
   });
-
-  it('loads the money-flow ledger on demand and charts complete payments only', async () => {
-    const api = await bootstrap([entityA, entityB]);
-    const ledger = 'GET /api/investigations/inv-1/financial-flows';
-    const row = {
-      id: 'rel-9', relationship_id: 'rel-9', dateTime: '2024-03-02', from: 'Kestrelwood Holdings Ltd', to: 'Jane Doe',
-      from_entity_id: 'ent-1', to_entity_id: 'ent-2', amount: 1250.5, currency: 'USD', statedPurpose: 'consulting',
-      transactionNumber: null, evidence: 'p.2 [supports]', evidence_count: 1, supporting_evidence_count: 1,
-      status: 'no_claim_dependency', flowType: 'direct',
-    };
-    api.add({
-      [ledger]: {
-        investigation_id: 'inv-1', transactions: [row],
-        incomplete: [{...row, id: 'rel-10', relationship_id: 'rel-10', amount: null, flowType: 'inferred', problems: ['amount missing']}],
-        currencies: ['USD'], flow_type_rule: 'direct = supporting reviewed evidence', duplicate_rule: 'reviewed duplicates once',
-      },
-    });
-
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Load money flows'}));
-
-    const panel = await screen.findByTestId('money-flows');
-    expect(api.calls(ledger)).toHaveLength(1);
-    expect(panel).toHaveTextContent('1,250.5 USD');
-    expect(panel).toHaveTextContent('p.2 [supports]');
-    expect(panel).toHaveTextContent('Not charted (1)');
-    expect(panel).toHaveTextContent('amount missing');
-    await screen.findByTestId('sankey-stub');
-    const props = sankeySpy.mock.calls.at(-1)?.[0] as {transactions: Array<{id: string; amount: number; flowType: string}>};
-    expect(props.transactions).toEqual([expect.objectContaining({id: 'rel-9', amount: 1250.5, currency: 'USD', flowType: 'direct'})]);
-    expect(screen.getByRole('button', {name: 'Reload money flows'})).toBeInTheDocument();
-    expect(api.unmatched()).toEqual([]);
-  });
 });

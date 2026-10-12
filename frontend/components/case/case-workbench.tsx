@@ -29,6 +29,7 @@ import {BackupPanel} from '../../features/backups/backup-panel';
 import {CaseHome} from '../../features/case-home/case-home';
 import {DecideScreen} from '../../features/case-home/decide-screen';
 import {TheWire} from '../../features/the-wire/the-wire';
+import {MoneyView} from '../../features/money/money-view';
 import {TheDrop} from '../../features/the-drop/the-drop';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
@@ -241,6 +242,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       {stage('map', <>
         <YearSlider investigationId={inv}/>
         <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
+        <div id="money-flows"><PanelErrorBoundary name="Money"><MoneyView investigationId={inv} active={false}/></PanelErrorBoundary></div>
         <div id="timeline"><PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary></div>
         <div id="places"><PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary></div>
       </>)}
@@ -277,6 +279,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       ])}
       {screen('map', [
         {anchor: 'the-wire', label: 'The Wire', fill: true, render: () => <PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
+        {anchor: 'money-flows', label: 'Money', render: () => <PanelErrorBoundary name="Money"><MoneyView investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
         {anchor: 'relationship-graph', label: 'Relationships', render: () => <><YearSlider investigationId={inv}/>
           <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary></>},
         {anchor: 'timeline', label: 'Timeline', render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},

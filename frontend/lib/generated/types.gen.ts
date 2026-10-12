@@ -4567,6 +4567,28 @@ export type CrossReferenceOut = {
 };
 
 /**
+ * CurrencyMoneyChecksOut
+ */
+export type CurrencyMoneyChecksOut = {
+  /**
+   * Checks
+   */
+  checks: Array<MoneyCheckOut>;
+  /**
+   * Currency
+   */
+  currency: string;
+  /**
+   * Payments
+   */
+  payments: number;
+  /**
+   * Round Trips
+   */
+  round_trips: Array<RoundTripOut>;
+};
+
+/**
  * DataTableOut
  */
 export type DataTableOut = {
@@ -8186,6 +8208,10 @@ export type FinancialTransactionOut = {
    */
   amount: number;
   /**
+   * Certainty
+   */
+  certainty: 'shown' | 'not_yet_shown' | 'disputed';
+  /**
    * Currency
    */
   currency: string;
@@ -8217,6 +8243,10 @@ export type FinancialTransactionOut = {
    * Id
    */
   id: string;
+  /**
+   * Locator
+   */
+  locator?: string | null;
   /**
    * Relationship Id
    */
@@ -10413,6 +10443,82 @@ export type MissingValueOut = {
    * Status
    */
   status: 'open' | 'chasing' | 'unknowable' | 'not_needed';
+};
+
+/**
+ * MoneyCheckOut
+ *
+ * One party the money checks ask about: a lead, not a finding.
+ */
+export type MoneyCheckOut = {
+  /**
+   * Amount In
+   */
+  amount_in: number;
+  /**
+   * Amount Out
+   */
+  amount_out: number;
+  /**
+   * Gap
+   */
+  gap: number;
+  /**
+   * Innocent
+   */
+  innocent: string;
+  /**
+   * Kind
+   */
+  kind: 'grey_hole' | 'miracle' | 'black_hole';
+  /**
+   * Lead Idea
+   */
+  lead_idea: string;
+  /**
+   * Party
+   */
+  party: string;
+  /**
+   * Party Id
+   */
+  party_id: string;
+  /**
+   * Payments In
+   */
+  payments_in: number;
+  /**
+   * Payments Out
+   */
+  payments_out: number;
+};
+
+/**
+ * MoneyChecksOut
+ */
+export type MoneyChecksOut = {
+  /**
+   * As Of
+   */
+  as_of?: number | null;
+  /**
+   * Currencies
+   */
+  currencies: Array<CurrencyMoneyChecksOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Ran At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  ran_at: string;
+  /**
+   * Rule
+   */
+  rule: string;
 };
 
 /**
@@ -12990,6 +13096,48 @@ export type RetrievalSummaryOut = {
    * Total Matches
    */
   total_matches: number;
+};
+
+/**
+ * RoundTripOut
+ */
+export type RoundTripOut = {
+  /**
+   * Gap
+   */
+  gap: number;
+  /**
+   * Innocent
+   */
+  innocent: string;
+  /**
+   * Kind
+   */
+  kind: 'round_trip';
+  /**
+   * Lead Idea
+   */
+  lead_idea: string;
+  /**
+   * Party
+   */
+  party: string;
+  /**
+   * Party Id
+   */
+  party_id: string;
+  /**
+   * Path
+   */
+  path: Array<string>;
+  /**
+   * Payment Ids
+   */
+  payment_ids: Array<string>;
+  /**
+   * Returning Payment Id
+   */
+  returning_payment_id: string;
 };
 
 /**
@@ -22330,6 +22478,47 @@ export type GetRecordMarksResponses = {
 
 export type GetRecordMarksResponse =
   GetRecordMarksResponses[keyof GetRecordMarksResponses];
+
+export type GetInvestigationMoneyChecksData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * As Of
+     */
+    as_of?: number | null;
+  };
+  url: '/api/investigations/{investigation_id}/money-checks';
+};
+
+export type GetInvestigationMoneyChecksErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetInvestigationMoneyChecksError =
+  GetInvestigationMoneyChecksErrors[keyof GetInvestigationMoneyChecksErrors];
+
+export type GetInvestigationMoneyChecksResponses = {
+  /**
+   * Successful Response
+   */
+  200: MoneyChecksOut;
+};
+
+export type GetInvestigationMoneyChecksResponse =
+  GetInvestigationMoneyChecksResponses[keyof GetInvestigationMoneyChecksResponses];
 
 export type GetNotesData = {
   body?: never;

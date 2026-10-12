@@ -121,11 +121,15 @@ SEE_1 "Who controls Kestrel SA": The Wire is now See's map; SEE_1's parts go int
 - [ ] Right detail panel for a link: sentence, status, the source scan with the words lit, Open the source / Chain of Custody, its Red Flag, "How is X linked to Y?"
 - [ ] Active chips (As of end of 2019 ✕ · Lit Kestrel SA ✕ · Clear all) and the as-of time rail with histogram, "11 of 14 links held by then · 1 ended · 2 undated"
 - [ ] Arrangement switch (Who controls whom · Around a party · By kind · Linked groups · Grid) with "Chosen because…"
-SEE_2 "Where did the money go" (fixes the dead Money link and $6.87B tile):
-- [ ] Currency tabs, Columns / Flow / Ledger switch, "Traced so far" running total
-- [ ] Comes from → passes through → goes to columns; missing money drawn hatched with its arithmetic
-- [ ] Integrity checks panel: grey hole, miracle, black hole, round trip (with "none found"), each with could-be-innocent and Make a lead / Add to To check
-- [ ] Ledger strip with the €10,000 line and structuring brackets from Red Flags; ledger table with status chips and sources
+SEE_2 "Where did the money go" (12 Oct: See › Money, `features/money`, loads with the view; the dead Money link now opens it):
+- [x] Currency tabs with counts, Columns / Flow / Ledger switch, "Traced so far" running total (click a band; Esc clears)
+- [x] Comes from → passes through → goes to columns in SVG, labelled bands with the status grammar; missing money drawn as a hatched "No recorded source" ghost with its arithmetic; a round trip's latest payment drawn as a return arc (never "cannot draw")
+- [x] Integrity checks panel (backend `money_checks`, per currency, as of the year): grey hole, miracle, black hole, round trip with "none found"; each with could-be-innocent, Make a lead and the lead idea; the same icons on the parties
+- [x] Ledger strip on a time axis (log height, stated), the €10,000 line, Red Flags' structuring bracket (ML-021 now counts euros as well as dollars, per currency); ledger table with status chips and sources; J / K lights the row
+- [x] Ledger certainty is shown / not yet shown / disputed (`certainty` on each payment)
+- [ ] "Add to To check" from a money check (To check holds only an indicator's own questions; needs a backend kind)
+- [ ] Hover a band lights its ledger rows too; scroll replays the flows in date order ("drawn up to Dec 2021")
+- [ ] Top 20 flows plus "others (n)" for very large ledgers
 Timeline and Places: **no mockup in the 16 screens** — the canvas frames 4–13 exist; per Ony's rule, mockups first (backlog items: unreadable axis, raw property names, invented days; base map shipped with the app; dated place events and precision).
 
 ## 6. Check — mockups CHECK_1 (Decide) and CHECK_2 (Chain of Custody) (§06)

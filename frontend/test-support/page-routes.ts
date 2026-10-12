@@ -326,6 +326,9 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
     [`GET ${base}/red-flags`]: {investigation_id: id, rules: [], flags: [], gone: []},
     [`GET ${base}/checks`]: {investigation_id: id, items: [], gone: []},
+    // See › Money loads with the view (features/money): no payments yet.
+    [`GET ${base}/financial-flows`]: {investigation_id: id, transactions: [], incomplete: [], currencies: [], flow_type_rule: '', duplicate_rule: ''},
+    [`GET ${base}/money-checks`]: {investigation_id: id, as_of: null, ran_at: '2026-10-12T00:00:00Z', rule: '', currencies: []},
   };
 }
 

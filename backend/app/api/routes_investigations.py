@@ -32,7 +32,7 @@ from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
 from app.schemas.responses import (
     AiAnalysisCandidatesOut, AiModelFailedOut, AiOutputRejectedOut, AiReasoningRunOut, ClaimOut, ErrorOut, ConnectorFindingOut, ConnectorRunOut, CorpusSearchOut, CorpusStatusOut, DemoSeedOut, DocumentOut,
-    EvidencePoolRow, FinancialLedgerOut, GraphOut, InvestigationDeletionPreview, InvestigationDeletionResult,
+    EvidencePoolRow, FinancialLedgerOut, GraphOut, MoneyChecksOut, InvestigationDeletionPreview, InvestigationDeletionResult,
     InvestigationOut, LeadOut, LeadQueueOut, OpenAlephCorpusBindingOut, OpenAlephOperationFailureOut,
     QuestionContextOut, RelationshipOut, ReportingTaskOut, SourceOut, TimelineOut, ValidationErrorOut, file_response, upstream,
 )
@@ -57,6 +57,7 @@ from app.services.investigations import (
 )
 from app.services.demo_seed import seed_demo_investigation
 from app.services.financial_flows import investigation_financial_ledger
+from app.services.money_checks import investigation_money_checks
 from app.services.lifecycle import delete_investigation, preview_investigation_deletion
 from app.services.openaleph_corpus import (
     ensure_openaleph_collection,
@@ -411,6 +412,18 @@ def get_investigation_financial_flows(investigation_id: str, db: Session = Depen
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return investigation_financial_ledger(db, investigation_id)
+
+
+@router.get("/investigations/{investigation_id}/money-checks", response_model=MoneyChecksOut)
+def get_investigation_money_checks(
+    investigation_id: str,
+    as_of: int | None = Query(default=None, ge=1000, le=9999),
+    db: Session = Depends(get_db),
+) -> Any:
+    """Where money appears or vanishes, per currency: grey hole, miracle, black hole, round trip. Read-only."""
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return investigation_money_checks(db, investigation_id, as_of)
 
 
 @router.get("/investigations/{investigation_id}/documents", response_model=list[DocumentOut])

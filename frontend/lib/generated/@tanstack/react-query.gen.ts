@@ -112,6 +112,7 @@ import {
   getIngestionBatch,
   getInvestigationFinancialFlows,
   getInvestigationGraph,
+  getInvestigationMoneyChecks,
   getInvestigationPlaces,
   getInvestigationTimeline,
   getInvestigationType,
@@ -571,6 +572,9 @@ import type {
   GetInvestigationGraphData,
   GetInvestigationGraphError,
   GetInvestigationGraphResponse,
+  GetInvestigationMoneyChecksData,
+  GetInvestigationMoneyChecksError,
+  GetInvestigationMoneyChecksResponse,
   GetInvestigationPlacesData,
   GetInvestigationPlacesError,
   GetInvestigationPlacesResponse,
@@ -6253,6 +6257,36 @@ export const getRecordMarksOptions = (options: Options<GetRecordMarksData>) =>
       return data;
     },
     queryKey: getRecordMarksQueryKey(options),
+  });
+
+export const getInvestigationMoneyChecksQueryKey = (
+  options: Options<GetInvestigationMoneyChecksData>,
+) => createQueryKey('getInvestigationMoneyChecks', options);
+
+/**
+ * Get Investigation Money Checks
+ *
+ * Where money appears or vanishes, per currency: grey hole, miracle, black hole, round trip. Read-only.
+ */
+export const getInvestigationMoneyChecksOptions = (
+  options: Options<GetInvestigationMoneyChecksData>,
+) =>
+  queryOptions<
+    GetInvestigationMoneyChecksResponse,
+    GetInvestigationMoneyChecksError,
+    GetInvestigationMoneyChecksResponse,
+    ReturnType<typeof getInvestigationMoneyChecksQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInvestigationMoneyChecks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInvestigationMoneyChecksQueryKey(options),
   });
 
 export const getNotesQueryKey = (options: Options<GetNotesData>) =>

@@ -11921,6 +11921,40 @@
         "title": "CrossReferenceOut",
         "type": "object"
       },
+      "CurrencyMoneyChecksOut": {
+        "properties": {
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/MoneyCheckOut"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "payments": {
+            "title": "Payments",
+            "type": "integer"
+          },
+          "round_trips": {
+            "items": {
+              "$ref": "#/components/schemas/RoundTripOut"
+            },
+            "title": "Round Trips",
+            "type": "array"
+          }
+        },
+        "required": [
+          "currency",
+          "payments",
+          "checks",
+          "round_trips"
+        ],
+        "title": "CurrencyMoneyChecksOut",
+        "type": "object"
+      },
       "DataTableOut": {
         "properties": {
           "columns": {
@@ -18266,6 +18300,15 @@
             "title": "Amount",
             "type": "number"
           },
+          "certainty": {
+            "enum": [
+              "shown",
+              "not_yet_shown",
+              "disputed"
+            ],
+            "title": "Certainty",
+            "type": "string"
+          },
           "currency": {
             "title": "Currency",
             "type": "string"
@@ -18315,6 +18358,17 @@
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
           },
           "relationship_id": {
             "title": "Relationship Id",
@@ -18377,7 +18431,8 @@
           "currency",
           "evidence_count",
           "supporting_evidence_count",
-          "flowType"
+          "flowType",
+          "certainty"
         ],
         "title": "FinancialTransactionOut",
         "type": "object"
@@ -22033,6 +22088,114 @@
           "parties"
         ],
         "title": "MissingValueOut",
+        "type": "object"
+      },
+      "MoneyCheckOut": {
+        "description": "One party the money checks ask about: a lead, not a finding.",
+        "properties": {
+          "amount_in": {
+            "title": "Amount In",
+            "type": "number"
+          },
+          "amount_out": {
+            "title": "Amount Out",
+            "type": "number"
+          },
+          "gap": {
+            "title": "Gap",
+            "type": "number"
+          },
+          "innocent": {
+            "title": "Innocent",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "grey_hole",
+              "miracle",
+              "black_hole"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "lead_idea": {
+            "title": "Lead Idea",
+            "type": "string"
+          },
+          "party": {
+            "title": "Party",
+            "type": "string"
+          },
+          "party_id": {
+            "title": "Party Id",
+            "type": "string"
+          },
+          "payments_in": {
+            "title": "Payments In",
+            "type": "integer"
+          },
+          "payments_out": {
+            "title": "Payments Out",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "party_id",
+          "party",
+          "amount_in",
+          "amount_out",
+          "payments_in",
+          "payments_out",
+          "gap",
+          "innocent",
+          "lead_idea"
+        ],
+        "title": "MoneyCheckOut",
+        "type": "object"
+      },
+      "MoneyChecksOut": {
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "currencies": {
+            "items": {
+              "$ref": "#/components/schemas/CurrencyMoneyChecksOut"
+            },
+            "title": "Currencies",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "ran_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Ran At",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "ran_at",
+          "rule",
+          "currencies"
+        ],
+        "title": "MoneyChecksOut",
         "type": "object"
       },
       "MultiEnrichmentRequest": {
@@ -26243,6 +26406,66 @@
           "confirm"
         ],
         "title": "RolesIn",
+        "type": "object"
+      },
+      "RoundTripOut": {
+        "properties": {
+          "gap": {
+            "title": "Gap",
+            "type": "number"
+          },
+          "innocent": {
+            "title": "Innocent",
+            "type": "string"
+          },
+          "kind": {
+            "const": "round_trip",
+            "title": "Kind",
+            "type": "string"
+          },
+          "lead_idea": {
+            "title": "Lead Idea",
+            "type": "string"
+          },
+          "party": {
+            "title": "Party",
+            "type": "string"
+          },
+          "party_id": {
+            "title": "Party Id",
+            "type": "string"
+          },
+          "path": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Path",
+            "type": "array"
+          },
+          "payment_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Payment Ids",
+            "type": "array"
+          },
+          "returning_payment_id": {
+            "title": "Returning Payment Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "party_id",
+          "party",
+          "path",
+          "payment_ids",
+          "returning_payment_id",
+          "gap",
+          "innocent",
+          "lead_idea"
+        ],
+        "title": "RoundTripOut",
         "type": "object"
       },
       "RuleOut": {
@@ -48378,6 +48601,74 @@
           }
         },
         "summary": "Get Record Marks"
+      }
+    },
+    "/api/investigations/{investigation_id}/money-checks": {
+      "get": {
+        "description": "Where money appears or vanishes, per currency: grey hole, miracle, black hole, round trip. Read-only.",
+        "operationId": "get_investigation_money_checks",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "as_of",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 9999,
+                  "minimum": 1000,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoneyChecksOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Investigation Money Checks"
       }
     },
     "/api/investigations/{investigation_id}/notes": {

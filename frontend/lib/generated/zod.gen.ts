@@ -3220,6 +3220,7 @@ export const zExtractionReviewOut = z.object({
  */
 export const zFinancialTransactionOut = z.object({
   amount: z.number(),
+  certainty: z.enum(['shown', 'not_yet_shown', 'disputed']),
   currency: z.string(),
   dateTime: z.string().nullish(),
   evidence: z.string().nullish(),
@@ -3228,6 +3229,7 @@ export const zFinancialTransactionOut = z.object({
   from: z.string(),
   from_entity_id: z.string(),
   id: z.string(),
+  locator: z.string().nullish(),
   relationship_id: z.string(),
   statedPurpose: z.string().nullish(),
   status: z.string().nullish(),
@@ -4294,6 +4296,24 @@ export const zMissingValueOut = z.object({
   rule: z.string(),
   rule_name: z.string(),
   status: z.enum(['open', 'chasing', 'unknowable', 'not_needed']),
+});
+
+/**
+ * MoneyCheckOut
+ *
+ * One party the money checks ask about: a lead, not a finding.
+ */
+export const zMoneyCheckOut = z.object({
+  amount_in: z.number(),
+  amount_out: z.number(),
+  gap: z.number(),
+  innocent: z.string(),
+  kind: z.enum(['grey_hole', 'miracle', 'black_hole']),
+  lead_idea: z.string(),
+  party: z.string(),
+  party_id: z.string(),
+  payments_in: z.number().int(),
+  payments_out: z.number().int(),
 });
 
 /**
@@ -5500,6 +5520,46 @@ export const zQuestionContextOut = z.object({
   reasoning_contract: z.record(z.boolean()),
   retrieval: zRetrievalSummaryOut,
   warnings: z.array(z.string()),
+});
+
+/**
+ * RoundTripOut
+ */
+export const zRoundTripOut = z.object({
+  gap: z.number(),
+  innocent: z.string(),
+  kind: z.literal('round_trip'),
+  lead_idea: z.string(),
+  party: z.string(),
+  party_id: z.string(),
+  path: z.array(z.string()),
+  payment_ids: z.array(z.string()),
+  returning_payment_id: z.string(),
+});
+
+/**
+ * CurrencyMoneyChecksOut
+ */
+export const zCurrencyMoneyChecksOut = z.object({
+  checks: z.array(zMoneyCheckOut),
+  currency: z.string(),
+  payments: z.number().int(),
+  round_trips: z.array(zRoundTripOut),
+});
+
+/**
+ * MoneyChecksOut
+ */
+export const zMoneyChecksOut = z.object({
+  as_of: z.number().int().nullish(),
+  currencies: z.array(zCurrencyMoneyChecksOut),
+  investigation_id: z.string(),
+  ran_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  rule: z.string(),
 });
 
 /**
@@ -9415,6 +9475,19 @@ export const zGetRecordMarksQuery = z.object({
  * Successful Response
  */
 export const zGetRecordMarksResponse = zRecordMarksOut;
+
+export const zGetInvestigationMoneyChecksPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetInvestigationMoneyChecksQuery = z.object({
+  as_of: z.number().int().gte(1000).lte(9999).nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetInvestigationMoneyChecksResponse = zMoneyChecksOut;
 
 export const zGetNotesPath = z.object({
   investigation_id: z.string(),

@@ -4,8 +4,8 @@
 // entity by hand, adds a relationship (with the Payment properties the
 // money-flow ledger reads), filters the drawing by schema, shows reviewed
 // duplicate edges collapsed to the reporter-preferred record (or expanded),
-// opens one relationship's evidence and assessments, lists every edge, and
-// holds the money flows. Moved out of app/page.tsx (Foundation Fixes fix
+// opens one relationship's evidence and assessments and lists every edge (the
+// money flows are See › Money, features/money). Moved out of app/page.tsx (Foundation Fixes fix
 // 3); the calls and their reply checks are generated from the API schema
 // (fix 2). The graph, the entities and the evidence pool are queries keyed
 // by the investigation; saving a relationship or an entity marks the
@@ -22,7 +22,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Table, TableBody, TableCell, TableRow} from '@/components/ui/table';
 import type {EntityFormSubmitPayload} from '../../components/entity-form';
 import {
-  getInvestigationFinancialFlowsQueryKey, getInvestigationGraphOptions, getInvestigationGraphQueryKey, listEntitiesOptions, listEntitiesQueryKey,
+  getInvestigationFinancialFlowsQueryKey, getInvestigationMoneyChecksQueryKey, getInvestigationGraphOptions, getInvestigationGraphQueryKey, listEntitiesOptions, listEntitiesQueryKey,
   getAllRecordTagsOptions, getRedFlagsOptions, listInvestigationEvidenceOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {createCanonicalRelationship, createEntity} from '../../lib/generated/sdk.gen';
@@ -31,7 +31,6 @@ import {reportPayloadError} from '../../lib/report-error';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {Graph, withEnds} from './graph';
 import type {GraphEdge} from './graph';
-import {MoneyFlows} from './money-flows';
 import {RelationshipDetail} from './relationship-detail';
 
 // The entity form is loaded on demand so it stays out of the page's first load.
@@ -65,7 +64,6 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
   const [payCurrency, setPayCurrency] = useState('');
   const [payDate, setPayDate] = useState('');
   const [payPurpose, setPayPurpose] = useState('');
-  const [ledgerWanted, setLedgerWanted] = useState(false);
 
   const enabled = Boolean(investigationId);
   const path = {investigation_id: investigationId};
@@ -95,7 +93,7 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
   // A new case starts with nothing opened, no ledger asked for, and its own
   // schema filter (set from its graph below; it used to keep the last case's,
   // which could hide every relationship of the new one).
-  useEffect(() => { setEdge(null); setLedgerWanted(false); }, [investigationId]);
+  useEffect(() => { setEdge(null); }, [investigationId]);
 
   // The form's endpoints follow the entity list: the first two entities
   // unless the chosen ones are still listed.
@@ -154,7 +152,8 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
       setRelRole(''); setPayAmount(''); setPayCurrency(''); setPayDate(''); setPayPurpose('');
       await reloadGraph();
       await reloadEntities();
-      if (relSchema === 'Payment') await queryClient.invalidateQueries({queryKey: getInvestigationFinancialFlowsQueryKey({path})});
+      if (relSchema === 'Payment') await Promise.all([queryClient.invalidateQueries({queryKey: getInvestigationFinancialFlowsQueryKey({path})}),
+        queryClient.invalidateQueries({queryKey: getInvestigationMoneyChecksQueryKey({path})})]);
     } catch (error) {
       reportPayloadError(error);
     }
@@ -218,6 +217,5 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
         </TableRow>)}
       </TableBody></Table>}
     </div>
-    <MoneyFlows investigationId={investigationId} wanted={ledgerWanted} onLoad={() => setLedgerWanted(true)}/>
   </section>;
 }

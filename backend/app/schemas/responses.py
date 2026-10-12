@@ -2566,6 +2566,8 @@ class FinancialTransactionOut(ResponseModel):
     supporting_evidence_count: int
     status: str | None = None
     flowType: Literal["direct", "inferred"]
+    certainty: Literal["shown", "not_yet_shown", "disputed"]
+    locator: str | None = None
 
 
 class IncompleteTransactionOut(ResponseModel):
@@ -2599,6 +2601,47 @@ class FinancialLedgerOut(ResponseModel):
     currencies: list[str]
     flow_type_rule: str
     duplicate_rule: str
+
+
+class MoneyCheckOut(ResponseModel):
+    """One party the money checks ask about: a lead, not a finding."""
+    kind: Literal["grey_hole", "miracle", "black_hole"]
+    party_id: str
+    party: str
+    amount_in: float
+    amount_out: float
+    payments_in: int
+    payments_out: int
+    gap: float
+    innocent: str
+    lead_idea: str
+
+
+class RoundTripOut(ResponseModel):
+    kind: Literal["round_trip"]
+    party_id: str
+    party: str
+    path: list[str]
+    payment_ids: list[str]
+    returning_payment_id: str
+    gap: float
+    innocent: str
+    lead_idea: str
+
+
+class CurrencyMoneyChecksOut(ResponseModel):
+    currency: str
+    payments: int
+    checks: list[MoneyCheckOut]
+    round_trips: list[RoundTripOut]
+
+
+class MoneyChecksOut(ResponseModel):
+    investigation_id: str
+    as_of: int | None = None
+    ran_at: Timestamp
+    rule: str
+    currencies: list[CurrencyMoneyChecksOut]
 
 
 # --- Settings, credentials and the security audit ------------------------------------------

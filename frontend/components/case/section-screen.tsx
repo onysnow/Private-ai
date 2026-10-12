@@ -31,7 +31,8 @@ export function SectionScreen({stage, investigationName, sections, active = true
   stage: StageKey; investigationName: string; sections: Section[]; active?: boolean;
 }): ReactElement {
   const s = STAGES.find(x => x.key === stage)!;
-  const [current, setCurrent] = useState<string>(() => fromHash(sections) ?? sections[0].anchor);
+  // The first render matches the server's (which cannot see the address's #); the effect below then opens the asked-for section.
+  const [current, setCurrent] = useState<string>(sections[0].anchor);
   const [opened, setOpened] = useState<Set<string>>(() => new Set([current]));
 
   const open = useCallback((anchor: string, write = true) => {

@@ -5,7 +5,7 @@
 // manual entity form, the link filters, the duplicate-edge toggle, the
 // drawing (the React Flow network replaced by a DOM stub),
 // one opened relationship with its evidence attached and assessed, the
-// relationship list, the money flows, and the requests other panels make
+// relationship list, and the requests other panels make
 // through the shared store.
 import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -21,9 +21,8 @@ import {mockApi} from '../test-support/mock-api';
 import type {RouteCall, Routes} from '../test-support/mock-api';
 import {emptyGraph, entityFixture, leadQueueBody, relationshipFixture} from '../test-support/page-routes';
 
-const {sankeySpy} = vi.hoisted(() => ({sankeySpy: vi.fn()}));
 vi.mock('../components/charts/financial-flow-sankey', () => ({
-  FinancialFlowSankey: (props: Record<string, unknown>) => { sankeySpy(props); return <div data-testid="sankey-stub"/>; },
+  FinancialFlowSankey: () => <div data-testid="sankey-stub"/>,
 }));
 // The SVG network (React Flow) is replaced by a DOM stub that lists what it is handed.
 vi.mock('../components/network/network-view', () => ({
@@ -97,7 +96,7 @@ describe('RelationshipGraphPanel', () => {
     expect(screen.getByRole('button', {name: 'Add relationship'})).toBeDisabled();
   });
 
-  it('sends the Payment properties and the chosen evidence, and marks the money flows stale', async () => {
+  it('sends the Payment properties and the chosen evidence, and marks the graph stale', async () => {
     const api = await renderPanel({[RELATIONSHIPS]: relationshipFixture({id: 'rel-2', schema: 'Payment'})}, {evidence: [poolRow]});
     await waitFor(() => expect(screen.getByRole('button', {name: 'Add relationship'})).toBeEnabled());
     const user = userEvent.setup();
@@ -312,39 +311,7 @@ describe('RelationshipGraphPanel', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
-  it('loads the money-flow ledger on demand, charts complete payments only, and reloads on request', async () => {
-    const ledger = 'GET /api/investigations/inv-1/financial-flows';
-    const row = {
-      id: 'rel-9', relationship_id: 'rel-9', dateTime: '2024-03-02', from: 'Kestrelwood Holdings Ltd', to: 'Jane Doe', from_entity_id: 'ent-1', to_entity_id: 'ent-2',
-      amount: 1250.5, currency: 'USD', statedPurpose: 'consulting', transactionNumber: null, evidence: 'p.2 [supports]', evidence_count: 1, supporting_evidence_count: 1,
-      status: 'no_claim_dependency', flowType: 'direct',
-    };
-    const api = await renderPanel({[ledger]: {
-      investigation_id: 'inv-1', transactions: [row], incomplete: [{...row, id: 'rel-10', relationship_id: 'rel-10', amount: null, flowType: 'inferred', problems: ['amount missing']}],
-      currencies: ['USD'], flow_type_rule: 'direct = supporting reviewed evidence', duplicate_rule: 'reviewed duplicates once',
-    }});
-    expect(api.calls(ledger)).toHaveLength(0);
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Load money flows'}));
-
-    const panel = await screen.findByTestId('money-flows');
-    expect(panel).toHaveTextContent('1,250.5 USD');
-    expect(panel).toHaveTextContent('Not charted (1)');
-    expect(panel).toHaveTextContent('amount missing');
-    await screen.findByTestId('sankey-stub');
-    const props = sankeySpy.mock.calls.at(-1)?.[0] as {transactions: Array<{id: string}>};
-    expect(props.transactions).toEqual([expect.objectContaining({id: 'rel-9', amount: 1250.5, currency: 'USD', flowType: 'direct'})]);
-
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Reload money flows'}));
-    await waitFor(() => expect(api.calls(ledger)).toHaveLength(2));
-  });
-
-  it('shows the reason when the ledger cannot be loaded', async () => {
-    await renderPanel({'GET /api/investigations/inv-1/financial-flows': {status: 500, body: {detail: 'ledger unavailable'}}});
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Load money flows'}));
-    await screen.findByText(/ledger unavailable/);
-  });
-
-  it('closes the opened relationship and forgets the ledger when the case changes', async () => {
+  it('closes the opened relationship when the case changes', async () => {
     const api = await renderPanel({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}, 'GET /api/investigations/inv-2/entities': [], 'GET /api/investigations/inv-2/graph': emptyGraph(), 'GET /api/investigations/inv-2/evidence': []}, {edges: [relationshipFixture()]});
     await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Kestrelwood Holdings Ltd → Jane Doe');
@@ -354,6 +321,5 @@ describe('RelationshipGraphPanel', () => {
     await waitFor(() => expect(api.calls('GET /api/investigations/inv-2/graph')).toHaveLength(1));
     expect(screen.queryByText('Kestrelwood Holdings Ltd → Jane Doe')).not.toBeInTheDocument();
     expect(screen.getByText('No canonical relationships yet.')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Load money flows'})).toBeInTheDocument();
   });
 });
