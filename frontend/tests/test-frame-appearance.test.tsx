@@ -134,6 +134,24 @@ describe('AppFrame', () => {
     expect(push).toHaveBeenCalledWith('/act#red-flags');
   });
 
+  it('opens edges with Alt and an arrow, pins one on this computer, and lists where you have been', async () => {
+    render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
+    const left = document.getElementById('fr-left')!;
+    expect(screen.getByText('Steps and pages', {selector: '.fr-hint'})).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'ArrowRight', altKey: true});
+    expect(left).toHaveClass('open');
+    expect(screen.queryByText('Steps and pages', {selector: '.fr-hint'})).not.toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'ArrowLeft', altKey: true});
+    expect(left).not.toHaveClass('open');
+    fireEvent.keyDown(window, {key: '['});
+    const user = userEvent.setup();
+    await user.click(within(left).getByRole('button', {name: 'Pin'}));
+    expect(JSON.parse(window.localStorage.getItem('pai:edge-pins')!)).toEqual({left: true, top: false});
+    fireEvent.keyDown(window, {key: 'Escape'});
+    expect(left).toHaveClass('open');
+    expect(window.localStorage.getItem('pai:trail')).toContain('Settings');
+  });
+
   it('switches case with ⌘O, and Hide screen covers everything until asked back', async () => {
     connectGeneratedClient(new ApiClient('http://api.test'));
     mockApi({'GET /api/investigations': [

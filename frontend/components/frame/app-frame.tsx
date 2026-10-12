@@ -25,7 +25,31 @@ import {getStandingOptions, listInvestigationsOptions} from '../../lib/generated
 /** Any screen can ask the frame to open the case switcher. */
 export const SWITCH_CASE_EVENT = 'pai:switch-case';
 
-const DWELL_MS = 260;
+const DWELL_MS = 250;
+const PIN_KEY = 'pai:edge-pins';
+const LEARNED_KEY = 'pai:edges-learned';
+const TRAIL_KEY = 'pai:trail';
+
+type Pins = {left: boolean; top: boolean};
+function readPins(): Pins {
+  try { const v = JSON.parse(window.localStorage.getItem(PIN_KEY) ?? '{}') as Partial<Pins>; return {left: v.left === true, top: v.top === true}; }
+  catch { return {left: false, top: false}; }
+}
+function writePins(p: Pins): void { try { window.localStorage.setItem(PIN_KEY, JSON.stringify(p)); } catch { /* private window */ } }
+function learned(): boolean { try { return window.localStorage.getItem(LEARNED_KEY) === '1'; } catch { return true; } }
+function markLearned(): void { try { window.localStorage.setItem(LEARNED_KEY, '1'); } catch { /* private window */ } }
+
+/** The last five places, newest first: a place is its address and the trail's words for it. */
+type Place = {href: string; label: string};
+function readPlaces(): Place[] {
+  try { const v = JSON.parse(window.localStorage.getItem(TRAIL_KEY) ?? '[]') as Place[]; return Array.isArray(v) ? v.filter(p => p && typeof p.href === 'string').slice(0, 5) : []; }
+  catch { return []; }
+}
+function rememberPlace(place: Place): Place[] {
+  const next = [place, ...readPlaces().filter(p => p.href !== place.href)].slice(0, 5);
+  try { window.localStorage.setItem(TRAIL_KEY, JSON.stringify(next)); } catch { /* private window */ }
+  return next;
+}
 const EDGE_PX = 6;
 
 const PAGES: {label: string; href: string; hint: string}[] = [
@@ -85,7 +109,7 @@ function useTrail(): {label: string; href?: string}[] {
 }
 
 /** An edge that opens after the pointer rests at it, on its handle, or by key; closes on Escape or when the pointer leaves. */
-function useEdge(key: string, atEdge: (e: PointerEvent) => boolean) {
+function useEdge(key: string, atEdge: (e: PointerEvent) => boolean, altOpen: string, altClose: string) {
   const [open, setOpen] = useState(false);
   const timer = useRef<number | null>(null);
   useEffect(() => {
@@ -100,11 +124,13 @@ function useEdge(key: string, atEdge: (e: PointerEvent) => boolean) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
       if (e.key === key && !e.metaKey && !e.ctrlKey && !e.altKey && !typing(e.target) && singleKeysOn()) { e.preventDefault(); setOpen(o => !o); }
+      // Alt and an arrow: towards the middle opens the edge, towards the edge closes it.
+      if (e.altKey && !e.metaKey && !e.ctrlKey && !typing(e.target) && (e.key === altOpen || e.key === altClose)) { e.preventDefault(); setOpen(e.key === altOpen); }
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('keydown', onKey);
     return () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('keydown', onKey); if (timer.current) window.clearTimeout(timer.current); };
-  }, [key, atEdge]);
+  }, [key, atEdge, altOpen, altClose]);
   return [open, setOpen] as const;
 }
 
@@ -171,6 +197,7 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
 
 function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open: boolean) => void}): ReactElement {
   const rows: [string, string][] = [['⌘K / Ctrl K', 'Search the case, or go anywhere'], ['⌘O / Ctrl O', 'Switch case'], ['⌘⇧H / Ctrl Shift H', 'Hide the screen'], ['[', 'Open or close the steps (left edge)'], [']', 'Open or close the tools (top edge)'],
+    ['Alt →  /  Alt ←', 'Open or close the steps'], ['Alt ↓  /  Alt ↑', 'Open or close the tools'],
     ['?', 'This list'], ['Esc', 'Close what is open']];
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="fr-help">
@@ -245,8 +272,22 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   const trail = useTrail();
   const leftAt = useCallback((e: PointerEvent) => e.clientX <= EDGE_PX, []);
   const topAt = useCallback((e: PointerEvent) => e.clientY <= EDGE_PX, []);
-  const [left, setLeft] = useEdge('[', leftAt);
-  const [top, setTop] = useEdge(']', topAt);
+  const [leftOpen, setLeft] = useEdge('[', leftAt, 'ArrowRight', 'ArrowLeft');
+  const [topOpen, setTop] = useEdge(']', topAt, 'ArrowDown', 'ArrowUp');
+  const [pins, setPins] = useState<Pins>({left: false, top: false});
+  const [fresh, setFresh] = useState(false);
+  const [places, setPlaces] = useState<Place[]>([]);
+  useEffect(() => { setPins(readPins()); setFresh(!learned()); setPlaces(readPlaces()); }, []);
+  const left = leftOpen || pins.left;
+  const top = topOpen || pins.top;
+  useEffect(() => { if ((leftOpen || topOpen) && fresh) { markLearned(); setFresh(false); } }, [leftOpen, topOpen, fresh]);
+  const pin = (edge: keyof Pins) => setPins(p => { const next = {...p, [edge]: !p[edge]}; writePins(next); return next; });
+  // Where you have been: every place the breadcrumb names, newest first.
+  const trailLabel = trail.map(t => t.label).join(' › ');
+  useEffect(() => {
+    if (!trailLabel || typeof window === 'undefined') return;
+    setPlaces(rememberPlace({href: `${window.location.pathname}${window.location.search}${window.location.hash}`, label: trailLabel}));
+  }, [trailLabel]);
   const [palette, setPalette] = useState(false);
   const [help, setHelp] = useState(false);
   const [cases, setCases] = useState(false);
@@ -268,7 +309,7 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   // Re-apply the kept (or tried) appearance after every navigation, in case anything reset <html>'s attributes.
   useEffect(() => { applyAppearance(); }, [pathname]);
 
-  return <div className="fr">
+  return <div className={`fr${pins.left ? ' pin-left' : ''}${pins.top ? ' pin-top' : ''}`}>
     <a href="#fr-main" className="fr-skip">Skip to the content</a>
     <nav className="fr-crumbs" aria-label="You are here">
       <button type="button" className="fr-crumb-home" onClick={() => setLeft(o => !o)} aria-expanded={left} aria-controls="fr-left" title="Steps and pages ( [ )">
@@ -280,8 +321,15 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
 
     {/* Left edge: where to go. */}
     <button type="button" className={`fr-handle fr-handle-left${left ? ' on' : ''}`} aria-label="Open steps and pages" aria-expanded={left} aria-controls="fr-left" onClick={() => setLeft(o => !o)}/>
+    {fresh && !left && <span className="fr-hint fr-hint-left" aria-hidden="true">Steps and pages <kbd>[</kbd></span>}
+    {fresh && !top && <span className="fr-hint fr-hint-top" aria-hidden="true">Tools <kbd>]</kbd></span>}
     <aside id="fr-left" className={`fr-left${left ? ' open' : ''}`} aria-label="Steps and pages" aria-hidden={!left} onMouseLeave={() => setLeft(false)} inert={!left ? true : undefined}>
-      <div className="fr-left-head"><b>Journalism Workbench</b><button type="button" className="fr-x" onClick={() => setLeft(false)} aria-label="Close">×</button></div>
+      <div className="fr-left-head"><b>Journalism Workbench</b>
+        <span><button type="button" className={`fr-pin${pins.left ? ' on' : ''}`} aria-pressed={pins.left} onClick={() => pin('left')}
+          title={pins.left ? 'Let it hide again' : 'Keep it open on this computer'}>{pins.left ? 'Pinned' : 'Pin'}</button>
+        <button type="button" className="fr-x" onClick={() => { setLeft(false); if (pins.left) pin('left'); }} aria-label="Close">×</button></span></div>
+      {places.length > 1 && <div className="fr-places"><p>Where you have been</p>
+        <ul>{places.slice(1).map(p => <li key={p.href}><Link href={p.href}>{p.label}</Link></li>)}</ul></div>}
       <ul className="fr-pages">{PAGES.map(p => <li key={p.href}><Link href={caseHref(p.href)} className={pathname === p.href ? 'on' : ''} aria-current={pathname === p.href ? 'page' : undefined}>{p.label}</Link></li>)}</ul>
       <div className="fr-steps">
         {STAGES.map(s => <div key={s.key} className="fr-step">
@@ -301,6 +349,8 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
       <Link href="/settings" className="fr-tool" aria-label="Settings" title="Settings"><span aria-hidden="true">⚙</span></Link>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setHelp(true); }}>Keys <kbd>?</kbd></button>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setHidden(true); }} title="Cover the screen at once (⌘⇧H)">Hide screen</button>
+      <button type="button" className={`fr-tool fr-pin${pins.top ? ' on' : ''}`} aria-pressed={pins.top} onClick={() => pin('top')}
+        title={pins.top ? 'Let it hide again' : 'Keep it open on this computer'}>{pins.top ? 'Pinned' : 'Pin'}</button>
     </div>
 
     <div id="fr-main" className="fr-main">{children}</div>
