@@ -23,7 +23,7 @@ const doc = {
 };
 const start = TEXT.indexOf('Fernhill Ltd');
 const name = {id: 'x1', investigation_id: 'inv-1', document_id: 'd1', chunk_id: 'c1', candidate_type: 'entity', confidence: 0.9, review_status: 'proposed',
-  payload: {caption: 'Fernhill Ltd', suggested_schema: 'Company', span: {start_char: start, end_char: start + 12}}, created_at: '2026-10-12T00:00:00'};
+  payload: {caption: 'Fernhill Ltd', suggested_schema: 'Company', span: {start_char: start, end_char: start + 12}, rationale: {rule: 'capitalized_name_sequence'}}, created_at: '2026-10-12T00:00:00'};
 
 function routes(extra = {}) {
   return mockApi({
@@ -31,6 +31,9 @@ function routes(extra = {}) {
     'GET /api/documents/d1/candidates': [name],
     'GET /api/investigations/inv-1/documents': [doc],
     'GET /api/investigations/inv-1/tags': {investigation_id: 'inv-1', colours: [], tags: []},
+    'GET /api/investigations': [],
+    'GET /api/extraction-candidates/x1/entity-matches': {candidate_id: 'x1', caption: 'Fernhill Ltd', schema: 'Company', matches: [], strong_match: null,
+      provider_lead: null, identity_rule: 'same name'},
     ...extra,
   });
 }
@@ -56,17 +59,43 @@ describe('reading room helpers', () => {
 });
 
 describe('ReadingRoom', () => {
-  it('marks what was found and answers a proposal with 1', async () => {
+  it('marks what was found, accepts a proposal with A after a moment to undo it, and sends it on closing', async () => {
     const api = routes({'POST /api/extraction-candidates/x1/review': {candidate: {...name, review_status: 'accepted'}, record: null}});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
     const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
     expect(await within(room).findByText('Fernhill Ltd', {selector: '.rr-span'})).toBeInTheDocument();
-    expect(within(room).getByRole('button', {name: /^4/})).toHaveAttribute('aria-current', 'true');
+    expect(within(room).getByRole('button', {name: /^Page 4/})).toHaveAttribute('aria-current', 'true');
     const card = within(room).getByRole('article', {name: 'Name: Fernhill Ltd'});
+    expect(within(card).getByText('Name-finder (rules) · p.4 ¶1')).toBeInTheDocument();
+    expect(within(card).getByText('High')).toBeInTheDocument();
+    await waitFor(() => expect(within(card).getByRole('button', {name: /Accept/})).toBeEnabled());
     await userEvent.setup().click(card);
-    fireEvent.keyDown(window, {key: '1'});
+    fireEvent.keyDown(window, {key: 'a'});
+    expect(await within(card).findByText(/saved in a moment/)).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'u'});
+    expect(within(card).getByRole('button', {name: /Accept/})).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'a'});
+    expect(api.calls('POST /api/extraction-candidates/x1/review')).toHaveLength(0);
+    fireEvent.keyDown(window, {key: 'Escape'});
     await waitFor(() => expect(api.calls('POST /api/extraction-candidates/x1/review')).toHaveLength(1));
     expect(api.lastBody('POST /api/extraction-candidates/x1/review')).toEqual({decision: 'accept', entity_schema: 'Company'});
+  });
+
+  it('waits for the answer to its question before a name can be accepted', async () => {
+    const unsure = {...name, confidence: 0.4, payload: {...name.payload, schema_choices: ['Person', 'Organization', 'Company']}};
+    const api = routes({'GET /api/documents/d1/candidates': [unsure], 'POST /api/extraction-candidates/x1/review': {candidate: {...unsure, review_status: 'accepted'}, record: null}});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const card = await screen.findByRole('article', {name: 'Name: Fernhill Ltd'});
+    expect(within(card).getByText('Low')).toBeInTheDocument();
+    expect(within(card).getByRole('button', {name: /Accept/})).toBeDisabled();
+    expect(within(card).getByText('Answer the question first')).toBeInTheDocument();
+    await userEvent.setup().click(card);
+    fireEvent.keyDown(window, {key: '3'});
+    expect(within(card).getByRole('button', {name: /Company/})).toHaveAttribute('aria-pressed', 'true');
+    await waitFor(() => expect(within(card).getByRole('button', {name: /Accept/})).toBeEnabled());
+    fireEvent.keyDown(window, {key: 'a'});
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(api.lastBody('POST /api/extraction-candidates/x1/review')).toMatchObject({decision: 'accept', entity_schema: 'Company'}));
   });
 
   it('keeps selected words as evidence and shows the clip', async () => {
@@ -84,7 +113,7 @@ describe('ReadingRoom', () => {
     fireEvent.mouseUp(passage);
     expect(await screen.findByRole('toolbar', {name: 'Keep the selected words'})).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'e'});
-    const clip = await screen.findByRole('complementary', {name: 'Evidence clip'});
+    const clip = await screen.findByRole('region', {name: 'Evidence clip'});
     expect(within(clip).getByText('bought on behalf', {selector: 'mark'})).toBeInTheDocument();
     expect(within(clip).getByText(/the words are in the stored text/)).toBeInTheDocument();
     expect(api.lastBody('POST /api/evidence')).toEqual({source_id: 'src-1', quote: 'bought on behalf', locator: 'page 4', document_id: 'd1'});

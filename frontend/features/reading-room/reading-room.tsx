@@ -1,11 +1,16 @@
 'use client';
-// The reading room (Bring in; mockup INTAKE_2): one document read calmly, its pages in a
-// strip with marks where something was found, the text in a narrow serif column, and in
-// the margin each proposal beside the words it came from. Select words to keep them:
-// E evidence, C a claim, N a name, X something to check, T a tag. A proposal is answered
-// with 1 (keep), 2 (not useful) or 3 (later). Evidence kept here shows its clip: the
-// quote with 32 characters either side, the file's fingerprint and where it is, checked
-// against the stored text.
+// The reading room (Bring in; mockup INTAKE_2, research §6–8): one document read calmly,
+// a page at a time. On the left a strip of its pages, drawn, with a mark for each page that
+// still asks for a decision; in the middle the page's text in a narrow serif column, each
+// passage numbered (¶) and what was found underlined, dashed while it waits (no fill over
+// the words); on the right the page's proposals, each saying who proposed it and how sure,
+// with the one question it needs answered inside it (what kind of name, already in the
+// case, whose address) before it can be accepted. A leader line joins the chosen card to
+// its words. Select words to keep them: E evidence, C a claim, N a name, X to check, T a
+// tag, from a bar at the selection. J and K move between proposals, A accepts, R rejects,
+// 1–4 answer the card's question, U undoes the last decision (each waits 6 s before it is
+// sent). Evidence kept here shows its clip: the quote with 32 characters either side, the
+// file's fingerprint and where it is, checked against the stored text.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
@@ -13,7 +18,8 @@ import type {ReactElement, ReactNode} from 'react';
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
 import {
-  getDocumentOptions, getExtractionCandidateExplanationOptions, getTagsOptions, listDocumentCandidatesEndpointOptions, listDocumentsOptions,
+  getDocumentOptions, getExtractionCandidateExplanationOptions, getExtractionEntityMatchesOptions, getIdentifierTargetsOptions, getTagsOptions,
+  listDocumentCandidatesEndpointOptions, listDocumentsOptions, listInvestigationsOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {
   createClaimEndpoint, createEntity, createEvidenceEndpoint, createLeadEndpoint, linkClaimEvidenceEndpoint, reviewExtractionCandidate, tagARecord,
@@ -21,15 +27,25 @@ import {
 import type {DocumentChunkOut, DocumentDetailOut, ExtractionCandidateOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {PagePicture} from '../case-home/decision-card';
+import {confidenceBand} from '../documents/confidence';
 import {DocumentTranslation} from '../documents/document-translation';
+import {needsSchemaAnswer} from '../documents/schema-question';
+import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/entity-identity';
 
 type Tab = 'text' | 'original' | 'translation' | 'details';
 type Span = {start: number; end: number; id: string; kind: string; status: string; primary: boolean};
-type Picked = {chunk: DocumentChunkOut; start: number; end: number; quote: string};
-export type Clip = {quote: string; before: string; after: string; fingerprint: string; anchor: string; checked: boolean};
+type Picked = {chunk: DocumentChunkOut; start: number; end: number; quote: string; x: number; y: number};
+export type Clip = {quote: string; before: string; after: string; fingerprint: string; anchor: string; checked: boolean; page: number | null; evidenceId: string};
+type Answer = {schema?: string; identity?: IdentityChoice; owner?: string};
+type Held = {c: ExtractionCandidateOut; decision: 'accept' | 'reject'; body: Record<string, unknown>; until: number};
 
 const CLIP_CONTEXT = 32;
-const KIND_WORD: Record<string, string> = {entity: 'Name', claim: 'Claim', evidence: 'Evidence', relationship: 'Link', event: 'Date', identifier: 'Identifier'};
+const HOLD_MS = 6000;
+const KIND_WORD: Record<string, string> = {entity: 'Name', claim: 'Claim', evidence: 'Quote', relationship: 'Link', event: 'Date', identifier: 'Email address'};
+const PROPOSER: Record<string, string> = {capitalized_name_sequence: 'Name-finder (rules)', sentence_assertion: 'Claim-finder (rules)', whole_chunk: 'Passage (whole)',
+  openaleph_ingest_file: 'OpenAleph', openaleph_ftm_analyze: 'OpenAleph', column_mapping: 'Column mapping', reporter_staged: 'You'};
+const SCHEMA_WORD: Record<string, string> = {Person: 'Person', Company: 'Company', Organization: 'Organisation', LegalEntity: 'Not sure'};
 
 function typing(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null;
@@ -47,10 +63,31 @@ export function proposalText(c: ExtractionCandidateOut): string {
   return String(p.caption ?? p.text ?? p.quote ?? p.value ?? p.title ?? c.candidate_type);
 }
 
+/** Who proposed it, in a reporter's words (research §1: "Name-finder (rules)", "OpenAleph", "You"). */
+export function proposerOf(c: ExtractionCandidateOut): string {
+  const rule = String(((c.payload as {rationale?: {rule?: string}}).rationale ?? {}).rule ?? '');
+  return PROPOSER[rule] ?? (rule.startsWith('openaleph') ? 'OpenAleph' : 'The reader');
+}
+
+/** The schema choices a name's question offers, in the order the payload lists them. */
+export function schemaChoices(c: ExtractionCandidateOut): string[] {
+  const listed = (c.payload as {schema_choices?: unknown}).schema_choices;
+  const base = Array.isArray(listed) && listed.every(x => typeof x === 'string') && listed.length ? listed as string[] : ['Person', 'Company', 'Organization'];
+  return [...new Set([...base, 'LegalEntity'])].slice(0, 4);
+}
+
+/** Whether a proposal still waits for an answer before it can be accepted, and which. */
+export function openQuestion(c: ExtractionCandidateOut, a: Answer, strongMatch: boolean): 'schema' | 'identity' | 'owner' | null {
+  if (c.candidate_type === 'entity' && needsSchemaAnswer(c) && !a.schema) return 'schema';
+  if (c.candidate_type === 'entity' && strongMatch && !a.identity) return 'identity';
+  if (c.candidate_type === 'identifier' && !a.owner) return 'owner';
+  return null;
+}
+
 /** The words kept as evidence, with their surroundings, checked against the stored text. */
-export function clipOf(chunk: {text: string; locator: string}, start: number, end: number, quote: string, fingerprint: string): Clip {
+export function clipOf(chunk: {text: string; locator: string; page_number?: number | null}, start: number, end: number, quote: string, fingerprint: string, evidenceId = ''): Clip {
   return {quote, before: chunk.text.slice(Math.max(0, start - CLIP_CONTEXT), start), after: chunk.text.slice(end, end + CLIP_CONTEXT),
-    fingerprint, anchor: `${chunk.locator} · characters ${start + 1}–${end}`, checked: chunk.text.slice(start, end) === quote};
+    fingerprint, anchor: `${chunk.locator} · characters ${start + 1}–${end}`, checked: chunk.text.slice(start, end) === quote, page: chunk.page_number ?? null, evidenceId};
 }
 
 /** A chunk's text with its proposals and find matches marked. */
@@ -70,9 +107,7 @@ function Marked({text, spans, find, focus, onFocus}: {text: string; spans: Span[
     // The innermost proposal marks the words (a name inside a claim is the name); every
     // proposal that starts here still gets its anchor, for its margin card.
     const s = spans.filter(x => x.start <= a && x.end >= b).sort((x, y) => (x.end - x.start) - (y.end - y.start))[0];
-    if (s) {
-      piece = <span className={`rr-span rr-${s.kind} rr-${s.status}${focus === s.id ? ' on' : ''}`} onClick={() => onFocus(s.id)}>{piece}</span>;
-    }
+    if (s) piece = <span className={`rr-span rr-${s.kind} rr-${s.status}${focus === s.id ? ' on' : ''}`} onClick={() => onFocus(s.id)}>{piece}</span>;
     out.push(<span key={a}>{spans.filter(x => x.start === a && x.primary).map(x => <span key={x.id} id={`rr-anchor-${x.id}`} className="rr-anchor"/>)}{piece}</span>);
   }
   return <>{out}</>;
@@ -97,22 +132,121 @@ function Why({candidateId}: {candidateId: string}): ReactElement {
   const why = useQuery({...getExtractionCandidateExplanationOptions({path: {candidate_id: candidateId}})});
   if (why.isPending) return <p className="rr-quiet">Reading why…</p>;
   if (why.isError) return <p className="rr-quiet">{errorMessage(why.error, 'Could not say why')}</p>;
-  return <div className="rr-why"><p>{why.data.summary}</p>{why.data.parts.slice(0, 3).map(p => <p key={p.id}><b>{p.label}:</b> {p.reasoning.join(" ")}</p>)}</div>;
+  return <div className="rr-why"><p>{why.data.summary}</p>{why.data.parts.slice(0, 3).map(p => <p key={p.id}><b>{p.label}:</b> {p.reasoning.join(' ')}</p>)}</div>;
 }
 
-function Card({c, focus, top, onFocus, onAnswer}: {c: ExtractionCandidateOut; focus: boolean; top: number | null; onFocus: () => void;
-  onAnswer: (decision: 'accept' | 'reject') => void}): ReactElement {
+function Dots({confidence}: {confidence: number}): ReactElement | null {
+  const band = confidenceBand(confidence);
+  if (!band) return null;
+  const n = band === 'high' ? 3 : band === 'medium' ? 2 : 1;
+  return <span className="rr-dots" title={`${Math.round(confidence * 100)}%`}><i aria-hidden="true">{'●'.repeat(n)}{'○'.repeat(3 - n)}</i>{band.charAt(0).toUpperCase() + band.slice(1)}</span>;
+}
+
+/** The card's one question, in its own words, with numbered answers. */
+function Question({c, answer, setAnswer, active, onAcceptFirst}: {c: ExtractionCandidateOut; answer: Answer; setAnswer: (a: Answer) => void; active: boolean;
+  onAcceptFirst: (candidateId: string, caption: string, schema: string) => Promise<string>}): ReactElement | null {
+  const isName = c.candidate_type === 'entity';
+  const matches = useQuery({...getExtractionEntityMatchesOptions({path: {candidate_id: c.id}}), enabled: isName && c.review_status === 'proposed'});
+  const targets = useQuery({...getIdentifierTargetsOptions({path: {candidate_id: c.id}}), enabled: c.candidate_type === 'identifier' && c.review_status === 'proposed'});
+  const strong = matches.data?.strong_match ?? null;
+  const options = sameAsOptions(matches.data?.matches ?? [], [], strong?.entity_id ?? null).slice(0, 2);
+  const caption = proposalText(c);
+  const pick = (choices: (() => void)[]) => (e: KeyboardEvent) => {
+    const n = Number(e.key);
+    if (Number.isInteger(n) && n >= 1 && n <= choices.length) { e.preventDefault(); choices[n - 1](); }
+  };
+  const choices: (() => void)[] = [];
+  let body: ReactElement | null = null;
+  if (isName && needsSchemaAnswer(c)) {
+    const list = schemaChoices(c);
+    list.forEach(s => choices.push(() => setAnswer({...answer, schema: s})));
+    body = <div className="rr-q" role="group" aria-label={`What is “${caption}”?`}>
+      <p>What is “{caption}”? {c.payload.schema_question === true ? 'OpenAleph found the name but not what it is.' : 'The text does not say.'}</p>
+      <div className="rr-q-choices">{list.map((s, i) => <button key={s} type="button" aria-pressed={answer.schema === s} onClick={() => setAnswer({...answer, schema: s})}>
+        {SCHEMA_WORD[s] ?? s} <kbd>{i + 1}</kbd></button>)}</div>
+    </div>;
+  }
+  if (isName && options.length && (!body || answer.schema)) {
+    const qChoices: (() => void)[] = [...options.map(o => () => setAnswer({...answer, identity: {kind: 'same' as const, entityId: o.entityId}})), () => setAnswer({...answer, identity: {kind: 'new'}})];
+    if (!body) choices.push(...qChoices);
+    body = <>{body}<div className="rr-q" role="group" aria-label="Is this already in the case?">
+      <p>Is this already in the case?{strong ? '' : ' (optional)'}</p>
+      {options.map((o, i) => <div key={o.entityId} className="rr-match">
+        <span><b>{o.caption}</b><small>{o.schema} · {o.why}</small></span>
+        <button type="button" aria-pressed={answer.identity?.kind === 'same' && answer.identity.entityId === o.entityId}
+          onClick={() => setAnswer({...answer, identity: {kind: 'same', entityId: o.entityId}})}>Same as this {!body || answer.schema ? <kbd>{i + 1}</kbd> : null}</button>
+      </div>)}
+      <button type="button" className="rr-new" aria-pressed={answer.identity?.kind === 'new'} onClick={() => setAnswer({...answer, identity: {kind: 'new'}})}>
+        A new record <kbd>{options.length + 1}</kbd></button>
+    </div></>;
+  }
+  if (c.candidate_type === 'identifier') {
+    const data = targets.data;
+    const people = data?.document_entities ?? [];
+    const waiting = (data?.document_proposals ?? []).filter(p => !p.schema_question);
+    people.forEach(p => choices.push(() => setAnswer({...answer, owner: p.entity_id})));
+    body = <div className="rr-q" role="group" aria-label="Whose is it?">
+      <p>Whose is it?</p>
+      <div className="rr-q-choices">
+        {people.map((p, i) => <button key={p.entity_id} type="button" aria-pressed={answer.owner === p.entity_id} onClick={() => setAnswer({...answer, owner: p.entity_id})}>
+          {p.caption} <kbd>{i + 1}</kbd></button>)}
+        {waiting.map(p => <button key={p.candidate_id} type="button" onClick={() => void onAcceptFirst(p.candidate_id, p.caption, p.suggested_schema)
+          .then(id => { if (id) setAnswer({...answer, owner: id}); })}>Accept “{p.caption}” first, then link</button>)}
+        {(data?.other_entities ?? []).length > 0 && <select aria-label="Someone else" value={(data?.other_entities ?? []).some(o => o.entity_id === answer.owner) ? answer.owner : ''}
+          onChange={e => setAnswer({...answer, owner: e.target.value})}>
+          <option value="">Someone else…</option>
+          {(data?.other_entities ?? []).map(o => <option key={o.entity_id} value={o.entity_id}>{o.caption}</option>)}
+        </select>}
+      </div>
+      {targets.isPending && <p className="rr-quiet">Finding who it could belong to…</p>}
+    </div>;
+  }
+  useEffect(() => {
+    if (!active || !choices.length) return undefined;
+    const onKey = (e: KeyboardEvent) => { if (!e.metaKey && !e.ctrlKey && !e.altKey && !typing(e.target) && singleKeysOn()) pick(choices)(e); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });  // eslint-disable-line react-hooks/exhaustive-deps -- the latest choices on each key
+  if (c.candidate_type === 'claim') return <p className="rr-becomes">Becomes a claim to test. <span className="st st-unshown"><span aria-hidden="true">○</span>Not yet shown</span> until evidence is linked.</p>;
+  return body;
+}
+
+function Card({c, focus, locator, held, answer, setAnswer, onFocus, onDecide, onUndo, onAcceptFirst}: {
+  c: ExtractionCandidateOut; focus: boolean; locator: string; held: Held | null; answer: Answer; setAnswer: (a: Answer) => void; onFocus: () => void;
+  onDecide: (decision: 'accept' | 'reject', caption?: string) => void; onUndo: () => void;
+  onAcceptFirst: (candidateId: string, caption: string, schema: string) => Promise<string>;
+}): ReactElement {
   const [why, setWhy] = useState(false);
-  const open = c.review_status === 'proposed';
-  return <article className={`rr-card rr-${c.candidate_type}${focus ? ' on' : ''}${open ? '' : ' done'}`} style={top === null ? undefined : {top}}
-    aria-label={`${KIND_WORD[c.candidate_type] ?? c.candidate_type}: ${proposalText(c)}`} onClick={onFocus}>
-    <header><b>{KIND_WORD[c.candidate_type] ?? c.candidate_type}</b><small>{open ? `${Math.round(c.confidence * 100)}%` : c.review_status}</small></header>
-    <p className="rr-card-text">{proposalText(c)}</p>
-    {open ? <div className="rr-answers" role="group" aria-label="Your answer">
-      <button type="button" onClick={e => { e.stopPropagation(); onAnswer('accept'); }} aria-keyshortcuts={focus ? '1' : undefined}>Keep <kbd>1</kbd></button>
-      <button type="button" onClick={e => { e.stopPropagation(); onAnswer('reject'); }} aria-keyshortcuts={focus ? '2' : undefined}>Not useful <kbd>2</kbd></button>
-      <button type="button" className="rr-why-btn" onClick={e => { e.stopPropagation(); setWhy(w => !w); }} aria-expanded={why}>Why?</button>
-    </div> : null}
+  const [editing, setEditing] = useState(false);
+  const [caption, setCaption] = useState(proposalText(c));
+  const matches = useQuery({...getExtractionEntityMatchesOptions({path: {candidate_id: c.id}}), enabled: c.candidate_type === 'entity' && c.review_status === 'proposed'});
+  const open = c.review_status === 'proposed' && !held;
+  const ask = openQuestion(c, answer, Boolean(matches.data?.strong_match));
+  const blocked = ask !== null || (c.candidate_type === 'entity' && matches.isPending);
+  const kind = KIND_WORD[c.candidate_type] ?? c.candidate_type;
+  return <article id={`rr-card-${c.id}`} className={`rr-card rr-${c.candidate_type}${focus ? ' on' : ''}${open ? '' : ' done'}`}
+    aria-label={`${kind}: ${proposalText(c)}`} onClick={onFocus}>
+    <header>
+      <b>{kind}</b>
+      {c.review_status === 'proposed' ? <span className="rr-chip">Proposed</span> : <span className={`rr-chip ${c.review_status}`}>{c.review_status === 'accepted' ? '✓ Accepted' : '✕ Rejected'}</span>}
+      <Dots confidence={c.confidence}/>
+      <small>{proposerOf(c)} · {locator}</small>
+    </header>
+    {editing ? <input className="rr-edit" aria-label="Edit the name" value={caption} onChange={e => setCaption(e.target.value)} onClick={e => e.stopPropagation()}/>
+      : <p className="rr-card-text">{caption}</p>}
+    {held ? <p className="rr-held" role="status">{held.decision === 'accept' ? '✓ Accepted' : '✕ Rejected'}: saved in a moment.
+      <button type="button" onClick={e => { e.stopPropagation(); onUndo(); }}>Undo <kbd>U</kbd></button></p>
+      : open ? <>
+        <Question c={c} answer={answer} setAnswer={setAnswer} active={focus} onAcceptFirst={onAcceptFirst}/>
+        <div className="rr-answers" role="group" aria-label="Your answer">
+          <button type="button" className="p" disabled={blocked} onClick={e => { e.stopPropagation(); onDecide('accept', editing ? caption : undefined); }}
+            aria-keyshortcuts={focus ? 'A' : undefined}>Accept <kbd>A</kbd></button>
+          <button type="button" onClick={e => { e.stopPropagation(); onDecide('reject'); }} aria-keyshortcuts={focus ? 'R' : undefined}>Reject <kbd>R</kbd></button>
+          {c.candidate_type === 'entity' && <button type="button" onClick={e => { e.stopPropagation(); setEditing(v => !v); }} aria-pressed={editing}>Edit</button>}
+          {blocked && ask && <small className="rr-why-not">{ask === 'owner' ? 'Say whose it is first' : 'Answer the question first'}</small>}
+          <button type="button" className="rr-why-btn" onClick={e => { e.stopPropagation(); setWhy(w => !w); }} aria-expanded={why}>Why? ›</button>
+        </div>
+      </> : null}
     {why && <Why candidateId={c.id}/>}
   </article>;
 }
@@ -125,16 +259,21 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   const candidates = useQuery(candidatesKey);
   const docs = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data ?? [];
   const tags = useQuery({...getTagsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const caseName = useQuery({...listInvestigationsOptions()}).data?.find(i => i.id === investigationId)?.name ?? 'Case';
   const [tab, setTab] = useState<Tab>('text');
   const [find, setFind] = useState('');
   const [focus, setFocus] = useState<string | null>(null);
   const [picked, setPicked] = useState<Picked | null>(null);
-  const [clip, setClip] = useState<Clip | null>(null);
+  const [clips, setClips] = useState<Clip[]>([]);
   const [status, setStatus] = useState('');
   const [tagMenu, setTagMenu] = useState(false);
-  const [page, setPage] = useState<number | null>(startPage);
-  const column = useRef<HTMLDivElement>(null);
-  const [tops, setTops] = useState<Record<string, number>>({});
+  const [filter, setFilter] = useState<'all' | 'questions'>('all');
+  const [answers, setAnswers] = useState<Record<string, Answer>>({});
+  const [held, setHeld] = useState<Held | null>(null);
+  const heldRef = useRef<Held | null>(null);
+  const findRef = useRef<HTMLInputElement>(null);
+  const roomRef = useRef<HTMLDivElement>(null);
+  const [line, setLine] = useState<{x1: number; y1: number; x2: number; y2: number} | null>(null);
   const doc: DocumentDetailOut | undefined = detail.data;
   const chunks = useMemo(() => doc?.chunks ?? [], [doc]);
   const all = useMemo(() => candidates.data ?? [], [candidates.data]);
@@ -156,6 +295,8 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   const order = useMemo(() => new Map(chunks.map(ch => [ch.id, ch.ordinal])), [chunks]);
   const cards = useMemo(() => all.filter(c => c.candidate_type !== 'evidence' && c.chunk_id && byChunk.get(c.chunk_id)?.some(s => s.id === c.id))
     .sort((a, b) => (order.get(a.chunk_id!) ?? 0) - (order.get(b.chunk_id!) ?? 0)), [all, byChunk, order]);
+  const unanchored = all.filter(c => c.candidate_type !== 'evidence' && c.review_status === 'proposed' && !cards.includes(c)).length;
+  const pageOf = useCallback((chunkId: string | null | undefined) => chunks.find(ch => ch.id === chunkId)?.page_number ?? 0, [chunks]);
   const pages = useMemo(() => {
     const seen = new Map<number, {page: number; marks: number}>();
     for (const ch of chunks) {
@@ -164,8 +305,22 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
       entry.marks += (byChunk.get(ch.id) ?? []).filter(s => s.status === 'proposed' && s.primary).length;
       seen.set(p, entry);
     }
-    return [...seen.values()].filter(p => p.page > 0).sort((a, b) => a.page - b.page);
+    return [...seen.values()].sort((a, b) => a.page - b.page);
   }, [chunks, byChunk]);
+  const paged = pages.some(p => p.page > 0);
+  const [page, setPage] = useState<number>(startPage ?? 0);
+  const current = pages.find(p => p.page === page)?.page ?? pages[0]?.page ?? 0;
+  const pageChunks = chunks.filter(ch => (ch.page_number ?? 0) === current);
+  const paraOf = (chunkId: string | null | undefined) => {
+    const ch = chunks.find(x => x.id === chunkId);
+    const same = chunks.filter(x => (x.page_number ?? 0) === (ch?.page_number ?? 0));
+    return same.findIndex(x => x.id === chunkId) + 1;
+  };
+  const locatorOf = (c: ExtractionCandidateOut) => `${paged ? `p.${pageOf(c.chunk_id)} ` : ''}¶${paraOf(c.chunk_id)}`;
+  const pageCards = cards.filter(c => (pageOf(c.chunk_id)) === current);
+  const strongOf = (id: string) => Boolean(queryClient.getQueryData<{strong_match?: unknown}>(getExtractionEntityMatchesOptions({path: {candidate_id: id}}).queryKey)?.strong_match);
+  const shownCards = filter === 'questions' ? pageCards.filter(c => c.review_status === 'proposed' && openQuestion(c, answers[c.id] ?? {}, strongOf(c.id))) : pageCards;
+  const pageClips = clips.filter(cl => (cl.page ?? 0) === current);
   const counts = useMemo(() => {
     const c = {accepted: 0, rejected: 0, waiting: 0};
     for (const x of all) { if (x.review_status === 'accepted') c.accepted += 1; else if (x.review_status === 'rejected') c.rejected += 1; else if (x.review_status === 'proposed') c.waiting += 1; }
@@ -173,42 +328,89 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   }, [all]);
   const tops0 = docs.filter(d => !d.parent_document_id);
   const index = tops0.findIndex(d => d.id === documentId);
+  const ocr = pageChunks.some(ch => /\(OCR\)/i.test(ch.locator));
+  const isPdf = /\.pdf$/i.test(doc?.filename ?? '');
 
-  // Margin cards sit beside the words they came from; a later card never overlaps an earlier one.
-  useLayoutEffect(() => {
-    if (tab !== 'text' || !column.current) return undefined;
-    const measure = () => {
-      const next: Record<string, number> = {};
-      let floor = 0;
-      for (const c of cards) {
-        const el = document.getElementById(`rr-anchor-${c.id}`);
-        const top = Math.max(el ? el.offsetTop - 4 : floor, floor);
-        next[c.id] = top;
-        floor = top + (c.id === focus ? 150 : 112);
-      }
-      setTops(next);
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [cards, tab, find, focus]);
-
+  // Focus the first waiting proposal of the page once there is one.
   useEffect(() => {
-    if (page === null || tab !== 'text') return;
-    document.getElementById(`rr-page-${page}`)?.scrollIntoView({block: 'start'});
-  }, [page, tab, chunks.length]);
+    if (focus && cards.some(c => c.id === focus)) return;
+    const first = pageCards.find(c => c.review_status === 'proposed') ?? pageCards[0];
+    if (first) setFocus(first.id);
+  }, [pageCards, cards, focus]);
 
-  const answer = useCallback(async (c: ExtractionCandidateOut, decision: 'accept' | 'reject') => {
-    const p = c.payload as Record<string, unknown>;
+  // The leader line from the chosen card to its words.
+  useLayoutEffect(() => {
+    if (tab !== 'text' || !focus || !roomRef.current) { setLine(null); return undefined; }
+    const draw = () => {
+      const anchor = document.getElementById(`rr-anchor-${focus}`);
+      const card = document.getElementById(`rr-card-${focus}`);
+      const room = roomRef.current?.getBoundingClientRect();
+      if (!anchor || !card || !room) { setLine(null); return; }
+      const a = anchor.getBoundingClientRect();
+      const paper = anchor.closest('.rr-paper')?.getBoundingClientRect();
+      const b = card.getBoundingClientRect();
+      if (!paper || a.top < paper.top || a.top > paper.bottom || b.bottom < room.top) { setLine(null); return; }
+      setLine({x1: paper.right - room.left - 12, y1: a.top - room.top + a.height / 2, x2: b.left - room.left, y2: b.top - room.top + 22});
+    };
+    draw();
+    const scrollers = roomRef.current.querySelectorAll('.rr-paper-scroll, .rr-side-list');
+    scrollers.forEach(s => s.addEventListener('scroll', draw));
+    window.addEventListener('resize', draw);
+    return () => { scrollers.forEach(s => s.removeEventListener('scroll', draw)); window.removeEventListener('resize', draw); };
+  }, [focus, tab, current, shownCards.length, find, held]);
+
+  useEffect(() => { document.getElementById(`rr-card-${focus}`)?.scrollIntoView?.({block: 'nearest'}); }, [focus]);
+
+  const candidatesQueryKey = candidatesKey.queryKey;
+  const send = useCallback(async (h: Held) => {
     try {
-      await reviewExtractionCandidate({path: {candidate_id: c.id}, body: {decision, ...(c.candidate_type === 'entity' && decision === 'accept'
-        ? {entity_schema: String(p.suggested_schema ?? 'LegalEntity')} : {})}, throwOnError: true});
-      setStatus(decision === 'accept' ? `Kept: ${proposalText(c)}` : `Set aside: ${proposalText(c)}`);
-      const next = cards.find(x => x.review_status === 'proposed' && x.id !== c.id);
-      setFocus(next?.id ?? null);
-      await queryClient.invalidateQueries({queryKey: candidatesKey.queryKey});
-    } catch (error) { setStatus(errorMessage(error, 'Could not answer it here; open it in the Library to decide')); }
-  }, [cards, candidatesKey.queryKey, queryClient]);
+      await reviewExtractionCandidate({path: {candidate_id: h.c.id}, body: {decision: h.decision, ...h.body}, throwOnError: true});
+      setStatus(h.decision === 'accept' ? `✓ ${proposalText(h.c)} added to the case.` : `✕ Rejected: ${proposalText(h.c)}`);
+    } catch (error) { setStatus(errorMessage(error, 'Not saved: try again')); }
+    await queryClient.invalidateQueries({queryKey: candidatesQueryKey});
+  }, [documentId, queryClient]);  // eslint-disable-line react-hooks/exhaustive-deps -- the key follows documentId
+  const sendRef = useRef(send);
+  sendRef.current = send;
+
+  // A decision waits HOLD_MS before it is sent, so U can take it back; closing sends it.
+  useEffect(() => {
+    heldRef.current = held;
+    if (!held) return undefined;
+    const timer = window.setTimeout(() => { setHeld(null); heldRef.current = null; void send(held); }, Math.max(0, held.until - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [held, send]);
+  // Closing the room sends a decision still held.
+  useEffect(() => () => { if (heldRef.current) void sendRef.current(heldRef.current); }, []);
+
+  const decide = useCallback((c: ExtractionCandidateOut, decision: 'accept' | 'reject', caption?: string) => {
+    if (heldRef.current && heldRef.current.c.id !== c.id) void send(heldRef.current);
+    const p = c.payload as Record<string, unknown>;
+    const a = answers[c.id] ?? {};
+    const body: Record<string, unknown> = {};
+    if (decision === 'accept' && c.candidate_type === 'entity') {
+      body.entity_schema = a.schema ?? String(p.suggested_schema ?? 'LegalEntity');
+      Object.assign(body, identityFields(a.identity, null));
+      if (caption && caption.trim() !== proposalText(c)) body.caption = caption.trim();
+    }
+    if (decision === 'accept' && c.candidate_type === 'identifier') body.target_entity_id = a.owner;
+    const next: Held = {c, decision, body, until: Date.now() + HOLD_MS};
+    setHeld(next);
+    heldRef.current = next;
+    const at = cards.indexOf(c);
+    const after = [...cards.slice(at + 1), ...cards.slice(0, at)].find(x => x.review_status === 'proposed' && x.id !== c.id);
+    if (after) { setFocus(after.id); setPage(pageOf(after.chunk_id)); }
+  }, [answers, cards, pageOf, send]);
+
+  const undo = () => { if (heldRef.current) { setStatus(`Undone: ${proposalText(heldRef.current.c)} still waits.`); setFocus(heldRef.current.c.id); setPage(pageOf(heldRef.current.c.chunk_id)); } setHeld(null); heldRef.current = null; };
+
+  const acceptFirst = async (candidateId: string, caption: string, schema: string): Promise<string> => {
+    try {
+      const reply = (await reviewExtractionCandidate({path: {candidate_id: candidateId}, body: {decision: 'accept', caption, entity_schema: schema}, throwOnError: true})).data;
+      await queryClient.invalidateQueries();
+      setStatus(`✓ ${caption} added to the case.`);
+      return typeof reply.record?.id === 'string' ? reply.record.id : '';
+    } catch (error) { setStatus(errorMessage(error, `Accept “${caption}” in its own card first`)); return ''; }
+  };
 
   const readSelection = () => {
     const sel = window.getSelection();
@@ -224,7 +426,9 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     const start = before.toString().length;
     const quote = range.toString();
     if (!quote.trim()) { setPicked(null); return; }
-    setPicked({chunk, start, end: start + quote.length, quote});
+    const box = typeof range.getBoundingClientRect === 'function' ? range.getBoundingClientRect() : null;
+    const room = roomRef.current?.getBoundingClientRect();
+    setPicked({chunk, start, end: start + quote.length, quote, x: box && room ? box.left - room.left : 0, y: box && room ? box.top - room.top : 0});
   };
 
   const keep = async (what: 'evidence' | 'claim' | 'name' | 'check') => {
@@ -233,7 +437,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     try {
       if (what === 'evidence' || what === 'claim') {
         const ev = (await createEvidenceEndpoint({body: {source_id: doc.source_id, quote, locator: chunk.locator, document_id: doc.id}, throwOnError: true})).data;
-        setClip(clipOf(chunk, start, end, quote, doc.sha256));
+        setClips(cs => [clipOf(chunk, start, end, quote, doc.sha256, ev.id), ...cs]);
         if (what === 'claim') {
           const claim = (await createClaimEndpoint({body: {investigation_id: investigationId, text: quote, status: 'unverified', confidence: 0.5}, throwOnError: true})).data;
           await linkClaimEvidenceEndpoint({path: {claim_id: claim.id}, body: {evidence_id: ev.id, stance: 'supports'}, throwOnError: true});
@@ -260,9 +464,19 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     } catch (error) { setStatus(errorMessage(error, 'Could not tag it')); }
   };
 
+  const move = (step: number) => {
+    const open = cards.filter(c => c.review_status === 'proposed' || c.id === focus);
+    if (!open.length) return;
+    const at = open.findIndex(c => c.id === focus);
+    const next = open[Math.min(open.length - 1, Math.max(0, (at < 0 ? -1 : at) + step))];
+    setFocus(next.id);
+    setPage(pageOf(next.chunk_id));
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') { if (picked) setPicked(null); else onClose(); return; }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'f') { e.preventDefault(); findRef.current?.focus(); return; }
       if (e.metaKey || e.ctrlKey || e.altKey || typing(e.target) || !singleKeysOn()) return;
       const k = e.key.toLowerCase();
       if (picked && ['e', 'c', 'n', 'x', 't'].includes(k)) {
@@ -271,9 +485,17 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         else void keep(k === 'e' ? 'evidence' : k === 'c' ? 'claim' : k === 'n' ? 'name' : 'check');
         return;
       }
+      if (k === 'j') { e.preventDefault(); move(1); return; }
+      if (k === 'k') { e.preventDefault(); move(-1); return; }
+      if (k === 'u' && heldRef.current) { e.preventDefault(); undo(); return; }
       const card = cards.find(c => c.id === focus);
-      if (card && card.review_status === 'proposed' && (k === '1' || k === '2')) { e.preventDefault(); void answer(card, k === '1' ? 'accept' : 'reject'); }
-      if (card && k === '3') { e.preventDefault(); const at = cards.indexOf(card); setFocus(cards.slice(at + 1).find(c => c.review_status === 'proposed')?.id ?? null); }
+      if (!card || card.review_status !== 'proposed' || held?.c.id === card.id) return;
+      if (k === 'a') {
+        const blocked = openQuestion(card, answers[card.id] ?? {}, strongOf(card.id)) !== null;
+        if (blocked) { setStatus('Answer the question on the card first.'); return; }
+        e.preventDefault(); decide(card, 'accept');
+      }
+      if (k === 'r') { e.preventDefault(); decide(card, 'reject'); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -285,45 +507,56 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     return chunks.reduce((sum, ch) => sum + (ch.text.toLowerCase().split(n).length - 1), 0);
   }, [chunks, find]);
 
-  let lastPage: number | null = null;
-  return <div className="rr" role="dialog" aria-modal="true" aria-label={`Reading room: ${doc?.filename ?? 'document'}`}>
+  const title = (doc?.filename ?? '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+  return <div ref={roomRef} className="rr" role="dialog" aria-modal="true" aria-label={`Reading room: ${doc?.filename ?? 'document'}`}>
     <header className="rr-top">
-      <div className="rr-title"><p className="rr-eyebrow">Reading room</p><h2>{doc?.filename ?? 'Opening…'}</h2></div>
+      <nav className="rr-crumbs" aria-label="You are here"><span>{caseName}</span><span>Bring in</span><span>Reading room</span><b>{doc?.filename ?? 'Opening…'}</b></nav>
       <div role="tablist" aria-label="How to read it" className="rr-tabs">
         {(['text', 'original', 'translation', 'details'] as Tab[]).map(t => <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>
           {t === 'text' ? 'Text' : t === 'original' ? 'Original' : t === 'translation' ? 'Translation' : 'Details'}</button>)}
       </div>
-      <input type="search" className="rr-find-input" aria-label="Find in this document" placeholder="Find in this document" value={find} onChange={e => setFind(e.target.value)}/>
+      <span className="rr-find-box"><input ref={findRef} type="search" className="rr-find-input" aria-label="Find in this document" placeholder="Find in this document" value={find} onChange={e => setFind(e.target.value)}/>
+        <kbd aria-hidden="true">⌘F</kbd></span>
       {find.trim().length > 1 && <small className="rr-quiet">{findCount} found</small>}
+      {index >= 0 && <span className="rr-nav">
+        <button type="button" disabled={index <= 0} onClick={() => openDocument(tops0[index - 1].id)} aria-label="Previous document">‹</button>
+        Document {index + 1} of {tops0.length}
+        <button type="button" disabled={index >= tops0.length - 1} onClick={() => openDocument(tops0[index + 1].id)} aria-label="Next document">›</button>
+      </span>}
       <button type="button" className="rr-close" onClick={onClose} aria-label="Close the reading room">×</button>
     </header>
 
     <nav className="rr-pages" aria-label="Pages">
-      {pages.map(p => <button key={p.page} type="button" aria-current={page === p.page ? 'true' : undefined} onClick={() => { setPage(p.page); if (tab === 'details' || tab === 'translation') setTab('text'); }}
-        title={p.marks ? `Page ${p.page}: ${p.marks} waiting` : `Page ${p.page}`}><span>{p.page}</span>{p.marks > 0 && <i aria-label={`${p.marks} waiting`}>{p.marks}</i>}</button>)}
+      <ol>{pages.map(p => <li key={p.page}><button type="button" aria-current={current === p.page ? 'true' : undefined} onClick={() => { setPage(p.page); if (tab === 'details' || tab === 'translation') setTab('text'); }}
+        aria-label={`${paged ? `Page ${p.page}` : 'The text'}${p.marks ? `, ${p.marks} waiting` : ''}`}>
+        <span className="rr-page-n">{paged ? p.page : '¶'}</span>
+        <span className="rr-thumb">{isPdf && paged ? <PagePicture documentId={documentId} page={p.page} width={120} alt=""/> : <i className="rr-lines" aria-hidden="true"/>}</span>
+        {p.marks > 0 && <span className="rr-marks" aria-hidden="true">{Array.from({length: Math.min(p.marks, 4)}, (_, i) => <i key={i}/>)}</span>}
+      </button></li>)}</ol>
+      <p className="rr-strip-counts">{pages.length} {paged ? `page${pages.length === 1 ? '' : 's'}` : 'text'}<br/>{counts.waiting} waiting<br/>{unanchored} unanchored</p>
     </nav>
 
-    <div className="rr-body">
+    <main className="rr-main">
       {detail.isError ? <p role="alert">{errorMessage(detail.error, 'Could not open the document')}</p>
-        : tab === 'text' ? <div className="rr-read">
-          <div ref={column} className="rr-column" onMouseUp={readSelection} onKeyUp={e => { if (e.shiftKey) readSelection(); }}>
-            {chunks.map(ch => {
-              const head = ch.page_number !== null && ch.page_number !== undefined && ch.page_number !== lastPage;
-              if (head) lastPage = ch.page_number ?? null;
-              return <div key={ch.id}>
-                {head && <p className="rr-page-head" id={`rr-page-${ch.page_number}`}>Page {ch.page_number}</p>}
-                <p className="rr-passage" data-chunk={ch.id} title={ch.locator}>
-                  <Marked text={ch.text} spans={byChunk.get(ch.id) ?? []} find={find} focus={focus} onFocus={setFocus}/></p>
-              </div>;
-            })}
+        : tab === 'text' ? <div className="rr-paper">
+          <div className="rr-paper-scroll" onMouseUp={readSelection} onKeyUp={e => { if (e.shiftKey) readSelection(); }}>
+            <p className="rr-chips">
+              {paged && <span>Page {current} of {pages.length}</span>}
+              {pageChunks.length > 0 && <span>{ocr ? 'Read by OCR' : 'Read from the file’s own text'}</span>}
+              {paged && <small>p. {current}</small>}
+            </p>
+            <h2 className="rr-doc-title">{title}</h2>
+            {pageChunks.map((ch, i) => <div key={ch.id} className="rr-para">
+              <span className="rr-pilcrow" aria-hidden="true">¶{i + 1}</span>
+              <p className="rr-passage" data-chunk={ch.id} title={ch.locator}>
+                <Marked text={ch.text} spans={byChunk.get(ch.id) ?? []} find={find} focus={focus} onFocus={setFocus}/></p>
+            </div>)}
             {!chunks.length && <p className="rr-quiet">{doc ? 'No text was read from this document.' : 'Opening…'}</p>}
-            <div className="rr-margin" aria-label="What was found here">
-              {cards.map(c => <Card key={c.id} c={c} focus={focus === c.id} top={tops[c.id] ?? null} onFocus={() => setFocus(c.id)} onAnswer={d => void answer(c, d)}/>)}
-            </div>
+            {(doc?.extraction_issues ?? []).map(issue => <p key={issue} className="rr-issue"><span className="st st-unshown"><span aria-hidden="true">○</span>Note</span> {issue}</p>)}
           </div>
         </div>
-        : tab === 'original' ? <div className="rr-orig-wrap">{pages.length
-          ? <OriginalPage documentId={documentId} page={page ?? pages[0].page}/> : <p className="rr-quiet">Only a PDF has pages to show as they look.</p>}</div>
+        : tab === 'original' ? <div className="rr-orig-wrap">{paged
+          ? <OriginalPage documentId={documentId} page={current}/> : <p className="rr-quiet">Only a PDF has pages to show as they look.</p>}</div>
         : tab === 'translation' ? <div className="rr-orig-wrap"><DocumentTranslation documentId={documentId}/></div>
         : <dl className="rr-details">
           <div><dt>File</dt><dd>{doc?.filename}</dd></div>
@@ -332,11 +565,41 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
           <div><dt>Passages</dt><dd>{chunks.length}</dd></div>
           {(doc?.extraction_issues ?? []).map(i => <div key={i}><dt>Note</dt><dd>{i}</dd></div>)}
         </dl>}
-    </div>
+    </main>
 
-    {picked && <div className="rr-selbar" role="toolbar" aria-label="Keep the selected words">
-      <span className="rr-selquote">“{picked.quote.length > 60 ? `${picked.quote.slice(0, 60)}…` : picked.quote}”</span>
-      <button type="button" onClick={() => void keep('evidence')}>Evidence <kbd>E</kbd></button>
+    <aside className="rr-side" aria-label="What was found on this page">
+      <header className="rr-side-head">
+        <p><b>{paged ? `Page ${current}` : 'This text'}</b> · {pageCards.length} proposal{pageCards.length === 1 ? '' : 's'} · {pageClips.length} clip{pageClips.length === 1 ? '' : 's'}</p>
+        <span role="radiogroup" aria-label="Show">
+          <button type="button" role="radio" aria-checked={filter === 'all'} onClick={() => setFilter('all')}>All</button>
+          <button type="button" role="radio" aria-checked={filter === 'questions'} onClick={() => setFilter('questions')}>Questions only</button>
+        </span>
+      </header>
+      <div className="rr-side-list">
+        {pageClips.map(cl => <section key={cl.evidenceId || cl.anchor} className="rr-clip" aria-label="Evidence clip">
+          <p className="rr-eyebrow">Evidence clip <span className="rr-quiet">saved just now</span>
+            <span className="st st-unshown"><span aria-hidden="true">○</span>Not yet shown</span></p>
+          <div className="rr-clip-body">
+            <blockquote><span className="rr-ctx">…{cl.before}</span><mark>{cl.quote}</mark><span className="rr-ctx">{cl.after}…</span></blockquote>
+            {isPdf && cl.page ? <span className="rr-clip-scan"><PagePicture documentId={documentId} page={cl.page} passage={cl.quote} width={160} alt={`Page ${cl.page}, the words marked`}/></span> : null}
+          </div>
+          <p className="rr-clip-meta">{cl.anchor} · <code title={cl.fingerprint}>SHA-256 {cl.fingerprint.slice(0, 6)}…{cl.fingerprint.slice(-4)}</code>{' '}
+            {cl.checked ? <span className="rr-ok">✓ the words are in the stored text</span> : <span className="rr-bad">✕ the words differ from the stored text</span>}</p>
+        </section>)}
+        {shownCards.map(c => <Card key={c.id} c={c} focus={focus === c.id} locator={locatorOf(c)} held={held?.c.id === c.id ? held : null}
+          answer={answers[c.id] ?? {}} setAnswer={a => setAnswers(prev => ({...prev, [c.id]: a}))} onFocus={() => setFocus(c.id)}
+          onDecide={(d, caption) => decide(c, d, caption)} onUndo={undo} onAcceptFirst={acceptFirst}/>)}
+        {!shownCards.length && !pageClips.length && <p className="rr-quiet">{filter === 'questions' ? 'No question waits on this page.'
+          : pageCards.length ? '' : `Nothing waits on this ${paged ? 'page' : 'text'}.`}{counts.waiting && !pageCards.some(c => c.review_status === 'proposed') ? ' Others wait elsewhere: J moves to the next.' : ''}</p>}
+      </div>
+    </aside>
+
+    {line && <svg className="rr-leader" aria-hidden="true"><circle cx={line.x1} cy={line.y1} r={3}/>
+      <path d={`M${line.x1},${line.y1} C${(line.x1 + line.x2) / 2},${line.y1} ${(line.x1 + line.x2) / 2},${line.y2} ${line.x2},${line.y2}`}/></svg>}
+
+    {picked && <div className="rr-selbar" role="toolbar" aria-label="Keep the selected words"
+      style={picked.x || picked.y ? {left: Math.max(8, picked.x), top: Math.max(8, picked.y - 48)} : undefined}>
+      <button type="button" className="p" onClick={() => void keep('evidence')}>Evidence <kbd>E</kbd></button>
       <button type="button" onClick={() => void keep('claim')}>Claim <kbd>C</kbd></button>
       <button type="button" onClick={() => void keep('name')}>Name <kbd>N</kbd></button>
       <button type="button" onClick={() => void keep('check')}>To check <kbd>X</kbd></button>
@@ -345,22 +608,11 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         : <small>No tags yet; make them in Keep.</small>}</span>}
     </div>}
 
-    {clip && <aside className="rr-clip" aria-label="Evidence clip">
-      <p className="rr-eyebrow">Evidence clip {clip.checked ? <span className="rr-ok">✓ the words are in the stored text</span> : <span className="rr-bad">✕ the words differ from the stored text</span>}</p>
-      <blockquote><span className="rr-ctx">…{clip.before}</span><mark>{clip.quote}</mark><span className="rr-ctx">{clip.after}…</span></blockquote>
-      <p className="rr-quiet"><code title={clip.fingerprint}>{clip.fingerprint.slice(0, 12)}…</code> · {clip.anchor}</p>
-      <button type="button" onClick={() => setClip(null)}>Close</button>
-    </aside>}
-
     <footer className="rr-foot">
-      <span><b>{counts.accepted}</b> kept · <b>{counts.rejected}</b> set aside · <b>{counts.waiting}</b> waiting</span>
-      <span className="rr-keys">Select words: <kbd>E</kbd> <kbd>C</kbd> <kbd>N</kbd> <kbd>X</kbd> <kbd>T</kbd> · A proposal: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> · <kbd>Esc</kbd> close</span>
+      <span className="rr-keys"><kbd>J</kbd><kbd>K</kbd> move · <kbd>A</kbd><kbd>R</kbd> decide · <kbd>1</kbd>–<kbd>4</kbd> answer · <kbd>E</kbd> clip · <kbd>U</kbd> undo · <kbd>?</kbd></span>
+      <span><b>{counts.accepted}</b> accepted · <b>{counts.rejected}</b> rejected · <b>{counts.waiting}</b> waiting</span>
       <span aria-live="polite" className="rr-status">{status}</span>
-      {index >= 0 && <span className="rr-nav">
-        <button type="button" disabled={index <= 0} onClick={() => openDocument(tops0[index - 1].id)} aria-label="Previous document">‹</button>
-        Document {index + 1} of {tops0.length}
-        <button type="button" disabled={index >= tops0.length - 1} onClick={() => openDocument(tops0[index + 1].id)} aria-label="Next document">›</button>
-      </span>}
+      {index >= 0 && index < tops0.length - 1 && <button type="button" className="rr-next" onClick={() => openDocument(tops0[index + 1].id)}>Next ›</button>}
     </footer>
   </div>;
 }
