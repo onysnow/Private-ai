@@ -2349,28 +2349,53 @@ export const zDropStageOut = z.object({
 /**
  * DropLaneOut
  */
-export const zDropLaneOut = z.object({
+export const zDropLaneOut: z.AnyZodObject = z.object({
+  children: z
+    .array(z.lazy(() => zDropLaneOut))
+    .optional()
+    .default([]),
   document_id: z.string(),
   filename: z.string(),
   in_progress: z.boolean(),
   issues: z.array(z.string()),
   job_id: z.string().nullish(),
+  note: z.string().optional().default(''),
   problem: z.boolean(),
   receipt: zDropReceiptOut,
+  retry_job_id: z.string().nullish(),
+  same_as: z.string().nullish(),
+  seconds: z.number().int().nullish(),
   stages: z.array(zDropStageOut),
+  waiting: z.number().int().optional().default(0),
 });
 
 /**
  * DropTotalsOut
  */
 export const zDropTotalsOut = z.object({
+  by_stage: z.record(z.number().int()).optional().default({}),
   files: z.number().int(),
   files_inside: z.number().int(),
   passages: z.number().int(),
   problems: z.number().int(),
   read: z.number().int(),
+  reading: z.number().int().optional().default(0),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   unread: z.number().int(),
   waiting: z.number().int(),
+});
+
+/**
+ * DropWatchlistOut
+ */
+export const zDropWatchlistOut = z.object({
+  hits: z.number().int(),
+  names: z.array(z.string()),
 });
 
 /**
@@ -2382,8 +2407,11 @@ export const zDropOut = z.object({
   investigation_id: z.string(),
   lanes: z.array(zDropLaneOut),
   ready_for_you: z.record(z.number().int()),
+  ready_from: z.number().int().optional().default(0),
+  ready_unsure: z.number().int().optional().default(0),
   stages: z.array(zDropStageNameOut),
   totals: zDropTotalsOut,
+  watchlist: zDropWatchlistOut.nullish(),
 });
 
 /**

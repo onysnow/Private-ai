@@ -684,6 +684,7 @@ export type {
   DropStageNameOut,
   DropStageOut,
   DropTotalsOut,
+  DropWatchlistOut,
   DuplicateDocumentDetailOut,
   DuplicateDocumentOut,
   EditCollectionData,

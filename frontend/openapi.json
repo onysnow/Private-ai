@@ -14499,6 +14499,14 @@
       },
       "DropLaneOut": {
         "properties": {
+          "children": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DropLaneOut"
+            },
+            "title": "Children",
+            "type": "array"
+          },
           "document_id": {
             "title": "Document Id",
             "type": "string"
@@ -14529,6 +14537,11 @@
             ],
             "title": "Job Id"
           },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
           "problem": {
             "title": "Problem",
             "type": "boolean"
@@ -14536,12 +14549,50 @@
           "receipt": {
             "$ref": "#/components/schemas/DropReceiptOut"
           },
+          "retry_job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retry Job Id"
+          },
+          "same_as": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Same As"
+          },
+          "seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds"
+          },
           "stages": {
             "items": {
               "$ref": "#/components/schemas/DropStageOut"
             },
             "title": "Stages",
             "type": "array"
+          },
+          "waiting": {
+            "default": 0,
+            "title": "Waiting",
+            "type": "integer"
           }
         },
         "required": [
@@ -14577,6 +14628,16 @@
             "title": "Ready For You",
             "type": "object"
           },
+          "ready_from": {
+            "default": 0,
+            "title": "Ready From",
+            "type": "integer"
+          },
+          "ready_unsure": {
+            "default": 0,
+            "title": "Ready Unsure",
+            "type": "integer"
+          },
           "stages": {
             "items": {
               "$ref": "#/components/schemas/DropStageNameOut"
@@ -14586,6 +14647,16 @@
           },
           "totals": {
             "$ref": "#/components/schemas/DropTotalsOut"
+          },
+          "watchlist": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DropWatchlistOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -14737,6 +14808,14 @@
       },
       "DropTotalsOut": {
         "properties": {
+          "by_stage": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "By Stage",
+            "type": "object"
+          },
           "files": {
             "title": "Files",
             "type": "integer"
@@ -14757,6 +14836,24 @@
             "title": "Read",
             "type": "integer"
           },
+          "reading": {
+            "default": 0,
+            "title": "Reading",
+            "type": "integer"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
           "unread": {
             "title": "Unread",
             "type": "integer"
@@ -14776,6 +14873,27 @@
           "waiting"
         ],
         "title": "DropTotalsOut",
+        "type": "object"
+      },
+      "DropWatchlistOut": {
+        "properties": {
+          "hits": {
+            "title": "Hits",
+            "type": "integer"
+          },
+          "names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Names",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hits",
+          "names"
+        ],
+        "title": "DropWatchlistOut",
         "type": "object"
       },
       "DuplicateDocumentDetailOut": {

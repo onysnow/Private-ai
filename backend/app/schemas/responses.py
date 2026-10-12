@@ -4558,10 +4558,16 @@ class DropLaneOut(ResponseModel):
     document_id: str
     filename: str
     job_id: str | None = None  # the read still queued or running, which Stop reading stops
+    retry_job_id: str | None = None  # the read that failed, which Try again runs again
     stages: list[DropStageOut]
+    note: str = ""  # what happened to it, in a few words
+    same_as: str | None = None  # an earlier document with the same fingerprint
     problem: bool
     in_progress: bool
     issues: list[str]
+    waiting: int = 0
+    seconds: int | None = None
+    children: list["DropLaneOut"] = []
     receipt: DropReceiptOut
 
 
@@ -4570,9 +4576,17 @@ class DropTotalsOut(ResponseModel):
     files_inside: int
     read: int
     unread: int
+    reading: int = 0
     problems: int
     passages: int
     waiting: int
+    by_stage: dict[str, int] = {}
+    started_at: Timestamp | None = None
+
+
+class DropWatchlistOut(ResponseModel):
+    hits: int
+    names: list[str]
 
 
 class DropOut(ResponseModel):
@@ -4582,3 +4596,6 @@ class DropOut(ResponseModel):
     lanes: list[DropLaneOut]
     totals: DropTotalsOut
     ready_for_you: dict[str, int]
+    ready_from: int = 0
+    ready_unsure: int = 0
+    watchlist: DropWatchlistOut | None = None

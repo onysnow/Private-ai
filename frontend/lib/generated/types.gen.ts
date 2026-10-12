@@ -6092,6 +6092,10 @@ export type DossierSummaryOut = {
  */
 export type DropLaneOut = {
   /**
+   * Children
+   */
+  children?: Array<DropLaneOut>;
+  /**
    * Document Id
    */
   document_id: string;
@@ -6112,14 +6116,34 @@ export type DropLaneOut = {
    */
   job_id?: string | null;
   /**
+   * Note
+   */
+  note?: string;
+  /**
    * Problem
    */
   problem: boolean;
   receipt: DropReceiptOut;
   /**
+   * Retry Job Id
+   */
+  retry_job_id?: string | null;
+  /**
+   * Same As
+   */
+  same_as?: string | null;
+  /**
+   * Seconds
+   */
+  seconds?: number | null;
+  /**
    * Stages
    */
   stages: Array<DropStageOut>;
+  /**
+   * Waiting
+   */
+  waiting?: number;
 };
 
 /**
@@ -6143,10 +6167,19 @@ export type DropOut = {
     [key: string]: number;
   };
   /**
+   * Ready From
+   */
+  ready_from?: number;
+  /**
+   * Ready Unsure
+   */
+  ready_unsure?: number;
+  /**
    * Stages
    */
   stages: Array<DropStageNameOut>;
   totals: DropTotalsOut;
+  watchlist?: DropWatchlistOut | null;
 };
 
 /**
@@ -6243,6 +6276,12 @@ export type DropStageOut = {
  */
 export type DropTotalsOut = {
   /**
+   * By Stage
+   */
+  by_stage?: {
+    [key: string]: number;
+  };
+  /**
    * Files
    */
   files: number;
@@ -6263,6 +6302,14 @@ export type DropTotalsOut = {
    */
   read: number;
   /**
+   * Reading
+   */
+  reading?: number;
+  /**
+   * Started At
+   */
+  started_at?: string | null;
+  /**
    * Unread
    */
   unread: number;
@@ -6270,6 +6317,20 @@ export type DropTotalsOut = {
    * Waiting
    */
   waiting: number;
+};
+
+/**
+ * DropWatchlistOut
+ */
+export type DropWatchlistOut = {
+  /**
+   * Hits
+   */
+  hits: number;
+  /**
+   * Names
+   */
+  names: Array<string>;
 };
 
 /**
