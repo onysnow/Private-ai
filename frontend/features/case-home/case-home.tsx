@@ -67,8 +67,16 @@ function usePointedYears(): {party: string | null; years: number[]} {
   return {party, years: party ? years : []};
 }
 
+// The last visit as it stood when this page load first opened the case: marking the
+// visit (on leaving, or a minute in) must not move what this load shows as "since".
+const visitAtOpen = new Map<string, string | null>();
 function readVisit(id: string): string | null {
-  try { return window.localStorage.getItem(VISIT_KEY(id)); } catch { return null; }
+  if (!visitAtOpen.has(id)) {
+    let stored: string | null = null;
+    try { stored = window.localStorage.getItem(VISIT_KEY(id)); } catch { /* private window */ }
+    visitAtOpen.set(id, stored);
+  }
+  return visitAtOpen.get(id) ?? null;
 }
 function writeVisit(id: string): void {
   try { window.localStorage.setItem(VISIT_KEY(id), new Date().toISOString()); } catch { /* private window */ }
@@ -95,6 +103,7 @@ function Stepper({index, count, total, onStep, label}: {index: number; count: nu
     <button type="button" aria-label="Previous" onClick={() => onStep(Math.max(0, index - 1))} disabled={index === 0}>‹</button>
     {index + 1} of {all.toLocaleString('en-GB')}
     <button type="button" aria-label="Next" onClick={() => onStep(Math.min(count - 1, index + 1))} disabled={index >= count - 1}>›</button>
+    <small className="ch-step-hint" aria-hidden="true">· scroll</small>
   </span>;
 }
 
