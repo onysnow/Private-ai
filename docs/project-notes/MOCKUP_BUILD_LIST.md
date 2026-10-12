@@ -21,7 +21,7 @@ screen · disabled controls say why.
 
 | Mockup | Status | Notes |
 |---|---|---|
-| The Wire (See prototype) | **built** 12 Oct | Whole case / around a party / one link, lens, follow the money, time strip. Remaining: label links with sentences and certainty line styles from SEE_1 (see §5). Not yet run on 1MDB (downloads blocked in the cloud). |
+| The Wire (See prototype) | **work in progress** (Ony, 12 Oct: needs much more design work; redesign from SEE_1, SEE_2 and research ch. 07, mockup first) | Whole case / around a party / one link, lens, follow the money, time strip. Remaining: label links with sentences and certainty line styles from SEE_1 (see §5). Not yet run on 1MDB (downloads blocked in the cloud). |
 | Decide (CHECK_1) table-row cards | **built** 12 Oct | Row facts in the question, cells shown, "already in the case". |
 | App-side suite gaps | **data built** 12 Oct | §1 below; each shown on its screen with that screen's section. |
 
