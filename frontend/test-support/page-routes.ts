@@ -379,3 +379,22 @@ export function claimDoneFixture(claimId = 'claim-1', met = true): ClaimDoneBySt
   const one = (target: 'supported' | 'confirmed') => ({claim_id: claimId, target, rules, met, left: met ? 0 : 1, unknown: 1});
   return {supported: one('supported'), confirmed: one('confirmed')};
 }
+
+/** What a Case home asks for, for an empty case: the Settings › Appearance preview draws it. */
+export function emptyCaseHomeRoutes(investigationId: string): Record<string, unknown> {
+  const base = `/api/investigations/${investigationId}`;
+  return {
+    [`GET ${base}/standing`]: {
+      investigation_id: investigationId, claims: {total: 0, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, to_check: 0, missing: 0, to_decide: 0,
+      to_decide_by_kind: {}, money: {currency: null, amount: 0, payments: 0, from_sources: 0, other_currencies: []},
+      timeline: {events: 0, from: null, to: null, years: []}, documents: {total: 0, unread: 0, failed: 0}, sources: 0, evidence: 0,
+      network: {parties: 0, links: 0}, flags: {open: 0, textbook: 0, strong: 0, faint: 0}, leads: {open: 0}, watchlist: {names: 0, new_hits: 0},
+    },
+    [`GET ${base}/decisions`]: {investigation_id: investigationId, counts: {}, total: 0, offset: 0, items: []},
+    [`GET ${base}/claims`]: [],
+    [`GET ${base}/claim-sources`]: [],
+    [`GET ${base}/red-flags`]: {investigation_id: investigationId, flags: [], gone: [], rules: [], cannot_run: [], type: null},
+    [`GET ${base}/documents`]: [],
+    [`GET ${base}/graph`]: emptyGraph(),
+  };
+}
