@@ -11,7 +11,10 @@ import type {InvestigationDeletionPreview, SettingsStatusOut} from '../../lib/ge
 import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
 import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
-import {AppearancePanel} from '../../features/appearance/appearance-panel';
+import {AppearancePanel, useAppearance} from '../../features/appearance/appearance-panel';
+import {SettingsIndex, type SettingRow} from '../../features/settings/settings-index';
+import {singleKeysOn} from '../../lib/shortcuts';
+import {FORMATS, THEMES} from '../../lib/theme';
 import {SuiteCoverage} from '../../features/suite-coverage/suite-coverage';
 import {DemoCasesLoader} from '../../features/demo/demo-cases-loader';
 import {OneMdbLoader} from '../../features/demo/one-mdb-loader';
@@ -189,108 +192,44 @@ function Settings(): ReactElement {
     error: 'border-destructive/40 bg-destructive/15 text-destructive-foreground'
   };
 
+  const look = useAppearance().kept;
+  const [keysOn, setKeysOn] = useState(true);
+  useEffect(() => { setKeysOn(singleKeysOn()); }, []);
+  const cases = investigationsQuery.data ?? [];
+  const settingRows: SettingRow[] = [
+    {group: 'You', label: 'Theme', value: THEMES.find(t => t.id === look.theme)?.name ?? look.theme, target: 'st-appearance', words: 'colour color dark'},
+    {group: 'You', label: 'Effects', value: look.effects === 'full' ? 'Full' : look.effects === 'light' ? 'Light' : 'Off', target: 'st-appearance'},
+    {group: 'You', label: 'Calm motion', value: look.motion === 'calm' ? 'On' : 'Off', target: 'st-appearance', words: 'animation reduce'},
+    {group: 'You', label: 'Single-key shortcuts', value: keysOn ? 'On' : 'Off', target: 'st-appearance', words: 'keyboard keys'},
+    {group: 'You', label: 'Format', value: FORMATS.find(f => f.id === look.format)?.name ?? look.format, target: 'st-appearance', words: 'layout'},
+    {group: 'Cases', label: 'Cases on this computer', value: String(cases.filter(c => !c.is_demo).length), target: 'st-cases'},
+    {group: 'Cases', label: '1MDB demo', value: cases.some(c => c.is_demo && c.name === '1MDB') ? 'Loaded' : 'Not loaded', target: 'st-cases', words: 'sample real'},
+    {group: 'Cases', label: 'Demo investigation', value: demoInv ? (hideDemo ? 'Hidden here' : 'Shown') : 'None', target: 'st-demo', words: 'sample seed delete'},
+    {group: 'This computer', label: 'API access', value: state === 'local' ? 'Local' : state === 'authenticated' ? 'Token saved' : state === 'needs_token' ? 'Token needed'
+      : state === 'remote_disabled' ? 'Remote off' : state === 'error' ? 'Not reached' : 'Checking', target: 'st-computer', words: 'token bearer'},
+    {group: 'This computer', label: 'Private AI', value: status?.ai?.model ?? (status ? 'Off' : 'Checking'), target: 'st-ai', words: 'model ollama'},
+    {group: 'This computer', label: 'Operator console', value: 'Loopback only', target: 'st-computer'},
+  ];
+
   return (
     <div className="mx-auto max-w-[1180px] px-6 py-14">
       <h1 className="text-3xl font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
         Settings
       </h1>
       <p className="mt-2 max-w-[640px] text-sm text-muted-foreground">
-        API access for this browser session. Connector credentials, backups, and the security audit log are on the{' '}
+        Everything you can set, under You, Cases and This computer. Connector credentials, backups, and the security audit log are on the{' '}
         <Link href="/" className="text-primary hover:underline">
           main workbench
         </Link>
         .
       </p>
-      <div className="mt-8"><AppearancePanel/></div>
+      <SettingsIndex rows={settingRows}/>
 
-      {/* API access and the operator console are both short, self-contained
-          cards -- pairing them in a 2-column grid on desktop instead of
-          stacking each full-width, one per row, like "Demo mode" below,
-          which genuinely needs the room. */}
-      <div className="mt-8 grid items-start gap-6 sm:grid-cols-2">
-      <div className="rounded-xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
-          API access
-        </h2>
-        <div className={`mt-3 rounded-md border px-3 py-2 text-sm ${stateTone[state]}`}>{message}</div>
+      <h2 className="st-group" id="st-you">You</h2>
+      <div id="st-appearance" tabIndex={-1}><AppearancePanel/></div>
 
-        {(state === 'needs_token' || state === 'authenticated') && (
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-            <input
-              type="password"
-              autoComplete="off"
-              value={tokenInput}
-              onChange={e => setTokenInput(e.target.value)}
-              placeholder="Bearer token"
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-            />
-            <button
-              type="button"
-              onClick={() => void authenticate()}
-              disabled={!tokenInput.trim()}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
-              Save token
-            </button>
-          </div>
-        )}
-
-        {api.hasAuthToken() && (
-          <button
-            type="button"
-            onClick={() => void clearSession()}
-            className="mt-3 rounded-md border border-border px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
-          >
-            Clear session token
-          </button>
-        )}
-
-        <div className="mt-4 text-xs text-muted-foreground">
-          <div>API base URL: {API}</div>
-          {status && (
-            <div className="mt-1">
-              Access mode: {status.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} ·
-              token configured on backend: {status.access.token_configured ? 'yes' : 'no'}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
-          Operator console
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The backend console is loopback-only by design -- no bearer token grants remote access to it. Open it from{' '}
-          <code>localhost</code> or <code>127.0.0.1</code> directly.
-        </p>
-        <a href="/console/" className="mt-3 inline-block text-sm text-primary hover:underline">
-          Open console
-        </a>
-      </div>
-      </div>
-
-      <div className="mt-8 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
-          Private AI
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{describeAiStatus(status?.ai)}</p>
-        {status?.ai?.model && (
-          <p className="mt-2 text-sm">
-            Model: <code>{status.ai.model}</code>{whereModelRuns(status.ai)}
-            {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}
-          </p>
-        )}
-        {status?.ai?.authority_suite?.present && (
-          <p className="mt-2 text-sm" data-testid="authority-suite">
-            Rules the AI works under: the Authority System Suite{status.ai.authority_suite.source ? <> (<code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code>)</> : null}, TAS v{status.ai.authority_suite.tas_version ?? '?'}.
-            Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.
-          </p>
-        )}
-        {status?.ai?.authority_suite?.present && <SuiteCoverage/>}
-      </div>
-
-      <div className="mt-8 rounded-xl border border-border bg-card p-5">
+      <h2 className="st-group" id="st-cases" tabIndex={-1}>Cases</h2>
+      <div className="mt-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           A real case to look around
         </h2>
@@ -308,7 +247,7 @@ function Settings(): ReactElement {
         <DemoCasesLoader/>
       </div>
 
-      <div className="mt-8 rounded-xl border border-border bg-card p-5">
+      <div id="st-demo" tabIndex={-1} className="mt-8 rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           Demo mode
         </h2>
@@ -406,6 +345,95 @@ function Settings(): ReactElement {
           </div>
         )}
       </div>
+      <h2 className="st-group" id="st-computer" tabIndex={-1}>This computer</h2>
+
+      {/* API access and the operator console are both short, self-contained
+          cards -- pairing them in a 2-column grid on desktop instead of
+          stacking each full-width, one per row, like "Demo mode" below,
+          which genuinely needs the room. */}
+      <div className="mt-4 grid items-start gap-6 sm:grid-cols-2">
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
+          API access
+        </h2>
+        <div className={`mt-3 rounded-md border px-3 py-2 text-sm ${stateTone[state]}`}>{message}</div>
+
+        {(state === 'needs_token' || state === 'authenticated') && (
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <input
+              type="password"
+              autoComplete="off"
+              value={tokenInput}
+              onChange={e => setTokenInput(e.target.value)}
+              placeholder="Bearer token"
+              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+            />
+            <button
+              type="button"
+              onClick={() => void authenticate()}
+              disabled={!tokenInput.trim()}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+            >
+              Save token
+            </button>
+          </div>
+        )}
+
+        {api.hasAuthToken() && (
+          <button
+            type="button"
+            onClick={() => void clearSession()}
+            className="mt-3 rounded-md border border-border px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            Clear session token
+          </button>
+        )}
+
+        <div className="mt-4 text-xs text-muted-foreground">
+          <div>API base URL: {API}</div>
+          {status && (
+            <div className="mt-1">
+              Access mode: {status.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} ·
+              token configured on backend: {status.access.token_configured ? 'yes' : 'no'}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
+          Operator console
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The backend console is loopback-only by design -- no bearer token grants remote access to it. Open it from{' '}
+          <code>localhost</code> or <code>127.0.0.1</code> directly.
+        </p>
+        <a href="/console/" className="mt-3 inline-block text-sm text-primary hover:underline">
+          Open console
+        </a>
+      </div>
+      </div>
+
+      <div id="st-ai" tabIndex={-1} className="mt-8 rounded-xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
+          Private AI
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">{describeAiStatus(status?.ai)}</p>
+        {status?.ai?.model && (
+          <p className="mt-2 text-sm">
+            Model: <code>{status.ai.model}</code>{whereModelRuns(status.ai)}
+            {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}
+          </p>
+        )}
+        {status?.ai?.authority_suite?.present && (
+          <p className="mt-2 text-sm" data-testid="authority-suite">
+            Rules the AI works under: the Authority System Suite{status.ai.authority_suite.source ? <> (<code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code>)</> : null}, TAS v{status.ai.authority_suite.tas_version ?? '?'}.
+            Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.
+          </p>
+        )}
+        {status?.ai?.authority_suite?.present && <SuiteCoverage/>}
+      </div>
+
     </div>
   );
 }

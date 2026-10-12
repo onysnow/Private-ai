@@ -77,7 +77,7 @@ Today: **partial**. Built: five themes as tokens, Appearance with try-then-keep,
 edge-hidden frame, ⌘K palette, breadcrumb.
 To finish:
 - [x] Appearance (12 Oct: six chips, Compare, live before/after of the real Case home, four facts, Format thumbnails; the named effect switches wait for the Rain Noir effects port below): specimen cards drawn in their own theme with six status chips and the lowest contrast pair; **live before/after divider of the real Case home** (react-compare-slider is installed); the four facts under it (contrast, calm zones, fonts, cost); effects as named switches (bokeh, rain pane, grain, iris, shutter corners, neon); Format thumbnails (Board, Editorial, Desk, Story)
-- [ ] Settings regrouped: You / Cases / This computer, each row showing its current value; settings search
+- [x] Settings regrouped (12 Oct; values for API, AI, cases, theme, effects, motion, keys, format): You / Cases / This computer, each row showing its current value; settings search
 - [ ] Edge rules: dwell ~250 ms, visible 5 px handles labelled on first use, Alt+arrows, pin per device; trail of the last five places on the left edge
 - [ ] Notifications inbox (Needs you / Everything else, snooze)
 - [ ] New-case setup (name + question, "what kind of case", "what do you have so far")
