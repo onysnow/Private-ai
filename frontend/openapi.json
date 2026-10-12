@@ -876,6 +876,306 @@
         "title": "AiReasoningStatusOut",
         "type": "object"
       },
+      "AiRunEventOut": {
+        "description": "One step of an AI run (ADR-0012). `status` is the app's colour for the verdict; `self_reported` marks what\nthe model said that no app check has confirmed.",
+        "properties": {
+          "at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "At",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "node": {
+            "title": "Node",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
+          },
+          "refs": {
+            "items": {
+              "$ref": "#/components/schemas/AiRunRefOut"
+            },
+            "title": "Refs",
+            "type": "array"
+          },
+          "rule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule"
+          },
+          "self_reported": {
+            "title": "Self Reported",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verdict"
+          }
+        },
+        "required": [
+          "n",
+          "at",
+          "kind",
+          "node",
+          "system",
+          "rule",
+          "status",
+          "verdict",
+          "text",
+          "refs",
+          "parent",
+          "self_reported",
+          "detail"
+        ],
+        "title": "AiRunEventOut",
+        "type": "object"
+      },
+      "AiRunEventsOut": {
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/AiRunEventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "run": {
+            "$ref": "#/components/schemas/AiRunOut"
+          }
+        },
+        "required": [
+          "run",
+          "events"
+        ],
+        "title": "AiRunEventsOut",
+        "type": "object"
+      },
+      "AiRunOut": {
+        "properties": {
+          "candidate_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Id"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "events": {
+            "title": "Events",
+            "type": "integer"
+          },
+          "finished": {
+            "title": "Finished",
+            "type": "boolean"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "problems": {
+            "title": "Problems",
+            "type": "integer"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "review_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Status"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "working_theory": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working Theory"
+          }
+        },
+        "required": [
+          "run_id",
+          "status",
+          "finished",
+          "module",
+          "question",
+          "working_theory",
+          "created_at",
+          "started_at",
+          "finished_at",
+          "candidate_id",
+          "review_status",
+          "events",
+          "problems",
+          "message",
+          "error"
+        ],
+        "title": "AiRunOut",
+        "type": "object"
+      },
+      "AiRunRefOut": {
+        "properties": {
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id"
+        ],
+        "title": "AiRunRefOut",
+        "type": "object"
+      },
+      "AiRunsOut": {
+        "properties": {
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/AiRunOut"
+            },
+            "title": "Runs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "runs"
+        ],
+        "title": "AiRunsOut",
+        "type": "object"
+      },
       "ApiAccessStatusOut": {
         "properties": {
           "investigation_scope_configured": {
@@ -48047,6 +48347,220 @@
           }
         },
         "summary": "List Investigation Ai Analysis Candidates"
+      }
+    },
+    "/api/investigations/{investigation_id}/ai-runs": {
+      "get": {
+        "description": "This case's AI runs, newest first.",
+        "operationId": "list_ai_runs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiRunsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Ai Runs"
+      }
+    },
+    "/api/investigations/{investigation_id}/ai-runs/{run_id}/events": {
+      "get": {
+        "description": "The run and its events after `after` (0 = from the start).",
+        "operationId": "list_ai_run_events",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "After",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiRunEventsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Ai Run Events"
+      }
+    },
+    "/api/investigations/{investigation_id}/ai-runs/{run_id}/events/stream": {
+      "get": {
+        "description": "The run's events as Server-Sent Events (`id` is the event's n), until the run has finished.",
+        "operationId": "stream_ai_run_events",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "After",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "last-event-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Stream Ai Run Events"
       }
     },
     "/api/investigations/{investigation_id}/assistant/case-synthesis": {

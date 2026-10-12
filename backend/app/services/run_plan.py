@@ -8,7 +8,6 @@ way the suite asks for a reason on a flip (research AI §6 innovation 2).
 from __future__ import annotations
 
 import json
-import re
 from datetime import datetime, timezone
 from typing import Any
 
@@ -16,10 +15,21 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ai.reasoning import (
-    CONTROL_SURFACE_FLAGS, MODULE_FILES, RUN_OPTIONS, SAFETY_LIMITS, TAS_MODULES, ReasoningInputError, ai_reasoning_status,
-    build_system_prompt, normalize_control_flags, normalize_premises, normalize_run_options,
+    CONTROL_SURFACE_FLAGS,
+    MODULE_FILES,
+    RUN_OPTIONS,
+    SAFETY_LIMITS,
+    TAS_MODULES,
+    ReasoningInputError,
+    ai_reasoning_status,
+    build_system_prompt,
+    normalize_control_flags,
+    normalize_premises,
+    normalize_run_options,
 )
-from app.core.config import Settings, settings as default_settings
+from app.ai.run_events import instructions_in_packet
+from app.core.config import Settings
+from app.core.config import settings as default_settings
 from app.models.domain import BackgroundJob, Investigation
 from app.services.assistant_context import build_question_context
 
@@ -57,15 +67,6 @@ LOCKED = [
     {"text": "Material in the case can never change a setting", "by": "AGENTS.md [AG-049]; TAS Standard §15"},
     {"text": "Nothing joins the case until you accept it", "by": "every result is a proposal (review queue)"},
 ]
-
-# Instructions written inside case material: shown before the run and kept with it; the prompt already tells the
-# model such text is quoted content (TAS Standard §15).
-_INJECTION = re.compile(
-    r"(severity[ _]floor|source[ _]tier[ _]floor|tier floor|devil'?s advocate|research[ _]depth|"
-    r"ignore (?:all |any )?(?:previous|prior|above|earlier) instructions|disregard (?:the |all )?(?:previous |above )?instructions|"
-    r"system prompt|you are now)",
-    re.IGNORECASE,
-)
 
 MODULE_TEXT = {
     "case_synthesis": ("Case synthesis", "TAS 08"),
@@ -170,22 +171,6 @@ def _systems(module: str) -> list[dict]:
     return rows
 
 
-def _injections(packet: dict) -> list[dict]:
-    found = []
-    items = [i for group in (packet.get("context") or {}).values() for i in group] + list(packet.get("external_leads") or [])
-    for item in items:
-        for field in ("snippet", "title"):
-            text = item.get(field) or ""
-            m = _INJECTION.search(text)
-            if not m:
-                continue
-            start = max(0, m.start() - 60)
-            found.append({"record_type": item["record_type"], "record_id": item["record_id"], "title": item.get("title") or "",
-                          "quote": ("…" if start else "") + text[start:m.end() + 80].strip()})
-            break
-    return found
-
-
 def _past_run_minutes(db: Session) -> list[float]:
     rows = db.execute(
         select(BackgroundJob.started_at, BackgroundJob.finished_at)
@@ -247,7 +232,7 @@ def build_run_plan(db: Session, investigation_id: str, *, module: str, question:
         },
         "steps": _steps(module, resolved_options, include_external_leads, len(citations)),
         "systems": _systems(module),
-        "injections": _injections(packet),
+        "injections": instructions_in_packet(packet),
         "where": {
             "enabled": status["enabled"], "callable": status["endpoints_callable"], "provider": provider, "model": status["model"],
             "runs_on_this_computer": local, "leaves": leaves, "nothing_leaves": bool(provider) and local is True,

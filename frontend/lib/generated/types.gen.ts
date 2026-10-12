@@ -539,6 +539,174 @@ export type AiReasoningStatusOut = {
 };
 
 /**
+ * AiRunEventOut
+ *
+ * One step of an AI run (ADR-0012). `status` is the app's colour for the verdict; `self_reported` marks what
+ * the model said that no app check has confirmed.
+ */
+export type AiRunEventOut = {
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * Detail
+   */
+  detail: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * N
+   */
+  n: number;
+  /**
+   * Node
+   */
+  node: string;
+  /**
+   * Parent
+   */
+  parent: number | null;
+  /**
+   * Refs
+   */
+  refs: Array<AiRunRefOut>;
+  /**
+   * Rule
+   */
+  rule: string | null;
+  /**
+   * Self Reported
+   */
+  self_reported: boolean;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Verdict
+   */
+  verdict: string | null;
+};
+
+/**
+ * AiRunEventsOut
+ */
+export type AiRunEventsOut = {
+  /**
+   * Events
+   */
+  events: Array<AiRunEventOut>;
+  run: AiRunOut;
+};
+
+/**
+ * AiRunOut
+ */
+export type AiRunOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string | null;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Error
+   */
+  error: string | null;
+  /**
+   * Events
+   */
+  events: number;
+  /**
+   * Finished
+   */
+  finished: boolean;
+  /**
+   * Finished At
+   */
+  finished_at: string | null;
+  /**
+   * Message
+   */
+  message: string | null;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Problems
+   */
+  problems: number;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Review Status
+   */
+  review_status: string | null;
+  /**
+   * Run Id
+   */
+  run_id: string;
+  /**
+   * Started At
+   */
+  started_at: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Working Theory
+   */
+  working_theory: string | null;
+};
+
+/**
+ * AiRunRefOut
+ */
+export type AiRunRefOut = {
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+};
+
+/**
+ * AiRunsOut
+ */
+export type AiRunsOut = {
+  /**
+   * Runs
+   */
+  runs: Array<AiRunOut>;
+};
+
+/**
  * ApiAccessStatusOut
  */
 export type ApiAccessStatusOut = {
@@ -22078,6 +22246,138 @@ export type ListInvestigationAiAnalysisCandidatesResponses = {
 
 export type ListInvestigationAiAnalysisCandidatesResponse =
   ListInvestigationAiAnalysisCandidatesResponses[keyof ListInvestigationAiAnalysisCandidatesResponses];
+
+export type ListAiRunsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Limit
+     */
+    limit?: number;
+  };
+  url: '/api/investigations/{investigation_id}/ai-runs';
+};
+
+export type ListAiRunsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListAiRunsError = ListAiRunsErrors[keyof ListAiRunsErrors];
+
+export type ListAiRunsResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiRunsOut;
+};
+
+export type ListAiRunsResponse = ListAiRunsResponses[keyof ListAiRunsResponses];
+
+export type ListAiRunEventsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Run Id
+     */
+    run_id: string;
+  };
+  query?: {
+    /**
+     * After
+     */
+    after?: number;
+  };
+  url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/events';
+};
+
+export type ListAiRunEventsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListAiRunEventsError =
+  ListAiRunEventsErrors[keyof ListAiRunEventsErrors];
+
+export type ListAiRunEventsResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiRunEventsOut;
+};
+
+export type ListAiRunEventsResponse =
+  ListAiRunEventsResponses[keyof ListAiRunEventsResponses];
+
+export type StreamAiRunEventsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Last-Event-Id
+     */
+    'last-event-id'?: string | null;
+  };
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Run Id
+     */
+    run_id: string;
+  };
+  query?: {
+    /**
+     * After
+     */
+    after?: number;
+  };
+  url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/events/stream';
+};
+
+export type StreamAiRunEventsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type StreamAiRunEventsError =
+  StreamAiRunEventsErrors[keyof StreamAiRunEventsErrors];
+
+export type StreamAiRunEventsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
 
 export type InvestigationCaseSynthesisData = {
   body: CaseSynthesisRequest;

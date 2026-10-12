@@ -28,6 +28,7 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
+    Story, StorySection, StoryClaim, AIRunEvent,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -44,6 +45,7 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
+        Story, StorySection, StoryClaim, AIRunEvent,
     ]
 }
 
@@ -83,6 +85,10 @@ RESTORE_ORDER = [
     # Writeups/decks may point at an ai_analysis_candidate (source_ai_candidate_id,
     # nullable) when they were promoted from one, so they must restore after it.
     "writeups", "decks",
+    # What the story needs (ADR-0010): a story may point at its write-up, so after writeups; its claims after claims.
+    "stories", "story_sections", "story_claims",
+    # Each AI run's steps as they happened (ADR-0012): the run record travels with the case.
+    "ai_run_events",
 ]
 
 
@@ -150,12 +156,15 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
+        Story, AIRunEvent,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
         for m in direct_models
     }
 
+    story_sections = _rows(db, StorySection, {x.id for x in direct["stories"]}, StorySection.story_id)
+    story_claims = _rows(db, StoryClaim, {x.id for x in story_sections}, StoryClaim.section_id)
     batch_items = _rows(db, IngestionBatchItem, {x.id for x in direct["ingestion_batches"]}, IngestionBatchItem.batch_id)
     relationship_edge_ids = {x.id for x in direct["relationship_edges"]}
     relationship_evidence_reviews = _rows(db, RelationshipEvidenceReviewEvent, relationship_edge_ids, RelationshipEvidenceReviewEvent.relationship_edge_id)
@@ -193,6 +202,8 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "pattern_flags": direct["pattern_flags"],
         "check_items": direct["check_items"],
         "case_records": direct["case_records"],
+        "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
+        "ai_run_events": direct["ai_run_events"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

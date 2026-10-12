@@ -201,6 +201,90 @@ export const zAiReasoningStatusOut = z.object({
 });
 
 /**
+ * AiRunOut
+ */
+export const zAiRunOut = z.object({
+  candidate_id: z.string().nullable(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  error: z.string().nullable(),
+  events: z.number().int(),
+  finished: z.boolean(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  message: z.string().nullable(),
+  module: z.string(),
+  problems: z.number().int(),
+  question: z.string(),
+  review_status: z.string().nullable(),
+  run_id: z.string(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  status: z.string(),
+  working_theory: z.string().nullable(),
+});
+
+/**
+ * AiRunRefOut
+ */
+export const zAiRunRefOut = z.object({
+  record_id: z.string(),
+  record_type: z.string(),
+});
+
+/**
+ * AiRunEventOut
+ *
+ * One step of an AI run (ADR-0012). `status` is the app's colour for the verdict; `self_reported` marks what
+ * the model said that no app check has confirmed.
+ */
+export const zAiRunEventOut = z.object({
+  at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  detail: z.record(z.unknown()).nullable(),
+  kind: z.string(),
+  n: z.number().int(),
+  node: z.string(),
+  parent: z.number().int().nullable(),
+  refs: z.array(zAiRunRefOut),
+  rule: z.string().nullable(),
+  self_reported: z.boolean(),
+  status: z.string(),
+  system: z.string(),
+  text: z.string(),
+  verdict: z.string().nullable(),
+});
+
+/**
+ * AiRunEventsOut
+ */
+export const zAiRunEventsOut = z.object({
+  events: z.array(zAiRunEventOut),
+  run: zAiRunOut,
+});
+
+/**
+ * AiRunsOut
+ */
+export const zAiRunsOut = z.object({
+  runs: z.array(zAiRunOut),
+});
+
+/**
  * ApiAccessStatusOut
  */
 export const zApiAccessStatusOut = z.object({
@@ -9531,6 +9615,46 @@ export const zListInvestigationAiAnalysisCandidatesQuery = z.object({
  */
 export const zListInvestigationAiAnalysisCandidatesResponse =
   zAiAnalysisCandidatesOut;
+
+export const zListAiRunsPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zListAiRunsQuery = z.object({
+  limit: z.number().int().gte(1).lte(100).optional().default(20),
+});
+
+/**
+ * Successful Response
+ */
+export const zListAiRunsResponse = zAiRunsOut;
+
+export const zListAiRunEventsPath = z.object({
+  investigation_id: z.string(),
+  run_id: z.string(),
+});
+
+export const zListAiRunEventsQuery = z.object({
+  after: z.number().int().gte(0).optional().default(0),
+});
+
+/**
+ * Successful Response
+ */
+export const zListAiRunEventsResponse = zAiRunEventsOut;
+
+export const zStreamAiRunEventsHeaders = z.object({
+  'last-event-id': z.string().nullish(),
+});
+
+export const zStreamAiRunEventsPath = z.object({
+  investigation_id: z.string(),
+  run_id: z.string(),
+});
+
+export const zStreamAiRunEventsQuery = z.object({
+  after: z.number().int().gte(0).optional().default(0),
+});
 
 export const zInvestigationCaseSynthesisBody = zCaseSynthesisRequest;
 

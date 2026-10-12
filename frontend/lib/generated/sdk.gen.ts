@@ -8,6 +8,7 @@ import {
   formDataBodySerializer,
   type Options as Options2,
   type RequestResult,
+  type ServerSentEventsResult,
   type TDataShape,
 } from './client';
 import { client } from './client.gen';
@@ -480,6 +481,12 @@ import type {
   LinkLeadData,
   LinkLeadErrors,
   LinkLeadResponses,
+  ListAiRunEventsData,
+  ListAiRunEventsErrors,
+  ListAiRunEventsResponses,
+  ListAiRunsData,
+  ListAiRunsErrors,
+  ListAiRunsResponses,
   ListAppUsersData,
   ListAppUsersErrors,
   ListAppUsersResponses,
@@ -774,6 +781,9 @@ import type {
   StartStoryWriteupData,
   StartStoryWriteupErrors,
   StartStoryWriteupResponses,
+  StreamAiRunEventsData,
+  StreamAiRunEventsErrors,
+  StreamAiRunEventsResponses,
   SyncCorpusNowData,
   SyncCorpusNowErrors,
   SyncCorpusNowResponses,
@@ -1170,6 +1180,12 @@ import {
   zLinkLeadBody,
   zLinkLeadPath,
   zLinkLeadResponse,
+  zListAiRunEventsPath,
+  zListAiRunEventsQuery,
+  zListAiRunEventsResponse,
+  zListAiRunsPath,
+  zListAiRunsQuery,
+  zListAiRunsResponse,
   zListAppUsersResponse,
   zListAreasResponse,
   zListAssessmentsPath,
@@ -1399,6 +1415,9 @@ import {
   zSettingsStatusResponse,
   zStartStoryWriteupPath,
   zStartStoryWriteupResponse,
+  zStreamAiRunEventsHeaders,
+  zStreamAiRunEventsPath,
+  zStreamAiRunEventsQuery,
   zSyncCorpusNowPath,
   zSyncCorpusNowResponse,
   zSyncOpenalephDocumentPath,
@@ -5220,6 +5239,90 @@ export const listInvestigationAiAnalysisCandidates = <
     responseValidator: async (data) =>
       await zListInvestigationAiAnalysisCandidatesResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/ai-analysis-candidates',
+    ...options,
+  });
+
+/**
+ * List Ai Runs
+ *
+ * This case's AI runs, newest first.
+ */
+export const listAiRuns = <ThrowOnError extends boolean = false>(
+  options: Options<ListAiRunsData, ThrowOnError>,
+): RequestResult<ListAiRunsResponses, ListAiRunsErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ListAiRunsResponses,
+    ListAiRunsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListAiRunsPath,
+          query: zListAiRunsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListAiRunsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/ai-runs',
+    ...options,
+  });
+
+/**
+ * List Ai Run Events
+ *
+ * The run and its events after `after` (0 = from the start).
+ */
+export const listAiRunEvents = <ThrowOnError extends boolean = false>(
+  options: Options<ListAiRunEventsData, ThrowOnError>,
+): RequestResult<
+  ListAiRunEventsResponses,
+  ListAiRunEventsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListAiRunEventsResponses,
+    ListAiRunEventsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListAiRunEventsPath,
+          query: zListAiRunEventsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListAiRunEventsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/events',
+    ...options,
+  });
+
+/**
+ * Stream Ai Run Events
+ *
+ * The run's events as Server-Sent Events (`id` is the event's n), until the run has finished.
+ */
+export const streamAiRunEvents = <ThrowOnError extends boolean = false>(
+  options: Options<StreamAiRunEventsData, ThrowOnError, unknown>,
+): Promise<ServerSentEventsResult<StreamAiRunEventsResponses>> =>
+  (options.client ?? client).sse.get<
+    StreamAiRunEventsResponses,
+    StreamAiRunEventsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zStreamAiRunEventsHeaders.optional(),
+          path: zStreamAiRunEventsPath,
+          query: zStreamAiRunEventsQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/events/stream',
     ...options,
   });
 

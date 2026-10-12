@@ -32,6 +32,7 @@ from app.api.routes_settings import router as settings_router
 from app.api.routes_entities import router as entities_router
 from app.api.routes_writeups import router as writeups_router
 from app.api.routes_stories import router as stories_router
+from app.api.routes_ai_runs import router as ai_runs_router
 from app.api.routes_decks import router as decks_router
 from app.api.routes_jobs import router as jobs_router
 from app.api.routes_corpus import router as corpus_router
@@ -94,6 +95,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(entities_router)
     app.include_router(writeups_router)
     app.include_router(stories_router)
+    app.include_router(ai_runs_router)
     app.include_router(decks_router)
     app.include_router(jobs_router)
     app.include_router(visuals_router)

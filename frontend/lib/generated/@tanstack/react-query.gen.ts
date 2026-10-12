@@ -165,6 +165,8 @@ import {
   leadQueue,
   linkClaimEvidenceEndpoint,
   linkLead,
+  listAiRunEvents,
+  listAiRuns,
   listAppUsers,
   listAreas,
   listAssessments,
@@ -264,6 +266,7 @@ import {
   setStoryThesis,
   settingsStatus,
   startStoryWriteup,
+  streamAiRunEvents,
   syncCorpusNow,
   syncOpenalephDocument,
   tagARecord,
@@ -747,6 +750,12 @@ import type {
   LinkLeadData,
   LinkLeadError,
   LinkLeadResponse,
+  ListAiRunEventsData,
+  ListAiRunEventsError,
+  ListAiRunEventsResponse,
+  ListAiRunsData,
+  ListAiRunsError,
+  ListAiRunsResponse,
   ListAppUsersData,
   ListAppUsersError,
   ListAppUsersResponse,
@@ -1040,6 +1049,8 @@ import type {
   StartStoryWriteupData,
   StartStoryWriteupError,
   StartStoryWriteupResponse,
+  StreamAiRunEventsData,
+  StreamAiRunEventsError,
   SyncCorpusNowData,
   SyncCorpusNowError,
   SyncCorpusNowResponse,
@@ -4753,6 +4764,169 @@ export const listInvestigationAiAnalysisCandidatesInfiniteOptions = (
         return data;
       },
       queryKey: listInvestigationAiAnalysisCandidatesInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const listAiRunsQueryKey = (options: Options<ListAiRunsData>) =>
+  createQueryKey('listAiRuns', options);
+
+/**
+ * List Ai Runs
+ *
+ * This case's AI runs, newest first.
+ */
+export const listAiRunsOptions = (options: Options<ListAiRunsData>) =>
+  queryOptions<
+    ListAiRunsResponse,
+    ListAiRunsError,
+    ListAiRunsResponse,
+    ReturnType<typeof listAiRunsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listAiRuns({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listAiRunsQueryKey(options),
+  });
+
+export const listAiRunEventsQueryKey = (
+  options: Options<ListAiRunEventsData>,
+) => createQueryKey('listAiRunEvents', options);
+
+/**
+ * List Ai Run Events
+ *
+ * The run and its events after `after` (0 = from the start).
+ */
+export const listAiRunEventsOptions = (options: Options<ListAiRunEventsData>) =>
+  queryOptions<
+    ListAiRunEventsResponse,
+    ListAiRunEventsError,
+    ListAiRunEventsResponse,
+    ReturnType<typeof listAiRunEventsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listAiRunEvents({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listAiRunEventsQueryKey(options),
+  });
+
+export const listAiRunEventsInfiniteQueryKey = (
+  options: Options<ListAiRunEventsData>,
+): QueryKey<Options<ListAiRunEventsData>> =>
+  createQueryKey('listAiRunEvents', options, true);
+
+/**
+ * List Ai Run Events
+ *
+ * The run and its events after `after` (0 = from the start).
+ */
+export const listAiRunEventsInfiniteOptions = (
+  options: Options<ListAiRunEventsData>,
+) => {
+  const opts = infiniteQueryOptions<
+    ListAiRunEventsResponse,
+    ListAiRunEventsError,
+    InfiniteData<ListAiRunEventsResponse>,
+    QueryKey<Options<ListAiRunEventsData>>,
+    | number
+    | Pick<
+        QueryKey<Options<ListAiRunEventsData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ListAiRunEventsData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  after: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await listAiRunEvents({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: listAiRunEventsInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const streamAiRunEventsInfiniteQueryKey = (
+  options: Options<StreamAiRunEventsData, boolean, unknown>,
+): QueryKey<Options<StreamAiRunEventsData, boolean, unknown>> =>
+  createQueryKey('streamAiRunEvents', options, true);
+
+/**
+ * Stream Ai Run Events
+ *
+ * The run's events as Server-Sent Events (`id` is the event's n), until the run has finished.
+ */
+export const streamAiRunEventsInfiniteOptions = (
+  options: Options<StreamAiRunEventsData, boolean, unknown>,
+) => {
+  const opts = infiniteQueryOptions<
+    unknown,
+    StreamAiRunEventsError,
+    InfiniteData<unknown>,
+    QueryKey<Options<StreamAiRunEventsData, boolean, unknown>>,
+    | number
+    | Pick<
+        QueryKey<Options<StreamAiRunEventsData, boolean, unknown>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<StreamAiRunEventsData, boolean, unknown>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  after: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await streamAiRunEvents({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: streamAiRunEventsInfiniteQueryKey(options),
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;

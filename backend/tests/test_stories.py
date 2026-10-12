@@ -63,3 +63,19 @@ def test_the_tree_is_as_strong_as_its_weakest_claim_and_ready_waits_for_every_ga
     assert client.delete(f"/api/investigations/{other}/story/sections/{section['id']}").status_code == 404
     story = ok(client.delete(f"/api/investigations/{inv}/story/sections/{section['id']}/claims/{unshown['id']}"))
     assert story["sections"][0]["status"] == "shown" and len(story["unplaced"]) == 1
+
+
+def test_the_story_travels_with_the_case_backup():
+    from app.db.session import SessionLocal
+    from app.services.exports import collect_investigation_records
+
+    inv = ok(client.post("/api/investigations", json={"name": "Backup"}))["id"]
+    claim = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "The land was sold"}))
+    ok(client.put(f"/api/investigations/{inv}/story", json={"thesis": "The land was sold cheaply"}))
+    section = ok(client.post(f"/api/investigations/{inv}/story/sections", json={"title": "The sale"}))["sections"][0]
+    ok(client.post(f"/api/investigations/{inv}/story/sections/{section['id']}/claims", json={"claim_id": claim["id"]}))
+    with SessionLocal() as db:
+        records = collect_investigation_records(db, inv)
+    assert [r["thesis"] for r in records["stories"]] == ["The land was sold cheaply"]
+    assert [r["title"] for r in records["story_sections"]] == ["The sale"]
+    assert [r["claim_id"] for r in records["story_claims"]] == [claim["id"]]

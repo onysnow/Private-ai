@@ -4929,3 +4929,53 @@ class RunPlanOut(ResponseModel):
     profile: RunProfileOut
     locked: list[RunPlanLockedOut]
     safety_limits: list[str]
+
+
+class AiRunRefOut(ResponseModel):
+    record_type: str
+    record_id: str
+
+
+class AiRunEventOut(ResponseModel):
+    """One step of an AI run (ADR-0012). `status` is the app's colour for the verdict; `self_reported` marks what
+    the model said that no app check has confirmed."""
+    n: int
+    at: Timestamp
+    kind: str
+    node: str
+    system: str
+    rule: str | None
+    status: str
+    verdict: str | None
+    text: str
+    refs: list[AiRunRefOut]
+    parent: int | None
+    self_reported: bool
+    detail: dict[str, Any] | None
+
+
+class AiRunOut(ResponseModel):
+    run_id: str
+    status: str
+    finished: bool
+    module: str
+    question: str
+    working_theory: str | None
+    created_at: Timestamp
+    started_at: Timestamp | None
+    finished_at: Timestamp | None
+    candidate_id: str | None
+    review_status: str | None
+    events: int
+    problems: int
+    message: str | None
+    error: str | None
+
+
+class AiRunsOut(ResponseModel):
+    runs: list[AiRunOut]
+
+
+class AiRunEventsOut(ResponseModel):
+    run: AiRunOut
+    events: list[AiRunEventOut]

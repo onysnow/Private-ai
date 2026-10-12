@@ -84,6 +84,7 @@ from app.models.annotations import (
 )
 from app.models.ai import (
     AIAnalysisCandidate,
+    AIRunEvent,
 )
 from app.models.writeups import (
     Writeup,
@@ -166,6 +167,7 @@ __all__ = [
     "PatternFlag",
     "CheckItem",
     "AIAnalysisCandidate",
+    "AIRunEvent",
     "Writeup",
     "Story",
     "StoryClaim",
