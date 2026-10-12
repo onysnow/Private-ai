@@ -29,6 +29,7 @@ import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
 import {NewCaseSetup} from '../new-case/new-case-setup';
 import {DecisionCard} from './decision-card';
+import {RainPane} from '../effects/rain-pane';
 import {MiniNetwork} from './mini-network';
 import {PagePicture} from './decision-card';
 import {HOLD_MS, useDecisions} from './use-decisions';
@@ -467,7 +468,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
   const id = investigation?.id ?? '';
   if (!investigation) return loading ? <div className="ch-home ch-loading" aria-busy="true"><div className="ch-skeleton"/></div> : <div className="ch-home"><FirstCase onSwitch={onSwitch}/></div>;
   return <div className="ch-home" data-testid="case-home">
-    <header className="ch-top">
+    <RainPane as="header" className="ch-top" still={preview}>
       <div className="ch-name">
         <h1>{investigation.name}</h1>
         <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
@@ -476,7 +477,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
       {!preview && <HomeTools/>}
       <CaseQuestion investigation={investigation}/>
       <StandingStrip investigationId={id}/>
-    </header>
+    </RainPane>
     <div className="ch-grid">
       <div className="ch-col"><BringIn investigationId={id}/><CheckModule investigationId={id}/></div>
       <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id} markVisit={!preview}/></div>

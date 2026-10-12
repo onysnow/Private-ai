@@ -3,6 +3,8 @@ import './globals.css';
 import '../styles/themes.css';
 import '../styles/case.css';
 import '../styles/settings.css';
+// The OnySnow Studios effect system's stylesheet, then where the workbench places its effects (ADR-0009).
+import '../vendor/onysnow-effects/effects.css';
 import '../styles/effects.css';
 import '../styles/wire.css';
 import '../styles/drop.css';

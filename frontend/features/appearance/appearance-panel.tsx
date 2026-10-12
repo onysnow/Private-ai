@@ -8,6 +8,8 @@ import type {ReactElement} from 'react';
 import {useEffect, useState} from 'react';
 
 import {STATUS_WORDS, LEVEL_WORDS} from '../../components/status';
+import {clearHeroPhoto, loadHeroPhoto, onHeroPhotoChange, saveHeroPhoto, type HeroPhoto} from '../../lib/hero-photo';
+import {webglAvailable} from '../effects/webgl';
 import {ThemeCompare} from './theme-compare';
 import {
   currentAppearance, DEFAULT_APPEARANCE, FORMATS, keepAppearance, keptAppearance, onAppearanceChange, THEMES, tryingTheme, tryTheme,
@@ -52,10 +54,10 @@ export function TryingBar(): ReactElement | null {
 
 const EFFECTS: {id: Effects; name: string}[] = [{id: 'full', name: 'Full'}, {id: 'light', name: 'Light'}, {id: 'off', name: 'Off'}];
 
-/** The named effects, ported from the OnySnow Studios site; the rain pane waits for the WebGL engine (ADR-0009). */
+/** The named effects, from the OnySnow Studios effect system (vendor/onysnow-effects, ADR-0009). */
 const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeId[]}[] = [
   {id: 'bokeh', name: 'Bokeh lights on the board', line: 'CSS only · drifts 23–34 s', themes: ['rain-noir']},
-  {id: null, name: 'Rain on the case-home pane', line: 'Needs the WebGL engine (ADR-0009)', themes: []},
+  {id: 'rain', name: 'Rain on the case-home pane', line: 'WaterDrops · one pane only · stops if calm', themes: ['rain-noir']},
   {id: 'grain', name: 'Film grain', line: 'Never on documents', themes: ['rain-noir', 'archive']},
   {id: 'iris', name: 'Iris when a feature opens', line: '8-blade shutter · fades if calm', themes: ['rain-noir']},
   {id: 'shutter', name: 'Shutter corners on save', line: 'Brackets only, no flash', themes: ['rain-noir']},
@@ -88,12 +90,42 @@ function Switch({on, label, line, disabled, onChange}: {on: boolean; label: stri
   </label>;
 }
 
+/** The photograph behind Rain Noir's glass: the reporter's own, kept in this browser, decoration only. */
+function RainPhoto(): ReactElement {
+  const [photo, setPhoto] = useState<HeroPhoto | null>(null);
+  const [refused, setRefused] = useState(false);
+  useEffect(() => {
+    let live = true;
+    const read = () => void loadHeroPhoto().then(p => { if (live) setPhoto(p); });
+    read();
+    const off = onHeroPhotoChange(read);
+    return () => { live = false; off(); };
+  }, []);
+  return <div className="ap-photo">
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    {photo ? <img src={photo.url} alt=""/> : <span className="ap-photo-none" aria-hidden="true">no photograph</span>}
+    <span><b>Photograph behind the glass</b>
+      <small>{refused ? 'That file is not a picture.' : photo ? `${photo.name} · kept in this browser only, never with the case`
+        : 'The rain needs a picture behind it: one of your own night shots. Kept in this browser only, never with the case.'}</small></span>
+    <label className="ap-photo-pick">{photo ? 'Change…' : 'Choose…'}
+      <input type="file" accept="image/*" onChange={e => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        if (file) void saveHeroPhoto(file).then(ok => setRefused(!ok));
+      }}/></label>
+    {photo && <button type="button" onClick={() => void clearHeroPhoto()}>Remove</button>}
+  </div>;
+}
+
 export function AppearancePanel(): ReactElement {
   const {now, kept, trying} = useAppearance();
   const [pointed, setPointed] = useState<ThemeId | null>(null);
   const looking: ThemeId = pointed ?? trying ?? kept.theme;
   const info = THEMES.find(t => t.id === looking)!;
   const lookingWord = trying === looking ? 'trying' : looking === kept.theme ? 'now' : 'pointed at';
+  // Read after mounting, so the first render matches the server's.
+  const [webgl, setWebgl] = useState(true);
+  useEffect(() => setWebgl(webglAvailable()), []);
   return <section className="ap" aria-label="Appearance">
     <div className="ap-two">
       <div className="ap-pane">
@@ -141,6 +173,7 @@ export function AppearancePanel(): ReactElement {
         </div>
         <div className="ap-switches">
           {NAMED.map(n => {
+            if (n.id === 'rain' && !webgl) return <Switch key={n.name} label={n.name} disabled line="Not available on this computer (no WebGL)" on={false} onChange={() => {}}/>;
             const usable = n.id !== null && now.effects !== 'off';
             const forTheme = n.id === null || n.themes.includes(now.theme);
             return <Switch key={n.name} label={n.name} disabled={!usable}
@@ -149,6 +182,7 @@ export function AppearancePanel(): ReactElement {
               onChange={on => { if (n.id) keepAppearance({off: on ? now.off.filter(x => x !== n.id) : [...now.off, n.id]}); }}/>;
           })}
         </div>
+        {webgl && now.theme === 'rain-noir' && now.effects !== 'off' && !now.off.includes('rain') && <RainPhoto/>}
         <Switch on={now.motion === 'calm'} label="Calm motion" line="Slides become fades and moving effects stand still. Your computer’s reduce-motion setting does the same."
           onChange={on => keepAppearance({motion: on ? 'calm' : 'normal'})}/>
       </div>

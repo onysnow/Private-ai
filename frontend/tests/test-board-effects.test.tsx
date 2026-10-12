@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// Rain Noir's board effects (ported from the OnySnow Studios site): bokeh on the board, the iris
+// Rain Noir's board effects (the OnySnow Studios effect system's): bokeh on the board, the iris
 // when a feature opens, shutter corners on save, neon on a Textbook title; each with its switch,
 // all off with Effects Off, the moving ones off with Effects Light or Calm motion.
 import {act, cleanup, render, screen} from '@testing-library/react';
@@ -35,7 +35,7 @@ describe('board effects', () => {
     const {container} = render(<BoardEffects/>);
     expect(container.querySelectorAll('.bokeh')).toHaveLength(6);
     act(() => { window.dispatchEvent(new Event(FEATURE_OPEN_EVENT)); });
-    expect(container.querySelectorAll('.iris-blade')).toHaveLength(8);
+    expect(container.querySelectorAll('.iris-open .custom-cursor__blade')).toHaveLength(8);
     act(() => { window.dispatchEvent(new Event(SHUTTER_EVENT)); });
     expect(container.querySelector('.shutter-frame[data-firing]')).not.toBeNull();
   });

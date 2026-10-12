@@ -1,6 +1,6 @@
 # Start here (12 Oct 2026)
 
-**The work plan is `MOCKUP_BUILD_LIST.md`** (Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct (PR #58 into timeline-wip): table-row Decide cards, The Wire, the app-side suite gaps (data and API), Case home to HOME_1, the frame and Settings to HOME_2 (all but the Rain Noir effects), The Drop and the reading room (INTAKE_1/2; History tab, per-file stream, web links and "already in the case" on reading-room cards still to do). Next: §5 See (SEE_1 network into The Wire, SEE_2 money).
+**The work plan is `MOCKUP_BUILD_LIST.md`** (Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct (PR #58 into timeline-wip): table-row Decide cards, The Wire, the app-side suite gaps (data and API), Case home to HOME_1, the frame and Settings to HOME_2, the whole OnySnow Studios effect system brought in with the rain pane on the case title band (ADR-0009; frosted Glass panels still to do), The Drop and the reading room (INTAKE_1/2; History tab, per-file stream, web links and "already in the case" on reading-room cards still to do). Next: §5 See (SEE_1 network into The Wire, SEE_2 money).
 
 This is where the Workbench redesign stands, for a new session picking it up. The branch is
 `timeline-wip`.

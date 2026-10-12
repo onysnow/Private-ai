@@ -19,7 +19,7 @@ export const THEMES: ThemeInfo[] = [
   {id: 'case-night', name: 'Case Night', mood: 'The newsroom after dark: navy, cream paper, an amber lamp.',
     swatches: ['#14263A', '#1E3448', '#26425A', '#2E4D67', '#F5ECDA', '#E8A95B', '#7FB7E0'], fonts: 'IBM Plex Sans · Source Serif 4 · Plex Mono', lowestContrast: '4.66:1', effects: 'A faint hairline grid on the board', calm: 'Panels and reading areas are plain; the grid stays on the board.', cost: 'Next to none: one still background.'},
   {id: 'rain-noir', name: 'Rain Noir', mood: 'A city at night through a wet window: the work stays dry.',
-    swatches: ['#18120F', '#211A16', '#2A221E', '#342C27', '#F0EAE1', '#DD9231', '#3AB3AD'], fonts: 'Manrope · Jost 300 titles · Source Serif 4 · Plex Mono', lowestContrast: '5.90:1', effects: 'Drifting bokeh lights and film grain on the board', calm: 'Lights and grain stay on the board, never under text.', cost: 'One moving layer; none with Effects Light or Off.'},
+    swatches: ['#18120F', '#211A16', '#2A221E', '#342C27', '#F0EAE1', '#DD9231', '#3AB3AD'], fonts: 'Manrope · Jost 300 titles · Source Serif 4 · Plex Mono', lowestContrast: '5.90:1', effects: 'Drifting bokeh lights, rain on the case-title glass, film grain on the board', calm: 'Lights, rain and grain stay on the board, never over text.', cost: 'Bokeh drift and one rain pane (WebGL); none with Effects Light or Off.'},
   {id: 'archive', name: 'Archive', mood: 'A records room: manila folders, a desk lamp.',
     swatches: ['#221A15', '#2C221B', '#3A2D24', '#54463A', '#F3E7CF', '#D9945A', '#7CC0B4'], fonts: 'Public Sans · Domine · Plex Mono', lowestContrast: '4.72:1', effects: 'Paper grain on the board', calm: 'Grain stays on the board, never under text.', cost: 'Next to none: one still texture.'},
   {id: 'forest-ledger', name: 'Forest Ledger', mood: 'A quiet library for long sessions. No effects.',
@@ -36,8 +36,8 @@ export const FORMATS: {id: Format; name: string; line: string; ready: boolean}[]
 ];
 
 /** The named board effects that can be switched off one by one (mockup HOME_2). */
-export type NamedEffect = 'bokeh' | 'grain' | 'iris' | 'shutter' | 'neon';
-export const NAMED_EFFECTS: NamedEffect[] = ['bokeh', 'grain', 'iris', 'shutter', 'neon'];
+export type NamedEffect = 'bokeh' | 'rain' | 'grain' | 'iris' | 'shutter' | 'neon';
+export const NAMED_EFFECTS: NamedEffect[] = ['bokeh', 'rain', 'grain', 'iris', 'shutter', 'neon'];
 /** Neon starts off (research §04.11: "steady only, off by default"). */
 const OFF_AT_FIRST: NamedEffect[] = ['neon'];
 export type Appearance = {theme: ThemeId; effects: Effects; motion: Motion; format: Format; off: NamedEffect[]};

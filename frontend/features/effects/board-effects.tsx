@@ -1,16 +1,18 @@
 'use client';
-// Rain Noir's board effects, ported from the OnySnow Studios site (onysnow/onysnow-studios,
-// src/components/site/BokehField.tsx, CameraIris.tsx and the shutter-frame and neon rules in
-// src/styles.css), as the redesign asks (chapter 03, §04.11): bokeh lights on the board, the
-// iris when a whole-screen feature opens, shutter corners when evidence is saved, and a
+// Rain Noir's board effects, from the OnySnow Studios effect system (vendor/onysnow-effects:
+// BokehField, CameraIris, Neon, and the shutter-frame rules of its stylesheet), as the redesign
+// asks (chapter 03, §04.11): bokeh lights on the board, the iris when a whole-screen feature opens, shutter corners when evidence is saved, and a
 // steady neon title on an opened Textbook flag. Each is on the board or a transition only,
 // never over text that is being read, and each has its own switch in Settings › Appearance;
 // Effects Off turns them all off, Effects Light keeps only the still ones, and Calm motion or
 // the computer's reduced-motion setting stops every moving one.
-// The rain pane and the glass panes need the site's WebGL engine and are not ported here
-// (ADR-0009).
-import {useEffect, useId, useState} from 'react';
-import type {CSSProperties, ReactElement} from 'react';
+// The rain pane is features/effects/rain-pane.tsx (ADR-0009).
+import {useEffect, useState} from 'react';
+import type {ReactElement} from 'react';
+
+import {BokehField} from '@fx/components/site/BokehField';
+import {CameraIris} from '@fx/components/site/CameraIris';
+import {Neon} from '@fx/components/site/Neon';
 
 import {currentAppearance, onAppearanceChange, type NamedEffect} from '../../lib/theme';
 
@@ -39,53 +41,13 @@ function useAppearanceTick(): number {
   return tick;
 }
 
-// BokehField: a fixed table, so the server and client render the same; each light drifts on its own clock.
-type Light = {left: number; top: number; size: number; tint: 'amber' | 'teal'; alpha: number; dx: number; dy: number; duration: number; delay: number};
-const LIGHTS: Light[] = [
-  {left: 6, top: 18, size: 17, tint: 'amber', alpha: 0.34, dx: 3.5, dy: -2.2, duration: 26, delay: 0},
-  {left: 22, top: 66, size: 11, tint: 'teal', alpha: 0.3, dx: -2.6, dy: -3, duration: 31, delay: -7},
-  {left: 41, top: 12, size: 9, tint: 'teal', alpha: 0.22, dx: 2.2, dy: 2.8, duration: 23, delay: -14},
-  {left: 58, top: 72, size: 15, tint: 'amber', alpha: 0.28, dx: -3.2, dy: -1.8, duration: 29, delay: -4},
-  {left: 76, top: 28, size: 20, tint: 'amber', alpha: 0.3, dx: 2.8, dy: 2.4, duration: 34, delay: -19},
-  {left: 90, top: 60, size: 12, tint: 'teal', alpha: 0.26, dx: -2.4, dy: -2.6, duration: 27, delay: -11},
-];
-
-export function BokehField({className}: {className?: string}): ReactElement {
-  return <div aria-hidden="true" className={`bokeh-field ${className ?? ''}`}>
-    {LIGHTS.map((l, i) => <span key={i} className="bokeh" style={{
-      left: `${l.left}%`, top: `${l.top}%`, width: `${l.size}rem`, height: `${l.size}rem`, marginLeft: `${-l.size / 2}rem`, marginTop: `${-l.size / 2}rem`,
-      '--bokeh-tint': l.tint === 'amber' ? 'var(--accent-1)' : 'var(--accent-2)', '--bokeh-alpha': l.alpha, '--bokeh-dx': `${l.dx}rem`, '--bokeh-dy': `${l.dy}rem`,
-      '--bokeh-dur': `${l.duration}s`, '--bokeh-delay': `${l.delay}s`,
-    } as CSSProperties}/>)}
-  </div>;
-}
-
-/** CameraIris: eight blades, each hinged on the housing, so the opening is a polygon. */
-const BLADES = [0, 45, 90, 135, 180, 225, 270, 315];
-export function CameraIris({className}: {className?: string}): ReactElement {
-  const housing = `iris-housing-${useId().replace(/:/g, '')}`;
-  return <svg className={className} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-    <clipPath id={housing}><circle cx="50" cy="50" r="46"/></clipPath>
-    <g clipPath={`url(#${housing})`}>
-      {BLADES.map(angle => <g key={angle} transform={`rotate(${angle} 50 50)`}><path className="iris-blade" d="M 50,4 A 46,46 0 0,1 82.5,17.5 L 50,50 Z"/></g>)}
-    </g>
-  </svg>;
-}
-
-/** Neon: the glass tube, always there, and the gas burning in it; steady, never flickering. */
-export function Neon({text, className}: {text: string; className?: string}): ReactElement {
-  return <span className={`neon ${className ?? ''}`} aria-label={text}>
-    <span className="neon__tube" aria-hidden="true">{text}</span>
-    <span className="neon__gas" aria-hidden="true">{text}</span>
-  </span>;
-}
-
 /** A heading that is neon when the switch is on and the theme carries it, plain text otherwise. */
 export function NeonTitle({text}: {text: string}): ReactElement {
   const tick = useAppearanceTick();
   const [on, setOn] = useState(false);
   useEffect(() => { setOn(effectOn('neon', false)); }, [tick]);
-  return on ? <Neon text={text}/> : <>{text}</>;
+  // Neon gas (the red-orange), steady; it lights nothing, the workbench has no light scene.
+  return on ? <Neon gas="neon" flicker="steady" lights={false}>{text}</Neon> : <>{text}</>;
 }
 
 /** The board's layers and the two transitions, mounted once by the app frame. */
