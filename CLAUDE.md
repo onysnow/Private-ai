@@ -1,6 +1,6 @@
 # Working on the Journalism Workbench (Private-ai)
 
-Read docs/project-notes/START_HERE.md first: it says where the work stands. docs/project-notes/MOCKUP_BUILD_LIST.md is the work plan: every mockup, what the app has, and what is left to make it look and work like the mockup. docs/project-notes/BACKLOG.md lists everything else Ony has asked for.
+Read docs/project-notes/START_HERE.md first: it says where the work stands. The mockup pictures are in docs/design/mockups/: compare every screen against its picture, side by side, before calling it done. docs/project-notes/MOCKUP_BUILD_LIST.md is the work plan: every mockup, what the app has, and what is left to make it look and work like the mockup. docs/project-notes/BACKLOG.md lists everything else Ony has asked for.
 
 ## How Ony wants to work
 - **Commands for him to run:** always one single line, starting with the command that goes to the
