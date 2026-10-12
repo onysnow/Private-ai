@@ -2350,6 +2350,7 @@ export const zDropLaneOut = z.object({
   filename: z.string(),
   in_progress: z.boolean(),
   issues: z.array(z.string()),
+  job_id: z.string().nullish(),
   problem: z.boolean(),
   receipt: zDropReceiptOut,
   stages: z.array(zDropStageOut),

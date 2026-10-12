@@ -14489,6 +14489,17 @@
             "title": "Issues",
             "type": "array"
           },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
           "problem": {
             "title": "Problem",
             "type": "boolean"

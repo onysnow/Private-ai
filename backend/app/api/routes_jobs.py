@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.core.authorization import AuthorizationScope, require_scope_investigation, scope_for_request
 from app.db.session import get_db
-from app.jobs.records import cancel_queued, list_jobs, requeue_for_retry, serialize_job
+from app.jobs.records import cancel_queued, list_jobs, request_stop, requeue_for_retry, serialize_job
 from app.jobs.runner import job_runner
 from app.models.jobs import JOB_STATUSES, BackgroundJob
 from app.schemas.responses import BackgroundJobOut, ErrorOut, ValidationErrorOut
@@ -67,6 +67,9 @@ async def retry_job_endpoint(job_id: str, request: Request, db: Session = Depend
 async def cancel_job_endpoint(job_id: str, request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
     job = _visible_job(db, scope_for_request(request), job_id)
     try:
+        if job.status == "running":
+            # A document being read stops at its next page (app/jobs/records.py request_stop).
+            return serialize_job(request_stop(db, job))
         job = cancel_queued(db, job)
     except ValueError as exc:
         raise HTTPException(409, str(exc))

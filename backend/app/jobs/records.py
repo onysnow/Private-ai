@@ -119,22 +119,39 @@ def execute_job(
         def report(progress: int | None, message: str | None) -> None:
             # Its own session, so a progress update never commits the
             # handler's half-done work (on SQLite every session shares one
-            # connection anyway; see app/db/session.py).
+            # connection anyway; see app/db/session.py). A plain UPDATE, not an
+            # ORM flush: a flush takes the investigation's write lock
+            # (app/db/mutation_guard.py), which the handler may be holding while
+            # it reports (a document read page by page), and would wait forever.
             with session_factory() as progress_db:
-                row = progress_db.get(BackgroundJob, job_id)
-                if row is None:
-                    return
+                stop = progress_db.scalar(select(BackgroundJob.payload).where(BackgroundJob.id == job_id))
+                stopping = bool((stop or {}).get("stop_requested"))
+                values: dict[str, Any] = {"updated_at": utcnow_naive()}
                 if progress is not None:
-                    row.progress = max(0, min(100, int(progress)))
-                if message is not None:
-                    row.message = message
+                    values["progress"] = max(0, min(100, int(progress)))
+                if message is not None and not stopping:
+                    values["message"] = message
+                progress_db.execute(update(BackgroundJob).where(BackgroundJob.id == job_id).values(**values))
                 progress_db.commit()
+            if stopping:
+                raise JobStopped("Stopped by you")
 
         handler = handlers.get(job.kind)
         try:
             if handler is None:
                 raise LookupError(f"No handler for job kind {job.kind!r}")
             result = handler(db, job, report)
+        except JobStopped as exc:
+            db.rollback()
+            stopped = db.get(BackgroundJob, job_id)
+            if stopped is None:
+                return None
+            stopped.status = "cancelled"
+            stopped.message = str(exc) or "Stopped by you"
+            stopped.payload = {k: v for k, v in (stopped.payload or {}).items() if k != "stop_requested"}
+            stopped.finished_at = utcnow_naive()
+            db.commit()
+            return "cancelled"
         except Exception as exc:
             db.rollback()
             logger.warning("background job failed", exc_info=(type(exc), exc, exc.__traceback__),
@@ -163,6 +180,27 @@ def execute_job(
         done.finished_at = utcnow_naive()
         db.commit()
         return "succeeded"
+
+
+class JobStopped(Exception):
+    """A person asked a running job to stop; it stops at its next progress report."""
+
+
+STOPPABLE_KINDS = {"extract_document"}
+
+
+def request_stop(db: Session, job: BackgroundJob) -> BackgroundJob:
+    """Ask a running job to stop. It stops at its next progress report (a reading job
+    reports each page), undoes what it had done, and ends cancelled."""
+    if job.status != "running" or job.kind not in STOPPABLE_KINDS:
+        raise ValueError(f"Only a document being read can be stopped while it runs (this one is {job.status})")
+    # A plain UPDATE: the read holds the investigation's write lock, which an ORM
+    # flush would wait on until the read had finished (see report in execute_job).
+    db.execute(update(BackgroundJob).where(BackgroundJob.id == job.id)
+               .values(payload={**(job.payload or {}), "stop_requested": True}, message="Stopping…", updated_at=utcnow_naive()))
+    db.commit()
+    db.refresh(job)
+    return job
 
 
 def requeue_for_retry(db: Session, job: BackgroundJob) -> BackgroundJob:

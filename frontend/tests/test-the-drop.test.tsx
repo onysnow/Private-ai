@@ -61,6 +61,20 @@ describe('The Drop', () => {
     expect(screen.getByRole('button', {name: /Problems & in progress/})).toHaveAttribute('aria-pressed', 'true');
   });
 
+  it('stops a file being read', async () => {
+    const reading = lane('d3', 'long.pdf', ['done', 'done', 'active', 'waiting', 'skipped', 'waiting', 'waiting'], {job_id: 'j9'});
+    const api = mockApi({
+      'GET /api/investigations/inv-1/drop': {...drop, lanes: [reading]},
+      'POST /api/jobs/j9/cancel': {id: 'j9', kind: 'extract_document', investigation_id: 'inv-1', subject_type: 'document', subject_id: 'd3', status: 'running',
+        finished: false, progress: 40, message: 'Stopping…', error: null, attempts: 1, runner: 'inline', result: null, created_at: '2026-10-12T00:00:00',
+        started_at: '2026-10-12T00:00:01', finished_at: null, updated_at: '2026-10-12T00:00:02'},
+    });
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    await userEvent.setup().click(await screen.findByRole('button', {name: 'Stop reading'}));
+    expect(await screen.findByText('It stops at the next page; nothing half-read is kept.')).toBeInTheDocument();
+    expect(api.calls('POST /api/jobs/j9/cancel')).toHaveLength(1);
+  });
+
   it('offers a large drop field while the case has no files', async () => {
     mockApi({'GET /api/investigations/inv-1/drop': {...drop, lanes: [], totals: {...drop.totals, files: 0}, ready_for_you: {}}});
     render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);

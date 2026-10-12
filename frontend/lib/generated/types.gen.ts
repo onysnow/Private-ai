@@ -6092,6 +6092,10 @@ export type DropLaneOut = {
    */
   issues: Array<string>;
   /**
+   * Job Id
+   */
+  job_id?: string | null;
+  /**
    * Problem
    */
   problem: boolean;

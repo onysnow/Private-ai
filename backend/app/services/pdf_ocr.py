@@ -69,11 +69,17 @@ def strip_page_furniture(text: str, page_no: int | None = None) -> str:
 PAGE_PROGRESS: ContextVar[Callable[[int, int, bool], None] | None] = ContextVar("pdf_page_progress", default=None)
 
 
+class ReadingStopped(Exception):
+    """A person stopped the read; raised from the page callback, it ends the read."""
+
+
 def _tell(page_no: int, total: int, ocr: bool) -> None:
     told = PAGE_PROGRESS.get()
     if told is not None:
         try:
             told(page_no, total, ocr)
+        except ReadingStopped:
+            raise
         except Exception:  # progress is a courtesy; it never stops a read
             pass
 

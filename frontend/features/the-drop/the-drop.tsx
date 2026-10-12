@@ -11,7 +11,8 @@ import type {ChangeEvent, DragEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {caseHref} from '../../lib/case-href';
-import {getDropOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getDropOptions, getDropQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {cancelJobEndpoint} from '../../lib/generated/sdk.gen';
 import type {DropLaneOut, DropStageOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -39,6 +40,18 @@ function Lane({lane, on, onPick}: {lane: DropLaneOut; on: boolean; onPick: () =>
 }
 
 function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: string}): ReactElement {
+  const queryClient = useQueryClient();
+  const [stopping, setStopping] = useState('');
+  const reading = lane.stages.some(s => s.key === 'read' && (s.state === 'active' || s.state === 'waiting'));
+  const stop = async () => {
+    if (!lane.job_id) return;
+    setStopping('Stopping…');
+    try {
+      await cancelJobEndpoint({path: {job_id: lane.job_id}, throwOnError: true});
+      setStopping('It stops at the next page; nothing half-read is kept.');
+      await queryClient.invalidateQueries({queryKey: getDropQueryKey({path: {investigation_id: investigationId}})});
+    } catch (error) { setStopping(errorMessage(error, 'Could not stop it')); }
+  };
   const openDocument = useWorkbenchStore(state => state.openDocument);
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
   const r = lane.receipt;
@@ -61,8 +74,10 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
     <div className="dp-actions">
       <button type="button" onClick={() => openDocument(lane.document_id)}>Open in reading room</button>
       <button type="button" onClick={() => openProvenance({title: lane.filename, kind: 'document', documentId: lane.document_id})}>Trace</button>
+      {reading && lane.job_id && <button type="button" className="dp-stop" onClick={() => void stop()}>Stop reading</button>}
       {waiting > 0 && <Link href={caseHref('/decide?kind=proposal', investigationId)}>Review what it found →</Link>}
     </div>
+    {stopping && <p role="status" className="dp-quiet">{stopping}</p>}
   </aside>;
 }
 

@@ -118,6 +118,7 @@ def drop(db: Session, investigation_id: str) -> dict[str, Any]:
         pages = {p for _, p in own_chunks if p is not None}
         lanes.append({
             "document_id": d.id, "filename": d.filename, "stages": stages,
+            "job_id": job.id if job is not None and job.status in {"queued", "running"} else None,
             "problem": status == "failed" or any(s["state"] == "stopped" for s in stages),
             "in_progress": any(s["state"] in {"active", "waiting"} for s in stages),
             "issues": list(d.extraction_issues or []),

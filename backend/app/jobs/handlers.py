@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger("journalism.jobs")
 
 EXTRACT_DOCUMENT = "extract_document"
+# What a document says when a person stopped its read; reading it again starts over.
+STOPPED_READ = "Stopped by you before it was read. Read it again from the Library."
 ANALYZE_DOCUMENT = "openaleph_analyze"
 FIND_CHILDREN = "openaleph_children"
 
@@ -197,6 +199,23 @@ def _with_local_text(read: OpenAlephText, storage_path: str) -> OpenAlephText:
 
 
 def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str | None:
+    """Read a document (_read_document); a stop asked for at any point leaves it
+    marked as stopped, not waiting for a read that will never come."""
+    from app.jobs.records import JobStopped
+    from app.models.domain import Document
+
+    try:
+        return _read_document(db, job, report)
+    except JobStopped:
+        db.rollback()
+        doc = db.get(Document, job.subject_id) if job.subject_id else None
+        if doc is not None and doc.extraction_status != "complete":
+            doc.extraction_status, doc.extraction_error = "failed", STOPPED_READ
+            db.commit()
+        raise
+
+
+def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | None:
     """Read an uploaded document into chunks and proposals.
 
     OpenAleph reads it when that is configured (app/services/openaleph_reader.py)
@@ -240,10 +259,14 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
             return _check_watchlist_after_read(db, document_id, message)
 
     report(5, "Reading the document")
-    from app.services.pdf_ocr import PAGE_PROGRESS
+    from app.jobs.records import JobStopped
+    from app.services.pdf_ocr import PAGE_PROGRESS, ReadingStopped
 
     def page_read(page_no: int, total: int, ocr: bool) -> None:
-        report(5 + int(70 * page_no / max(total, 1)), f"Reading{' with OCR' if ocr else ''} · page {page_no} of {total}")
+        try:
+            report(5 + int(70 * page_no / max(total, 1)), f"Reading{' with OCR' if ocr else ''} · page {page_no} of {total}")
+        except JobStopped:
+            raise ReadingStopped(STOPPED_READ) from None
 
     token = PAGE_PROGRESS.set(page_read)
     try:
@@ -252,6 +275,8 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
         PAGE_PROGRESS.reset(token)
     if doc is None:
         return "The document was deleted before it was read"
+    if doc.extraction_status == "failed" and doc.extraction_error == STOPPED_READ:
+        raise JobStopped("Stopped by you")
     if doc.extraction_status == "failed":
         raise RuntimeError(doc.extraction_error or "The document could not be read")
     message = "Document read" if fallback_reason is None else f"Read by the Workbench's own reader; {fallback_reason}"

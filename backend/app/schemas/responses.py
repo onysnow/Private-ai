@@ -4553,6 +4553,7 @@ class DropReceiptOut(ResponseModel):
 class DropLaneOut(ResponseModel):
     document_id: str
     filename: str
+    job_id: str | None = None  # the read still queued or running, which Stop reading stops
     stages: list[DropStageOut]
     problem: bool
     in_progress: bool

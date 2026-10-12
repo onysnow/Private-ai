@@ -254,3 +254,46 @@ def test_ai_runs_are_jobs_that_keep_the_endpoints_answers(client, monkeypatch):
     failed = client.get("/api/jobs", params={"investigation_id": inv, "status": "failed"}).json()
     assert failed[0]["kind"] == "ai_reasoning" and failed[0]["result"]["status_code"] == 502
     governor.reset()
+
+
+def test_stop_reading_stops_at_the_next_page_and_leaves_nothing_half_read(client, tmp_path):
+    import fitz
+
+    from app.jobs.handlers import HANDLERS, STOPPED_READ
+    from app.jobs.records import request_stop
+    from app.models.domain import Document, Source
+
+    inv = _investigation(client)
+    path = tmp_path / "long.pdf"
+    pdf = fitz.open()
+    for n in range(3):
+        pdf.new_page().insert_text((72, 72), f"Page {n + 1} of a long filing, with enough words to be read as text.")
+    pdf.save(path); pdf.close()
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Filing", source_type="document")
+        db.add(src); db.flush()
+        doc = Document(investigation_id=inv, source_id=src.id, filename="long.pdf", sha256="cd" * 32, storage_path=str(path), extraction_status="pending")
+        db.add(doc); db.commit()
+        job = create_job(db, kind="extract_document", investigation_id=inv, subject_type="document", subject_id=doc.id)
+        doc_id, job_id = doc.id, job.id
+        # A queued job is cancelled outright; only a running one is asked to stop.
+        with pytest.raises(ValueError):
+            request_stop(db, job)
+
+    real = HANDLERS["extract_document"]
+
+    def stop_then_read(db, job, report):
+        request_stop(db, db.get(BackgroundJob, job.id))  # as if the person pressed Stop reading as it started
+        return real(db, job, report)
+
+    assert execute_job(SessionLocal, job_id, {**HANDLERS, "extract_document": stop_then_read}) == "cancelled"
+    with SessionLocal() as db:
+        stopped = db.get(BackgroundJob, job_id)
+        assert stopped.message == "Stopped by you" and "stop_requested" not in (stopped.payload or {})
+        document = db.get(Document, doc_id)
+        assert (document.extraction_status, document.extraction_error) == ("failed", STOPPED_READ)
+        assert db.query(DocumentChunk).filter(DocumentChunk.document_id == doc_id).count() == 0
+    # Read again, it starts over and finishes.
+    assert client.post(f"/api/jobs/{job_id}/retry").json()["status"] == "succeeded"
+    with SessionLocal() as db:
+        assert db.query(DocumentChunk).filter(DocumentChunk.document_id == doc_id).count() == 3
