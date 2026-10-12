@@ -14487,6 +14487,335 @@ export type StatementPromotionRequest = {
 };
 
 /**
+ * StoryClaimOut
+ */
+export type StoryClaimOut = {
+  /**
+   * Evidence
+   */
+  evidence: Array<StoryEvidenceOut>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Single Source
+   */
+  single_source: boolean;
+  /**
+   * State
+   */
+  state: 'shown' | 'unshown' | 'disputed' | 'ruled_out';
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * StoryClaimPlace
+ */
+export type StoryClaimPlace = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+};
+
+/**
+ * StoryCountsOut
+ */
+export type StoryCountsOut = {
+  /**
+   * Claims
+   */
+  claims: number;
+  /**
+   * Disputed
+   */
+  disputed: number;
+  /**
+   * Shown
+   */
+  shown: number;
+  /**
+   * Unshown
+   */
+  unshown: number;
+};
+
+/**
+ * StoryCriticalOut
+ */
+export type StoryCriticalOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Section
+   */
+  section: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * StoryEvidenceOut
+ */
+export type StoryEvidenceOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Stance
+   */
+  stance: string;
+};
+
+/**
+ * StoryGateOut
+ */
+export type StoryGateOut = {
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * State
+   */
+  state: 'passed' | 'open' | 'warning' | 'pending';
+};
+
+/**
+ * StoryGateSet
+ */
+export type StoryGateSet = {
+  /**
+   * Gate
+   */
+  gate: 'right_of_reply' | 'legal_read';
+  /**
+   * On
+   *
+   * The day, YYYY-MM-DD.
+   */
+  on?: string | null;
+  /**
+   * Who
+   *
+   * Whom the reply went to, or who read it for the lawyer.
+   */
+  who?: string | null;
+};
+
+/**
+ * StoryOut
+ */
+export type StoryOut = {
+  /**
+   * Can Ready
+   */
+  can_ready: boolean;
+  counts: StoryCountsOut;
+  /**
+   * Critical
+   */
+  critical: Array<StoryCriticalOut>;
+  /**
+   * Gates
+   */
+  gates: Array<StoryGateOut>;
+  /**
+   * Gates Passed
+   */
+  gates_passed: number;
+  /**
+   * Id
+   */
+  id?: string | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  ready?: StoryReadyOut | null;
+  /**
+   * Sections
+   */
+  sections: Array<StorySectionOut>;
+  sentences: StorySentencesOut;
+  /**
+   * Thesis
+   */
+  thesis: string;
+  /**
+   * Unplaced
+   */
+  unplaced: Array<StoryUnplacedOut>;
+  /**
+   * Writeup Id
+   */
+  writeup_id?: string | null;
+};
+
+/**
+ * StoryReady
+ */
+export type StoryReady = {
+  /**
+   * By
+   *
+   * Who decided it is ready to run.
+   */
+  by: string;
+};
+
+/**
+ * StoryReadyOut
+ */
+export type StoryReadyOut = {
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * By
+   */
+  by?: string | null;
+};
+
+/**
+ * StorySectionCreate
+ */
+export type StorySectionCreate = {
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * StorySectionOut
+ */
+export type StorySectionOut = {
+  /**
+   * Claims
+   */
+  claims: Array<StoryClaimOut>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Position
+   */
+  position: number;
+  /**
+   * Shown
+   */
+  shown: number;
+  /**
+   * Status
+   */
+  status: 'shown' | 'unshown' | 'disputed' | 'empty';
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * StorySectionUpdate
+ */
+export type StorySectionUpdate = {
+  /**
+   * Position
+   */
+  position?: number | null;
+  /**
+   * Title
+   */
+  title?: string | null;
+};
+
+/**
+ * StorySentencesOut
+ */
+export type StorySentencesOut = {
+  /**
+   * Total
+   */
+  total: number;
+  /**
+   * Uncited
+   */
+  uncited: number;
+};
+
+/**
+ * StoryThesisSet
+ */
+export type StoryThesisSet = {
+  /**
+   * Thesis
+   *
+   * The one sentence the story says.
+   */
+  thesis: string;
+};
+
+/**
+ * StoryUnplacedOut
+ */
+export type StoryUnplacedOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * State
+   */
+  state: 'shown' | 'unshown' | 'disputed' | 'ruled_out';
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * StyleWarningOut
  *
  * A warning the style panel shows beside one option's control.
@@ -23517,6 +23846,384 @@ export type GetStandingResponses = {
 
 export type GetStandingResponse =
   GetStandingResponses[keyof GetStandingResponses];
+
+export type GetStoryData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story';
+};
+
+export type GetStoryErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetStoryError = GetStoryErrors[keyof GetStoryErrors];
+
+export type GetStoryResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type GetStoryResponse = GetStoryResponses[keyof GetStoryResponses];
+
+export type SetStoryThesisData = {
+  body: StoryThesisSet;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story';
+};
+
+export type SetStoryThesisErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SetStoryThesisError =
+  SetStoryThesisErrors[keyof SetStoryThesisErrors];
+
+export type SetStoryThesisResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type SetStoryThesisResponse =
+  SetStoryThesisResponses[keyof SetStoryThesisResponses];
+
+export type RecordStoryGateData = {
+  body: StoryGateSet;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/gates';
+};
+
+export type RecordStoryGateErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecordStoryGateError =
+  RecordStoryGateErrors[keyof RecordStoryGateErrors];
+
+export type RecordStoryGateResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type RecordStoryGateResponse =
+  RecordStoryGateResponses[keyof RecordStoryGateResponses];
+
+export type MarkStoryReadyData = {
+  body: StoryReady;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/ready';
+};
+
+export type MarkStoryReadyErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MarkStoryReadyError =
+  MarkStoryReadyErrors[keyof MarkStoryReadyErrors];
+
+export type MarkStoryReadyResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type MarkStoryReadyResponse =
+  MarkStoryReadyResponses[keyof MarkStoryReadyResponses];
+
+export type AddStorySectionData = {
+  body: StorySectionCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/sections';
+};
+
+export type AddStorySectionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddStorySectionError =
+  AddStorySectionErrors[keyof AddStorySectionErrors];
+
+export type AddStorySectionResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type AddStorySectionResponse =
+  AddStorySectionResponses[keyof AddStorySectionResponses];
+
+export type DeleteStorySectionData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Section Id
+     */
+    section_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/sections/{section_id}';
+};
+
+export type DeleteStorySectionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteStorySectionError =
+  DeleteStorySectionErrors[keyof DeleteStorySectionErrors];
+
+export type DeleteStorySectionResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type DeleteStorySectionResponse =
+  DeleteStorySectionResponses[keyof DeleteStorySectionResponses];
+
+export type UpdateStorySectionData = {
+  body: StorySectionUpdate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Section Id
+     */
+    section_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/sections/{section_id}';
+};
+
+export type UpdateStorySectionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateStorySectionError =
+  UpdateStorySectionErrors[keyof UpdateStorySectionErrors];
+
+export type UpdateStorySectionResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type UpdateStorySectionResponse =
+  UpdateStorySectionResponses[keyof UpdateStorySectionResponses];
+
+export type PlaceStoryClaimData = {
+  body: StoryClaimPlace;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Section Id
+     */
+    section_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/sections/{section_id}/claims';
+};
+
+export type PlaceStoryClaimErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PlaceStoryClaimError =
+  PlaceStoryClaimErrors[keyof PlaceStoryClaimErrors];
+
+export type PlaceStoryClaimResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type PlaceStoryClaimResponse =
+  PlaceStoryClaimResponses[keyof PlaceStoryClaimResponses];
+
+export type RemoveStoryClaimData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Section Id
+     */
+    section_id: string;
+    /**
+     * Claim Id
+     */
+    claim_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/sections/{section_id}/claims/{claim_id}';
+};
+
+export type RemoveStoryClaimErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemoveStoryClaimError =
+  RemoveStoryClaimErrors[keyof RemoveStoryClaimErrors];
+
+export type RemoveStoryClaimResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type RemoveStoryClaimResponse =
+  RemoveStoryClaimResponses[keyof RemoveStoryClaimResponses];
+
+export type StartStoryWriteupData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/writeup';
+};
+
+export type StartStoryWriteupErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type StartStoryWriteupError =
+  StartStoryWriteupErrors[keyof StartStoryWriteupErrors];
+
+export type StartStoryWriteupResponses = {
+  /**
+   * Successful Response
+   */
+  200: StoryOut;
+};
+
+export type StartStoryWriteupResponse =
+  StartStoryWriteupResponses[keyof StartStoryWriteupResponses];
 
 export type GetTagsData = {
   body?: never;

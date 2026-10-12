@@ -27,6 +27,9 @@ import type {
   AddNoteData,
   AddNoteErrors,
   AddNoteResponses,
+  AddStorySectionData,
+  AddStorySectionErrors,
+  AddStorySectionResponses,
   AddTagData,
   AddTagErrors,
   AddTagResponses,
@@ -138,6 +141,9 @@ import type {
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipErrors,
   DeleteInvestigationMembershipResponses,
+  DeleteStorySectionData,
+  DeleteStorySectionErrors,
+  DeleteStorySectionResponses,
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointErrors,
   DeleteWriteupEndpointResponses,
@@ -396,6 +402,9 @@ import type {
   GetStandingData,
   GetStandingErrors,
   GetStandingResponses,
+  GetStoryData,
+  GetStoryErrors,
+  GetStoryResponses,
   GetSuiteCoverageData,
   GetSuiteCoverageErrors,
   GetSuiteCoverageResponses,
@@ -603,6 +612,9 @@ import type {
   MarkRedFlagInnocentData,
   MarkRedFlagInnocentErrors,
   MarkRedFlagInnocentResponses,
+  MarkStoryReadyData,
+  MarkStoryReadyErrors,
+  MarkStoryReadyResponses,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
@@ -624,6 +636,9 @@ import type {
   PeekAtRecordData,
   PeekAtRecordErrors,
   PeekAtRecordResponses,
+  PlaceStoryClaimData,
+  PlaceStoryClaimErrors,
+  PlaceStoryClaimResponses,
   PresentationStylesData,
   PresentationStylesErrors,
   PresentationStylesResponses,
@@ -654,6 +669,9 @@ import type {
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
+  RecordStoryGateData,
+  RecordStoryGateErrors,
+  RecordStoryGateResponses,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewErrors,
   RefreshOpenalephDocumentReviewResponses,
@@ -672,6 +690,9 @@ import type {
   RemoveNoteData,
   RemoveNoteErrors,
   RemoveNoteResponses,
+  RemoveStoryClaimData,
+  RemoveStoryClaimErrors,
+  RemoveStoryClaimResponses,
   RemoveTagData,
   RemoveTagErrors,
   RemoveTagResponses,
@@ -735,9 +756,15 @@ import type {
   SetInvestigationTypeData,
   SetInvestigationTypeErrors,
   SetInvestigationTypeResponses,
+  SetStoryThesisData,
+  SetStoryThesisErrors,
+  SetStoryThesisResponses,
   SettingsStatusData,
   SettingsStatusErrors,
   SettingsStatusResponses,
+  StartStoryWriteupData,
+  StartStoryWriteupErrors,
+  StartStoryWriteupResponses,
   SyncCorpusNowData,
   SyncCorpusNowErrors,
   SyncCorpusNowResponses,
@@ -768,6 +795,9 @@ import type {
   UpdateReportingTaskEndpointData,
   UpdateReportingTaskEndpointErrors,
   UpdateReportingTaskEndpointResponses,
+  UpdateStorySectionData,
+  UpdateStorySectionErrors,
+  UpdateStorySectionResponses,
   UpdateWriteupEndpointData,
   UpdateWriteupEndpointErrors,
   UpdateWriteupEndpointResponses,
@@ -791,6 +821,9 @@ import {
   zAddNoteBody,
   zAddNotePath,
   zAddNoteResponse,
+  zAddStorySectionBody,
+  zAddStorySectionPath,
+  zAddStorySectionResponse,
   zAddTagBody,
   zAddTagPath,
   zAddTagResponse,
@@ -880,6 +913,8 @@ import {
   zDeleteDeckEndpointResponse,
   zDeleteInvestigationMembershipPath,
   zDeleteInvestigationMembershipResponse,
+  zDeleteStorySectionPath,
+  zDeleteStorySectionResponse,
   zDeleteWriteupEndpointPath,
   zDeleteWriteupEndpointResponse,
   zDismissHitPath,
@@ -1064,6 +1099,8 @@ import {
   zGetSinceResponse,
   zGetStandingPath,
   zGetStandingResponse,
+  zGetStoryPath,
+  zGetStoryResponse,
   zGetSuiteCoverageResponse,
   zGetTaggedRecordsPath,
   zGetTaggedRecordsResponse,
@@ -1221,6 +1258,9 @@ import {
   zMarkRedFlagInnocentBody,
   zMarkRedFlagInnocentPath,
   zMarkRedFlagInnocentResponse,
+  zMarkStoryReadyBody,
+  zMarkStoryReadyPath,
+  zMarkStoryReadyResponse,
   zOpenalephIntegrationStatusResponse,
   zPatchClaimSuiteBody,
   zPatchClaimSuitePath,
@@ -1239,6 +1279,9 @@ import {
   zPeekAtRecordPath,
   zPeekAtRecordQuery,
   zPeekAtRecordResponse,
+  zPlaceStoryClaimBody,
+  zPlaceStoryClaimPath,
+  zPlaceStoryClaimResponse,
   zPresentationStylesResponse,
   zPreviewBackupRestoreBody,
   zPreviewBackupRestoreResponse,
@@ -1263,6 +1306,9 @@ import {
   zPutInvestigationMembershipResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
+  zRecordStoryGateBody,
+  zRecordStoryGatePath,
+  zRecordStoryGateResponse,
   zRefreshOpenalephDocumentReviewPath,
   zRefreshOpenalephDocumentReviewResponse,
   zRelationshipSchemasResponse,
@@ -1276,6 +1322,8 @@ import {
   zRemoveInvestigationResponse,
   zRemoveNotePath,
   zRemoveNoteResponse,
+  zRemoveStoryClaimPath,
+  zRemoveStoryClaimResponse,
   zRemoveTagPath,
   zRemoveTagResponse,
   zRemoveWatchlistEntryPath,
@@ -1328,7 +1376,12 @@ import {
   zSetInvestigationTypeBody,
   zSetInvestigationTypePath,
   zSetInvestigationTypeResponse,
+  zSetStoryThesisBody,
+  zSetStoryThesisPath,
+  zSetStoryThesisResponse,
   zSettingsStatusResponse,
+  zStartStoryWriteupPath,
+  zStartStoryWriteupResponse,
   zSyncCorpusNowPath,
   zSyncCorpusNowResponse,
   zSyncOpenalephDocumentPath,
@@ -1357,6 +1410,9 @@ import {
   zUpdateReportingTaskEndpointBody,
   zUpdateReportingTaskEndpointPath,
   zUpdateReportingTaskEndpointResponse,
+  zUpdateStorySectionBody,
+  zUpdateStorySectionPath,
+  zUpdateStorySectionResponse,
   zUpdateWriteupEndpointBody,
   zUpdateWriteupEndpointPath,
   zUpdateWriteupEndpointResponse,
@@ -6763,6 +6819,315 @@ export const getStanding = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetStandingResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/standing',
+    ...options,
+  });
+
+/**
+ * Get Story
+ *
+ * The story tree with its readiness. Reading writes nothing; a case with no story yet gets an empty one.
+ */
+export const getStory = <ThrowOnError extends boolean = false>(
+  options: Options<GetStoryData, ThrowOnError>,
+): RequestResult<GetStoryResponses, GetStoryErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetStoryResponses,
+    GetStoryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetStoryPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetStoryResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story',
+    ...options,
+  });
+
+/**
+ * Set Story Thesis
+ */
+export const setStoryThesis = <ThrowOnError extends boolean = false>(
+  options: Options<SetStoryThesisData, ThrowOnError>,
+): RequestResult<SetStoryThesisResponses, SetStoryThesisErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    SetStoryThesisResponses,
+    SetStoryThesisErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSetStoryThesisBody,
+          path: zSetStoryThesisPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSetStoryThesisResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Record Story Gate
+ *
+ * Right of reply sent (to whom, when) or legal read (by whom, when); both empty clears it.
+ */
+export const recordStoryGate = <ThrowOnError extends boolean = false>(
+  options: Options<RecordStoryGateData, ThrowOnError>,
+): RequestResult<
+  RecordStoryGateResponses,
+  RecordStoryGateErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    RecordStoryGateResponses,
+    RecordStoryGateErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zRecordStoryGateBody,
+          path: zRecordStoryGatePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRecordStoryGateResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/gates',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Mark Story Ready
+ *
+ * Ready to run: refused, naming what is left, until every gate has passed.
+ */
+export const markStoryReady = <ThrowOnError extends boolean = false>(
+  options: Options<MarkStoryReadyData, ThrowOnError>,
+): RequestResult<MarkStoryReadyResponses, MarkStoryReadyErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    MarkStoryReadyResponses,
+    MarkStoryReadyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMarkStoryReadyBody,
+          path: zMarkStoryReadyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMarkStoryReadyResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/ready',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Add Story Section
+ */
+export const addStorySection = <ThrowOnError extends boolean = false>(
+  options: Options<AddStorySectionData, ThrowOnError>,
+): RequestResult<
+  AddStorySectionResponses,
+  AddStorySectionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AddStorySectionResponses,
+    AddStorySectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddStorySectionBody,
+          path: zAddStorySectionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddStorySectionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/sections',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Story Section
+ */
+export const deleteStorySection = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteStorySectionData, ThrowOnError>,
+): RequestResult<
+  DeleteStorySectionResponses,
+  DeleteStorySectionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteStorySectionResponses,
+    DeleteStorySectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteStorySectionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteStorySectionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/sections/{section_id}',
+    ...options,
+  });
+
+/**
+ * Update Story Section
+ */
+export const updateStorySection = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateStorySectionData, ThrowOnError>,
+): RequestResult<
+  UpdateStorySectionResponses,
+  UpdateStorySectionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    UpdateStorySectionResponses,
+    UpdateStorySectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateStorySectionBody,
+          path: zUpdateStorySectionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateStorySectionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/sections/{section_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Place Story Claim
+ */
+export const placeStoryClaim = <ThrowOnError extends boolean = false>(
+  options: Options<PlaceStoryClaimData, ThrowOnError>,
+): RequestResult<
+  PlaceStoryClaimResponses,
+  PlaceStoryClaimErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    PlaceStoryClaimResponses,
+    PlaceStoryClaimErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPlaceStoryClaimBody,
+          path: zPlaceStoryClaimPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPlaceStoryClaimResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/sections/{section_id}/claims',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Remove Story Claim
+ */
+export const removeStoryClaim = <ThrowOnError extends boolean = false>(
+  options: Options<RemoveStoryClaimData, ThrowOnError>,
+): RequestResult<
+  RemoveStoryClaimResponses,
+  RemoveStoryClaimErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    RemoveStoryClaimResponses,
+    RemoveStoryClaimErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRemoveStoryClaimPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRemoveStoryClaimResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/sections/{section_id}/claims/{claim_id}',
+    ...options,
+  });
+
+/**
+ * Start Story Writeup
+ *
+ * The write-up the story is told in, made if it does not exist yet.
+ */
+export const startStoryWriteup = <ThrowOnError extends boolean = false>(
+  options: Options<StartStoryWriteupData, ThrowOnError>,
+): RequestResult<
+  StartStoryWriteupResponses,
+  StartStoryWriteupErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    StartStoryWriteupResponses,
+    StartStoryWriteupErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zStartStoryWriteupPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zStartStoryWriteupResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/writeup',
     ...options,
   });
 

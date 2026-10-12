@@ -88,6 +88,11 @@ from app.models.ai import (
 from app.models.writeups import (
     Writeup,
 )
+from app.models.stories import (
+    Story,
+    StoryClaim,
+    StorySection,
+)
 from app.models.decks import (
     Deck,
 )
@@ -162,6 +167,9 @@ __all__ = [
     "CheckItem",
     "AIAnalysisCandidate",
     "Writeup",
+    "Story",
+    "StoryClaim",
+    "StorySection",
     "Deck",
     "AppUser",
     "InvestigationMembership",

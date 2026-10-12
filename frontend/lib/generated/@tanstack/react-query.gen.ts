@@ -14,6 +14,7 @@ import {
   addCollection,
   addCollectionItem,
   addNote,
+  addStorySection,
   addTag,
   addWatchlistEntry,
   amendCaseRecord,
@@ -51,6 +52,7 @@ import {
   deleteConnectorCredential,
   deleteDeckEndpoint,
   deleteInvestigationMembership,
+  deleteStorySection,
   deleteWriteupEndpoint,
   dismissHit,
   dismissRedFlag,
@@ -137,6 +139,7 @@ import {
   getSimilarDocuments,
   getSince,
   getStanding,
+  getStory,
   getSuiteCoverage,
   getTaggedRecords,
   getTags,
@@ -206,6 +209,7 @@ import {
   makeLeadFromNote,
   makeLeadFromRedFlag,
   markRedFlagInnocent,
+  markStoryReady,
   openalephIntegrationStatus,
   type Options,
   patchClaimSuite,
@@ -214,6 +218,7 @@ import {
   patchRelationshipSuite,
   patchSourceSuite,
   peekAtRecord,
+  placeStoryClaim,
   presentationStyles,
   previewBackupRestore,
   previewTableMapping,
@@ -224,12 +229,14 @@ import {
   pruneSecurityAudit,
   putInvestigationMembership,
   recheckHash,
+  recordStoryGate,
   refreshOpenalephDocumentReview,
   relationshipSchemas,
   removeCollection,
   removeCollectionItem,
   removeInvestigation,
   removeNote,
+  removeStoryClaim,
   removeTag,
   removeWatchlistEntry,
   reopenRedFlag,
@@ -251,7 +258,9 @@ import {
   seedDemo,
   sendCorpusEntitySet,
   setInvestigationType,
+  setStoryThesis,
   settingsStatus,
+  startStoryWriteup,
   syncCorpusNow,
   syncOpenalephDocument,
   tagARecord,
@@ -262,6 +271,7 @@ import {
   updateEntity,
   updateLeadEndpoint,
   updateReportingTaskEndpoint,
+  updateStorySection,
   updateWriteupEndpoint,
   uploadDocument,
 } from '../sdk.gen';
@@ -281,6 +291,9 @@ import type {
   AddNoteData,
   AddNoteError,
   AddNoteResponse,
+  AddStorySectionData,
+  AddStorySectionError,
+  AddStorySectionResponse,
   AddTagData,
   AddTagError,
   AddTagResponse,
@@ -392,6 +405,9 @@ import type {
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipError,
   DeleteInvestigationMembershipResponse,
+  DeleteStorySectionData,
+  DeleteStorySectionError,
+  DeleteStorySectionResponse,
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointError,
   DeleteWriteupEndpointResponse,
@@ -650,6 +666,9 @@ import type {
   GetStandingData,
   GetStandingError,
   GetStandingResponse,
+  GetStoryData,
+  GetStoryError,
+  GetStoryResponse,
   GetSuiteCoverageData,
   GetSuiteCoverageError,
   GetSuiteCoverageResponse,
@@ -857,6 +876,9 @@ import type {
   MarkRedFlagInnocentData,
   MarkRedFlagInnocentError,
   MarkRedFlagInnocentResponse,
+  MarkStoryReadyData,
+  MarkStoryReadyError,
+  MarkStoryReadyResponse,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
@@ -877,6 +899,9 @@ import type {
   PeekAtRecordData,
   PeekAtRecordError,
   PeekAtRecordResponse,
+  PlaceStoryClaimData,
+  PlaceStoryClaimError,
+  PlaceStoryClaimResponse,
   PresentationStylesData,
   PresentationStylesError,
   PresentationStylesResponse,
@@ -907,6 +932,9 @@ import type {
   RecheckHashData,
   RecheckHashError,
   RecheckHashResponse,
+  RecordStoryGateData,
+  RecordStoryGateError,
+  RecordStoryGateResponse,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewError,
   RefreshOpenalephDocumentReviewResponse,
@@ -925,6 +953,9 @@ import type {
   RemoveNoteData,
   RemoveNoteError,
   RemoveNoteResponse,
+  RemoveStoryClaimData,
+  RemoveStoryClaimError,
+  RemoveStoryClaimResponse,
   RemoveTagData,
   RemoveTagError,
   RemoveTagResponse,
@@ -988,9 +1019,15 @@ import type {
   SetInvestigationTypeData,
   SetInvestigationTypeError,
   SetInvestigationTypeResponse,
+  SetStoryThesisData,
+  SetStoryThesisError,
+  SetStoryThesisResponse,
   SettingsStatusData,
   SettingsStatusError,
   SettingsStatusResponse,
+  StartStoryWriteupData,
+  StartStoryWriteupError,
+  StartStoryWriteupResponse,
   SyncCorpusNowData,
   SyncCorpusNowError,
   SyncCorpusNowResponse,
@@ -1021,6 +1058,9 @@ import type {
   UpdateReportingTaskEndpointData,
   UpdateReportingTaskEndpointError,
   UpdateReportingTaskEndpointResponse,
+  UpdateStorySectionData,
+  UpdateStorySectionError,
+  UpdateStorySectionResponse,
   UpdateWriteupEndpointData,
   UpdateWriteupEndpointError,
   UpdateWriteupEndpointResponse,
@@ -6949,6 +6989,282 @@ export const getStandingOptions = (options: Options<GetStandingData>) =>
     },
     queryKey: getStandingQueryKey(options),
   });
+
+export const getStoryQueryKey = (options: Options<GetStoryData>) =>
+  createQueryKey('getStory', options);
+
+/**
+ * Get Story
+ *
+ * The story tree with its readiness. Reading writes nothing; a case with no story yet gets an empty one.
+ */
+export const getStoryOptions = (options: Options<GetStoryData>) =>
+  queryOptions<
+    GetStoryResponse,
+    GetStoryError,
+    GetStoryResponse,
+    ReturnType<typeof getStoryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getStory({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getStoryQueryKey(options),
+  });
+
+/**
+ * Set Story Thesis
+ */
+export const setStoryThesisMutation = (
+  options?: Partial<Options<SetStoryThesisData>>,
+): UseMutationOptions<
+  SetStoryThesisResponse,
+  SetStoryThesisError,
+  Options<SetStoryThesisData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SetStoryThesisResponse,
+    SetStoryThesisError,
+    Options<SetStoryThesisData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await setStoryThesis({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Record Story Gate
+ *
+ * Right of reply sent (to whom, when) or legal read (by whom, when); both empty clears it.
+ */
+export const recordStoryGateMutation = (
+  options?: Partial<Options<RecordStoryGateData>>,
+): UseMutationOptions<
+  RecordStoryGateResponse,
+  RecordStoryGateError,
+  Options<RecordStoryGateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RecordStoryGateResponse,
+    RecordStoryGateError,
+    Options<RecordStoryGateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await recordStoryGate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Mark Story Ready
+ *
+ * Ready to run: refused, naming what is left, until every gate has passed.
+ */
+export const markStoryReadyMutation = (
+  options?: Partial<Options<MarkStoryReadyData>>,
+): UseMutationOptions<
+  MarkStoryReadyResponse,
+  MarkStoryReadyError,
+  Options<MarkStoryReadyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MarkStoryReadyResponse,
+    MarkStoryReadyError,
+    Options<MarkStoryReadyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await markStoryReady({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add Story Section
+ */
+export const addStorySectionMutation = (
+  options?: Partial<Options<AddStorySectionData>>,
+): UseMutationOptions<
+  AddStorySectionResponse,
+  AddStorySectionError,
+  Options<AddStorySectionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddStorySectionResponse,
+    AddStorySectionError,
+    Options<AddStorySectionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addStorySection({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete Story Section
+ */
+export const deleteStorySectionMutation = (
+  options?: Partial<Options<DeleteStorySectionData>>,
+): UseMutationOptions<
+  DeleteStorySectionResponse,
+  DeleteStorySectionError,
+  Options<DeleteStorySectionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteStorySectionResponse,
+    DeleteStorySectionError,
+    Options<DeleteStorySectionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteStorySection({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update Story Section
+ */
+export const updateStorySectionMutation = (
+  options?: Partial<Options<UpdateStorySectionData>>,
+): UseMutationOptions<
+  UpdateStorySectionResponse,
+  UpdateStorySectionError,
+  Options<UpdateStorySectionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateStorySectionResponse,
+    UpdateStorySectionError,
+    Options<UpdateStorySectionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateStorySection({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Place Story Claim
+ */
+export const placeStoryClaimMutation = (
+  options?: Partial<Options<PlaceStoryClaimData>>,
+): UseMutationOptions<
+  PlaceStoryClaimResponse,
+  PlaceStoryClaimError,
+  Options<PlaceStoryClaimData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PlaceStoryClaimResponse,
+    PlaceStoryClaimError,
+    Options<PlaceStoryClaimData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await placeStoryClaim({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Remove Story Claim
+ */
+export const removeStoryClaimMutation = (
+  options?: Partial<Options<RemoveStoryClaimData>>,
+): UseMutationOptions<
+  RemoveStoryClaimResponse,
+  RemoveStoryClaimError,
+  Options<RemoveStoryClaimData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RemoveStoryClaimResponse,
+    RemoveStoryClaimError,
+    Options<RemoveStoryClaimData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await removeStoryClaim({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Start Story Writeup
+ *
+ * The write-up the story is told in, made if it does not exist yet.
+ */
+export const startStoryWriteupMutation = (
+  options?: Partial<Options<StartStoryWriteupData>>,
+): UseMutationOptions<
+  StartStoryWriteupResponse,
+  StartStoryWriteupError,
+  Options<StartStoryWriteupData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    StartStoryWriteupResponse,
+    StartStoryWriteupError,
+    Options<StartStoryWriteupData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await startStoryWriteup({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getTagsQueryKey = (options: Options<GetTagsData>) =>
   createQueryKey('getTags', options);

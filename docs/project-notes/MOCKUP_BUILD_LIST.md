@@ -158,10 +158,11 @@ ACT_1 Red Flags (12 Oct: rebuilt as three columns, `features/act/red-flags-board
 - [x] Before you call it: innocent explanations as a checklist kept on the flag (not looked at / ruled out with what ruled it out / could apply; backend `POST /red-flags/{id}/innocent`, migration a9c3e7f1d204), the records can't show with their To check status, the sources as quotes
 - [ ] Reading never writes (split GET / POST run); hover-preview; scroll over the picture to step through payments; "What changed" replay
 
-ACT_2 Story: **missing**.
-- [ ] Thesis diamond → sections → claims → evidence tree; branch styles by weakest child; critical path
-- [ ] Gates (every sentence has a source, innocent explanations, single-source marked, right of reply, legal read)
-- [ ] Write-up editor (TipTap, ADR) with citation chips, AI-draft marks, sentence status underlines, Cited / Notes tabs, Export for publication disabled with its reason
+ACT_2 Story (12 Oct: Act › Story, `features/story`; backend `app/services/stories.py`, ADR-0010 data model, ADR-0011 TipTap):
+- [x] Thesis diamond → sections → claims → evidence tree; branch lines by the weakest claim (solid / dashed / red); critical path banner and marks; L for the outline; put a claim under a section, take it out
+- [x] Gates (every sentence has a source, innocent explanations addressed, single-source statements, right of reply, legal read) with ✓ / ○ / ! and what each waits on; right of reply and legal read recorded by a person; Ready to run refused until every gate passes
+- [x] Write-up editor (TipTap) in the reading face: citation chips (the server's own citation node), ⌘⇧C cites a claim of the story, sentence marks (no source ○ dashed, disputed ! red, not yet shown dotted) worked out from the cited claims, saves on its own, Cited tab, Export for publication disabled with how many sentences need a source
+- [ ] AI-draft marks on paragraphs, Notes tab, version history ("Before legal read"), hover a citation for its quote, click to open the passage beside the text, drag a claim into the text
 - [ ] Leads as Now / Next / Later; Export sheet; evidence pack
 
 ## 8. The AI — mockups AI_1 (Watch the run) and AI_2 (Before you run) (§09)

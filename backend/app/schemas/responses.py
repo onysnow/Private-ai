@@ -2728,6 +2728,85 @@ class HashRecheckOut(ResponseModel):
     checked_at: Timestamp
 
 
+class StoryEvidenceOut(ResponseModel):
+    id: str
+    stance: str
+    label: str
+    locator: str | None = None
+
+
+class StoryClaimOut(ResponseModel):
+    id: str
+    text: str
+    status: str
+    state: Literal["shown", "unshown", "disputed", "ruled_out"]
+    evidence: list[StoryEvidenceOut]
+    single_source: bool
+
+
+class StorySectionOut(ResponseModel):
+    id: str
+    title: str
+    position: int
+    status: Literal["shown", "unshown", "disputed", "empty"]
+    shown: int
+    total: int
+    claims: list[StoryClaimOut]
+
+
+class StoryGateOut(ResponseModel):
+    key: str
+    label: str
+    state: Literal["passed", "open", "warning", "pending"]
+    detail: str
+
+
+class StoryCriticalOut(ResponseModel):
+    claim_id: str
+    text: str
+    section: str
+
+
+class StoryUnplacedOut(ResponseModel):
+    id: str
+    text: str
+    status: str
+    state: Literal["shown", "unshown", "disputed", "ruled_out"]
+
+
+class StoryReadyOut(ResponseModel):
+    by: str | None = None
+    at: Timestamp
+
+
+class StorySentencesOut(ResponseModel):
+    total: int
+    uncited: int
+
+
+class StoryCountsOut(ResponseModel):
+    claims: int
+    shown: int
+    disputed: int
+    unshown: int
+
+
+class StoryOut(ResponseModel):
+    id: str | None = None
+    investigation_id: str
+    thesis: str
+    writeup_id: str | None = None
+    sections: list[StorySectionOut]
+    counts: StoryCountsOut
+    critical: list[StoryCriticalOut]
+    gates: list[StoryGateOut]
+    gates_passed: int
+    sentences: StorySentencesOut
+    ready: StoryReadyOut | None = None
+    can_ready: bool
+    unplaced: list[StoryUnplacedOut]
+
+
 # --- Settings, credentials and the security audit ------------------------------------------
 
 class SettingsLimitsOut(ResponseModel):

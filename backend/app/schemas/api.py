@@ -628,3 +628,32 @@ class CaseRecordCreate(BaseModel):
 
 class CaseRecordAmend(BaseModel):
     body: dict[str, Any]
+
+
+# --- What the story needs (app/services/stories.py, mockup ACT_2) ------------------------------------------------
+
+class StoryThesisSet(BaseModel):
+    thesis: str = Field(max_length=2000, description="The one sentence the story says.")
+
+
+class StorySectionCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=512)
+
+
+class StorySectionUpdate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=512)
+    position: int | None = Field(default=None, ge=0, le=10_000)
+
+
+class StoryClaimPlace(BaseModel):
+    claim_id: str = Field(min_length=1, max_length=64)
+
+
+class StoryGateSet(BaseModel):
+    gate: Literal["right_of_reply", "legal_read"]
+    who: str | None = Field(default=None, max_length=255, description="Whom the reply went to, or who read it for the lawyer.")
+    on: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$", description="The day, YYYY-MM-DD.")
+
+
+class StoryReady(BaseModel):
+    by: str = Field(min_length=1, max_length=255, description="Who decided it is ready to run.")

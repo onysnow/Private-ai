@@ -36,6 +36,7 @@ export const STAGES: Stage[] = [
   ]},
   {key: 'report', route: '/act', n: 4, name: 'Act', line: 'What to chase next, and what to publish from.', colour: SWATCH.copper, parts: [
     {label: 'Red Flags', anchor: 'red-flags'},
+    {label: 'Story', anchor: 'story'},
     {label: 'Leads', anchor: 'leads'},
     {label: 'Charts', anchor: 'chart-builder'},
     {label: 'AI drafts', anchor: 'ai-reasoning-panel'},

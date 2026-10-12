@@ -31,6 +31,7 @@ import {DecideScreen} from '../../features/case-home/decide-screen';
 import {TheWire} from '../../features/the-wire/the-wire';
 import {MoneyView} from '../../features/money/money-view';
 import {ChainOfCustody} from '../../features/custody/chain-of-custody';
+import {StoryScreen} from '../../features/story/story-screen';
 import {TheDrop} from '../../features/the-drop/the-drop';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
@@ -289,6 +290,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       ])}
       {screen('report', [
         {anchor: 'red-flags', label: 'Red Flags', fill: true, render: () => <PanelErrorBoundary name="Red Flags"><RedFlagsBoard investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'story', label: 'Story', render: () => <PanelErrorBoundary name="Story"><StoryScreen investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
         {anchor: 'leads', label: 'Leads', render: () => <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'chart-builder', label: 'Charts', render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},

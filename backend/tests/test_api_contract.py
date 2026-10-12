@@ -434,8 +434,12 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     case_record = ok(client.post(f"/api/investigations/{inv}/case-records", json={
         "kind": "GAP", "body": {"unresolved_question": "Who signed the transfer?", "bears_on": [claim["id"]]}}))
 
+    # The case's story with one section (app/services/stories.py, mockup ACT_2).
+    story = ok(client.post(f"/api/investigations/{inv}/story/sections", json={"title": "Who bought the land"}))
+
     return Seeded(
         ids={
+            "section_id": story["sections"][0]["id"],
             "investigation_id": inv, "entity_id": meridian, "claim_id": claim["id"], "lead_id": lead, "relationship_id": relationship,
             "source_id": payment["source"]["id"], "evidence_id": payment["evidence"]["id"], "document_id": document["id"],
             "job_id": document["job"]["id"], "finding_id": company["id"], "session_id": session["id"], "assessment_id": assessment["id"],

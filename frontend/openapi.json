@@ -28677,6 +28677,538 @@
         "title": "StatementPromotionRequest",
         "type": "object"
       },
+      "StoryClaimOut": {
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/StoryEvidenceOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "single_source": {
+            "title": "Single Source",
+            "type": "boolean"
+          },
+          "state": {
+            "enum": [
+              "shown",
+              "unshown",
+              "disputed",
+              "ruled_out"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "status",
+          "state",
+          "evidence",
+          "single_source"
+        ],
+        "title": "StoryClaimOut",
+        "type": "object"
+      },
+      "StoryClaimPlace": {
+        "properties": {
+          "claim_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Claim Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id"
+        ],
+        "title": "StoryClaimPlace",
+        "type": "object"
+      },
+      "StoryCountsOut": {
+        "properties": {
+          "claims": {
+            "title": "Claims",
+            "type": "integer"
+          },
+          "disputed": {
+            "title": "Disputed",
+            "type": "integer"
+          },
+          "shown": {
+            "title": "Shown",
+            "type": "integer"
+          },
+          "unshown": {
+            "title": "Unshown",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "claims",
+          "shown",
+          "disputed",
+          "unshown"
+        ],
+        "title": "StoryCountsOut",
+        "type": "object"
+      },
+      "StoryCriticalOut": {
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "text",
+          "section"
+        ],
+        "title": "StoryCriticalOut",
+        "type": "object"
+      },
+      "StoryEvidenceOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "stance",
+          "label"
+        ],
+        "title": "StoryEvidenceOut",
+        "type": "object"
+      },
+      "StoryGateOut": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "passed",
+              "open",
+              "warning",
+              "pending"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "state",
+          "detail"
+        ],
+        "title": "StoryGateOut",
+        "type": "object"
+      },
+      "StoryGateSet": {
+        "properties": {
+          "gate": {
+            "enum": [
+              "right_of_reply",
+              "legal_read"
+            ],
+            "title": "Gate",
+            "type": "string"
+          },
+          "on": {
+            "anyOf": [
+              {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The day, YYYY-MM-DD.",
+            "title": "On"
+          },
+          "who": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whom the reply went to, or who read it for the lawyer.",
+            "title": "Who"
+          }
+        },
+        "required": [
+          "gate"
+        ],
+        "title": "StoryGateSet",
+        "type": "object"
+      },
+      "StoryOut": {
+        "properties": {
+          "can_ready": {
+            "title": "Can Ready",
+            "type": "boolean"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/StoryCountsOut"
+          },
+          "critical": {
+            "items": {
+              "$ref": "#/components/schemas/StoryCriticalOut"
+            },
+            "title": "Critical",
+            "type": "array"
+          },
+          "gates": {
+            "items": {
+              "$ref": "#/components/schemas/StoryGateOut"
+            },
+            "title": "Gates",
+            "type": "array"
+          },
+          "gates_passed": {
+            "title": "Gates Passed",
+            "type": "integer"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "ready": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryReadyOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/StorySectionOut"
+            },
+            "title": "Sections",
+            "type": "array"
+          },
+          "sentences": {
+            "$ref": "#/components/schemas/StorySentencesOut"
+          },
+          "thesis": {
+            "title": "Thesis",
+            "type": "string"
+          },
+          "unplaced": {
+            "items": {
+              "$ref": "#/components/schemas/StoryUnplacedOut"
+            },
+            "title": "Unplaced",
+            "type": "array"
+          },
+          "writeup_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Writeup Id"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "thesis",
+          "sections",
+          "counts",
+          "critical",
+          "gates",
+          "gates_passed",
+          "sentences",
+          "can_ready",
+          "unplaced"
+        ],
+        "title": "StoryOut",
+        "type": "object"
+      },
+      "StoryReady": {
+        "properties": {
+          "by": {
+            "description": "Who decided it is ready to run.",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "By",
+            "type": "string"
+          }
+        },
+        "required": [
+          "by"
+        ],
+        "title": "StoryReady",
+        "type": "object"
+      },
+      "StoryReadyOut": {
+        "properties": {
+          "at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "At",
+            "type": "string"
+          },
+          "by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By"
+          }
+        },
+        "required": [
+          "at"
+        ],
+        "title": "StoryReadyOut",
+        "type": "object"
+      },
+      "StorySectionCreate": {
+        "properties": {
+          "title": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "StorySectionCreate",
+        "type": "object"
+      },
+      "StorySectionOut": {
+        "properties": {
+          "claims": {
+            "items": {
+              "$ref": "#/components/schemas/StoryClaimOut"
+            },
+            "title": "Claims",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "shown": {
+            "title": "Shown",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "shown",
+              "unshown",
+              "disputed",
+              "empty"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "position",
+          "status",
+          "shown",
+          "total",
+          "claims"
+        ],
+        "title": "StorySectionOut",
+        "type": "object"
+      },
+      "StorySectionUpdate": {
+        "properties": {
+          "position": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "StorySectionUpdate",
+        "type": "object"
+      },
+      "StorySentencesOut": {
+        "properties": {
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "uncited": {
+            "title": "Uncited",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "uncited"
+        ],
+        "title": "StorySentencesOut",
+        "type": "object"
+      },
+      "StoryThesisSet": {
+        "properties": {
+          "thesis": {
+            "description": "The one sentence the story says.",
+            "maxLength": 2000,
+            "title": "Thesis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "thesis"
+        ],
+        "title": "StoryThesisSet",
+        "type": "object"
+      },
+      "StoryUnplacedOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "shown",
+              "unshown",
+              "disputed",
+              "ruled_out"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "status",
+          "state"
+        ],
+        "title": "StoryUnplacedOut",
+        "type": "object"
+      },
       "StyleWarningOut": {
         "description": "A warning the style panel shows beside one option's control.",
         "properties": {
@@ -50292,6 +50824,601 @@
           }
         },
         "summary": "Get Standing"
+      }
+    },
+    "/api/investigations/{investigation_id}/story": {
+      "get": {
+        "description": "The story tree with its readiness. Reading writes nothing; a case with no story yet gets an empty one.",
+        "operationId": "get_story",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Story"
+      },
+      "put": {
+        "operationId": "set_story_thesis",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryThesisSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Set Story Thesis"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/gates": {
+      "put": {
+        "description": "Right of reply sent (to whom, when) or legal read (by whom, when); both empty clears it.",
+        "operationId": "record_story_gate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryGateSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Record Story Gate"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/ready": {
+      "post": {
+        "description": "Ready to run: refused, naming what is left, until every gate has passed.",
+        "operationId": "mark_story_ready",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryReady"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Mark Story Ready"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/sections": {
+      "post": {
+        "operationId": "add_story_section",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StorySectionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Add Story Section"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/sections/{section_id}": {
+      "delete": {
+        "operationId": "delete_story_section",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "section_id",
+            "required": true,
+            "schema": {
+              "title": "Section Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Delete Story Section"
+      },
+      "patch": {
+        "operationId": "update_story_section",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "section_id",
+            "required": true,
+            "schema": {
+              "title": "Section Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StorySectionUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Update Story Section"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/sections/{section_id}/claims": {
+      "post": {
+        "operationId": "place_story_claim",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "section_id",
+            "required": true,
+            "schema": {
+              "title": "Section Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryClaimPlace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Place Story Claim"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/sections/{section_id}/claims/{claim_id}": {
+      "delete": {
+        "operationId": "remove_story_claim",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "section_id",
+            "required": true,
+            "schema": {
+              "title": "Section Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "claim_id",
+            "required": true,
+            "schema": {
+              "title": "Claim Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Remove Story Claim"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/writeup": {
+      "post": {
+        "description": "The write-up the story is told in, made if it does not exist yet.",
+        "operationId": "start_story_writeup",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Start Story Writeup"
       }
     },
     "/api/investigations/{investigation_id}/tags": {

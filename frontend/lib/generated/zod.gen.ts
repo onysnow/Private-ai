@@ -6332,6 +6332,167 @@ export const zStatementPromotionRequest = z.object({
 });
 
 /**
+ * StoryClaimPlace
+ */
+export const zStoryClaimPlace = z.object({
+  claim_id: z.string().min(1).max(64),
+});
+
+/**
+ * StoryCountsOut
+ */
+export const zStoryCountsOut = z.object({
+  claims: z.number().int(),
+  disputed: z.number().int(),
+  shown: z.number().int(),
+  unshown: z.number().int(),
+});
+
+/**
+ * StoryCriticalOut
+ */
+export const zStoryCriticalOut = z.object({
+  claim_id: z.string(),
+  section: z.string(),
+  text: z.string(),
+});
+
+/**
+ * StoryEvidenceOut
+ */
+export const zStoryEvidenceOut = z.object({
+  id: z.string(),
+  label: z.string(),
+  locator: z.string().nullish(),
+  stance: z.string(),
+});
+
+/**
+ * StoryClaimOut
+ */
+export const zStoryClaimOut = z.object({
+  evidence: z.array(zStoryEvidenceOut),
+  id: z.string(),
+  single_source: z.boolean(),
+  state: z.enum(['shown', 'unshown', 'disputed', 'ruled_out']),
+  status: z.string(),
+  text: z.string(),
+});
+
+/**
+ * StoryGateOut
+ */
+export const zStoryGateOut = z.object({
+  detail: z.string(),
+  key: z.string(),
+  label: z.string(),
+  state: z.enum(['passed', 'open', 'warning', 'pending']),
+});
+
+/**
+ * StoryGateSet
+ */
+export const zStoryGateSet = z.object({
+  gate: z.enum(['right_of_reply', 'legal_read']),
+  on: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullish(),
+  who: z.string().max(255).nullish(),
+});
+
+/**
+ * StoryReady
+ */
+export const zStoryReady = z.object({
+  by: z.string().min(1).max(255),
+});
+
+/**
+ * StoryReadyOut
+ */
+export const zStoryReadyOut = z.object({
+  at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  by: z.string().nullish(),
+});
+
+/**
+ * StorySectionCreate
+ */
+export const zStorySectionCreate = z.object({
+  title: z.string().min(1).max(512),
+});
+
+/**
+ * StorySectionOut
+ */
+export const zStorySectionOut = z.object({
+  claims: z.array(zStoryClaimOut),
+  id: z.string(),
+  position: z.number().int(),
+  shown: z.number().int(),
+  status: z.enum(['shown', 'unshown', 'disputed', 'empty']),
+  title: z.string(),
+  total: z.number().int(),
+});
+
+/**
+ * StorySectionUpdate
+ */
+export const zStorySectionUpdate = z.object({
+  position: z.number().int().gte(0).lte(10000).nullish(),
+  title: z.string().min(1).max(512).nullish(),
+});
+
+/**
+ * StorySentencesOut
+ */
+export const zStorySentencesOut = z.object({
+  total: z.number().int(),
+  uncited: z.number().int(),
+});
+
+/**
+ * StoryThesisSet
+ */
+export const zStoryThesisSet = z.object({
+  thesis: z.string().max(2000),
+});
+
+/**
+ * StoryUnplacedOut
+ */
+export const zStoryUnplacedOut = z.object({
+  id: z.string(),
+  state: z.enum(['shown', 'unshown', 'disputed', 'ruled_out']),
+  status: z.string(),
+  text: z.string(),
+});
+
+/**
+ * StoryOut
+ */
+export const zStoryOut = z.object({
+  can_ready: z.boolean(),
+  counts: zStoryCountsOut,
+  critical: z.array(zStoryCriticalOut),
+  gates: z.array(zStoryGateOut),
+  gates_passed: z.number().int(),
+  id: z.string().nullish(),
+  investigation_id: z.string(),
+  ready: zStoryReadyOut.nullish(),
+  sections: z.array(zStorySectionOut),
+  sentences: zStorySentencesOut,
+  thesis: z.string(),
+  unplaced: z.array(zStoryUnplacedOut),
+  writeup_id: z.string().nullish(),
+});
+
+/**
  * StyleWarningOut
  *
  * A warning the style panel shows beside one option's control.
@@ -9877,6 +10038,113 @@ export const zGetStandingPath = z.object({
  * Successful Response
  */
 export const zGetStandingResponse = zCaseStandingOut;
+
+export const zGetStoryPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetStoryResponse = zStoryOut;
+
+export const zSetStoryThesisBody = zStoryThesisSet;
+
+export const zSetStoryThesisPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSetStoryThesisResponse = zStoryOut;
+
+export const zRecordStoryGateBody = zStoryGateSet;
+
+export const zRecordStoryGatePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRecordStoryGateResponse = zStoryOut;
+
+export const zMarkStoryReadyBody = zStoryReady;
+
+export const zMarkStoryReadyPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMarkStoryReadyResponse = zStoryOut;
+
+export const zAddStorySectionBody = zStorySectionCreate;
+
+export const zAddStorySectionPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddStorySectionResponse = zStoryOut;
+
+export const zDeleteStorySectionPath = z.object({
+  investigation_id: z.string(),
+  section_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteStorySectionResponse = zStoryOut;
+
+export const zUpdateStorySectionBody = zStorySectionUpdate;
+
+export const zUpdateStorySectionPath = z.object({
+  investigation_id: z.string(),
+  section_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateStorySectionResponse = zStoryOut;
+
+export const zPlaceStoryClaimBody = zStoryClaimPlace;
+
+export const zPlaceStoryClaimPath = z.object({
+  investigation_id: z.string(),
+  section_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPlaceStoryClaimResponse = zStoryOut;
+
+export const zRemoveStoryClaimPath = z.object({
+  investigation_id: z.string(),
+  section_id: z.string(),
+  claim_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRemoveStoryClaimResponse = zStoryOut;
+
+export const zStartStoryWriteupPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zStartStoryWriteupResponse = zStoryOut;
 
 export const zGetTagsPath = z.object({
   investigation_id: z.string(),
