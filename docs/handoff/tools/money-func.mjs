@@ -1,0 +1,32 @@
+const {chromium} = await import(process.env.PLAYWRIGHT || '/opt/node22/lib/node_modules/playwright/index.mjs');
+const b = await chromium.launch({executablePath: '/opt/pw-browsers/chromium'});
+const p = await b.newPage({viewport: {width: 1440, height: 900}});
+const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 200))); p.on('response', r => { if (r.status() >= 400) errs.push(r.status() + ' ' + r.url()); });
+await p.goto(`http://localhost:3000/see?inv=${process.env.INV}#money-flows`, {waitUntil: 'networkidle', timeout: 300000});
+await p.waitForTimeout(2500);
+const cap = async () => (await p.locator('.mn-figure figcaption span').first().textContent()).slice(0, 80);
+console.log('caption:', await cap());
+const fig = p.locator('.mn-figure'); const box = await fig.boundingBox();
+await p.mouse.move(box.x + 300, box.y + 150);
+for (let i = 0; i < 3; i++) { await p.mouse.wheel(0, -100); await p.waitForTimeout(300); }
+console.log('after scroll up x3:', await cap(), '| bands:', await p.locator('.mn-band').count());
+for (let i = 0; i < 5; i++) { await p.mouse.wheel(0, 100); await p.waitForTimeout(200); }
+console.log('after scroll down:', await cap(), '| bands:', await p.locator('.mn-band').count());
+await p.locator('.mn-band.mn-shown').first().click({force: true}); await p.waitForTimeout(300);
+console.log('traced:', (await p.locator('.mn-traced').textContent()).replace(/\s+/g, ' '));
+await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+console.log('after Esc:', (await p.locator('.mn-traced').textContent()).replace(/\s+/g, ' '));
+await p.keyboard.press('j'); await p.keyboard.press('j'); await p.waitForTimeout(200);
+console.log('lit rows:', await p.locator('.mn-table tr.lit').count(), 'lit bands:', await p.locator('.mn-band.lit').count());
+await p.locator('text=How these work').click(); await p.waitForTimeout(200);
+console.log('how list:', await p.locator('.mn-how li').count());
+await p.locator('.mn-check-acts button', {hasText: 'Make a lead'}).first().click(); await p.waitForTimeout(800);
+console.log('lead button:', await p.locator('.mn-check-acts button').first().textContent());
+await p.keyboard.press('l'); await p.waitForTimeout(300);
+console.log('ledger view rows:', await p.locator('.mn-table.full tbody tr').count());
+await p.locator('.mn-seg button', {hasText: 'Flow'}).click(); await p.waitForTimeout(1500);
+console.log('flow svg:', await p.locator('.mn-figure svg, .mn-figure canvas').count());
+await p.locator('.mn-tabs button', {hasText: 'GBP'}).click(); await p.waitForTimeout(800);
+console.log('GBP heading line:', await p.locator('.mn-titles p').first().textContent());
+console.log('errors:', errs.join('\n') || 'none');
+await b.close();
