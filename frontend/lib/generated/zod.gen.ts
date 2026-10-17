@@ -9643,19 +9643,6 @@ export const zListAiRunEventsQuery = z.object({
  */
 export const zListAiRunEventsResponse = zAiRunEventsOut;
 
-export const zStreamAiRunEventsHeaders = z.object({
-  'last-event-id': z.string().nullish(),
-});
-
-export const zStreamAiRunEventsPath = z.object({
-  investigation_id: z.string(),
-  run_id: z.string(),
-});
-
-export const zStreamAiRunEventsQuery = z.object({
-  after: z.number().int().gte(0).optional().default(0),
-});
-
 export const zInvestigationCaseSynthesisBody = zCaseSynthesisRequest;
 
 export const zInvestigationCaseSynthesisPath = z.object({

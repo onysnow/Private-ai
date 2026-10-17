@@ -71,8 +71,9 @@ def _read(investigation_id: str, run_id: str, after: int) -> tuple[list[dict], b
         return [serialize_event(e) for e in run_events(db, investigation_id, run_id, after)], finished
 
 
-@router.get("/investigations/{investigation_id}/ai-runs/{run_id}/events/stream", response_class=StreamingResponse,
-            responses={200: {"content": {"text/event-stream": {}}}})
+# Kept out of the OpenAPI schema: the generated client has no shape for an event stream, and the screen polls
+# …/events?after=n (ADR-0012). The route is tested in tests/test_run_events.py.
+@router.get("/investigations/{investigation_id}/ai-runs/{run_id}/events/stream", response_class=StreamingResponse, include_in_schema=False)
 def stream_ai_run_events(investigation_id: str, run_id: str, after: int = Query(default=0, ge=0),
                          last_event_id: str | None = Header(default=None), db: Session = Depends(get_db)) -> StreamingResponse:
     """The run's events as Server-Sent Events (`id` is the event's n), until the run has finished."""

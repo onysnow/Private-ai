@@ -16,6 +16,8 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {investigationCaseSynthesis, investigationHypothesisTest} from '../../lib/generated/sdk.gen';
 import type {RunOptionsIn, RunPlanOut, RunSettingOut} from '../../lib/generated/types.gen';
+import {listAiRunsOptions, listAiRunsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {WatchTheRun} from './watch-the-run';
 
 type Module = 'case_synthesis' | 'hypothesis_test';
 type Values = Record<string, string>;
@@ -78,7 +80,8 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   const [hover, setHover] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [reason, setReason] = useState('');
-  const [progress, setProgress] = useState<string[]>([]);
+  const [runId, setRunId] = useState<string | null>(null);
+  const earlier = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && step === 1});
   const [outcome, setOutcome] = useState<{ok: boolean; text: string} | null>(null);
   const flagged = useRef(new Set<string>());
 
@@ -137,16 +140,16 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   const run = async (watch: boolean) => {
     if (!body || !p?.where.callable || running) return;
     setRunning(true); setOutcome(null);
-    setProgress([`${clock()} Sent: ${p.module_label} under ${p.changed_from_case_default.length ? `${p.changed_from_case_default.length} changed setting(s)` : "this case's defaults"}`]);
-    if (watch) setStep(3);
     const runBody = {question: body.question, max_results: 30, include_external_leads: true, severity_floor: body.severity_floor,
       source_tier_floor: body.source_tier_floor, options: body.options, premises, changes: echo};
     try {
       const reply = module === 'hypothesis_test'
         ? (await investigationHypothesisTest({path: {investigation_id: investigationId}, body: {...runBody, working_theory: theory.trim()}, throwOnError: true})).data
         : (await investigationCaseSynthesis({path: {investigation_id: investigationId}, body: runBody, throwOnError: true})).data;
+      setRunId(reply.job.id);
+      if (watch) setStep(3);
       if (!reply.candidate_id && reply.job) {
-        const done = await waitForJob(api, reply.job.id, j => setProgress(l => [...l, `${clock()} ${describeJob(j)}`]), {intervalMs: 2000});
+        const done = await waitForJob(api, reply.job.id, undefined, {intervalMs: 2000});
         const result = (done.result ?? {}) as {candidate_id?: string; detail?: unknown};
         if (done.status !== 'succeeded' || !result.candidate_id) throw new Error(typeof result.detail === 'string' ? result.detail : describeJob(done));
       }
@@ -155,7 +158,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       setOutcome({ok: false, text: errorMessage(error, 'The run did not finish')});
     } finally {
       setRunning(false);
-      if (watch) setStep(4);
+      void queryClient.invalidateQueries({queryKey: listAiRunsQueryKey({path: {investigation_id: investigationId}})});
     }
   };
   useEffect(() => {
@@ -186,17 +189,18 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       {module === 'hypothesis_test' && <label>The theory to test<textarea rows={2} value={theory} onChange={e => setTheory(e.target.value)}/></label>}
       <button type="submit" className="br-primary" disabled={!question.trim() || (module === 'hypothesis_test' && !theory.trim())}>Next: instructions and plan</button>
     </form>
+    {(earlier.data?.runs.length ?? 0) > 0 && <div className="br-earlier"><p className="br-eyebrow">Earlier runs</p><ul>
+      {earlier.data!.runs.slice(0, 6).map(r => <li key={r.run_id}><span>{r.question}</span>
+        <small>{new Date(r.created_at.endsWith('Z') ? r.created_at : `${r.created_at}Z`).toLocaleString(undefined, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})} · {r.events} steps{r.problems ? ` · ${r.problems} problem${r.problems === 1 ? '' : 's'}` : ''}{r.review_status ? ` · ${r.review_status}` : ''}</small>
+        <button type="button" className="br-quiet" onClick={() => { setRunId(r.run_id); setStep(3); }}>Watch it again</button></li>)}
+    </ul></div>}
   </section>;
 
   if (step === 3 || step === 4) return <section className="br" aria-label="AI runs">
-    <header className="br-head"><h2>{step === 3 ? 'Watch the run' : 'Review'}</h2>{stepper}</header>
-    <div className="br-col br-watch">
-      <p className="br-eyebrow">The run so far</p>
-      <ol className="br-log" aria-live="polite">{progress.map((line, i) => <li key={i}>{line}</li>)}</ol>
-      {outcome && <p role={outcome.ok ? 'status' : 'alert'} className={outcome.ok ? 'br-ok' : 'br-bad'}>{outcome.text}</p>}
-      {outcome?.ok && <a className="br-primary" href="#ai-reasoning-panel">Open it in AI drafts</a>}
-      {outcome && <button type="button" className="br-quiet" onClick={() => { setOutcome(null); setStep(2); }}>Back to the plan</button>}
-    </div>
+    <header className="br-head"><h2>Watch the run</h2>{stepper}</header>
+    {outcome && !outcome.ok && <p role="alert" className="br-bad">{outcome.text}</p>}
+    {!runId && running && <p role="status">Sending the run…</p>}
+    {runId && <WatchTheRun investigationId={investigationId} runId={runId} onBack={() => setStep(2)}/>}
   </section>;
 
   return <section className="br" aria-label="AI runs">
@@ -274,7 +278,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       </form> : <button type="button" className="br-save" onClick={() => setSaving(true)}>Save as this case’s default</button>}
       {save.isError && <span role="alert" className="br-bad">{errorMessage(save.error, 'Not saved')}</span>}
       {!running && outcome && step === 2 && <span role="status" className={outcome.ok ? 'br-ok' : 'br-bad'}>{outcome.text}</span>}
-      {running && step === 2 && <span role="status">Running in the background. The answer will wait for you in AI drafts.</span>}
+      {running && step === 2 && <span role="status">Running in the background. The answer will wait for you in AI drafts.{runId && <> <button type="button" className="br-quiet" onClick={() => setStep(3)}>Watch it</button></>}</span>}
       <span className="br-note">AI can be wrong. Every result waits for you.</span>
       <button type="button" className="br-cancel" onClick={cancel}>Cancel</button>
     </footer>

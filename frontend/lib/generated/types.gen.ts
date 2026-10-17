@@ -22331,54 +22331,6 @@ export type ListAiRunEventsResponses = {
 export type ListAiRunEventsResponse =
   ListAiRunEventsResponses[keyof ListAiRunEventsResponses];
 
-export type StreamAiRunEventsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Last-Event-Id
-     */
-    'last-event-id'?: string | null;
-  };
-  path: {
-    /**
-     * Investigation Id
-     */
-    investigation_id: string;
-    /**
-     * Run Id
-     */
-    run_id: string;
-  };
-  query?: {
-    /**
-     * After
-     */
-    after?: number;
-  };
-  url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/events/stream';
-};
-
-export type StreamAiRunEventsErrors = {
-  /**
-   * The request's input does not match what the route declares
-   */
-  422: ValidationErrorOut;
-  /**
-   * Refused: why, in a sentence
-   */
-  '4XX': ErrorOut;
-};
-
-export type StreamAiRunEventsError =
-  StreamAiRunEventsErrors[keyof StreamAiRunEventsErrors];
-
-export type StreamAiRunEventsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
 export type InvestigationCaseSynthesisData = {
   body: CaseSynthesisRequest;
   path: {

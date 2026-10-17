@@ -8,7 +8,6 @@ import {
   formDataBodySerializer,
   type Options as Options2,
   type RequestResult,
-  type ServerSentEventsResult,
   type TDataShape,
 } from './client';
 import { client } from './client.gen';
@@ -781,9 +780,6 @@ import type {
   StartStoryWriteupData,
   StartStoryWriteupErrors,
   StartStoryWriteupResponses,
-  StreamAiRunEventsData,
-  StreamAiRunEventsErrors,
-  StreamAiRunEventsResponses,
   SyncCorpusNowData,
   SyncCorpusNowErrors,
   SyncCorpusNowResponses,
@@ -1415,9 +1411,6 @@ import {
   zSettingsStatusResponse,
   zStartStoryWriteupPath,
   zStartStoryWriteupResponse,
-  zStreamAiRunEventsHeaders,
-  zStreamAiRunEventsPath,
-  zStreamAiRunEventsQuery,
   zSyncCorpusNowPath,
   zSyncCorpusNowResponse,
   zSyncOpenalephDocumentPath,
@@ -5297,32 +5290,6 @@ export const listAiRunEvents = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListAiRunEventsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/events',
-    ...options,
-  });
-
-/**
- * Stream Ai Run Events
- *
- * The run's events as Server-Sent Events (`id` is the event's n), until the run has finished.
- */
-export const streamAiRunEvents = <ThrowOnError extends boolean = false>(
-  options: Options<StreamAiRunEventsData, ThrowOnError, unknown>,
-): Promise<ServerSentEventsResult<StreamAiRunEventsResponses>> =>
-  (options.client ?? client).sse.get<
-    StreamAiRunEventsResponses,
-    StreamAiRunEventsErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) =>
-      await z
-        .object({
-          body: z.never().optional(),
-          headers: zStreamAiRunEventsHeaders.optional(),
-          path: zStreamAiRunEventsPath,
-          query: zStreamAiRunEventsQuery.optional(),
-        })
-        .parseAsync(data),
-    url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/events/stream',
     ...options,
   });
 

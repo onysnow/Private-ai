@@ -266,7 +266,6 @@ import {
   setStoryThesis,
   settingsStatus,
   startStoryWriteup,
-  streamAiRunEvents,
   syncCorpusNow,
   syncOpenalephDocument,
   tagARecord,
@@ -1049,8 +1048,6 @@ import type {
   StartStoryWriteupData,
   StartStoryWriteupError,
   StartStoryWriteupResponse,
-  StreamAiRunEventsData,
-  StreamAiRunEventsError,
   SyncCorpusNowData,
   SyncCorpusNowError,
   SyncCorpusNowResponse,
@@ -4873,60 +4870,6 @@ export const listAiRunEventsInfiniteOptions = (
         return data;
       },
       queryKey: listAiRunEventsInfiniteQueryKey(options),
-    },
-  );
-  return opts as Omit<typeof opts, 'initialData'>;
-};
-
-export const streamAiRunEventsInfiniteQueryKey = (
-  options: Options<StreamAiRunEventsData, boolean, unknown>,
-): QueryKey<Options<StreamAiRunEventsData, boolean, unknown>> =>
-  createQueryKey('streamAiRunEvents', options, true);
-
-/**
- * Stream Ai Run Events
- *
- * The run's events as Server-Sent Events (`id` is the event's n), until the run has finished.
- */
-export const streamAiRunEventsInfiniteOptions = (
-  options: Options<StreamAiRunEventsData, boolean, unknown>,
-) => {
-  const opts = infiniteQueryOptions<
-    unknown,
-    StreamAiRunEventsError,
-    InfiniteData<unknown>,
-    QueryKey<Options<StreamAiRunEventsData, boolean, unknown>>,
-    | number
-    | Pick<
-        QueryKey<Options<StreamAiRunEventsData, boolean, unknown>>[0],
-        'body' | 'headers' | 'path' | 'query'
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<StreamAiRunEventsData, boolean, unknown>>[0],
-          'body' | 'headers' | 'path' | 'query'
-        > =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  after: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await streamAiRunEvents({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: streamAiRunEventsInfiniteQueryKey(options),
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
