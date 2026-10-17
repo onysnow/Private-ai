@@ -19,6 +19,8 @@ export type Node = {
 export type Band = {
   key: string; fromId: string; toId: string; ids: string[]; amount: number; certainty: Certainty | 'worked_out';
   d: string; width: number; midX: number; midY: number; label: string;
+  /** The chip on the band (mockup SEE_2): what it carried in words, and where it is shown. */
+  chip: {text: string; sub: string | null; x: number; y: number};
 };
 export type ReturnArc = {id: string; fromId: string; toId: string; amount: number; d: string; labelX: number; labelY: number; label: string};
 export type Picture = {width: number; height: number; columns: {x: number; title: string}[]; nodes: Node[]; bands: Band[]; returns: ReturnArc[]};
@@ -74,7 +76,7 @@ const RANK: Record<Certainty, number> = {shown: 0, not_yet_shown: 1, disputed: 2
 export function layout(payments: Payment[], currency: string, opts: {
   closers?: string[]; marks?: Record<string, CheckMark[]>; ghosts?: Record<string, number>; height?: number;
 } = {}): Picture {
-  const height = opts.height ?? 420;
+  const height = opts.height ?? 340;
   const closers = cycleClosers(payments, opts.closers);
   const flow = payments.filter(p => !closers.has(p.id));
   const names = new Map<string, string>();
@@ -116,7 +118,8 @@ export function layout(payments: Payment[], currency: string, opts: {
     amountOut.get(n) ?? 0,
   );
   const cols = last + 1;
-  const xs = Array.from({length: cols}, (_, i) => 170 + i * ((W - 170 - 230) / (cols - 1)));
+  // Labels of the first column sit right of their bars, on the bands (mockup SEE_2), so the picture starts near the edge.
+  const xs = Array.from({length: cols}, (_, i) => 56 + i * ((W - 56 - 230) / (cols - 1)));
   const byCol: string[][] = Array.from({length: cols}, () => []);
   for (const n of names.keys()) byCol[depth.get(n)!].push(n);
   const usable = height - TOP - 20;
@@ -150,8 +153,9 @@ export function layout(payments: Payment[], currency: string, opts: {
     groups.set(key, [...(groups.get(key) ?? []), b]);
   }
   const outOff = new Map<string, number>(); const inOff = new Map<string, number>();
+  // Into a party, the worked-out ghost comes in first (top), then the recorded money, so they never cross.
   const entries = [...groups.entries()].sort(([, a], [, b]) =>
-    nodes.get(a[0].toId)!.y - nodes.get(b[0].toId)!.y || RANK[a[0].certainty] - RANK[b[0].certainty]);
+    nodes.get(a[0].toId)!.y - nodes.get(b[0].toId)!.y || Number(b[0].worked) - Number(a[0].worked) || RANK[a[0].certainty] - RANK[b[0].certainty]);
   const bands: Band[] = [];
   for (const [key, group] of entries) {
     const from = nodes.get(group[0].fromId)!; const to = nodes.get(group[0].toId)!;
@@ -169,13 +173,27 @@ export function layout(payments: Payment[], currency: string, opts: {
     const label = worked ? `ƒ ${amountText(amount, currency)} · worked out`
       : same ? `${group.length} × ${amountText(group[0].amount, currency)}`
       : `${amountText(amount, currency)}${purpose ? ` · ${purpose}` : ''}`;
+    const certainty = worked ? 'worked_out' as const : group[0].certainty;
+    const mark = certainty === 'shown' ? '✓' : certainty === 'disputed' ? '✕' : certainty === 'worked_out' ? 'ƒ' : '○';
+    const chipText = worked ? ''
+      : same ? `${mark} ${group.length} × ${amountText(group[0].amount, currency)}`
+      : certainty === 'shown' && purpose ? `${mark} ${purpose}`
+      : `${mark} ${amountText(amount, currency)}${purpose ? ` “${purpose}”` : ''}`;
+    const locator = certainty === 'shown' ? group.find(b => b.locator)?.locator ?? null : null;
     // The label sits on the band: halfway for a band to the next column, near its start for one that
     // skips a column (so it is never under a party's bar). y follows the band's own curve.
     const at = to.col - from.col > 1 ? 0.16 : 0.5;
     const ease = 3 * at * at - 2 * at * at * at;
+    // The chip sits near the start of a wide band (top-left, as the mockup draws "✓ land price"), and just under
+    // a thin one, where it cannot fit inside.
+    const thin = width <= 40;
+    const cx = x1 + (x2 - x1) * (thin ? (to.col - from.col > 1 ? 0.1 : 0.2) : to.col - from.col > 1 ? 0.12 : 0.22);
+    const ce = (() => { const a = (cx - x1) / (x2 - x1); return 3 * a * a - 2 * a * a * a; })();
+    const cy = y1 + (y2 - y1) * ce + (thin ? -14 : 22);
     bands.push({key, fromId: from.id, toId: to.id, ids: group.map(b => b.id), amount, width,
-      certainty: worked ? 'worked_out' : group[0].certainty, d: ribbon(x1, y1, x2, y2, width),
-      midX: x1 + (x2 - x1) * at, midY: y1 + (y2 - y1) * ease + width / 2, label});
+      certainty, d: ribbon(x1, y1, x2, y2, width),
+      midX: x1 + (x2 - x1) * at, midY: y1 + (y2 - y1) * ease + width / 2, label,
+      chip: {text: chipText, sub: locator, x: cx, y: cy}});
   }
   const floor = Math.max(...[...nodes.values()].map(n => n.y + n.h));
   const returns: ReturnArc[] = payments.filter(p => closers.has(p.id)).map((p, i) => {

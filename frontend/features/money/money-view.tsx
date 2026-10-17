@@ -8,7 +8,7 @@
 // Keys: J / K move the lit row (and its band), L shows the ledger, Esc clears the traced set.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {LevelChip} from '../../components/status';
@@ -74,27 +74,50 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   }, [all]);
   const currency = chosen && counts.some(([c]) => c === chosen) ? chosen : counts[0]?.[0] ?? null;
   const txs = useMemo(() => all.filter(t => t.currency === currency), [all, currency]);
-  const payments = useMemo(() => txs.map(toPayment), [txs]);
+  const allPayments = useMemo(() => txs.map(toPayment), [txs]);
+  // Scroll over the flow to replay it in date order: the picture is drawn up to one payment date at a time.
+  const dates = useMemo(() => [...new Set(allPayments.map(p => p.date).filter((d): d is string => Boolean(d)))].sort(), [allPayments]);
+  const [upTo, setUpTo] = useState<number | null>(null);
+  const cutoff = upTo === null ? null : dates[upTo] ?? null;
+  const payments = useMemo(() => cutoff === null ? allPayments : allPayments.filter(p => !p.date || p.date <= cutoff), [allPayments, cutoff]);
+  const figureRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const el = figureRef.current;
+    if (!el || !dates.length) return;
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return;
+      e.preventDefault();
+      setUpTo(now => {
+        const at = now === null ? dates.length - 1 : now;
+        const next = Math.max(0, Math.min(dates.length - 1, at + (e.deltaY > 0 ? 1 : -1)));
+        return next === dates.length - 1 ? null : next;
+      });
+    };
+    el.addEventListener('wheel', onWheel, {passive: false});
+    return () => el.removeEventListener('wheel', onWheel);
+  });
+  const drawnTo = cutoff ?? dates[dates.length - 1] ?? null;
   const checks: CurrencyMoneyChecksOut | undefined = checksQ.data?.currencies.find(c => c.currency === currency);
   const picture = useMemo(() => {
     if (!currency || !payments.length) return null;
     const marks: Record<string, CheckMark[]> = {};
     const ghosts: Record<string, number> = {};
-    for (const c of checks?.checks ?? []) {
+    for (const c of cutoff === null ? checks?.checks ?? [] : []) {
       marks[c.party_id] = [...(marks[c.party_id] ?? []), c.kind];
       if (c.kind === 'grey_hole') ghosts[c.party_id] = c.gap;
     }
-    for (const t of checks?.round_trips ?? []) marks[t.party_id] = [...(marks[t.party_id] ?? []), 'round_trip'];
+    for (const t of cutoff === null ? checks?.round_trips ?? [] : []) marks[t.party_id] = [...(marks[t.party_id] ?? []), 'round_trip'];
     return layout(payments, currency, {closers: (checks?.round_trips ?? []).map(t => t.returning_payment_id), marks, ghosts});
-  }, [payments, currency, checks]);
+  }, [payments, currency, checks, cutoff]);
   const tracedSet = new Set(traced);
   const tracedTotal = payments.filter(p => tracedSet.has(p.id));
   const litPayment = lit ? payments.find(p => p.id === lit) : undefined;
   const litBand = picture?.bands.find(b => litPayment && b.ids.includes(litPayment.id));
   const lightPath = litBand && picture ? pathOf(picture, litBand.key) : null;
   const others = counts.filter(([c]) => c !== currency);
-  const structuring = (flagsQ.data?.flags ?? []).filter(f => f.status === 'open' && f.indicator_id === 'ML-021'
-    && f.links.some(id => payments.some(p => p.id === id)));
+  const flagsOn = (flagsQ.data?.flags ?? []).filter(f => f.status === 'open' && f.links.some(id => allPayments.some(p => p.id === id)));
+  const structuring = flagsOn.filter(f => f.indicator_id === 'ML-021');
+  const flaggedIds = new Set(structuring.flatMap(f => f.links));
 
   // Keys: J / K walk the ledger rows (date order), L shows the ledger, Esc clears what is traced.
   useEffect(() => {
@@ -131,7 +154,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
       <div className="mn-controls">
         {counts.length > 0 && <div className="mn-tabs" role="tablist" aria-label="Currency">
           {counts.map(([c, n]) => <button key={c} type="button" role="tab" aria-selected={c === currency} className={c === currency ? 'on' : ''}
-            onClick={() => { setChosen(c); setTraced([]); setLit(null); setRow(0); }}>{c} · {n}</button>)}
+            onClick={() => { setChosen(c); setTraced([]); setLit(null); setRow(0); setUpTo(null); }}>{c} · {n}</button>)}
         </div>}
         <div className="mn-seg" role="radiogroup" aria-label="Layout">
           {(['columns', 'flow', 'ledger'] as const).map(v => <button key={v} type="button" role="radio" aria-checked={view === v} className={view === v ? 'on' : ''}
@@ -155,7 +178,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
 
     {currency && payments.length > 0 && <div className="mn-body">
       <div className="mn-main">
-        {view === 'columns' && picture && <figure className="mn-figure">
+        {view === 'columns' && picture && <figure className="mn-figure" ref={figureRef}>
           <svg viewBox={`0 0 ${picture.width} ${picture.height}`} role="img" aria-label={`Money in ${currency}, from where it comes to where it goes`}>
             <defs>
               <pattern id="mn-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -176,21 +199,36 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
             {picture.returns.map(r => <g key={r.id} className="mn-return">
               <path d={r.d}/><text x={r.labelX} y={r.labelY + 12} textAnchor="middle">↺ {r.label}</text>
             </g>)}
-            {picture.bands.filter(b => b.width >= 12 || b.certainty === 'worked_out').map(b =>
-              <text key={`l${b.key}`} x={b.midX} y={b.midY + 4} className="mn-band-label" textAnchor="middle">{b.label}</text>)}
+            {chips(picture.bands, labelBoxes(picture, payments, currency), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h}))).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
+              <rect x={0} y={-13} width={c.w} height={c.sub ? 34 : 19} rx={5}/>
+              <text x={8} y={0}>{c.text}</text>{c.sub && <text x={8} y={15} className="sub">{c.sub}</text>}</g>)}
             {picture.nodes.map(n => {
               const last = n.col === picture.columns.length - 1;
-              const lx = n.col === 0 ? n.x - 8 : n.x + 20;
+              const first = n.col === 0;
+              // First column: name right of the bar, on its band; the others: right of the bar too, the middle
+              // ones under their outgoing money (mockup SEE_2). Marks: left of a source, right of an end, above a middle.
+              const lx = n.x + 20;
+              const owner = n.ghost ? picture.nodes.find(x => `ghost:${x.id}` === n.id) : undefined;
+              const incoming = picture.bands.filter(b => b.toId === n.id && b.certainty !== 'worked_out');
+              const purposes = [...new Set(incoming.map(b => payments.find(p => b.ids.includes(p.id))?.purpose).filter(Boolean))];
+              const count = payments.filter(p => p.fromId === n.id).length;
+              const lines: Array<[string, string]> = // [words, 'sum'] or, in the first column, [name, its sum on the same line]
+                n.ghost
+                ? [[n.name, ''], [`ƒ ${amountText(n.amountOut, currency)} · worked out`, 'sum'], [`= what left ${owner?.name ?? 'it'} minus what came in`, 'sum']]
+                : first ? [[n.name, `${amountText(n.amountOut, currency)} · ${count} payment${count === 1 ? '' : 's'}${n.marks.includes('miracle') && n.h > 24 ? ' · nothing seen coming in' : ''}`]]
+                : last ? [[n.name, ''], [n.marks.includes('black_hole') ? `${amountText(n.amountIn, currency)} in · ${amountText(0, currency)} out`
+                    : `${amountText(n.amountIn, currency)}${purposes.length === 1 ? ` · ${purposes[0]}` : ''}`, 'sum']]
+                : [[n.name, ''], [`in ${amountText(n.amountIn, currency)}`, 'sum'], [`out ${amountText(n.amountOut, currency)}`, 'sum']];
+              const ly = n.ghost ? n.y + 20 : last || first ? n.y + Math.min(n.h / 2, 14) + (n.h < 30 ? 0 : 0) : n.y + n.h + 16;
+              const markAt = (i: number) => first ? {x: n.x - 14 - i * 20, y: n.y + Math.min(n.h / 2, 10)}
+                : last ? {x: lx + lines[1][0].length * 6.6 + 14 + i * 20, y: ly + 10} : {x: n.x + 6 + i * 20, y: n.y - 14};
               return <g key={n.id} className={`mn-node${n.ghost ? ' ghost' : ''}`}>
                 <rect x={n.x} y={n.y} width={12} height={n.h} rx={2} fill={n.ghost ? 'url(#mn-hatch)' : undefined}/>
-                {n.marks.map((m, i) => <text key={m} x={n.x + 6} y={n.y - 6 - i * 14} textAnchor="middle" className={`mn-mark mn-mark-${m}`}>
-                  <title>{KIND[m].word}: {KIND[m].line}</title>{KIND[m].icon}</text>)}
-                <text x={lx} y={n.y + Math.min(n.h / 2, 18)} textAnchor={n.col === 0 ? 'end' : 'start'} className="mn-node-name">{n.name}</text>
-                <text x={lx} y={n.y + Math.min(n.h / 2, 18) + 15} textAnchor={n.col === 0 ? 'end' : 'start'} className="mn-node-sum">
-                  {n.ghost ? `= what left ${picture.nodes.find(x => `ghost:${x.id}` === n.id)?.name ?? 'it'} minus what came in`
-                    : last ? amountText(n.amountIn, currency) : n.col === 0 ? amountText(n.amountOut, currency)
-                    : `in ${amountText(n.amountIn, currency)} · out ${amountText(n.amountOut, currency)}`}
-                </text>
+                {n.ghost && <rect x={n.x} y={n.y} width={picture.nodes.find(x => `ghost:${x.id}` === n.id)!.x - n.x} height={n.h} className="mn-ghost-box"/>}
+                {n.marks.map((m, i) => { const at = markAt(i); return <g key={m} className={`mn-mark mn-mark-${m}`} transform={`translate(${at.x} ${at.y})`}>
+                  <title>{KIND[m].word}: {KIND[m].line}</title><circle r={8}/><text y={4} textAnchor="middle">{KIND[m].icon}</text></g>; })}
+                {lines.map(([words, cls], i) => <text key={i} x={lx} y={ly + i * 14} className={cls === 'sum' ? 'mn-node-sum' : 'mn-node-name'}>{words}
+                  {cls && cls !== 'sum' && <tspan className="mn-node-sum" dx={8}>{cls}</tspan>}</text>)}
               </g>;
             })}
           </svg>
@@ -198,19 +236,23 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
             {picture.bands.filter(b => b.certainty !== 'worked_out').map(b => <li key={b.key}>{bandWords(b, picture)}</li>)}
           </ul>
           <figcaption>
-            <span>Click a band to add it to “Traced so far” · <kbd>L</kbd> ledger</span>
-            <span className="mn-key"><i className="k-shown"/>shown <i className="k-unshown"/>not yet shown <i className="k-disputed"/>disputed <i className="k-worked"/>ƒ worked out</span>
+            <span>Scroll over the flow to replay it in date order · drawn up to {drawnTo ? day(drawnTo.slice(0, 7)) : '—'}{upTo !== null && <> · <button type="button" className="mn-link" onClick={() => setUpTo(null)}>all</button></>} · click a band to add it to “Traced so far” · <kbd>L</kbd> list view</span>
+            <span className="mn-key"><i className="k-shown"/>shown <i className="k-unshown"/>not yet shown{payments.some(p => p.certainty === 'disputed') && <><i className="k-disputed"/>disputed</>} <i className="k-worked"/>ƒ worked out</span>
           </figcaption>
         </figure>}
         {view === 'flow' && <div className="mn-figure"><FinancialFlowSankey height={360} transactions={txs.map(t => ({
           id: t.id, dateTime: t.dateTime || '', from: t.from, to: t.to, amount: t.amount, currency: t.currency,
           statedPurpose: t.statedPurpose || undefined, evidence: t.evidence || undefined, status: t.status || undefined, flowType: t.flowType,
         }))}/></div>}
-        {view === 'ledger' && <LedgerTable txs={txs} lit={lit} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }} full/>}
+        {view === 'ledger' && <LedgerTable txs={txs} lit={lit} flagged={flaggedIds} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }} full/>}
 
         <div className="mn-strip">
           <LedgerStrip txs={txs} currency={currency} lit={lit} flags={structuring}/>
-          {view !== 'ledger' && <LedgerTable txs={txs} lit={lit} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }}/>}
+          {view !== 'ledger' && <div className="mn-table-side">
+            {[...structuring, ...flagsOn.filter(f => !structuring.includes(f) && f.links.length === 1 && /round/i.test(f.summary))].slice(0, 2).map(f => <p key={f.id} className="mn-flag"><LevelChip level={f.level as 'faint' | 'strong' | 'textbook'}/> <span>{f.summary}</span></p>)}
+            {flagsOn.length > 2 && <p className="mn-muted mn-more-flags">{flagsOn.length} open Red Flags touch these payments · <a href="#red-flags" className="mn-link">see them in Act</a></p>}
+            <LedgerTable txs={txs} lit={lit} flagged={flaggedIds} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }}/>
+          </div>}
         </div>
         {(ledgerQ.data?.incomplete.length ?? 0) > 0 && <details className="mn-incomplete">
           <summary>Not charted: {ledgerQ.data!.incomplete.length} payment{ledgerQ.data!.incomplete.length === 1 ? '' : 's'} missing something</summary>
@@ -223,6 +265,33 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   </section>;
 }
 
+/** The band chips, nudged right where two would overlap. */
+/** Where the parties' names sit (roughly), so a chip never covers one. */
+function labelBoxes(picture: ReturnType<typeof layout>, payments: Payment[], currency: string): Array<{x: number; y: number; w: number; h: number}> {
+  return picture.nodes.filter(n => !n.ghost).map(n => {
+    const first = n.col === 0; const last = n.col === picture.columns.length - 1;
+    const count = payments.filter(p => p.fromId === n.id).length;
+    const w = first ? n.name.length * 7.4 + (amountText(n.amountOut, currency).length + 14 + String(count).length) * 6.6 + 12 : Math.max(n.name.length * 7.4, 150);
+    const y = first || last ? n.y + Math.min(n.h / 2, 14) - 12 : n.y + n.h + 4;
+    return {x: n.x + 18, y: y - 3, w, h: first ? 22 : 46};
+  });
+}
+
+function chips(bands: ReturnType<typeof layout>['bands'], avoid: Array<{x: number; y: number; w: number; h: number}> = [],
+  bars: Array<{x: number; y: number; w: number; h: number}> = []): Array<{key: string; certainty: string; text: string; sub: string | null; x: number; y: number; w: number}> {
+  const placed: Array<{x: number; y: number; w: number; h: number}> = [...avoid];
+  return bands.filter(b => b.chip.text).sort((a, b) => a.chip.y - b.chip.y).map(b => {
+    const w = Math.max(b.chip.text.length, (b.chip.sub ?? '').length) * 6.3 + 16;
+    const h = b.chip.sub ? 34 : 19;
+    // Try the chip's own place, then rows above it, then to the right; never over a bar or a name.
+    const free = (x: number, top: number) => [...placed, ...bars].every(p => !(x < p.x + p.w + 6 && x + w > p.x && top < p.y + p.h && top + h > p.y));
+    const spots = [0, -1, -2, 1, -3].flatMap(r => [0, 1, 2].map(s => ({x: b.chip.x + s * 60, top: b.chip.y - 13 + r * (h + 4)})));
+    const at = spots.find(s => free(s.x, s.top)) ?? spots[0];
+    placed.push({x: at.x, y: at.top, w, h});
+    return {key: b.key, certainty: b.certainty, text: b.chip.text, sub: b.chip.sub, x: at.x, y: at.top + 13, w};
+  });
+}
+
 function currencyName(c: string): string {
   return ({EUR: 'Euro', USD: 'Dollar', GBP: 'Sterling'} as Record<string, string>)[c] ?? c;
 }
@@ -233,19 +302,19 @@ function bandWords(b: ReturnType<typeof layout>['bands'][number], picture: Retur
   return `${from} to ${to}: ${b.label} (${how})`;
 }
 
-function LedgerTable({txs, lit, traced, onLight, full = false}: {
-  txs: FinancialTransactionOut[]; lit: string | null; traced: Set<string>; onLight: (id: string, i: number) => void; full?: boolean;
+function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
+  txs: FinancialTransactionOut[]; lit: string | null; flagged: Set<string>; traced: Set<string>; onLight: (id: string, i: number) => void; full?: boolean;
 }): ReactElement {
   const shown = full ? txs : txs.slice(0, 6);
   return <div className={`mn-table${full ? ' full' : ''}`}>
     <table aria-label="The ledger, in date order">
-      <thead><tr><th scope="col">Date</th><th scope="col">From → to</th><th scope="col" className="num">Amount</th><th scope="col">How sure</th><th scope="col">Source</th>
+      <thead><tr><th scope="col">Date</th><th scope="col">From → to</th><th scope="col" className="num">Amount{txs[0] ? ` · ${txs[0].currency}` : ''}</th><th scope="col">How sure</th><th scope="col">Source</th>
         {full && <th scope="col">Purpose</th>}</tr></thead>
       <tbody>{shown.map((t, i) => {
         const c = CERTAINTY[t.certainty];
-        return <tr key={t.id} className={`${lit === t.id ? 'lit' : ''}${traced.has(t.id) ? ' traced' : ''}`} onMouseEnter={() => onLight(t.id, i)}
+        return <tr key={t.id} className={`${lit === t.id ? 'lit' : ''}${flagged.has(t.id) ? ' flagged' : ''}${traced.has(t.id) ? ' traced' : ''}`} onMouseEnter={() => onLight(t.id, i)}
           aria-current={lit === t.id ? 'true' : undefined}>
-          <td>{day(t.dateTime ?? null)}</td><td>{t.from} → {t.to}</td><td className="num">{amountText(t.amount, t.currency)}</td>
+          <td>{day(t.dateTime ?? null)}</td><td>{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
           <td><span className={`mn-sure mn-sure-${t.certainty}`}><span aria-hidden="true">{c.mark}</span> {c.word}</span></td>
           <td>{t.locator ?? <span className="mn-muted">none attached</span>}</td>
           {full && <td>{t.statedPurpose ?? <span className="mn-muted">none stated</span>}</td>}
@@ -269,13 +338,16 @@ function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[
   const maxLog = Math.log10(Math.max(...dated.map(t => t.amount), 10));
   const h = (a: number) => (Math.log10(Math.max(a, 1)) / maxLog) * (H - B - 26);
   const line = REPORTING_LINE[currency];
+  // The line's name goes in the widest stretch with no bar, so it never sits on one.
+  const xsAll = [L, ...dated.map(t => x(time(t.dateTime!))).sort((a, b) => a - b), W - L];
+  const gapX = xsAll.slice(1).reduce((best, xv, i) => (xv - xsAll[i] > best.w ? {w: xv - xsAll[i], x: (xv + xsAll[i]) / 2} : best), {w: 0, x: W / 2}).x;
   const years = Array.from({length: new Date(y1).getUTCFullYear() - new Date(y0).getUTCFullYear()}, (_, i) => new Date(y0).getUTCFullYear() + i);
   return <figure className="mn-ledger-strip">
     <figcaption>The ledger, in date order · {currency}</figcaption>
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Each payment in ${currency} by date; bar height on a log scale`}>
       {years.map(yr => <text key={yr} x={x(Date.UTC(yr, 6, 1))} y={H - 4} textAnchor="middle" className="mn-axis">{yr}</text>)}
       {line && line < 10 ** maxLog && <g className="mn-line"><line x1={L} x2={W - L} y1={H - B - h(line)} y2={H - B - h(line)}/>
-        <text x={W - L} y={H - B - h(line) - 4} textAnchor="end">{amountText(line, currency)} line</text></g>}
+        <text x={gapX} y={H - B - h(line) - 4} textAnchor="middle">{amountText(line, currency)} line</text></g>}
       {flags.map(f => {
         const ids = new Set(f.links);
         const xs = dated.filter(t => ids.has(t.id)).map(t => x(time(t.dateTime!)));
@@ -285,9 +357,9 @@ function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[
       })}
       {dated.map(t => <rect key={t.id} x={x(time(t.dateTime!)) - 3} width={6} y={H - B - h(t.amount)} height={h(t.amount)}
         className={`mn-bar mn-bar-${t.certainty}${lit === t.id ? ' lit' : ''}`}><title>{day(t.dateTime ?? null)} · {t.from} → {t.to} · {amountText(t.amount, currency)}</title></rect>)}
+      {dated.filter(t => t.amount >= 10 * (line ?? 10000)).map(t => <text key={`v${t.id}`} x={x(time(t.dateTime!)) + 6} y={H - B - h(t.amount) + 8} className="mn-bar-value">{amountText(t.amount, currency)}</text>)}
     </svg>
-    <p className="mn-muted">Bar height: amount, log scale. {flags.length ? '' : `No structuring flag on these ${currency} payments.`}</p>
-    {flags.map(f => <p key={f.id} className="mn-flag"><LevelChip level={f.level as 'faint' | 'strong' | 'textbook'}/> {f.summary}</p>)}
+    <p className="mn-muted mn-axis-note">bar height: amount, log scale (stated on the axis){flags.length ? '' : ` · no structuring flag on these ${currency} payments`}</p>
   </figure>;
 }
 
@@ -298,6 +370,7 @@ function ChecksPanel({investigationId, currency, checks, ranAt, error}: {
   const lead = useMutation({...createLeadEndpointMutation(), onSuccess: () => queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path: {investigation_id: investigationId}})})});
   const [made, setMade] = useState<Record<string, boolean>>({});
   const [more, setMore] = useState(false);
+  const [how, setHow] = useState(false);
   const found = checks?.checks ?? [];
   const firstOfKind = (['grey_hole', 'miracle', 'black_hole'] as const).flatMap(k => found.filter(c => c.kind === k).slice(0, 1));
   const shown = more ? found : firstOfKind;
@@ -343,6 +416,13 @@ function ChecksPanel({investigationId, currency, checks, ranAt, error}: {
           <p>No {currencyName(currency).toLowerCase()} chain returns to its payer.</p>
         </article>}
     </>}
-    {ranAt && <p className="mn-ran">Checks re-run when the ledger or the year changes · last run {ran(ranAt)}</p>}
+    {ranAt && <p className="mn-ran">Checks re-run when the ledger or the year changes · last run {ran(ranAt)} · <button type="button" className="mn-link" aria-expanded={how} onClick={() => setHow(h => !h)}>How these work</button></p>}
+    {how && <ul className="mn-how">
+      <li><b>Grey hole:</b> a party sent more than the case shows it received; the difference is worked out, never a payment.</li>
+      <li><b>Miracle:</b> a party sent money and nothing is recorded coming in.</li>
+      <li><b>Black hole:</b> a party received money and nothing is recorded leaving.</li>
+      <li><b>Round trip:</b> a chain of payments returns to the party it started from.</li>
+      <li>One currency at a time, from the payments in this case only, up to the year chosen.</li>
+    </ul>}
   </aside>;
 }

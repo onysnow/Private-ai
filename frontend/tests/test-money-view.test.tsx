@@ -83,6 +83,17 @@ describe('the money picture', () => {
     expect(pathOf(pic, pic.bands.find(b => b.toId === 'C')!.key).size).toBe(3);
   });
 
+  it('puts a chip on each band in the status grammar: what it carried and, when shown, where', () => {
+    const shown = {...p('1', 'K', 'C', 1250000, '2019-05-20'), purpose: 'land price', locator: 'council minutes p.4'};
+    const three = ['a', 'b', 'c'].map(id => p(id, 'F', 'K', 9800, '2018-02-06'));
+    const open = {...p('d', 'F', 'K', 42000, '2019-05-14'), certainty: 'not_yet_shown' as const, purpose: 'deposit'};
+    const pic = layout([shown, ...three, open], 'EUR');
+    const chip = (to: string, c: string) => pic.bands.find(b => b.toId === to && b.certainty === c)!.chip;
+    expect(chip('C', 'shown')).toMatchObject({text: '✓ land price', sub: 'council minutes p.4'});
+    expect(chip('K', 'shown')).toMatchObject({text: '✓ 3 × €9,800'});
+    expect(chip('K', 'not_yet_shown')).toMatchObject({text: '○ €42,000 “deposit”', sub: null});
+  });
+
   it('never refuses a cycle: the latest payment of a round trip is drawn as a return arc', () => {
     const ps = [p('1', 'A', 'B', 100, '2018-01-01'), p('2', 'B', 'C', 90, '2018-06-01'), p('3', 'C', 'A', 85, '2019-01-01')];
     expect([...cycleClosers(ps)]).toEqual(['3']);
