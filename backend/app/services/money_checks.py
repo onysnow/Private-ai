@@ -103,6 +103,9 @@ def _checks_for(currency: str, txs: list[dict]) -> dict[str, Any]:
     trips = []
     for cycle in _cycles(txs):
         latest = max(cycle, key=lambda e: (e["dateTime"] or "", e["id"]))
+        # Read the trip from the party the money returns to, round to it again (not from whichever id sorts first).
+        at = next(i for i, e in enumerate(cycle) if e["from_entity_id"] == latest["to_entity_id"])
+        cycle = cycle[at:] + cycle[:at]
         trips.append({"kind": "round_trip", "party_id": latest["to_entity_id"], "party": latest["to"],
                       "path": [cycle[0]["from"], *[e["to"] for e in cycle]], "payment_ids": [e["id"] for e in cycle],
                       "returning_payment_id": latest["id"], "gap": latest["amount"], "innocent": INNOCENT["round_trip"],
