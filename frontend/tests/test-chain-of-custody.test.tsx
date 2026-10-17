@@ -3,7 +3,10 @@
 // claim, the detail panel with Re-check hash, the custody log and its export, L for the log as a list.
 import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {afterEach, beforeEach, describe, expect, it} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+const push = vi.fn();
+vi.mock('next/navigation', () => ({useRouter: () => ({push})}));
 
 import {ChainOfCustody, logTable, sealLine} from '../features/custody/chain-of-custody';
 import {ApiClient} from '../lib/api-client';
@@ -20,7 +23,9 @@ const card = (id: string, kind: string, title: string, extra: Record<string, unk
 const CHAIN = {
   claim: {id: 'c1', text: 'Harbour Nominees Ltd held 40% of Fernhill Ltd from March 2018', status: 'supported', confidence: 0.8},
   rows: [
-    {evidence_id: 'e1', stance: 'supports', cards: [
+    {evidence_id: 'e1', stance: 'supports', source: {title: 'Stock transfer form J30', source_type: 'document', tier: 'A', issuer: null},
+      anchor: {start: 27, end: 79, exact: true}, rests_on: [{kind: 'claim', id: 'c1', label: 'Harbour Nominees Ltd held 40%', level: null},
+        {kind: 'flag', id: 'f1', label: 'Red Flag BO-031', level: 'strong'}], cards: [
       card('file:e1', 'file', 'Fernhill_share_transfer_2018.pdf', {who: 'Ony', actor: 'person', checks: [{label: 'hash', ok: true}], document_id: 'd1', sha256: SHA,
         lines: ['uploaded by Ony · 02 Oct 09:14'], wire: {style: 'worked_out', words: 'read by the app'}}),
       card('read:e1', 'reading', 'Page 3 of 4', {who: 'App reader', lines: ['read by OCR', 'app reader'], checks: [{label: 'OCR', ok: true}], wire: {style: 'worked_out', words: 'p.3'}}),
@@ -34,7 +39,7 @@ const CHAIN = {
       card('decision:e2', 'decision', 'Answered', {actor: 'person', who: 'a person', lines: ['filed 14 Dec 2017, before the transfer'], wire: {style: 'against', words: 'against'}}),
     ]},
   ],
-  ai: [{id: 'ai1', module: 'case synthesis', status: 'pending', when: '2026-10-10T14:02:00Z'}],
+  ai: [{id: 'ai1', module: 'case_synthesis', status: 'pending', when: '2026-10-10T14:02:00Z', run_id: 'job-9'}],
   log: [
     {when: '2026-10-02T09:14:00Z', who: 'Ony', actor: 'person', what: 'Uploaded Fernhill_share_transfer_2018.pdf · SHA-256 recorded at intake', card: 'file:e1'},
     {when: '2026-10-02T09:15:00Z', who: 'App reader', actor: 'app', what: 'Read 4 pages of Fernhill_share_transfer_2018.pdf by OCR', card: 'read:e1'},
@@ -65,12 +70,19 @@ describe('Chain of Custody', () => {
     expect(await screen.findByText(/7 steps · 1 person/)).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /^File: Fernhill_share_transfer_2018\.pdf\. hash passed$/})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /^Passage: .*says it passed$/})).toBeInTheDocument();
-    expect(screen.getByRole('article', {name: `The claim: ${CHAIN.claim.text}`})).toHaveTextContent('✕ 1 against');
-    expect(screen.getByRole('article', {name: 'AI step'})).toHaveTextContent('case synthesis draft quoted this claim');
+    expect(screen.getByRole('article', {name: `The claim: ${CHAIN.claim.text}`})).toHaveTextContent('✓ 1 against, answered');
+    expect(screen.getByRole('article', {name: 'AI step'})).toHaveTextContent('Case synthesis draft quoted this claim');
     // The passage opens first in the detail panel, with its words lit.
     const detail = screen.getByRole('complementary', {name: 'Step 3 of 4: Passage'});
     expect(detail.querySelector('mark')).toHaveTextContent('Harbour Nominees Limited, being forty per cent (40%)');
-    expect(within(detail).getByText(/a3f907c2…5d1e/)).toBeInTheDocument();
+    expect(within(detail).getByText(/a3f9 07c2 … 5d1e/)).toBeInTheDocument();
+    expect(detail).toHaveTextContent('Stock transfer form J30, page 3');
+    expect(detail).toHaveTextContent('exact quote at characters 27–79 of the passage');
+    expect(within(detail).getByText(/Red Flag BO-031/)).toBeInTheDocument();
+    // The AI step leads to its run.
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Watch the run →'}));
+    expect(useWorkbenchStore.getState().aiRun).toMatchObject({runId: 'job-9'});
+    expect(push).toHaveBeenCalledWith('/act?inv=inv-1#ai-runs');
   });
 
   it('re-checks the file, opens the page, and shows the chain as a list with L', async () => {
@@ -83,12 +95,13 @@ describe('Chain of Custody', () => {
     expect(await within(detail).findByText(/✓ re-checked now/)).toBeInTheDocument();
     await user.click(within(detail).getByRole('button', {name: 'Open page 3'}));
     expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1', pageNumber: 3});
-    expect(within(detail).getByRole('button', {name: 'What if this breaks?'})).toBeDisabled();
+    await user.click(within(detail).getByRole('button', {name: 'What if this breaks?'}));
+    expect(within(detail).getByRole('status')).toHaveTextContent('If this step breaks, everything after it in this row falls, and with it:Claim: Harbour Nominees Ltd held 40%Flag: Red Flag BO-031');
     fireEvent.keyDown(window, {key: 'l'});
     expect(screen.getByRole('list', {name: 'The chain as a list'})).toHaveTextContent('Ony: Uploaded Fernhill_share_transfer_2018.pdf');
     fireEvent.keyDown(window, {key: 'l'});
     await user.click(screen.getByRole('button', {name: /^Source: Companies House CS01/}));
-    expect(screen.getByRole('complementary', {name: 'Step 1 of 2: Source'})).toHaveTextContent('none: no file in the case to check it against');
+    expect(screen.getByRole('complementary', {name: 'Step 1 of 2: Source'})).toHaveTextContent('Answered: filed 14 Dec 2017, before the transfer');
   });
 
   it('opens the claim another panel asked for, and says when there is nothing to trace', async () => {

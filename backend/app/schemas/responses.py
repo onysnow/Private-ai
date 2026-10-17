@@ -2672,10 +2672,35 @@ class CustodyCardOut(ResponseModel):
     page: int | None = None
 
 
+class CustodySourceOut(ResponseModel):
+    """The source the evidence is quoted from, as the case records it."""
+    title: str
+    source_type: str
+    tier: str | None = None
+    issuer: str | None = None
+
+
+class CustodyAnchorOut(ResponseModel):
+    """Where the quote stands in the passage, found now (character offsets in the passage text)."""
+    start: int
+    end: int
+    exact: bool
+
+
+class CustodyRestingOut(ResponseModel):
+    kind: Literal["claim", "link", "flag"]
+    id: str
+    label: str
+    level: str | None = None
+
+
 class CustodyRowOut(ResponseModel):
     evidence_id: str
     stance: Literal["supports", "contradicts"]
     cards: list[CustodyCardOut]
+    source: CustodySourceOut | None = None
+    anchor: CustodyAnchorOut | None = None
+    rests_on: list[CustodyRestingOut] = []
 
 
 class CustodyAiOut(ResponseModel):
@@ -2683,6 +2708,7 @@ class CustodyAiOut(ResponseModel):
     module: str
     status: str
     when: Timestamp
+    run_id: str | None = None
 
 
 class CustodyLogOut(ResponseModel):

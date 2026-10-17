@@ -4778,6 +4778,10 @@ export type CustodyAiOut = {
    */
   module: string;
   /**
+   * Run Id
+   */
+  run_id?: string | null;
+  /**
    * Status
    */
   status: string;
@@ -4787,6 +4791,26 @@ export type CustodyAiOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   when: string;
+};
+
+/**
+ * CustodyAnchorOut
+ *
+ * Where the quote stands in the passage, found now (character offsets in the passage text).
+ */
+export type CustodyAnchorOut = {
+  /**
+   * End
+   */
+  end: number;
+  /**
+   * Exact
+   */
+  exact: boolean;
+  /**
+   * Start
+   */
+  start: number;
 };
 
 /**
@@ -4941,9 +4965,32 @@ export type CustodyLogOut = {
 };
 
 /**
+ * CustodyRestingOut
+ */
+export type CustodyRestingOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'claim' | 'link' | 'flag';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Level
+   */
+  level?: string | null;
+};
+
+/**
  * CustodyRowOut
  */
 export type CustodyRowOut = {
+  anchor?: CustodyAnchorOut | null;
   /**
    * Cards
    */
@@ -4952,6 +4999,11 @@ export type CustodyRowOut = {
    * Evidence Id
    */
   evidence_id: string;
+  /**
+   * Rests On
+   */
+  rests_on?: Array<CustodyRestingOut>;
+  source?: CustodySourceOut | null;
   /**
    * Stance
    */
@@ -4998,6 +5050,30 @@ export type CustodySealOut = {
    * Steps
    */
   steps: number;
+};
+
+/**
+ * CustodySourceOut
+ *
+ * The source the evidence is quoted from, as the case records it.
+ */
+export type CustodySourceOut = {
+  /**
+   * Issuer
+   */
+  issuer?: string | null;
+  /**
+   * Source Type
+   */
+  source_type: string;
+  /**
+   * Tier
+   */
+  tier?: string | null;
+  /**
+   * Title
+   */
+  title: string;
 };
 
 /**

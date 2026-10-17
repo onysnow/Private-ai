@@ -18,6 +18,7 @@ import {investigationCaseSynthesis, investigationHypothesisTest} from '../../lib
 import type {RunOptionsIn, RunPlanOut, RunSettingOut} from '../../lib/generated/types.gen';
 import {listAiRunsOptions, listAiRunsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {WatchTheRun} from './watch-the-run';
+import {useWorkbenchStore} from '../../lib/workbench-store';
 
 type Module = 'case_synthesis' | 'hypothesis_test';
 type Values = Record<string, string>;
@@ -81,6 +82,9 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   const [saving, setSaving] = useState(false);
   const [reason, setReason] = useState('');
   const [runId, setRunId] = useState<string | null>(null);
+  // Asked to watch a run from elsewhere (a Chain of Custody AI step): open it in step 3.
+  const asked = useWorkbenchStore(s => s.aiRun);
+  useEffect(() => { if (asked) { setRunId(asked.runId); setStep(3); } }, [asked]);
   const earlier = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && step === 1});
   const [outcome, setOutcome] = useState<{ok: boolean; text: string} | null>(null);
   const flagged = useRef(new Set<string>());

@@ -1917,12 +1917,24 @@ export const zCrossReferenceMatchOut = z.object({
 export const zCustodyAiOut = z.object({
   id: z.string(),
   module: z.string(),
+  run_id: z.string().nullish(),
   status: z.string(),
   when: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+});
+
+/**
+ * CustodyAnchorOut
+ *
+ * Where the quote stands in the passage, found now (character offsets in the passage text).
+ */
+export const zCustodyAnchorOut = z.object({
+  end: z.number().int(),
+  exact: z.boolean(),
+  start: z.number().int(),
 });
 
 /**
@@ -1959,6 +1971,16 @@ export const zCustodyLogOut = z.object({
 });
 
 /**
+ * CustodyRestingOut
+ */
+export const zCustodyRestingOut = z.object({
+  id: z.string(),
+  kind: z.enum(['claim', 'link', 'flag']),
+  label: z.string(),
+  level: z.string().nullish(),
+});
+
+/**
  * CustodySealOut
  */
 export const zCustodySealOut = z.object({
@@ -1971,6 +1993,18 @@ export const zCustodySealOut = z.object({
   people: z.number().int(),
   sources_for: z.number().int(),
   steps: z.number().int(),
+});
+
+/**
+ * CustodySourceOut
+ *
+ * The source the evidence is quoted from, as the case records it.
+ */
+export const zCustodySourceOut = z.object({
+  issuer: z.string().nullish(),
+  source_type: z.string(),
+  tier: z.string().nullish(),
+  title: z.string(),
 });
 
 /**
@@ -2012,8 +2046,11 @@ export const zCustodyCardOut = z.object({
  * CustodyRowOut
  */
 export const zCustodyRowOut = z.object({
+  anchor: zCustodyAnchorOut.nullish(),
   cards: z.array(zCustodyCardOut),
   evidence_id: z.string(),
+  rests_on: z.array(zCustodyRestingOut).optional().default([]),
+  source: zCustodySourceOut.nullish(),
   stance: z.enum(['supports', 'contradicts']),
 });
 

@@ -6,7 +6,14 @@ from fastapi.testclient import TestClient
 
 from app.db.session import SessionLocal
 from app.main import app
-from app.models.domain import Document, DocumentChunk, IngestionBatch, IngestionBatchItem, Source
+from app.models.domain import (
+    AIAnalysisCandidate,
+    Document,
+    DocumentChunk,
+    IngestionBatch,
+    IngestionBatchItem,
+    Source,
+)
 
 client = TestClient(app)
 
@@ -66,6 +73,23 @@ def test_each_piece_of_evidence_is_a_row_from_the_file_to_the_claim(tmp_path):
     whats = [e["what"] for e in chain["log"]]
     assert "Uploaded transfer.pdf · SHA-256 recorded at intake" in whats
     assert any(w.startswith("Linked as against the claim: filed 14 Dec 2017") for w in whats)
+
+    # The source, where the quote stands in the passage, and what rests on the evidence.
+    assert support["source"] == {"title": "Share transfer", "source_type": "document", "tier": None, "issuer": None}
+    text = passage["text"]
+    assert text[support["anchor"]["start"]:support["anchor"]["end"]] == "being forty per cent (40%) of the issued share capital"
+    assert support["anchor"]["exact"] is True
+    assert support["rests_on"] == [{"kind": "claim", "id": claim["id"], "label": "Harbour Nominees held 40% of Fernhill Ltd", "level": None}]
+    # An AI answer counts only when it cites the claim or its evidence, not when it merely had it in its packet.
+    with SessionLocal() as db:
+        db.add(AIAnalysisCandidate(investigation_id=inv, module="case_synthesis", review_status="proposed", trace={"run_id": "job-1"},
+                                   payload={"claims": [{"claim_id": "CLM-0001", "supporting_evidence": [{"record_type": "evidence", "record_id": ev["id"]}]}]},
+                                   checked_citation_ids=[]))
+        db.add(AIAnalysisCandidate(investigation_id=inv, module="hypothesis_test", review_status="proposed", payload={},
+                                   checked_citation_ids=[{"record_type": "claim", "record_id": claim["id"]}]))
+        db.commit()
+    traced = ok(client.get(f"/api/claims/{claim['id']}/custody-chain"))
+    assert [(a["module"], a["run_id"]) for a in traced["ai"]] == [("case_synthesis", "job-1")]
 
     # The file changes on disk: the chain says the hash no longer matches, and the re-check says so too.
     path.write_bytes(b"changed")

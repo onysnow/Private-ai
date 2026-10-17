@@ -12305,6 +12305,17 @@
             "title": "Module",
             "type": "string"
           },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -12323,6 +12334,30 @@
           "when"
         ],
         "title": "CustodyAiOut",
+        "type": "object"
+      },
+      "CustodyAnchorOut": {
+        "description": "Where the quote stands in the passage, found now (character offsets in the passage text).",
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "integer"
+          },
+          "exact": {
+            "title": "Exact",
+            "type": "boolean"
+          },
+          "start": {
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "exact"
+        ],
+        "title": "CustodyAnchorOut",
         "type": "object"
       },
       "CustodyCardOut": {
@@ -12612,8 +12647,57 @@
         "title": "CustodyLogOut",
         "type": "object"
       },
+      "CustodyRestingOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "claim",
+              "link",
+              "flag"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label"
+        ],
+        "title": "CustodyRestingOut",
+        "type": "object"
+      },
       "CustodyRowOut": {
         "properties": {
+          "anchor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustodyAnchorOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "cards": {
             "items": {
               "$ref": "#/components/schemas/CustodyCardOut"
@@ -12624,6 +12708,24 @@
           "evidence_id": {
             "title": "Evidence Id",
             "type": "string"
+          },
+          "rests_on": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CustodyRestingOut"
+            },
+            "title": "Rests On",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustodySourceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "stance": {
             "enum": [
@@ -12699,6 +12801,47 @@
           "against"
         ],
         "title": "CustodySealOut",
+        "type": "object"
+      },
+      "CustodySourceOut": {
+        "description": "The source the evidence is quoted from, as the case records it.",
+        "properties": {
+          "issuer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tier"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "source_type"
+        ],
+        "title": "CustodySourceOut",
         "type": "object"
       },
       "CustodyWireOut": {

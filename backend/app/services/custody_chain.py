@@ -20,10 +20,18 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.ai.reasoning import _find_citation_refs
 from app.models.ai import AIAnalysisCandidate
 from app.models.claims import Claim, ClaimEvidenceLink, ClaimReviewEvent
-from app.models.documents import Document, DocumentChunk, IngestionBatch, IngestionBatchItem
+from app.models.documents import (
+    Document,
+    DocumentChunk,
+    IngestionBatch,
+    IngestionBatchItem,
+)
 from app.models.jobs import BackgroundJob
+from app.models.patterns import PatternFlag
+from app.models.relationships import RelationshipEdge, RelationshipEvidenceAttachment
 from app.models.sources import Evidence, Source
 from app.services.claim_done import _document_of, _file_matches, _norm
 from app.services.provenance import _record_extraction_lineage
@@ -65,6 +73,33 @@ def _proposer(payload: Any) -> str:
     if prov.get("provider"):
         return str(prov["provider"])
     return "the app"
+
+
+def _rests_on(db: Session, investigation_id: str, evidence_id: str, claim_id: str) -> list[dict[str, Any]]:
+    """What falls if this evidence breaks: the claims it is linked to, the links (relationships) it is attached to,
+    and the open Red Flags that name it or one of those claims (research §3.11 "What if this breaks?")."""
+    out: list[dict[str, Any]] = []
+    claim_ids = list(db.scalars(select(ClaimEvidenceLink.claim_id).where(ClaimEvidenceLink.evidence_id == evidence_id)))
+    for c in list(db.scalars(select(Claim).where(Claim.id.in_(claim_ids)))) if claim_ids else []:
+        out.append({"kind": "claim", "id": c.id, "label": c.text})
+    edge_ids = list(db.scalars(select(RelationshipEvidenceAttachment.relationship_edge_id).where(RelationshipEvidenceAttachment.evidence_id == evidence_id)))
+    for e in list(db.scalars(select(RelationshipEdge).where(RelationshipEdge.id.in_(edge_ids)))) if edge_ids else []:
+        out.append({"kind": "link", "id": e.id, "label": f"{e.schema} link"})
+    named = {evidence_id, *claim_ids, *edge_ids}
+    for f in db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id, PatternFlag.status == "open")):
+        if named & set(f.links or []):
+            out.append({"kind": "flag", "id": f.id, "label": f"Red Flag {f.indicator_id}", "level": f.level})
+    return out
+
+
+def _anchor(text: str | None, quote: str | None) -> dict[str, Any] | None:
+    if not text or not quote:
+        return None
+    at = text.find(quote)
+    if at >= 0:
+        return {"start": at, "end": at + len(quote), "exact": True}
+    at = text.lower().find(quote.lower())
+    return {"start": at, "end": at + len(quote), "exact": False} if at >= 0 else None
 
 
 def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
@@ -151,17 +186,24 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
                           "wire": {"style": "against" if against else "confirmed", "words": "against" if against else "supports"}})
         log.append({"when": link.created_at, "who": "a person", "actor": "person",
                     "what": f"Linked as {'against' if against else 'supporting'} the claim{f': {link.note}' if link.note else ''}", "card": f"decision:{ev.id}"})
-        rows.append({"evidence_id": ev.id, "stance": link.stance, "cards": cards})
+        passage_card = next((c for c in cards if c["kind"] == "passage"), None)
+        rows.append({"evidence_id": ev.id, "stance": link.stance, "cards": cards,
+                     "source": {"title": source.title, "source_type": source.source_type, "tier": source.source_tier, "issuer": source.issuer_or_author} if source else None,
+                     "anchor": _anchor(passage_card.get("text") if passage_card else None, ev.quote),
+                     "rests_on": _rests_on(db, claim.investigation_id, ev.id, claim.id)})
 
     for event in db.scalars(select(ClaimReviewEvent).where(ClaimReviewEvent.claim_id == claim.id).order_by(ClaimReviewEvent.created_at)):
         who = "a person" if (event.reviewer_type or "HUMAN").upper() == "HUMAN" else event.reviewer_type.lower()
         log.append({"when": event.created_at, "who": who, "actor": "person" if who == "a person" else "app",
                     "what": f"Set the claim {event.to_status}" + (f": {event.rationale}" if event.rationale else ""), "card": "claim"})
     ai = []
+    # An AI answer that cites this claim or one of its pieces of evidence (not merely had it in its packet).
+    mine = {("claim", claim.id), *(("evidence", r["evidence_id"]) for r in rows)}
     for cand in db.scalars(select(AIAnalysisCandidate).where(AIAnalysisCandidate.investigation_id == claim.investigation_id)):
-        cited = cand.checked_citation_ids or []
-        if any(isinstance(c, dict) and c.get("record_type") == "claim" and c.get("record_id") == claim.id for c in cited):
-            ai.append({"id": cand.id, "module": cand.module, "status": cand.review_status, "when": cand.created_at})
+        cited = {(str(c.get("record_type")), str(c.get("record_id"))) for c in _find_citation_refs(cand.payload or {})}
+        if cited & mine:
+            ai.append({"id": cand.id, "module": cand.module, "status": cand.review_status, "when": cand.created_at,
+                       "run_id": (cand.trace or {}).get("run_id")})
             log.append({"when": cand.created_at, "who": f"AI · {cand.module}", "actor": "ai",
                         "what": "Quoted the claim in a draft" + (" (not accepted yet)" if cand.review_status != "accepted" else ""), "card": f"ai:{cand.id}"})
     log = sorted((e for e in log if e["when"] is not None), key=lambda e: e["when"])

@@ -55,6 +55,9 @@ type WorkbenchState = {
   chain: {serial: number; claimId: string} | null;
   openChain: (claimId: string) => void;
   openClaim: (claimId: string) => void;
+  /** The AI run last asked to be watched (a Chain of Custody AI step's "Watch the run"). */
+  aiRun: {serial: number; runId: string} | null;
+  openAiRun: (runId: string) => void;
   /** The entity whose dossier was last asked for (the "Open dossier" button,
    * a graph node, a relationship endpoint, the record a merge kept). */
   dossier: {serial: number; entityId: string} | null;
@@ -92,11 +95,13 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   investigationId: '',
   // A new case means a new trace, claim, dossier and relationship: nothing from the old one applies.
   setInvestigationId: id => set(state => (state.investigationId === id ? {investigationId: id}
-    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, flag: null, check: null, chain: null, asOf: null, pointedParty: null})),
+    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, flag: null, check: null, chain: null, aiRun: null, asOf: null, pointedParty: null})),
   investigationName: '',
   setInvestigationName: name => set(state => (state.investigationName === name ? state : {investigationName: name})),
   entityId: '',
   setEntityId: id => set({entityId: id}),
+  aiRun: null,
+  openAiRun: runId => set({aiRun: {serial: nextSerial(), runId}}),
   provenance: null,
   openProvenance: request => set({provenance: {serial: nextSerial(), request}}),
   clearProvenance: () => set({provenance: null}),
