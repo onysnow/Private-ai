@@ -128,7 +128,9 @@ SEE_2 "Where did the money go" (12 Oct: See › Money, `features/money`, loads w
 - [x] Ledger strip on a time axis (log height, stated), the €10,000 line, Red Flags' structuring bracket (ML-021 now counts euros as well as dollars, per currency); ledger table with status chips and sources; J / K lights the row
 - [x] Ledger certainty is shown / not yet shown / disputed (`certainty` on each payment)
 - [ ] "Add to To check" from a money check (To check holds only an indicator's own questions; needs a backend kind)
-- [ ] Hover a band lights its ledger rows too; scroll replays the flows in date order ("drawn up to Dec 2021")
+- [x] 17 Oct, checked side by side with the mockup's own payments: band chips (✓ land price / council minutes p.4, ✓ 3 × €9,800, ○ €42,000 "deposit"), names and marks where the mockup puts them, ghost as a dotted box, scroll replays the flow in date order ("drawn up to May 2019"), named large bars, flag strip above a compact table, How these work
+- [ ] Hover a band lights its ledger rows too
+- [ ] The stage header above every screen (title, line, part tabs) is not in the mockups, which show only a breadcrumb; with it Money does not fit 1440×900 as drawn (Ony's call: it changes every screen)
 - [ ] Top 20 flows plus "others (n)" for very large ledgers
 Timeline and Places: **no mockup in the 16 screens** — the canvas frames 4–13 exist; per Ony's rule, mockups first (backlog items: unreadable axis, raw property names, invented days; base map shipped with the app; dated place events and precision).
 
@@ -145,7 +147,9 @@ CHECK_2 Chain of Custody (12 Oct: Check › Chain of Custody, `features/custody`
 - [x] Detail panel: the passage with the quote lit, checks, SHA-256, Decided, who and when; Open page n, Re-check hash
 - [x] Opened from a claim in Claims ("Chain of Custody: how this got here"); Esc back to the claim
 - [ ] OCR legibility % (not stored by the reader), who decided by name (review events keep only "a person")
-- [ ] "What if this breaks?" (what rests on a step); scroll-over replay; draw-in motion
+- [x] 17 Oct, checked side by side with the mockup's three rows and an AI draft: seal beside the title, From file → to sentence, Fit; cards as drawn (page picture, ! OCR, PASSAGE · P.3, decision kind as heading, short dates); only the line into the claim labelled; against rows red throughout; AI step under the claim on a "used in" line with Watch the run (opens Act › AI runs › Watch); detail panel with source qualities, file and content checks, anchor (found now), grouped SHA-256, Rests on it, the key
+- [x] "What if this breaks?": the steps after it and the claims, links and open Red Flags resting on the evidence
+- [ ] Scroll-over replay along the log; draw-in motion; line numbers in a passage (not stored); stored anchors (research §3.9, ADR)
 - [x] Decide: "Open the document" opens the reader at the evidence's page; the filters work past the first 200 (the server filters by kind before paging)
 - [ ] Claim card with the Done checklist for Supported (server-enforced rules) in the chain
 
