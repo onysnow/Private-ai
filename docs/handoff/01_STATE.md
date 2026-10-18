@@ -21,14 +21,51 @@ The full checklist lives in `docs/project-notes/MOCKUP_BUILD_LIST.md`. This page
 
 ## AI_1 notes
 
-The screen reads the run record by polling every second (`GET …/ai-runs/{run_id}/events?after=0`); the SSE route exists
-but the screen does not use it yet. The Watch step has no title or stepper of its own: its one-line header is the mockup's.
-Not drawn, because the run record does not hold it: packet tile titles and pages (the record has ids only), a confidence
-cap (no step records one, so the drawer shows it only when `detail.capped_to` exists), "INTEROP", the other TAS modules
-(shown as "+ 9 modules · not run here"), RAS/QAS/LAS/DAS contents. "To check" is a disabled button: review applies to the
-whole answer. Streams (more than 12 claims on one wire) are built and unit-tested but the demo data has at most 7.
-Wheel zoom on the map, per-wire hover counts and the first-use notes are not built.
-`tools/seed_run.py` now ends the run as stopped (the deliberate out-of-packet citation), with the job marked failed.
+Built from research AI §4–5 (the PDF and `docs/design/REDESIGN_RESEARCH.md` are the same text):
+- **Live:** the screen reads `…/events/stream` (`features/ai/run-stream.ts`), merging each step into the same query.
+  - A dropped connection says "reconnecting · catching up from event n" and resumes with `?after=n`. It can't send a
+    `Last-Event-ID` header, because CORS allows only Authorization and Content-Type.
+  - After three failures it polls every second; while streaming, a 5-second poll keeps the run's status.
+  - When more than 40 steps wait, the clock runs 1.6× and the pill says so.
+- **Map:**
+  - Hovering a node shows its tally in words; hovering a wire shows its count and kinds.
+  - Arrow keys move along the pipeline; Ctrl+wheel zooms the map, with Fit to reset.
+  - A stopped step leaves a ⊘ that stays, plus four sparks once (none under Calm).
+  - Lights have a glow and a short tail; good steps are dimmer, problems at full brightness.
+  - Lights in flight are only those still moving.
+  - Two first-use notes stay until "Got it".
+  - CP-02 and CP-03 sit in the input column, dimmed unless the record has them.
+  - Over the strip, the wheel zooms the lanes in time, with "whole run" to reset.
+- **Drawer:**
+  - Steps as a tree or on a time axis, searchable by kind, #n or rule.
+  - ↑/↓ move through steps, Enter lights one on the map, Tab stays inside, Esc closes and focus returns.
+  - A skeleton while the answer loads.
+  - The weakest-link chain; the cap shows only when a step records `detail.capped_to`.
+  - "Copy cite" carries the passage, the record ids and a link `/act?inv=…&run=…&step=n#ai-runs`, which reopens the
+    trace.
+- **States:**
+  - A failed run says "Stopped" with its message.
+  - A run without steps says it was made before steps were recorded.
+  - "Play a sample run" (`features/ai/run-sample.ts`, labelled "sample — not a real run") is in Watch's empty state.
+    Watch only opens with a run, so the button is reachable only once Ask has an entry for it (not added: it changes
+    AI_2).
+
+Not built, because the run record does not hold it:
+- packet tile titles and pages;
+- "INTEROP";
+- the other TAS modules;
+- RAS/QAS/LAS/DAS contents;
+- B4 split lights;
+- the B6 membrane.
+
+Not built, needing a decision or an ADR:
+- per-claim "To check" (a disabled button for now);
+- comparing two runs;
+- the dashboard mini strip (another screen);
+- the WebGL bloom in Rain Noir;
+- "Run again from this step".
+
+`tools/seed_run.py` ends as a stopped run (the deliberate out-of-packet citation), with the job marked failed.
 
 ## Not started
 

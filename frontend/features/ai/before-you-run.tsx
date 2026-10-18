@@ -85,6 +85,8 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   // Asked to watch a run from elsewhere (a Chain of Custody AI step): open it in step 3.
   const asked = useWorkbenchStore(s => s.aiRun);
   useEffect(() => { if (asked) { setRunId(asked.runId); setStep(3); } }, [asked]);
+  // A link copied with "Copy cite" in the trace drawer (…?run=<id>&step=n#ai-runs) opens that run.
+  useEffect(() => { const linked = new URLSearchParams(window.location.search).get('run'); if (linked && linked !== 'sample') { setRunId(linked); setStep(3); } }, []);
   const earlier = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && step === 1});
   const [outcome, setOutcome] = useState<{ok: boolean; text: string} | null>(null);
   const flagged = useRef(new Set<string>());

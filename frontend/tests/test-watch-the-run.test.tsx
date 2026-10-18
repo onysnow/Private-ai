@@ -3,8 +3,9 @@
 // time axis, the trace drawer for one thought, streams for crowds of thoughts, and the review that applies to the answer.
 import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {afterEach, beforeEach, describe, expect, it} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {parseSse} from '../features/ai/run-stream';
 import {WatchTheRun} from '../features/ai/watch-the-run';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -136,5 +137,66 @@ describe('WatchTheRun', () => {
     open();
     await screen.findByRole('group', {name: /The run as a map/});
     expect(document.querySelectorAll('.wr-light')).toHaveLength(0);
+  });
+
+  it('searches the steps of a thought and shows them on a time axis', async () => {
+    open();
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
+    const drawer = screen.getByRole('dialog');
+    const all = within(drawer).getAllByRole('button', {name: /^Step \d+/}).length;
+    await user.type(within(drawer).getByLabelText('Search the steps by kind, number or rule'), 'gate');
+    const some = within(drawer).getAllByRole('button', {name: /^Step \d+/}).length;
+    expect(some).toBeLessThan(all);
+    await user.clear(within(drawer).getByLabelText('Search the steps by kind, number or rule'));
+    await user.click(within(drawer).getByRole('radio', {name: 'timeline'}));
+    expect(drawer.querySelectorAll('.wr-steptime i').length).toBe(all);
+  });
+
+  it('names the weakest link and copies a citation that links back to the trace', async () => {
+    open();
+    const user = userEvent.setup();
+    const write = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {value: {writeText: write}, configurable: true});
+    await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
+    const drawer = screen.getByRole('dialog');
+    expect(within(drawer).getByText(/weakest: step #\d+: Called corroborated on one record/)).toBeInTheDocument();
+    await user.click(within(drawer).getByRole('button', {name: 'Copy cite'}));
+    expect(write.mock.calls[0][0]).toMatch(/^“Kestrel SA controlled Fernhill Ltd\.” \[CLM-0001; document:doc-41-register; AI run run-1\] .*\?inv=inv-1&run=run-1&step=\d+#ai-runs$/);
+  });
+
+  it('moves along the pipeline with the arrow keys', async () => {
+    open();
+    const user = userEvent.setup();
+    const router = await screen.findByRole('button', {name: /^Router/});
+    router.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(document.activeElement?.getAttribute('data-k')).toBe('model');
+  });
+
+  it('offers a sample run when there is none, labelled as not real', async () => {
+    mockApi({'GET /api/investigations/inv-1/ai-runs': {runs: []}});
+    render(<QueryProvider><WatchTheRun investigationId="inv-1" runId={null}/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: 'Play a sample run'}));
+    expect(await screen.findByText('sample — not a real run')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: '✓ Accept'})).toBeNull();
+  });
+
+  it('says why a stopped run stopped', async () => {
+    const events = record(1);
+    mockApi({[`GET ${EV}`]: {run: {...RUN, status: 'failed', candidate_id: null, review_status: null, message: 'Stopped by the app’s checks: a cited record is not in the packet', events: events.length}, events}});
+    render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-1"/></QueryProvider>);
+    expect(await screen.findByText(/Stopped · 10 Oct/)).toBeInTheDocument();
+    expect(screen.getByText(/a cited record is not in the packet/)).toBeInTheDocument();
+  });
+});
+
+describe('parseSse', () => {
+  it('splits whole messages and keeps the rest for the next bytes', () => {
+    const {messages, rest} = parseSse('id: 3\nevent: step\ndata: {"n":3}\n\nid: 4\nevent: st');
+    expect(messages).toEqual([{id: '3', event: 'step', data: '{"n":3}'}]);
+    expect(rest).toBe('id: 4\nevent: st');
+    expect(parseSse('event: end\ndata: {}\n\n').messages[0].event).toBe('end');
   });
 });

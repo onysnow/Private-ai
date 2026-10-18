@@ -8,7 +8,7 @@
 // travelling lights; the log (L) carries the same steps in order and is the screen-reader view.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import type {ReactElement} from 'react';
+import type {KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {
@@ -16,6 +16,8 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {AiRunEventOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {SAMPLE_EVENTS, SAMPLE_RUN} from './run-sample';
+import {useRunStream} from './run-stream';
 
 type Ev = AiRunEventOut;
 type Status = 'good' | 'partial' | 'bad' | 'neutral';
@@ -26,12 +28,12 @@ const AT: Record<string, Pt> = {
   run: {x: 70, y: 110}, retrieval: {x: 70, y: 215}, controls: {x: 500, y: 28}, router: {x: 185, y: 150}, model: {x: 165, y: 305},
   'gate:schema': {x: 290, y: 130}, 'gate:citation': {x: 290, y: 215}, 'gate:quote': {x: 252, y: 300}, 'gate:chart': {x: 292, y: 300}, 'gate:writing': {x: 332, y: 300},
   'tas/08': {x: 495, y: 122}, 'tas/06': {x: 495, y: 122}, 'app/draft': {x: 290, y: 60}, 'tas/class': {x: 495, y: 158}, 'tas/corroboration': {x: 495, y: 194},
-  'cp-01': {x: 495, y: 290}, candidate: {x: 905, y: 110}, review: {x: 905, y: 300},
+  'cp-01': {x: 495, y: 290}, 'cp-02': {x: 32, y: 318}, 'cp-03': {x: 80, y: 318}, candidate: {x: 905, y: 110}, review: {x: 905, y: 300},
 };
 const HALF: Record<string, Pt> = {
   run: {x: 50, y: 22}, retrieval: {x: 50, y: 14}, router: {x: 21, y: 21}, model: {x: 26, y: 26}, 'gate:schema': {x: 18, y: 16}, 'gate:citation': {x: 18, y: 16},
   'gate:quote': {x: 18, y: 8}, 'gate:chart': {x: 18, y: 8}, 'gate:writing': {x: 18, y: 8}, 'tas/08': {x: 40, y: 11}, 'tas/06': {x: 40, y: 11}, 'tas/class': {x: 40, y: 11},
-  'tas/corroboration': {x: 40, y: 11}, 'cp-01': {x: 14, y: 16}, candidate: {x: 50, y: 20}, review: {x: 22, y: 22}, 'app/draft': {x: 40, y: 11},
+  'tas/corroboration': {x: 40, y: 11}, 'cp-01': {x: 14, y: 16}, 'cp-02': {x: 14, y: 16}, 'cp-03': {x: 14, y: 16}, candidate: {x: 50, y: 20}, review: {x: 22, y: 22}, 'app/draft': {x: 40, y: 11},
 };
 const SYSTEMS: Array<{key: string; name: string; x: number; w: number; trigger: string}> = [
   {key: 'ras', name: 'RAS', x: 390, w: 80, trigger: 'if the answer had relied on published research'},
@@ -41,6 +43,10 @@ const SYSTEMS: Array<{key: string; name: string; x: number; w: number; trigger: 
   {key: 'das', name: 'DAS', x: 780, w: 80, trigger: 'if the answer had recommended an action'},
 ];
 const TAS_MODULES = 10;
+// The pipeline in reading order, for the arrow keys (research AI §4 "arrow keys move along the pipeline").
+const ORDER = ['run', 'retrieval', 'cp-02', 'cp-03', 'router', 'model', 'gate:schema', 'gate:citation', 'gate:quote', 'gate:chart', 'gate:writing',
+  'tas/08', 'tas/06', 'tas/class', 'tas/corroboration', 'cp-01', 'candidate', 'review'];
+const NOTES_KEY = 'pai:watch-run-notes';
 const LANES: Array<{key: string; label: string; match: (e: Ev) => boolean}> = [
   {key: 'router', label: 'Router', match: e => e.kind === 'ROUTE' || e.kind === 'LOAD' || e.node === 'controls'},
   {key: 'model', label: 'Model', match: e => e.node === 'model'},
@@ -54,7 +60,7 @@ const LANES: Array<{key: string; label: string; match: (e: Ev) => boolean}> = [
 const WORD: Record<Status, string> = {good: 'verified', partial: 'in between', bad: 'stopped', neutral: 'a finding'};
 const STREAM_OVER = 12;
 const isProblem = (e: Ev) => e.status === 'bad' || (e.status === 'partial' && !e.self_reported);
-const nodeOf = (e: Ev) => (AT[e.node] ? e.node : e.node.startsWith('gate:') ? 'gate:citation' : e.system === 'tas' ? 'tas/class' : 'run');
+const nodeOf = (e: Ev) => (AT[e.node] ? e.node : e.node === 'cp-02' || e.node === 'cp-03' ? e.node : e.node.startsWith('gate:') ? 'gate:citation' : e.system === 'tas' ? 'tas/class' : 'run');
 const words = (v: string | null | undefined) => (v ? (v.charAt(0) + v.slice(1).toLowerCase()).replace(/_/g, ' ') : '');
 const utc = (iso: string) => Date.parse(iso.endsWith('Z') ? iso : `${iso}Z`);
 const stamp = (iso: string) => new Date(utc(iso)).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false}).replace(',', '');
@@ -102,14 +108,20 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
   const queryClient = useQueryClient();
   const caseName = useWorkbenchStore(s => s.investigationName);
   const runs = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && !runId});
-  const id = runId ?? runs.data?.runs[0]?.run_id ?? null;
+  const [sample, setSample] = useState(false);
+  const realId = runId ?? runs.data?.runs[0]?.run_id ?? null;
+  const id = sample ? 'sample' : realId;
+  // While the stream is connected, a slow poll only picks up the run's own status; without it, poll every second.
+  const streaming = useRef(false);
   const q = useQuery({
-    ...listAiRunEventsOptions({path: {investigation_id: investigationId, run_id: id ?? ''}, query: {after: 0}}),
-    enabled: Boolean(id),
-    refetchInterval: query => (query.state.data?.run.finished ? false : 1000),
+    ...listAiRunEventsOptions({path: {investigation_id: investigationId, run_id: realId ?? ''}, query: {after: 0}}),
+    enabled: Boolean(realId) && !sample,
+    refetchInterval: query => (query.state.data?.run.finished ? false : streaming.current ? 5000 : 1000),
   });
-  const run = q.data?.run;
-  const events = useMemo(() => q.data?.events ?? [], [q.data]);
+  const run = sample ? SAMPLE_RUN : q.data?.run;
+  const events = useMemo(() => (sample ? SAMPLE_EVENTS : q.data?.events ?? []), [sample, q.data]);
+  const stream = useRunStream(investigationId, sample ? null : realId, Boolean(q.data && !q.data.run.finished));
+  streaming.current = stream.mode === 'live';
   const byN = useMemo(() => new Map(events.map(e => [e.n, e])), [events]);
 
   // Playback: steps are revealed one at a time, a short beat apart, as lights; a finished run opens complete and can
@@ -122,23 +134,41 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
   const [full, setFull] = useState(false);
   const [focus, setFocus] = useState<number | null>(null);
   const [replay, setReplay] = useState(false);
+  // Very large live runs: when more than 40 steps wait to be shown, the clock runs 1.6× until it has caught up.
+  const catchUp = run && !run.finished && playing && events.length - shown > 40 ? 1.6 : 1;
   const opened = useRef<string | null>(null);
   useEffect(() => { setCalm(calmNow()); }, []);
   useEffect(() => {
     if (!run || opened.current === run.run_id) return;
     opened.current = run.run_id;
-    setShown(run.finished ? events.length : 0);
-    setReplay(false);
-  }, [run, events.length]);
+    setShown(run.run_id === 'sample' ? 0 : run.finished ? events.length : 0);
+    setReplay(run.run_id === 'sample');
+    setPlaying(true);
+    // A link copied with "Copy cite" opens the run on its step (…&step=n).
+    const step = Number(new URLSearchParams(window.location.search).get('step'));
+    if (step && events.some(e => e.n === step)) setFocus(step);
+  }, [run, events]);
   useEffect(() => {
     if (!playing || shown >= events.length) return;
     // Never faster than about 6 steps a second, so no node changes more than three times a second at normal speed.
-    const t = window.setTimeout(() => setShown(s => Math.min(events.length, s + 1)), (calm ? 30 : 160) / speed);
+    const t = window.setTimeout(() => setShown(s => Math.min(events.length, s + 1)), (calm ? 30 : 160) / (speed * catchUp));
     return () => window.clearTimeout(t);
-  }, [playing, shown, events.length, speed, calm]);
+  }, [playing, shown, events.length, speed, calm, catchUp]);
   useEffect(() => { if (run?.finished && !replay && playing) setShown(events.length); }, [run?.finished, replay, playing, events.length]);
 
   const visible = useMemo(() => events.slice(0, shown), [events, shown]);
+  // Lights in flight: each newly shown step travels for about a second, then only its node keeps the verdict.
+  const [flying, setFlying] = useState<number[]>([]);
+  const prevShown = useRef(0);
+  const timers = useRef<number[]>([]);
+  useEffect(() => {
+    const fresh = shown > prevShown.current ? events.slice(prevShown.current, shown).map(e => e.n) : [];
+    prevShown.current = shown;
+    if (!fresh.length || calm) return;
+    setFlying(f => [...f, ...fresh].slice(-80));
+    timers.current.push(window.setTimeout(() => setFlying(f => f.filter(n => !fresh.includes(n))), 1100 / speed));
+  }, [shown, events, calm, speed]);
+  useEffect(() => () => { timers.current.forEach(t => window.clearTimeout(t)); }, []);
   const last = visible[visible.length - 1];
   const problems = events.filter(isProblem);
   const modelStart = visible.find(e => e.node === 'model' && e.verdict === 'STARTED');
@@ -185,7 +215,7 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
       if (e.key === 'n' || e.key === 'N') { e.preventDefault(); nextProblem(); }
       else if (e.key === 'l' || e.key === 'L') { e.preventDefault(); setLog(v => !v); }
-      else if (e.key === ' ' && target?.closest?.('.wr')) { e.preventDefault(); setPlaying(p => !p); }
+      else if (e.key === ' ' && target?.closest?.('.wr') && target.tagName !== 'BUTTON' && target.getAttribute('role') !== 'button') { e.preventDefault(); setPlaying(p => !p); }
       else if (e.key === 'Escape') setFocus(null);
     };
     window.addEventListener('keydown', key);
@@ -204,9 +234,71 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
     void candidate.refetch();
   }});
   const [copied, setCopied] = useState(false);
+  // Hover: a node's tally in words, or a wire's count and kinds (research AI §4 "Hover").
+  const [hover, setHover] = useState<{x: number; y: number; text: string} | null>(null);
+  // Ctrl+wheel zooms the map around the pointer; the wheel over the strip zooms the lanes in time. The page never scrolls.
+  const [zoom, setZoom] = useState({k: 1, cx: 500, cy: 210});
+  const [win, setWin] = useState({from: 0, to: 1});
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const lanesRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const wheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      const r = map.getBoundingClientRect();
+      setZoom(z => {
+        const k = Math.min(3, Math.max(1, z.k * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+        const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+        const w = 1000 / z.k, h = 420 / z.k;
+        const px = z.cx - w / 2 + fx * w, py = z.cy - h / 2 + fy * h;
+        return k === 1 ? {k: 1, cx: 500, cy: 210} : {k, cx: px + (z.cx - px) * (z.k / k), cy: py + (z.cy - py) * (z.k / k)};
+      });
+    };
+    map.addEventListener('wheel', wheel, {passive: false});
+    return () => map.removeEventListener('wheel', wheel);
+  });
+  useEffect(() => {
+    const lanes = lanesRef.current;
+    if (!lanes) return;
+    const wheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const r = lanes.getBoundingClientRect();
+      const f = Math.min(1, Math.max(0, (e.clientX - r.left - 64) / Math.max(1, r.width - 64)));
+      setWin(w => {
+        const width = w.to - w.from;
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { // sideways: move in time
+          const shift = Math.max(-w.from, Math.min(1 - w.to, (e.deltaX / r.width) * width));
+          return {from: w.from + shift, to: w.to + shift};
+        }
+        const next = Math.min(1, Math.max(0.05, width * (e.deltaY < 0 ? 0.8 : 1.25)));
+        const at = w.from + f * width;
+        const from = Math.max(0, Math.min(1 - next, at - f * next));
+        return {from, to: from + next};
+      });
+    };
+    lanes.addEventListener('wheel', wheel, {passive: false});
+    return () => lanes.removeEventListener('wheel', wheel);
+  });
+  // First use: two notes point at the model ring and the chips, until dismissed once.
+  const [notes, setNotes] = useState(false);
+  useEffect(() => { try { setNotes(!window.localStorage.getItem(NOTES_KEY)); } catch { setNotes(false); } }, []);
+  const dismissNotes = () => { setNotes(false); try { window.localStorage.setItem(NOTES_KEY, '1'); } catch { /* the notes come back next time */ } };
+  // The trace drawer: steps as a tree or on a time axis, a search over kind, id and rule, focus kept inside while open.
+  const [stepsView, setStepsView] = useState<'tree' | 'timeline'>('tree');
+  const [stepSearch, setStepSearch] = useState('');
+  const drawerRef = useRef<HTMLElement | null>(null);
+  const opener = useRef<Element | null>(null);
+  const drawerOpen = focus !== null;
+  useEffect(() => {
+    if (drawerOpen) { opener.current = document.activeElement; drawerRef.current?.focus({preventScroll: true}); }
+    else if (opener.current instanceof HTMLElement || opener.current instanceof SVGElement) { (opener.current as HTMLElement).focus?.({preventScroll: true}); opener.current = null; }
+  }, [drawerOpen]);
 
   if (!id) return <section className="wr wr-empty" aria-label="Watch the run">
     <p>{runs.isLoading ? 'Looking for runs…' : 'No run yet. Ask the case a question, check the plan, then Run and watch.'}</p>
+    {!runs.isLoading && <button type="button" className="br-quiet" onClick={() => setSample(true)}>Play a sample run</button>}
     {onBack && <button type="button" className="br-quiet" onClick={onBack}>Ask the case</button>}
   </section>;
 
@@ -215,10 +307,13 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
   const tEnd = Math.max(events.length ? utc(events[events.length - 1].at) : 0, run?.finished || !t0 ? 0 : now);
   const span = Math.max(1000, tEnd - t0);
   const xOf = (e: Ev) => (t0 ? Math.min(100, ((utc(e.at) - t0) / span) * 100) : 0);
+  // The lanes show the window the wheel has zoomed to (the whole run by default).
+  const xIn = (pct: number) => ((pct / 100 - win.from) / (win.to - win.from)) * 100;
+  const inWin = (pct: number) => pct / 100 >= win.from - 1e-9 && pct / 100 <= win.to + 1e-9;
   // Steps that land in the same moment keep their order but are spaced a few pixels apart, so each can be clicked.
   const spread = (list: Ev[]): Array<[Ev, number]> => {
     let prev = -1;
-    return list.map(e => { const x = Math.min(99.4, Math.max(xOf(e), prev + 0.7)); prev = x; return [e, x]; });
+    return list.filter(e => inWin(xOf(e))).map(e => { const x = Math.min(99.4, Math.max(xIn(xOf(e)), prev + 0.7)); prev = x; return [e, x]; });
   };
   const settingsIn = events.filter(e => e.kind === 'SETTING' && e.rule !== 'echo' && e.rule !== 'premise');
   const overrides = events.filter(e => e.kind === 'SETTING' && e.rule !== 'echo' && / \(default /.test(e.text)).length;
@@ -259,18 +354,19 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
   const WIRES: Array<[string, string]> = [['run', 'router'], ['retrieval', 'model'], ['router', 'model'], ['model', 'gate:schema'], ['gate:schema', 'gate:citation'],
     ['router', tasOn ? loadNode : 'app/draft'], ['gate:citation', 'tas/class'], ['tas/class', 'tas/corroboration'], ['tas/class', 'candidate'], ['candidate', 'review']];
 
-  const node = (k: string, label: string, shape: 'diamond' | 'circle' | 'double' | 'hex' | 'person' | 'qtile' | 'chip' | 'mini' | 'cand', sub?: string[], opts: {dim?: boolean; icon?: string} = {}) => {
+  const node = (k: string, label: string, shape: 'diamond' | 'circle' | 'double' | 'hex' | 'person' | 'qtile' | 'chip' | 'mini' | 'cand', sub?: string[], opts: {dim?: boolean; icon?: string; hint?: string} = {}) => {
     const p = AT[k];
     const t = tally[k];
     const dim = opts.dim ?? false;
-    const name = `${label}${t ? `, ${(['good', 'partial', 'bad', 'neutral'] as Status[]).filter(s => t[s]).map(s => `${t[s]} ${WORD[s]}`).join(', ')}` : ''}${dim ? ', not run in the app' : ''}`;
+    const name = `${label}${opts.hint ? ` (${opts.hint})` : ''}${t ? `, ${(['good', 'partial', 'bad', 'neutral'] as Status[]).filter(s => t[s]).map(s => `${t[s]} ${WORD[s]}`).join(', ')}` : ''}${dim ? ', not run in the app' : ''}`;
     const onLit = chain.some(e => nodeOf(e) === k);
     const small = shape === 'chip' || shape === 'mini';
     const labelY = shape === 'circle' ? 44 : shape === 'hex' ? 30 : shape === 'person' ? 36 : shape === 'cand' ? -3 : shape === 'double' ? 30 : 32;
     return <g key={k} className={`wr-node ${shape}${dim ? ' dim' : ''}${onLit ? ' lit' : ''}${focus !== null && !onLit ? ' faded' : ''}${k === 'model' && writing ? ' writing' : ''}`}
-      transform={`translate(${p.x} ${p.y})`} role="button" tabIndex={0} aria-label={name}
-      onClick={() => t?.last && setFocus(t.last.n)} onKeyDown={e => { if (e.key === 'Enter' && t?.last) setFocus(t.last.n); }}>
-      <title>{name}</title>
+      transform={`translate(${p.x} ${p.y})`} role="button" tabIndex={0} aria-label={name} data-k={k}
+      onClick={() => t?.last && setFocus(t.last.n)} onKeyDown={e => { if (e.key === 'Enter' && t?.last) setFocus(t.last.n); else along(e, k); }}
+      onMouseEnter={() => showTally(k, opts.hint ? `${label} ${opts.hint}` : label)} onMouseLeave={() => setHover(null)}
+      onFocus={() => showTally(k, opts.hint ? `${label} ${opts.hint}` : label)} onBlur={() => setHover(null)}>
       {shape === 'diamond' && <rect x={-15} y={-15} width={30} height={30} transform="rotate(45)"/>}
       {shape === 'circle' && <><circle r={27} className="ring"/><circle r={19}/><circle r={6} className="inner"/></>}
       {shape === 'double' && <><rect x={-18} y={-16} width={36} height={32} rx={4}/><rect x={-14} y={-12} width={28} height={24} rx={2.5} className="inner"/><text className="wr-icon" y={4}>{opts.icon}</text></>}
@@ -284,32 +380,99 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
         : small ? <text y={shape === 'mini' ? 3 : 4} className={shape === 'mini' ? 'wr-sub' : 'wr-label chip'}>{label}</text>
         : <><text y={labelY} className="wr-label">{label}</text>{(sub ?? []).map((l, i) => <text key={i} y={labelY + 12 + i * 11} className="wr-sub">{l}</text>)}</>}
       {t?.last && shape !== 'mini' && <Mark status={t.last.status} self={t.last.self_reported} x={shape === 'qtile' || shape === 'cand' ? 48 : small ? 38 : 18} y={shape === 'qtile' ? -20 : shape === 'cand' ? -18 : small ? -9 : -16} r={5.5}/>}
+      {t && t.bad > 0 && <text className="wr-stopmark" x={shape === 'qtile' || shape === 'cand' ? -58 : small ? -48 : -24} y={shape === 'qtile' || shape === 'cand' ? 4 : small ? 4 : -10} aria-hidden="true">⊘</text>}
+      {!calm && last && last.status === 'bad' && nodeOf(last) === k && <g key={`spark${last.n}`} className="wr-sparks" aria-hidden="true">
+        {[[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([dx, dy], i) => <path key={i} d={`M${dx * 10} ${dy * 10} l${dx * 7} ${dy * 7}`}>
+          <animate attributeName="opacity" values="0;1;0" dur="0.6s" fill="freeze"/></path>)}</g>}
     </g>;
   };
+  // Hover words for a node: "TAS · 5 verified · 6 in between · 2 stopped".
+  const showTally = (k: string, label: string) => {
+    const t = tally[k], p = AT[k];
+    const parts = t ? (['good', 'partial', 'bad', 'neutral'] as Status[]).filter(st => t[st]).map(st => `${t[st]} ${WORD[st]}`) : [];
+    setHover({x: p.x, y: p.y - (HALF[k]?.y ?? 16) - 12, text: [label, ...(parts.length ? parts : ['nothing yet'])].join(' · ')});
+  };
+  const along = (e: ReactKeyboardEvent, k: string) => {
+    const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const nodes = ORDER.map(o => document.querySelector<SVGGElement>(`.wr-node[data-k="${o}"]`)).filter((x): x is SVGGElement => Boolean(x));
+    const at = nodes.findIndex(x => x.dataset.k === k);
+    nodes[(at + step + nodes.length) % nodes.length]?.focus();
+  };
 
-  const lights = calm ? [] : visible.slice(Math.max(0, shown - 6)).filter(e => e.parent && byN.get(e.parent) && !isStream(edgeKey(e))).map(e => {
+  const lights = calm ? [] : visible.filter(e => flying.includes(e.n)).filter(e => e.parent && byN.get(e.parent) && !isStream(edgeKey(e))).map(e => {
     const from = AT[nodeOf(byN.get(e.parent!)!)];
     const to = AT[nodeOf(e)];
     if (!from || !to || (from.x === to.x && from.y === to.y)) return null;
     const mid = {x: (from.x + to.x) / 2, y: Math.min(from.y, to.y) - 26};
-    return <circle key={`l${e.n}`} r={e.status === 'bad' ? 6 : 4} className={`wr-light ${e.status}${e.self_reported ? ' self' : ''}`}>
-      <animateMotion dur={`${0.45 / speed}s`} fill="freeze" path={`M${from.x} ${from.y} Q${mid.x} ${mid.y} ${to.x} ${to.y}`}/>
-      <animate attributeName="opacity" values="1;1;0" dur={`${0.9 / speed}s`} fill="freeze"/>
-    </circle>;
+    // A soft dot with a short glowing tail; good steps travel dimmer with a shorter tail, problems at full brightness.
+    const path = `M${from.x} ${from.y} Q${mid.x} ${mid.y} ${to.x} ${to.y}`;
+    const tail = e.status === 'good' ? [0.03, 0.06] : [0.03, 0.06, 0.09, 0.12];
+    const dur = Math.min(0.6, Math.max(0.3, 0.45)) / speed;
+    return <g key={`l${e.n}`} className={`wr-light ${e.status}${e.self_reported ? ' self' : ''}`}>
+      {[0, ...tail].map((d, i) => <circle key={i} r={(e.status === 'bad' ? 6 : 4.5) * (1 - i * 0.18)} opacity={0}>
+        <animateMotion dur={`${dur}s`} begin={`${d / speed}s`} fill="freeze" path={path}/>
+        <animate attributeName="opacity" values={`${(e.status === 'good' ? 0.6 : 1) * (1 - i * 0.22)};${(e.status === 'good' ? 0.6 : 1) * (1 - i * 0.22)};0`} begin={`${d / speed}s`} dur={`${(dur * 2)}s`} fill="freeze"/>
+      </circle>)}
+    </g>;
   });
   const lightsInFlight = lights.filter(Boolean).length;
 
-  const tickLabels = [0, 0.25, 0.5, 0.75, 1].map(f => ({f, text: t0 ? clock(t0 + span * f) : ''}));
+  const tickLabels = [0, 0.25, 0.5, 0.75, 1].map(f => ({f, text: t0 ? clock(t0 + span * (win.from + f * (win.to - win.from))) : ''}));
   const verdictOf = (e: Ev) => words(e.verdict) || WORD[e.status as Status];
   const worst = chain.find(e => e.status === 'bad') ?? chain.find(e => isProblem(e)) ?? thought ?? focused;
   const cap = chain.map(e => (e.detail as {capped_to?: string} | null)?.capped_to).find(Boolean);
   const refsOf = (thought ?? focused)?.refs ?? [];
   const removed = chain.find(e => e.kind === 'BLOCK') ?? events.find(e => e.kind === 'BLOCK' && e.refs.some(r => refsOf.some(x => x.record_id === r.record_id)));
 
+  // The drawer's steps: the parent chain, filtered by the search (kind, #n, rule, node or verdict).
+  const needle = stepSearch.trim().toLowerCase().replace(/^#/, '');
+  const steps = chain.filter(e => full || e.kind !== 'SETTING').filter(e => !needle
+    || String(e.n) === needle || [e.kind, e.rule, e.node, e.verdict, e.system].some(v => (v ?? '').toLowerCase().includes(needle)));
+  const chainT0 = chain.length ? Math.min(...chain.map(e => utc(e.at))) : 0;
+  const chainT1 = chain.length ? Math.max(...chain.map(e => utc(e.at))) : 0;
+  const stepX = (e: Ev) => {
+    const len = Math.max(1, chainT1 - chainT0);
+    const start = ((utc(e.at) - chainT0) / len) * 100;
+    // The model's call is drawn as one bar from its start to its answer, as a trace waterfall draws a generation.
+    const answer = e.node === 'model' && e.verdict === 'STARTED' ? events.find(x => x.parent === e.n && x.node === 'model') : undefined;
+    const width = answer ? ((utc(answer.at) - utc(e.at)) / len) * 100 : 1.5;
+    return {left: Math.min(98.5, start), width: Math.max(1.5, Math.min(100 - start, width))};
+  };
+  // The weakest link: one mark per step that bears on the thought; the worst is named (SUITE §2.5 D2).
+  const links = thought ? chain.filter(e => e.n !== thought.n && ['RULE', 'CHECK', 'FLAG', 'BLOCK'].includes(e.kind) && e.node !== 'model' && e.node !== 'retrieval') : [];
+  const weakest = links.find(e => e.status === 'bad') ?? links.find(e => e.status === 'partial');
+  const citation = () => {
+    const link = typeof window === 'undefined' ? '' : `${window.location.origin}${window.location.pathname}?inv=${encodeURIComponent(investigationId)}&run=${encodeURIComponent(id ?? '')}&step=${focused?.n ?? ''}#ai-runs`;
+    return `“${(claim?.claim as string | undefined) ?? thought?.text ?? focused?.text ?? ''}” [${thoughtId ?? `step ${focused?.n}`}; ${refsOf.map(r => `${r.record_type}:${r.record_id}`).join(', ') || 'no record cited'}; AI run ${id}${sample ? ' (sample)' : ''}] ${link}`;
+  };
+  // Inside the drawer: ↑/↓ move through the steps, Enter lights one on the map, Tab stays inside until Esc.
+  const drawerKeys = (e: ReactKeyboardEvent<HTMLElement>) => {
+    const root = drawerRef.current;
+    if (!root) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      const rows = [...root.querySelectorAll<HTMLButtonElement>('.wr-steprow')];
+      if (!rows.length) return;
+      e.preventDefault();
+      const at = rows.indexOf(document.activeElement as HTMLButtonElement);
+      rows[at < 0 ? 0 : (at + (e.key === 'ArrowDown' ? 1 : -1) + rows.length) % rows.length].focus();
+    } else if (e.key === 'Tab') {
+      const items = [...root.querySelectorAll<HTMLElement>('button:not(:disabled), input, [tabindex="0"]')];
+      if (!items.length) return;
+      const first = items[0], lastItem = items[items.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === root)) { e.preventDefault(); lastItem.focus(); }
+      else if (!e.shiftKey && document.activeElement === lastItem) { e.preventDefault(); first.focus(); }
+    }
+  };
+
   return <section className="wr" aria-label="Watch the run">
     <header className="wr-head">
       <h2><span>{caseName || 'Case'}</span> · Act · AI runs · <b>{(words(run?.module) || 'Run').replace(/^./, c => c.toUpperCase())}</b> · {run ? stamp(run.created_at) : ''}</h2>
-      {liveRun ? <span className="wr-pill live">● LIVE · {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}</span>
+      {sample ? <span className="wr-pill">sample — not a real run</span>
+        : stream.mode === 'reconnecting' ? <span className="wr-pill live" role="status">reconnecting · catching up from event {stream.from}</span>
+        : liveRun ? <span className="wr-pill live">● LIVE · {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}{catchUp > 1 ? ` · ${catchUp}× to catch up` : ''}</span>
+        : run?.status === 'failed' ? <span className="wr-pill bad" title={run.message ?? undefined}>Stopped · {stamp(run.created_at)}</span>
         : <span className="wr-pill">{replay ? 'Replay of run' : 'Run record'} · {run ? stamp(run.created_at) : ''}</span>}
       <button type="button" className="wr-pill" onClick={() => setFull(f => !f)} aria-pressed={full}>Events: {full ? 'full' : 'summary'}</button>
       <button type="button" className={`wr-pill${problems.length ? ' bad' : ''}`} onClick={nextProblem} disabled={!problems.length}>{problems.length} problem{problems.length === 1 ? '' : 's'} <kbd>N</kbd></button>
@@ -324,8 +487,10 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
         {visible.filter(e => full || e.kind !== 'SETTING').map(e => <li key={e.n} className={`${e.status}${lit.has(e.n) ? ' lit' : ''}`}>
           <button type="button" onClick={() => setFocus(e.n)}><span className="wr-ln">#{e.n}</span><svg width="16" height="16" aria-hidden="true"><Mark status={e.status} self={e.self_reported} x={8} y={8} r={5}/></svg>
             <span>{e.text}</span><small>{who(e)}{e.rule ? ` · ${e.rule}` : ''}</small><b>{words(e.verdict)}</b></button></li>)}
-      </ol> : <div className="wr-map">
-        <svg viewBox="0 0 1000 420" role="group" aria-label="The run as a map: input, router and model, app checks, the suite's systems, output" preserveAspectRatio="xMidYMid meet">
+      </ol> : <div className="wr-map" ref={mapRef}>
+        {zoom.k > 1 && <button type="button" className="wr-pill wr-fit" onClick={() => setZoom({k: 1, cx: 500, cy: 210})}>Fit · {Math.round(zoom.k * 100)}%</button>}
+        {run?.finished && events.length === 0 && <p className="wr-old" role="status">This run was made before steps were recorded. Showing what was stored: question, packet, reply.</p>}
+        <svg viewBox={`${zoom.cx - 500 / zoom.k} ${zoom.cy - 210 / zoom.k} ${1000 / zoom.k} ${420 / zoom.k}`} role="group" aria-label="The run as a map: input, router and model, app checks, the suite's systems, output" preserveAspectRatio="xMidYMid meet">
           <g className="wr-band"><rect x={200} y={8} width={600} height={40} rx={20}/>
             <text x={262} y={32} textAnchor="middle" className="dimtext"><title>Boundaries between the suite’s systems: not in the app yet</title>Boundaries</text>
             <g className="wr-controls" transform="translate(500 28)" role="button" tabIndex={0} aria-label={`Controls, ${overrides} override${overrides === 1 ? '' : 's'}`}
@@ -349,6 +514,20 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
               const k = `${a}>${b}`;
               const onChain = chain.some(e => nodeOf(e) === a) && chain.some(e => nodeOf(e) === b);
               return isStream(k) ? null : <path key={k} className={onChain ? 'lit' : ''} d={wire(a, b)}/>;
+            })}
+          </g>
+          <g className="wr-wirehits">
+            {WIRES.map(([a, b]) => {
+              const k = `${a}>${b}`;
+              const on = visible.filter(e => edgeKey(e) === k);
+              const kinds = [...new Set(on.map(e => e.kind))].join(', ');
+              const text = on.length ? `${on.length} step${on.length === 1 ? '' : 's'} · ${kinds}` : 'nothing has passed yet';
+              return <path key={k} d={wire(a, b)} onMouseEnter={ev => {
+                const svg = (ev.currentTarget.ownerSVGElement as SVGSVGElement), pt = svg.createSVGPoint();
+                pt.x = ev.clientX; pt.y = ev.clientY;
+                const m = svg.getScreenCTM(); const at = m ? pt.matrixTransform(m.inverse()) : {x: (AT[a].x + AT[b].x) / 2, y: (AT[a].y + AT[b].y) / 2};
+                setHover({x: at.x, y: at.y - 10, text});
+              }} onMouseLeave={() => setHover(null)}><title>{text}</title></path>;
             })}
             {[...streams.entries()].filter(([k]) => isStream(k)).map(([k, n]) => {
               const [a, b] = k.split('>');
@@ -382,11 +561,23 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
           <g className="wr-band support"><rect x={330} y={362} width={340} height={34} rx={17}/>
             <text x={366} y={383} className="dimtext" textAnchor="middle">Support</text>
             {[['EGS', 'gathering', 440], ['EHS', 'ethics', 560]].map(([a, b, x]) => <g key={a as string} className="wr-sys dim" transform={`translate(${x} 379)`}><title>{a} {b}: not triggered, not in the app yet</title><rect x={-44} y={-12} width={88} height={24} rx={12}/><text y={4} className="wr-sub">{a} {b}</text></g>)}</g>
+          {node('cp-02', 'CP-02', 'hex', undefined, {dim: !events.some(e => e.node === 'cp-02'), hint: 'source protection'})}
+          {node('cp-03', 'CP-03', 'hex', undefined, {dim: !events.some(e => e.node === 'cp-03'), hint: 'publication approval'})}
           {lights}
+          {notes && <g className="wr-note" role="note">
+            <g transform={`translate(${AT.model.x + 34} ${AT.model.y - 44})`}><rect width={190} height={34} rx={6}/>
+              <text x={8} y={14}>Lights leave the model only</text><text x={8} y={27}>after it has answered.</text></g>
+            <g transform={`translate(${AT['tas/class'].x + 48} ${AT['tas/class'].y + 46})`}><rect width={190} height={46} rx={6}/>
+              <text x={8} y={14}>Each light is one thought. Click a</text><text x={8} y={27}>light, a chip or a tally to trace it.</text>
+              <text x={8} y={40} className="wr-note-ok" role="button" tabIndex={0} onClick={dismissNotes} onKeyDown={e => { if (e.key === 'Enter') dismissNotes(); }}>Got it</text></g>
+          </g>}
+          {hover && <g className="wr-hover" transform={`translate(${hover.x} ${hover.y})`} aria-hidden="true">
+            <rect x={-hover.text.length * 2.9 - 8} y={-13} width={hover.text.length * 5.8 + 16} height={18} rx={5}/><text y={0}>{hover.text}</text></g>}
         </svg>
         <div className="wr-under">
           <p className="wr-focus" aria-live="polite"><span className="br-eyebrow">Thought in focus</span>
             {thought ? <><b>{thoughtId} · {thought.text}</b><small>Everything else dims to about a third. Esc clears.</small></>
+              : run?.status === 'failed' ? <><b className="wr-bad">Stopped</b><small>{(run.message ?? run.error ?? 'The run stopped').replace(/[.\s]*$/, '.')} Press N for the step that stopped it.</small></>
               : <><b>None chosen</b><small>Click a light, a chip or a tally to follow one thought from input to output.</small></>}</p>
           <ul className="wr-legend" aria-label="Key">
             {(['good', 'partial', 'bad', 'neutral'] as Status[]).map(s => <li key={s}><svg width="14" height="14" aria-hidden="true"><Mark status={s} x={7} y={7} r={5}/></svg>{WORD[s].replace('a finding', 'a finding')}</li>)}
@@ -396,7 +587,7 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
         </div>
       </div>}
 
-      {focused && <aside className="wr-drawer" role="dialog" aria-label="One thought, input to output">
+      {focused && <aside className="wr-drawer" role="dialog" aria-label="One thought, input to output" ref={drawerRef} tabIndex={-1} onKeyDown={drawerKeys}>
         <div className="wr-drawer-scroll">
           <header><p className="br-eyebrow">Trace · one thought, input to output</p>
             <h3>{thought?.text || focused.text}</h3>
@@ -406,17 +597,28 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
           <section aria-label="Input"><h4><b>1</b> Input</h4><p className="wr-q">“{run?.question}”</p>
             <p className="wr-chips">{settingsIn.filter(e => ['source_tier_floor', 'severity_floor', 'devils_advocate', 'live_events'].includes(e.rule ?? '')).map(e => <span key={e.n} className="br-chip">{settingChip(e)}</span>)}</p>
             {refsOf.length > 0 && <ul className="wr-refs">{refsOf.slice(0, 4).map(r => <li key={`${r.record_type}:${r.record_id}`}><b>{r.record_type}:{r.record_id.slice(0, 8)}</b></li>)}</ul>}</section>
-          <section aria-label="Steps"><h4><b>2</b> Steps <small>{chain.filter(e => full || e.kind !== 'SETTING').length} events · parent chain</small></h4>
-            <ol className="wr-steps">{chain.filter(e => full || e.kind !== 'SETTING').map(e => <li key={e.n} className={e.n === focus ? 'on' : ''}
-              aria-label={`Step ${e.n}, ${e.text}, ${verdictOf(e)}, by ${who(e)}${e.rule ? `, rule ${e.rule}` : ''}`}>
-              <span className="wr-ln">#{e.n}</span><svg width="14" height="14" aria-hidden="true"><Mark status={e.status} self={e.self_reported} x={7} y={7} r={5}/></svg>
-              <span className="wr-step-text" title={`${e.text} · ${who(e)}${e.rule ? ` · ${e.rule}` : ''}`}>{e.text}<small> {who(e)}{e.rule ? ` · ${e.rule}` : ''}</small></span><b className={e.status}>{verdictOf(e)}</b></li>)}</ol></section>
+          <section aria-label="Steps"><h4><b>2</b> Steps <small>{steps.length} events · parent chain</small></h4>
+            <p className="wr-stepbar"><span className="br-seg" role="radiogroup" aria-label="Show the steps as">
+              {(['tree', 'timeline'] as const).map(v => <button key={v} type="button" role="radio" aria-checked={stepsView === v} className={stepsView === v ? 'on' : ''} onClick={() => setStepsView(v)}>{v}</button>)}</span>
+              <input type="search" aria-label="Search the steps by kind, number or rule" placeholder="kind, #n or rule" value={stepSearch} onChange={e => setStepSearch(e.target.value)}/></p>
+            <ol className={`wr-steps${stepsView === 'timeline' ? ' timeline' : ''}`}>{steps.map(e => <li key={e.n} className={e.n === focus ? 'on' : ''}>
+              <button type="button" className="wr-steprow" onClick={() => setFocus(e.n)} aria-current={e.n === focus ? 'step' : undefined}
+                aria-label={`Step ${e.n}, ${e.text}, ${verdictOf(e)}, by ${who(e)}${e.rule ? `, rule ${e.rule}` : ''}`}>
+                <span className="wr-ln">#{e.n}</span><svg width="14" height="14" aria-hidden="true"><Mark status={e.status} self={e.self_reported} x={7} y={7} r={5}/></svg>
+                {stepsView === 'tree' ? <span className="wr-step-text" title={`${e.text} · ${who(e)}${e.rule ? ` · ${e.rule}` : ''}`}>{e.text}<small> {who(e)}{e.rule ? ` · ${e.rule}` : ''}</small></span>
+                  : <span className="wr-steptime" title={`${e.text} · ${clock(utc(e.at))}`}><i className={e.status} style={{left: `${stepX(e).left}%`, width: `${stepX(e).width}%`}}/></span>}
+                <b className={e.status}>{verdictOf(e)}</b></button></li>)}
+              {!steps.length && <li className="wr-none">No step matches “{stepSearch}”.</li>}</ol>
+            {stepsView === 'timeline' && chain.length > 0 && <p className="wr-stepaxis"><span>{clock(chainT0)}</span><span>{Math.max(0, Math.round((chainT1 - chainT0) / 1000))} s</span><span>{clock(chainT1)}</span></p>}</section>
           <section aria-label="Output"><h4><b>3</b> Output <small>{refsOf.length ? 'from a passage · model’s words' : 'model’s words'}</small></h4>
             <p className="wr-q">{(claim?.claim as string | undefined) ?? (thought ?? focused).text}</p>
-            <dl className="br-facts">
+            {candidateId && candidate.isLoading ? <div className="wr-skeleton" aria-label="Loading the answer"><i/><i/><i/></div>
+              : <dl className="br-facts">
               {claim && <><dt>Class</dt><dd>{words(String(claim.classification ?? ''))} <span className="br-chip ai">model says</span></dd>
-                <dt>Confidence</dt><dd>model: {words(String(claim.confidence_term ?? '')).toLowerCase()}{cap ? <> → <b>capped: {cap}</b></> : null}</dd></>}
-              <dt>Removed</dt><dd>{removed ? removed.text : 'nothing removed'}</dd></dl></section>
+                <dt>Confidence</dt><dd>model: {claim.confidence_term ? words(String(claim.confidence_term)).toLowerCase() : 'not given (old format)'}{cap ? <> → <b>capped: {cap}</b></> : null}</dd></>}
+              {links.length > 0 && <><dt>Weakest link</dt><dd><span className="wr-links" aria-hidden="true">{links.map(e => <i key={e.n} className={`${e.status}${e === weakest ? ' weak' : ''}`} title={`#${e.n} ${e.text}`}/>)}</span>
+                {weakest ? <> {cap ? 'capped by' : 'weakest:'} step #{weakest.n}: {weakest.text}</> : ' every step held'}</dd></>}
+              <dt>Removed</dt><dd>{removed ? removed.text : 'nothing removed'}</dd></dl>}</section>
           <section aria-label="Ledger"><h4><b>4</b> Ledger</h4><p className="wr-chips">
             {thoughtId && <span className="br-chip">{thoughtId} proposed</span>}
             {candidateId && <span className="br-chip">AIC {candidateId.slice(0, 8)} {reviewed ? words(candidate.data?.review_status) : 'sent for you'}</span>}
@@ -430,7 +632,7 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
             <input aria-label="Why reject it" value={reason} onChange={e => setReason(e.target.value)} autoFocus/><button type="submit" disabled={!reason.trim()}>Reject</button></form>}
           {reviewed && <span className="br-ok">{words(candidate.data?.review_status)}</span>}
           <button type="button" disabled title="Review applies to the whole answer; marking one claim to check is not built yet">○ To check</button>
-          <button type="button" onClick={() => { void navigator.clipboard?.writeText(`${thought?.text ?? focused.text} [${thoughtId ?? `step ${focused.n}`}; ${refsOf.map(r => `${r.record_type}:${r.record_id}`).join(', ')}; AI run ${id}]`); setCopied(true); }}>{copied ? 'Copied' : 'Copy cite'}</button>
+          <button type="button" onClick={() => { void navigator.clipboard?.writeText(citation()); setCopied(true); }}>{copied ? 'Copied' : 'Copy cite'}</button>
           {review.isError && <span role="alert" className="br-bad">{errorMessage(review.error, 'Not saved')}</span>}
           <small>Accept and reject apply to the whole answer.</small>
         </footer>
@@ -448,15 +650,18 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
         <small>Event {shown} of {events.length} · {lightsInFlight} light{lightsInFlight === 1 ? '' : 's'} in flight{!playing && liveRun && events.length > shown ? ` · ${events.length - shown} new` : ''}</small>
         <small>Model: {(events.find(e => e.node === 'model' && e.verdict !== 'STARTED')?.detail as {model?: string} | null)?.model ?? '—'}{local ? ' · this computer' : ''}</small>
       </div>
-      <div className="wr-lanes" aria-label="The run, one lane per part">
-        <p className="br-eyebrow">The run, one lane per part</p>
+      <div className="wr-lanes" aria-label="The run, one lane per part" ref={lanesRef}>
+        <p className="br-eyebrow">The run, one lane per part{win.to - win.from < 1 && <button type="button" className="wr-lanefit" onClick={() => setWin({from: 0, to: 1})}>whole run</button>}</p>
         <div className="wr-axis" aria-hidden="true"><span/>{tickLabels.map(t => <i key={t.f} style={{left: `${t.f * 100}%`}}>{t.text}</i>)}</div>
         {LANES.map(l => <div key={l.key} className={`wr-lane${l.key === 'las' || l.key === 'das' ? ' dim' : ''}`}><span>{l.label}</span><div>
-          {l.key === 'model' && modelStart && <i className="wr-bar" style={{left: `${xOf(modelStart)}%`, width: `${Math.max(1, (modelEnd ? xOf(modelEnd) : 100) - xOf(modelStart))}%`}}/>}
+          {l.key === 'model' && modelStart && (() => {
+            const a = Math.max(0, xIn(xOf(modelStart))), b = Math.min(100, xIn(modelEnd ? xOf(modelEnd) : 100));
+            return b > a ? <i className="wr-bar" style={{left: `${a}%`, width: `${Math.max(0.5, b - a)}%`}}/> : null;
+          })()}
           {spread(visible.filter(l.match)).map(([e, x]) => <button key={e.n} type="button" className={`wr-tick ${e.status}${e.self_reported ? ' self' : ''}${lit.has(e.n) ? ' lit' : ''}`} style={{left: `${x}%`}}
             aria-label={`Step ${e.n}: ${e.text}`} onClick={() => setFocus(e.n)}/>)}
         </div></div>)}
-        {last && <i className="wr-playhead" style={{left: `calc(64px + (100% - 64px) * ${xOf(last) / 100})`}}/>}
+        {last && inWin(xOf(last)) && <i className="wr-playhead" style={{left: `calc(64px + (100% - 64px) * ${xIn(xOf(last)) / 100})`}}/>}
       </div>
       <div className="wr-ledgers">
         <p className="br-eyebrow">Ledgers</p>

@@ -73,6 +73,11 @@ export class ApiClient {
     return this.request(`${url.pathname}${url.search}`,{method,headers:new Headers(input.headers),rawBody:bytes&&bytes.size?bytes:undefined,signal:input.signal});
   };
 
+  // The raw response, for a body read as it arrives (the AI run's Server-Sent Events, features/ai/run-stream.ts).
+  async stream(endpoint:string,options:RequestOptions={}):Promise<Response>{
+    return this.request(endpoint,options);
+  }
+
   async blob(endpoint:string,options:RequestOptions={}):Promise<Blob>{
     return (await this.request(endpoint,options)).blob();
   }
