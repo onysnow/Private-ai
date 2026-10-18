@@ -1,0 +1,821 @@
+area: ML
+terms:
+- term: Money laundering
+  definition: 'Hiding where criminal money came from so it can be used as if it were legitimate, usually
+    in three stages: placement, layering and integration.'
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/frequently-asked-questions.html
+  cases: []
+  related:
+  - Placement
+  - Layering
+  - Integration
+  indicators: []
+  areas:
+  - ML
+- term: Placement
+  definition: The first stage of laundering, when criminal money is first put into the financial system
+    (for example cash deposits).
+  examples:
+  - Structuring cash deposits
+  source_url: https://www.fatf-gafi.org/en/pages/frequently-asked-questions.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Layering
+  definition: The second stage, when money is moved and converted repeatedly to distance it from its source.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/frequently-asked-questions.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Integration
+  definition: The final stage, when laundered money re-enters the legitimate economy, for example through
+    property or business investment.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/frequently-asked-questions.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Trade-based money laundering (TBML)
+  definition: Disguising criminal proceeds and moving value through trade deals, for example by mis-stating
+    the price, quantity or type of goods.
+  examples: []
+  source_url: https://home.treasury.gov/system/files/246/Trade-based-ML-062006.pdf
+  cases: []
+  related:
+  - Over-invoicing
+  - Under-invoicing
+  indicators: []
+  areas:
+  - ML
+- term: Over-invoicing / under-invoicing
+  definition: Billing goods above or below their true value so that extra value moves secretly between
+    buyer and seller.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Shell company
+  definition: A company with little or no real operations or assets, often formed without disclosing who
+    owns or controls it.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2017-a003
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Front company
+  definition: A business that does some real trade but is used to hide criminal money among its legitimate
+    takings or payments.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Beneficial owner
+  definition: The real person who ultimately owns or controls a company or customer, even if others are
+    named on paper.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Nominee
+  definition: A person or company acting on instructions as the named shareholder or director on behalf
+    of someone else.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Politically exposed person (PEP)
+  definition: Someone who holds or held a prominent public role, such as a senior politician or official,
+    treated as higher risk for corruption proceeds.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Designated non-financial businesses and professions (DNFBPs)
+  definition: Non-bank businesses covered by AML rules, such as real estate agents, lawyers, accountants,
+    casinos, dealers in precious metals and trust and company service providers.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Trust and company service provider (TCSP)
+  definition: A business that forms companies and trusts for clients and may provide their addresses,
+    directors or administration.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Mass registration address
+  definition: An address where very many companies are registered, such as a formation agent's office
+    or post box.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Letter of credit
+  definition: A bank's promise to pay a seller once shipping documents meeting set terms are presented;
+    a common trade finance product.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Free trade zone
+  definition: An area where goods can be stored, processed or re-shipped with reduced customs controls
+    and duties.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Temporary importation / inward processing
+  definition: Customs regimes letting goods enter duty-free for processing or temporary use on condition
+    they are re-exported.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Structuring
+  definition: Splitting cash or other transactions into smaller amounts to avoid a reporting threshold;
+    a crime in the US under 31 U.S.C. 5324.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/31/5324
+  cases: []
+  related:
+  - Currency transaction report
+  - Smurfing
+  indicators: []
+  areas:
+  - ML
+- term: Currency transaction report (CTR)
+  definition: A report US financial institutions (other than casinos, which have their own rule) must
+    file for cash transactions of more than $10,000.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/31/1010.311
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Threshold transaction report (TTR)
+  definition: Australia's report for cash transactions of A$10,000 or more; the reports at issue in the
+    CBA case.
+  examples: []
+  source_url: https://austrac.gov.au/news-and-media/media-release/austrac-and-cba-agree-700m-penalty
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Suspicious activity report (SAR) / suspicious transaction report (STR)
+  definition: A confidential report a financial institution files with its financial intelligence unit
+    when it suspects a transaction involves criminal funds or has no lawful purpose.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Funnel account
+  definition: An account in one area that receives many cash deposits, often below the reporting threshold,
+    with the money withdrawn quickly in another area.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2014-a005
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Money mule
+  definition: A person used, knowingly or not, to move money or goods for criminals, for example by receiving
+    and forwarding funds through their account.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Mirror transaction (mirror transfer)
+  definition: A broker makes two equal but separate payments in different currencies and countries so
+    value moves without money crossing the border.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related:
+  - Black market peso exchange
+  - Informal value transfer system
+  indicators: []
+  areas:
+  - ML
+- term: Black market peso exchange (BMPE)
+  definition: A trade-based scheme in which drug dollars in the US are exchanged through brokers for pesos
+    in Latin America, often via goods purchases.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Informal value transfer system (IVTS)
+  definition: Moving value between places through brokers and offsetting balances, outside the formal
+    banking system (e.g. hawala, underground banking).
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Money or value transfer service (MVTS)
+  definition: A business that accepts cash or other value and pays an equivalent sum to a recipient elsewhere,
+    such as remittance companies.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Professional money launderer (PML)
+  definition: Individuals, organisations or networks that launder money for other criminals in exchange
+    for a fee or commission.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Professional-Money-Laundering.pdf
+  cases: []
+  related:
+  - Professional money laundering organisation
+  - Professional money laundering network
+  indicators: []
+  areas:
+  - ML
+- term: Professional money laundering organisation / network
+  definition: An organisation is two or more people acting as an autonomous structured group; a network
+    is a looser set of associates working together on laundering schemes.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Professional-Money-Laundering.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Account settlement mechanism
+  definition: A launderer serves criminals who have cash and others who need money in bank accounts at
+    the same time, balancing the two so little money actually moves.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Professional-Money-Laundering.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Virtual asset (VA)
+  definition: A digital representation of value that can be traded or transferred digitally and used for
+    payment or investment, such as cryptocurrency.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Virtual asset service provider (VASP)
+  definition: A business that exchanges, transfers, holds or administers virtual assets for others, such
+    as a crypto exchange or custodial wallet.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Mixer / tumbler
+  definition: A service that pools and blends many users' coins so outgoing funds cannot easily be traced
+    to their source.
+  examples:
+  - Bitcoin Fog
+  - Helix
+  source_url: https://www.justice.gov/usao-dc/pr/operator-bitcoin-fog-sentenced-more-12-years-prison-running-notorious-darknet
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Anonymity-enhanced cryptocurrency (AEC) / privacy coin
+  definition: A cryptocurrency designed to hide senders, receivers or amounts, unlike public blockchains
+    such as Bitcoin.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Unhosted (self-custody) wallet
+  definition: A crypto wallet controlled directly by the user (software, hardware or paper) rather than
+    held by an exchange.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Peer-to-peer (P2P) exchange
+  definition: A platform where individuals trade crypto directly with each other rather than with an exchange.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Crypto-to-plastic
+  definition: Using debit or credit cards linked to a crypto wallet to withdraw cash.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Initial coin offering (ICO)
+  definition: A sale of new crypto tokens to raise money, where investor data may be limited.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Darknet marketplace
+  definition: A hidden website, usually on Tor, selling illegal goods such as drugs and stolen data, typically
+    for crypto.
+  examples:
+  - AlphaBay (taken down 2017)
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Customer due diligence (CDD) / know your customer (KYC)
+  definition: Checks a regulated business must run to know who its customers and beneficial owners are,
+    why they use the service and where their money comes from.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Geographic Targeting Order (GTO)
+  definition: A temporary FinCEN order making title insurers report who is really behind certain all-cash
+    home purchases by companies in named areas.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2017-a003
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: All-cash purchase
+  definition: In US real estate usage, a purchase made without a bank loan or mortgage (not necessarily
+    with banknotes).
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2017-a003
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Citizenship by investment (CBI)
+  definition: A government programme granting citizenship or residence in return for an investment, often
+    in real estate.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Off-plan property
+  definition: Property sold before it is built.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Client account
+  definition: An account a lawyer, notary or estate agent holds for clients' money; misuse can make criminal
+    funds look like they came from a professional.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Unexplained Wealth Order (UWO)
+  definition: A UK court order requiring a person to explain their interest in property and how they paid
+    for it.
+  examples: []
+  source_url: https://caselaw.nationalarchives.gov.uk/ewca/civ/2020/108
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Cash-intensive business
+  definition: A business taking much of its income in cash (shops, restaurants, car washes, salons), which
+    can be used to mix criminal cash with real takings.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Civil forfeiture
+  definition: A court action against property itself, claiming it is proceeds of crime, which does not
+    require a criminal conviction.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdny/pr/manhattan-us-attorney-announces-102-million-settlement-civil-forfeiture-and-money
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Bank Secrecy Act (BSA)
+  definition: The main US anti-money-laundering law, requiring banks and others to keep records, file
+    reports and run AML programmes.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/td-bank-pleads-guilty-bank-secrecy-act-and-money-laundering-conspiracy-violations-18b
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Unlicensed money transmitting business
+  definition: Moving money for others without required registration or licence; a US federal crime (charged
+    in Bitcoin Fog and Binance cases).
+  examples: []
+  source_url: https://www.justice.gov/usao-dc/pr/operator-bitcoin-fog-sentenced-more-12-years-prison-running-notorious-darknet
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Red flag / risk indicator
+  definition: A sign that suggests activity may be suspicious; FATF stresses one indicator alone does
+    not prove wrongdoing.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Casino chips
+  definition: Tokens a casino sells for cash or credit to use at its tables; they can be cashed back at
+    the cage and are a store of value.
+  examples: []
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related:
+  - Cage
+  - Refining
+  indicators: []
+  areas:
+  - ML
+- term: Cage (casino cashier)
+  definition: The casino's cashier desk, where chips are bought and cashed, deposits are taken and casino
+    cheques or wires are issued.
+  examples: []
+  source_url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+  cases: []
+  related:
+  - Front money
+  indicators: []
+  areas:
+  - ML
+- term: Minimal play
+  definition: Gambling very little with money brought into a casino before cashing out, a sign the aim
+    was to move money rather than gamble.
+  examples: []
+  source_url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+  cases: []
+  related:
+  - ML-064
+  indicators: []
+  areas:
+  - ML
+- term: Refining
+  definition: Swapping many small-denomination notes for fewer large ones (or a cheque), which makes illicit
+    cash easier to carry and hide.
+  examples: []
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related:
+  - ML-065
+  indicators: []
+  areas:
+  - ML
+- term: Front money
+  definition: Money a player deposits with a casino in advance to gamble against; it sits in a casino
+    deposit account.
+  examples: []
+  source_url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+  cases: []
+  related:
+  - ML-069
+  indicators: []
+  areas:
+  - ML
+- term: Casino marker
+  definition: A form of credit a casino extends to a player, used to buy chips and repaid later.
+  examples: []
+  source_url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Junket
+  definition: An organised gambling tour that brings players to a casino, often including travel, credit
+    and the movement of their money; run by the casino or an independent junket operator.
+  examples:
+  - A junket operator flies VIP players to Macao and arranges their gambling funds.
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related:
+  - ML-070
+  indicators: []
+  areas:
+  - ML
+- term: TITO ticket (ticket-in, ticket-out)
+  definition: A paper voucher a gaming machine prints when a player cashes out credits, which is redeemed
+    at the cage or a kiosk.
+  examples: []
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: EGM (electronic gaming machine)
+  definition: A poker machine or slot machine; AUSTRAC's term for gaming machines.
+  examples: []
+  source_url: https://austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/indicators-suspicious-activity-casino-sector
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Player rating
+  definition: A casino's record of how much and how long a patron gambles, used for rewards; falsifying
+    it can make cashed-out chips look like winnings.
+  examples: []
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Surrender (of an insurance policy)
+  definition: Cancelling a life insurance or investment policy before it matures and taking its cash value,
+    usually minus a surrender charge.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related:
+  - ML-074
+  indicators: []
+  areas:
+  - ML
+- term: Single (lump-sum) premium
+  definition: Paying for an insurance policy in one large payment instead of instalments.
+  examples: []
+  source_url: https://www.austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/indicators-suspicious-activity-life-insurance-sector
+  cases: []
+  related:
+  - ML-075
+  indicators: []
+  areas:
+  - ML
+- term: Beneficiary (of a policy)
+  definition: The person or entity named to receive the payout from an insurance policy.
+  examples: []
+  source_url: https://www.austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/indicators-suspicious-activity-life-insurance-sector
+  cases: []
+  related:
+  - ML-076
+  indicators: []
+  areas:
+  - ML
+- term: Mirror trade
+  definition: A pair of matched trades in which one party buys and a linked party sells the same security
+    in the same quantity and at the same price, usually in different currencies or countries, used to
+    move money with no real investment.
+  examples: []
+  source_url: https://www.dfs.ny.gov/reports_and_publications/press_releases/pr1701301
+  cases: []
+  related:
+  - ML-078
+  indicators: []
+  areas:
+  - ML
+- term: Wash trade
+  definition: Buying and selling the same security at the same time or in matching amounts so that ownership
+    does not really change; it lacks economic purpose.
+  examples: []
+  source_url: https://www.austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/indicators-suspicious-activity-securities-and-derivatives-sector
+  cases: []
+  related:
+  - ML-079
+  indicators: []
+  areas:
+  - ML
+- term: Loan-back
+  definition: A scheme in which a person's own illicit money is lent back to them, or secures a loan to
+    them, so it returns looking like borrowed money.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related:
+  - ML-080
+  indicators: []
+  areas:
+  - ML
+- term: Monetary instrument
+  definition: A paper payment item such as a money order, traveller's cheque or cashier's cheque that
+    can be bought with cash.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related:
+  - ML-082
+  indicators: []
+  areas:
+  - ML
+- term: Casa de cambio
+  definition: A currency exchange house, common in Mexico and Latin America, that changes money and sends
+    payments.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related:
+  - ML-082
+  indicators: []
+  areas:
+  - ML
+- term: Informal value transfer system (IVTS) / hawala
+  definition: Any system or network that takes money in one place and pays the same value to someone elsewhere,
+    often outside the regular banking system; hawala is a common traditional form.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-07-05/FIN-2010-A11-updated_508.pdf
+  cases: []
+  related:
+  - ML-083
+  indicators: []
+  areas:
+  - ML
+- term: Unlicensed money transmitter
+  definition: A business that sends money for others without the required state licence or federal registration,
+    a crime in the US.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-07-05/FIN-2010-A11-updated_508.pdf
+  cases: []
+  related:
+  - ML-083
+  indicators: []
+  areas:
+  - ML
+- term: Sham litigation
+  definition: A fake or collusive lawsuit or debt claim, settled or enforced quickly, used to make a transfer
+    of money look like a legal judgment or settlement.
+  examples: []
+  source_url: https://cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf
+  cases: []
+  related:
+  - ML-084
+  indicators: []
+  areas:
+  - ML
+- term: Power of attorney
+  definition: A legal document giving one person authority to act for another, for example to manage or
+    sell their assets.
+  examples: []
+  source_url: https://cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf
+  cases: []
+  related:
+  - ML-088
+  indicators: []
+  areas:
+  - ML
+- term: Retainer
+  definition: The engagement of a lawyer by a client for a particular piece of work.
+  examples: []
+  source_url: https://cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Back-to-back (ABC) property transaction
+  definition: A property bought and quickly resold, often between connected parties, with the price rising
+    sharply each time.
+  examples: []
+  source_url: https://cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf
+  cases: []
+  related:
+  - ML-040
+  indicators: []
+  areas:
+  - ML
+- term: Residence by investment (RBI)
+  definition: A government programme granting residence rights (a 'golden visa') in exchange for a qualifying
+    investment.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
+  cases: []
+  related:
+  - Citizenship by investment (CBI)
+  indicators: []
+  areas:
+  - ML
+- term: Money merry-go-round
+  definition: A scheme in which the same investment money is recycled through several CBI/RBI applicants
+    or bogus investment schemes so each appears to have invested.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
+  cases: []
+  related:
+  - ML-097
+  indicators: []
+  areas:
+  - ML
+- term: Non-prosecution agreement
+  definition: A deal in which prosecutors agree not to bring charges in return for the company paying
+    money and accepting conditions; it is not a conviction.
+  examples: []
+  source_url: https://www.dea.gov/press-releases/2013/08/27/operator-venetian-resort-las-vegas-agrees-return-over-47-million-after
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Civil penalty order (AUSTRAC)
+  definition: A court-ordered fine in a civil (not criminal) case that AUSTRAC brings against a business
+    for breaking Australia's AML/CTF Act.
+  examples: []
+  source_url: https://www.austrac.gov.au/lists-enforcement-actions-taken
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML

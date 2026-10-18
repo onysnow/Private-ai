@@ -1,0 +1,112 @@
+# Detection specs for the BO area (hidden ownership and shell companies).
+# docs/discovery/detection-design.md: a spec picks a detector family
+# (backend/app/patterns/detectors/) and fills in its settings; bands carry the
+# catalogue's numbers, each with the sentence the card shows.
+
+- indicator: BO-001
+  family: cycle
+  params: {link: Ownership}
+  level: textbook   # the catalogue gives no number: a loop meets the definition as worded
+  summary: "Ownership runs in a loop: {path}."
+  examples:
+    - name: three companies own each other in a ring
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}, {id: c, schema: Company}]
+      links: [{schema: Ownership, source: a, target: b}, {schema: Ownership, source: b, target: c}, {schema: Ownership, source: c, target: a}]
+      expect: textbook
+    - name: a plain chain
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Ownership, source: a, target: b}]
+      expect: null
+
+- indicator: BO-002
+  family: path_length
+  params: {link: Ownership}
+  bands:
+    - {level: faint, from: 4, to: 6, reason: "More than 3 layers between the top owner and the company (World Bank, Puppet Masters, three-layer test)"}
+    - {level: strong, from: 6, reason: "More than 5 layers (Tax Justice Network 2020; Open Ownership's complex chain)"}
+  summary: "{layers} layers of ownership above {bottom}: {chain}."
+  not_shown: ["whether there is a business reason for the layers"]
+  examples:
+    - name: four layers
+      parties: [{id: l0, schema: Company}, {id: l1, schema: Company}, {id: l2, schema: Company}, {id: l3, schema: Company}, {id: l4, schema: Company}]
+      links: [{schema: Ownership, source: l0, target: l1}, {schema: Ownership, source: l1, target: l2}, {schema: Ownership, source: l2, target: l3}, {schema: Ownership, source: l3, target: l4}]
+      expect: faint
+    - name: six layers
+      parties: [{id: l0, schema: Company}, {id: l1, schema: Company}, {id: l2, schema: Company}, {id: l3, schema: Company}, {id: l4, schema: Company}, {id: l5, schema: Company}, {id: l6, schema: Company}]
+      links: [{schema: Ownership, source: l0, target: l1}, {schema: Ownership, source: l1, target: l2}, {schema: Ownership, source: l2, target: l3}, {schema: Ownership, source: l3, target: l4}, {schema: Ownership, source: l4, target: l5}, {schema: Ownership, source: l5, target: l6}]
+      expect: strong
+    - name: three layers
+      parties: [{id: l0, schema: Company}, {id: l1, schema: Company}, {id: l2, schema: Company}, {id: l3, schema: Company}]
+      links: [{schema: Ownership, source: l0, target: l1}, {schema: Ownership, source: l1, target: l2}, {schema: Ownership, source: l2, target: l3}]
+      expect: null
+
+- indicator: BO-031
+  family: shared_holder_link
+  params: {link: Payment, holder_links: [Ownership, Directorship]}
+  level: faint   # the records show the structure; whether there was a business reason needs a person
+  summary: "{count_text} between {a} and {b}; both are held or run by {holders}."
+  not_shown: ["whether there was a business reason for the payments"]
+  examples:
+    - name: a shared owner and director
+      parties: [{id: p, schema: Person}, {id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Ownership, source: p, target: a}, {schema: Directorship, source: p, target: b}, {schema: Payment, source: a, target: b, properties: {amount: ["5000"]}}]
+      expect: faint
+    - name: a parent paying its own company
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Ownership, source: a, target: b}, {schema: Payment, source: a, target: b}]
+      expect: null
+
+- indicator: BO-032
+  family: shared_property
+  version: 2   # 2: one address written two ways is one address; a linked third holder no longer hides an unlinked pair
+  params: {properties: {address: address, phone: phone, email: email}, unlinked_only: true}
+  level: textbook   # a shared detail between unlinked parties meets the definition as worded
+  summary: "{names} share the {kind} “{value}”{also_written}; {no_link}."
+  examples:
+    - name: two unlinked companies at one address
+      parties: [{id: a, schema: Company, properties: {address: ["1 Harbour Road"]}}, {id: b, schema: Company, properties: {address: ["1 harbour road"]}}]
+      expect: textbook
+    - name: the same address but linked
+      parties: [{id: a, schema: Company, properties: {address: ["1 Harbour Road"]}}, {id: b, schema: Company, properties: {address: ["1 Harbour Road"]}}]
+      links: [{schema: Ownership, source: a, target: b}]
+      expect: null
+    - name: only the same city
+      parties: [{id: a, schema: Company, properties: {address: ["New York, New York"]}}, {id: b, schema: RealEstate, properties: {address: ["New York, New York"]}}]
+      expect: null
+    - name: one address written two ways
+      parties: [{id: a, schema: Company, properties: {address: ["Esplanade 44, Saint Helier JE4 9WG, Jersey"]}}, {id: b, schema: Company, properties: {address: ["44 Esplanade, St. Helier JE4 9WG, Jersey"]}}]
+      expect: textbook
+    - name: two house numbers on one street
+      parties: [{id: a, schema: Company, properties: {address: ["44 Esplanade, St. Helier JE4 9WG, Jersey"]}}, {id: b, schema: Company, properties: {address: ["45 Esplanade, St. Helier JE4 9WG, Jersey"]}}]
+      expect: null
+    - name: a third holder linked to one of two unlinked holders
+      parties: [{id: a, schema: Company, properties: {address: ["1 Harbour Road"]}}, {id: b, schema: Company, properties: {address: ["1 Harbour Rd."]}}, {id: c, schema: Company, properties: {address: ["Harbour Road 1"]}}]
+      links: [{schema: Ownership, source: b, target: c}]
+      expect: textbook
+
+- indicator: BO-033
+  family: missing_property
+  version: 2
+  params: {link: Payment, property: purpose}
+  bands:
+    - level: faint
+      from: 1
+      to: 2
+      reason: "No purpose found: the records give none yet. That may only mean no one has recorded it; find what the documents say the payment was for."
+    - level: textbook
+      from: 2
+      reason: "The record says the payment had no purpose, which meets the definition as worded. Whether invoices were false needs a person."
+  summary: "{source} paid {target}{amount_text}, {finding}."
+  examples:
+    - name: no purpose recorded yet
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Payment, source: a, target: b, properties: {amount: ["100"], currency: ["EUR"]}}]
+      expect: faint
+    - name: the record says there was none
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Payment, source: a, target: b, properties: {amount: ["100"], purpose: ["None stated"]}}]
+      expect: textbook
+    - name: a purpose given
+      parties: [{id: a, schema: Company}, {id: b, schema: Company}]
+      links: [{schema: Payment, source: a, target: b, properties: {purpose: ["rent"]}}]
+      expect: null

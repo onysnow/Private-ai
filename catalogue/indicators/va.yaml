@@ -1,0 +1,2284 @@
+key: VA
+name: Abuse and neglect of older and disabled adults in care
+scope: Physical, sexual, psychological and organisational abuse and neglect in nursing homes, learning-disability
+  units, supported living and group homes, including unreported incidents and failing facilities.
+indicators:
+- id: VA-001
+  name: Injuries with no explanation, or an explanation that does not fit
+  definition: A resident has bruises, fractures, burns, cuts or other injuries that nobody can account
+    for, or the account given does not match the injury.
+  areas:
+  - VA
+  typology: Physical abuse / injury of unknown source
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: Social Care Institute for Excellence (SCIE)
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Physical abuse - signs and indicators
+    quote: No explanation for injuries or inconsistency with the account of what happened
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Signs of Elder Abuse
+    publisher: National Center on Elder Abuse (ACL)
+    url: https://pfs2.acl.gov/strapib/assets/NCEA_Signs_EA_e7f59fa5f6.pdf
+    locator: Physical
+    quote: Broken bones, bruises, and welts
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Incidents of Potential Abuse and Neglect at Skilled Nursing Facilities Were Not Always Reported
+      (A-01-16-00509)
+    publisher: HHS Office of Inspector General
+    year: '2019'
+    url: https://oig.hhs.gov/oas/reports/region1/11600509.pdf
+    locator: p. 13
+    quote: interpreted the term 'suspicious' in different ways when determining whether an incident should
+      have been reported
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hospital records show a femur fracture for a bed-bound resident with no incident report
+  - Staff give differing accounts of how a resident got facial bruising
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - PublicBody
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Older people bruise and fracture easily (thin skin, osteoporosis, anticoagulant drugs)
+  - Genuine accidents and falls, including unwitnessed ones
+  - Injuries caused during legitimate moving and handling
+  - Residents with dementia may not be able to explain an accident
+  version: 1
+- id: VA-002
+  name: Frequent injuries or repeated unexplained falls
+  definition: The same resident, or many residents of one home, keep getting hurt or falling without a
+    clear cause being recorded.
+  areas:
+  - VA
+  typology: Physical abuse / neglect
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Physical abuse - signs and indicators
+    quote: Unexplained falls
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nursing Homes Failed to Report 43 Percent of Falls With Major Injury and Hospitalization Among
+      Their Medicare-Enrolled Residents (OEI-05-24-00180)
+    publisher: HHS Office of Inspector General
+    year: '2025'
+    url: https://oig.hhs.gov/reports/all/2025/nursing-homes-failed-to-report-43-percent-of-falls-with-major-injury-and-hospitalization-among-their-medicare-enrolled-residents/
+    locator: Report summary
+    quote: Nursing homes failed to report 43 percent of falls with major injury and hospitalization
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: QSO-23-01-NH Special Focus Facility program (revised Jan 2026)
+    publisher: CMS
+    year: '2026'
+    url: https://www.cms.gov/files/document/qso-23-01-nh-revised-2026-01-28.pdf
+    locator: Section II, Selection Focus Area
+    quote: CMS recommends selecting the facility with the higher prevalence of falls among the resident
+      population.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A home's fall rate on Care Compare is far above the state average
+  - A resident has several emergency room visits for fall injuries in a few months
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Frail, mobile residents with dementia fall often despite good care
+  - Homes that accept high-acuity residents will have more falls
+  - Policies avoiding restraint may increase falls
+  version: 1
+- id: VA-003
+  name: Fear of, or changed behaviour around, a particular person
+  definition: A resident goes quiet, becomes fearful, or refuses to be alone with or cared for by a specific
+    staff member or visitor.
+  areas:
+  - VA
+  typology: Physical, sexual or psychological abuse
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Physical abuse
+    quote: Subdued or changed behaviour in the presence of a particular person
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Sexual abuse
+    quote: Reluctance to be alone with a particular person
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Psychological or emotional abuse
+    quote: An air of silence when a particular person is present
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Family members report a parent becomes distressed when one carer comes on shift
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Dementia can cause fear or dislike of particular people for no reason
+  - A personality clash or a previous unrelated upset
+  version: 1
+- id: VA-004
+  name: Unexplained behaviour change, withdrawal or distress
+  definition: A resident shows new fear, anxiety, sleep problems, sadness, withdrawal or appetite change
+    that has no medical explanation.
+  areas:
+  - VA
+  typology: Psychological / emotional abuse
+  status: verified
+  sources:
+  - title: Signs of Elder Abuse
+    publisher: National Center on Elder Abuse (ACL)
+    url: https://pfs2.acl.gov/strapib/assets/NCEA_Signs_EA_e7f59fa5f6.pdf
+    locator: Emotional & Behavioral
+    quote: Unusual changes in behavior or sleep
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Psychological or emotional abuse
+    quote: Withdrawal or change in the psychological state of the person
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A previously sociable resident stops eating and speaking after a change of staff
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Progression of dementia or depression
+  - Illness, pain or medication side effects
+  - Bereavement or the move into care itself
+  version: 1
+- id: VA-005
+  name: Physical signs that may point to sexual abuse
+  definition: Published signs such as unexplained sexually transmitted infection, torn or bloody underclothing,
+    or pregnancy in a person unable to consent, found in a care setting.
+  areas:
+  - VA
+  typology: Sexual abuse
+  status: verified
+  sources:
+  - title: Signs of Elder Abuse
+    publisher: National Center on Elder Abuse (ACL)
+    url: https://pfs2.acl.gov/strapib/assets/NCEA_Signs_EA_e7f59fa5f6.pdf
+    locator: Physical
+    quote: Sexually transmitted diseases without clear explanation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Sexual abuse
+    quote: Pregnancy in a woman who is unable to consent to sexual intercourse
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 CFR 483.5 Definitions
+    publisher: US Code of Federal Regulations (eCFR)
+    url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.5
+    locator: Definitions
+    quote: Sexual abuse is non-consensual sexual contact of any type with a resident.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An inspection report records a resident's unexplained infection that the facility did not investigate
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some infections have non-sexual causes or pre-date admission
+  - Staining or marks may come from incontinence or medical conditions
+  version: 1
+- id: VA-006
+  name: Fear of receiving personal care
+  definition: A resident becomes frightened of, or resists, washing, dressing or toileting help in a way
+    that is new.
+  areas:
+  - VA
+  typology: Sexual or physical abuse
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Sexual abuse
+    quote: Fear of receiving help with personal care
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Care notes record repeated refusal of personal care with one staff member only
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Dementia commonly causes resistance to personal care
+  - Pain or embarrassment, or a preference for same-sex carers
+  version: 1
+- id: VA-007
+  name: Pressure sores or ulcers
+  definition: Residents develop pressure sores (bed sores), which usually means they were not moved, fed
+    or cared for often enough.
+  areas:
+  - VA
+  typology: Neglect / acts of omission
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Neglect or acts of omission
+    quote: Pressure sores or ulcers
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Extendicare Health Services Inc. Agrees to Pay $38 Million to Settle False Claims Act Allegations
+    publisher: US Department of Justice (USAO S.D. Ohio)
+    year: '2014'
+    url: https://www.justice.gov/usao-sdoh/pr/extendicare-health-services-inc-agrees-pay-38-million-settle-false-claims-act
+    locator: Press release, 10 October 2014
+    quote: failed to follow the appropriate protocols to prevent pressure ulcers or falls
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Care Compare pressure-ulcer quality measure much worse than average
+  - Hospital admission notes record stage 4 pressure ulcers on arrival from a home
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some pressure ulcers are unavoidable in end-of-life or very frail residents
+  - Ulcers may have developed in hospital before admission
+  version: 1
+- id: VA-008
+  name: Hunger, dehydration, malnutrition or unexplained weight loss
+  definition: Residents are hungry, thirsty, underweight or losing weight without a medical reason.
+  areas:
+  - VA
+  typology: Neglect / organisational abuse
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Neglect or acts of omission
+    quote: Malnutrition or unexplained weight loss
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: People being hungry or dehydrated
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Signs of Elder Abuse
+    publisher: National Center on Elder Abuse (ACL)
+    url: https://pfs2.acl.gov/strapib/assets/NCEA_Signs_EA_e7f59fa5f6.pdf
+    locator: Physical
+    quote: Dirtiness, poor nutrition or dehydration
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection report cites residents not given help to eat
+  - Hospital admissions for dehydration from one home
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Weight loss is common in advanced dementia, cancer and end of life
+  - Residents may refuse food or fluids
+  version: 1
+- id: VA-009
+  name: Dirty environment and poor personal hygiene
+  definition: Residents or their rooms are dirty or unhygienic, or the building is in poor or unsuitable
+    condition.
+  areas:
+  - VA
+  typology: Neglect / organisational abuse
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Neglect or acts of omission
+    quote: Poor environment – dirty or unhygienic
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Signs of Elder Abuse
+    publisher: National Center on Elder Abuse (ACL)
+    url: https://pfs2.acl.gov/strapib/assets/NCEA_Signs_EA_e7f59fa5f6.pdf
+    locator: Physical
+    quote: Poor living conditions
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: 'Red flags: notifications and environment'
+    quote: There are concerns about the condition and suitability of the physical environment that people
+      are living in
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection photos or reports describe soiled bedding and broken equipment
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A one-off lapse, outbreak or building works
+  - Old buildings awaiting funded refurbishment
+  version: 1
+- id: VA-010
+  name: Missing daily living aids
+  definition: Residents are without the glasses, hearing aids, walkers or medicines they need.
+  areas:
+  - VA
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Signs of Elder Abuse
+    publisher: National Center on Elder Abuse (ACL)
+    url: https://pfs2.acl.gov/strapib/assets/NCEA_Signs_EA_e7f59fa5f6.pdf
+    locator: Physical
+    quote: Missing daily living aids (glasses, walker, and medications)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Family complaints that hearing aids are repeatedly lost
+  cases: []
+  data_needed:
+  - Person
+  - Note
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Aids get mislaid in shared settings
+  - The resident removes or refuses them
+  version: 1
+- id: VA-011
+  name: Untreated injuries or medical problems, or delayed care
+  definition: Injuries or illnesses are left untreated, medical help is not sought, or the person's doctor
+    keeps changing.
+  areas:
+  - VA
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Neglect or acts of omission
+    quote: Untreated injuries and medical problems
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Physical abuse
+    quote: Failure to seek medical treatment or frequent changes of GP
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Adverse Events in Skilled Nursing Facilities: National Incidence Among Medicare Beneficiaries
+      (OEI-06-11-00370)'
+    publisher: HHS Office of Inspector General
+    year: '2014'
+    url: https://oig.hhs.gov/reports/all/2014/adverse-events-in-skilled-nursing-facilities-national-incidence-among-medicare-beneficiaries/
+    locator: Report summary
+    quote: 59 percent of these adverse events and temporary harm events were clearly or likely preventable.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Late transfer to hospital with sepsis after days of recorded symptoms
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Resident or legal representative declined treatment
+  - Doctor changes due to practice closures or local shortages
+  version: 1
+- id: VA-012
+  name: Medication not given
+  definition: Prescribed medicines pile up untaken or doses are missed.
+  areas:
+  - VA
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Neglect or acts of omission
+    quote: Accumulation of untaken medication
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Medication administration records with gaps; inspection cites medication errors
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Resident refused, or doses were withheld on clinical advice
+  - Recording errors rather than missed doses
+  version: 1
+- id: VA-013
+  name: Medicines used to control behaviour (chemical restraint)
+  definition: Sedatives or antipsychotics appear to be used to keep residents quiet rather than to treat
+    them, including diagnoses that look added to justify such drugs.
+  areas:
+  - VA
+  typology: Chemical restraint / organisational abuse
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - red flags
+    quote: Concerns about medicine management including inappropriate use of medicines to restrain or
+      control behaviour.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 CFR 483.12 Freedom from abuse, neglect, and exploitation
+    publisher: eCFR
+    url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.12
+    locator: §483.12
+    quote: any physical or chemical restraint not required to treat the resident's medical symptoms
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CMS Could Improve the Data It Uses To Monitor Antipsychotic Drugs in Nursing Homes (OEI-07-19-00490)
+    publisher: HHS Office of Inspector General
+    year: '2021'
+    url: https://oig.hhs.gov/reports/all/cms-could-improve-the-data-it-uses-to-monitor-antipsychotic-drugs-in-nursing-homes
+    locator: Report summary
+    quote: nearly one-third of residents who were reported in the MDS as having schizophrenia
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Gosport Independent Panel report, Chapter 12
+    publisher: Gosport Independent Panel (UK Government)
+    year: '2018'
+    url: https://www.gosportpanel.independent.gov.uk/panel-report/part-four/chapter-12
+    locator: para 12.10
+    quote: the lives of over 450 people were shortened as a direct result of the pattern of prescribing
+      and administering opioids
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A home's share of residents with a schizophrenia diagnosis rises sharply while its antipsychotic quality
+    measure looks good
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Residents with genuine psychiatric diagnoses need antipsychotics
+  - Specialist homes take more residents with serious mental illness
+  - Palliative sedation and pain relief at end of life are legitimate
+  version: 1
+- id: VA-014
+  name: Frequent or prolonged restraint, seclusion or segregation
+  definition: People are often held down, secluded or kept apart for long periods, especially without
+    a plan to reduce it.
+  areas:
+  - VA
+  typology: Restrictive practice / organisational abuse
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - red flags
+    quote: Restrictions, including restraint, long-term segregation and prolonged seclusion, being imposed
+      on people
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Winterbourne View: Transforming Care - 4 page summary'
+    publisher: UK Department of Health
+    year: '2012'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/213221/4-page-summary.pdf
+    quote: well over 500 reported cases of restraint in a fifteen month period.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Out of sight - who cares? (restraint, seclusion and segregation) key points
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/publications/major-reports/restraint-seclusion-segregation-independent-care-education-treatment
+    locator: Key points
+    quote: Fifteen patients (21%) were subject to prolonged, prone or mechanical restraints.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CQC news release on second Murphy review of Whorlton Hall regulation
+    publisher: Care Quality Commission
+    year: '2020'
+    url: https://cqc.org.uk/node/1006
+    quote: Services should not be rated as 'Good' or 'Outstanding' if they have used frequent restraint,
+      seclusion and segregation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Restraint logs obtained by FOI show hundreds of holds a year in a small unit
+  cases: []
+  data_needed:
+  - Organization
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some patients pose real risk to themselves or others and restraint is lawful as a last resort
+  - High numbers can reflect better recording rather than more use
+  version: 1
+- id: VA-015
+  name: Blanket restrictions and lack of choice
+  definition: Rules apply to everyone regardless of need, people are confined to rooms, and daily life
+    offers little choice or flexibility.
+  areas:
+  - VA
+  typology: Organisational abuse / closed culture
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - red flags
+    quote: People being asked to go to their rooms or another area and prevented from leaving.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Lack of flexibility and choice for people using the service
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Locked kitchens and fixed bedtimes for all residents of a supported-living house
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Individually assessed and lawful restrictions (e.g. under a deprivation of liberty authorisation)
+  - Temporary measures during an outbreak
+  version: 1
+- id: VA-016
+  name: Staff belittling, taunting or punishing residents
+  definition: Staff talk about or treat residents with contempt, exclude or mock them, or use a punitive
+    approach to care.
+  areas:
+  - VA
+  typology: Psychological abuse / closed culture
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - red flags
+    quote: Staff belittling, excluding or taunting people.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - red flags
+    quote: Potentially punitive approach to care.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Covert filming by a broadcaster shows staff mocking patients (Whorlton Hall, Winterbourne View)
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - Event
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A single staff member's poor conduct dealt with promptly by management
+  - Misreading of banter that residents themselves welcome
+  version: 1
+- id: VA-017
+  name: Inadequate or consistently short staffing
+  definition: There are too few staff, or too few qualified nurses, for the number and needs of residents.
+  areas:
+  - VA
+  typology: Organisational abuse / neglect
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Inadequate staffing levels
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Staff - built-in risks
+    quote: There are consistent staff shortages.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Extendicare press release
+    publisher: US Department of Justice
+    year: '2014'
+    url: https://www.justice.gov/usao-sdoh/pr/extendicare-health-services-inc-agrees-pay-38-million-settle-false-claims-act
+    locator: Allegations
+    quote: a sufficient number of skilled nurses to adequately care for its skilled nursing residents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Care Compare Nursing Home Five-Star Quality Rating System: Technical Users'' Guide'
+    publisher: CMS
+    url: https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/downloads/usersguide.pdf
+    locator: Staffing Domain - weekend staffing
+    quote: aggregated (summed) across all weekend days (Saturdays and Sundays) in the quarterly reporting
+      period
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Payroll-based staffing data show weekend nurse hours far below weekday hours
+  - One-star staffing rating on Care Compare
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - CMS Care Compare staffing rating and Payroll-Based Journal data
+  - CQC inspection reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Regional labour shortages affect all providers
+  - Low census or low-acuity residents need fewer staff hours
+  - Data reporting errors in payroll submissions
+  version: 1
+- id: VA-018
+  name: High staff, nurse or administrator turnover
+  definition: Staff, nurses or managers leave and are replaced often.
+  areas:
+  - VA
+  typology: Closed culture / organisational risk
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Staff - built-in risks
+    quote: There is a high turnover of staff.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Care Compare Five-Star Technical Users' Guide
+    publisher: CMS
+    url: https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/downloads/usersguide.pdf
+    locator: Specifications for Staff Turnover Measures
+    quote: Nursing home administrator turnover is measured as the total number of administrators that
+      left the nursing home
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Three administrators in two years at one home
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - CMS Care Compare turnover measures
+  - State licensing records of administrators
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sector-wide high turnover in care work
+  - A new owner replacing poor managers as part of improvement
+  version: 1
+- id: VA-019
+  name: Untrained, unsupervised or poorly inducted staff, including agency staff
+  definition: Staff, including agency workers, lack proper recruitment checks, induction, training or
+    supervision.
+  areas:
+  - VA
+  typology: Closed culture
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Staff - red flags
+    quote: A high use of poorly inducted agency staff or locums who do not know people's needs.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Winterbourne View Hospital: A Serious Case Review'
+    publisher: South Gloucestershire Safeguarding Adults Board (Flynn and Citarella)
+    year: '2012'
+    url: https://sites.southglos.gov.uk/safeguarding/wp-content/uploads/sites/221/2023/07/WV-SCR-report.pdf
+    locator: Section 2, p. iv
+    quote: became a support worker led hospital
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection notes most shifts staffed by agency workers with no record of induction
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Company
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short-term agency cover during sickness outbreaks
+  - Records of training held elsewhere (e.g. by the agency)
+  version: 1
+- id: VA-020
+  name: No registered manager or weak management oversight
+  definition: The service runs without a manager for long periods or senior leaders do not oversee care.
+  areas:
+  - VA
+  typology: Closed culture / organisational abuse
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Leadership and management - built-in risks
+    quote: The service sometimes runs without a manager or leader.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Lack of management overview and support
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Winterbourne View Hospital: A Serious Case Review'
+    publisher: South Gloucestershire SAB
+    year: '2012'
+    url: https://sites.southglos.gov.uk/safeguarding/wp-content/uploads/sites/221/2023/07/WV-SCR-report.pdf
+    locator: Section 5, p. viii
+    quote: insufficient senior management oversight
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - CQC register shows 'no registered manager' for over a year
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Person
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - CQC provider register (registered manager field)
+  - State licensing records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A brief gap while a new manager's registration is processed
+  version: 1
+- id: VA-021
+  name: Staff cliques, fixed shift groups and excessive hours
+  definition: Staff are related or close friends, the same people always work together, or staff work
+    very long hours.
+  areas:
+  - VA
+  typology: Closed culture
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Leadership and management - red flags
+    quote: Shift patterns within the service mean that the same people are always working together.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Leadership and management - red flags
+    quote: Staff work excessively long hours or overtime.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rotas show the same night team for months; several staff share a surname and address
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Family
+  - Associate
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small rural services naturally employ local families
+  - Fixed teams can give residents continuity of care
+  version: 1
+- id: VA-022
+  name: Whistleblowers discouraged or ignored
+  definition: Staff are afraid to raise concerns, or concerns raised internally or to the regulator get
+    no response.
+  areas:
+  - VA
+  typology: Closed culture
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Leadership and management - red flags
+    quote: Staff are not supported or encouraged to raise concerns and or staff are actively discouraged
+      and are afraid to 'speak out'.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Winterbourne View Hospital: A Serious Case Review'
+    publisher: South Gloucestershire SAB
+    year: '2012'
+    url: https://sites.southglos.gov.uk/safeguarding/wp-content/uploads/sites/221/2023/07/WV-SCR-report.pdf
+    locator: Section 5, p. x
+    quote: did not respond to the Winterbourne View Hospital whistleblower
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A former employee's complaint to the regulator is on file with no follow-up inspection
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document
+  - PublicBody
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Concerns were investigated and found unsubstantiated
+  - Disgruntled former staff may raise unfounded complaints
+  version: 1
+- id: VA-023
+  name: Few visitors, restricted contact and isolation
+  definition: Residents get few or no visitors, contact with family is limited, and families have a poor
+    relationship with the provider.
+  areas:
+  - VA
+  typology: Organisational abuse / closed culture
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Absence of visitors
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: 'Red flags: external oversight'
+    quote: There are few visitors and a lack of initiatives to support regular contact with loved ones
+      either in person or remotely.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Signs of Elder Abuse
+    publisher: National Center on Elder Abuse (ACL)
+    url: https://pfs2.acl.gov/strapib/assets/NCEA_Signs_EA_e7f59fa5f6.pdf
+    locator: Emotional & Behavioral
+    quote: Isolated or not responsive
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Families report visits refused or limited to short supervised slots
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Family
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Residents with no living family
+  - Infection-control visiting limits ordered by public health authorities
+  - Court orders restricting a specific visitor
+  version: 1
+- id: VA-024
+  name: Placed far from home or in an isolated location
+  definition: People are placed a long way from family or in remote settings with little outside contact.
+  areas:
+  - VA
+  typology: Closed culture
+  status: verified
+  sources:
+  - title: 'Winterbourne View: Transforming Care - 4 page summary'
+    publisher: UK Department of Health
+    year: '2012'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/213221/4-page-summary.pdf
+    quote: Almost half of patients were more than 40 miles away from where their family or primary carers
+      lived.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Out of sight - who cares? key points
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/publications/major-reports/restraint-seclusion-segregation-independent-care-education-treatment
+    locator: Key points
+    quote: poor commissioning decisions had led to some patients being admitted to hospitals that were
+      a long way from home.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: 'Built-in risks: service structure'
+    quote: The service is in an isolated location resulting in people using the service having limited
+      access to
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Commissioning records show residents placed out of area hundreds of miles from home
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Organization
+  - PublicBody
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - No suitable specialist placement exists locally
+  - Family moved after placement, or chose the location
+  version: 1
+- id: VA-025
+  name: Very long stays in inpatient or secure units
+  definition: People stay in hospital-type units for months or years with no clear plan to leave.
+  areas:
+  - VA
+  typology: Closed culture / restrictive care
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - built-in risks
+    quote: People remain in a service such as a mental health unit for months or years.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Out of sight - who cares? key points
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/publications/major-reports/restraint-seclusion-segregation-independent-care-education-treatment
+    locator: Key points
+    quote: Over a third of the IC(E)TR patients we reviewed had been in hospital for between 10 and 30
+      years.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Winterbourne View: Transforming Care - 4 page summary'
+    publisher: UK Department of Health
+    year: '2012'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/213221/4-page-summary.pdf
+    quote: the average length of stay was 19 months.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - NHS data on learning-disability inpatients show a unit's average stay is years long
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clinical need for long treatment
+  - No community placement available, which is a commissioning failure rather than the unit's
+  version: 1
+- id: VA-026
+  name: No individual care plan or discharge plan
+  definition: Residents lack personalised care plans, communication plans or plans to move on.
+  areas:
+  - VA
+  typology: Organisational abuse / neglect
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Absence of individual care plans
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - red flags
+    quote: Care plans not being individualised or reflecting the person's voice.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Out of sight - who cares? key points
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/publications/major-reports/restraint-seclusion-segregation-independent-care-education-treatment
+    locator: Key points
+    quote: Almost half of the patients we reviewed did not have an exit strategy from long-term segregation
+      or a robust discharge plan.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection finds copy-pasted care plans identical across residents
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Newly admitted residents whose plans are still being written
+  - Plans kept on a system the inspector did not see
+  version: 1
+- id: VA-027
+  name: Poor records, missing documents and poor notifications
+  definition: Records are incomplete or missing, and statutory notifications to the regulator are thin,
+    late or oddly worded.
+  areas:
+  - VA
+  typology: Organisational abuse / concealment
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Poor record-keeping and missing documents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: 'Red flags: notifications and environment'
+    quote: Notifications to CQC are poorly completed, lack detail and concerns exist about tone of language.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Incident logs with gaps on the dates of known hospital transfers
+  cases: []
+  data_needed:
+  - Document
+  - Organization
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Weak administration without any abuse
+  - IT system changes losing records
+  version: 1
+- id: VA-028
+  name: Incidents not reported to the regulator or police on time
+  definition: A facility fails to report suspected abuse, neglect or serious injury to the state agency,
+    regulator or police within the legal deadline.
+  areas:
+  - VA
+  typology: Concealment / failure to report
+  status: verified
+  sources:
+  - title: 42 CFR 483.12 Freedom from abuse, neglect, and exploitation
+    publisher: eCFR
+    url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.12
+    locator: §483.12(c)(1)
+    quote: not later than 2 hours after the allegation is made
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Incidents of Potential Abuse and Neglect at SNFs Were Not Always Reported (A-01-16-00509)
+    publisher: HHS Office of Inspector General
+    year: '2019'
+    url: https://oig.hhs.gov/oas/reports/region1/11600509.pdf
+    locator: p. 12
+    quote: 84 percent of the estimated 7,831 high-risk hospital ER Medicare claims
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Incidents of Potential Abuse and Neglect at SNFs Were Not Always Reported (A-01-16-00509)
+    publisher: HHS Office of Inspector General
+    year: '2019'
+    url: https://oig.hhs.gov/oas/reports/region1/11600509.pdf
+    locator: p. 14
+    quote: did not report findings of substantiated abuse to local law enforcement for 67 of 69 incidents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Ensuring Beneficiary Health and Safety in Group Homes (joint report)
+    publisher: HHS OIG, ACL and OCR
+    url: https://OIG.HHS.gov/reports-and-publications/featured-topics/group-homes/group-homes-joint-report.pdf
+    locator: p. 8
+    quote: group homes did not report 24 (14 percent) of the critical incidents to DDS.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: 'Red flags: external oversight'
+    quote: There is limited interaction with outside agencies due to failings on the part of the service
+      to submit mandatory information such as notifications or safeguarding referrals.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hospital ER claims for a resident's head injury with no matching facility-reported incident
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Organization
+  - PublicBody
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: A single incident reported late
+    strong: Repeated late or missing reports
+    textbook: An allegation involving abuse or serious bodily injury not reported within 2 hours (or other
+      allegations not within 24 hours), as 42 CFR 483.12(c)(1) requires
+    threshold_source: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.12
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff genuinely judged the injury accidental and not reportable; OIG found guidance on 'suspicious'
+    unclear
+  - Report made but lost or logged under a different category
+  version: 1
+- id: VA-029
+  name: Emergency room visits with high-risk diagnoses
+  definition: Residents are taken to hospital with injuries or conditions (head injury, fractures, overdose,
+    sepsis, aspiration) that can signal abuse or neglect.
+  areas:
+  - VA
+  typology: Data screen for potential abuse or neglect
+  status: verified
+  sources:
+  - title: Incidents of Potential Abuse and Neglect at SNFs Were Not Always Reported (A-01-16-00509)
+    publisher: HHS Office of Inspector General
+    year: '2019'
+    url: https://oig.hhs.gov/oas/reports/region1/11600509.pdf
+    locator: p. 7
+    quote: The 580 diagnosis codes included head injuries, bodily injuries, and safety and medical issues.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Ensuring Beneficiary Health and Safety in Group Homes (joint report)
+    publisher: HHS OIG, ACL and OCR
+    url: https://OIG.HHS.gov/reports-and-publications/featured-topics/group-homes/group-homes-joint-report.pdf
+    locator: App. A, p. A-v
+    quote: hospital emergency room visits where the injury or the medical condition could indicate abuse
+      or neglect
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Medicare or Medicaid claims show several fracture ER visits from one facility in a quarter
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Frail residents get these conditions without any abuse or neglect
+  - Homes with sicker residents will have more ER visits
+  version: 1
+- id: VA-030
+  name: Clusters of safeguarding alerts, police call-outs and hospital visits treated one by one
+  definition: Many separate alerts, police contacts and A&E visits from one service, each closed on its
+    own without anyone seeing the pattern.
+  areas:
+  - VA
+  typology: Missed pattern / oversight failure
+  status: verified
+  sources:
+  - title: 'Winterbourne View: Transforming Care - 4 page summary'
+    publisher: UK Department of Health
+    year: '2012'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/213221/4-page-summary.pdf
+    quote: could and should have raised the alarm.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Winterbourne View Hospital: A Serious Case Review'
+    publisher: South Gloucestershire SAB
+    year: '2012'
+    url: https://sites.southglos.gov.uk/safeguarding/wp-content/uploads/sites/221/2023/07/WV-SCR-report.pdf
+    locator: Section 5, p. viii (40 alerts, 29 police contacts, 78 A&E attendances, Sections 5-6)
+    quote: the extensive misuse of physical restraint
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - FOI to police shows dozens of call-outs to one care address in a year
+  cases: []
+  data_needed:
+  - Address
+  - Event
+  - Organization
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Services for people with complex behaviour legitimately call police and ambulances more
+  - A provider that reports diligently will generate more alerts
+  version: 1
+- id: VA-031
+  name: Abuse citations on inspection (Care Compare abuse icon)
+  definition: Inspectors have cited the home for abuse, shown on Care Compare by an abuse icon.
+  areas:
+  - VA
+  typology: Regulator finding
+  status: verified
+  sources:
+  - title: Care Compare Five-Star Technical Users' Guide
+    publisher: CMS
+    url: https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/downloads/usersguide.pdf
+    locator: Health Inspection Domain - Rating Methodology for Facilities with Abuse Citation(s)
+    quote: Facilities cited for abuse where residents were found to be harmed (Scope/Severity of G or
+      higher)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Nursing Homes: Improved Oversight Needed to Better Protect Residents from Abuse (GAO-19-433)'
+    publisher: US Government Accountability Office
+    year: '2019'
+    url: https://www.gao.gov/products/gao-19-433
+    quote: abuse deficiencies cited in nursing homes more than doubled, increasing from 430 in 2013 to
+      875 in 2017
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A home with an F600 citation at severity G on its last standard survey
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - CMS Care Compare / Provider Data Catalog health deficiencies
+  - State survey agency inspection reports
+  levels:
+    faint: An abuse citation at scope/severity D or higher on one survey
+    strong: Abuse citations at D or higher on two consecutive survey periods
+    textbook: Abuse citation (F600, F602, F603) at G or higher on the most recent standard survey or a
+      complaint survey in the past 12 months, or D or higher in both of the last two cycles (CMS abuse
+      icon criteria)
+    threshold_source: https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/downloads/usersguide.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The home self-reported and dealt with a single staff member's misconduct
+  - Citations under appeal or later overturned
+  version: 1
+- id: VA-032
+  name: Special Focus Facility or candidate status
+  definition: CMS has put the home on its list of the worst-performing nursing homes for extra inspections.
+  areas:
+  - VA
+  typology: Regulator finding / chronic poor performance
+  status: verified
+  sources:
+  - title: QSO-23-01-NH Special Focus Facility program (revised Jan 2026)
+    publisher: CMS
+    year: '2026'
+    url: https://www.cms.gov/files/document/qso-23-01-nh-revised-2026-01-28.pdf
+    locator: 'Section I: SFF Candidate List'
+    quote: The number of nursing homes on the candidate list is based on five candidates for each SFF
+      slot in a state.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: QSO-23-01-NH
+    publisher: CMS
+    year: '2026'
+    url: https://www.cms.gov/files/document/qso-23-01-nh-revised-2026-01-28.pdf
+    locator: Section I
+    quote: the last three years of complaint survey performance
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A home on the monthly SFF candidate list for several years
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Document
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - CMS Special Focus Facility list (published monthly)
+  levels:
+    faint: To be set by Ony
+    strong: On the SFF candidate list
+    textbook: Selected as a Special Focus Facility
+    threshold_source: https://www.cms.gov/files/document/qso-23-01-nh-revised-2026-01-28.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New owners may be mid-turnaround after inheriting a poor record
+  - Candidacy is relative to other homes in the same state
+  version: 1
+- id: VA-033
+  name: Repeated immediate jeopardy citations
+  definition: Inspectors have found, more than once, that residents were in immediate danger of serious
+    harm.
+  areas:
+  - VA
+  typology: Regulator finding
+  status: verified
+  sources:
+  - title: QSO-23-01-NH
+    publisher: CMS
+    year: '2026'
+    url: https://www.cms.gov/files/document/qso-23-01-nh-revised-2026-01-28.pdf
+    locator: 'Section V: Termination'
+    quote: SFFs with deficiencies cited at S/S of IJ on any two surveys
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Two IJ citations in a year for a Special Focus Facility
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - CMS Care Compare health deficiencies
+  - State survey agency reports
+  levels:
+    faint: One IJ citation
+    strong: To be set by Ony
+    textbook: For a Special Focus Facility, IJ citations on two surveys, which CMS treats as grounds to
+      consider discretionary termination
+    threshold_source: https://www.cms.gov/files/document/qso-23-01-nh-revised-2026-01-28.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - IJ removed quickly and not repeated
+  - Citation later reduced on informal dispute resolution
+  version: 1
+- id: VA-034
+  name: Self-reported resident data that do not match outside records
+  definition: What the home reports about its residents (falls, diagnoses) does not match hospital or
+    Medicare claims, which can hide harm or flatter quality ratings.
+  areas:
+  - VA
+  typology: Data misreporting
+  status: verified
+  sources:
+  - title: Nursing Homes Failed to Report 43 Percent of Falls With Major Injury... (OEI-05-24-00180)
+    publisher: HHS Office of Inspector General
+    year: '2025'
+    url: https://oig.hhs.gov/reports/all/2025/nursing-homes-failed-to-report-43-percent-of-falls-with-major-injury-and-hospitalization-among-their-medicare-enrolled-residents/
+    quote: Nursing homes failed to report 43 percent of falls with major injury and hospitalization
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CMS Could Improve the Data It Uses To Monitor Antipsychotic Drugs in Nursing Homes (OEI-07-19-00490)
+    publisher: HHS Office of Inspector General
+    year: '2021'
+    url: https://oig.hhs.gov/reports/all/cms-could-improve-the-data-it-uses-to-monitor-antipsychotic-drugs-in-nursing-homes
+    quote: did not have any Medicare service claims for that diagnosis
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A home's falls-with-injury measure is excellent while hospital claims show many fall fractures
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Person
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Coding errors and timing differences between assessments and claims
+  - Residents treated outside Medicare (e.g. by VA or private insurance)
+  version: 1
+- id: VA-035
+  name: Staff with prior abuse findings employed
+  definition: A home employs someone convicted of abuse or listed on a nurse aide registry for abuse or
+    neglect.
+  areas:
+  - VA
+  typology: Screening failure
+  status: verified
+  sources:
+  - title: 42 CFR 483.12 Freedom from abuse, neglect, and exploitation
+    publisher: eCFR
+    url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.12
+    locator: §483.12(a)(3)
+    quote: Have had a finding entered into the State nurse aide registry
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A caregiver named in a registry finding is later on a home's staff list
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - CourtCase
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - State nurse aide registries
+  - Court records
+  - UK DBS barred lists (via employer only)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Employing a person found guilty of abuse, neglect, exploitation, misappropriation or mistreatment
+      by a court, or with a registry finding, which 42 CFR 483.12(a)(3) prohibits
+    threshold_source: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.12
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Same-name mismatch with a different person
+  - Finding overturned or removed from the registry
+  version: 1
+- id: VA-036
+  name: No personal clothing or possessions; shared personal items
+  definition: Residents lack their own clothes and belongings, and personal items are used communally.
+  areas:
+  - VA
+  typology: Organisational abuse
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Lack of personal clothing and possessions and communal use of personal items
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection finds residents dressed in clothing from a shared pool
+  cases: []
+  data_needed:
+  - Organization
+  - Note
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Laundry mix-ups in large homes
+  - Recently admitted residents still awaiting belongings
+  version: 1
+- id: VA-037
+  name: Loss of dignity and privacy
+  definition: Residents are needlessly exposed while bathing or toileting, or their private matters are
+    discussed in public.
+  areas:
+  - VA
+  typology: Organisational abuse
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Unnecessary exposure during bathing or using the toilet
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Public discussion of personal matters
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection report cites residents left undressed in corridors
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Isolated lapses by individual staff that were corrected
+  version: 1
+- id: VA-038
+  name: Few activities and little stimulation
+  definition: Residents have few social, recreational or educational activities.
+  areas:
+  - VA
+  typology: Organisational abuse
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Organisational or institutional abuse
+    quote: Few social, recreational and educational activities
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Activity coordinator post vacant for a year
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Residents choosing not to take part
+  - Temporary suspension during an outbreak
+  version: 1
+- id: VA-039
+  name: Poor use of mental capacity and mental health law, and rights not explained
+  definition: Staff misunderstand or ignore capacity and detention law, and patients and families are
+    not told their rights.
+  areas:
+  - VA
+  typology: Closed culture / unlawful restriction
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - red flags
+    quote: Poor application or understanding of the Mental Capacity Act (MCA) and Mental Health Act (MHA),
+      including not following the MCA, DoLS and MHA Codes of Practice.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Out of sight - who cares? key points
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/publications/major-reports/restraint-seclusion-segregation-independent-care-education-treatment
+    locator: Key points
+    quote: 35% of providers failed to review patient care in line with the MHA Code of Practice.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Residents deprived of liberty with no DoLS authorisation on file
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Authorisation applied for but backlogged at the local authority
+  version: 1
+- id: VA-040
+  name: No reasonable adjustments or communication support for disabled people
+  definition: Care ignores disabled people's needs, including how they communicate, or a protected characteristic.
+  areas:
+  - VA
+  typology: Discriminatory abuse / closed culture
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - red flags
+    quote: Poor or absent communication plans for people who have communication needs and or communication
+      plans not being followed.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Discriminatory abuse
+    quote: The support on offer does not take account of the person’s individual needs in terms of a protected
+      characteristic
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Non-verbal residents with no communication aids or plan
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Assessment in progress for a new resident
+  version: 1
+- id: VA-041
+  name: Residents highly dependent and unable to speak up or leave
+  definition: 'A built-in risk: people depend on staff for basic needs, cannot easily speak for themselves,
+    or cannot leave.'
+  areas:
+  - VA
+  typology: Closed culture - built-in risk
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: People using the service - built-in risks
+    quote: People in a service are highly dependent on staff for their basic needs.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Service-level built-in risks
+    quote: services where people are unable to leave of their own accord
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Locked units for people with learning disabilities and autism
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - This describes the population served, not misconduct; it raises risk but is not itself a sign of abuse
+  version: 1
+- id: VA-042
+  name: Weak outside oversight and slow responses to regulators
+  definition: Few outside agencies monitor the service and it is slow to answer regulators or commissioners.
+  areas:
+  - VA
+  typology: Closed culture
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: 'Red flags: external oversight'
+    quote: There is a lack of monitoring by outside agencies.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: 'Red flags: external oversight'
+    quote: The service does not respond to CQC, commissioners or other external requests for information
+      in a timely way.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Nursing Homes: Improved Oversight Needed (GAO-19-433)'
+    publisher: GAO
+    year: '2019'
+    url: https://www.gao.gov/products/gao-19-433
+    quote: CMS cannot readily access information on abuse or perpetrator type in its data
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Last full inspection years ago; no ombudsman visits on record
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Regulator inspection history (CQC, state survey agency)
+  - Long-term care ombudsman reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Regulator backlog rather than provider avoidance
+  - Good ratings leading to less frequent inspection
+  version: 1
+- id: VA-043
+  name: Provider structure that distances leaders from the service
+  definition: The provider runs at scale with remote headquarters and regional managers spread thin, or
+    has just changed what kind of service it offers.
+  areas:
+  - VA
+  typology: Closed culture - built-in risk
+  status: verified
+  sources:
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: 'Built-in risks: service structure'
+    quote: The provider is operating at scale and/or nationwide with regional managers covering large
+      areas.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How CQC identifies and responds to closed cultures
+    publisher: Care Quality Commission
+    url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+    locator: Service-level built-in risks
+    quote: a provider changing the type of service it offers in response to market or other influences.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Winterbourne View Hospital: A Serious Case Review'
+    publisher: South Gloucestershire SAB
+    year: '2012'
+    url: https://sites.southglos.gov.uk/safeguarding/wp-content/uploads/sites/221/2023/07/WV-SCR-report.pdf
+    locator: Section 2, p. iv
+    quote: geographically distant from Castlebeck Ltd's headquarters in Darlington
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A national chain's only regional manager covers dozens of homes
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Ownership
+  - Address
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Companies House / state corporate registries
+  - CMS nursing home ownership data
+  - CQC provider register
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many large chains run good services with strong regional oversight
+  version: 1
+- id: VA-044
+  name: Takeover by private equity owners
+  definition: A nursing home has been bought by a private equity firm, which peer-reviewed-style research
+    links to higher mortality and lower staffing.
+  areas:
+  - VA
+  typology: Ownership risk factor
+  status: verified
+  sources:
+  - title: Does Private Equity Investment in Healthcare Benefit Patients? Evidence from Nursing Homes
+      (NBER Working Paper 28474)
+    publisher: National Bureau of Economic Research (Gupta, Howell, Yannelis, Gupta)
+    year: '2021'
+    url: https://www.nber.org/papers/w28474
+    quote: PE ownership leads to lower-risk patients and increases mortality.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - CMS ownership file shows a new PE-backed parent followed by falling staffing ratings
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Organization
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - CMS nursing home ownership / affiliated entity data
+  - Corporate registries and SEC filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: Ownership changes are traced with corporate-registry methods covered elsewhere in the catalogue
+    source_url: https://www.nber.org/papers/w28474
+  innocent_explanations:
+  - Many PE-owned homes perform well; the finding is an average effect
+  - New capital can fund improvements in failing homes
+  version: 1
+- id: VA-045
+  name: Deaths without proper review
+  definition: Deaths of residents, especially unexpected ones, are not reported or reviewed, or many deaths
+    cluster around a pattern of care.
+  areas:
+  - VA
+  typology: Mortality oversight failure
+  status: verified
+  sources:
+  - title: Ensuring Beneficiary Health and Safety in Group Homes (joint report)
+    publisher: HHS OIG, ACL and OCR
+    url: https://OIG.HHS.gov/reports-and-publications/featured-topics/group-homes/group-homes-joint-report.pdf
+    locator: p. 15
+    quote: An effective mortality review protocol involves timely reporting of all beneficiary deaths,
+      including identification of the cause of death
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Gosport Independent Panel report, Chapter 12
+    publisher: Gosport Independent Panel
+    year: '2018'
+    url: https://www.gosportpanel.independent.gov.uk/panel-report/part-four/chapter-12
+    locator: para 12.11
+    quote: There was a disregard for human life and a culture of shortening the lives of a large number
+      of patients
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Death certificates from one unit show many deaths soon after admission with similar drug regimes
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - Organization
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Hospices and end-of-life units naturally have high death rates
+  - State systems may not require reviews for expected deaths
+  version: 1
+- id: VA-046
+  name: Care home holds residents' money without clear accounts
+  definition: The home manages residents' money or shopping but cannot show clear accounts or receipts,
+    or possessions go missing.
+  areas:
+  - VA
+  typology: Financial or material abuse in a care setting
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: SCIE
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: Financial or material abuse
+    quote: A lack of clear financial accounts held by a care home or service
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 42 CFR 483.5 Definitions
+    publisher: eCFR
+    url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.5
+    locator: Misappropriation of resident property
+    quote: temporary, or permanent use of a resident's belongings or money without the resident's consent.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - F602 misappropriation citation on a home's inspection record
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: Financial exploitation of older adults is covered in depth in the EF area; this indicator
+      covers the institutional (care home) angle
+    source_url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+  innocent_explanations:
+  - Poor bookkeeping without theft
+  - Belongings lost in laundry or during moves
+  version: 1
+- id: VA-047
+  name: Guardian or conservator red flags
+  definition: A court-appointed guardian charges unusually high fees or spends the ward's money on things
+    like cars or dining.
+  areas:
+  - VA
+  typology: Abusive guardianship
+  status: verified
+  sources:
+  - title: 'Elder Abuse: The Extent of Abuse by Guardians Is Unknown, but Some Measures Exist to Help
+      Protect Older Adults (GAO-17-33)'
+    publisher: US Government Accountability Office
+    year: '2016'
+    url: https://gao.gov/products/gao-17-33
+    quote: The extent of elder abuse by guardians nationally is unknown due to limited data on key factors
+      related to elder abuse by a guardian
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: GAO-17-33
+    publisher: US Government Accountability Office
+    year: '2016'
+    url: https://gao.gov/products/gao-17-33
+    quote: The extent of elder abuse by guardians nationally is unknown due to limited data on key factors
+      related to elder abuse by a guardian
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Guardianship accountings show fees exceeding the ward's income (Nevada, April Parks case)
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Payment
+  - Document
+  - Company
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Probate / guardianship court files and annual accountings
+  - State professional guardian licensing boards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: GAO identifies financial exploitation as one of the most common types of abuse by guardians
+    source_url: https://gao.gov/products/gao-17-33
+  innocent_explanations:
+  - Complex estates legitimately cost more to administer
+  - Court-approved fees and expenses for the ward's own needs
+  version: 1
+not_reached:
+- NCEA web pages (blocked by robots.txt in an earlier pass); only the NCEA 'Signs of Elder Abuse' PDF
+  was read
+- CMS State Operations Manual Appendix PP (F600-F610 interpretive guidance and abuse indicators) was not
+  opened
+- Full list of the 580 high-risk diagnosis codes in OIG A-01-16-00509 is not in the report body; the 12
+  Early Alert codes are in Appendix C and were not extracted
+- CPS original press release on Winterbourne View sentencing (blog.cps.gov.uk) was not opened; used the
+  Inner Temple Library excerpt citing it
+- Prof. Glynis Murphy's full Whorlton Hall reports (Feb and Dec 2020) were not opened; only CQC's news
+  release
+- BBC primary report of the Whorlton Hall verdicts not opened; used Patient Safety Learning hub summary
+  citing BBC
+- CMS 2024 minimum staffing rule (3.48 hours per resident day) and its December 2025 repeal were seen
+  only in search results, so no staffing number threshold is given
+- Rehabilitation Center at Hollywood Hills (Hurricane Irma deaths, 2017) court outcomes not verified,
+  so not included
+- No published numeric threshold for restraint frequency, staff turnover or staffing found in the sources
+  read
+- Self-neglect indicators (SCIE) not included because they fall outside institutional care; available
+  at the SCIE page if wanted
+- Disability abuse in US psychiatric residential facilities (e.g. GAO or Senate reports) not researched
+  in this pass

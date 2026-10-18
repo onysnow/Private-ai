@@ -1,0 +1,1546 @@
+key: AN
+name: Animal cruelty and welfare abuse
+scope: Neglect, hoarding, dogfighting, puppy mills, roadside zoos, abuse of lab and farm animals.
+indicators:
+- id: AN-001
+  name: Fighting-type dogs with multiple scars or torn ears and lips
+  definition: Several dogs of fighting breeds on one property show repeated scarring or injuries of the
+    kind fighting produces.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: Dogfighting
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/dogfighting
+    locator: How to Spot Signs of Dogfighting
+    quote: Pit bull-mix-type dogs with multiple scars, possibly with lips or ears ripped off
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+    publisher: US Department of Justice
+    year: '2025'
+    url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    quote: Many of the dogs had recent injuries and scars consistent with dog fighting.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Neighbour photos or rescue intake records showing many scarred pit bull-type dogs at one address
+  cases:
+  - name: United States v. Dun Bradford
+    year: '2025'
+    jurisdiction: US federal (Middle District of Georgia)
+    what_happened: Found guilty of 67 counts of possessing dogs for use in an animal fighting venture
+      plus drug and firearm counts; 67 dogs rescued, many with injuries and scars consistent with dog
+      fighting.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    source_title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+  data_needed:
+  - Address
+  - Person
+  - Event
+  - Document
+  - Note
+  checkable: person
+  lookup_sources:
+  - Animal control and shelter intake records
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Dogs adopted from shelters or rescues already carrying old injuries
+  - Injuries from accidental fights between household dogs
+  - Owner fostering previously seized fighting dogs
+  jurisdictions: US
+  version: 1
+- id: AN-002
+  name: Dogs on heavy chains, tethered to axles or barrels, chained inches apart
+  definition: Many dogs are kept on heavy chains fixed to tire axles, dog houses or barrels, placed just
+    out of reach of each other.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: Dogfighting
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/dogfighting
+    locator: How to Spot Signs of Dogfighting
+    quote: Dogs on heavy chains, tethered to a tire axle or dog house/barrel
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dogfighting
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/dogfighting
+    locator: How to Spot Signs of Dogfighting
+    quote: Dogs chained inches apart from one another
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+    publisher: US Department of Justice
+    year: '2025'
+    url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    quote: Agents rescued 67 dogs on chains, many without food, water, or shelter.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Aerial or street imagery showing rows of dog houses with chained dogs spaced just apart
+  cases:
+  - name: United States v. Dun Bradford
+    year: '2025'
+    jurisdiction: US federal (Middle District of Georgia)
+    what_happened: Officers saw many pit bull type dogs on heavy chains outside the residence; 67 dogs
+      rescued.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    source_title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+  data_needed:
+  - Address
+  - Document
+  - Event
+  - Person
+  checkable: records
+  lookup_sources:
+  - Satellite and street-level imagery
+  - Local tethering ordinance complaints
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rural owners who tether working or guard dogs
+  - Legitimate multi-dog households lacking fencing
+  - Sled-dog or hunting-dog kennels that use tethering
+  jurisdictions: US
+  version: 1
+- id: AN-003
+  name: Dogs penned or chained out of public view
+  definition: Dogs are kept chained or penned in a secluded area, or in urban settings in hidden indoor
+    spaces such as basements.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: Dogfighting
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/dogfighting
+    locator: How to Spot Signs of Dogfighting
+    quote: Dogs chained or penned in a secluded area out of the public's view
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Reports of many dogs heard but not seen in a basement or rear lot
+  cases: []
+  data_needed:
+  - Address
+  - Note
+  - Event
+  checkable: person
+  lookup_sources:
+  - Neighbour accounts
+  - Animal control complaint logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Privacy-conscious owners or rural properties
+  - Dogs kept indoors because of noise complaints or weather
+  jurisdictions: US
+  version: 1
+- id: AN-004
+  name: Fighting records, veterinary drugs and steroids held alongside many dogs
+  definition: A site with many fighting-type dogs also holds pedigrees recording fight history, self-administered
+    veterinary drugs, steroids or forced-breeding equipment.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+    publisher: US Department of Justice
+    year: '2025'
+    url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    quote: paper pedigrees documenting the fighting history of the dogs
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+    publisher: US Department of Justice
+    year: '2025'
+    url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    quote: veterinary drugs and devices; anabolic horse steroids
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Seizure inventory listing pedigrees with fight records and veterinary supplies
+  cases:
+  - name: United States v. Dun Bradford
+    year: '2025'
+    jurisdiction: US federal (Middle District of Georgia)
+    what_happened: Shed held veterinary drugs, anabolic horse steroids, pedigrees documenting fighting
+      history and a breeding stand.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    source_title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+  data_needed:
+  - Document
+  - CourtCase
+  - Address
+  - Person
+  checkable: records
+  lookup_sources:
+  - Court filings and search-warrant inventories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Livestock owners hold veterinary drugs lawfully
+  - Show breeders keep detailed pedigrees
+  jurisdictions: US
+  version: 1
+- id: AN-005
+  name: Animal fighting co-located with drugs, firearms or gambling
+  definition: Animal fighting activity appears together with illegal gambling, drug dealing, illegal firearms
+    or other crime.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: Dogfighting
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/dogfighting
+    locator: The Criminal, Underground World of Dogfighting
+    quote: Dogfighting is often associated with other forms of criminal activity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Animal Welfare
+    publisher: US DOJ Environment and Natural Resources Division
+    url: https://www.justice.gov/enrd/animal-welfare
+    quote: frequently attract other criminal activities, including drug trafficking, unlawful possession
+      of firearms
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is the Link?
+    publisher: National Link Coalition
+    url: https://nationallinkcoalition.org/faqs/what-is-the-link
+    quote: When animals are abused, people are at risk; when people are abused, animals are at risk.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Dog fighting search warrant that also recovers crack cocaine and guns
+  cases:
+  - name: United States v. Dun Bradford
+    year: '2025'
+    jurisdiction: US federal (Middle District of Georgia)
+    what_happened: Convicted on dog fighting counts plus manufacturing crack cocaine with intent to distribute
+      and possessing a firearm in furtherance of a crime.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    source_title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+  data_needed:
+  - CourtCase
+  - Person
+  - Address
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Police incident data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: DOJ ENRD and the Bradford case tie dog fighting to drug trafficking.
+    source_url: https://www.justice.gov/enrd/animal-welfare
+  - target_area: OC
+    reason: DOJ ENRD lists unlawful firearm possession alongside fighting ventures.
+    source_url: https://www.justice.gov/enrd/animal-welfare
+  - target_area: OC
+    reason: ASPCA links dogfighting to illegal gambling.
+    source_url: https://www.aspca.org/animal-cruelty/dogfighting
+  innocent_explanations:
+  - Separate unrelated offences by different household members
+  - Lawfully owned firearms at a property with dogs
+  jurisdictions: US
+  version: 1
+- id: AN-006
+  name: Kennel selling dogs from fighting bloodlines or stud fees across the country
+  definition: A kennel breeds, sells, transports or charges stud fees for dogs marketed on fighting bloodlines,
+    which federal law bars when done for an animal fighting venture.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: 7 U.S.C. 2156 Animal fighting venture prohibition
+    publisher: Cornell LII (US Code)
+    url: https://www.law.cornell.edu/uscode/text/7/2156
+    locator: subsection (b)
+    quote: knowingly sell, buy, possess, train, transport, deliver, or receive any animal
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Former NFL Player Sentenced to 5 Years in Prison for Operating Large-Scale Dog Fighting and
+      Trafficking Venture
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/former-nfl-player-sentenced-5-years-prison-operating-large-scale-dog-fighting-and
+    quote: Authorities seized 190 dogs from his property
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Named kennel advertising puppies from 'champion' fighting lines and stud services nationally
+  cases:
+  - name: United States v. LeShon Johnson
+    year: '2026'
+    jurisdiction: US federal (Eastern District of Oklahoma)
+    what_happened: Convicted at trial of six dog fighting-related charges; 190 dogs seized; sold dogs
+      from fighting bloodlines and stud fees; sentenced to 60 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-nfl-player-sentenced-5-years-prison-operating-large-scale-dog-fighting-and
+    source_title: Former NFL Player Sentenced to 5 Years in Prison for Operating Large-Scale Dog Fighting
+      and Trafficking Venture
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - Online classified and social media listings
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful breeders of bull-breed dogs selling for companionship or show
+  - Stud fees are common in legitimate breeding
+  jurisdictions: US
+  version: 1
+- id: AN-007
+  name: Repeat animal-fighting offender running a renamed kennel
+  definition: A person with a past animal-fighting conviction operates a new or renamed kennel breeding
+    or selling fighting-type dogs.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: Former NFL Player Sentenced to 5 Years in Prison for Operating Large-Scale Dog Fighting and
+      Trafficking Venture
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/former-nfl-player-sentenced-5-years-prison-operating-large-scale-dog-fighting-and
+    quote: pleaded guilty in 2004 to Oklahoma dog fighting offenses
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Defendant previously ran one named kennel, later operated under a different kennel name
+  cases:
+  - name: United States v. LeShon Johnson
+    year: '2026'
+    jurisdiction: US federal (Eastern District of Oklahoma)
+    what_happened: Previously pleaded guilty to state dog fighting offences in 2004 after running Krazyside
+      Kennels; later ran Mal Kant Kennels and was convicted federally.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-nfl-player-sentenced-5-years-prison-operating-large-scale-dog-fighting-and
+    source_title: Former NFL Player Sentenced to 5 Years in Prison
+  data_needed:
+  - Person
+  - Company
+  - CourtCase
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - State and federal court records
+  - Business and kennel-name registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rehabilitated person lawfully keeping pets
+  - Name match to a different person
+  jurisdictions: US
+  version: 1
+- id: AN-008
+  name: Animals advertised for fighting by mail or online
+  definition: Animals are advertised, or a fight is promoted, through the postal service or any interstate
+    channel such as the internet.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: 7 U.S.C. 2156
+    publisher: Cornell LII (US Code)
+    url: https://www.law.cornell.edu/uscode/text/7/2156
+    locator: subsection (c)
+    quote: for purposes of advertising an animal
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Online posts offering 'game-bred' dogs or roosters with fight records
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Online marketplaces and social media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legal sale of breeding stock in jurisdictions where buyers keep them as pets or show birds
+  jurisdictions: US
+  version: 1
+- id: AN-009
+  name: Gaffs, knives or other blades for birds' legs bought or sold
+  definition: Sharp instruments designed to be attached to a bird's leg are traded or carried, a federal
+    offence linked to cockfighting.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: 7 U.S.C. 2156
+    publisher: Cornell LII (US Code)
+    url: https://www.law.cornell.edu/uscode/text/7/2156
+    locator: subsection (d)
+    quote: knowingly sell, buy, transport, or deliver in interstate or foreign commerce a knife, a gaff,
+      or any other sharp instrument
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Massachusetts Man Sentenced for Cockfighting
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/massachusetts-man-sentenced-cockfighting
+    quote: gaffs or other sharp instruments
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Customs or postal seizure of gaff shipments
+  cases:
+  - name: United States v. Jose Rivera
+    year: '2026'
+    jurisdiction: US federal (District of Rhode Island)
+    what_happened: Pleaded guilty to an Animal Welfare Act violation for a 2022 cockfighting operation,
+      admitting he brought gaffs; sentenced to two years probation.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/massachusetts-man-sentenced-cockfighting
+    source_title: Massachusetts Man Sentenced for Cockfighting
+  data_needed:
+  - Payment
+  - Document
+  - Person
+  - Event
+  checkable: records
+  lookup_sources:
+  - Customs and postal seizure records
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Antique or collector items
+  - Mislabelled general-purpose blades
+  jurisdictions: US
+  version: 1
+- id: AN-010
+  name: Children brought to animal fights
+  definition: Minors under 16 are taken to animal fighting events, which federal law makes a separate
+    offence and DOJ treats as child endangerment.
+  areas:
+  - AN
+  typology: Organised animal fighting
+  status: verified
+  sources:
+  - title: 7 U.S.C. 2156
+    publisher: Cornell LII (US Code)
+    url: https://www.law.cornell.edu/uscode/text/7/2156
+    locator: subsection (a)(2)(B)
+    quote: knowingly cause an individual who has not attained the age of 16 to attend an animal fighting
+      venture.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is the Link?
+    publisher: National Link Coalition
+    url: https://nationallinkcoalition.org/faqs/what-is-the-link
+    quote: the first warning sign of an individual or family in trouble
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Raid reports noting children among spectators
+  cases: []
+  data_needed:
+  - Event
+  - Person
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Child protective services referrals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: DOJ ENRD lists child endangerment among crimes accompanying fighting ventures.
+    source_url: https://www.justice.gov/enrd/animal-welfare
+  innocent_explanations:
+  - Children present at a lawful agricultural or animal show misreported as a fight
+  jurisdictions: US
+  version: 1
+- id: AN-011
+  name: Visibly emaciated animals
+  definition: Animals are so thin that bones show.
+  areas:
+  - AN
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Recognizing and Reporting Animal Cruelty and Neglect
+    publisher: ASPCA
+    url: https://www.aspca.org/investigations-rescue/recognizing-and-reporting-animal-cruelty-and-neglect
+    locator: Physical signs
+    quote: Extreme thinness or emaciation—bones may be visible.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rescue intake body-condition scores for animals from one property
+  cases: []
+  data_needed:
+  - Address
+  - Person
+  - Document
+  checkable: person
+  lookup_sources:
+  - Animal control and shelter intake records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Old age or chronic illness under veterinary care
+  - Recently rescued animal still recovering
+  - Owner in sudden financial hardship
+  jurisdictions: Any
+  version: 1
+- id: AN-012
+  name: Untreated injury, illness or embedded collar
+  definition: An animal has open wounds, broken bones, illness, or a collar grown into its neck with no
+    treatment.
+  areas:
+  - AN
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Recognizing and Reporting Animal Cruelty and Neglect
+    publisher: ASPCA
+    url: https://www.aspca.org/investigations-rescue/recognizing-and-reporting-animal-cruelty-and-neglect
+    locator: Physical signs
+    quote: Signs of an illness or injury that is not being treated, including open wounds or broken bones.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Recognizing and Reporting Animal Cruelty and Neglect
+    publisher: ASPCA
+    url: https://www.aspca.org/investigations-rescue/recognizing-and-reporting-animal-cruelty-and-neglect
+    locator: Physical signs
+    quote: A tight collar that has caused a wound or has become embedded in the animal's neck.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Animal Welfare Act 2006, section 9
+    publisher: UK legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2006/45/section/9
+    locator: s.9(2)
+    quote: its need to be protected from pain, suffering, injury and disease
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Veterinary or shelter records of embedded-collar cases
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Document
+  checkable: person
+  lookup_sources:
+  - Shelter and veterinary records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Recent injury before the owner could reach a vet
+  - Stray animal not owned by the household
+  jurisdictions: Any
+  version: 1
+- id: AN-013
+  name: Heavy parasites, severe matting or overgrown nails
+  definition: An animal's coat is infested with fleas or ticks, badly matted, or its nails are so long
+    it cannot walk normally.
+  areas:
+  - AN
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Recognizing and Reporting Animal Cruelty and Neglect
+    publisher: ASPCA
+    url: https://www.aspca.org/investigations-rescue/recognizing-and-reporting-animal-cruelty-and-neglect
+    locator: Physical signs
+    quote: Fur infested with fleas, ticks or other parasites.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Groomer or shelter reports
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Note
+  checkable: person
+  lookup_sources:
+  - Shelter intake records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Owner illness or disability
+  - Animal that resists grooming
+  - Seasonal parasite outbreak
+  jurisdictions: Any
+  version: 1
+- id: AN-014
+  name: Animals left outside without food, water or shelter
+  definition: Animals are confined outdoors for long periods without adequate food, water or protection
+    from bad weather.
+  areas:
+  - AN
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Recognizing and Reporting Animal Cruelty and Neglect
+    publisher: ASPCA
+    url: https://www.aspca.org/investigations-rescue/recognizing-and-reporting-animal-cruelty-and-neglect
+    locator: Environmental signs
+    quote: Animals confined outside in inclement weather without access to adequate shelter.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Recognizing and Reporting Animal Cruelty and Neglect
+    publisher: ASPCA
+    url: https://www.aspca.org/investigations-rescue/recognizing-and-reporting-animal-cruelty-and-neglect
+    locator: Environmental signs
+    quote: Animals confined outside for long periods of time without adequate food or water.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated welfare-check calls to one address during cold snaps
+  cases:
+  - name: United States v. Dun Bradford
+    year: '2025'
+    jurisdiction: US federal (Middle District of Georgia)
+    what_happened: 67 dogs rescued on chains, many without food, water or shelter.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/georgia-man-guilty-69-counts-dog-fighting-case
+    source_title: Georgia Man Guilty of 69 Counts in Dog Fighting Case
+  data_needed:
+  - Address
+  - Event
+  - Note
+  checkable: records
+  lookup_sources:
+  - Animal control call logs
+  - Local tethering and shelter ordinances
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Livestock and working dogs adapted to outdoor living
+  - Temporary absence of owner with caretaker arranged
+  jurisdictions: Any
+  version: 1
+- id: AN-015
+  name: Filthy or undersized confinement
+  definition: Animals are kept in spaces littered with waste or hazards, or in cages too small to stand,
+    turn and move normally.
+  areas:
+  - AN
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Recognizing and Reporting Animal Cruelty and Neglect
+    publisher: ASPCA
+    url: https://www.aspca.org/investigations-rescue/recognizing-and-reporting-animal-cruelty-and-neglect
+    locator: Environmental signs
+    quote: Animals confined to a space that is littered with feces, urine, garbage, broken glass or other
+      objects that could harm them.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Animal Welfare Act 2006, section 9
+    publisher: UK legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2006/45/section/9
+    locator: s.9(2)
+    quote: its need for a suitable environment
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection report noting cages that prevent normal movement
+  cases: []
+  data_needed:
+  - Address
+  - Document
+  - Company
+  checkable: records
+  lookup_sources:
+  - USDA APHIS inspection reports
+  - Local animal control records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Temporary crating for transport or recovery
+  - Cleaning not yet done on the day of inspection
+  jurisdictions: Any
+  version: 1
+- id: AN-016
+  name: Person seen striking or physically abusing an animal
+  definition: A witness sees someone hitting or otherwise physically abusing an animal.
+  areas:
+  - AN
+  typology: Intentional cruelty
+  status: verified
+  sources:
+  - title: Recognizing and Reporting Animal Cruelty and Neglect
+    publisher: ASPCA
+    url: https://www.aspca.org/investigations-rescue/recognizing-and-reporting-animal-cruelty-and-neglect
+    locator: Physical signs
+    quote: A person striking or otherwise physically abusing an animal.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Video posted by neighbours
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Witness accounts
+  - Police reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Misread restraint during a dog fight or medical handling
+  - Edited or out-of-context video
+  jurisdictions: Any
+  version: 1
+- id: AN-017
+  name: Animal cruelty recorded alongside family violence (the Link)
+  definition: Police or agency records show animal cruelty offences (gross neglect, torture, organised
+    abuse or sexual abuse) at a household or by a person also linked to violence against people.
+  areas:
+  - AN
+  typology: Link to human violence
+  status: verified
+  sources:
+  - title: Tracking Animal Cruelty
+    publisher: FBI
+    year: '2016'
+    url: https://www.fbi.gov/news/stories/-tracking-animal-cruelty
+    quote: If somebody is harming an animal, there is a good chance they also are hurting a human,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Tracking Animal Cruelty
+    publisher: FBI
+    year: '2016'
+    url: https://www.fbi.gov/news/stories/-tracking-animal-cruelty
+    quote: If somebody is harming an animal, there is a good chance they also are hurting a human,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is the Link?
+    publisher: National Link Coalition
+    url: https://nationallinkcoalition.org/faqs/what-is-the-link
+    quote: When animals are abused, people are at risk; when people are abused, animals are at risk.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - NIBRS animal cruelty incidents at an address with domestic-violence calls
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - CourtCase
+  - Event
+  - Family
+  checkable: records
+  lookup_sources:
+  - FBI NIBRS / Crime Data Explorer
+  - Local police incident records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FBI and National Sheriffs' Association statements and the Link Coalition tie animal abuse
+      to domestic violence and child abuse.
+    source_url: https://www.fbi.gov/news/stories/-tracking-animal-cruelty
+  innocent_explanations:
+  - Shared address with unrelated occupants
+  - Victim harmed an animal while protecting it or under coercion (described by the Link Coalition)
+  - Coincidental records
+  jurisdictions: US (NIBRS); concept applies widely
+  version: 1
+- id: AN-018
+  name: Unusual number of animals, count unknown to keeper
+  definition: A person keeps far more animals than normal and may not know how many they have.
+  areas:
+  - AN
+  typology: Animal hoarding
+  status: verified
+  sources:
+  - title: Animal Hoarding
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/animal-hoarding
+    locator: Signs a Person May Be Hoarding Animals
+    quote: The person owns an unusual number of animals.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Animal Hoarding
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/animal-hoarding
+    locator: Signs a Person May Be Hoarding Animals
+    quote: In some cases, the person may not know the total number of animals in their care.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Animal control seizure of dozens of cats from one house
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Event
+  checkable: records
+  lookup_sources:
+  - Pet licence counts
+  - Animal control records
+  - Local animal-limit ordinances
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licensed breeders, sanctuaries or farms
+  - Temporary foster surge after a disaster
+  jurisdictions: Any
+  version: 1
+- id: AN-019
+  name: Keeper unable to meet minimum care standards
+  definition: A keeper cannot provide even minimal nutrition, sanitation, shelter and veterinary care
+    for the animals held.
+  areas:
+  - AN
+  typology: Animal hoarding
+  status: verified
+  sources:
+  - title: Animal Hoarding
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/animal-hoarding
+    locator: Signs a Person May Be Hoarding Animals
+    quote: The person is unable to provide minimal standards of nutrition, sanitation, shelter and veterinary
+      care for the animals.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Animal welfare
+    publisher: World Organisation for Animal Health (WOAH)
+    url: https://www.woah.org/en/what-we-do/animal-health-and-welfare/animal-welfare/
+    quote: Freedom from hunger, malnutrition and thirst
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Emaciated, lethargic or under-socialised animals and fleas or vermin found together
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - Animal control and code enforcement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sudden illness, job loss or bereavement of the keeper
+  - Rescue overwhelmed by an emergency intake
+  jurisdictions: Any
+  version: 1
+- id: AN-020
+  name: Deteriorated property with strong odour, waste and vermin
+  definition: The home is visibly run down, smells strongly, has waste on floors and fleas or vermin present.
+  areas:
+  - AN
+  typology: Animal hoarding
+  status: verified
+  sources:
+  - title: Animal Hoarding
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/animal-hoarding
+    locator: Signs a Person May Be Hoarding Animals
+    quote: The home or property has deteriorated
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Code-enforcement or condemnation orders on a house with many animals
+  cases: []
+  data_needed:
+  - Address
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Municipal code-enforcement records
+  - Health department complaints
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - General poverty or housing disrepair unrelated to animals
+  - Owner disability
+  jurisdictions: Any
+  version: 1
+- id: AN-021
+  name: Isolated keeper neglecting self as well as animals
+  definition: The person keeping the animals is cut off from social support and neglects their own wellbeing,
+    sometimes refusing help.
+  areas:
+  - AN
+  typology: Animal hoarding
+  status: verified
+  sources:
+  - title: Animal Hoarding
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/animal-hoarding
+    locator: Signs a Person May Be Hoarding Animals
+    quote: The person may be isolated from social support and may neglect themselves or appear physically
+      or mentally unwell.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is the Link?
+    publisher: National Link Coalition
+    url: https://nationallinkcoalition.org/faqs/what-is-the-link
+    quote: the first warning sign of an individual or family in trouble
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Adult protective services case at the same address as an animal seizure
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Note
+  checkable: person
+  lookup_sources:
+  - Adult protective services (where reportable)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: The Link Coalition ties hoarding, especially by elders, to self-neglect and mental illness.
+    source_url: https://nationallinkcoalition.org/faqs/what-is-the-link
+  innocent_explanations:
+  - Elderly owner with limited money, transport or mobility (noted by the Link Coalition)
+  - Temporary illness
+  jurisdictions: Any
+  version: 1
+- id: AN-022
+  name: Rescue or shelter that refuses visitors and will not disclose its animal count
+  definition: A rescue group bars visitors from where animals are kept, will not say how many animals
+    it has and makes little effort to adopt them out.
+  areas:
+  - AN
+  typology: Rescue hoarding
+  status: verified
+  sources:
+  - title: Animal Hoarding
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/animal-hoarding
+    locator: Signs a Rescue Group or Shelter May Be Hoarding
+    quote: Legitimate shelters and rescue organizations may be viewed as an enemy.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rescue that only meets adopters in car parks and refuses facility tours
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Person
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - IRS Form 990 and state charity registries
+  - State shelter or rescue licensing
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Rescue hoarding and puppy laundering both use nonprofit status as cover.
+    source_url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+  innocent_explanations:
+  - Disease quarantine or biosecurity rules
+  - Foster-based rescues with no central facility
+  - Volunteer safety concerns
+  jurisdictions: Any
+  version: 1
+- id: AN-023
+  name: Rescue keeps taking animals despite poor conditions or hands them over at remote sites
+  definition: A rescue continues intake while its animals are in poor condition, or receives and releases
+    animals at off-site locations so visitors never see the facility.
+  areas:
+  - AN
+  typology: Rescue hoarding
+  status: verified
+  sources:
+  - title: Animal Hoarding
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/animal-hoarding
+    locator: section heading; lists continued intake despite poor condition and animals received at a
+      remote site
+    quote: More animals are continually taken in, despite the poor condition of existing animals.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rising intake figures with no matching adoption figures in annual filings
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Address
+  checkable: records
+  lookup_sources:
+  - Charity annual filings
+  - State shelter reporting where required
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transport rescues that legitimately meet adopters at hand-off points
+  - Emergency intake after disasters
+  jurisdictions: Any
+  version: 1
+- id: AN-024
+  name: Puppy laundering through phony nonprofits
+  definition: Commercially bred puppies are passed through sham nonprofit groups and marketed as rescues
+    or adoptable animals.
+  areas:
+  - AN
+  typology: Puppy mills and commercial breeding
+  status: verified
+  sources:
+  - title: The Problem with Pet Sellers
+    publisher: ASPCA
+    url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+    locator: Puppy Laundering
+    quote: funneling puppy mill-bred puppies through phony nonprofit organizations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - '''Rescue'' whose stock is mostly young purebred puppies sourced from commercial breeders or auctions'
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Payment
+  - Ownership
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - IRS Tax Exempt Organization Search
+  - State corporation registries
+  - USDA APHIS licensee search
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: ASPCA describes sham nonprofits used to market commercial puppies.
+    source_url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+  innocent_explanations:
+  - Genuine rescues that pull surplus puppies from breeders or auctions to save them
+  jurisdictions: US
+  version: 1
+- id: AN-025
+  name: Seller relies on 'USDA-licensed', AKC papers or 'no puppy mill' claims
+  definition: A pet seller answers welfare questions mainly by pointing to USDA licensing, registry papers
+    or 'no puppy mill' promises that buyers cannot verify.
+  areas:
+  - AN
+  typology: Puppy mills and commercial breeding
+  status: verified
+  sources:
+  - title: The Problem with Pet Sellers
+    publisher: ASPCA
+    url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+    locator: USDA Licensing Statements
+    quote: these claims offer no guarantee that the puppies are indeed healthy
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Pet store signage stating all breeders are USDA-licensed
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - USDA APHIS Animal Care Public Search Tool (cross-check named breeders' inspection reports)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Responsible breeders also hold licences and registry papers
+  jurisdictions: US
+  version: 1
+- id: AN-026
+  name: Puppies sold on lease or high-fee finance
+  definition: A seller offers puppies through lease agreements or financing that inflate the price and
+    leave ownership with the lender until paid off.
+  areas:
+  - AN
+  typology: Puppy mills and commercial breeding
+  status: verified
+  sources:
+  - title: The Problem with Pet Sellers
+    publisher: ASPCA
+    url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+    locator: Leasing and Financing
+    quote: the pets in question are not owned by their new families until the lease is up.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Pet store contracts with third-party pet-lease lenders
+  cases: []
+  data_needed:
+  - Contract
+  - Company
+  - Payment
+  checkable: records
+  lookup_sources:
+  - State attorney general consumer complaints
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: ASPCA flags lease pricing as padding the purchase price.
+    source_url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+  innocent_explanations:
+  - Ordinary consumer credit used for expensive purchases
+  jurisdictions: US
+  version: 1
+- id: AN-027
+  name: Online puppy sales with no-show, sick or substituted animals
+  definition: A seller sells puppies online sight unseen and attracts complaints of buyers never receiving
+    the puppy, getting a sick puppy or a different one.
+  areas:
+  - AN
+  typology: Puppy mills and commercial breeding
+  status: verified
+  sources:
+  - title: The Problem with Pet Sellers
+    publisher: ASPCA
+    url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+    locator: Online Sales
+    quote: there are thousands of reports of consumers who lost thousands of dollars and never got their
+      puppy
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cluster of complaints about one website
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Document
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Consumer complaint databases
+  - Domain registration records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: ASPCA notes non-delivery losses in online puppy sales.
+    source_url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+  innocent_explanations:
+  - Shipping delays or genuine illness after sale
+  - Impersonation of a legitimate breeder by scammers
+  jurisdictions: Any
+  version: 1
+- id: AN-028
+  name: Breeder or dealer above the licence exemption with no AWA licence
+  definition: A person operating as a dealer, exhibitor or auction operator, or keeping more than four
+    breeding females and selling as a dealer, holds no USDA Animal Welfare Act licence.
+  areas:
+  - AN
+  typology: Licensing and regulatory compliance
+  status: verified
+  sources:
+  - title: 9 CFR 2.1 Requirements and application
+    publisher: Cornell LII (Code of Federal Regulations)
+    url: https://www.law.cornell.edu/cfr/text/9/2.1
+    locator: § 2.1(a)(1); exemptions in § 2.1(a)(3)
+    quote: No person shall operate as a dealer, exhibitor, or operator of an auction sale, without a valid
+      license, except persons who are exempt from the licensing requirements under paragraph (a)(3) of
+      this section.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Prepare for an inspection / annual inspection reports
+    publisher: USDA APHIS
+    url: https://www.aphis.usda.gov/awa/annual-inspection-reports
+    locator: Inspections
+    quote: Focused inspections based on public complaints or allegations of unlicensed activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Online seller with many litters per year not found in the APHIS licensee list
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - USDA APHIS Animal Care Public Search Tool (licensee list)
+  - State breeder licensing registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: More than four breeding female dogs, cats or small exotic mammals and selling as a dealer,
+      or acting as dealer/exhibitor/auction operator, with no valid licence
+    threshold_source: https://www.law.cornell.edu/cfr/text/9/2.1
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Retail pet stores selling directly to the public are exempt
+  - Hobby breeders with four or fewer breeding females selling their own offspring
+  - State licence held instead where federal licence not required
+  jurisdictions: US
+  version: 1
+- id: AN-029
+  name: Repeat Animal Welfare Act noncompliance or enforcement history
+  definition: A licensed or registered facility (breeder, dealer, exhibitor, roadside zoo or research
+    facility) shows repeated noncompliances, teachable moments or enforcement actions in USDA records.
+  areas:
+  - AN
+  typology: Licensing and regulatory compliance
+  status: verified
+  sources:
+  - title: Prepare for an inspection / annual inspection reports
+    publisher: USDA APHIS
+    url: https://www.aphis.usda.gov/awa/annual-inspection-reports
+    locator: Inspections
+    quote: USDA inspects research facilities that use regulated animals at least once a year.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Attorney General Bondi Announces Department of Justice Prioritization of Animal Welfare
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/attorney-general-bondi-announces-department-justice-prioritization-animal-welfare-0
+    quote: remove chronic violators from the industry
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Animal Welfare Act
+    publisher: USDA APHIS
+    url: https://www.aphis.usda.gov/awa
+    quote: set standards for the humane care and treatment of certain animals exhibited to the public
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Same dealer cited across several consecutive inspection reports for veterinary care and housing
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Address
+  - Document
+  - Sanction
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - USDA APHIS Animal Care Public Search Tool (inspection reports, enforcement actions, teachable moments,
+    research facility annual reports)
+  - USDA FOIA portal
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Minor paperwork citations later corrected
+  - More frequent inspection of large facilities produces more records
+  - Inspection frequency itself depends on compliance history, not only on severity
+  jurisdictions: US
+  version: 1
+- id: AN-030
+  name: Animal crush content commissioned or distributed through online groups
+  definition: Videos of animals being deliberately and seriously harmed are commissioned, paid for or
+    shared through online chat and payment groups, a federal offence.
+  areas:
+  - AN
+  typology: Online animal cruelty content
+  status: verified
+  sources:
+  - title: 18 U.S.C. 48 Animal crushing
+    publisher: Cornell LII (US Code)
+    url: https://www.law.cornell.edu/uscode/text/18/48
+    locator: § 48(a)(3)
+    quote: sell, market, advertise, exchange, or distribute an animal crush video
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Illinois Woman Sentenced to 31 Months in Prison for Distributing and Conspiring to Create and
+      Distribute Animal Crush Videos
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/illinois-woman-sentenced-31-months-prison-distributing-and-conspiring-create-and-distribute
+    quote: She was a member of several chat groups and private payment groups dedicated to the creation,
+      distribution, and discussion of sexual and violent videos depicting monkeys being tortured
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Private chat or payment groups organised around commissioning such videos
+  cases:
+  - name: United States v. Amanda Leigh Fourez
+    year: '2026'
+    jurisdiction: US federal (prosecuted by US Attorney's Office, Western District of Pennsylvania)
+    what_happened: Pleaded guilty to distributing animal crush videos and conspiracy to create and distribute
+      them; paid to commission videos and belonged to related chat and payment groups; sentenced to 31
+      months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/illinois-woman-sentenced-31-months-prison-distributing-and-conspiring-create-and-distribute
+    source_title: Illinois Woman Sentenced to 31 Months in Prison
+  data_needed:
+  - Person
+  - Payment
+  - Document
+  - Associate
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Platform transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: The DOJ case describes commissioning and distribution through online chat and payment groups.
+    source_url: https://www.justice.gov/opa/pr/illinois-woman-sentenced-31-months-prison-distributing-and-conspiring-create-and-distribute
+  innocent_explanations:
+  - Lawful veterinary, hunting, slaughter or pest-control footage (statutory exceptions exist)
+  - Researchers or moderators holding content for reporting
+  jurisdictions: US
+  version: 1
+- id: AN-031
+  name: Farmed animals confined in large numbers in barren industrial settings
+  definition: Farm animals are kept in very large numbers in barren, intensive housing that limits basic
+    welfare needs such as normal behaviour.
+  areas:
+  - AN
+  typology: Farm animal welfare
+  status: verified
+  sources:
+  - title: Farm Animal Welfare
+    publisher: ASPCA
+    url: https://www.aspca.org/animal-cruelty/farm-animal-welfare
+    quote: are confined in huge numbers in barren, industrial settings
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Animal welfare
+    publisher: World Organisation for Animal Health (WOAH)
+    url: https://www.woah.org/en/what-we-do/animal-health-and-welfare/animal-welfare/
+    quote: Freedom to express normal patterns of behaviour
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Animal Welfare Act 2006, section 9
+    publisher: UK legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2006/45/section/9
+    locator: s.9(2)
+    quote: its need to be able to exhibit normal behaviour patterns
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Permit records showing very large confined animal feeding operations
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - State environmental permits for confined animal feeding operations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: ASPCA describes factory farms as environmentally unsound and dangerous for public health.
+    source_url: https://www.aspca.org/animal-cruelty/farm-animal-welfare
+  innocent_explanations:
+  - Housing systems that are lawful and meet current industry or national standards
+  - Biosecurity requirements that justify indoor housing
+  jurisdictions: Any
+  version: 1
+not_reached:
+- WebSearch budget for this turn was exhausted after the first query, so the work used only direct WebFetch
+  of known or likely URLs. A follow-up run with search could widen coverage.
+- 'USDA OIG audit 33002-4-SF (2010) on APHIS inspections of problematic dealers: usda.gov blocked it via
+  robots.txt; the oversight.gov mirror did not respond. It is the main primary source for repeat-violator
+  and penalty-discounting indicators.'
+- 'APHIS regulatory enforcement page and Animal Care Inspection Guide (definitions of direct, critical
+  and repeat noncompliance and teachable moments): returned 403 or a server error. Thresholds for AN-029
+  could not be sourced.'
+- 'FSIS Directive 6900.2 on humane handling and egregious inhumane treatment at slaughter: 403. Slaughterhouse
+  indicators were not built.'
+- 'USFWS Big Cat Public Safety Act page: fetch error. Roadside zoo and cub-petting indicators were not
+  built.'
+- 'AVMA animal abuse and neglect recognition page: fetch error.'
+- 'Patronek 1999 animal hoarding study (Public Health Reports, PMC1308342): blocked by a CAPTCHA.'
+- 'FBI NIBRS user manual definitions of the four animal cruelty categories: no working URL found. Only
+  the category names from the FBI story are used.'
+- 'DOJ press releases for United States v. Envigo RMS (W.D. Va.) and United States v. Jeffrey Lowe / Tiger
+  King Park (E.D. Okla.): ENRD names both, but every guessed URL returned 404, so their outcomes are not
+  recorded. The WD Okla Joe Maldonado-Passage release also failed to fetch.'
+- ASPCA puppy mill pages (Puppy Mills 101, FAQ) returned no definition or condition list. ASPCA dogfighting
+  pages gave no paraphernalia terms or tiers of fighter.
+- National Link Coalition research statistics pages were not opened.
+- Lab animal indicators (pain category reporting, IACUC oversight) could not be sourced from the APHIS
+  page reached.

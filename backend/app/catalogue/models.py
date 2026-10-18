@@ -1,0 +1,251 @@
+"""The shape of one indicator and one glossary term.
+
+``extra="forbid"`` everywhere: a misspelt field in a YAML file is refused,
+not ignored. JSON Schema files in ``catalogue/schema/`` are exported from
+these models (``python tools/catalogue.py schema``), so the schema and the
+code cannot drift.
+"""
+
+from __future__ import annotations
+
+import re
+from datetime import date
+from enum import Enum
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+ID_PATTERN = re.compile(r"^[A-Z]{2}-\d{3}$")
+NUMBER = re.compile(
+    r"\d|\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|fifty|hundred|thousand|million|billion|half|percent|per cent)\b",
+    re.IGNORECASE,
+)
+# References to a law, article or report carry digits that are not thresholds
+# ("Article 4(3) of Directive (EU) 2024/1069"); they are removed before looking
+# for a number that needs a source.
+REFERENCE = re.compile(
+    r"\b(?:Article|Art\.|Directive|Regulation|Reg\.|Recommendation|Rec|Section|s\.|paragraph|para\.|Annex|Rule|indicator|indication|point|item|principle|chapter|§)\s*(?:\(EU\)\s*)?[\w()./-]*\d[\w()./-]*",
+    re.IGNORECASE,
+)
+
+
+# Years, page numbers and US Code citations ("2020 advisory p.3", "18 U.S.C. 152(1),(7)").
+OTHER_REFERENCES = re.compile(r"\b(?:fn|footnote|note)\.?\s*\d+|\b(?:19|20)\d{2}\b|\bpp?\.\s*\d+|\b\d+\s*U\.S\.C\.?\s*§?\s*[\d()a-z,\s]*", re.IGNORECASE)
+
+
+def has_threshold_number(*texts: str) -> bool:
+    """True when the text gives a quantity (a count, a share, an amount) rather
+    than only a reference to a law or report."""
+    return any(NUMBER.search(OTHER_REFERENCES.sub("", REFERENCE.sub("", text))) for text in texts)
+
+
+# Every area the catalogue covers. A cross-hint may point to any of them, even
+# before that area's file exists.
+AREAS: dict[str, str] = {
+    "ML": "Money laundering", "BO": "Hidden ownership and shell companies",
+    "SF": "Terrorist financing, proliferation financing and sanctions evasion", "FR": "Tax evasion and fraud",
+    "CO": "Corruption and influence", "PP": "Public procurement, non-profits and elections",
+    "HT": "Human trafficking and forced labour", "HR": "Human rights abuses, war crimes and cultural property",
+    "OC": "Organised crime and illicit goods", "EN": "Environmental crime", "IN": "Information integrity",
+    "CY": "Cybercrime and judging sources", "SA": "Safety of investigators, sources and witnesses",
+    # Added in the second research round (coverage check, 8 October 2026).
+    "VE": "Violent extremism and hate-motivated attacks", "ES": "Espionage and insider threat",
+    "EF": "Elder financial exploitation", "MA": "Securities market abuse", "AF": "Corporate accounting fraud",
+    "PD": "Prescription drug diversion", "LE": "Labour exploitation and wage theft",
+    "PM": "Police misconduct and state violence", "CA": "Child sexual abuse in institutions",
+    # Added 10 October 2026 at Ony's request.
+    "HO": "Homicide and suspicious deaths",
+    # Coverage round 3 (10 October 2026): checked against complete crime taxonomies.
+    "HC": "Health care harm and patient safety", "SV": "Sexual harassment and sexual violence against adults",
+    "CP": "Child protection failures and illicit adoption", "VA": "Abuse and neglect of older and disabled adults in care",
+    "WS": "Workplace, industrial and transport safety", "PS": "Unsafe products, food fraud and falsified medicines",
+    "PL": "Pollution and environmental health", "CF": "Consumer, housing and lending exploitation",
+    "DA": "Domestic abuse, coercive control and stalking", "DT": "Torture, arbitrary detention and enforced disappearance",
+    "TH": "Organised theft and fencing", "KX": "Kidnapping, extortion and protection rackets",
+    "CT": "Price-fixing and market-sharing cartels", "TR": "Transnational repression",
+    "AG": "Aggression, coups, insurrection and unlawful militias", "SP": "Sport integrity: doping and abuse of athletes",
+    "CG": "Cults and high-control groups", "AN": "Animal cruelty and welfare abuse",
+    "OH": "Online encouragement of suicide and self-harm",
+}
+
+# One plain line per area for people choosing an investigation's type (the
+# area files' "scope" is the research brief, not written for readers).
+AREA_SUMMARIES: dict[str, str] = {
+    "ML": "Moving criminal money so it looks clean: through trade, property, cash businesses or crypto.",
+    "BO": "Hiding who really owns or controls a company, trust or asset: shells, nominees, formation agents.",
+    "SF": "Paying for terrorism or weapons programmes, and getting round sanctions on land and at sea.",
+    "FR": "Tax evasion, investment and Ponzi schemes, and insurance, healthcare and bankruptcy fraud.",
+    "CO": "Bribes, kickbacks, conflicts of interest, lobbying, foreign influence and politically exposed people.",
+    "PP": "Rigged tenders and contracts, misused non-profits, and election and campaign-finance fraud.",
+    "HT": "Human trafficking, forced labour, migrant smuggling and child labour.",
+    "HR": "Human rights abuses and war crimes, conflict resources, and trafficking of cultural property.",
+    "OC": "Crime groups and their trades: drugs, arms, counterfeit goods, match-fixing and front businesses.",
+    "EN": "Wildlife trafficking, illegal fishing, logging and mining, waste trafficking and carbon-market fraud.",
+    "IN": "Disinformation and influence operations, fake accounts, and forged or manipulated documents.",
+    "CY": "Ransomware, online fraud and scam compounds, business email compromise and crypto fraud.",
+    "SA": "Danger to the people doing or helping an investigation.",
+    "VE": "Signs that someone is moving toward ideologically motivated or hate-motivated violence.",
+    "ES": "Spying and insider threats in organisations that hold national-security information.",
+    "EF": "Taking money or property from older people, often by carers, relatives or scammers.",
+    "MA": "Market manipulation and insider trading in shares and other securities.",
+    "AF": "Companies misstating their accounts: inflated sales, hidden costs, managed earnings.",
+    "PD": "Prescription drugs diverted to illegal use: pill mills, careless prescribing, stolen stock.",
+    "LE": "Underpaying or cheating workers short of forced labour, such as wage theft.",
+    "PM": "Misconduct and violence by police and other state officers.",
+    "CA": "Child sexual abuse in churches, schools, sport and care, and how institutions respond.",
+    "HO": "Murders and suspicious deaths: botched death probes, possible serial killings, wrongful convictions, contract killings.",
+    "HC": "Unsafe hospitals and units, dangerous practitioners, harmful medical devices and cover-ups of patient harm.",
+    "SV": "Sexual harassment and violence against adults, image-based abuse, and institutions that cover it up.",
+    "CP": "Children harmed while known to services, care-system failures, and illicit or fraudulent adoption.",
+    "VA": "Neglect and abuse of older and disabled people in care homes, at home and under guardianship.",
+    "WS": "Deaths and injuries at work, in industry and in transport, and safety rules ignored.",
+    "PS": "Dangerous products, food fraud, fake or falsified medicines and illicit alcohol.",
+    "PL": "Illegal pollution, faked emissions data and harm to people's health from the environment.",
+    "CF": "Predatory lending, abusive landlords, debt collection, discrimination and scams aimed at consumers.",
+    "DA": "Domestic abuse, coercive control, stalking, honour-based abuse and the missed warnings before harm.",
+    "DT": "Torture, ill-treatment and deaths in detention, secret detention and people made to disappear.",
+    "TH": "Organised theft rings, cargo and retail crime, and the people who sell on stolen goods.",
+    "KX": "Kidnapping for ransom, extortion and protection rackets.",
+    "CT": "Companies that fix prices, rig bids together or share out markets.",
+    "TR": "States reaching across borders to watch, threaten or harm critics and exiles.",
+    "AG": "Coups, insurrections, unlawful private armies and acts of aggression between states.",
+    "SP": "Doping in sport and abuse of athletes by coaches and sports bodies.",
+    "CG": "Coercive control by cults and high-control groups over members and their money.",
+    "AN": "Cruelty to animals, neglect in farming and breeding, and animal fighting.",
+    "OH": "Online spaces that encourage suicide or self-harm, as public-health bodies describe them.",
+}
+
+
+class Strict(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class Outcome(str, Enum):
+    """What a case's source establishes. Ordered from a court's finding to a
+    published allegation; an allegation is never shown as a finding."""
+
+    convicted = "convicted"
+    acquitted = "acquitted"
+    settled = "settled"
+    fined_by_regulator = "fined_by_regulator"
+    found_by_official_inquiry = "found_by_official_inquiry"
+    alleged_in_reporting = "alleged_in_reporting"
+
+
+class Checkable(str, Enum):
+    records = "records"   # from the case's own records
+    lookups = "lookups"   # needs outside data (a Paper Trail source)
+    person = "person"     # a person must read documents or interviews
+
+
+class Status(str, Enum):
+    verified = "verified"  # every quote re-opened and found word for word
+    pending = "pending"    # collected, not yet fully verified; kept out of Red Flags and the PDF
+
+
+class Source(Strict):
+    title: str
+    publisher: str
+    year: str | None = None
+    url: str
+    locator: str | None = Field(default=None, description="page, section or paragraph")
+    quote: str = Field(min_length=1)
+    quote_verified: bool = False
+    licence: str | None = None
+    checked: date | None = None
+
+
+class Case(Strict):
+    name: str
+    year: str
+    jurisdiction: str
+    what_happened: str
+    outcome: Outcome
+    outcome_verified: bool = False
+    source_url: str
+    source_title: str | None = None
+
+
+class Levels(Strict):
+    faint: str
+    strong: str
+    textbook: str
+    threshold_source: str = Field(description="URL of the source for any number in the levels, or 'none'")
+    threshold_note: str | None = Field(default=None, description="what the number applies to: its jurisdiction, the kind of rule it is, and its limits")
+
+    @model_validator(mode="after")
+    def numbers_need_a_source(self) -> "Levels":
+        if has_threshold_number(self.faint, self.strong, self.textbook) and self.threshold_source.strip().lower() in {"", "none"}:
+            raise ValueError("a level gives a number but threshold_source names no source")
+        return self
+
+
+class CrossHint(Strict):
+    target_area: str
+    target_indicator: str | None = None
+    reason: str
+    source_url: str
+
+
+class Indicator(Strict):
+    id: str
+    name: str
+    definition: str
+    areas: list[str] = Field(min_length=1)
+    typology: str | None = None
+    status: Status = Status.pending
+    sources: list[Source] = Field(min_length=1)
+    examples: list[str] = Field(default_factory=list)
+    cases: list[Case] = Field(default_factory=list)
+    data_needed: list[str] = Field(default_factory=list)
+    checkable: Checkable
+    lookup_sources: list[str] = Field(default_factory=list)
+    levels: Levels
+    threshold_verified: bool = False
+    cross_hints: list[CrossHint] = Field(default_factory=list)
+    innocent_explanations: list[str] = Field(min_length=1)
+    jurisdictions: str | None = None
+    version: int = 1
+
+    @field_validator("id")
+    @classmethod
+    def id_shape(cls, value: str) -> str:
+        if not ID_PATTERN.match(value):
+            raise ValueError(f"indicator id {value!r} must look like ML-001")
+        return value
+
+    @model_validator(mode="after")
+    def verified_means_verified(self) -> "Indicator":
+        if self.status is Status.verified:
+            unverified = [s.url for s in self.sources if not s.quote_verified]
+            if unverified:
+                raise ValueError(f"{self.id} is verified but these quotes are not: {unverified}")
+            cases = [c.name for c in self.cases if not c.outcome_verified]
+            if cases:
+                raise ValueError(f"{self.id} is verified but these case outcomes are not: {cases}")
+            if has_threshold_number(self.levels.faint, self.levels.strong, self.levels.textbook) and not self.threshold_verified:
+                raise ValueError(f"{self.id} is verified but its threshold numbers are not")
+        return self
+
+
+class Area(Strict):
+    key: str = Field(pattern=r"^[A-Z]{2}$")
+    name: str
+    scope: str
+    indicators: list[Indicator]
+    not_reached: list[str] = Field(default_factory=list)
+
+
+class Term(Strict):
+    term: str
+    definition: str
+    examples: list[str] = Field(default_factory=list)
+    source_url: str
+    cases: list[str] = Field(default_factory=list)
+    related: list[str] = Field(default_factory=list)
+    indicators: list[str] = Field(default_factory=list)
+    areas: list[str] = Field(default_factory=list)
+
+
+class Glossary(Strict):
+    area: str
+    terms: list[Term]

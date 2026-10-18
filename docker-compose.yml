@@ -30,7 +30,6 @@ services:
 
   postgres:
     image: postgres:17-alpine
-    profiles: ["openaleph"]
     environment:
       POSTGRES_DB: aleph
       POSTGRES_USER: aleph
@@ -45,32 +44,88 @@ services:
 
   elasticsearch:
     image: ghcr.io/openaleph/elasticsearch:latest
-    profiles: ["openaleph"]
     environment:
       discovery.type: single-node
       xpack.security.enabled: "false"
       ES_JAVA_OPTS: ${OPENALEPH_ES_JAVA_OPTS:--Xms1g -Xmx1g}
     volumes:
       - openaleph-elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
 
   redis:
     image: redis:alpine
-    profiles: ["openaleph"]
     command: ["redis-server", "--save", "3600", "10"]
     volumes:
       - openaleph-redis-data:/data
 
+  # One-shot: creates or upgrades OpenAleph's database (including its job
+  # queue) and search indexes. Its workers and API start only after it
+  # succeeds; without it they stop at once on a fresh install. `aleph upgrade`
+  # takes several minutes, so it is skipped when this OpenAleph version has
+  # already been set up and its index and queue table are present. Delete
+  # /data/.workbench-openaleph-setup-* in the openaleph-archive volume to force it.
+  openaleph-setup:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        marker=/data/.workbench-openaleph-setup-${OPENALEPH_TAG:-5.3.1}
+        if [ -f "$$marker" ] && python - <<'PY'
+        import os, sys
+        import psycopg, requests
+        es = os.environ["ALEPH_ELASTICSEARCH_URI"].rstrip("/")
+        ready = requests.head(f"{es}/openaleph-collection-v1", timeout=10).ok
+        with psycopg.connect(os.environ["ALEPH_DATABASE_URI"]) as conn:
+            ready = ready and conn.execute("SELECT to_regclass('public.procrastinate_jobs')").fetchone()[0] is not None
+        sys.exit(0 if ready else 1)
+        PY
+        then
+          echo "OpenAleph is already set up for this version."
+        else
+          aleph upgrade
+          touch "$$marker"
+        fi
+    restart: "no"
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
   ingest:
     image: ghcr.io/openaleph/ingest-file:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     platform: linux/amd64
     command: procrastinate worker -q ingest
-    environment: *openaleph-environment
+    environment:
+      <<: *openaleph-environment
+      # ADR-0006: without this, names are never found. ingest-file hands a
+      # document to ftm-analyze only when the entity it emits carries text
+      # (should_analyze in ingestors/tasks.py), but with the default (true,
+      # openaleph_procrastinate/settings.py) Manager.emit_entity emits a
+      # stripped file entity without its text, so no analysis job is ever
+      # queued. Job payloads carry the document text instead.
+      OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES: "false"
     tmpfs:
       - /tmp:mode=777
     volumes:
       - openaleph-archive:/data
     depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -78,12 +133,57 @@ services:
 
   analyze:
     image: ghcr.io/openaleph/ftm-analyze:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     command: procrastinate worker -q analyze
-    environment: *openaleph-environment
+    environment:
+      <<: *openaleph-environment
+      # ADR-0006, optional translation: with OPENALEPH_TRANSLATE_DEFER=true,
+      # ftm-analyze hands every document whose detected language differs from
+      # FTM_TRANSLATE_TARGET_LANGUAGE to the `translate` service (profile
+      # "translate"; ftm_analyze/tasks.py should_translate). The target is the
+      # three-letter code FollowTheMoney stores in detectedLanguage (eng, deu,
+      # fra...): a two-letter code would never equal it, so every document,
+      # English ones included, would be sent. Set both only together with
+      # `--profile translate`, or jobs wait in the translate queue unread.
+      OPENALEPH_TRANSLATE_DEFER: ${OPENALEPH_TRANSLATE_DEFER:-false}
+      FTM_TRANSLATE_TARGET_LANGUAGE: ${FTM_TRANSLATE_TARGET_LANGUAGE:-eng}
     tmpfs:
       - /tmp:mode=777
     depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  translate:
+    # Optional machine translation (ADR-0006, Wave C): `docker compose --profile
+    # translate up -d` with OPENALEPH_TRANSLATE_DEFER=true. ftm-translate puts
+    # the translation on each page (translatedText) and adds it to the
+    # document's search text; the Workbench shows it beside the original.
+    # Argos downloads a language pair the first time it is needed (internet
+    # access from this container) and keeps it in the translate-models volume.
+    # Sentences are split with MiniSBD, whose model is downloaded once into
+    # translate-cache; the default for these packages, Stanza, fetches its
+    # resources index from GitHub every time a translator starts
+    # (argostranslate/sbd.py StanzaSentencizer), so translation would stop
+    # whenever the internet is out of reach.
+    image: ghcr.io/openaleph/ftm-translate:${FTM_TRANSLATE_TAG:-5.3.0-argos}
+    profiles: ["translate"]
+    command: procrastinate worker -q translate
+    environment:
+      <<: *openaleph-environment
+      FTM_TRANSLATE_ENGINE: argos
+      FTM_TRANSLATE_TARGET_LANGUAGE: ${FTM_TRANSLATE_TARGET_LANGUAGE:-eng}
+      ARGOS_CHUNK_TYPE: MINISBD
+    tmpfs:
+      - /tmp:mode=777
+    volumes:
+      - translate-models:/root/.local/share/argos-translate
+      - translate-cache:/root/.cache
+    depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -91,7 +191,6 @@ services:
 
   worker:
     image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     command: procrastinate worker -q openaleph,openaleph-management
     environment: *openaleph-environment
     tmpfs:
@@ -99,6 +198,8 @@ services:
     volumes:
       - openaleph-archive:/data
     depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       elasticsearch:
@@ -110,7 +211,6 @@ services:
 
   api:
     image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     environment: *openaleph-environment
     ports:
       - "127.0.0.1:8001:8000"
@@ -119,6 +219,8 @@ services:
     volumes:
       - openaleph-archive:/data
     depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       elasticsearch:
@@ -132,17 +234,25 @@ services:
 
   ui:
     image: ghcr.io/openaleph/aleph-ui:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
       - api
 
   backend:
-    build: ./backend
+    # One image, one port: the API plus the workbench screen it serves at "/"
+    # (ADR-0004). The build context is the repo root so the image can build
+    # the frontend in its first stage.
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        # Browser calls reach the API through Docker's port publishing, so they
+        # don't count as loopback; the dev bundle carries the dev token.
+        NEXT_PUBLIC_API_AUTH_TOKEN: ${API_AUTH_TOKEN:-docker-compose-local-dev-token}
     environment:
       DATABASE_URL: postgresql+psycopg://journalism:${POSTGRES_PASSWORD:-journalism-local-dev}@workbench-db:5432/journalism
-      OPENALEPH_ENABLED: ${OPENALEPH_ENABLED:-false}
+      OPENALEPH_ENABLED: ${OPENALEPH_ENABLED:-true}
       OPENALEPH_BASE_URL: http://api:8000
       OPENALEPH_UI_URL: http://localhost:8080
       OPENALEPH_API_KEY: ${OPENALEPH_API_KEY:-}
@@ -157,24 +267,102 @@ services:
       API_AUTH_TOKEN: ${API_AUTH_TOKEN:-docker-compose-local-dev-token}
       API_AUTH_INVESTIGATION_IDS: ${API_AUTH_INVESTIGATION_IDS:-}
       ENABLE_AI_FEATURES: "false"
+      RENDER_SERVICE_URL: http://render:8070
+      BASEMAP_DIR: /data/basemap
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
       workbench-db:
         condition: service_healthy
+    # Deliberately NOT depends_on: api -- OpenAleph is part of the stack, but its
+    # images are large and Elasticsearch is slow to come up; the workbench must be
+    # reachable while that happens. The backend probes OpenAleph on demand
+    # (/api/integrations/openaleph/status) and reports it as down until it is up.
+    # Nor depends_on: render -- an export falls back to native charts and tables
+    # when the render service is down (ADR-0005, line 2).
     volumes:
       - ./backend:/app
+      # The base map the `maps` profile installs (empty until it has run).
+      - basemap:/data/basemap:ro
 
-  frontend:
-    build: ./frontend
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
-      NEXT_PUBLIC_API_AUTH_TOKEN: ${API_AUTH_TOKEN:-docker-compose-local-dev-token}
-      NEXT_PUBLIC_OPENALEPH_URL: http://localhost:8080
+  # Chart images for PowerPoint and Word exports (ADR-0005, line 2): ECharts
+  # drawn as SVG on the server, no browser. See render/README.md.
+  # The self-hosted base map (ADR-0005, lines 4 and 18), installed once with
+  # `docker compose --profile maps up basemap-extract basemap-assets`: a world
+  # extract of the Protomaps build (45 MB at zoom 6; each zoom level more is
+  # about three times larger) and the style's fonts and sprites from
+  # Protomaps' basemaps-assets. Both are public map data, so nothing about an
+  # investigation leaves the machine; the backend then serves them to the
+  # app and the render service. Run it again to take a newer build.
+  basemap-extract:
+    image: protomaps/go-pmtiles:${PMTILES_TAG:-v1.31.2}
+    profiles: ["maps"]
+    command:
+      - extract
+      - https://build.protomaps.com/${BASEMAP_BUILD:-20261003}.pmtiles
+      - /basemap/world.pmtiles
+      - --maxzoom=${BASEMAP_MAXZOOM:-6}
+    restart: "no"
+    volumes:
+      - basemap:/basemap
+
+  basemap-assets:
+    image: alpine:3.22
+    profiles: ["maps"]
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        site=https://protomaps.github.io/basemaps-assets
+        # The three fonts the @protomaps/basemaps style names, every range of 256
+        # glyphs the fonts have (a range they lack answers 404 and is skipped).
+        for font in "Noto Sans Regular" "Noto Sans Medium" "Noto Sans Italic"; do
+          mkdir -p "/basemap/fonts/$$font"
+          start=0
+          while [ $$start -le 65280 ]; do
+            range="$$start-$$((start + 255))"
+            file="/basemap/fonts/$$font/$$range.pbf"
+            [ -s "$$file" ] || wget -q -O "$$file" "$$site/fonts/$$(echo "$$font" | sed 's/ /%20/g')/$$range.pbf" || rm -f "$$file"
+            start=$$((start + 256))
+          done
+        done
+        mkdir -p /basemap/sprites/v4
+        for flavor in light dark grayscale; do
+          for name in "$$flavor.json" "$$flavor.png" "$$flavor@2x.json" "$$flavor@2x.png"; do
+            [ -s "/basemap/sprites/v4/$$name" ] || wget -q -O "/basemap/sprites/v4/$$name" "$$site/sprites/v4/$$name" || {
+              rm -f "/basemap/sprites/v4/$$name"; echo "Could not fetch sprite $$name; run this again."; exit 1; }
+          done
+        done
+        echo "Base map fonts and sprites are in place."
+    restart: "no"
+    volumes:
+      - basemap:/basemap
+
+  render:
+    build:
+      context: ./render
+    # xvfb-run, which gives MapLibre Native its X display, does not start its
+    # program when it runs as PID 1 (seen 2026-10-03): an init runs first.
+    init: true
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:8070:8070"
+    volumes:
+      # The base map the `maps` profile installs, for maps in exports (ADR-0005, line 18).
+      - basemap:/basemap:ro
+
+  # Database inspector for local development: browse and edit workbench-db tables, run SQL.
+  # Chosen over pgweb/CloudBeaver/sqladmin on 2026-09-21 (see dev-log.md). Bound to localhost only;
+  # log in with System=PostgreSQL, Server=workbench-db, Username=journalism, Database=journalism.
+  adminer:
+    image: adminer:6
+    environment:
+      ADMINER_DEFAULT_SERVER: workbench-db
+    ports:
+      - "127.0.0.1:8081:8080"
     depends_on:
-      - backend
+      workbench-db:
+        condition: service_healthy
 
 volumes:
   workbench-pgdata:
@@ -182,3 +370,6 @@ volumes:
   openaleph-elasticsearch-data:
   openaleph-redis-data:
   openaleph-archive:
+  translate-models:
+  translate-cache:
+  basemap:

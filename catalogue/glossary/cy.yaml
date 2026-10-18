@@ -1,0 +1,718 @@
+area: CY
+terms:
+- term: Ransomware
+  definition: Malicious software that locks or encrypts a victim's systems or data and demands payment
+    to restore access.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+  cases: []
+  related:
+  - Ransomware-as-a-service
+  - Double extortion
+  indicators: []
+  areas:
+  - CY
+- term: Ransomware-as-a-service (affiliate model)
+  definition: A ransomware group's developers rent their tools to 'affiliates' who carry out break-ins
+    and share each ransom with the developers (LockBit's administrator allegedly took 20%).
+  examples:
+  - LockBit
+  source_url: https://www.justice.gov/archives/opa/pr/two-foreign-nationals-plead-guilty-participating-lockbit-ransomware-group
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Double extortion / leak site
+  definition: Attackers both encrypt and steal data, then threaten to publish it on a public site they
+    control if the victim will not pay.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/two-foreign-nationals-plead-guilty-participating-lockbit-ransomware-group
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Business email compromise (BEC)
+  definition: A scam in which criminals hijack or impersonate a business's email to trick it into sending
+    payments to accounts they control.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2019-07-16/Updated%20BEC%20Advisory%20FINAL%20508.pdf
+  cases: []
+  related:
+  - Email account compromise
+  indicators: []
+  areas:
+  - CY
+- term: Email account compromise (EAC)
+  definition: The same kind of scam aimed at an individual's personal email account rather than a business.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2019-07-16/Updated%20BEC%20Advisory%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Money mule
+  definition: A person who moves illegally obtained money on someone else's behalf, knowingly or not.
+  examples: []
+  source_url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Pig butchering
+  definition: A long con in which a scammer builds a relationship with a victim, then draws them into
+    a fake crypto investment and keeps raising the stakes before disappearing; named after fattening a
+    hog before slaughter.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Scam center / scam compound
+  definition: An industrial-scale site, mainly in Cambodia, Burma and Laos, where organised crime groups
+    run online fraud, often using trafficked workers held against their will.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Forced criminality
+  definition: A form of human trafficking where victims are forced to commit crimes (here, online scams)
+    for their captors.
+  examples: []
+  source_url: https://www.ohchr.org/en/press-releases/2023/08/hundreds-thousands-trafficked-work-online-scammers-se-asia-says-un-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Debt bondage
+  definition: Holding someone in work by charging them invented or inflated debts (such as travel or board)
+    they can never repay.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2023/PSA230522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Guarantee marketplace
+  definition: An online market, usually a network of Chinese-language Telegram groups, where a 'guarantor'
+    holds funds in escrow for trades, including laundering and scam services.
+  examples:
+  - Haowang Guarantee (Huione)
+  source_url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Chinese money laundering networks (CMLNs)
+  definition: Professional networks that use informal and grey-market transfer systems to move and swap
+    criminal proceeds across borders, including scam-centre money.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Convertible virtual currency (CVC) / virtual asset (VA)
+  definition: Digital money such as bitcoin that can be swapped for regular currency; FinCEN says CVC,
+    FATF says virtual asset.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Virtual asset service provider (VASP)
+  definition: A business, such as a crypto exchange or custodian, that exchanges, transfers or holds crypto
+    for customers.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Money services business (MSB)
+  definition: A US category of non-bank financial business, including money transmitters and crypto exchangers,
+    that must register with FinCEN.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: DFIR firm / CIC
+  definition: Digital forensics and incident response firms and cyber insurance companies, which help
+    ransomware victims and sometimes pay ransoms on their behalf.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/912981/download?inline=
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Mixer / tumbler
+  definition: A service that pools many users' coins and pays out different coins so it is hard to trace
+    where funds came from.
+  examples:
+  - Bitcoin Fog
+  - Helix
+  - Tornado Cash
+  - Samourai Whirlpool
+  source_url: https://www.justice.gov/usao-sdny/pr/founders-samourai-wallet-cryptocurrency-mixing-service-sentenced-five-and-four-years
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: CoinJoin (Whirlpool)
+  definition: A mixing method that bundles payments from many users into one transaction; Samourai's Whirlpool
+    coordinated such batches.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdny/pr/founders-samourai-wallet-cryptocurrency-mixing-service-sentenced-five-and-four-years
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Hops (Ricochet)
+  definition: Extra, unnecessary intermediate transactions added between sender and receiver to make links
+    harder to see.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdny/pr/founders-samourai-wallet-cryptocurrency-mixing-service-sentenced-five-and-four-years
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Chain-hopping
+  definition: Rapidly swapping funds between different cryptocurrencies or blockchains to break the traceable
+    'chain of custody'.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Anonymity-enhanced cryptocurrency (AEC) / privacy coin
+  definition: A cryptocurrency designed to hide transaction details; FinCEN flags rapid trades into AECs
+    as an obfuscation sign.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Stablecoin (e.g. USDT/Tether)
+  definition: A crypto token pegged to a regular currency such as the US dollar; FinCEN describes scam
+    proceeds in USDT being moved between blockchains.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Decentralised finance (DeFi)
+  definition: Crypto services run by software on a blockchain rather than by a company, which may lack
+    anti-money-laundering controls.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: OTC / P2P broker
+  definition: A person or firm that trades crypto directly with clients outside an exchange's order book;
+    unregistered ones are a laundering risk.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Unhosted wallet
+  definition: A crypto wallet controlled directly by its owner rather than held by an exchange, including
+    hardware and paper wallets.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Darknet market
+  definition: An online marketplace reached through anonymising networks that sells illegal goods; mixers
+    like Bitcoin Fog mostly processed darknet-market funds.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/bitcoin-fog-operator-sentenced-money-laundering-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Tor (the onion router)
+  definition: A network that hides users' locations; ransomware negotiators often communicate through
+    Tor sites.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Crypto kiosk (crypto ATM)
+  definition: A machine that turns cash into crypto sent to a wallet address; scammers direct victims
+    and mules to use them.
+  examples: []
+  source_url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Recovery scam
+  definition: A follow-up fraud where someone promises, for a fee, to recover money a victim has already
+    lost.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Deepfake media
+  definition: Realistic but fake video, images, audio or text made with AI, used to get past identity
+    checks or impersonate people.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Investment fraud (IC3)
+  definition: Deception that persuades people to invest based on false information; crypto investment
+    fraud was the largest source of US losses reported to the FBI in 2025.
+  examples: []
+  source_url: https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Section 311 'primary money laundering concern'
+  definition: A US Treasury finding that a foreign institution is a major laundering risk, allowing FinCEN
+    to bar US banks from dealing with it.
+  examples:
+  - Huione Group (2025)
+  source_url: https://www.fincen.gov/news/news-releases/fincen-issues-final-rule-severing-huione-group-us-financial-system
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: OFAC designation (SDN list)
+  definition: US Treasury's listing of a person or company under sanctions, freezing their US assets and
+    barring US persons from dealing with them.
+  examples: []
+  source_url: https://home.treasury.gov/news/press-releases/jy0364
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Strict liability (sanctions)
+  definition: Penalties can apply even if the payer did not know the recipient was sanctioned, which OFAC
+    applies to ransom payments.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/912981/download?inline=
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Suspicious activity report (SAR) key term
+  definition: A code FinCEN asks banks to put in suspicious activity reports so related reports can be
+    grouped, e.g. FIN-2023-PIGBUTCHERING or FIN-2026-SCAMCENTERS.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Unlicensed money transmitting business
+  definition: A US crime of moving money for others without required registration or licence; mixer operators
+    have been convicted of it.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdny/pr/founder-tornado-cash-crypto-mixing-service-convicted-knowingly-transmitting-criminal
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Admiralty Code / NATO source and information grading (A–F, 1–6)
+  definition: 'A two-part grade for intelligence: a letter rates how reliable the source is (A completely
+    reliable, B usually reliable, C fairly reliable, D not usually reliable, E unreliable, F cannot be
+    judged) and a number rates how credible the information is (1 completely credible, 2 probably true,
+    3 possibly true, 4 doubtful, 5 improbable, 6 truth cannot be judged).'
+  examples:
+  - B2 = usually reliable source, information probably true
+  source_url: https://jadl.act.nato.int/ILIAS/data/testclient/lm_data/lm_152845/Linear/JISR04222102/sharedFiles/AJP21.pdf
+  cases: []
+  related:
+  - Independence of reliability and credibility
+  indicators: []
+  areas:
+  - CY
+- term: Independence of reliability and credibility
+  definition: NATO doctrine says source reliability and information credibility must be graded separately
+    so one does not sway the other.
+  examples: []
+  source_url: https://jadl.act.nato.int/ILIAS/data/testclient/lm_data/lm_152845/Linear/JISR04222102/sharedFiles/AJP21.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: 3x5x2 grading (UK police)
+  definition: 'UK police intelligence grading: source rated 1 reliable, 2 untested, 3 not reliable; information
+    rated A known directly, B known indirectly but corroborated, C known indirectly, D not known, E suspected
+    false; and a handling code P (sharing permitted) or C (sharing with conditions).'
+  examples: []
+  source_url: https://www.college.police.uk/app/intelligence-management/completing-intelligence-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Handling code
+  definition: In the UK 3x5x2 system, a code saying whether and on what conditions a piece of intelligence
+    may be shared.
+  examples: []
+  source_url: https://www.college.police.uk/app/intelligence-management/completing-intelligence-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Expressions of likelihood (ICD 203)
+  definition: 'US intelligence standard words for probability with ranges: almost no chance 1–5%, very
+    unlikely 5–20%, unlikely 20–45%, roughly even chance 45–55%, likely 55–80%, very likely 80–95%, almost
+    certain 95–99%.'
+  examples: []
+  source_url: https://archive.dni.gov/files/documents/ICD/ICD-203.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Confidence level vs likelihood (ICD 203)
+  definition: Confidence describes how solid the evidence and reasoning are; likelihood describes how
+    probable an event is; ICD 203 says the two must not be combined in one statement.
+  examples: []
+  source_url: https://archive.dni.gov/files/documents/ICD/ICD-203.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: SIM swap fraud
+  definition: A criminal pretends to be a mobile customer and gets the carrier to move the customer's
+    number to a SIM the criminal controls, so they receive the victim's calls and security codes.
+  examples: []
+  source_url: https://docs.fcc.gov/public/attachments/FCC-23-95A1.pdf
+  cases: []
+  related:
+  - Port-out fraud
+  - Account takeover
+  indicators: []
+  areas:
+  - CY
+- term: Port-out fraud
+  definition: A criminal pretends to be a mobile customer and has the customer's number transferred to
+    a different phone company under the criminal's control.
+  examples: []
+  source_url: https://docs.fcc.gov/public/attachments/FCC-23-95A1.pdf
+  cases: []
+  related:
+  - SIM swap fraud
+  indicators: []
+  areas:
+  - CY
+- term: DPRK IT workers
+  definition: Skilled IT workers from North Korea who get remote jobs abroad under false or borrowed identities
+    to earn money for the North Korean government, in breach of sanctions.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/923126/download?inline
+  cases: []
+  related:
+  - Laptop farm
+  - Sanctions evasion
+  indicators: []
+  areas:
+  - CY
+- term: Laptop farm
+  definition: A location, often a home in the employer's country, where a facilitator keeps company laptops
+    switched on so remote workers abroad can control them and appear to be local.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+  cases: []
+  related:
+  - DPRK IT workers
+  - Remote desktop
+  indicators: []
+  areas:
+  - CY
+- term: Remote desktop (port 3389)
+  definition: Software that lets someone control a computer from another location; port 3389 is the network
+    port commonly used by Microsoft's Remote Desktop Protocol and is named as a red flag in the DPRK IT
+    worker guidance.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/923126/download?inline
+  cases: []
+  related:
+  - Laptop farm
+  indicators: []
+  areas:
+  - CY
+- term: E-Verify
+  definition: A U.S. government system employers use to confirm that a new hire is allowed to work in
+    the United States; the FBI says errors in it during hiring can be a warning sign.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2024/PSA240516
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Face-swapping / deepfake
+  definition: Using AI to replace or generate a person's face or voice in video so someone appears to
+    be another person, reported by the FBI in job interviews.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2025/PSA250123
+  cases: []
+  related:
+  - AI-enabled fraud
+  indicators: []
+  areas:
+  - CY
+- term: Data extortion
+  definition: Stealing an organisation's data or code and demanding payment not to release or sell it.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2025/PSA250123
+  cases: []
+  related:
+  - Ransomware
+  indicators: []
+  areas:
+  - CY
+- term: Romance baiting
+  definition: INTERPOL's term for a scheme that mixes a fake romantic relationship with a fake crypto
+    investment, also called pig butchering.
+  examples: []
+  source_url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+  cases: []
+  related:
+  - Investment fraud
+  - Forced criminality
+  indicators: []
+  areas:
+  - CY
+- term: Fraud-as-a-service (phishing-as-a-service, ransomware-as-a-service)
+  definition: A criminal business model where tools or services for fraud or attacks are sold or rented
+    to other criminals.
+  examples: []
+  source_url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Tech-support fraud
+  definition: A scam in which criminals pose as technical support to convince victims their device has
+    a problem and get payment or remote access.
+  examples: []
+  source_url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Personal data breach
+  definition: A security failure that leads to personal data being destroyed, lost, changed, disclosed
+    or accessed without permission, whether by accident or on purpose.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Confidentiality, integrity and availability breach
+  definition: 'The three kinds of breach: data seen by people who should not see it, data changed without
+    permission, and data lost or made unreachable.'
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Controller
+  definition: The organisation that decides why and how personal data is used and that carries the duty
+    to report breaches.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Processor
+  definition: A supplier that handles personal data on a controller's behalf and must tell the controller
+    promptly about a breach.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Awareness (GDPR)
+  definition: The moment a controller is reasonably certain a security incident has compromised personal
+    data; the 72-hour clock starts here.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Supervisory authority
+  definition: The national data protection regulator that receives breach notices, such as the ICO in
+    the UK or the DPC in Ireland.
+  examples: []
+  source_url: https://ico.org.uk/for-organisations/report-a-breach/personal-data-breach/personal-data-breaches-a-guide/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Breach register
+  definition: The internal record a controller must keep of every breach, its effects and the action taken,
+    whether reported or not.
+  examples: []
+  source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Form 8-K Item 1.05
+  definition: The SEC filing a US-listed company must make within four business days of deciding a cybersecurity
+    incident is material.
+  examples: []
+  source_url: https://www.sec.gov/newsroom/press-releases/2023-139
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Materiality
+  definition: Whether information would matter to a reasonable investor; under the SEC rule the company
+    itself determines whether a cyber incident is material.
+  examples: []
+  source_url: https://www.sec.gov/newsroom/press-releases/2023-139
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Regulation S-K Item 106
+  definition: SEC rule requiring listed companies to describe how they assess and manage material cybersecurity
+    risks and who oversees them.
+  examples: []
+  source_url: https://www.sec.gov/newsroom/press-releases/2023-139
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Risk factors
+  definition: The section of an investor filing listing risks the company faces; the SEC has charged companies
+    for describing a breach as hypothetical there after it happened.
+  examples: []
+  source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Bug bounty
+  definition: A programme that pays outside researchers for reporting security flaws responsibly; it is
+    not meant to pay people who exploit flaws and take data.
+  examples: []
+  source_url: https://www.ftc.gov/news-events/news/press-releases/2018/04/uber-agrees-expanded-settlement-ftc-related-privacy-security-claims
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Misprision of felony
+  definition: A US federal crime of actively concealing a known felony and not reporting it to authorities
+    (18 U.S.C. 4).
+  examples: []
+  source_url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: HIPAA covered entity
+  definition: A US health plan, healthcare clearinghouse or healthcare provider bound by HIPAA's breach
+    notification rule.
+  examples: []
+  source_url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Interception
+  definition: Capturing the contents of a call, message or other communication while it is being transmitted.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2016/25/section/3
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Lawful authority (interception)
+  definition: Legal permission to intercept, such as a warrant or consent, without which interception
+    in the UK is an offence.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2016/25/section/3
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY

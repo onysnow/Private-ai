@@ -1,0 +1,1092 @@
+area: FR
+terms:
+- term: Ponzi scheme
+  definition: An investment fraud that pays earlier investors with money from newer investors instead
+    of real profits.
+  examples:
+  - Madoff
+  - Stanford
+  source_url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+  cases: []
+  related:
+  - Pyramid scheme
+  - Affinity fraud
+  indicators: []
+  areas:
+  - FR
+- term: Pyramid scheme
+  definition: A scheme where people mainly earn by recruiting new paying members, not by selling real
+    products to outsiders.
+  examples:
+  - BurnLounge
+  source_url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/pyramid-schemes
+  cases: []
+  related:
+  - Multi-level marketing (MLM)
+  - Buy-in
+  indicators: []
+  areas:
+  - FR
+- term: Multi-level marketing (MLM)
+  definition: A legal sales model where sellers earn on their own and their recruits' product sales; it
+    becomes a pyramid scheme when pay comes mainly from recruiting.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-30
+  cases: []
+  related:
+  - Pyramid scheme
+  indicators: []
+  areas:
+  - FR
+- term: Buy-in
+  definition: A fee a person must pay to join a sales or investment programme; SEC lists a required buy-in
+    as a pyramid red flag.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-30
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Affinity fraud
+  definition: Investment fraud aimed at members of a group (religious, ethnic, professional) by someone
+    who is, or pretends to be, one of them.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-alert-have-something-common-someone-selling-investment-it-may-make-you-target-fraud
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Pump-and-dump
+  definition: Promoters hype a small company's stock with false claims to push the price up, then sell
+    their own shares.
+  examples: []
+  source_url: https://www.sec.gov/files/investor/alerts/ia_pumpanddump.htm
+  cases: []
+  related:
+  - Microcap stock
+  indicators: []
+  areas:
+  - FR
+- term: Pig butchering
+  definition: A crypto investment scam where a fake online friend builds trust, steers the victim into
+    a fake platform, then takes the money.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  cases: []
+  related:
+  - Virtual asset service provider (VASP)
+  indicators: []
+  areas:
+  - FR
+- term: Virtual asset service provider (VASP)
+  definition: A business that exchanges, holds or transfers crypto assets for customers, such as an exchange.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Unregistered investment
+  definition: A security not registered with the SEC or state regulators, so less information is available
+    to investors.
+  examples: []
+  source_url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Tax evasion (indicators of fraud)
+  definition: Deliberately not paying tax owed, by hiding income, faking deductions or concealing assets;
+    the IRS lists 'badges' that suggest it.
+  examples: []
+  source_url: https://www.irs.gov/irm/part25/irm_25-001-002
+  cases: []
+  related:
+  - Badges of fraud
+  - Nominee
+  indicators: []
+  areas:
+  - FR
+- term: Badges of fraud
+  definition: Circumstantial signs, such as transfers to relatives for little value while insolvent, that
+    courts and the IRS use to infer intent to defraud.
+  examples: []
+  source_url: https://www.irs.gov/irm/part25/irm_25-001-002
+  cases: []
+  related:
+  - Fraudulent transfer
+  indicators: []
+  areas:
+  - FR
+- term: Nominee
+  definition: A person or company that holds an asset or account in its own name for someone else, hiding
+    the real owner.
+  examples: []
+  source_url: https://www.irs.gov/irm/part25/irm_25-001-002
+  cases: []
+  related:
+  - Fiduciary shareholder
+  - Beneficial owner
+  indicators: []
+  areas:
+  - FR
+- term: Fiduciary shareholder
+  definition: A shareholder who holds shares on behalf of someone else; FIAU flags their use without a
+    clear legitimate purpose.
+  examples: []
+  source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Beneficial owner
+  definition: The real person who ultimately owns or controls a company or account, even if someone else
+    is named on paper.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Bearer shares
+  definition: Shares owned by whoever physically holds the certificate, so ownership is not recorded;
+    FIAU lists them as a red flag.
+  examples: []
+  source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Shell company
+  definition: A company with little or no real operations or presence, often used to hold or move money;
+    FinCEN refers to 'shell company indicators'.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Structuring (smurfing)
+  definition: Breaking cash transactions into smaller amounts to avoid reporting thresholds such as the
+    US $10,000 Currency Transaction Report.
+  examples: []
+  source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  cases: []
+  related:
+  - Currency Transaction Report (CTR)
+  indicators: []
+  areas:
+  - FR
+- term: Currency Transaction Report (CTR)
+  definition: A report US financial institutions file on cash transactions over $10,000.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Suspicious Activity Report (SAR)
+  definition: A confidential report a financial institution files with FinCEN when it suspects illegal
+    activity; FinCEN advisories give key terms for SARs.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Round-tripping
+  definition: Moving money out through other parties so it returns to the original owner disguised as
+    new investment or a loan.
+  examples: []
+  source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Commingling
+  definition: Mixing personal and business money in the same accounts.
+  examples: []
+  source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Rubber stamping
+  definition: A board or administrator that approves whatever it is told without real oversight; FIAU
+    treats it as a typology.
+  examples: []
+  source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: FBAR (Report of Foreign Bank and Financial Accounts)
+  definition: A yearly US filing required when a US person's foreign accounts together exceed $10,000
+    at any time in the year.
+  examples: []
+  source_url: https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Listed transaction
+  definition: A tax arrangement the IRS has formally identified as abusive, which must be disclosed.
+  examples:
+  - Syndicated conservation easements (Notice 2017-10)
+  - Micro-captive insurance
+  source_url: https://www.irs.gov/businesses/corporations/listed-transactions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Abusive tax arrangement (tax shelter)
+  definition: A promoted scheme that twists tax rules to produce deductions or deferrals the law does
+    not allow.
+  examples: []
+  source_url: https://www.irs.gov/newsroom/irs-wraps-up-its-2021-dirty-dozen-scams-list-with-warning-about-promoted-abusive-arrangements
+  cases: []
+  related:
+  - Listed transaction
+  indicators: []
+  areas:
+  - FR
+- term: Syndicated conservation easement
+  definition: A partnership deal that uses inflated land appraisals to sell investors charitable deductions
+    worth more than they invested.
+  examples: []
+  source_url: https://www.irs.gov/businesses/corporations/listed-transactions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Micro-captive insurance
+  definition: A small insurance company owned by the business it insures; abusive versions charge inflated
+    premiums for unrealistic risks to cut tax.
+  examples: []
+  source_url: https://www.irs.gov/newsroom/irs-wraps-up-its-2021-dirty-dozen-scams-list-with-warning-about-promoted-abusive-arrangements
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Cum-ex
+  definition: Rapid share trading around dividend dates so that withholding tax paid once is refunded
+    several times.
+  examples: []
+  source_url: https://www.euronews.com/2022/12/13/key-figure-in-german-cum-ex-tax-evasion-scandal-jailed-for-eight-years
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Deferred prosecution agreement (DPA)
+  definition: A deal where prosecutors file charges but hold off pursuing them if the company admits facts,
+    pays and meets conditions.
+  examples:
+  - UBS 2009
+  source_url: https://www.justice.gov/opa/pr/2009/February/09-tax-136.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Upcoding
+  definition: Billing for a more expensive service than the one actually given.
+  examples: []
+  source_url: https://www.nhcaa.org/tools-insights/about-health-care-fraud/the-challenge-of-health-care-fraud/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Unbundling
+  definition: Billing each step of one procedure as if it were a separate procedure.
+  examples: []
+  source_url: https://www.nhcaa.org/tools-insights/about-health-care-fraud/the-challenge-of-health-care-fraud/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Anti-Kickback Statute (AKS)
+  definition: US criminal law banning payments meant to induce or reward referrals of federally funded
+    health care business.
+  examples: []
+  source_url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Stark Law (Physician Self-Referral Law)
+  definition: US law barring doctors from referring Medicare/Medicaid patients for certain services to
+    businesses they or family have a financial stake in, unless an exception applies.
+  examples: []
+  source_url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: False Claims Act (FCA)
+  definition: US law imposing liability for submitting false claims for government payment.
+  examples: []
+  source_url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: OIG exclusion
+  definition: A ban by HHS-OIG on a person or company taking part in federal health programmes, after
+    certain convictions or misconduct.
+  examples: []
+  source_url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Durable medical equipment (DME)
+  definition: Reusable medical equipment such as braces or wheelchairs billed to health programmes; a
+    frequent target of billing fraud.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Health Care Benefit Program
+  definition: A public or private plan that pays for health care, such as Medicare or Medicaid.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Insurance fraud
+  definition: Deliberate deception by an insurer, agent, adjuster or consumer to get money they are not
+    owed.
+  examples: []
+  source_url: https://content.naic.org/insurance-topics/insurance-fraud
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Hard fraud / soft fraud
+  definition: Hard fraud is deliberately causing a loss to claim on it; soft fraud is exaggerating a real
+    claim or lying on an application.
+  examples: []
+  source_url: https://content.naic.org/insurance-topics/insurance-fraud
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Premium diversion
+  definition: An agent or broker keeps policyholders' premiums instead of sending them to the insurer.
+  examples: []
+  source_url: https://content.naic.org/insurance-topics/insurance-fraud
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Staged or caused accident
+  definition: A crash planned or deliberately caused to make fraudulent injury and damage claims.
+  examples: []
+  source_url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
+  cases: []
+  related:
+  - Swoop and squat
+  indicators: []
+  areas:
+  - FR
+- term: Swoop and squat
+  definition: A staged-crash method named by NICB in which a car is suddenly cut in front of a victim
+    so the victim rear-ends it.
+  examples: []
+  source_url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Bankruptcy fraud (18 U.S.C. 152)
+  definition: Knowingly hiding assets, lying under oath or making false declarations in a bankruptcy case;
+    up to 5 years in prison.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/152
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Bankruptcy trustee / US Trustee
+  definition: The official who manages a debtor's estate (trustee) and the DOJ office that oversees bankruptcy
+    cases and refers crimes (US Trustee).
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/152
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fraudulent transfer
+  definition: A transfer made to cheat creditors, or for less than fair value while insolvent; a US bankruptcy
+    trustee can undo those made within 2 years before filing.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/11/548
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Bust-out
+  definition: Building up credit, maxing it out, then using bankruptcy to discharge the debts.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/case_example/085.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Serial filer
+  definition: A person who files bankruptcy repeatedly, often to delay creditors; a US Trustee referral
+    category.
+  examples: []
+  source_url: https://www.justice.gov/ust/file/criminal_report_fy2014.pdf/dl
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Petition preparer (BPP)
+  definition: A non-lawyer paid to prepare bankruptcy papers; the US Trustee tracks their rule violations.
+  examples: []
+  source_url: https://www.justice.gov/ust/file/criminal_report_fy2014.pdf/dl
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Typology vs red flag
+  definition: A typology is a method used to commit or launder; a red flag is a sign that may point to
+    it.
+  examples: []
+  source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Panama Papers
+  definition: A 2016 leak of offshore law-firm records published by ICIJ showing how secretive offshore
+    companies were used.
+  examples: []
+  source_url: https://www.icij.org/investigations/panama-papers/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Wash trade
+  definition: A trade in which the buyer and seller are the same person or are acting together, so ownership
+    does not really change; used to fake trading activity.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related:
+  - Cross trade
+  - Market manipulation
+  indicators: []
+  areas:
+  - FR
+- term: Pump-and-dump scheme
+  definition: Fraudsters spread false or misleading hype to push up a stock's price, then sell their own
+    shares at the high price, leaving later buyers with losses.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/pump-and-dump-schemes
+  cases: []
+  related:
+  - Penny stock
+  - Stock promoter
+  indicators: []
+  areas:
+  - FR
+- term: Insider trading
+  definition: Buying or selling a security on the basis of important non-public information, in breach
+    of a duty of trust or confidence.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+  cases: []
+  related:
+  - Material non-public information
+  indicators: []
+  areas:
+  - FR
+- term: Spoofing
+  definition: Placing bids or offers in a market with the intent to cancel them before they execute, to
+    mislead other traders; illegal under US commodities law.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/7/6c
+  cases: []
+  related:
+  - Layering
+  - Market manipulation
+  indicators: []
+  areas:
+  - FR
+- term: Journaling (securities)
+  definition: Moving shares or cash between brokerage accounts by internal book entry rather than by a
+    trade or outside payment.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Penny stock / low-priced security
+  definition: A thinly traded, low-priced share, which is easier to manipulate; FINRA lists trading in
+    penny stocks among red flags.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Public shell company
+  definition: A listed company with few or no operations, which can be used as a vehicle for share schemes
+    or to move funds.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Elder financial exploitation
+  definition: The illegal or improper use of an older adult's funds, property or assets.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related:
+  - Elder theft
+  - Elder scam
+  indicators: []
+  areas:
+  - FR
+- term: Elder theft
+  definition: Theft of an older adult's assets, funds or income by someone they trust, such as a relative
+    or caregiver.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Elder scam
+  definition: A scheme where an older adult is persuaded to send money to a stranger or imposter for a
+    promised benefit.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Check washing
+  definition: Using chemicals to remove the ink on a stolen check so the payee and often the amount can
+    be rewritten.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Money mule
+  definition: Someone who transfers or moves illegally acquired money on behalf of someone else.
+  examples: []
+  source_url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-frauds-and-scams/money-mules
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Timeshare exit / resale scam
+  definition: A scam where callers claim to have a buyer for a victim's timeshare and charge fees for
+    a sale that never happens.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+  cases: []
+  related:
+  - Re-rent scam
+  - Advance-fee scheme
+  indicators: []
+  areas:
+  - FR
+- term: Advance-fee scheme
+  definition: A fraud in which the victim pays money up front for a promised benefit (a sale, loan, prize
+    or recovery) that never arrives.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: CJNG (Cartel de Jalisco Nueva Generación)
+  definition: A Mexico-based transnational criminal organisation that US authorities link to timeshare
+    fraud targeting US owners.
+  examples: []
+  source_url: https://home.treasury.gov/news/press-releases/jy2465
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fideicomiso
+  definition: A Mexican trust arrangement; the joint notice says cartel networks move timeshare-fraud
+    funds through shell companies and such trusts.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: MTIC fraud (missing trader intra-community fraud)
+  definition: VAT fraud in which a trader buys goods VAT-free from another EU country, sells them with
+    VAT and disappears without paying that VAT.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23510
+  cases: []
+  related:
+  - Carousel fraud
+  - Missing trader
+  indicators: []
+  areas:
+  - FR
+- term: Carousel fraud
+  definition: MTIC fraud where the goods or services do not reach an end consumer but go round a chain,
+    usually back to the starting country.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23540
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Missing trader / defaulter
+  definition: The VAT-registered company in an MTIC chain that charges VAT but fails to file or pay it.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23520
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Buffer (VAT fraud)
+  definition: A VAT-registered company placed in the chain between the defaulter and the broker to hide
+    the link.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23520
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Broker (VAT fraud)
+  definition: The company at the end of an MTIC chain that exports or dispatches the goods and claims
+    a VAT repayment.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23520
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fraud risk factor
+  definition: A condition, such as pressure, opportunity or attitude, that auditors treat as raising the
+    risk of fraud; not proof of fraud.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Operating cash flow
+  definition: The cash a business actually generates from its everyday operations, as shown in the cash-flow
+    statement.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Related-party transaction
+  definition: A deal between a company and people or companies connected to it, such as owners, directors
+    or their relatives.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Segregation of duties
+  definition: Splitting tasks such as handling, recording and checking money between different people
+    so no one person can steal and hide it.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Unemployment insurance (UI) fraud
+  definition: Claiming unemployment benefits you are not entitled to, often with stolen identities or
+    fake employers.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fictitious employer-employee fraud
+  definition: Inventing a company and fake staff and wage records to claim unemployment benefits.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/Advisory%20Unemployment%20Insurance%20COVID%2019%20508%20Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Economic Impact Payment (EIP)
+  definition: The US federal stimulus payments sent to individuals during the COVID-19 pandemic.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2021-02-24/Advisory%20EIP%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Benefits fraud
+  definition: Applying for emergency assistance benefits you are not entitled to.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2017-10-31/FinCEN%20Advisory%20FIN-2017-A007-508%20Compliant.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Paycheck Protection Program (PPP) and COVID-19 EIDL
+  definition: SBA pandemic loan programmes for businesses; PPP required the business to be operating by
+    15 February 2020.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fraud indicator
+  definition: GAO's term for characteristics and flags that warn of possible fraud; not proof of fraud.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fictitious entity
+  definition: A fake business presented as real to obtain relief funds.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Shell company (GAO usage)
+  definition: A business with no employees or operations.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Kickback (relief fraud)
+  definition: Part of loan or grant money paid to someone in return for illicit help getting it.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-23-105331.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: National Directory of New Hires (NDNH)
+  definition: Federal database of wage and employment records that GAO matched against relief loan data.
+  examples: []
+  source_url: https://www.gao.gov/products/gao-23-105331
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fraud Risk Management Framework
+  definition: 'GAO''s model of four steps for federal programmes: commit, assess, design and implement
+    controls, evaluate and adapt.'
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-15-593sp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Data matching
+  definition: Comparing information from one source with another to find inconsistencies, such as checking
+    self-reported eligibility data.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-15-593sp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Pay-and-chase
+  definition: Paying out first and trying to recover fraudulent payments later, which GAO says prevention
+    avoids.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-15-593sp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Pandemic Response Accountability Committee (PRAC)
+  definition: Body of inspectors general overseeing US pandemic relief spending; it publishes fraud alerts.
+  examples: []
+  source_url: https://www.pandemicoversight.gov/news/articles/prac-issues-fraud-prevention-alert-pre-award-vetting-using-data-analytics-could-have-prevented-over-79-billion-in-potentially-fraudulent-pandemic-relief-payments
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Stolen identity refund fraud
+  definition: Filing tax returns in other people's names to collect refunds.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2012-a005
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Foreclosure rescue scam
+  definition: A scheme promising distressed homeowners help to avoid foreclosure, usually taking fees
+    or the home itself.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Loan modification
+  definition: A change to the terms of an existing mortgage to make it affordable; scammers sell fake
+    help with it.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Equity skimming
+  definition: Draining the value of someone's home, for example through equity loans or false quitclaim
+    deeds.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Quitclaim deed
+  definition: A deed that transfers whatever interest the signer has in a property; FinCEN notes false
+    ones are used to steal homes.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Straw borrower
+  definition: A person whose name is used on a loan to hide who is really behind it.
+  examples: []
+  source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2010-a006
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Short sale
+  definition: A home sale for less than the mortgage owed, approved by the lender; FinCEN flags quick
+    resales and related-party buyers.
+  examples: []
+  source_url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Debt elimination scheme
+  definition: Using invalid documents or fake checks to claim a mortgage or debt is cancelled.
+  examples: []
+  source_url: https://fincen.gov/resources/advisories/fincen-advisory-fin-2012-a009
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Home Equity Conversion Mortgage (HECM)
+  definition: The federally insured US reverse mortgage that lets homeowners 62 and older draw on home
+    equity.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Cross-selling (HECM)
+  definition: Pushing seniors to put reverse-mortgage money into annuities or other products.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/fin-2010-a005.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Deed theft
+  definition: Taking title to a home without the owner's knowledge or approval, by forgery or trickery.
+  examples: []
+  source_url: https://ag.ny.gov/publications/deed-theft
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Seller impersonation fraud
+  definition: Criminals posing as property owners to sell land or homes they do not own.
+  examples: []
+  source_url: https://alta.org/news-and-publications/news/20230509-Red-Flags-and-Tips-to-Help-Prevent-Seller-Impersonation-in-Real-Estate
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: VoIP
+  definition: Internet-based phone numbers; the FBI notes impostor sellers use them.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2026/PSA260616
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Synthetic identity fraud
+  definition: Using a combination of personal information to fabricate a person or entity for gain.
+  examples: []
+  source_url: https://fedpaymentsimprovement.org/news/press-releases/federal-reserve-system-announces-industry-recommended-definition-of-synthetic-identity-fraud/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Drop address
+  definition: An address (house, flat or PO box) used only to receive mail for false identities.
+  examples: []
+  source_url: https://archives.fbi.gov/archives/newark/press-releases/2013/ten-indicted-in-200-million-international-credit-card-fraud-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Credit pumping
+  definition: Feeding false information to credit bureaus to make a fake identity look creditworthy before
+    maxing it out.
+  examples: []
+  source_url: https://archives.fbi.gov/archives/newark/press-releases/2013/ten-indicted-in-200-million-international-credit-card-fraud-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Arson for profit
+  definition: Setting a fire deliberately to collect insurance or escape a financial burden.
+  examples: []
+  source_url: https://www.ojp.gov/pdffiles1/Digitization/54514NCJRS.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Smoke and ash claim
+  definition: An insurance claim for contamination from wildfire smoke and ash rather than direct burning;
+    NICB lists ways these are inflated.
+  examples: []
+  source_url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Examination Under Oath
+  definition: A sworn questioning of a claimant by an insurer, which NICB suggests to deter questionable
+    claims.
+  examples: []
+  source_url: https://difi.az.gov/sites/default/files/Indicators%20of%20Wildfire-Related%20Fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Federal Child Nutrition Program sponsor
+  definition: An organisation that enrols meal sites in federal child nutrition programmes and receives
+    administrative fees; Feeding Our Future was one.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/feeding-our-future-ringleader-sentenced-500-months
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR

@@ -1,0 +1,398 @@
+# Production / shared-server compose for Journalism Workbench (STRUCT-0031).
+#
+# This is a SEPARATE file from docker-compose.yml on purpose. The dev file
+# bind-mounts ./backend over the image, binds every port to 127.0.0.1, ships a
+# literal default API token, and adds Adminer. None of that belongs on a shared
+# host. This file:
+#   - runs the image that was built (no source bind-mount; a deploy is a rebuild);
+#   - refuses to start without real secrets (${VAR:?...} -- no defaults);
+#   - keeps the backend (API + workbench screen, one port) bound to the host loopback by default
+#     (BIND_ADDRESS) so a TLS reverse proxy (Caddy, nginx, Traefik) in front is
+#     the only thing reachable from the network; the database has no host port;
+#   - persists backend data (documents, audit log, connector secrets, limiter
+#     state) in a named volume so the audit trail survives a redeploy;
+#   - does not bake a bearer token into the workbench screen. Reporters
+#     enter their own token (or persisted-user token) in the app's "API access"
+#     panel; the dev file's public token variable is deliberately absent.
+#
+#   - runs OpenAleph as part of the stack (it is not optional in this product):
+#     its own Postgres 17, Elasticsearch, Redis, ingest/analyze/openaleph workers,
+#     API and UI, all on the internal network; only the OpenAleph UI gets a
+#     loopback port so the proxy can publish it beside the workbench.
+#
+# Usage:  docker compose -f docker-compose.prod.yml up -d --build
+# Runbook (upgrade, rollback, restore): DEPLOYMENT.md
+x-openaleph-environment: &openaleph-environment
+  ALEPH_DEBUG: "false"
+  ALEPH_SECRET_KEY: ${OPENALEPH_SECRET_KEY:?set OPENALEPH_SECRET_KEY (openssl rand -hex 32)}
+  ALEPH_SINGLE_USER: "true"
+  ALEPH_DATABASE_URI: postgresql://aleph:${OPENALEPH_DB_PASSWORD:?set OPENALEPH_DB_PASSWORD}@postgres:5432/aleph
+  OPENALEPH_DB_URI: postgresql://aleph:${OPENALEPH_DB_PASSWORD:?set OPENALEPH_DB_PASSWORD}@postgres:5432/aleph
+  FTM_STORE_URI: postgresql://aleph:${OPENALEPH_DB_PASSWORD:?set OPENALEPH_DB_PASSWORD}@postgres:5432/aleph
+  ALEPH_ELASTICSEARCH_URI: http://elasticsearch:9200
+  OPENALEPH_ELASTICSEARCH_URI: http://elasticsearch:9200
+  REDIS_URL: redis://redis:6379/0
+  ARCHIVE_TYPE: file
+  ARCHIVE_PATH: /data
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aleph
+      POSTGRES_USER: aleph
+      POSTGRES_PASSWORD: ${OPENALEPH_DB_PASSWORD:?set OPENALEPH_DB_PASSWORD}
+    volumes:
+      - openaleph-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aleph -d aleph"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  elasticsearch:
+    image: ghcr.io/openaleph/elasticsearch:latest
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: ${OPENALEPH_ES_JAVA_OPTS:--Xms1g -Xmx1g}
+    volumes:
+      - openaleph-elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "3600", "10"]
+    volumes:
+      - openaleph-redis-data:/data
+
+  # One-shot: creates or upgrades OpenAleph's database (including its job
+  # queue) and search indexes. Its workers and API start only after it
+  # succeeds; without it they stop at once on a fresh install. `aleph upgrade`
+  # takes several minutes, so it is skipped when this OpenAleph version has
+  # already been set up and its index and queue table are present. Delete
+  # /data/.workbench-openaleph-setup-* in the openaleph-archive volume to force it.
+  openaleph-setup:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        marker=/data/.workbench-openaleph-setup-${OPENALEPH_TAG:-5.3.1}
+        if [ -f "$$marker" ] && python - <<'PY'
+        import os, sys
+        import psycopg, requests
+        es = os.environ["ALEPH_ELASTICSEARCH_URI"].rstrip("/")
+        ready = requests.head(f"{es}/openaleph-collection-v1", timeout=10).ok
+        with psycopg.connect(os.environ["ALEPH_DATABASE_URI"]) as conn:
+            ready = ready and conn.execute("SELECT to_regclass('public.procrastinate_jobs')").fetchone()[0] is not None
+        sys.exit(0 if ready else 1)
+        PY
+        then
+          echo "OpenAleph is already set up for this version."
+        else
+          aleph upgrade
+          touch "$$marker"
+        fi
+    restart: "no"
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  ingest:
+    image: ghcr.io/openaleph/ingest-file:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    platform: linux/amd64
+    command: procrastinate worker -q ingest
+    environment:
+      <<: *openaleph-environment
+      # ADR-0006: without this, names are never found. ingest-file hands a
+      # document to ftm-analyze only when the entity it emits carries text
+      # (should_analyze in ingestors/tasks.py), but with the default (true,
+      # openaleph_procrastinate/settings.py) Manager.emit_entity emits a
+      # stripped file entity without its text, so no analysis job is ever
+      # queued. Job payloads carry the document text instead.
+      OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES: "false"
+    tmpfs:
+      - /tmp:mode=777
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  analyze:
+    image: ghcr.io/openaleph/ftm-analyze:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    command: procrastinate worker -q analyze
+    environment:
+      <<: *openaleph-environment
+      # ADR-0006, optional translation: with OPENALEPH_TRANSLATE_DEFER=true,
+      # ftm-analyze hands every document whose detected language differs from
+      # FTM_TRANSLATE_TARGET_LANGUAGE to the `translate` service (profile
+      # "translate"; ftm_analyze/tasks.py should_translate). The target is the
+      # three-letter code FollowTheMoney stores in detectedLanguage (eng, deu,
+      # fra...): a two-letter code would never equal it, so every document,
+      # English ones included, would be sent. Set both only together with
+      # `--profile translate`, or jobs wait in the translate queue unread.
+      OPENALEPH_TRANSLATE_DEFER: ${OPENALEPH_TRANSLATE_DEFER:-false}
+      FTM_TRANSLATE_TARGET_LANGUAGE: ${FTM_TRANSLATE_TARGET_LANGUAGE:-eng}
+    tmpfs:
+      - /tmp:mode=777
+    depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  translate:
+    # Optional machine translation (ADR-0006, Wave C): `docker compose --profile
+    # translate up -d` with OPENALEPH_TRANSLATE_DEFER=true. ftm-translate puts
+    # the translation on each page (translatedText) and adds it to the
+    # document's search text; the Workbench shows it beside the original.
+    # Argos downloads a language pair the first time it is needed (internet
+    # access from this container) and keeps it in the translate-models volume.
+    # Sentences are split with MiniSBD, whose model is downloaded once into
+    # translate-cache; the default for these packages, Stanza, fetches its
+    # resources index from GitHub every time a translator starts
+    # (argostranslate/sbd.py StanzaSentencizer), so translation would stop
+    # whenever the internet is out of reach.
+    image: ghcr.io/openaleph/ftm-translate:${FTM_TRANSLATE_TAG:-5.3.0-argos}
+    profiles: ["translate"]
+    restart: unless-stopped
+    command: procrastinate worker -q translate
+    environment:
+      <<: *openaleph-environment
+      FTM_TRANSLATE_ENGINE: argos
+      FTM_TRANSLATE_TARGET_LANGUAGE: ${FTM_TRANSLATE_TARGET_LANGUAGE:-eng}
+      ARGOS_CHUNK_TYPE: MINISBD
+    tmpfs:
+      - /tmp:mode=777
+    volumes:
+      - translate-models:/root/.local/share/argos-translate
+      - translate-cache:/root/.cache
+    depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    command: procrastinate worker -q openaleph,openaleph-management
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+      redis:
+        condition: service_started
+      ingest:
+        condition: service_started
+
+  api:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+      redis:
+        condition: service_started
+      worker:
+        condition: service_started
+      ingest:
+        condition: service_started
+
+  ui:
+    image: ghcr.io/openaleph/aleph-ui:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:8080:8080"
+    depends_on:
+      - api
+
+  workbench-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: journalism
+      POSTGRES_USER: journalism
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in the environment or .env}
+    volumes:
+      - workbench-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U journalism -d journalism"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    # The API and the workbench screen it serves at "/" (ADR-0004). No bearer
+    # token is baked into the screen: users enter one in Settings.
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: journalism-workbench-backend:${WORKBENCH_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      APP_ENVIRONMENT: production
+      DATABASE_URL: postgresql+psycopg://journalism:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@workbench-db:5432/journalism
+      API_AUTH_TOKEN: ${API_AUTH_TOKEN:?set API_AUTH_TOKEN to a long random secret (openssl rand -hex 32)}
+      API_AUTH_INVESTIGATION_IDS: ${API_AUTH_INVESTIGATION_IDS:-}
+      CORS_ALLOWED_ORIGINS: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN to the https origin the reverse proxy serves, e.g. https://workbench.example.org}
+      DOCUMENT_STORAGE_DIR: /app/data/documents
+      AUDIT_LOG_FILE: /app/data/audit/security.jsonl
+      API_AUTH_FAILURE_STATE_FILE: /app/data/audit/auth-failures.json
+      CONNECTOR_CREDENTIALS_FILE: /app/data/secrets/connectors.json
+      ENABLE_RESTORE_API: ${ENABLE_RESTORE_API:-false}
+      ENABLE_AI_FEATURES: ${ENABLE_AI_FEATURES:-false}
+      AI_PROVIDER: ${AI_PROVIDER:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ALEPH_API_KEY: ${ALEPH_API_KEY:-}
+      OPENSANCTIONS_API_KEY: ${OPENSANCTIONS_API_KEY:-}
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-}
+      OPENALEPH_ENABLED: "true"
+      OPENALEPH_BASE_URL: http://api:8000
+      OPENALEPH_UI_URL: ${PUBLIC_OPENALEPH_URL:?set PUBLIC_OPENALEPH_URL to the https URL the proxy serves the OpenAleph UI at}
+      OPENALEPH_API_KEY: ${OPENALEPH_API_KEY:-}
+      OPENALEPH_AUTO_SYNC_DOCUMENTS: ${OPENALEPH_AUTO_SYNC_DOCUMENTS:-true}
+      ENABLE_LOCAL_ENTITY_SUGGESTIONS: ${ENABLE_LOCAL_ENTITY_SUGGESTIONS:-false}
+      RENDER_SERVICE_URL: http://render:8070
+      BASEMAP_DIR: /data/basemap
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:8000:8000"
+    volumes:
+      - workbench-data:/app/data
+      # The base map the `maps` profile installs (empty until it has run).
+      - basemap:/data/basemap:ro
+    depends_on:
+      workbench-db:
+        condition: service_healthy
+    # Deliberately NOT depends_on: api -- OpenAleph is part of the stack, but its
+    # images are large and Elasticsearch is slow to come up; the workbench must be
+    # reachable while that happens. The backend probes OpenAleph on demand
+    # (/api/integrations/openaleph/status) and reports it as down until it is up.
+    # Nor depends_on: render -- an export falls back to native charts and tables
+    # when the render service is down (ADR-0005, line 2).
+
+  # Chart images for PowerPoint and Word exports (ADR-0005, line 2): ECharts
+  # drawn as SVG on the server, no browser. Internal network only; the backend
+  # is its only caller. See render/README.md.
+  # The self-hosted base map (ADR-0005, lines 4 and 18), installed once with
+  # `docker compose --profile maps up basemap-extract basemap-assets`: a world
+  # extract of the Protomaps build (45 MB at zoom 6; each zoom level more is
+  # about three times larger) and the style's fonts and sprites from
+  # Protomaps' basemaps-assets. Both are public map data, so nothing about an
+  # investigation leaves the machine; the backend then serves them to the
+  # app and the render service. Run it again to take a newer build.
+  basemap-extract:
+    image: protomaps/go-pmtiles:${PMTILES_TAG:-v1.31.2}
+    profiles: ["maps"]
+    command:
+      - extract
+      - https://build.protomaps.com/${BASEMAP_BUILD:-20261003}.pmtiles
+      - /basemap/world.pmtiles
+      - --maxzoom=${BASEMAP_MAXZOOM:-6}
+    restart: "no"
+    volumes:
+      - basemap:/basemap
+
+  basemap-assets:
+    image: alpine:3.22
+    profiles: ["maps"]
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        site=https://protomaps.github.io/basemaps-assets
+        # The three fonts the @protomaps/basemaps style names, every range of 256
+        # glyphs the fonts have (a range they lack answers 404 and is skipped).
+        for font in "Noto Sans Regular" "Noto Sans Medium" "Noto Sans Italic"; do
+          mkdir -p "/basemap/fonts/$$font"
+          start=0
+          while [ $$start -le 65280 ]; do
+            range="$$start-$$((start + 255))"
+            file="/basemap/fonts/$$font/$$range.pbf"
+            [ -s "$$file" ] || wget -q -O "$$file" "$$site/fonts/$$(echo "$$font" | sed 's/ /%20/g')/$$range.pbf" || rm -f "$$file"
+            start=$$((start + 256))
+          done
+        done
+        mkdir -p /basemap/sprites/v4
+        for flavor in light dark grayscale; do
+          for name in "$$flavor.json" "$$flavor.png" "$$flavor@2x.json" "$$flavor@2x.png"; do
+            [ -s "/basemap/sprites/v4/$$name" ] || wget -q -O "/basemap/sprites/v4/$$name" "$$site/sprites/v4/$$name" || {
+              rm -f "/basemap/sprites/v4/$$name"; echo "Could not fetch sprite $$name; run this again."; exit 1; }
+          done
+        done
+        echo "Base map fonts and sprites are in place."
+    restart: "no"
+    volumes:
+      - basemap:/basemap
+
+  render:
+    build:
+      context: ./render
+    image: journalism-workbench-render:${WORKBENCH_TAG:-latest}
+    restart: unless-stopped
+    # xvfb-run, which gives MapLibre Native its X display, does not start its
+    # program when it runs as PID 1 (seen 2026-10-03): an init runs first.
+    init: true
+    volumes:
+      # The base map the `maps` profile installs, for maps in exports (ADR-0005, line 18).
+      - basemap:/basemap:ro
+
+volumes:
+  workbench-pgdata:
+  workbench-data:
+  openaleph-pgdata:
+  openaleph-elasticsearch-data:
+  openaleph-redis-data:
+  openaleph-archive:
+  translate-models:
+  translate-cache:
+  basemap:

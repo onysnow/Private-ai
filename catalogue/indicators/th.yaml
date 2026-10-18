@@ -1,0 +1,1570 @@
+key: TH
+name: Organised theft and fencing
+scope: 'Organised retail crime, online fencing, cyber-enabled cargo theft, ATM jackpotting, and the unsourced
+  gaps: robbery, burglary, livestock theft, electricity theft and payment-card skimming.'
+indicators:
+- id: TH-001
+  name: Wholesaler or trading company paying many unrelated individuals
+  definition: A company that calls itself a wholesaler, distributor or trading business sends cheques
+    or transfers to many private individuals instead of to recognisable suppliers, which can mean it is
+    paying thieves (boosters) for stolen goods.
+  areas:
+  - TH
+  typology: 'Organised retail crime: fencer paying boosters'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with Homeland Security Investigations (HSI)
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, Red Flag Indicators Related to Transactions (pp. 33-35)
+    quote: Unusually large number of beneficiaries receiving funds from one company. This may be indicative
+      of payment to fencers.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, cash, check and money order (p. 33)
+    quote: Check payments issued to multiple individuals for which no relationship or lawful purpose can
+      be established.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Checks written to individuals, as opposed to legitimate business suppliers.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A health-and-beauty wholesaler's account shows weekly even-amount cheques to dozens of individuals
+    and almost no payments to manufacturers (pattern described in Operation King of Thieves and Operation
+    At the Card Wash, ACAMS/HSI 2022, Section Eight).
+  cases:
+  - name: Operation At the Card Wash (HSI Long Beach and HSI Los Angeles)
+    year: '2021'
+    jurisdiction: United States (California)
+    what_happened: HSI reported a national network of wholesale electronics distributors that it said
+      bought consumer electronics with gift cards obtained from phone-scam victims and exported goods
+      declared at over US$13 million; four defendants were federally indicted. The report gives no conviction.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    source_title: ACAMS/HSI report on ORC, Section Eight (pp. 29-31)
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Ownership
+  - Directorship
+  - Document
+  checkable: records
+  lookup_sources:
+  - Bank records or court exhibits
+  - State business registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: The ACAMS/HSI guide frames these payments as laundering of theft proceeds through wholesale
+      front companies.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  - target_area: FR
+    reason: Operation At the Card Wash linked electronics wholesalers to gift cards taken from phone-scam
+      victims.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Buying from individual resellers, estate sales or consignors is a legitimate model for liquidators
+    and second-hand dealers.
+  - Paying commission-only sales agents or gig workers as individuals.
+  - Refunds or rebates to retail customers.
+  jurisdictions: United States (guidance written for US financial institutions)
+  version: 1
+- id: TH-002
+  name: Round-sum payments to 'liquidator' or 'wholesale' companies
+  definition: Money moves in large, even, repeated amounts between companies whose names contain words
+    like liquidator or wholesale, or that appear to be both suppliers and buyers, without invoices that
+    explain it.
+  areas:
+  - TH
+  typology: 'Organised retail crime: diverter and fencer layering'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Check payments issued to multiple companies with "liquidator" or "wholesale" in their name.
+      Overall funds may be co-mingled.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Operation At the Card Wash characteristics (p. 31)
+    quote: Large, even-numbered fund transfers to entities appearing to be suppliers or buyers
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, wire transactions (p. 34)
+    quote: Wire transfers sent in large, round dollar, repetitive amounts on a consistent date (e.g. weekly
+      or monthly).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, bank statements (p. 35)
+    quote: Even dollar payments between illicit wholesaler and diverter.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Weekly US$50,000 transfers from an electronics wholesaler to a 'liquidation' company that also sells
+    inventory back to it.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Contract
+  - Ownership
+  - Address
+  checkable: records
+  lookup_sources:
+  - Bank records or court exhibits
+  - State business registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Round, repetitive, undocumented transfers are listed as laundering red flags in the guide.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Liquidation and closeout buying is a lawful, large industry that buys surplus and returned stock.
+  - Retainer or instalment payments under a supply contract are often round and regular.
+  - Related companies in one group settle intercompany balances in round sums.
+  jurisdictions: United States
+  version: 1
+- id: TH-003
+  name: Online-marketplace payouts without a real sales business
+  definition: An account receives large or frequent payouts from online marketplaces or payment apps,
+    but the holder has no visible retail, online shop or supplier purchases that would explain the sales.
+  areas:
+  - TH
+  typology: E-fencing
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, ACH (p. 34)
+    quote: Large volume of credit transactions from online marketplaces for sale of stolen goods.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Twelve, Due Diligence and Transaction Monitoring (pp. 49-50)
+    quote: If the customer only had credits for sales, that is a red flag.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Organized Retail Crime (GAO-11-675)
+    publisher: US Government Accountability Office
+    year: '2011'
+    url: https://www.gao.gov/products/gao-11-675
+    locator: Highlights
+    quote: These stolen goods can also be sold on online marketplaces, a practice known as "e-fencing."
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A personal account receives several thousand dollars a week from a marketplace but shows no purchases
+    of stock.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Marketplace seller profiles
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Selling one's own used belongings, collections or an estate.
+  - Drop-shipping, where the seller never holds or visibly buys stock in the same account.
+  - Stock bought with a separate business account or card.
+  jurisdictions: United States
+  version: 1
+- id: TH-004
+  name: Merchandise business that never buys merchandise
+  definition: A warehouse, wholesaler or goods seller shows sales and deposits but no sign of buying goods
+    from manufacturers or legitimate suppliers.
+  areas:
+  - TH
+  typology: 'Organised retail crime: front companies'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, customer or customer's business (p. 35)
+    quote: Business is a warehouse, merchandise seller, or other similar business line with no evidence
+      of purchasing goods or products.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 35)
+    quote: Business has dramatically different amounts and patterns of currency deposits from similar
+      businesses.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, wire transactions (p. 34)
+    quote: Payments received with no apparent links to legitimate funds (purchase of product, creation
+      of product).
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A 'distribution' company's statements show only incoming sales and outgoing payments to individuals
+    and freight carriers.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Court exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: The guide lists shell companies and merchandise sellers without purchases as customer-risk
+      indicators.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Goods bought through a parent company, another account or trade credit.
+  - Consignment selling, where stock is paid for only after sale.
+  - A new business still selling down initial stock.
+  jurisdictions: United States
+  version: 1
+- id: TH-005
+  name: Steady spending on pallets, shrink wrap, freight, storage units and rental cars
+  definition: An account or business keeps paying for shipping supplies, trucking, many storage or warehouse
+    units, mailbox rentals and local car rentals in a pattern that fits moving and storing stolen stock.
+  areas:
+  - TH
+  typology: 'Organised retail crime: logistics of handling stolen goods'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, bank statements (p. 35)
+    quote: Ongoing payments to replenish shipping supplies, such as pallets, boxes, tape labels, and shrink
+      wrap.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, bank statements (p. 35)
+    quote: Repeated payments to transportation (trucking) company/companies.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Operation King of Thieves (pp. 28-29)
+    quote: Payments to multiple storage and/or warehouse companies
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Operation King of Thieves (pp. 28-29)
+    quote: Numerous payments to rental car companies, especially in the area in which the subject resides
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Operation King of Thieves (pp. 28-29)
+    quote: Rental payments to multiple mail centers for PO boxes
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A pawn shop or convenience store ships pallets of product every week by common carrier (ACAMS/HSI
+    p. 18).
+  cases:
+  - name: Operation King of Thieves (HSI Houston)
+    year: 2018-2021
+    jurisdiction: United States (Texas)
+    what_happened: HSI reported a transnational organisation that used booster crews to steal over-the-counter
+      medicines and diabetic test strips, cleaned and shipped them, and laundered proceeds through pharmacies
+      and healthcare billing; the guide reports 24 arrests and about US$8 million in cash and property
+      seized. The guide reports charges, not convictions.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    source_title: ACAMS/HSI report on ORC, Section Eight (pp. 25-29)
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Address
+  - Vehicle
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Court exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Operation King of Thieves tied stolen diabetic supplies to healthcare billing and program
+      losses.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Any genuine e-commerce, wholesale or moving business buys packaging and freight.
+  - Storage units and mailboxes are common for small online sellers working from home.
+  - Car rentals while a personal vehicle is being repaired.
+  jurisdictions: United States
+  version: 1
+- id: TH-006
+  name: Seller business behind a PO box or storage unit, or sharing addresses and agents with its buyers
+  definition: The trading company's registered address is a mailbox or storage unit, or its buyers and
+    sellers turn out to share the same address or registered agent, suggesting the 'trade' is between
+    linked parties.
+  areas:
+  - TH
+  typology: 'Organised retail crime: front companies'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Operation King of Thieves (pp. 28-29)
+    quote: Primary business may be registered with the state, but comes back to a PO box or storage unit
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, OSINT research (p. 37)
+    quote: Online search indicates that buyer and seller have identical addresses with the same individuals
+      as registered agents.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, customer (p. 35)
+    quote: Customers tied to the suspicious activity may all have the same physical address listed.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Two wholesalers that trade with each other list the same suite and the same registered agent.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Directorship
+  - Ownership
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - State business registries (secretary of state filings)
+  - Registered-agent records
+  - Satellite and street imagery of listed address
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: Shared addresses and agents are general front-company signs in the guide.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Commercial registered-agent firms serve thousands of unrelated companies at one address.
+  - Small businesses legally use virtual offices and mailbox addresses for privacy.
+  - Related companies in one family group often share an office.
+  jurisdictions: United States
+  version: 1
+- id: TH-007
+  name: Cash deposits in large notes that do not fit the person's job or location
+  definition: Cash, often in US$100 notes, is deposited in amounts or places that do not match the holder's
+    occupation or home, sometimes across several states and quickly withdrawn.
+  areas:
+  - TH
+  typology: 'Organised retail crime: cash proceeds'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, cash, check and money order (p. 33)
+    quote: Large cash deposits into an individual's account which do not coincide with their occupation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Cash deposits are typically in US$100 denominations.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Significant movement of cash funds between various states.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Structured cash deposits to avoid ID requirements and reluctance to share source of funds.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, customer (p. 35)
+    quote: Occupation listed for the customer is not commensurate with the volume and type of financial
+      activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A warehouse worker's account receives regular US$100-note deposits in branches in several states.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Employment
+  - Address
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Court exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Structuring and unexplained cash are general laundering indicators in the guide.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Cash-based trades (tips, markets, construction) and side businesses.
+  - Travelling workers such as truckers depositing on the road.
+  - Savings kept at home being banked.
+  jurisdictions: United States
+  version: 1
+- id: TH-008
+  name: Business cheques to cash, many same-day cheques below US$10,000, no stated purpose
+  definition: A business writes cheques payable to cash or many same-day cheques just under US$10,000,
+    with nothing in the memo line, and the money ends up in the owners' personal accounts.
+  areas:
+  - TH
+  typology: 'Organised retail crime: extracting cash'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Despite no reporting requirements, multiple checks written on the same day in amounts less
+      than US$10,000.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Checks written from the business account payable to cash are deposited in principal's personal
+      accounts.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: None of the checks in the business account note the purpose in the memo section.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Business checks written to cash on a regular basis in amounts that exceed a typical business's
+      petty cash requirement.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Five cheques to cash of US$9,500 each on the same day from a 'trading' company.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Court exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Sub-threshold and cash-out patterns are general laundering signals in the guide.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Owner draws or wage payments in cash in cash-heavy trades.
+  - Poor bookkeeping and blank memo lines are common in small firms.
+  - Paying several suppliers on one day.
+  jurisdictions: United States
+  version: 1
+- id: TH-009
+  name: Bulk gift-card and prepaid-card handling, funds loaded in one country and withdrawn abroad
+  definition: A person holds or buys many gift or prepaid cards out of proportion to any business need,
+    or cards loaded in the US are cashed out overseas, a pattern linked to converting stolen cards and
+    theft proceeds.
+  areas:
+  - TH
+  typology: 'Organised theft: stored-value card conversion'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Stored Value Initiative (p. 25)
+    quote: Subject(s) in possession of numerous SVCs
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Stored Value Initiative (p. 25)
+    quote: SVCs loaded with funds in the United States, withdrawn overseas
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, prepaid cards (p. 34)
+    quote: Customers purchasing several pre-paid cards; purchases are not commensurate with normal business
+      activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Stored Value Initiative (p. 25)
+    quote: Unusual level and frequency of ATM usage
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Gift cards bought in bulk at US stores are used to buy electronics that are then exported (Operation
+    At the Card Wash pattern, ACAMS/HSI pp. 29-31).
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Event
+  - Address
+  checkable: records
+  lookup_sources:
+  - Bank and card records
+  - Court exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The guide links stored-value cards to cards obtained from scam victims and stolen in burglaries.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Businesses buy gift cards for staff rewards or customer promotions.
+  - Migrant workers send money home using prepaid cards.
+  - Travellers withdraw abroad with prepaid travel cards.
+  jurisdictions: United States
+  version: 1
+- id: TH-010
+  name: Listing photos that show security tags, vehicles, defaced labels or factory wrap
+  definition: Online listings show goods still carrying store anti-theft tags, photographed inside a car,
+    with labels scraped off, still in shipping plastic, or using stock retail photos.
+  areas:
+  - TH
+  typology: 'E-fencing: listing content'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, OSINT research including online marketplaces (p. 37)
+    quote: Merchandise photos with sensor tags or other electronic article surveillance (EAS) devices
+      still attached.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 37)
+    quote: Photos of merchandise taken inside a vehicle.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 37)
+    quote: Defaced product labels.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 37)
+    quote: Merchandise still in shipping plastic (cargo theft).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 37)
+    quote: Using stock retail photos.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A marketplace listing for 20 bottles of perfume photographed on a car seat with store security tags
+    visible.
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Company
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Online marketplace and social-media listings
+  - Reverse image search
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Buyers of store returns or closeout pallets sometimes receive goods with tags still attached.
+  - Sellers photograph goods in a car for light or convenience.
+  - Stock photos are widely used by legitimate resellers.
+  jurisdictions: United States
+  version: 1
+- id: TH-011
+  name: Seller offering many units, full size runs and new-with-tags goods in high-theft product lines,
+    priced low
+  definition: A seller lists repeated quantities of the same new, tagged items, often in commonly stolen
+    categories such as razor blades, test strips or infant formula, across every size, at prices well
+    below other sellers.
+  areas:
+  - TH
+  typology: 'E-fencing: listing volume and pricing'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 37)
+    quote: Large variety of sizes available.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 37)
+    quote: A variety of merchandise, new with tags.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Organized Retail Crime (GAO-11-675)
+    publisher: US Government Accountability Office
+    year: '2011'
+    url: https://www.gao.gov/assets/gao-11-675.pdf
+    locator: p. 6
+    quote: steal multiple quantities of targeted items
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Organized Retail Crime (GAO-11-675)
+    publisher: US Government Accountability Office
+    year: '2011'
+    url: https://www.gao.gov/assets/gao-11-675.pdf
+    locator: p. 32
+    quote: top suspicious sellers of high-risk items based on quantities, price points, and high-theft
+      areas
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A seller lists 40 boxes of the same razor-blade refill and every size of one brand of jeans, all 'NWT',
+    at half the retail price.
+  cases:
+  - name: San Diego regional task force retail theft case (as summarised by GAO)
+    year: 2011 or earlier
+    jurisdiction: United States (California)
+    what_happened: GAO reported a task force investigation of a group suspected of stealing up to US$1
+      million in merchandise; one of the brothers involved was convicted and 78 theft cases were closed.
+      GAO does not name the defendants.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.gao.gov/assets/gao-11-675.pdf
+    source_title: GAO-11-675, p. 16
+  data_needed:
+  - Document
+  - Person
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Online marketplace listings
+  - Retail price comparisons
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Authorised resellers and closeout buyers legitimately sell in bulk below retail.
+  - Product arbitrage sellers buy clearance stock and resell it.
+  - Overstock from a closed store.
+  jurisdictions: United States
+  version: 1
+- id: TH-012
+  name: 'Seller identity hard to pin down: shared IPs, ''pawn'' or ''wholesale'' handles, thin reviews,
+    dead shop website'
+  definition: Several seller accounts share one internet address, use handles like 'Pawn', 'Flea Market'
+    or 'wholesale', have few reviews, keep changing seller IDs, or run a website where nothing can actually
+    be bought.
+  areas:
+  - TH
+  typology: 'E-fencing: seller identity'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, Common Indicators on the Surface Web (pp. 37-38)
+    quote: Multiple usernames using the same internet protocol (IP) address.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, Common Indicators on the Surface Web (pp. 37-38)
+    quote: Company's website does not allow you to buy a product outright, indicates you must contact
+      the retailer first.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Organized Retail Crime (GAO-11-675)
+    publisher: US Government Accountability Office
+    year: '2011'
+    url: https://www.gao.gov/assets/gao-11-675.pdf
+    locator: p. 7
+    quote: providing sellers with a perceived increase in anonymity
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Three marketplace stores with different names, one IP address and a shared 'DM for orders' message.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Organization
+  - Document
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Online marketplace seller pages
+  - Domain and website history (WHOIS, web archives)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family members or staff of one business share a network.
+  - New legitimate sellers have few reviews.
+  - Small wholesalers often sell only by enquiry to trade buyers.
+  jurisdictions: United States
+  version: 1
+- id: TH-013
+  name: High-volume marketplace seller without verified, disclosed identity
+  definition: A seller whose volume makes them a 'high-volume third party seller' under US law but whose
+    verified name, address or contact details are missing or do not check out.
+  areas:
+  - TH
+  typology: 'E-fencing: marketplace transparency'
+  status: verified
+  sources:
+  - title: Informing Businesses about the INFORM Consumers Act
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/business-guidance/resources/informing-businesses-about-inform-consumers-act
+    locator: Who is a high-volume third party seller
+    quote: 200 or more separate sales or transactions of new or unused consumer products
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Informing Businesses about the INFORM Consumers Act
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/business-guidance/resources/informing-businesses-about-inform-consumers-act
+    locator: Purpose
+    quote: to deter criminals from acquiring stolen, counterfeit, or unsafe items and selling them through
+      those marketplaces
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A store with thousands of sales of new goods shows only a first name and no address on its listings.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Marketplace seller disclosure pages
+  - Business registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 200 or more sales of new or unused products and US$5,000 or more gross revenue in a continuous
+      12 months within the last 24 (high-volume seller; marketplace must collect bank, contact and tax
+      ID); disclosure on listings required at US$20,000 or more annual gross revenue
+    threshold_source: https://www.ftc.gov/business-guidance/resources/informing-businesses-about-inform-consumers-act
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: The FTC states the Act also targets counterfeit items sold through marketplaces.
+    source_url: https://www.ftc.gov/business-guidance/resources/informing-businesses-about-inform-consumers-act
+  innocent_explanations:
+  - Sellers below the disclosure revenue level need not show full details.
+  - The Act allows some sellers to show partial details (for example, no street address for home-based
+    sellers) under conditions the FTC describes.
+  - Platform display errors.
+  jurisdictions: United States
+  version: 1
+- id: TH-014
+  name: Online footprint does not support the stated business, or shows past theft involvement
+  definition: Open-source checks find no real operation behind the company's claimed trade or revenue,
+    or show earlier involvement in retail theft or fraud.
+  areas:
+  - TH
+  typology: 'Organised retail crime: OSINT check'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, OSINT research (p. 37)
+    quote: Open-source internet search fails to support the client's stated business or revenue.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Operation King of Thieves (pp. 28-29)
+    quote: Open-source information indicates previous involvement in ORC, fraud, theft, etc.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Satellite imagery of a 'distribution centre' address shows an empty lot (pattern described on pp.
+    37-38).
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - CourtCase
+  - Person
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Satellite and street imagery
+  - Court records
+  - News archives
+  - Business registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many small firms have little web presence.
+  - Past charges may have been dropped or ended in acquittal.
+  - Businesses move or rebrand faster than online records update.
+  jurisdictions: United States
+  version: 1
+- id: TH-015
+  name: Bulk buying of tag-removal supplies
+  definition: Purchases of large amounts of heat guns or lighter fluid, which the guide says are used
+    to clean anti-theft stickers off stolen goods.
+  areas:
+  - TH
+  typology: 'Organised retail crime: cleaning stolen goods'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Three, ORC Steps and Potential Red Flags (p. 18)
+    quote: large amounts of lighter fluid or heat guns
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A reseller's card shows repeated hardware-store purchases of heat guns and lighter fluid alongside
+    packaging.
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  checkable: records
+  lookup_sources:
+  - Card or bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Heat guns are standard tools in crafts, packaging, electronics repair and building trades.
+  - Lighter fluid is a common consumer good.
+  - Legitimate resellers remove price stickers from closeout stock.
+  jurisdictions: United States
+  version: 1
+- id: TH-016
+  name: Gifts to bank staff from a trading business
+  definition: A business owner and associates give cash, food or beauty products to bank employees, which
+    the guide lists as a feature of a theft-proceeds case.
+  areas:
+  - TH
+  typology: 'Organised retail crime: gatekeeper influence'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Eight, Operation King of Thieves (pp. 28-29)
+    quote: Business owner and associates may attempt to provide gifts of money, food, and beauty items
+      to bank personnel
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bank tellers report repeated gifts of beauty products from a wholesale customer.
+  cases:
+  - name: Operation King of Thieves (HSI Houston)
+    year: 2018-2021
+    jurisdiction: United States (Texas)
+    what_happened: The guide lists gifts to bank personnel among the characteristics observed in this
+      HSI case, which it reports led to 24 arrests; no convictions are reported in the guide.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    source_title: ACAMS/HSI report on ORC, Section Eight
+  data_needed:
+  - Person
+  - Company
+  - Employment
+  - Associate
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Gifts to bank personnel suggest attempts to influence a gatekeeper.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Customary small holiday gifts to staff in some communities.
+  - Product samples given by a beauty business to people it deals with.
+  jurisdictions: United States
+  version: 1
+- id: TH-017
+  name: Theft-linked funds sent abroad to unrelated receivers or through privacy tools
+  definition: Proceeds move to receivers in several countries with no clear link, cheques are cashed abroad,
+    or the person uses crypto mixers, privacy coins or third-party processors to hide who is behind the
+    money.
+  areas:
+  - TH
+  typology: 'Organised theft: cross-border movement of proceeds'
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, geographical risks (p. 36)
+    quote: Subjects sending transfers to receivers in multiple countries with no apparent relationship.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine (p. 33)
+    quote: Checks drawn from suspicious financial activities are negotiated in foreign countries.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, cryptocurrency (p. 34)
+    quote: Customers using mixers, privacy coins, or private wallets to further mask their identity.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Nine, wire transactions (p. 34)
+    quote: Wire transactions containing limited content and lacking related party information.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A reseller wires funds to individuals in four countries with no stated purpose.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Address
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Blockchain explorers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Cross-border layering and privacy tools are laundering indicators in the guide.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Family remittances.
+  - Paying overseas suppliers or freelancers.
+  - Privacy-minded but lawful crypto use.
+  jurisdictions: United States
+  version: 1
+- id: TH-018
+  name: Outsiders fishing for shipment details or offering to 'help' with loads
+  definition: People outside a freight business ask about scheduled or moving shipments, offer unsolicited
+    help, or vendors show unusual interest in internal systems, which the FBI flagged as part of a cargo
+    theft scheme.
+  areas:
+  - TH
+  typology: Cyber-enabled cargo theft
+  status: verified
+  sources:
+  - title: Feds warn carriers about cargo theft scheme
+    publisher: Land Line (reporting an FBI Private Sector Liaison Information Report, 17 April 2024)
+    year: '2024'
+    url: https://landline.media/feds-warn-carriers-about-cargo-theft-scheme/
+    locator: List of warning signs
+    quote: Individuals outside your business soliciting information about scheduled or in-progress shipments
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Feds warn carriers about cargo theft scheme
+    publisher: Land Line (reporting an FBI Liaison Information Report)
+    year: '2024'
+    url: https://landline.media/feds-warn-carriers-about-cargo-theft-scheme/
+    locator: List of warning signs
+    quote: Outside entities offering to help or assist your business with shipments
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Feds warn carriers about cargo theft scheme
+    publisher: Land Line (reporting an FBI Liaison Information Report)
+    year: '2024'
+    url: https://landline.media/feds-warn-carriers-about-cargo-theft-scheme/
+    locator: List of warning signs
+    quote: Vendors or contractors showing unusual interest in business processes or systems
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A caller claiming to be a broker asks a carrier's dispatcher for the pickup time and trailer number
+    of a high-value load.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - Vehicle
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: The FBI report concerns cyber-enabled theft using compromised business logins.
+    source_url: https://landline.media/feds-warn-carriers-about-cargo-theft-scheme/
+  innocent_explanations:
+  - Brokers, shippers and receivers routinely ask about load status.
+  - New vendors legitimately need to learn a client's processes.
+  jurisdictions: United States
+  version: 1
+- id: TH-019
+  name: Changed contact details, login credentials or odd load-board logins at a freight business
+  definition: A carrier's or broker's contact information or passwords change unexpectedly, or there are
+    unusual login attempts on its load management systems, which can precede loads being redirected to
+    thieves.
+  areas:
+  - TH
+  typology: Cyber-enabled cargo theft
+  status: verified
+  sources:
+  - title: Feds warn carriers about cargo theft scheme
+    publisher: Land Line (reporting an FBI Private Sector Liaison Information Report, 17 April 2024)
+    year: '2024'
+    url: https://landline.media/feds-warn-carriers-about-cargo-theft-scheme/
+    locator: List of warning signs
+    quote: Unusual or unexpected changes in business contact information or login credentials
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Feds warn carriers about cargo theft scheme
+    publisher: Land Line (reporting an FBI Liaison Information Report)
+    year: '2024'
+    url: https://landline.media/feds-warn-carriers-about-cargo-theft-scheme/
+    locator: List of warning signs
+    quote: Unusual login attempts to business load management systems
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A carrier's email and phone number on a load board are changed overnight, and a load is booked under
+    its name by someone else.
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Document
+  - Vehicle
+  checkable: lookups
+  lookup_sources:
+  - Federal motor carrier registration records (FMCSA)
+  - Load-board account history
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Account takeover is the mechanism described.
+    source_url: https://landline.media/feds-warn-carriers-about-cargo-theft-scheme/
+  innocent_explanations:
+  - Staff changes, new phone systems or password resets.
+  - Users logging in from travel or new devices.
+  jurisdictions: United States
+  version: 1
+- id: TH-020
+  name: 'ATM physical tampering signs: door alerts, foreign USB devices, removed hard drives'
+  definition: An ATM shows door-open alerts outside planned maintenance, devices plugged in that should
+    not be there, a missing hard drive, unexpected outages or running out of cash at odd times, which
+    the FBI lists as jackpotting indicators.
+  areas:
+  - TH
+  typology: ATM jackpotting
+  status: verified
+  sources:
+  - title: Increase in Malware Enabled ATM Jackpotting Incidents
+    publisher: Federal Bureau of Investigation (IC3)
+    year: '2026'
+    url: https://www.ic3.gov/CSA/2026/260219.pdf
+    locator: Physical interaction indicators
+    quote: ATM door open alerts outside of planned maintenance schedule
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Increase in Malware Enabled ATM Jackpotting Incidents
+    publisher: FBI (IC3)
+    year: '2026'
+    url: https://www.ic3.gov/CSA/2026/260219.pdf
+    locator: Physical interaction indicators
+    quote: Low/No cash indicators outside of expected use schedule
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Increase in Malware Enabled ATM Jackpotting Incidents
+    publisher: FBI (IC3)
+    year: '2026'
+    url: https://www.ic3.gov/CSA/2026/260219.pdf
+    locator: Physical interaction indicators
+    quote: Removal of hard drives from ATMs
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Increase in Malware Enabled ATM Jackpotting Incidents
+    publisher: FBI (IC3)
+    year: '2026'
+    url: https://www.ic3.gov/CSA/2026/260219.pdf
+    locator: Physical interaction indicators
+    quote: Unauthorized devices plugged into the ATM
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A bank's maintenance log shows no visit, but the ATM reported a door-open alert and was empty an hour
+    later.
+  cases: []
+  data_needed:
+  - Event
+  - Organization
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - ATM operator incident logs
+  - Police incident reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: FBI describes jackpotting as malware-enabled.
+    source_url: https://www.ic3.gov/CSA/2026/260219.pdf
+  innocent_explanations:
+  - Unscheduled repairs or cash refills by contractors.
+  - High withdrawal demand around holidays or paydays.
+  - Hardware faults causing outages.
+  jurisdictions: United States (FBI advisory)
+  version: 1
+- id: TH-021
+  name: 'ATM software compromise: unknown programs, remote-access tools, cleared logs'
+  definition: An ATM's computer runs unexpected programs or services, has unauthorised remote-access tools,
+    connects to unexpected addresses, or has had its logs cleared, which the FBI treats as possible jackpotting
+    malware.
+  areas:
+  - TH
+  typology: ATM jackpotting
+  status: verified
+  sources:
+  - title: Increase in Malware Enabled ATM Jackpotting Incidents
+    publisher: FBI (IC3)
+    year: '2026'
+    url: https://www.ic3.gov/CSA/2026/260219.pdf
+    locator: Digital indicators
+    quote: Remote connection applications, such as TeamViewer or AnyDesk, if unauthorized
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Increase in Malware Enabled ATM Jackpotting Incidents
+    publisher: FBI (IC3)
+    year: '2026'
+    url: https://www.ic3.gov/CSA/2026/260219.pdf
+    locator: Digital indicators
+    quote: application logs showing connections from unexpected IP addresses
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Increase in Malware Enabled ATM Jackpotting Incidents
+    publisher: FBI (IC3)
+    year: '2026'
+    url: https://www.ic3.gov/CSA/2026/260219.pdf
+    locator: Persistence mechanisms
+    quote: Services running under SYSTEM without vendor signature
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Forensic report on an emptied ATM finds an unsigned service and a log-cleared event.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources:
+  - ATM forensic and security logs
+  - Court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Any deviation from the ATM's baseline file hashes, per the FBI advisory, is to be treated
+      as a potential compromise
+    threshold_source: https://www.ic3.gov/CSA/2026/260219.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Malware and remote-access indicators.
+    source_url: https://www.ic3.gov/CSA/2026/260219.pdf
+  innocent_explanations:
+  - Vendor-authorised remote support tools.
+  - Software updates that change file hashes.
+  - Routine log rotation.
+  jurisdictions: United States (FBI advisory)
+  version: 1
+- id: TH-022
+  name: Card-reader tampering at ATMs, fuel pumps or tills (skimming)
+  definition: Card readers or keypads that are loose, crooked, damaged, mismatched in colour or shape,
+    or that keep a card, can signal a skimming device that copies card data and PINs.
+  areas:
+  - TH
+  typology: Payment-card skimming
+  status: verified
+  sources:
+  - title: Skimming
+    publisher: Federal Bureau of Investigation
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-frauds-and-scams/skimming
+    locator: How to protect yourself
+    quote: Look for anything loose, crooked, damaged, or scratched.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Skimming
+    publisher: Federal Bureau of Investigation
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-frauds-and-scams/skimming
+    locator: Fuel pumps
+    quote: inconsistencies in coloring, material, or shape
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several local news reports of skimmers found on the same chain's fuel pumps within a month.
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Organization
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - State weights-and-measures or consumer-protection skimmer reports
+  - Police incident logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Skimmed card data feeds card fraud; ACAMS notes theft groups also use stolen cards to buy
+      gift cards.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Ordinary wear and damage to old terminals.
+  - Mismatched replacement parts after repairs.
+  - ATMs retain cards for legitimate reasons such as expired cards.
+  jurisdictions: United States
+  version: 1
+- id: TH-023
+  name: Booster crews drawn from vulnerable or exploited people
+  definition: The people doing the stealing are reported to include labour-trafficked people working off
+    debts, undocumented migrants or people with addictions, so a theft ring may also be an exploitation
+    case.
+  areas:
+  - TH
+  typology: Organised theft group structure
+  status: verified
+  sources:
+  - title: Detecting and Reporting the Illicit Financial Flows Tied to Organized Theft Groups and Organized
+      Retail Crime
+    publisher: ACAMS with HSI
+    year: '2022'
+    url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+    locator: Section Two, OTG Organizational Roles (p. 15)
+    quote: the thieves on the ground that steal (boost) the products.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Arrest records show the same crew boss linked to many low-level shoplifters from out of state.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court and arrest records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: The guide states boosters may be labour-trafficked people working off debt.
+    source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  innocent_explanations:
+  - Many shoplifting arrests are unconnected individual offences.
+  - Shared travel or housing among low-wage workers is common and not evidence of a crew.
+  jurisdictions: United States
+  version: 1
+not_reached:
+- WebSearch was unavailable for this whole run (the shared per-turn search budget was already used up),
+  so widening beyond the three given lists relied only on URLs fetched directly. More searching can be
+  done in a follow-up run.
+- 'FinCEN/FBI notice on catalytic converter theft (2023): guessed fincen.gov URLs failed to fetch; catalytic
+  converter and metal theft indicators not included.'
+- 'US DOJ press releases on the 2022 nationwide catalytic converter theft takedown: fetch failed.'
+- 'FBI cargo theft page (fbi.gov/investigate/violent-crime/cargo-theft) and the UCR cargo theft definition
+  (ucr.fbi.gov/cargo-theft): fetch failed.'
+- 'Original FBI Private Sector Liaison Information Report on cargo theft (17 April 2024): not reached;
+  TH-018 and TH-019 rely on Land Line''s reporting of it (secondary source).'
+- 'Europol guidance on logical attacks on ATMs: fetch failed.'
+- 'IC3 public service announcements on cargo or freight fraud: fetch failed.'
+- No sources were researched for robbery, burglary, livestock theft or electricity theft; these gaps stay
+  open.
+- 'FinCEN advisories and notices index page: fetch failed.'
+- The last 719 characters of the ACAMS/HSI PDF and the part of GAO-11-675 after character 100,000 were
+  not read.

@@ -13,5 +13,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Build backend and frontend images
-        run: docker compose build backend frontend
+      # One image (ADR-0004): its first stage builds the workbench screen,
+      # its second runs the API that serves it.
+      - name: Build the workbench image (API + screen)
+        run: docker compose build backend
+
+      # The render service (ADR-0005, line 2) draws chart images for exports.
+      - name: Build the render image
+        run: docker compose build render

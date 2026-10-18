@@ -1,0 +1,58 @@
+
+==============================================================================
+K1. Film colour at oblique incidence inside the glass (gap 300 nm, 'deep blue' at normal)
+==============================================================================
+  in-glass incidence  0 deg: Y=  2.06%  rgb(norm)=(0.00,0.13,1.00)
+  in-glass incidence 10 deg: Y=  1.30%  rgb(norm)=(0.04,0.05,1.00)
+  in-glass incidence 20 deg: Y=  1.84%  rgb(norm)=(1.00,0.04,0.61)
+  in-glass incidence 30 deg: Y= 13.99%  rgb(norm)=(1.00,0.71,0.20)
+  in-glass incidence 35 deg: Y= 26.92%  rgb(norm)=(1.00,0.95,0.87)
+  in-glass incidence 40 deg: Y= 52.21%  rgb(norm)=(0.81,0.85,1.00)
+  in-glass incidence 41 deg: Y= 59.19%  rgb(norm)=(0.79,0.84,1.00)
+  in-glass incidence 45 deg: Y= 82.12%  rgb(norm)=(0.84,0.87,1.00)
+  in-glass incidence 60 deg: Y= 99.07%  rgb(norm)=(0.99,0.95,1.00)
+
+==============================================================================
+K2. FTIR is slightly colour-selective (gap reflectance at 450/550/650 nm, in-glass 60 deg)
+==============================================================================
+  gap  50 nm: R450= 38.1%  R550= 28.7%  R650= 22.1%
+  gap 100 nm: R450= 76.5%  R550= 65.7%  R650= 56.0%
+  gap 150 nm: R450= 92.3%  R550= 85.7%  R650= 78.3%
+  gap 200 nm: R450= 97.6%  R550= 94.4%  R650= 90.0%
+  gap 300 nm: R450= 99.8%  R550= 99.2%  R650= 98.0%
+
+==============================================================================
+K3. Shallow face (lean > 49 deg) seen from the front: how much of the view goes THROUGH the gap
+==============================================================================
+  lean 50: incidence 40.0 deg, one face R=32.08%, both faces (incoherent) R=48.57%, through= 51.4%
+  lean 55: incidence 35.0 deg, one face R= 9.59%, both faces (incoherent) R=17.50%, through= 82.5%
+  lean 60: incidence 30.0 deg, one face R= 5.96%, both faces (incoherent) R=11.25%, through= 88.8%
+  lean 65: incidence 25.0 deg, one face R= 4.84%, both faces (incoherent) R= 9.24%, through= 90.8%
+  lean 70: incidence 20.0 deg, one face R= 4.45%, both faces (incoherent) R= 8.52%, through= 91.5%
+  lean 80: incidence 10.0 deg, one face R= 4.27%, both faces (incoherent) R= 8.18%, through= 91.8%
+
+==============================================================================
+K4. Exhaustive check: can a ray entering the front face be TIR'd by ONE crack face and leave the front face?
+==============================================================================
+  TIR reflections tested: 150836; of these, exiting the front face: 0
+
+==============================================================================
+K5. Two-bounce corner path (vertical crack face + back-face reflection): where does the lamp glint?
+==============================================================================
+  crack   0 px from the lamp foot: best angular mismatch  0.00 deg at y=+0 px
+  crack  10 px from the lamp foot: best angular mismatch  3.56 deg at y=+0 px
+  crack  25 px from the lamp foot: best angular mismatch  8.83 deg at y=+0 px
+  crack  50 px from the lamp foot: best angular mismatch 17.17 deg at y=+0 px
+  crack 100 px from the lamp foot: best angular mismatch 31.17 deg at y=+0 px
+  (a glint is seen where the mismatch is smaller than the combined lobe: lamp angular radius + frost/hackle spread)
+
+==============================================================================
+K6. Same for a single partial reflection off a SHALLOW face (cone wall, 25 deg to the surface)
+==============================================================================
+  shallow cone-wall facet at x= -80 px (normal facing +x): mismatch  53.42 deg
+  shallow cone-wall facet at x= -40 px (normal facing +x): mismatch  81.96 deg
+  shallow cone-wall facet at x= -20 px (normal facing +x): mismatch 180.00 deg
+  shallow cone-wall facet at x=  +0 px (normal facing +x): mismatch 180.00 deg
+  shallow cone-wall facet at x= +20 px (normal facing +x): mismatch 180.00 deg
+  shallow cone-wall facet at x= +40 px (normal facing +x): mismatch 180.00 deg
+  shallow cone-wall facet at x= +80 px (normal facing +x): mismatch 180.00 deg

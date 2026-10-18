@@ -224,6 +224,22 @@ def test_browser_write_guard_blocks_cross_site_and_unlisted_origins():
     cli = decide_browser_write_access(method="POST", origin=None, sec_fetch_site=None, allowed_origins=allowed)
     assert cli.allowed
 
+    # Regression: Chrome sends Sec-Fetch-Site: cross-site for two different ports on
+    # 127.0.0.1/localhost even when both are explicitly allow-listed (the standard
+    # `npm run dev` on :3000 talking to `uvicorn` on :8000 setup). An already-allowed
+    # origin must not be rejected by that same-host-different-port false positive.
+    allowed_localhost = ["http://localhost:3000"]
+    allowed_but_flagged_cross_site = decide_browser_write_access(
+        method="POST", origin="http://localhost:3000", sec_fetch_site="cross-site", allowed_origins=allowed_localhost
+    )
+    assert allowed_but_flagged_cross_site.allowed
+
+    # An origin that is both cross-site AND not on the allow-list is still blocked.
+    unlisted_and_cross_site = decide_browser_write_access(
+        method="POST", origin="https://evil.example", sec_fetch_site="cross-site", allowed_origins=allowed_localhost
+    )
+    assert not unlisted_and_cross_site.allowed and unlisted_and_cross_site.status_code == 403
+
 
 def test_browser_write_middleware_blocks_cross_origin_multipart_before_route_execution():
     from fastapi import FastAPI, Request

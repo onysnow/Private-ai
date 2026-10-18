@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import (
-    ConnectorFinding, Entity, ExternalRelationshipReview, ExternalRelationshipPromotion,
+    ConnectorFinding, Entity, ExternalRelationshipReview, ExternalRelationshipPromotion, OpenAlephEntityLink,
+    ResolutionDecision,
 )
-from app.services.relationships import RELATIONSHIP_SCHEMAS, create_relationship, serialize_relationship
+
+OPENALEPH_PROVIDER = "openaleph"  # app/services/openaleph_corpus.py PROVIDER
+from app.services.relationships import RELATIONSHIP_SCHEMAS, create_relationship
 from app.services.resolution import candidate_entities
 from app.services.promotion import _dataset_name
 
@@ -37,10 +43,10 @@ def _endpoint_finding(db: Session, finding: ConnectorFinding, record_id: str) ->
 
 def relationship_endpoint_candidates(db: Session, finding: ConnectorFinding) -> dict:
     source_ref, target_ref = _external_refs(finding)
-    result = {
+    result: dict[str, Any] = {
         "schema": finding.schema,
-        "source_prop": RELATIONSHIP_SCHEMAS[finding.schema]["source_prop"],
-        "target_prop": RELATIONSHIP_SCHEMAS[finding.schema]["target_prop"],
+        "source_prop": RELATIONSHIP_SCHEMAS[finding.schema or ""]["source_prop"],
+        "target_prop": RELATIONSHIP_SCHEMAS[finding.schema or ""]["target_prop"],
         "source_external_id": source_ref,
         "target_external_id": target_ref,
         "source_candidates": [],
@@ -48,14 +54,41 @@ def relationship_endpoint_candidates(db: Session, finding: ConnectorFinding) -> 
     }
     for side, ref in (("source", source_ref), ("target", target_ref)):
         ext = _endpoint_finding(db, finding, ref)
-        if ext is None:
-            continue
-        result[f"{side}_external_finding"] = {
-            "id": ext.id, "caption": ext.caption, "schema": ext.schema,
-            "provider_record_id": ext.provider_record_id, "source_url": ext.source_url,
-        }
-        result[f"{side}_candidates"] = candidate_entities(db, finding.investigation_id, ext.caption, ext.schema)
+        candidates: list[dict] = []
+        if ext is not None:
+            result[f"{side}_external_finding"] = {
+                "id": ext.id, "caption": ext.caption, "schema": ext.schema,
+                "provider_record_id": ext.provider_record_id, "source_url": ext.source_url,
+            }
+            candidates = candidate_entities(db, finding.investigation_id, ext.caption, ext.schema)
+        known = _known_endpoint(db, finding, ref, ext)
+        if known is not None:
+            # Already established (OpenAleph findings, ADR-0006 Wave B "Expand
+            # in the corpus"): the end is one of the investigation's own
+            # records as sent to OpenAleph, or an OpenAleph entity a reporter
+            # decided is one of them.
+            candidates = [{"entity_id": known.id, "caption": known.caption, "schema": known.schema, "score": 1.0}] + [
+                row for row in candidates if row["entity_id"] != known.id]
+        result[f"{side}_candidates"] = candidates
     return result
+
+
+def _known_endpoint(db: Session, finding: ConnectorFinding, ref: str, ext: ConnectorFinding | None) -> Entity | None:
+    if finding.provider != OPENALEPH_PROVIDER:
+        return None  # other providers keep the name comparison alone
+    link = db.scalar(select(OpenAlephEntityLink).where(
+        OpenAlephEntityLink.investigation_id == finding.investigation_id, OpenAlephEntityLink.openaleph_entity_id == ref,
+        OpenAlephEntityLink.record_type == "entity"))
+    entity = db.get(Entity, link.record_id) if link is not None else None
+    if entity is None and ext is not None:
+        latest = db.scalar(select(ResolutionDecision).where(
+            ResolutionDecision.finding_id == ext.id, ResolutionDecision.entity_id.is_not(None))
+            .order_by(ResolutionDecision.created_at.desc(), ResolutionDecision.id.desc()))
+        if latest is not None and latest.decision == "positive" and latest.entity_id:
+            entity = db.get(Entity, latest.entity_id)
+    if entity is None or entity.merged_into_entity_id or entity.investigation_id != finding.investigation_id:
+        return None
+    return entity
 
 
 def create_review(db: Session, finding: ConnectorFinding, source_entity_id: str | None, target_entity_id: str | None, decision: str, note: str | None) -> ExternalRelationshipReview:
@@ -107,4 +140,13 @@ def promote_review(db: Session, review: ExternalRelationshipReview) -> ExternalR
         provider=finding.provider, source_url=finding.source_url,
     )
     db.add(row); db.commit(); db.refresh(row)
+    # create_relationship queued the push already; asking again after the
+    # promotion's own commit keeps that true if it stops committing for us.
+    request_corpus_sync(db, review.investigation_id)
     return row
+
+
+def list_relationship_reviews(db: Session, finding_id: str) -> list[ExternalRelationshipReview]:
+    return list(db.scalars(
+        select(ExternalRelationshipReview).where(ExternalRelationshipReview.finding_id == finding_id).order_by(ExternalRelationshipReview.created_at.desc())
+    ).all())

@@ -1,0 +1,1223 @@
+key: TR
+name: Transnational repression
+scope: 'States harassing, surveilling, coercing home, spying on or attacking diaspora critics abroad:
+  covert police stations, threats to relatives, Interpol abuse, and assassination plots.'
+indicators:
+- id: TR-001
+  name: Undeclared foreign police 'station' or outpost operating in a diaspora community
+  definition: An office in the host country that quietly works for a foreign police or security ministry,
+    without being declared to the host government, to watch and pressure people from that country.
+  areas:
+  - TR
+  typology: Covert state presence / co-opting diaspora institutions
+  status: verified
+  sources:
+  - title: New York Resident Pleads Guilty to Operating Secret Police Station of the Chinese Government
+      in Lower Manhattan
+    publisher: US Department of Justice, Office of Public Affairs
+    year: '2024'
+    url: https://www.justice.gov/opa/pr/new-york-resident-pleads-guilty-operating-secret-police-station-chinese-government-lower
+    locator: Press release, 18 Dec 2024, opening paragraphs
+    quote: opening and operating an undeclared overseas police station, located in lower Manhattan
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (Joint Committee on Human Rights report HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 9
+    quote: used to monitor and pressure members of the Chinese diaspora
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - MPS-linked station occupying a floor of a Chinatown office building in Manhattan, closed in fall 2022
+    after the FBI investigation became known (DOJ).
+  cases:
+  - name: United States v. Chen Jinping (Manhattan overseas police station)
+    year: '2024'
+    jurisdiction: US (E.D.N.Y.)
+    what_happened: Chen Jinping pleaded guilty to conspiring to act as an illegal agent of the PRC government
+      in connection with an undeclared MPS police station in lower Manhattan.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/new-york-resident-pleads-guilty-operating-secret-police-station-chinese-government-lower
+    source_title: New York Resident Pleads Guilty to Operating Secret Police Station of the Chinese Government
+      in Lower Manhattan
+  - name: United States v. Lu Jianwang
+    year: '2023'
+    jurisdiction: US (E.D.N.Y.)
+    what_happened: Charged with conspiring to act as an agent of the PRC and obstruction; per the complaint
+      an MPS official sought his help locating a pro-democracy activist in California. He pleaded not
+      guilty; the charges are allegations.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/two-arrested-operating-illegal-overseas-police-station-chinese-government
+    source_title: Two Arrested for Operating Illegal Overseas Police Station of the Chinese Government
+  data_needed:
+  - Organization
+  - Address
+  - Person
+  - Directorship
+  - Employment
+  - PublicBody
+  - UnknownLink
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Company/charity registries for the hosting association
+  - Foreign-agent registers (FARA in US; FIRS in UK)
+  - Court dockets (PACER)
+  - Property/lease records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: Journalists covering such stations may become targets of the same monitoring.
+    source_url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+  - target_area: CO
+    reason: The charge was acting as an illegal agent of a foreign government without notice to the Attorney
+      General.
+    source_url: https://www.justice.gov/opa/pr/new-york-resident-pleads-guilty-operating-secret-police-station-chinese-government-lower
+  innocent_explanations:
+  - Hometown or clan associations legitimately offer help with paperwork such as driving-licence renewals
+    for people from the same region.
+  - Consulates lawfully provide consular services; a declared consular office is not an undeclared station.
+  - Community centres often host visiting officials for cultural events.
+  jurisdictions: US (EDNY case); UK (JCHR evidence); pattern reported in many host countries
+  version: 1
+- id: TR-002
+  name: Locating or surveilling a specific critic's home or routine for foreign officials
+  definition: Someone in the host country finds a named dissident or journalist, watches their home or
+    movements, and passes addresses, photos or routines back to foreign officials or their go-betweens.
+  areas:
+  - TR
+  typology: Direct attack precursor / stalking
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: stalking
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Two Eastern European Organized Crime Leaders Convicted of Murder-for-Hire Targeting U.S.-Based
+      Journalist on Behalf of Iranian Government
+    publisher: US Department of Justice
+    year: '2025'
+    url: https://www.justice.gov/opa/pr/two-eastern-european-organized-crime-leaders-convicted-murder-hire-targeting-us-based
+    locator: Press release, 21 Mar 2025
+    quote: repeatedly traveled to Alinejad's neighborhood to surveil her
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Two Arrested for Operating Illegal Overseas Police Station of the Chinese Government
+    publisher: US Department of Justice
+    year: '2023'
+    url: https://www.justice.gov/archives/opa/pr/two-arrested-operating-illegal-overseas-police-station-chinese-government
+    locator: Press release, 17 Apr 2023
+    quote: the MPS Official sought Lu's assistance in locating an individual living in California
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Political Operative Sentenced to 48 Months in Federal Prison for Acting as Covert Agent of
+      People's Republic of China
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/political-operative-sentenced-48-months-federal-prison-acting-covert-agent-peoples-republic
+    locator: Press release, 10 Feb 2026
+    quote: surveilled groups in the United States that China viewed as threatening its interests
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Photos and videos of a journalist's home sent up a chain to IRGC officials (Amirov/Omarov).
+  - Repeated stalking of a Brooklyn house and following the target to a university event (Loadholt).
+  cases:
+  - name: United States v. Rafat Amirov and Polad Omarov
+    year: '2025'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: A jury convicted both of a murder-for-hire plot, directed by IRGC members, targeting
+      journalist Masih Alinejad; a hired man surveilled her home and bought an AK-47-style rifle.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/two-eastern-european-organized-crime-leaders-convicted-murder-hire-targeting-us-based
+    source_title: Two Eastern European Organized Crime Leaders Convicted of Murder-for-Hire Targeting
+      U.S.-Based Journalist on Behalf of Iranian Government
+  - name: United States v. Yaoning 'Mike' Sun
+    year: '2026'
+    jurisdiction: US (C.D. Cal.)
+    what_happened: Sentenced to 48 months for acting as an illegal agent of the PRC, including surveilling
+      groups China saw as threats and reporting on the movements of Taiwan's then-President during a 2023
+      visit.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/political-operative-sentenced-48-months-federal-prison-acting-covert-agent-peoples-republic
+    source_title: Political Operative Sentenced to 48 Months in Federal Prison for Acting as Covert Agent
+      of People's Republic of China
+  data_needed:
+  - Person
+  - Address
+  - Event
+  - Note
+  - Associate
+  - UnknownLink
+  - Payment
+  - CourtCase
+  checkable: person
+  lookup_sources:
+  - Court filings and complaints
+  - Police reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: Surveillance of journalists' homes is the step before the attack in the Alinejad plots.
+    source_url: https://www.justice.gov/opa/pr/staten-island-man-sentenced-murder-hire-plot-and-stalking-journalist-and-prominent-critic
+  innocent_explanations:
+  - Press photographers, process servers, private investigators on lawful civil matters, and fans or neighbours
+    may be seen near a public figure's home.
+  - Community organisers legitimately track public events held by activist groups.
+  jurisdictions: US (SDNY, EDNY, CDCA cases)
+  version: 1
+- id: TR-003
+  name: Threats to, police visits to, or detention of relatives in the home country
+  definition: Family members or friends still in the home country are threatened, visited by police or
+    detained to put pressure on the critic living abroad.
+  areas:
+  - TR
+  typology: Coercion-by-proxy (long-distance threat)
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: threatening or detaining family members or friends in the country of origin
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 58 (witness evidence)
+    quote: my family back in China received a police visit
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: 'Tactic categories: Long Distance Threats'
+    quote: Origin country tactics that do not require physically reaching the individual targeted.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Police visit to an activist's family in China after the activist spoke out in the UK (JCHR evidence).
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - Note
+  - PublicBody
+  checkable: person
+  lookup_sources:
+  - Interviews with the target
+  - Human-rights NGO case files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: Sources and fixers with family in the origin country are exposed to the same pressure.
+    source_url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+  innocent_explanations:
+  - Relatives may be contacted by police for unrelated ordinary matters (registration, local disputes,
+    criminal investigations unrelated to the critic).
+  - Family members may voice worry or ask the person to stop speaking out on their own initiative.
+  jurisdictions: Global
+  version: 1
+- id: TR-004
+  name: Campaign to coerce a person to return ('repatriation' pressure)
+  definition: A sustained effort, often by agents or relatives acting for the origin state, to make someone
+    abroad go back home, using threats, harassment or pressure on family.
+  areas:
+  - TR
+  typology: Coerced return (e.g., Operation Fox Hunt / Sky Net)
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: forcing or coercing the victim to return to their country of origin
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Leader of Multi-Year 'Operation Fox Hunt' Repatriation Campaign Directed by the People's Republic
+      of China Sentenced
+    publisher: US Department of Justice
+    year: '2025'
+    url: https://www.justice.gov/opa/pr/leader-multi-year-operation-fox-hunt-repatriation-campaign-directed-peoples-republic-china
+    locator: Press release, Mar 2025
+    quote: a leading member of an international campaign to threaten, harass, and intimidate the U.S.
+      Resident and his family members
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 66
+    quote: applying coercive pressure, through threats to family members, to compel their return.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Unannounced visits to the target's adult son's home and messages that officials would 'keep pestering'
+    the son (Quanzhong An case).
+  cases:
+  - name: United States v. Quanzhong An (Operation Fox Hunt)
+    year: '2025'
+    jurisdiction: US (E.D.N.Y.)
+    what_happened: Sentenced to 20 months and about $5 million in financial penalties for leading a PRC-directed
+      campaign from 2017 to 2022 to coerce a U.S. resident to return to China.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/leader-multi-year-operation-fox-hunt-repatriation-campaign-directed-peoples-republic-china
+    source_title: Leader of Multi-Year 'Operation Fox Hunt' Repatriation Campaign ... Sentenced
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - Note
+  - PublicBody
+  - CourtCase
+  - Payment
+  checkable: person
+  lookup_sources:
+  - Court records
+  - Extradition / anti-corruption fugitive lists published by origin state
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Fox Hunt targets were described by the origin state as fugitives; distinguishing lawful recovery
+      from coercion requires checking legal channels.
+    source_url: https://www.justice.gov/archives/opa/pr/two-arrested-and-13-charged-three-separate-cases-alleged-participation-malign-schemes-united
+  innocent_explanations:
+  - Legitimate cross-border law-enforcement cooperation through extradition or mutual legal assistance
+    channels.
+  - Relatives genuinely wanting a family member to come home.
+  jurisdictions: US (EDNY); UK (JCHR)
+  version: 1
+- id: TR-005
+  name: Murder-for-hire or assassination plot using criminal proxies
+  definition: Foreign state officials, directly or through middlemen, hire criminals in the host country
+    to kill or kidnap a critic, usually paying in cash and supplying targeting details.
+  areas:
+  - TR
+  typology: Direct attack
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: attempted murder
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: 'Tactic categories: Direct Attacks'
+    quote: Origin country tactics that physically reach the individual targeted.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indian National Pleads Guilty to Plotting to Assassinate U.S. Citizen in New York City
+    publisher: US Attorney's Office, S.D.N.Y.
+    year: '2026'
+    url: https://www.justice.gov/usao-sdny/pr/indian-national-pleads-guilty-plotting-assassinate-us-citizen-new-york-city
+    locator: Press release, Feb 2026
+    quote: GUPTA directed the UC to carry out the murder as soon as possible, but GUPTA also specifically
+      instructed
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 10
+    quote: Russia has engaged in the most serious forms of transnational repression
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - $30,000 cash paid to a hired man who bought an AK-47-style rifle (Alinejad plot).
+  - Address, phone numbers and daily routine supplied by a government employee to a would-be hitman (Gupta).
+  cases:
+  - name: United States v. Nikhil Gupta
+    year: '2026'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Pleaded guilty to all three counts in a plot, allegedly directed by Indian Cabinet
+      Secretariat employee Vikash Yadav (charged, not arrested), to assassinate a U.S. citizen who advocates
+      for Khalistan.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/indian-national-pleads-guilty-plotting-assassinate-us-citizen-new-york-city
+    source_title: Indian National Pleads Guilty to Plotting to Assassinate U.S. Citizen in New York City
+  - name: United States v. Jonathan Loadholt
+    year: '2026'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Sentenced to 10 years after pleading guilty to stalking and money-laundering conspiracy
+      in an Iranian government-directed plot against Masih Alinejad; co-defendant Carlisle Rivera sentenced
+      to 15 years; Farhad Shakeri at large.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/staten-island-man-sentenced-murder-hire-plot-and-stalking-journalist-and-prominent-critic
+    source_title: Staten Island Man Sentenced for Murder-for-Hire Plot and Stalking a Journalist
+  - name: United States v. Amirov and Omarov
+    year: '2025'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Jury convicted both of an IRGC-directed murder-for-hire plot against Masih Alinejad.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/two-eastern-european-organized-crime-leaders-convicted-murder-hire-targeting-us-based
+    source_title: Two Eastern European Organized Crime Leaders Convicted...
+  data_needed:
+  - Person
+  - Payment
+  - Associate
+  - Event
+  - Address
+  - Employment
+  - PublicBody
+  - CourtCase
+  - Vehicle
+  checkable: records
+  lookup_sources:
+  - Federal court dockets
+  - Sanctions lists (IRGC designations)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: State plots used organised-crime figures and cash payments; Loadholt pleaded to money-laundering
+      conspiracy.
+    source_url: https://www.justice.gov/opa/pr/staten-island-man-sentenced-murder-hire-plot-and-stalking-journalist-and-prominent-critic
+  - target_area: SF
+    reason: IRGC direction of plots links to sanctioned entities.
+    source_url: https://www.justice.gov/opa/pr/two-eastern-european-organized-crime-leaders-convicted-murder-hire-targeting-us-based
+  innocent_explanations:
+  - Ordinary criminal violence against a public figure with no state link.
+  - Threats from private individuals who share a government's views but act alone.
+  jurisdictions: US (SDNY); UK (Skripal per JCHR)
+  version: 1
+- id: TR-006
+  name: Bounties on exiles and threatening letters to their neighbours
+  definition: The origin state publicly offers money for information leading to an exile's capture and
+    people near the exile receive letters urging them to inform.
+  areas:
+  - TR
+  typology: Long-distance threat / extraterritorial arrest warrants
+  status: verified
+  sources:
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 9
+    quote: offering $HK1 million for information leading to their capture abroad.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 9
+    quote: threatening letters were reportedly sent to the neighbours of individuals who had bounties
+      placed on them
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hong Kong bounties on UK-based activists including Chloe Cheung, who gave evidence to the committee
+    (JCHR paras 4, 9).
+  cases:
+  - name: Hong Kong bounties on UK-based activists (JCHR inquiry)
+    year: '2025'
+    jurisdiction: UK
+    what_happened: The Joint Committee on Human Rights reported HK$1 million bounties on Hong Kongers
+      abroad and letters to their neighbours, and that only one recipient in the third round was contacted
+      by MI5.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    source_title: Transnational repression (HC 681)
+  data_needed:
+  - Person
+  - PublicBody
+  - Document
+  - Address
+  - Event
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Origin-state police/government wanted announcements
+  - Official gazettes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary wanted-person appeals for people accused of common crimes in rule-of-law states.
+  jurisdictions: UK (Hong Kong cases per JCHR)
+  version: 1
+- id: TR-007
+  name: Politically motivated INTERPOL Red Notice or other international alert
+  definition: The origin state uses INTERPOL's wanted-person alerts against opponents, journalists or
+    rights defenders, which can lead to detention at borders or refusal of asylum or citizenship.
+  areas:
+  - TR
+  typology: Co-opting other countries / Interpol abuse
+  status: verified
+  sources:
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 64
+    quote: routinely used to pursue political opponents, human rights defenders, and journalists beyond
+      national borders
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Red Notices
+    publisher: INTERPOL
+    url: https://www.interpol.int/en/How-we-work/Notices/Red-Notices
+    locator: Red Notices page
+    quote: A Red Notice is an international alert for a wanted person, but it is not an arrest warrant.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: Definition
+    quote: including through assassinations, unlawful deportations, abductions, digital threats, Interpol
+      abuse,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Red Notice leading to refusal of asylum or citizenship applications (JCHR para 76).
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Document
+  - Event
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - INTERPOL public Red Notice list
+  - Extradition court rulings
+  - CCF (Commission for the Control of INTERPOL's Files) decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: JCHR notes Red Notices are used against journalists, which affects reporters travelling.
+    source_url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+  innocent_explanations:
+  - Most Red Notices concern ordinary criminal suspects and are reviewed by INTERPOL for compliance with
+    its rules.
+  - A person may face genuine criminal charges in addition to being a critic.
+  jurisdictions: Global
+  version: 1
+- id: TR-008
+  name: 'Mobility controls: passport revocation, denial of consular services, false lost/stolen passport
+    reports'
+  definition: The origin state stops a person travelling or living normally abroad by cancelling or withholding
+    passports, refusing consular help, or reporting travel documents lost or stolen so the person is held
+    in transit.
+  areas:
+  - TR
+  typology: Mobility controls
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: 'Tactic categories: Mobility Controls'
+    quote: When origin countries restrict individuals' ability to travel.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: abusive legal practices (e.g., lawsuits, asset freezes, or withholding legal documents such
+      as passports)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - PublicBody
+  - Event
+  checkable: person
+  lookup_sources:
+  - Consular correspondence held by the target
+  - Border/transit detention records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Passports expire or are cancelled after genuine loss reports, unpaid fees or ordinary administrative
+    errors.
+  - Consular backlogs and staffing shortages delay services for everyone.
+  jurisdictions: Global
+  version: 1
+- id: TR-009
+  name: Abusive legal action against critics abroad (SLAPPs, asset freezes)
+  definition: Lawsuits, asset freezes or other legal processes are used mainly to exhaust, frighten or
+    silence critics rather than to win a genuine claim.
+  areas:
+  - TR
+  typology: Abusive legal practices / lawfare
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: abusive legal practices (e.g., lawsuits, asset freezes, or withholding legal documents such
+      as passports)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: FBI Philadelphia Brings Awareness to Transnational Repression
+    publisher: FBI Philadelphia Field Office
+    url: https://www.fbi.gov/contact-us/field-offices/philadelphia/news/fbi-philadelphia-brings-awareness-to-transnational-repression
+    locator: Tactics list
+    quote: Freezing financial assets
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 35 (SLAPP definition)
+    quote: harassing, intimidating and financially or psychologically exhausting opponents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - JCHR cites legal actions against journalist Catherine Belton and the libel case brought against Eliot
+    Higgins (paras 36, 38).
+  cases: []
+  data_needed:
+  - CourtCase
+  - Person
+  - Company
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Court dockets
+  - Judgments databases (e.g., BAILII)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: SLAPPs target journalists directly.
+    source_url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+  innocent_explanations:
+  - People who believe they were defamed have a right to sue; many defamation claims are genuine.
+  - Asset freezes may follow legitimate criminal or civil proceedings.
+  jurisdictions: US; UK
+  version: 1
+- id: TR-010
+  name: Hacking or spyware aimed at diaspora critics
+  definition: Critics' phones, accounts or devices are hacked or infected with commercial spyware, or
+    bugged, so the origin state can read their communications and map their contacts.
+  areas:
+  - TR
+  typology: Digital transnational repression
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: cyberhacking
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Commerce Adds NSO Group and Other Foreign Companies to Entity List
+    publisher: US Department of Commerce
+    year: '2021'
+    url: https://www.commerce.gov/news/press-releases/2021/11/commerce-adds-nso-group-and-other-foreign-companies-entity-list
+    locator: Press release, 3 Nov 2021
+    quote: These tools have also enabled foreign governments to conduct transnational repression, which
+      is the practice of authoritarian governments targeting dissidents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Five Men Indicted for Crimes Related to Transnational Repression Scheme
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/archives/opa/pr/five-men-indicted-crimes-related-transnational-repression-scheme-silence-critics-people-s
+    locator: Press release, 7 Jul 2022 (allegation)
+    quote: planted surveillance equipment in the artist's workplace and car to spy on him from the PRC
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 11
+    quote: online abuse, surveillance and digital attacks such as hacking, doxing
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - NSO Group and Candiru added to the US Entity List for supplying spyware used against officials, journalists
+    and dissidents.
+  cases:
+  - name: NSO Group and Candiru Entity List designation
+    year: '2021'
+    jurisdiction: US
+    what_happened: The Commerce Department added both companies to the Entity List on evidence they supplied
+      spyware that governments used maliciously, including for transnational repression. This is an export-control
+      designation, not a fine.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.commerce.gov/news/press-releases/2021/11/commerce-adds-nso-group-and-other-foreign-companies-entity-list
+    source_title: Commerce Adds NSO Group and Other Foreign Companies to Entity List
+  - name: United States v. Fan 'Frank' Liu et al.
+    year: '2022'
+    jurisdiction: US (E.D.N.Y.)
+    what_happened: Indictment alleging a PRC-directed scheme to spy on, harass and discredit dissidents,
+      including bugging an artist's workplace and car; the charges are allegations.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/five-men-indicted-crimes-related-transnational-repression-scheme-silence-critics-people-s
+    source_title: Five Men Indicted for Crimes Related to Transnational Repression Scheme
+  data_needed:
+  - Person
+  - Company
+  - Contract
+  - Sanction
+  - Event
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - US Entity List (BIS)
+  - Forensic reports from device analysis labs
+  - Platform threat notifications
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Spyware vendors are designated on the Entity List.
+    source_url: https://www.commerce.gov/news/press-releases/2021/11/commerce-adds-nso-group-and-other-foreign-companies-entity-list
+  - target_area: SA
+    reason: Journalists in contact with targets may be swept into device surveillance.
+    source_url: https://www.commerce.gov/news/press-releases/2021/11/commerce-adds-nso-group-and-other-foreign-companies-entity-list
+  innocent_explanations:
+  - Ordinary criminal phishing, credential stuffing or ransomware hits everyone, not just critics.
+  - Device faults, battery drain or odd behaviour are rarely spyware.
+  jurisdictions: Global; US export-control action
+  version: 1
+- id: TR-011
+  name: Online disinformation, smears, doxing and death threats against critics
+  definition: Coordinated online campaigns spread false or damaging claims about critics, publish their
+    personal details, or threaten them, often through accounts or sites linked to a state agency.
+  areas:
+  - TR
+  typology: Digital transnational repression / information operations
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: online disinformation campaigns
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Justice Department Disrupts Iranian Cyber-Enabled Psychological Operations
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/justice-department-disrupts-iranian-cyber-enabled-psychological-operations
+    locator: Press release, 19 Mar 2026
+    quote: used to send death threats to Iranian dissidents and journalists
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Five Men Indicted for Crimes Related to Transnational Repression Scheme
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/archives/opa/pr/five-men-indicted-crimes-related-transnational-repression-scheme-silence-critics-people-s
+    locator: Press release (allegation)
+    quote: efforts to disseminate negative information about, and to spy on, stalk, harass and surveil
+      U.S.-based dissidents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Seized MOIS-linked domains posted personal data of about 190 people and called for killing journalists
+    and dissidents.
+  cases:
+  - name: Seizure of MOIS-linked Handala domains
+    year: '2026'
+    jurisdiction: US
+    what_happened: DOJ seized four domains tied to Iran's Ministry of Intelligence and Security that it
+      said posted personal data and called for killing journalists and dissidents. Seizure announcement,
+      not a conviction.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-iranian-cyber-enabled-psychological-operations
+    source_title: Justice Department Disrupts Iranian Cyber-Enabled Psychological Operations
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  - Event
+  - UnknownLink
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Domain WHOIS / DNS history
+  - Platform takedown reports
+  - Court seizure warrants
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Same tactics overlap with state information operations.
+    source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-iranian-cyber-enabled-psychological-operations
+  innocent_explanations:
+  - Public figures attract genuine criticism and organic pile-ons from private users.
+  - Personal information may already be public through ordinary records.
+  jurisdictions: US; UK
+  version: 1
+- id: TR-012
+  name: Covert informant inside the diaspora reporting on activists
+  definition: A community member secretly collects and passes on information about activists, dissidents
+    or visiting figures to the origin state's intelligence or police officials.
+  areas:
+  - TR
+  typology: Covert agent / community surveillance
+  status: verified
+  sources:
+  - title: U.S. Citizen and Four Chinese Intelligence Officers Charged with Spying on Prominent Dissidents,
+      Human Rights Leaders and Pro-Democracy Activists
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/archives/opa/pr/us-citizen-and-four-chinese-intelligence-officers-charged-spying-prominent-dissidents-human
+    locator: Press release, 18 May 2022 (allegation)
+    quote: spying on and reporting sensitive information on prominent pro-democracy activists
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Political Operative Sentenced to 48 Months...
+    publisher: US Department of Justice
+    year: '2026'
+    url: https://www.justice.gov/opa/pr/political-operative-sentenced-48-months-federal-prison-acting-covert-agent-peoples-republic
+    locator: Press release, 10 Feb 2026
+    quote: For years, Sun received and executed taskings from Chinese government officials
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Email 'diaries' left for MSS handlers and transfer of dissidents' phone numbers (Wang Shujun indictment).
+  cases:
+  - name: United States v. Wang Shujun et al.
+    year: '2022'
+    jurisdiction: US (E.D.N.Y.)
+    what_happened: Indictment alleging a Queens resident acted for years as an MSS asset reporting on
+      pro-democracy activists; four MSS officers charged and at large. Allegation as stated in the source.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/us-citizen-and-four-chinese-intelligence-officers-charged-spying-prominent-dissidents-human
+    source_title: U.S. Citizen and Four Chinese Intelligence Officers Charged...
+  - name: United States v. Yaoning 'Mike' Sun
+    year: '2026'
+    jurisdiction: US (C.D. Cal.)
+    what_happened: Sentenced to 48 months for acting as an illegal PRC agent carrying out taskings including
+      surveillance of groups and reporting on a visiting Taiwanese President.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/political-operative-sentenced-48-months-federal-prison-acting-covert-agent-peoples-republic
+    source_title: Political Operative Sentenced to 48 Months...
+  data_needed:
+  - Person
+  - Associate
+  - Organization
+  - PublicBody
+  - Event
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Court records
+  - FARA register (absence of registration)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Charges under acting as an agent without notifying the Attorney General.
+    source_url: https://www.justice.gov/opa/pr/political-operative-sentenced-48-months-federal-prison-acting-covert-agent-peoples-republic
+  innocent_explanations:
+  - Community leaders routinely meet consular officials for cultural or business reasons.
+  - People keep contact lists and notes about community events for ordinary organising.
+  jurisdictions: US
+  version: 1
+- id: TR-013
+  name: Community or 'cultural' bodies used as fronts for monitoring the diaspora
+  definition: Cultural centres or community associations linked to the origin state are used to watch,
+    intimidate and control members of the diaspora.
+  areas:
+  - TR
+  typology: Front organisations
+  status: verified
+  sources:
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 11
+    quote: '''cultural centres'' in the UK are used as fronts for surveillance operations targeting members
+      of the Iranian diaspora.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 12
+    quote: to monitor, intimidate and exert control over members of the Eritrean diaspora.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Directorship
+  - Address
+  - Payment
+  - Person
+  checkable: records
+  lookup_sources:
+  - Charity Commission / company registers
+  - Foreign-influence registers (FIRS)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Front bodies are often registered associations whose filings can be checked.
+    source_url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+  innocent_explanations:
+  - Most cultural and community associations exist for language, religion and social support and have
+    normal contact with their home country's embassy.
+  jurisdictions: UK (Iran, Eritrea per JCHR)
+  version: 1
+- id: TR-014
+  name: Bribing or recruiting host-country officials or using private investigators to target critics
+  definition: Agents of the origin state pay or recruit host-country officials, or hire investigators,
+    to obtain critics' private records or to turn official processes (such as tax enforcement) against
+    them.
+  areas:
+  - TR
+  typology: Co-opting host institutions / corruption
+  status: verified
+  sources:
+  - title: California Man Sentenced for Acting as an Illegal Agent of the People's Republic of China Government
+      and Bribery
+    publisher: US Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/archives/opa/pr/california-man-sentenced-acting-illegal-agent-peoples-republic-china-government-and-bribery
+    locator: Press release, 19 Nov 2024
+    quote: $5,000 in cash bribes and promised to pay substantially more
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Five Men Indicted for Crimes Related to Transnational Repression Scheme
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/archives/opa/pr/five-men-indicted-crimes-related-transnational-repression-scheme-silence-critics-people-s
+    locator: Press release (allegation)
+    quote: retained Taylor to obtain personal identification information regarding multiple PRC dissidents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: 'Tactic categories: Co-opting Other Countries'
+    quote: When origin countries manipulate host country institutions like police or immigration authorities
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Attempt to use the IRS Whistleblower Program to strip Shen Yun's tax-exempt status (John Chen, Lin
+    Feng).
+  cases:
+  - name: United States v. John Chen and Lin Feng
+    year: '2024'
+    jurisdiction: US (C.D. Cal.)
+    what_happened: Chen sentenced to 20 months and Feng to time served (16 months) for acting as unregistered
+      PRC agents and bribing a purported IRS agent to target Falun Gong practitioners.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/california-man-sentenced-acting-illegal-agent-peoples-republic-china-government-and-bribery
+    source_title: California Man Sentenced for Acting as an Illegal Agent of the PRC Government and Bribery
+  - name: United States v. Liu, Ziburis, Sun, Miller, Taylor
+    year: '2022'
+    jurisdiction: US (E.D.N.Y.)
+    what_happened: Indictment alleging a scheme including hiring a private investigator (a retired DHS
+      agent) for dissidents' personal data and a plot to bribe an official for an activist's tax returns.
+      Allegations.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/five-men-indicted-crimes-related-transnational-repression-scheme-silence-critics-people-s
+    source_title: Five Men Indicted for Crimes Related to Transnational Repression Scheme
+  data_needed:
+  - Person
+  - Payment
+  - Employment
+  - PublicBody
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court dockets
+  - Inspector-general reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Convictions included bribery of a purported federal official.
+    source_url: https://www.justice.gov/archives/opa/pr/california-man-sentenced-acting-illegal-agent-peoples-republic-china-government-and-bribery
+  innocent_explanations:
+  - Private investigators are lawfully hired for litigation, due diligence and background checks.
+  - Whistleblower tips to tax authorities are often legitimate.
+  jurisdictions: US
+  version: 1
+- id: TR-015
+  name: Host country detains, deports or renders a critic at the origin state's request
+  definition: Police or immigration authorities in a third country detain, deport or hand over a critic
+    in a way that serves the origin state, often outside normal extradition safeguards.
+  areas:
+  - TR
+  typology: Co-opting other countries
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: 'Tactic categories: Co-opting Other Countries'
+    quote: to harass, detain, or transfer individuals.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Deportation/asylum court rulings
+  - UN treaty body communications
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful deportation for immigration violations or extradition after judicial review.
+  jurisdictions: Global
+  version: 1
+- id: TR-016
+  name: Diplomatic or consular staff involved in intimidation or assault
+  definition: Embassy or consulate personnel take part in physically intimidating or assaulting protesters
+    or critics, sometimes on or near diplomatic premises.
+  areas:
+  - TR
+  typology: Direct attack by state officials
+  status: verified
+  sources:
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 31
+    quote: a diplomat can drag an activist by the hair into the Manchester consulate
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational repression (HC 681)
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    locator: Para 81
+    quote: The failure to expel consular officials responsible for past incidents of transnational repression
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hong Konger dragged into the Chinese consulate in Manchester during a protest (JCHR para 31).
+  cases:
+  - name: Manchester consulate incident (as described to JCHR)
+    year: '2022'
+    jurisdiction: UK
+    what_happened: The committee report describes a Hong Kong activist being dragged into the Chinese
+      consulate in Manchester; the report records this from evidence and the consular officials were not
+      expelled.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://publications.parliament.uk/pa/jt5901/jtselect/jtrights/681/report.html
+    source_title: Transnational repression (HC 681)
+  data_needed:
+  - Person
+  - PublicBody
+  - Employment
+  - Event
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - Diplomatic lists
+  - Police statements
+  - Video footage
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Scuffles at protests can involve security guards protecting premises.
+  - Diplomats routinely attend community events and protests as observers.
+  jurisdictions: UK
+  version: 1
+- id: TR-017
+  name: Harassment, intimidation or assault of diaspora critics by proxies
+  definition: Critics abroad face repeated harassment, intimidation or physical assault carried out by
+    people acting for the origin state.
+  areas:
+  - TR
+  typology: Direct attack / physical intimidation
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: FBI Counterintelligence Division
+    url: https://www.fbi.gov/investigate/counterintelligence/transnational-repression
+    locator: List of tactics
+    quote: intimidation or threats
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: Definition
+    quote: It is governments reaching across borders to silence dissent among diasporas and exiles,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Growth of foreign repression on UK soil going unchecked – JCHR report warns
+    publisher: UK Parliament Joint Committee on Human Rights
+    year: '2025'
+    url: https://committees.parliament.uk/committee/93/human-rights-joint-committee/news/208770/growth-of-foreign-repression-on-uk-soil-going-unchecked-jchr-report-warns/
+    locator: News release, 30 Jul 2025
+    quote: included cases of coercion, online threats and physical violence
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Freedom House compiled 1,375 direct, physical incidents from 2014 to 2025 by 54 origin countries in
+    107 host countries (dataset scale, not a threshold).
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Associate
+  - Note
+  - CourtCase
+  checkable: person
+  lookup_sources:
+  - Freedom House transnational repression dataset
+  - Police reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: Same tactics are applied to journalists who report on the diaspora.
+    source_url: https://committees.parliament.uk/committee/93/human-rights-joint-committee/news/208770/growth-of-foreign-repression-on-uk-soil-going-unchecked-jchr-report-warns/
+  innocent_explanations:
+  - Personal disputes, hate crimes or ordinary crime unrelated to any state.
+  - Heated disagreements within diaspora communities over politics without state direction.
+  jurisdictions: US; UK; global
+  version: 1
+not_reached:
+- WebSearch budget was exhausted at the start of this run (shared turn limit), so wider discovery searches
+  were not possible; work relied on fetching known URLs.
+- 'OHCHR ''Transnational Repression'' guidance (18 June 2025): landing page reached but the PDF could
+  not be fetched, so its definition and forms are not quoted.'
+- 'European Parliament PEGA recommendation on Pegasus (TA-9-2023-0244): blocked by robots.txt.'
+- 'Freedom House Interpol sub-page and Interpol Article 3 constitution page: fetch errors.'
+- 'UK Home Office / NPSA transnational repression guidance and gov.uk search: fetch errors / robots-disallowed.'
+- 'CSIS (Canada) transnational repression publication and the Hogue Foreign Interference Commission report:
+  fetch errors, not reached.'
+- 'Berlin Kammergericht judgment in the Khangoshvili (Tiergarten) killing: press release fetch failed,
+  so the case is not included.'
+- 'US v. Ahmad Abouammo (Twitter insider spying for Saudi Arabia) and the UN Special Rapporteur inquiry
+  into the Khashoggi killing: fetch errors, so the platform-insider indicator and these cases were omitted.'
+- Wang Shujun case outcome after 2022 indictment not verified; recorded only as an allegation per the
+  2022 release.
+- JCHR report characters 100000-121195 not read.

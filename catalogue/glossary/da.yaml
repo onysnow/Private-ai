@@ -1,0 +1,280 @@
+area: DA
+terms:
+- term: Controlling or coercive behaviour
+  definition: A pattern of acts that isolate, monitor, regulate and frighten a partner or family member;
+    a criminal offence in England and Wales under s.76 Serious Crime Act 2015.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Personally connected
+  definition: 'The legal relationship needed for the coercive-control offence: current or former spouses,
+    intimate partners, co-parents or relatives.'
+  examples: []
+  source_url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Serious effect
+  definition: 'The harm the coercive-control offence requires: fear of violence on two or more occasions,
+    or serious alarm or distress that substantially affects daily life.'
+  examples: []
+  source_url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Domestic abuse (statutory definition)
+  definition: Abusive behaviour between people aged 16 or over who are personally connected, including
+    physical, sexual, controlling, economic or psychological abuse, either one incident or a pattern.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2021/17/section/1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Economic abuse
+  definition: Behaviour that seriously harms someone's ability to get, use or keep money or property,
+    or to obtain goods and services.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2021/17/section/1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: DASH risk checklist
+  definition: A 24-question frontline checklist (Domestic Abuse, Stalking and Harassment and Honour-based
+    violence) used to identify high-risk victims.
+  examples: []
+  source_url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: S-DASH
+  definition: The stalking-and-harassment version of DASH with extra questions to identify high-risk stalking
+    cases.
+  examples: []
+  source_url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: MARAC
+  definition: 'Multi-Agency Risk Assessment Conference: a meeting of agencies that makes a safety plan
+    for high-risk domestic abuse victims.'
+  examples: []
+  source_url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: FOUR
+  definition: 'Fixated, Obsessive, Unwanted, Repeated: the shorthand prosecutors and charities use to
+    describe stalking.'
+  examples: []
+  source_url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Stalking
+  definition: A repeated, intrusive pattern of fixated behaviour that causes fear or distress; UK law
+    gives examples but no full definition.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/1997/40/section/2A
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Cyber-stalking
+  definition: Stalking carried out using the internet or technology, such as surveillance, impersonation
+    or spyware.
+  examples: []
+  source_url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Stalking Protection Order
+  definition: A civil order the police apply for to restrict a suspected stalker; breaking it without
+    reasonable excuse is an offence.
+  examples: []
+  source_url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Restraining order
+  definition: A criminal court order, made on conviction or acquittal, banning contact or conduct; breach
+    is a criminal offence.
+  examples: []
+  source_url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: SHARP
+  definition: 'Stalking and Harassment Assessment and Risk Profile: a free 48-item online tool producing
+    a 14-factor risk profile.'
+  examples: []
+  source_url: https://www.stalkingawareness.org/sharp/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: SASH
+  definition: 'Screening Assessment for Stalking and Harassment: 13 screening questions plus 3 for ex-partner
+    stalkers, used to judge how concerned to be.'
+  examples: []
+  source_url: https://www.stalkingriskprofile.com/?p=98
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: '''Honour''-based abuse'
+  definition: Violence, threats or coercion committed to protect a family's or community's honour for
+    a supposed breach of its code of behaviour.
+  examples: []
+  source_url: https://cps.gov.uk/legal-guidance/honour-based-violence-and-forced-marriage-guidance-identifying-and-flagging-cases
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Forced marriage
+  definition: A marriage in which one or both spouses do not consent and are coerced; in England and Wales
+    any marriage of a child under 18 is also covered.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: One Chance rule
+  definition: The principle that professionals may only get one chance to speak to a forced-marriage victim,
+    and so must act at once.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Reproductive coercion
+  definition: Controlling a partner's contraception, pregnancy or fertility decisions.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Intimate partner violence
+  definition: Physical, sexual or psychological harm by a current or former partner, including controlling
+    behaviours.
+  examples: []
+  source_url: https://www.who.int/news-room/fact-sheets/detail/violence-against-women
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Sex ratio at birth
+  definition: Male births per 100 female births; the biological norm is 104 to 106.
+  examples: []
+  source_url: https://www.unfpa.org/sites/default/files/pub-pdf/Sex%20Imbalances%20at%20Birth.%20PDF%20UNFPA%20APRO%20publication%202012.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Child sex ratio
+  definition: The ratio of boys to girls among young children in a census, used alongside the birth ratio
+    to track imbalance.
+  examples: []
+  source_url: https://www.unfpa.org/sites/default/files/pub-pdf/Sex%20Imbalances%20at%20Birth.%20PDF%20UNFPA%20APRO%20publication%202012.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Gender-biased (prenatal) sex selection
+  definition: Choosing the sex of a child before birth, usually to have a son, which skews the sex ratio
+    at birth.
+  examples: []
+  source_url: https://www.who.int/publications/i/item/9789241501460
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Son preference
+  definition: A cultural preference for sons over daughters, which UNFPA calls the main driver of sex
+    selection.
+  examples: []
+  source_url: https://www.unfpa.org/sites/default/files/pub-pdf/Sex%20Imbalances%20at%20Birth.%20PDF%20UNFPA%20APRO%20publication%202012.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Dowry-related killing
+  definition: The killing of a bride, or her death by suicide, after harassment by the groom's family
+    over dowry.
+  examples: []
+  source_url: https://www.unodc.org/documents/data-and-analysis/GSH2018/GSH18_Gender-related_killing_of_women_and_girls.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Prevention of Future Deaths report
+  definition: A report a coroner in England and Wales sends to organisations when an inquest shows a risk
+    that more deaths could happen.
+  examples: []
+  source_url: https://www.judiciary.uk/prevention-of-future-death-reports/gracie-spinks-prevention-of-future-deaths-report/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Domestic Violence Disclosure Scheme (Clare's Law)
+  definition: A police scheme in England and Wales for disclosing a partner's history of abuse; its guidance
+    covers checks and disclosure wording.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/domestic-violence-disclosure-scheme-pilot-guidance
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA
+- term: Counter-allegation
+  definition: An accusation of abuse made by the suspect against the victim, sometimes as a self-defence
+    claim.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DA

@@ -13,17 +13,33 @@ include = [
     "app/core/access.py",
     "app/core/config.py",
     "app/core/time.py",
+    "app/console_adapters.py",
+    "opsconsole/**/*.py",
 ]
 
 [tool.ruff.lint]
 select = ["I"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["app"]
+known-first-party = ["app", "opsconsole"]
 
 [tool.mypy]
 python_version = "3.12"
-files = ["app/connectors", "app/core/access.py", "app/core/config.py", "app/core/time.py"]
+# STRUCT-0013, cycle 5 (2026-09-22): the whole backend package is checked. Cycles
+# 2-4 widened this list one app/services slice at a time; cycle 5 cleared the
+# remaining 275 errors across 12 files (search.py 106, documents.py 41, leads.py 38,
+# provenance.py 35, dossier.py 17, investigations/exports/entities.py 8 each,
+# audit_log.py 6, routes_entities.py 4, migrations.py 2, ai/reasoning.py 2) -- almost
+# all one of three shapes: a loop/branch variable reused for a different ORM type
+# (renamed per type), Sequence-vs-list from db.scalars(...).all() (wrapped in
+# list()), or a missing dict/list annotation. Two were real bugs: routes_entities'
+# merge endpoints passed a possibly-None Entity into the service (now 404), and
+# dossier.py's evidence loop was one rename away from reporting a stale claim
+# basis. `files` is the package, so a new module is checked the day it lands.
+# ADR-0003 (2026-09-22): opsconsole/ (the standalone operator console package)
+# and its host wiring in app/console_adapters.py hold to the same bar and are
+# clean under it -- added to `files` so a regression here fails CI too.
+files = ["app", "opsconsole"]
 warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true
@@ -36,8 +52,14 @@ ignore_missing_imports = true
 pretty = true
 show_error_codes = true
 
-# Deferred until the remaining backend packages are ready for broader type-checking.
-disallow_untyped_defs = false
+# STRUCT-0013 closed (cycle 6, 2026-09-22): every def in the package is annotated.
+# Route handlers that return heterogeneous JSON are `-> Any` / `-> dict[str, Any]`;
+# service functions carry their real Pydantic request types (`body: ClaimCreate`,
+# not `body`). A new untyped def now fails Backend Lint.
+disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
-addopts = "-q --cov=app --cov-report=term-missing"
+# opsconsole (ADR-0003) is measured alongside app/ as of this line -- previously
+# only --cov=app, so opsconsole tests had to pass in CI but nothing gated their
+# coverage. Combined coverage at the time this was added: 86.21%.
+addopts = "-q --cov=app --cov=opsconsole --cov-report=term-missing --cov-fail-under=80"

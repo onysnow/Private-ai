@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-theme="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="same-origin">
+<meta name="color-scheme" content="light dark">
+<title>__APP_NAME__ · Console</title>
+<link rel="stylesheet" href="__CONSOLE_UI__/console.css">
+<script>
+  window.OPSCONSOLE = {prefix: "__CONSOLE_PREFIX__", ui: "__CONSOLE_UI__", app: "__APP_NAME__"};
+  try {
+    var t = localStorage.getItem("opsconsole.theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+</script>
+</head>
+<body>
+<noscript>The __APP_NAME__ console needs JavaScript. API: __CONSOLE_PREFIX__</noscript>
+<div id="app" class="app" data-app="__APP_NAME__" data-prefix="__CONSOLE_PREFIX__">
+  <div class="boot">
+    <div class="boot-card">
+      <div class="boot-title">__APP_NAME__ · Console</div>
+      <div class="boot-sub muted mono">loading manifest from __CONSOLE_PREFIX__/manifest …</div>
+    </div>
+  </div>
+</div>
+<script type="module" src="__CONSOLE_UI__/console.js"></script>
+</body>
+</html>

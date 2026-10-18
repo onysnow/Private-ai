@@ -3,7 +3,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from contextvars import ContextVar, Token
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, Iterator
 
 from fastapi import HTTPException, Request
 from sqlalchemy.orm import Session
@@ -20,6 +20,13 @@ class AuthorizationScope:
     ``investigation_ids=None`` means unrestricted. A concrete frozenset is a
     fail-closed allowlist. The local single-user workstation remains unrestricted;
     remote shared-bearer access can be narrowed with JW_API_AUTH_INVESTIGATION_IDS.
+
+    Two independent remote-auth paths feed this scope -- persisted per-user
+    tokens (app/services/identity.py) and the shared JW_API_AUTH_TOKEN
+    fallback -- and both are meant to coexist permanently as different
+    tiers rather than one migrating away. See
+    docs/adr/0002-authorization-two-tier-end-state.md (STRUCT-0023) before
+    changing either path.
     """
 
     actor_id: str
@@ -34,7 +41,11 @@ class AuthorizationScope:
     def allows(self, investigation_id: str | None) -> bool:
         if not investigation_id:
             return False
-        return self.unrestricted or investigation_id in self.investigation_ids
+        # Written as `is None` (not `self.unrestricted`) so mypy can narrow
+        # investigation_ids to frozenset[str] on the right side of `or` --
+        # the two are equivalent by construction (STRUCT-0013), but going
+        # through the property loses that narrowing for the type checker.
+        return self.investigation_ids is None or investigation_id in self.investigation_ids
 
     def role_for(self, investigation_id: str) -> str:
         if self.unrestricted:
@@ -55,13 +66,6 @@ class AuthorizationScope:
 class InvestigationAuthorizationError(PermissionError):
     """Raised when a scoped principal attempts to mutate another investigation."""
 
-
-def ensure_scope_allows_ids(scope: AuthorizationScope | None, investigation_ids: Iterable[str]) -> None:
-    if scope is None or scope.unrestricted:
-        return
-    denied = sorted({value for value in investigation_ids if value and not scope.allows(value)})
-    if denied:
-        raise InvestigationAuthorizationError("Investigation access denied")
 
 def ensure_scope_can_mutate_ids(scope: AuthorizationScope | None, investigation_ids: Iterable[str]) -> None:
     if scope is None:
@@ -88,7 +92,7 @@ def reset_current_authorization_scope(token: Token) -> None:
 
 
 @contextmanager
-def authorization_scope_context(scope: AuthorizationScope):
+def authorization_scope_context(scope: AuthorizationScope) -> Iterator[AuthorizationScope]:
     token = set_current_authorization_scope(scope)
     try:
         yield scope
@@ -142,25 +146,37 @@ def require_scope_global_admin(scope: AuthorizationScope) -> None:
         raise HTTPException(status_code=403, detail="Global admin role required")
 
 
-def filter_visible_investigation_ids(scope: AuthorizationScope, ids: Iterable[str]) -> list[str]:
-    return [value for value in ids if scope.allows(value)]
-
-
 def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
     # Lazy import keeps authorization infrastructure independent from ORM import order.
     from app.models.domain import (
+        AIAnalysisCandidate,
+        BackgroundJob,
         Claim,
         ConnectorFinding,
+        CrossReferenceProposal,
+        Deck,
         Document,
         Entity,
         EnrichmentSession,
         Evidence,
         ExternalRelationshipReview,
+        IngestionBatch,
         ExtractionCandidate,
         Lead,
+        RelationshipEdge,
         ReportingTask,
         Source,
         StatementAssessment,
+        TimelineEvent,
+        WatchlistEntry,
+        WatchlistHit,
+        Writeup,
+        Tag,
+        Note,
+        Collection,
+        PatternFlag,
+        CheckItem,
+        CaseRecord,
     )
 
     direct = {
@@ -174,6 +190,21 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "review_id": (ExternalRelationshipReview, "investigation_id"),
         "session_id": (EnrichmentSession, "investigation_id"),
         "document_id": (Document, "investigation_id"),
+        "job_id": (BackgroundJob, "investigation_id"),
+        "cross_reference_id": (CrossReferenceProposal, "investigation_id"),
+        "relationship_id": (RelationshipEdge, "investigation_id"),
+        "deck_id": (Deck, "investigation_id"),
+        "writeup_id": (Writeup, "investigation_id"),
+        "batch_id": (IngestionBatch, "investigation_id"),
+        "watch_id": (WatchlistEntry, "investigation_id"),
+        "hit_id": (WatchlistHit, "investigation_id"),
+        "tag_id": (Tag, "investigation_id"),
+        "note_id": (Note, "investigation_id"),
+        "collection_id": (Collection, "investigation_id"),
+        "flag_id": (PatternFlag, "investigation_id"),
+        "check_id": (CheckItem, "investigation_id"),
+        "timeline_event_id": (TimelineEvent, "investigation_id"),
+        "case_record_id": (CaseRecord, "investigation_id"),
     }
     if key in direct:
         model, attr = direct[key]
@@ -188,11 +219,16 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         return source.investigation_id if source is not None else None
 
     if key == "candidate_id":
+        # Two candidate tables share this path-parameter name:
+        # /extraction-candidates/{candidate_id}/... and /ai-analysis-candidates/{candidate_id}[/review].
+        # Both are UUID-keyed, so try each; an id found in neither resolves to None and the
+        # route's own 404 applies.
         row = db.get(ExtractionCandidate, value)
-        if row is None:
-            return None
-        document = db.get(Document, row.document_id)
-        return document.investigation_id if document is not None else None
+        if row is not None:
+            document = db.get(Document, row.document_id)
+            return document.investigation_id if document is not None else None
+        ai_row = db.get(AIAnalysisCandidate, value)
+        return ai_row.investigation_id if ai_row is not None else None
 
     return None
 

@@ -6,12 +6,24 @@ import stat
 import tempfile
 from pathlib import Path
 
-SUPPORTED_CONNECTORS = {"aleph", "opensanctions"}
+
+def _supported_connectors() -> set[str]:
+    # Deferred import: app.connectors.registry imports get_secret from this
+    # module, so importing it back at module load time would be circular.
+    # Deriving from CONNECTOR_SPECS here (rather than a hardcoded set) keeps
+    # this the same single source of truth as CONNECTOR_PROVIDERS and
+    # connector_credential_status in app/services/settings.py (STRUCT-0022) --
+    # this was a third, previously-missed hardcoded provider list that would
+    # have made get_secret("firecrawl", ...) raise ValueError at registry
+    # build time.
+    from app.connectors.registry import CONNECTOR_SPECS
+
+    return set(CONNECTOR_SPECS)
 
 
 def _validate_provider(provider: str) -> str:
     provider = (provider or "").strip().lower()
-    if provider not in SUPPORTED_CONNECTORS:
+    if provider not in _supported_connectors():
         raise ValueError("Unsupported connector credential")
     return provider
 
@@ -30,9 +42,10 @@ def _read(path: str | Path) -> dict[str, str]:
         raise RuntimeError("Connector credential store is unreadable") from exc
     if not isinstance(data, dict):
         raise RuntimeError("Connector credential store has invalid format")
+    supported = _supported_connectors()
     result: dict[str, str] = {}
     for key, value in data.items():
-        if key in SUPPORTED_CONNECTORS and isinstance(value, str) and value:
+        if key in supported and isinstance(value, str) and value:
             result[key] = value
     return result
 

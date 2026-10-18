@@ -1,0 +1,180 @@
+area: TH
+terms:
+- term: Organised retail crime (ORC)
+  definition: Theft or fraud carried out by a group, over several incidents or places, to obtain shop
+    merchandise and turn it into money.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related:
+  - Organised theft group
+  - E-fencing
+  indicators: []
+  areas:
+  - TH
+- term: Organised theft group (OTG)
+  definition: A group whose thefts happen repeatedly or across jurisdictions, carried out by two or more
+    people or by one person who both steals and sells.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Booster
+  definition: The person who physically steals the goods from stores.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Crew boss
+  definition: The person who leads and directs a group of boosters on the ground.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Fence / fencer
+  definition: Someone who knowingly buys stolen goods and resells them; in organised retail crime, the
+    middleman between thieves and higher-level buyers, often behind a wholesale front.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-11-675.pdf
+  cases: []
+  related:
+  - Diverter
+  indicators: []
+  areas:
+  - TH
+- term: E-fencing
+  definition: Selling stolen goods through online marketplaces.
+  examples: []
+  source_url: https://www.gao.gov/products/gao-11-675
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Cleaner
+  definition: A worker who removes security tags, stickers and labels from stolen goods so they look like
+    legitimate stock.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Diverter
+  definition: A higher-level illicit wholesaler who buys cleaned stolen goods in bulk and resells them
+    into wider supply chains.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: ORChestrator
+  definition: The guide's name for the leader who may supervise several organised theft groups.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Electronic article surveillance (EAS) tag
+  definition: An anti-theft sensor or tag attached to goods in stores that sets off an alarm if not removed
+    at the till.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Stored value card (SVC)
+  definition: A gift or prepaid card that holds a money balance.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Structuring
+  definition: Splitting cash deposits or withdrawals into smaller amounts to avoid identification or reporting
+    requirements.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Cargo theft
+  definition: Theft of goods in transit, for example stealing a tractor or trailer carrying valuable freight.
+  examples: []
+  source_url: https://www.icsc.com/uploads/gpp/ACAMS_-_HSI_Report_on_ORC.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: ATM jackpotting
+  definition: Using physical access and malicious software to make an ATM dispense cash without a real
+    transaction.
+  examples: []
+  source_url: https://www.ic3.gov/CSA/2026/260219.pdf
+  cases: []
+  related:
+  - XFS
+  - Ploutus
+  indicators: []
+  areas:
+  - TH
+- term: XFS (eXtensions for Financial Services)
+  definition: The software layer that tells an ATM's hardware what to do, such as dispensing cash.
+  examples: []
+  source_url: https://www.ic3.gov/CSA/2026/260219.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Ploutus
+  definition: A family of ATM malware that abuses the XFS layer to make machines dispense cash.
+  examples: []
+  source_url: https://www.ic3.gov/CSA/2026/260219.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: Skimming
+  definition: Using devices secretly fitted to ATMs, card terminals or fuel pumps to copy card data and
+    record PINs.
+  examples: []
+  source_url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-frauds-and-scams/skimming
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH
+- term: High-volume third party seller
+  definition: Under the US INFORM Consumers Act, a marketplace seller with 200 or more sales of new or
+    unused products and US$5,000 or more in revenue in a continuous 12 months within the past 24, whose
+    identity the marketplace must verify.
+  examples: []
+  source_url: https://www.ftc.gov/business-guidance/resources/informing-businesses-about-inform-consumers-act
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - TH

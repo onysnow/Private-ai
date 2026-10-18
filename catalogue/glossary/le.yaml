@@ -1,0 +1,684 @@
+area: LE
+terms:
+- term: Labour exploitation (short of forced labour)
+  definition: Breaking employment law to the worker's cost (underpayment, misclassification, unlawful
+    deductions) without the threats or coercion that make it forced labour. UK enforcement sees it as
+    a range running from compliant through negligent and exploitative to severe abuse.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1143364/uk-labour-market-enforcement-strategy-2022-2023.pdf
+  cases: []
+  related:
+  - Forced labour
+  - Wage theft
+  indicators: []
+  areas:
+  - LE
+- term: Forced labour
+  definition: Work a person has not freely or knowingly agreed to and faces a threat, coercion or penalty
+    for refusing. The ILO lists 11 indicators, including deception, debt bondage and withholding of wages.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - Modern slavery
+  - Debt bondage
+  indicators: []
+  areas:
+  - LE
+- term: Modern slavery
+  definition: Umbrella term for severe exploitation including forced labour, debt bondage and trafficking.
+    Australia's Modern Slavery Act 2018 created the Anti-Slavery Commissioner.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - Forced labour
+  indicators: []
+  areas:
+  - LE
+- term: Debt bondage
+  definition: Working to pay off a debt, often recruitment or travel fees, where the debt is used to keep
+    the worker in the job. It is one of the ILO forced-labour indicators.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - Recruitment fees
+  - Forced labour
+  indicators: []
+  areas:
+  - LE
+- term: Wage theft
+  definition: 'Not paying workers the full wages the law entitles them to: minimum wage, overtime, off-the-clock,
+    meal-break, tip, deduction and misclassification violations.'
+  examples: []
+  source_url: https://www.epi.org/publication/wage-theft-2021-23/
+  cases: []
+  related:
+  - Underpayment
+  indicators: []
+  areas:
+  - LE
+- term: Underpayment
+  definition: Paying a worker less than their minimum legal entitlements under the applicable award, agreement
+    or minimum wage. In Australia, intentional underpayment became a criminal offence on 1 January 2025.
+  examples: []
+  source_url: https://www.dewr.gov.au/node/16708
+  cases: []
+  related:
+  - Wage theft
+  - Modern award
+  indicators: []
+  areas:
+  - LE
+- term: Wage theft offence (Australia)
+  definition: Criminal offence from 1 January 2025 for employers who intentionally engage in conduct that
+    results in underpaying employees. Small businesses can avoid prosecution by following the Voluntary
+    Small Business Wage Compliance Code.
+  examples: []
+  source_url: https://www.dewr.gov.au/node/16708
+  cases: []
+  related:
+  - Underpayment
+  indicators: []
+  areas:
+  - LE
+- term: Australian Business Number (ABN)
+  definition: An Australian registration number for people and businesses running an enterprise. Workers
+    on an ABN are treated as contractors, not employees, so employee pay and record rules do not apply.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - Independent contractor
+  - Sham contracting
+  indicators: []
+  areas:
+  - LE
+- term: Independent contractor
+  definition: A worker who runs their own business, controls how, when and where they work, can delegate
+    the work and uses their own tools, as opposed to an employee.
+  examples: []
+  source_url: https://www.fairwork.gov.au/find-help-for/independent-contractors
+  cases: []
+  related:
+  - Misclassification
+  indicators: []
+  areas:
+  - LE
+- term: Misclassification
+  definition: Treating a worker who is legally an employee as an independent contractor, which denies
+    them the minimum wage, overtime and other protections.
+  examples: []
+  source_url: https://www.dol.gov/agencies/whd/flsa/misclassification
+  cases: []
+  related:
+  - Sham contracting
+  - Economic reality test
+  indicators: []
+  areas:
+  - LE
+- term: Sham contracting
+  definition: Deliberately presenting an employee as a contractor when the business knew or should have
+    known they were an employee. It is illegal under Australia's Fair Work Act 2009 and attracts penalties
+    per contravention.
+  examples: []
+  source_url: https://www.fairwork.gov.au/find-help-for/independent-contractors
+  cases: []
+  related:
+  - Misclassification
+  indicators: []
+  areas:
+  - LE
+- term: Economic reality test
+  definition: 'The US test for employee status. It weighs six factors: opportunity for profit or loss,
+    investments, permanence, control, whether the work is integral to the business, and skill and initiative.
+    Labels and titles do not decide it.'
+  examples: []
+  source_url: https://www.dol.gov/agencies/whd/fact-sheets/13-flsa-employment-relationship
+  cases: []
+  related:
+  - Misclassification
+  indicators: []
+  areas:
+  - LE
+- term: Casual employee (Australia)
+  definition: An employee hired with no firm advance commitment to ongoing work, who is paid a casual
+    loading or a specific casual rate instead of paid leave.
+  examples: []
+  source_url: https://www.fairwork.gov.au/starting-employment/types-of-employees/casual-employees
+  cases: []
+  related:
+  - Casual loading
+  - Sham casual arrangement
+  indicators: []
+  areas:
+  - LE
+- term: Casual loading
+  definition: Extra pay on top of the base rate for casual employees, usually 25%, paid instead of leave
+    entitlements.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - Casual employee
+  indicators: []
+  areas:
+  - LE
+- term: Sham casual arrangement
+  definition: Illegally misleading, dismissing or threatening a permanent employee to re-engage them as
+    a casual for the same or mostly the same work.
+  examples: []
+  source_url: https://www.fairwork.gov.au/starting-employment/types-of-employees/casual-employees
+  cases: []
+  related:
+  - Casual employee
+  indicators: []
+  areas:
+  - LE
+- term: Penalty rates
+  definition: Higher pay rates that awards set for nights, weekends, public holidays and overtime.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - Modern award
+  indicators: []
+  areas:
+  - LE
+- term: Modern award / National Employment Standards
+  definition: In Australia, awards set minimum pay and conditions for an industry or job, and the National
+    Employment Standards set the floor that awards and agreements cannot go below. Together with the National
+    Minimum Wage they form the safety net.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - National Minimum Wage
+  indicators: []
+  areas:
+  - LE
+- term: National Minimum Wage (Australia)
+  definition: The wage floor for employees not covered by an award or agreement. The guidance cites $23.23
+    an hour at the time of the survey; award rates are often higher.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - Modern award
+  indicators: []
+  areas:
+  - LE
+- term: Superannuation
+  definition: Compulsory employer contributions to an employee's retirement fund in Australia, which must
+    appear on pay slips with the receiving fund named.
+  examples: []
+  source_url: https://www.fairwork.gov.au/pay-and-wages/paying-wages/pay-slips
+  cases: []
+  related:
+  - Pay slip
+  indicators: []
+  areas:
+  - LE
+- term: Pay slip
+  definition: A record of each pay period's hours, rates, loadings, deductions and super. In Australia
+    it must be given within 1 working day of pay day, and giving one the employer knows is false is unlawful.
+  examples: []
+  source_url: https://www.fairwork.gov.au/pay-and-wages/paying-wages/pay-slips
+  cases: []
+  related:
+  - Record falsification
+  indicators: []
+  areas:
+  - LE
+- term: Cashback scheme
+  definition: An arrangement where an employee is paid correctly on paper but must hand back part of the
+    wage to the employer. It is unlawful in Australia, and US law requires wages to be paid 'free and
+    clear'.
+  examples: []
+  source_url: https://www.fairwork.gov.au/pay-and-wages/deductions-and-related-issues/requirements-to-spend-or-pay-back-money
+  cases: []
+  related:
+  - Kickback
+  - Free and clear
+  indicators: []
+  areas:
+  - LE
+- term: Free and clear / kickback (US)
+  definition: The US rule (29 CFR 531.35) that wages count only if paid unconditionally. Any kickback
+    of wages to the employer, including making workers buy the tools of the job, breaches it if it cuts
+    into the minimum or overtime wages.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/29/531.35
+  cases: []
+  related:
+  - Cashback scheme
+  indicators: []
+  areas:
+  - LE
+- term: Unlawful deduction
+  definition: Money taken from wages without a lawful basis. In Australia a deduction is generally allowed
+    only with written agreement mainly for the employee's benefit, or under an award, agreement, law or
+    court order.
+  examples: []
+  source_url: https://www.fairwork.gov.au/pay-and-wages/deductions-and-related-issues/deducting-pay
+  cases: []
+  related:
+  - Wage theft
+  indicators: []
+  areas:
+  - LE
+- term: Unpaid trial
+  definition: An unpaid skills demonstration before hiring. In Australia it is lawful only if it is no
+    longer than needed to show the skills (an hour up to a shift), is only a demonstration, and is directly
+    supervised.
+  examples: []
+  source_url: https://www.fairwork.gov.au/starting-employment/unpaid-work/unpaid-trials
+  cases: []
+  related:
+  - Off-the-clock work
+  indicators: []
+  areas:
+  - LE
+- term: Off-the-clock work
+  definition: Work done before or after a paid shift, or during breaks, without pay. Under US law, work
+    the employer suffers or permits must be paid.
+  examples: []
+  source_url: https://www.dol.gov/agencies/whd/fact-sheets/22-flsa-hours-worked
+  cases: []
+  related:
+  - Wage theft
+  indicators: []
+  areas:
+  - LE
+- term: Tip theft
+  definition: Employers, managers or supervisors keeping workers' tips, including through tip pools, which
+    is banned under the US FLSA.
+  examples: []
+  source_url: https://www.dol.gov/agencies/whd/flsa/tips
+  cases: []
+  related:
+  - Tip credit
+  indicators: []
+  areas:
+  - LE
+- term: Tip credit
+  definition: A US rule letting employers count part of tips toward the minimum wage, provided tips plus
+    cash wages reach at least the minimum wage and any overtime each week.
+  examples: []
+  source_url: https://www.dol.gov/agencies/whd/flsa/tips
+  cases: []
+  related:
+  - Tip theft
+  indicators: []
+  areas:
+  - LE
+- term: Exempt employee (US overtime)
+  definition: An employee excluded from US overtime pay because they meet salary-level and duties tests.
+    A job title alone does not make someone exempt.
+  examples: []
+  source_url: https://www.dol.gov/agencies/whd/fact-sheets/17a-overtime
+  cases: []
+  related:
+  - Misclassification
+  indicators: []
+  areas:
+  - LE
+- term: Phoenix activity
+  definition: Deliberately avoiding a company's debts by moving its assets to a new company and carrying
+    on the same business, leaving employees, creditors and the community to bear the cost.
+  examples: []
+  source_url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+  cases: []
+  related:
+  - Deregistration
+  indicators: []
+  areas:
+  - LE
+- term: Labour hire
+  definition: A business supplies its workers to work for a host business. Four Australian states license
+    labour hire providers, and hosts there must use licensed providers.
+  examples: []
+  source_url: https://labourhireauthority.vic.gov.au/
+  cases: []
+  related:
+  - Subcontracting chain
+  indicators: []
+  areas:
+  - LE
+- term: Piecework agreement
+  definition: In Australian horticulture, a written agreement signed by employer and employee that allows
+    pay per unit (bin, kilo) instead of per hour.
+  examples: []
+  source_url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+  cases: []
+  related:
+  - Underpayment
+  indicators: []
+  areas:
+  - LE
+- term: Recruitment fees
+  definition: Money charged to a worker to obtain or keep a job. These are banned for H-2A visa workers
+    in the US and generally unreasonable under Australian law.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/20/655.135
+  cases: []
+  related:
+  - Debt bondage
+  - H-2A visa
+  indicators: []
+  areas:
+  - LE
+- term: H-2A visa
+  definition: US temporary visa for foreign agricultural workers. Employers and their agents may not receive
+    recruitment, attorney or application fees, kickbacks or free labour from these workers.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/20/655.135
+  cases: []
+  related:
+  - Recruitment fees
+  indicators: []
+  areas:
+  - LE
+- term: Temporary visa holder
+  definition: A migrant allowed to stay and often work for a limited time, such as a student or working
+    holiday visa holder. In Australia they have the same workplace rights as other employees regardless
+    of visa status.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Fair Work Ombudsman (FWO)
+  definition: Australia's workplace regulator. It advises employers and workers, investigates breaches
+    of the Fair Work Act and takes enforcement action, including court cases for civil penalties.
+  examples: []
+  source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  cases: []
+  related:
+  - Wage and Hour Division
+  indicators: []
+  areas:
+  - LE
+- term: Wage and Hour Division (WHD)
+  definition: The US Department of Labor agency that enforces the Fair Labor Standards Act (minimum wage,
+    overtime, child labour).
+  examples: []
+  source_url: https://www.dol.gov/agencies/whd/flsa/misclassification
+  cases: []
+  related:
+  - FLSA
+  indicators: []
+  areas:
+  - LE
+- term: Fair Labor Standards Act (FLSA)
+  definition: The US federal law setting minimum wage, overtime, record-keeping and child labour rules.
+  examples: []
+  source_url: https://www.dol.gov/agencies/whd/flsa/misclassification
+  cases: []
+  related:
+  - Wage and Hour Division
+  indicators: []
+  areas:
+  - LE
+- term: Gangmasters and Labour Abuse Authority (GLAA)
+  definition: UK body that licenses labour providers in certain sectors and investigates labour abuse
+    and modern slavery. It publishes 'spot the signs' guidance.
+  examples: []
+  source_url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Consent judgment
+  definition: A court order agreed by both sides that settles a case. The employer pays back wages and
+    is barred from future violations without admitting the claims at trial.
+  examples: []
+  source_url: https://www.dol.gov/newsroom/releases/whd/whd20240423
+  cases: []
+  related:
+  - Liquidated damages
+  indicators: []
+  areas:
+  - LE
+- term: Liquidated damages (FLSA)
+  definition: An extra amount, usually equal to the unpaid back wages, that an employer pays workers under
+    the FLSA.
+  examples: []
+  source_url: https://www.dol.gov/newsroom/releases/whd/whd20240423
+  cases: []
+  related:
+  - Consent judgment
+  indicators: []
+  areas:
+  - LE
+- term: Civil money penalty
+  definition: A fine a regulator assesses for violations, such as the per-minor child labour penalties
+    assessed against PSSI.
+  examples: []
+  source_url: https://www.dol.gov/newsroom/releases/whd/whd20230217-1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Persuader
+  definition: A consultant or other outside person who, under an arrangement with an employer, works to
+    persuade employees about whether to organise or bargain, directly or through others.
+  examples: []
+  source_url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+  cases: []
+  related:
+  - LM-20
+  - LM-10
+  - Advice exemption
+  indicators: []
+  areas:
+  - LE
+- term: Form LM-10 (Employer Report)
+  definition: Annual report an employer files with OLMS listing persuader agreements and certain payments
+    to consultants, employees or unions; due within 90 days after the employer's fiscal year ends.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-405
+  cases: []
+  related:
+  - LMRDA section 203(a)
+  indicators: []
+  areas:
+  - LE
+- term: Form LM-20 (Agreement and Activities Report)
+  definition: Report a consultant files with OLMS describing a persuader agreement with an employer; due
+    within 30 days of making the agreement.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-406
+  cases: []
+  related:
+  - LM-21
+  indicators: []
+  areas:
+  - LE
+- term: Form LM-21 (Receipts and Disbursements Report)
+  definition: Annual report a consultant who filed an LM-20 makes of money received and spent on labour
+    relations work, due within 90 days of its fiscal year end.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-406
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Advice exemption
+  definition: The rule that a consultant who only gives advice to an employer, without persuading workers,
+    does not have to report.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/433
+  cases: []
+  related:
+  - Section 203(c)
+  indicators: []
+  areas:
+  - LE
+- term: OLMS
+  definition: The US Department of Labor's Office of Labor-Management Standards, which administers union
+    and persuader disclosure reports.
+  examples: []
+  source_url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: LMRDA
+  definition: The Labor-Management Reporting and Disclosure Act of 1959, the federal law that sets the
+    persuader reporting duties in section 203.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/433
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: NLRA
+  definition: The National Labor Relations Act, the US federal law protecting private-sector workers'
+    right to organise and listing employer unfair labour practices in section 8(a).
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/158
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: NLRB
+  definition: The National Labor Relations Board, the federal agency that runs union elections and decides
+    unfair labour practice cases.
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Unfair labour practice (ULP)
+  definition: Conduct the NLRA forbids, such as an employer interfering with, coercing or discriminating
+    against workers for union activity, or refusing to bargain.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/158
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Section 7 / protected concerted activity
+  definition: Workers' legal right to organise, bargain collectively and act together for mutual aid,
+    which section 8(a)(1) protects from employer interference.
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Captive audience meeting
+  definition: A meeting workers must attend, under threat of discipline, where the employer argues against
+    unionising; held unlawful by the NLRB in Amazon.com Services LLC (2024).
+  examples: []
+  source_url: https://www.nlrb.gov/news-outreach/news-story/board-rules-captive-audience-meetings-unlawful
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Cemex bargaining order
+  definition: A 2023 NLRB standard under which an employer that commits election-voiding unfair labour
+    practices is ordered to recognise and bargain with the union rather than hold a rerun.
+  examples: []
+  source_url: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+  cases: []
+  related:
+  - Gissel order
+  indicators: []
+  areas:
+  - LE
+- term: Gissel order
+  definition: An older form of NLRB bargaining order used where employer misconduct makes a fair election
+    unlikely; the Cemex decision ordered bargaining under both Gissel and the new standard.
+  examples: []
+  source_url: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Section 10(j) injunction
+  definition: A court order the NLRB can seek to halt alleged unfair labour practices while its case proceeds;
+    in Starbucks v. McKinney (2024) the Supreme Court said courts must apply the usual four-factor test.
+  examples: []
+  source_url: https://www.law.cornell.edu/supremecourt/text/23-367
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Decertification
+  definition: A process by which workers petition to remove their union; employers may not start or more
+    than minimally support it.
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Company union (employer domination)
+  definition: A workers' organisation that the employer dominates, controls or improperly supports, prohibited
+    by NLRA section 8(a)(2).
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-or-dominating-a-union-section-8a2
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Objectionable conduct
+  definition: Conduct around an NLRB election that can lead the Board to set aside the result, such as
+    mass speeches on company time within 24 hours of the vote.
+  examples: []
+  source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: First contract
+  definition: The first collective agreement after a union is certified; research finds many units still
+    have none a year after the election.
+  examples: []
+  source_url: https://files.epi.org/page/-/pdf/bp235.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Union avoidance consultant
+  definition: A consultant or law firm hired to help an employer defeat or avoid unionisation; EPI estimates
+    employer spending on them at roughly $340 million a year.
+  examples: []
+  source_url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE
+- term: Supervisor one-on-ones
+  definition: Individual meetings between supervisors and workers during a campaign, which research found
+    were often used to question workers about the union.
+  examples: []
+  source_url: https://files.epi.org/page/-/pdf/bp235.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - LE

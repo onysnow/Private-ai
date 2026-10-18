@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.routes import router
+from app.main import register_domain_routers
 from app.core.authorization import (
     AuthorizationScope,
     reset_current_authorization_scope,
@@ -41,7 +41,7 @@ def _app(factory, scope: AuthorizationScope) -> FastAPI:
             reset_current_authorization_scope(token)
 
     app.dependency_overrides[get_db] = db_override
-    app.include_router(router)
+    register_domain_routers(app)
     return app
 
 

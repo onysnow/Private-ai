@@ -6,7 +6,7 @@ from typing import Iterable
 
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import Engine, inspect
+from sqlalchemy import Engine, UniqueConstraint, inspect
 from sqlalchemy.sql.sqltypes import NullType
 
 from app.db.session import Base
@@ -51,7 +51,7 @@ def _live_application_tables(engine: Engine) -> tuple[set[str], bool]:
     return names - {ALEMBIC_VERSION_TABLE}, ALEMBIC_VERSION_TABLE in names
 
 
-def _type_family(value) -> str:
+def _type_family(value: object) -> str:
     """Compare portable SQL type families instead of dialect-specific rendered names."""
     if isinstance(value, NullType):
         return "unknown"
@@ -102,7 +102,7 @@ def inspect_schema_compatibility(engine: Engine) -> SchemaCompatibilityReport:
                 )
 
         expected_pk = {col.name for col in expected.primary_key.columns}
-        actual_pk = set((inspector.get_pk_constraint(table_name) or {}).get("constrained_columns") or [])
+        actual_pk = set(inspector.get_pk_constraint(table_name).get("constrained_columns") or [])
         if expected_pk != actual_pk:
             table_issues.append(
                 "primary key " + ", ".join(sorted(actual_pk)) +
@@ -145,7 +145,7 @@ def inspect_schema_compatibility(engine: Engine) -> SchemaCompatibilityReport:
         expected_uniques = {
             tuple(sorted(col.name for col in constraint.columns))
             for constraint in expected.constraints
-            if constraint.__class__.__name__ == "UniqueConstraint"
+            if isinstance(constraint, UniqueConstraint)
         }
         actual_uniques = {
             tuple(sorted(unique.get("column_names") or ()))

@@ -4,11 +4,6 @@ from app.db.session import Base, engine
 from app.main import app
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
     client = TestClient(app)
     inv = client.post('/api/investigations', json={'name': 'Dossier test'}).json()

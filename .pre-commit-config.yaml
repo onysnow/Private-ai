@@ -1,0 +1,14 @@
+# Fast checks on every commit: backend ruff and mypy, using the backend
+# virtualenv's own versions (the ones CI pins in backend/requirements-local.txt).
+#   pip install pre-commit && pre-commit install
+# The full CI set (tests, PostgreSQL gate, frontend build) is
+#   python tools/check_all.py
+repos:
+  - repo: local
+    hooks:
+      - id: backend-ruff-mypy
+        name: backend ruff + mypy
+        entry: python tools/check_all.py --fast
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false

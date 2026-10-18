@@ -26,6 +26,8 @@ async function parseError(response:Response,endpoint:string):Promise<ApiHttpErro
         const value=(body as {detail?:unknown}).detail;
         if(typeof value==='string'&&value.trim())detail=value.trim();
         else if(Array.isArray(value))detail=value.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('; ');
+        // A structured detail ({message, document, ...}: an upload's 409 or 422) says it in its message.
+        else if(typeof value==='object'&&value!==null&&typeof (value as {message?:unknown}).message==='string')detail=(value as {message:string}).message;
       }
     }else{
       const text=(await response.text()).trim();
@@ -56,6 +58,24 @@ export class ApiClient {
     const response=await fetch(`${this.baseUrl}${path}`,{...options,headers,body});
     if(!response.ok)throw await parseError(response,path);
     return response;
+  }
+
+  // The generated client (lib/generated, Foundation Fixes fix 2) sends every
+  // call through here, so the login token and error messages work exactly as
+  // they do for hand-written calls. See lib/api-generated.ts.
+  fetchForGenerated=async(input:Request):Promise<Response>=>{
+    const url=new URL(input.url);
+    const method=input.method.toUpperCase();
+    // The body goes on as the bytes it is (a FormData's too, with the boundary
+    // its content-type names). It used to be read as text, which changes the
+    // bytes of a zip or a PDF. An empty one is left out, as before.
+    const bytes=method==='GET'||method==='HEAD'?undefined:await input.blob();
+    return this.request(`${url.pathname}${url.search}`,{method,headers:new Headers(input.headers),rawBody:bytes&&bytes.size?bytes:undefined,signal:input.signal});
+  };
+
+  // The raw response, for a body read as it arrives (the AI run's Server-Sent Events, features/ai/run-stream.ts).
+  async stream(endpoint:string,options:RequestOptions={}):Promise<Response>{
+    return this.request(endpoint,options);
   }
 
   async blob(endpoint:string,options:RequestOptions={}):Promise<Blob>{

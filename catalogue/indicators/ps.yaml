@@ -1,0 +1,2160 @@
+key: PS
+name: Unsafe products, food fraud and falsified medicines
+scope: Hidden product defects and delayed recalls, vehicle and aviation defects, food adulteration and
+  mislabelling, substandard and falsified medicines, and counterfeit alcohol and methanol poisoning.
+indicators:
+- id: PS-001
+  name: Injury or incident reports held without telling the safety regulator
+  definition: A company keeps receiving reports that its product hurt people (or nearly did) but does
+    not report to the product safety regulator within the short legal window.
+  areas:
+  - PS
+  typology: Hidden product defects and delayed recalls
+  status: verified
+  sources:
+  - title: '16 CFR Part 1115: Substantial Product Hazard Reports, §1115.14(e)'
+    publisher: US Consumer Product Safety Commission (eCFR)
+    year: current
+    url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+    locator: §1115.14(e)
+    quote: Immediately, that is, within 24 hours, after a subject firm has obtained information
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 1115, §1115.14(d)
+    publisher: US Consumer Product Safety Commission (eCFR)
+    url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+    locator: §1115.14(d)
+    quote: This investigation and evaluation should not exceed 10 days
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 1115, §1115.12(f)(5)
+    publisher: US Consumer Product Safety Commission (eCFR)
+    url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+    locator: §1115.12(f)(5)
+    quote: Complaints from a consumer or consumer group.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Peloton Agrees to Pay $19 Million Civil Penalty for Failure to Immediately Report Tread+ Treadmill
+      Entrapment Hazards
+    publisher: US Consumer Product Safety Commission
+    year: '2023'
+    url: https://www.cpsc.gov/Newsroom/News-Releases/2023/Peloton-Agrees-to-Pay-19-Million-Civil-Penalty-for-Failure-to-Immediately-Report-Tread-Treadmill-Entrapment-Hazards-and-for-Distributing-Recalled-Treadmills
+    quote: Despite possessing this information, Peloton did not immediately report to the Commission.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Peloton received Tread+ entrapment reports from December 2018 into 2019; by the time it reported there
+    were more than 150 reports, including a child's death and 13 injuries (CPSC, 2023).
+  cases:
+  - name: Peloton Tread+ late reporting
+    year: '2023'
+    jurisdiction: United States
+    what_happened: CPSC charged that Peloton knowingly failed to immediately report Tread+ entrapment
+      hazards and distributed 38 recalled treadmills; Peloton agreed to a $19,065,000 civil penalty (provisionally
+      accepted 4-0, subject to public comment).
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.cpsc.gov/Newsroom/News-Releases/2023/Peloton-Agrees-to-Pay-19-Million-Civil-Penalty-for-Failure-to-Immediately-Report-Tread-Treadmill-Entrapment-Hazards-and-for-Distributing-Recalled-Treadmills
+    source_title: Peloton Agrees to Pay $19 Million Civil Penalty
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - SaferProducts.gov incident reports
+  - CPSC recalls and civil penalty releases
+  - Court dockets (product liability suits)
+  levels:
+    faint: Public complaints, lawsuits or news reports of injuries tied to a product with no recall or
+      regulator notice on record.
+    strong: Documents show the company received incident reports and the dates show a report to the regulator
+      came weeks or months later.
+    textbook: The firm held information reasonably supporting a substantial product hazard for more than
+      24 hours (or investigated for more than 10 days without justification) before reporting under CPSA
+      Section 15(b).
+    threshold_source: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Early reports may describe misuse rather than a defect and need time to evaluate.
+  - Firms may report in good faith once a pattern becomes clear; CPSC allows a longer investigation if
+    the firm can show it is reasonable.
+  - Duplicate or unverified complaints can inflate apparent counts.
+  jurisdictions: United States (CPSC); comparable duties exist in the EU under general product safety
+    rules
+  version: 1
+- id: PS-002
+  name: Repeated death or serious-injury lawsuits over one product model
+  definition: Several lawsuits over deaths or grievous injuries from the same product model end in settlements
+    or plaintiff wins within a short period, which in the US triggers a duty to report to the regulator.
+  areas:
+  - PS
+  typology: Hidden product defects and delayed recalls
+  status: verified
+  sources:
+  - title: 15 U.S. Code §2084 (CPSA Section 37)
+    publisher: US Code via Cornell Legal Information Institute
+    url: https://www.law.cornell.edu/uscode/text/15/2084
+    locator: §2084(a)
+    quote: the subject of at least 3 civil actions that have been filed in Federal or State court for
+      death or grievous bodily injury
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 1115, §1115.12(f)(3)
+    publisher: US Consumer Product Safety Commission (eCFR)
+    url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+    locator: §1115.12(f)(3)
+    quote: Product liability suits and/or claims for personal injury or damage.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Three or more death/grievous injury suits on one model settled within the same 24-month window.
+  cases: []
+  data_needed:
+  - Company
+  - CourtCase
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - PACER and state court dockets
+  - CourtListener
+  - CPSC recall database
+  levels:
+    faint: Two or more injury suits naming the same product model in court dockets.
+    strong: Several such suits settle confidentially within a short period with no recall or regulator
+      report on record.
+    textbook: At least 3 civil actions for death or grievous bodily injury over one model resolved by
+      settlement or plaintiff judgment within a 24-month period (Section 37 reporting trigger).
+    threshold_source: https://www.law.cornell.edu/uscode/text/15/2084
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-volume products attract more suits simply because more units are in use.
+  - Settlements are often made to avoid litigation cost, not because a defect exists.
+  - Suits may concern misuse or third-party modification.
+  jurisdictions: United States
+  version: 1
+- id: PS-003
+  name: Quiet safety-related design or production change
+  definition: A maker changes a product's design or production for safety reasons, or cancels a planned
+    safety change, without a recall or disclosure to the regulator.
+  areas:
+  - PS
+  typology: Hidden product defects and delayed recalls
+  status: verified
+  sources:
+  - title: 16 CFR Part 1115, §1115.12(f)(2)
+    publisher: US Consumer Product Safety Commission (eCFR)
+    url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+    locator: §1115.12(f)(2)
+    quote: Information about safety-related production or design change(s).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Justice Department Announces Criminal Charge Against Toyota Motor Corporation and Deferred
+      Prosecution Agreement
+    publisher: US Department of Justice
+    year: '2014'
+    url: https://www.justice.gov/opa/pr/justice-department-announces-criminal-charge-against-toyota-motor-corporation-and-deferred
+    quote: misled U.S. consumers by concealing and making deceptive statements about two safety issues
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Toyota cancelled planned pedal design changes and avoided documenting the cancellation to keep the
+    sticky-pedal problem from NHTSA (DOJ, 2014).
+  cases:
+  - name: Toyota unintended acceleration disclosures
+    year: '2014'
+    jurisdiction: United States
+    what_happened: Toyota admitted concealing and making deceptive statements about floor-mat entrapment
+      and sticky pedals; charged with one count of wire fraud under a deferred prosecution agreement with
+      a $1.2 billion financial penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-criminal-charge-against-toyota-motor-corporation-and-deferred
+    source_title: Justice Department Announces Criminal Charge Against Toyota Motor Corporation and Deferred
+      Prosecution Agreement
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: records
+  lookup_sources:
+  - NHTSA manufacturer communications and recall files
+  - Patent and parts catalogue changes
+  - Court exhibits
+  levels:
+    faint: A running change in part numbers or specifications between production batches with no stated
+      reason.
+    strong: Internal or supplier documents link the change to field failures or injuries, and no recall
+      followed.
+    textbook: 'Meets the published definition as worded: a safety-related design or production change
+      that was reportable information but not reported.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Products are routinely improved for cost, durability or comfort, not safety.
+  - Supplier changes or part obsolescence force design changes.
+  - Firms may make precautionary improvements where no hazard exists.
+  jurisdictions: United States; general concept applies elsewhere
+  version: 1
+- id: PS-004
+  name: Recalled or acted on abroad, still sold at home
+  definition: A product is recalled, withdrawn or found unsafe in one country while an identical or similar
+    product stays on sale elsewhere without action.
+  areas:
+  - PS
+  typology: Hidden product defects and delayed recalls
+  status: verified
+  sources:
+  - title: 49 CFR §579.11 Reporting of safety recalls and other safety campaigns in foreign countries
+    publisher: US NHTSA (eCFR)
+    url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-579/subpart-B/section-579.11
+    locator: §579.11
+    quote: Not later than 5 working days after a manufacturer determines to conduct a safety recall or
+      other safety campaign
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 1115, §1115.12(f)
+    publisher: US Consumer Product Safety Commission (eCFR)
+    url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+    locator: §1115.12(f) introductory text
+    quote: about product use, experience, performance, design, or manufacture outside the United States
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A vehicle campaign run in one country for a part also fitted to US-market vehicles; an EU Safety Gate
+    alert for a product still sold on another market.
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - NHTSA recalls database
+  - EU Safety Gate alerts
+  - OECD GlobalRecalls portal
+  - National recall sites
+  levels:
+    faint: A foreign recall notice names a product that looks like one sold in your market.
+    strong: Part numbers or model codes match and no domestic recall or foreign-recall report is on file.
+    textbook: A vehicle maker did not report a foreign recall of an identical or substantially similar
+      vehicle/equipment to NHTSA within 5 working days of deciding to conduct it.
+    threshold_source: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-579/subpart-B/section-579.11
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Products sold under the same name can differ by market (different parts, voltages, standards).
+  - Hazards can depend on climate or local use conditions.
+  - Different regulators reach different risk conclusions.
+  jurisdictions: US (NHTSA, CPSC); EU (Safety Gate); international
+  version: 1
+- id: PS-005
+  name: Recalled products still being sold or distributed
+  definition: Products already under a recall or corrective action keep being sold, delivered or imported.
+  areas:
+  - PS
+  typology: Hidden product defects and delayed recalls
+  status: verified
+  sources:
+  - title: 15 U.S. Code §2068(a)(2)(B)
+    publisher: US Code via Cornell Legal Information Institute
+    url: https://www.law.cornell.edu/uscode/text/15/2068
+    locator: §2068(a)(2)(B)
+    quote: subject to voluntary corrective action taken by the manufacturer
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Peloton Agrees to Pay $19 Million Civil Penalty
+    publisher: US Consumer Product Safety Commission
+    year: '2023'
+    url: https://www.cpsc.gov/Newsroom/News-Releases/2023/Peloton-Agrees-to-Pay-19-Million-Civil-Penalty-for-Failure-to-Immediately-Report-Tread-Treadmill-Entrapment-Hazards-and-for-Distributing-Recalled-Treadmills
+    quote: Peloton knowingly distributed in commerce 38 Tread+ recalled treadmills.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Recalled treadmills delivered after the recall announcement (Peloton, 2023).
+  cases:
+  - name: Peloton Tread+ recalled units
+    year: '2023'
+    jurisdiction: United States
+    what_happened: CPSC charged that 38 recalled Tread+ treadmills were distributed after the May 2021
+      recall; part of the $19,065,000 penalty settlement.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.cpsc.gov/Newsroom/News-Releases/2023/Peloton-Agrees-to-Pay-19-Million-Civil-Penalty-for-Failure-to-Immediately-Report-Tread-Treadmill-Entrapment-Hazards-and-for-Distributing-Recalled-Treadmills
+    source_title: Peloton Agrees to Pay $19 Million Civil Penalty
+  data_needed:
+  - Company
+  - Event
+  - Document
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - CPSC recalls
+  - EU Safety Gate
+  - Marketplace listings
+  levels:
+    faint: A recalled model appears in online listings or second-hand marketplaces.
+    strong: The original maker or a major retailer is still selling or shipping recalled units.
+    textbook: 'Meets the published definition as worded: selling, offering, distributing or importing
+      a product subject to an announced corrective action or order (15 USC 2068(a)(2)).'
+    threshold_source: https://www.cpsc.gov/Newsroom/News-Releases/2023/Peloton-Agrees-to-Pay-19-Million-Civil-Penalty-for-Failure-to-Immediately-Report-Tread-Treadmill-Entrapment-Hazards-and-for-Distributing-Recalled-Treadmills
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Listings may be for repaired or remedied units, or a different model with a similar name.
+  - Private resale by consumers unaware of a recall.
+  - Stock already in transit when the recall was announced.
+  jurisdictions: United States; EU equivalents under product safety law
+  version: 1
+- id: PS-006
+  name: Safety test data manipulated or withheld from customers or regulators
+  definition: A manufacturer or supplier gives buyers or regulators false, altered or incomplete safety
+    test results.
+  areas:
+  - PS
+  typology: Hidden product defects; fraud on customers
+  status: verified
+  sources:
+  - title: Takata Corporation Pleads Guilty and Sentenced to Pay $1 Billion in Criminal Penalties for
+      Airbag Scheme
+    publisher: US Department of Justice
+    year: '2017'
+    url: https://www.justice.gov/opa/pr/takata-corporation-pleads-guilty-sentenced-pay-1-billion-criminal-penalties-airbag-scheme
+    quote: providing false and manipulated airbag inflator test data
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 16 CFR Part 1115, §1115.12(f)(1) and (4)
+    publisher: US Consumer Product Safety Commission (eCFR)
+    url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+    locator: §1115.12(f)(4)
+    quote: Information from an independent testing laboratory.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Takata provided false and manipulated inflator test data from 2000 to 2015 (DOJ, 2017).
+  cases:
+  - name: Takata airbag inflator test data
+    year: '2017'
+    jurisdiction: United States (E.D. Michigan)
+    what_happened: Takata pleaded guilty to one count of wire fraud for a scheme of providing false and
+      manipulated airbag inflator test data and was sentenced to a $1 billion criminal penalty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/takata-corporation-pleads-guilty-sentenced-pay-1-billion-criminal-penalties-airbag-scheme
+    source_title: Takata Corporation Pleads Guilty and Sentenced to Pay $1 Billion
+  data_needed:
+  - Company
+  - Document
+  - Contract
+  - CourtCase
+  - Person
+  checkable: records
+  lookup_sources:
+  - Court records and plea agreements
+  - NHTSA investigation files
+  - Supplier contracts
+  levels:
+    faint: Test reports that are unusually uniform, missing raw data, or not independently verified.
+    strong: Whistleblower or internal documents show test results were changed or failures left out of
+      reports to customers.
+    textbook: 'Meets the published definition as worded: false or manipulated safety test data provided
+      to customers or regulators.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Retests after a lab error are legitimate if documented.
+  - Different test methods can give different but honest results.
+  - Clerical errors in reports.
+  jurisdictions: United States and global supply chains
+  version: 1
+- id: PS-007
+  name: Returns, replacement requests or warranty claims cluster on one part
+  definition: Business customers, dealers or consumers send back or claim on the same part or product
+    far more than usual.
+  areas:
+  - PS
+  typology: Hidden product defects and delayed recalls
+  status: verified
+  sources:
+  - title: 16 CFR Part 1115, §1115.12(f)(7)
+    publisher: US Consumer Product Safety Commission (eCFR)
+    url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+    locator: §1115.12(f)(7)
+    quote: Information received from other firms, including requests to return a product or for replacement
+      or credit.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 49 CFR Part 579 (Early warning reporting)
+    publisher: US NHTSA (eCFR)
+    url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-579
+    locator: §579.2
+    quote: The purpose of this part is to enhance motor vehicle safety by specifying information and documents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Warranty claims and field reports on a vehicle component reported quarterly to NHTSA under Early Warning
+    Reporting.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Payment
+  checkable: records
+  lookup_sources:
+  - NHTSA EWR public data
+  - NHTSA manufacturer communications (technical service bulletins)
+  levels:
+    faint: Dealer forums or service bulletins mention repeated replacements of one part.
+    strong: Warranty or return data show a sharp rise for one part, with injury or fire claims.
+    textbook: 'Meets the published definition as worded: returns or replacement requests that are reportable
+      information about a potential hazard.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Non-safety quality faults (noise, cosmetic wear) drive many warranty claims.
+  - Generous goodwill policies raise claim counts.
+  - A bad batch from a supplier may be fixed without any safety risk.
+  jurisdictions: United States (NHTSA EWR, CPSC)
+  version: 1
+- id: PS-008
+  name: Cluster of similar public complaints about the same vehicle or product
+  definition: Many owners independently report the same failure to a regulator's public complaint database.
+  areas:
+  - PS
+  typology: Vehicle and product defects
+  status: verified
+  sources:
+  - title: Recalls, investigations and complaints
+    publisher: US NHTSA
+    url: https://www.nhtsa.gov/recalls
+    quote: If the agency receives similar reports from a number of people about the same product
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Owners of one model year report sudden loss of power or airbag non-deployment to NHTSA.
+  cases: []
+  data_needed:
+  - Company
+  - Vehicle
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - NHTSA complaints database and API
+  - SaferProducts.gov
+  levels:
+    faint: A handful of similar complaints on one model in NHTSA or SaferProducts data.
+    strong: Complaints grow over time, involve crashes, injuries or fires, and no investigation or recall
+      exists.
+    textbook: 'Meets the published definition as worded: similar reports from a number of people about
+      the same product indicating a possible safety defect.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Media coverage can prompt a burst of complaints.
+  - Complaints are unverified and may describe driver error.
+  - Popular models get more complaints simply from volume.
+  jurisdictions: United States
+  version: 1
+- id: PS-009
+  name: Long gap between first field reports and a defect determination
+  definition: Warranty claims, field reports or crashes linked to a defect appear long before the maker
+    formally decides the defect is safety-related and reports it.
+  areas:
+  - PS
+  typology: Vehicle defects and delayed recalls
+  status: verified
+  sources:
+  - title: 49 CFR §573.6 Defect and noncompliance information report
+    publisher: US NHTSA (eCFR)
+    url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-573/section-573.6
+    locator: §573.6(b)
+    quote: Each report shall be submitted not more than 5 working days after a defect in a vehicle
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 49 CFR §573.6(c)(6)
+    publisher: US NHTSA (eCFR)
+    url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-573/section-573.6
+    locator: §573.6(c)(6)
+    quote: a chronology of all principal events that were the basis for the determination
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: United States v. General Motors
+    publisher: US Attorney's Office, Southern District of New York
+    url: https://www.justice.gov/usao-sdny/programs/victim-witness-services/united-states-v-general-motors
+    quote: engaging in a scheme to conceal material facts from a Government regulator
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - GM failed to disclose the ignition-switch defect to NHTSA from spring 2012 through February 2014 (SDNY).
+  cases:
+  - name: General Motors ignition switch
+    year: '2015'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: GM was charged with concealing material facts from a regulator and wire fraud over
+      the ignition-switch defect, acknowledged a Statement of Facts, and forfeited $900 million under
+      a deferred prosecution agreement.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/programs/victim-witness-services/united-states-v-general-motors
+    source_title: United States v. General Motors
+  data_needed:
+  - Company
+  - Vehicle
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - NHTSA recall files (Part 573 reports and chronologies)
+  - Court records
+  levels:
+    faint: The Part 573 chronology shows field reports years before the recall.
+    strong: Internal documents show staff linked the failures to crashes or injuries well before the determination.
+    textbook: The defect report was filed more than 5 working days after the maker determined the defect
+      was safety-related.
+    threshold_source: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-573/section-573.6
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Root-cause analysis of rare failures can genuinely take a long time.
+  - Early reports may be ambiguous or attributed to other causes.
+  - Supplier and maker may dispute the cause.
+  jurisdictions: United States
+  version: 1
+- id: PS-010
+  name: Misleading statements or timelines given to a safety regulator
+  definition: A company tells a regulator, lawmakers or the public that a problem is fixed or gives a
+    false timeline of what it knew.
+  areas:
+  - PS
+  typology: Hidden product defects
+  status: verified
+  sources:
+  - title: Justice Department Announces Criminal Charge Against Toyota Motor Corporation
+    publisher: US Department of Justice
+    year: '2014'
+    url: https://www.justice.gov/opa/pr/justice-department-announces-criminal-charge-against-toyota-motor-corporation-and-deferred
+    quote: misled U.S. consumers by concealing and making deceptive statements about two safety issues
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Boeing Charged with 737 Max Fraud Conspiracy and Agrees to Pay over $2.5 Billion
+    publisher: US Department of Justice
+    year: '2021'
+    url: https://www.justice.gov/opa/pr/boeing-charged-737-max-fraud-conspiracy-and-agrees-pay-over-25-billion
+    quote: Boeing—through two of its 737 MAX Flight Technical Pilots—deceived the FAA AEG about
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Toyota gave NHTSA and Congress an inaccurate timeline (DOJ, 2014); Boeing pilots deceived the FAA
+    Aircraft Evaluation Group about MCAS (DOJ, 2021).
+  cases:
+  - name: Boeing 737 MAX MCAS
+    year: '2021'
+    jurisdiction: United States (N.D. Texas)
+    what_happened: Boeing was charged with conspiracy to defraud the United States, admitted two technical
+      pilots deceived the FAA AEG about MCAS, and agreed to pay over $2.5 billion under a deferred prosecution
+      agreement.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/boeing-charged-737-max-fraud-conspiracy-and-agrees-pay-over-25-billion
+    source_title: Boeing Charged with 737 Max Fraud Conspiracy
+  data_needed:
+  - Company
+  - Person
+  - PublicBody
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - DOJ statements of facts
+  - Congressional hearing records
+  - Regulator correspondence
+  levels:
+    faint: Public statements that a root cause is fixed while complaints continue.
+    strong: Documents show the company knew facts that contradict what it told the regulator.
+    textbook: 'Meets the published definition as worded: concealment or deceptive statements to a safety
+      regulator.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Companies may honestly believe a fix worked before new evidence appears.
+  - Technical statements may be simplified for the public.
+  - Knowledge held by one team may not have reached those making statements.
+  jurisdictions: United States
+  version: 1
+- id: PS-011
+  name: Defect bulletins sent to dealers without a safety recall
+  definition: A maker tells dealers or repairers about a defect and how to fix it, but treats it as routine
+    service rather than a safety recall.
+  areas:
+  - PS
+  typology: Vehicle defects and delayed recalls
+  status: verified
+  sources:
+  - title: 49 CFR Part 579, §579.5(a)
+    publisher: US NHTSA (eCFR)
+    url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-579
+    locator: §579.2; §579.5(a) requires copies of notices, bulletins and other communications about defects
+      sent to more than one party, including dealers
+    quote: The purpose of this part is to enhance motor vehicle safety by specifying information and documents
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Technical service bulletins on a steering or brake component with no matching recall.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Vehicle
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - NHTSA manufacturer communications database
+  levels:
+    faint: A service bulletin addresses a part whose failure could affect control or crash protection.
+    strong: Bulletins repeat or widen over time while complaints about crashes or injuries grow.
+    textbook: 'Meets the published definition as worded: defect communications sent to dealers that are
+      not copied to NHTSA, or that address a safety-related defect without a recall.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most service bulletins concern comfort, noise or non-safety issues.
+  - Bulletins are legally filed with NHTSA and are public.
+  - A fix may be offered while the maker investigates in good faith.
+  jurisdictions: United States
+  version: 1
+- id: PS-012
+  name: Repeat alerts for the same brand, seller or product type on rapid alert systems
+  definition: The same brand, importer, online shop or product category keeps appearing in official dangerous-product
+    alerts.
+  areas:
+  - PS
+  typology: Unsafe consumer products
+  status: verified
+  sources:
+  - title: Record number of dangerous products reported in Safety Gate in 2024
+    publisher: Spanish Ministry of Consumer Affairs, European Consumer Centre (reporting European Commission
+      Safety Gate results)
+    year: '2025'
+    url: https://portal-cec.consumo.gob.es/en/comunicacion/noticias/2025/record-number-dangerous-products-reported-safety-gate-2024-drives-new
+    quote: cosmetics topped the list of notified products (36%)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Safety Gate: the EU rapid alert system for dangerous non-food products'
+    publisher: European Commission
+    url: https://ec.europa.eu/safety-gate-alerts/screen/webReport
+    quote: 'Safety Gate: the EU rapid alert system for dangerous non-food products'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 4,137 Safety Gate alerts in 2024, the highest since 2003; the eSurveillance tool identified more than
+    5,300 potentially non-compliant online shops (Safety Gate 2024 results as reported).
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Event
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - EU Safety Gate alerts
+  - RASFF Window (food)
+  - National market surveillance sites
+  levels:
+    faint: A brand or seller appears in one alert.
+    strong: The same brand, importer or online shop appears in several alerts across countries or years.
+    textbook: 'Meets the published definition as worded: a product notified as presenting a serious risk
+      in Safety Gate.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Popular brands are tested more often, so appear more.
+  - Counterfeits of a genuine brand can generate alerts against the brand's name.
+  - Alerts can concern old stock already withdrawn.
+  jurisdictions: EU/EEA
+  version: 1
+- id: PS-013
+  name: 'Safety culture warning signs: fear of retaliation and pressure on delegated inspectors'
+  definition: Staff who check safety (including those acting for a regulator) say they fear retaliation,
+    or the people who investigate safety reports are the same managers who control their pay.
+  areas:
+  - PS
+  typology: Aviation and manufacturing safety
+  status: verified
+  sources:
+  - title: Section 103 Organization Designation Authorizations (ODA) for Transport Airplanes Expert Panel
+      Review Report
+    publisher: US Federal Aviation Administration
+    year: '2024'
+    url: https://www.faa.gov/newsroom/Sec103_ExpertPanelReview_Report_Final.pdf
+    locator: Finding 4
+    quote: This dual responsibility and authority create, among some employees, hesitation in reporting
+      safety concerns for fear of retaliation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Section 103 ODA Expert Panel Review Report
+    publisher: US Federal Aviation Administration
+    year: '2024'
+    url: https://www.faa.gov/newsroom/Sec103_ExpertPanelReview_Report_Final.pdf
+    locator: Executive summary
+    quote: The Expert Panel observed a disconnect between Boeing's senior management and other members
+      of the organization on safety culture.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - FAA expert panel found the ODA restructuring still allowed opportunities for retaliation, particularly
+    regarding salary and furlough ranking (2024).
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Employment
+  - Document
+  - PublicBody
+  checkable: person
+  lookup_sources:
+  - FAA and NTSB reports
+  - OSHA whistleblower complaints
+  - Congressional hearings
+  levels:
+    faint: Employees or former employees describe reluctance to raise safety concerns.
+    strong: Whistleblower complaints, retaliation claims or surveys show pressure on safety staff.
+    textbook: An official inquiry finds interference with or retaliation against delegated safety staff,
+      as defined in 49 USC 44742.
+    threshold_source: https://www.faa.gov/newsroom/Sec103_ExpertPanelReview_Report_Final.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Any large organisation has some disgruntled staff.
+  - Reorganisations can create confusion that looks like pressure.
+  - Surveys reflect perception, which may differ from practice.
+  jurisdictions: United States (aviation); applicable to any safety-critical industry
+  version: 1
+- id: PS-014
+  name: Product shipped before safety test results came back, or with false test certificates
+  definition: Food or medicines are released to customers before their contamination or sterility tests
+    are complete, or with certificates claiming tests that never happened or failed.
+  areas:
+  - PS
+  typology: Food safety and substandard medicines
+  status: verified
+  sources:
+  - title: Former Peanut Company President Receives Largest Criminal Sentence in Food Safety Case
+    publisher: US Department of Justice
+    year: '2015'
+    url: https://www.justice.gov/opa/pr/former-peanut-company-president-receives-largest-criminal-sentence-food-safety-case-two
+    quote: shipping salmonella-positive peanut products before the results of microbiological testing
+      were received
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Owner of New England Compounding Center Sentenced for Racketeering
+    publisher: US Department of Justice
+    year: '2017'
+    url: https://www.justice.gov/opa/pr/owner-new-england-compounding-center-sentenced-racketeering-leading-nationwide-fungal
+    quote: before test results confirming their sterility were returned
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Peanut Corporation of America shipped products before test results and produced falsified certificates
+    (DOJ, 2015); NECC shipped drugs before sterility results and used expired ingredients (DOJ, 2017).
+  cases:
+  - name: Peanut Corporation of America salmonella
+    year: '2015'
+    jurisdiction: United States (M.D. Georgia)
+    what_happened: Stewart Parnell (336 months), Michael Parnell (240 months) and Mary Wilkerson (60 months)
+      were sentenced; the outbreak produced more than 700 reported cases in 46 states and, by CDC projection,
+      more than 22,000 cases including nine deaths.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-peanut-company-president-receives-largest-criminal-sentence-food-safety-case-two
+    source_title: Former Peanut Company President Receives Largest Criminal Sentence in Food Safety Case
+  - name: New England Compounding Center fungal meningitis
+    year: '2017'
+    jurisdiction: United States (D. Massachusetts)
+    what_happened: Barry Cadden was convicted of racketeering, racketeering conspiracy, mail fraud and
+      introducing misbranded drugs and sentenced to 108 months; 753 patients were infected and CDC reported
+      64 deaths.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/owner-new-england-compounding-center-sentenced-racketeering-leading-nationwide-fungal
+    source_title: Owner of New England Compounding Center Sentenced
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - FDA inspection reports (Form 483) and warning letters
+  - Court records
+  levels:
+    faint: Shipping dates precede lab report dates in records obtained.
+    strong: Certificates of analysis do not match lab records, or a lab reports positive results for shipped
+      lots.
+    textbook: 'Meets the published definition as worded: products shipped before required safety test
+      results, or certificates showing tests that were not done or were failed.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some products are legally released on validated process controls, with tests as confirmation.
+  - Date mismatches can be clerical.
+  - Positive screening tests may be false positives later cleared.
+  jurisdictions: United States; general
+  version: 1
+- id: PS-015
+  name: Food or drink theft for resale
+  definition: Food, drink or animal feed is stolen and resold for profit.
+  areas:
+  - PS
+  typology: Food crime
+  status: verified
+  sources:
+  - title: 'Food crime: reporting and preventing it'
+    publisher: UK Food Standards Agency, National Food Crime Unit
+    url: https://www.gov.uk/food-crime
+    quote: stealing food, drink or animal feed for profit
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What works to prevent food fraud, Appendix 3
+    publisher: UK Food Standards Agency
+    url: https://www.food.gov.uk/research/appendix-3-what-works-to-prevent-food-fraud-definitions-and-meanings-of-food-fraud
+    quote: dishonestly obtaining food, drink or feed products to profit from their use or sale.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Stolen loads resold through informal wholesalers.
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Vehicle
+  - Address
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Police and court records
+  - Trade press
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Europol notes counterfeit and illicit goods networks and theft along supply chains.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  innocent_explanations:
+  - Legitimate surplus or end-of-line stock sold cheaply.
+  - Clearance sales of near-date stock.
+  jurisdictions: UK definition; general
+  version: 1
+- id: PS-016
+  name: Illegal slaughter or unapproved processing premises
+  definition: Meat is slaughtered or prepared in places or ways that are not approved by food authorities.
+  areas:
+  - PS
+  typology: Food crime
+  status: verified
+  sources:
+  - title: 'Food crime: reporting and preventing it'
+    publisher: UK Food Standards Agency, National Food Crime Unit
+    url: https://www.gov.uk/food-crime
+    quote: slaughtering or preparing meat in places or ways that are not approved
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Unapproved premises supplying meat to restaurants.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - FSA approved establishments list
+  - Local authority food registration
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Premises awaiting approval while trading legally under another regime.
+  - Home slaughter for personal use where permitted.
+  jurisdictions: UK definition; general
+  version: 1
+- id: PS-017
+  name: Waste or animal by-products diverted back into the food chain
+  definition: Food, feed or animal by-products meant for disposal or pet food are put back into food for
+    people.
+  areas:
+  - PS
+  typology: Food crime
+  status: verified
+  sources:
+  - title: 'Food crime: reporting and preventing it'
+    publisher: UK Food Standards Agency, National Food Crime Unit
+    url: https://www.gov.uk/food-crime
+    quote: taking food, drink or feed that should have been thrown away and putting it back into the food
+      supply chain
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Elliott Review into the Integrity and Assurance of Food Supply Networks – Final Report
+    publisher: HM Government (Defra/DH)
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/media/5a7e20b740f0b62305b80fb8/elliot-review-final-report-july2014.pdf
+    locator: para 6.15
+    quote: Where Category 3 ABP cold stores are adjacent to licensed cold stores holding meat and meat
+      products for human consumption the opportunity for fraud is greater
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Pet-food grade meat bought at pet-food price and resold as fit for human consumption (Elliott Review,
+    para 6.15).
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Ownership
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Animal by-product approved premises lists
+  - Company registries
+  levels:
+    faint: A by-product or waste business shares owners, staff or premises with a food business.
+    strong: Volumes of by-product leaving a site do not match disposal records.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: Waste diversion links food crime to illegal waste handling.
+    source_url: https://www.gov.uk/food-crime
+  innocent_explanations:
+  - Many groups legitimately run both food and by-product operations.
+  - Surplus food redistribution to charities is legal.
+  - Co-location of stores is common for cost reasons.
+  jurisdictions: UK/EU
+  version: 1
+- id: PS-018
+  name: 'Adulteration: undeclared substances added to food'
+  definition: Something not on the label is added to food to bulk it up, cut costs or fake quality, such
+    as syrup in honey, colourings in cheap oil or melamine in milk.
+  areas:
+  - PS
+  typology: Food fraud
+  status: verified
+  sources:
+  - title: 'Food crime: reporting and preventing it'
+    publisher: UK Food Standards Agency, National Food Crime Unit
+    url: https://www.gov.uk/food-crime
+    quote: adding something that is not listed on the label, to cut costs or make the product seem better
+      quality
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: Section 3, Food and drink, p.14
+    quote: some counterfeiters add cheap corn syrup and sugarcane to genuine honey, producing large amounts
+      of counterfeit product at a much lower price than the genuine one.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Melamine-contaminated powdered infant formula in China – update 2
+    publisher: World Health Organization
+    year: '2008'
+    url: https://www.who.int/emergencies/disease-outbreak-news/item/2008_09_29a-en
+    quote: more than 13,000 infants are in hospital.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Operation Oro Giallo: low-quality oils coloured with chlorophyll and beta-carotene sold as extra-virgin
+    olive oil (Europol/EUIPO 2022).'
+  - Melamine-contaminated infant formula in China, 2008 (WHO).
+  cases:
+  - name: Melamine in infant formula, China
+    year: '2008'
+    jurisdiction: China
+    what_happened: WHO reported that more than 54,000 infants and young children sought medical treatment,
+      more than 13,000 were in hospital and three infant deaths were confirmed (as of 29 Sept 2008) after
+      melamine contamination of powdered infant formula.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.who.int/emergencies/disease-outbreak-news/item/2008_09_29a-en
+    source_title: Melamine-contaminated powdered infant formula in China – update 2
+  - name: Operation Oro Giallo (fake extra virgin olive oil)
+    year: '2019'
+    jurisdiction: Italy and Germany
+    what_happened: Italian and German authorities arrested 20 people and seized 150,000 litres of fake
+      olive oil worth up to EUR 8 million; low-quality oils were coloured and sold as extra-virgin.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    source_title: Europol/EUIPO IP Crime Threat Assessment 2022
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: records
+  lookup_sources:
+  - RASFF Window
+  - EU ACN monthly food fraud reports
+  - FSA food alerts
+  - Lab testing results published by NGOs or authorities
+  levels:
+    faint: A product sells well below the market price for its stated grade.
+    strong: Independent lab tests find undeclared substances or composition inconsistent with the label.
+    textbook: Meets the published definition as worded; under EU practice, the case meets all four Food
+      Fraud Network criteria (breach of law, intention, economic gain, deception).
+    threshold_source: https://www.gov.uk/food-crime
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Europol describes criminal networks controlling entire production and distribution chains
+      for counterfeit food.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  innocent_explanations:
+  - Accidental contamination or carry-over during processing.
+  - Natural variation in composition (e.g. honey sugars) can confuse some tests.
+  - Labelling errors without intent.
+  jurisdictions: Global
+  version: 1
+- id: PS-019
+  name: 'Substitution: cheaper species or ingredient sold as the real thing'
+  definition: A cheaper or lower-quality food is swapped in for the one on the label, such as horsemeat
+    sold as beef.
+  areas:
+  - PS
+  typology: Food fraud
+  status: verified
+  sources:
+  - title: 'Food crime: reporting and preventing it'
+    publisher: UK Food Standards Agency, National Food Crime Unit
+    url: https://www.gov.uk/food-crime
+    quote: swapping food or ingredients for cheaper or lower quality options
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What works to prevent food fraud, Appendix 3
+    publisher: UK Food Standards Agency
+    url: https://www.food.gov.uk/research/appendix-3-what-works-to-prevent-food-fraud-definitions-and-meanings-of-food-fraud
+    quote: replacing a more expensive or higher-quality food with a cheaper or lower-quality substitute.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Horsemeat mixed with beef and sold as 100 per cent beef (UK, 2012).
+  cases:
+  - name: Horsemeat sold as beef (Dinos & Sons)
+    year: '2017'
+    jurisdiction: England (Inner London Crown Court)
+    what_happened: Andronicos Sideras, owner of Dinos & Sons, was found guilty of defrauding customers
+      by mixing horsemeat with beef sold as 100 per cent beef in 2012; evidence included documents for
+      forging product labels.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.securingindustry.com/food-and-beverage/uk-s-first-guilty-conviction-in-horsemeat-food-fraud/s104/a5205
+    source_title: UK's first guilty conviction in horsemeat food fraud (Securing Industry)
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - CourtCase
+  - Person
+  checkable: records
+  lookup_sources:
+  - FSA and FSS testing results
+  - RASFF
+  - Court records
+  levels:
+    faint: Supplier's price for a species or cut is below the recognised market price.
+    strong: DNA or species tests find undeclared species.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Low-level cross-contamination in shared equipment.
+  - Regional naming differences for fish species.
+  - Honest supplier error.
+  jurisdictions: UK/EU; general
+  version: 1
+- id: PS-020
+  name: Misrepresented origin, quality or protected name
+  definition: Food is labelled or sold with a false origin, grade, freshness or protected designation
+    (for example seafood with a false catch origin or oil passed off as a protected regional product).
+  areas:
+  - PS
+  typology: Food fraud
+  status: verified
+  sources:
+  - title: 'Food crime: reporting and preventing it'
+    publisher: UK Food Standards Agency, National Food Crime Unit
+    url: https://www.gov.uk/food-crime
+    quote: wrongly labelling or selling a product to mislead people about its quality, freshness, safety
+      or where it came from
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: Section 3, p.14
+    quote: Food fraud in the EU increasingly involves seafood by falsely applying the designation of origin.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Seafood with false designation of origin, often linked to illegal fishing (Europol/EUIPO 2022).
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Vessel
+  - Address
+  - Event
+  checkable: records
+  lookup_sources:
+  - EU GI registers (eAmbrosia)
+  - Trade statistics
+  - Vessel tracking
+  levels:
+    faint: Volumes sold under a protected name or origin exceed what that region produces.
+    strong: Shipping, catch or transit documents contradict the claimed origin.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: Europol links false origin on seafood to illegal fishing.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  innocent_explanations:
+  - Products processed in one country from raw material of another may be labelled legally under origin
+    rules.
+  - Blends may legally carry certain names.
+  - Labelling mistakes.
+  jurisdictions: EU/UK; global
+  version: 1
+- id: PS-021
+  name: Forged labels, certificates, origin or transit documents
+  definition: Fake papers, labels or certificates are made or used so a product appears to be something
+    it is not.
+  areas:
+  - PS
+  typology: Food fraud; falsified medicines
+  status: verified
+  sources:
+  - title: 'Food crime: reporting and preventing it'
+    publisher: UK Food Standards Agency, National Food Crime Unit
+    url: https://www.gov.uk/food-crime
+    quote: making, using or holding fake papers to sell or market a product that is not what it claims
+      to be
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: Section 3, p.14
+    quote: Food fraud typically entails the falsification of origin, transit and administrative documents.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fake labels found at Dinos & Sons with the owner's fingerprints (horsemeat, 2017); a chemical supplier
+    put false labels on drums of ethylene glycol claiming pharmaceutical-grade propylene glycol (Indonesia,
+    2023).
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Person
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Issuer verification
+  - Customs records
+  - Court records
+  levels:
+    faint: Certificates with inconsistent formats, signatures or issuing bodies.
+    strong: The stated issuer (lab, manufacturer, authority) says it did not issue the document.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Document fraud is one of the seven FSA food crime types.
+    source_url: https://www.gov.uk/food-crime
+  innocent_explanations:
+  - Template changes by a genuine issuer.
+  - Translation or transcription errors.
+  - Legitimate relabelling by an authorised repacker.
+  jurisdictions: Global
+  version: 1
+- id: PS-022
+  name: Price too good to be true
+  definition: A supplier offers food, drink or medicines at a price well below the recognised market price
+    for the stated product.
+  areas:
+  - PS
+  typology: Food fraud; falsified medicines; illicit alcohol
+  status: verified
+  sources:
+  - title: Elliott Review into the Integrity and Assurance of Food Supply Networks – Final Report
+    publisher: HM Government
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/media/5a7e20b740f0b62305b80fb8/elliot-review-final-report-july2014.pdf
+    locator: Chapter 3
+    quote: if a retailer were to secure a foodstuff for a price well below the recognised market price,
+      then it might be inferred that the most obvious way the supplier was meeting that price was by committing
+      the offence of fraud by misrepresentation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: How to Buy Medicines Safely From an Online Pharmacy
+    publisher: US Food and Drug Administration
+    url: https://www.fda.gov/consumers/consumer-updates/how-buy-medicines-safely-online-pharmacy
+    quote: Offer deep discounts or prices that seem too good to be true.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hazard Information Profile CH0603: Methanol'
+    publisher: UNDRR / ISC (PreventionWeb)
+    url: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+    quote: Bottles may be sold in shops, markets and bars, often at what appears to be a discounted price
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Elliott Review recommendation that industry ask whether certain deals are too good to be true.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Commodity price indices
+  - Procurement contracts
+  - Retail price checks
+  levels:
+    faint: Price noticeably below typical market price for the grade.
+    strong: Price below the cost of the genuine raw material, or far below all comparable suppliers.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine surplus, clearance or near-date stock.
+  - Parallel imports from cheaper markets (legal in some cases).
+  - Efficient or subsidised producers.
+  jurisdictions: Global
+  version: 1
+- id: PS-023
+  name: Opaque traders and brokers in long, complex supply chains
+  definition: Product passes through brokers or traders who never handle it, or through many intermediaries
+    and countries, so the true source is hard to see.
+  areas:
+  - PS
+  typology: Food fraud; falsified medicines
+  status: pending
+  sources:
+  - title: Elliott Review into the Integrity and Assurance of Food Supply Networks – Final Report
+    publisher: HM Government
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/media/5a7e20b740f0b62305b80fb8/elliot-review-final-report-july2014.pdf
+    locator: 'Table: Meat commodity market and traders and brokers, p.44'
+    quote: May never take physical possession of the meat or own it, but merely arrange the deal. May
+      thus escape both registration and monitoring requirements.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: Section 6, p.21
+    quote: Weak links in global supply chains are exploited by counterfeiters of pharmaceuticals. This
+      is particularly so when imports involve different countries, importers, retailers and distributors
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Risky business: food fraud vulnerability assessments'
+    publisher: Huisman and van Ruth, Crime, Law and Social Change 78
+    year: '2022'
+    url: https://link.springer.com/article/10.1007/s10611-021-10008-9
+    quote: opportunities associated with supply chain transparency
+    quote_verified: false
+  examples:
+  - In the Indonesian syrup case, mislabelled material passed from a soap-ingredient supplier to a distributor
+    to an ingredient supplier before reaching the drug maker (court documents as reported, 2023).
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Contract
+  - Payment
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - Company registries
+  - Customs and trade data
+  - Food business and wholesale dealer licences
+  levels:
+    faint: Several intermediaries between producer and buyer with no clear role.
+    strong: Intermediaries are newly formed, unregistered for food/pharma, or in free trade zones, and
+      documents omit the original manufacturer.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Europol reports some IP-infringing food and drink traffickers set up complex trade-based money
+      laundering schemes.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  innocent_explanations:
+  - Brokers are a normal, legal part of commodity trade.
+  - Global sourcing is common and efficient.
+  - Free trade zones are widely used for legitimate logistics.
+  jurisdictions: Global
+  version: 1
+- id: PS-024
+  name: 'Weak checks: storage and sites rarely inspected, no unannounced audits'
+  definition: Cold stores, warehouses or plants that are seldom inspected and only get announced audits
+    offer more chance for fraud to go unseen.
+  areas:
+  - PS
+  typology: Food fraud
+  status: pending
+  sources:
+  - title: Elliott Review into the Integrity and Assurance of Food Supply Networks – Final Report
+    publisher: HM Government
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/media/5a7e20b740f0b62305b80fb8/elliot-review-final-report-july2014.pdf
+    locator: 'Table: storage, p.43-44'
+    quote: Assumed to be lower food safety risk than manufacturing or processing plants, so may be subject
+      to infrequent inspections.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Risky business: food fraud vulnerability assessments'
+    publisher: Huisman and van Ruth, Crime, Law and Social Change 78
+    year: '2022'
+    url: https://link.springer.com/article/10.1007/s10611-021-10008-9
+    quote: the lack of law enforcement in the supply chain
+    quote_verified: false
+  examples:
+  - Elliott Review recommendation for thorough, unannounced audits outside regular business hours.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Food hygiene rating data
+  - Local authority inspection records
+  levels:
+    faint: No inspection record for a storage site for several years.
+    strong: Site has only announced audits and handles high-risk commodities for several owners.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Inspection frequency is set by risk rating and may legitimately be low.
+  - Local authority resource limits, not the business, cause gaps.
+  jurisdictions: UK; general
+  version: 1
+- id: PS-025
+  name: Commodity under price or supply pressure
+  definition: Shortages, crop failures, price spikes, fishing limits or premium labels make a commodity
+    more profitable to fake.
+  areas:
+  - PS
+  typology: Food fraud vulnerability
+  status: pending
+  sources:
+  - title: Elliott Review into the Integrity and Assurance of Food Supply Networks – Final Report
+    publisher: HM Government
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/media/5a7e20b740f0b62305b80fb8/elliot-review-final-report-july2014.pdf
+    locator: para 4.12
+    quote: complexity, commodity price fluctuations, crop failures, fishing restrictions, the development
+      of premium markets through labelling, and criminal ingenuity.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Risky business: food fraud vulnerability assessments'
+    publisher: Huisman and van Ruth, Crime, Law and Social Change 78
+    year: '2022'
+    url: https://link.springer.com/article/10.1007/s10611-021-10008-9
+    quote: the supply and pricing of raw materials
+    quote_verified: false
+  examples:
+  - Honey adulteration rising as cheap corn syrup became available (Europol/EUIPO 2022).
+  cases: []
+  data_needed:
+  - Event
+  - Note
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Commodity price data (FAO, market reports)
+  - EU ACN monthly fraud reports
+  levels:
+    faint: Commodity price rises sharply or harvests fail.
+    strong: Price spike coincides with stable or rising sales of the premium product from a supplier.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Price spikes affect all honest suppliers too.
+  - Suppliers may hold stock bought before the spike.
+  jurisdictions: Global
+  version: 1
+- id: PS-026
+  name: Company with a history of offences, unethical culture or no whistleblowing route
+  definition: A food or product business has past violations, reports of an unethical culture, or no way
+    for staff to raise concerns.
+  areas:
+  - PS
+  typology: Food fraud vulnerability (motivations and controls)
+  status: pending
+  sources:
+  - title: 'Risky business: food fraud vulnerability assessments'
+    publisher: Huisman and van Ruth, Crime, Law and Social Change 78
+    year: '2022'
+    url: https://link.springer.com/article/10.1007/s10611-021-10008-9
+    quote: the lack of a whistle blowing scheme within the company
+    quote_verified: false
+  - title: Elliott Review into the Integrity and Assurance of Food Supply Networks – Final Report
+    publisher: HM Government
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/media/5a7e20b740f0b62305b80fb8/elliot-review-final-report-july2014.pdf
+    locator: Recommendation 2
+    quote: Support the development of whistleblowing and reporting of food crime;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - SSAFE motivation indicators include historical offences and business culture.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - CourtCase
+  - Sanction
+  - Directorship
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Regulator enforcement databases
+  - Company registries (director histories)
+  levels:
+    faint: One past regulatory notice for the company or its directors.
+    strong: Repeated enforcement, prior fraud convictions of directors, or staff reports of pressure.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Old violations may have been fixed.
+  - Small firms often lack formal whistleblowing schemes without wrongdoing.
+  jurisdictions: Global
+  version: 1
+- id: PS-027
+  name: Counterfeit or refilled branded alcohol
+  definition: Genuine bottles are refilled with cheap alcohol, or fake bottles and labels imitate known
+    brands.
+  areas:
+  - PS
+  typology: Illicit alcohol
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: Section 3, p.15
+    quote: The refilling of empty bottles is another frequently encountered modus operandi.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hazard Information Profile CH0603: Methanol'
+    publisher: UNDRR / ISC (PreventionWeb)
+    url: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+    quote: Some illicitly produced drinks are made to appear legitimate through bottle design and labelling
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Europol: counterfeit alcoholic beverages remain the most frequently seized fake food and drink; counterfeiters
+    target festivals and public celebrations.'
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Customs and excise seizures
+  - Brand-owner alerts
+  - Licensing records
+  levels:
+    faint: Branded spirits sold well below normal price at markets or events.
+    strong: Brand owners or authorities report seizures linked to a supplier or venue.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Illicit drinks are untaxed and counterfeiting hits state revenue.
+    source_url: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+  innocent_explanations:
+  - Duty-free or promotional pricing.
+  - Parallel imports of genuine product.
+  - Old label designs still in circulation.
+  jurisdictions: Global
+  version: 1
+- id: PS-028
+  name: Informal or untaxed spirits sold unlabelled or in tourist bars
+  definition: Spirits are sold outside legal, taxed channels, in unlabelled containers, at illegal venues
+    or in some tourist bars, which is how methanol poisoning outbreaks usually start.
+  areas:
+  - PS
+  typology: Illicit alcohol and methanol poisoning
+  status: verified
+  sources:
+  - title: 'Hazard Information Profile CH0603: Methanol'
+    publisher: UNDRR / ISC (PreventionWeb), citing WHO Information Note 2014
+    url: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+    locator: Section on informal production
+    quote: Such drinks are often sold in unlabelled containers in markets and at illegal drinking venues.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Hazard Information Profile CH0603: Methanol'
+    publisher: UNDRR / ISC (PreventionWeb)
+    url: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+    quote: Illicitly- or informally produced alcohol may also be sold in legitimate bars, particularly
+      in some tourist areas.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Czech methanol outbreak, 2012: spirits mixed with industrial solvent sold mostly locally in Moravia;
+    nearly 50 deaths (Radio Prague).'
+  cases:
+  - name: Czech methanol poisonings
+    year: '2014'
+    jurisdiction: Czech Republic (Zlín Regional Court)
+    what_happened: Spirits mixed with industrial solvent killed nearly 50 people from September 2012;
+      the court sentenced the main mixers and distributors, including the main distributor Jiří Vacula
+      to 15 years, with seven other co-defendants receiving a combined 104 years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://english.radio.cz/node/8295148
+    source_title: Life sentences handed out in Czech methanol scandal verdicts (Radio Prague International)
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Person
+  checkable: records
+  lookup_sources:
+  - Public health alerts
+  - Excise authority records
+  - Travel advisories
+  levels:
+    faint: Unlabelled or home-made spirits openly sold in an area.
+    strong: Reports of illness after drinking linked to specific outlets or suppliers.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Europol describes criminal networks producing counterfeit alcohol with dangerous ingredients
+      such as methanol.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  innocent_explanations:
+  - Traditional home distilling is legal or tolerated in some countries and often safe.
+  - Local unbranded drinks may be legally produced.
+  jurisdictions: Global
+  version: 1
+- id: PS-029
+  name: Sudden cluster of poisonings after drinking
+  definition: Many people fall ill or die in a short time after drinking alcohol from the same source,
+    which public-health bodies treat as a possible methanol outbreak.
+  areas:
+  - PS
+  typology: Methanol poisoning
+  status: verified
+  sources:
+  - title: 'Hazard Information Profile CH0603: Methanol'
+    publisher: UNDRR / ISC (PreventionWeb), citing WHO 2014
+    url: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+    quote: The size of these outbreaks has ranged from 10 to greater than 800 victims
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Czech Republic 2012: nearly 50 deaths and almost 80 survivors with serious harm including blindness.'
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Company
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Health ministry alerts
+  - WHO and travel advisories
+  - Hospital and news reports
+  levels:
+    faint: Several unexplained hospitalisations after drinking in one area.
+    strong: Health authority warning naming a drink, brand or venue.
+    textbook: An outbreak of 10 or more cases confirmed as methanol poisoning by health authorities (lower
+      end of the outbreak range published).
+    threshold_source: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Alcohol poisoning from ethanol alone.
+  - Other contaminants or food poisoning at the same event.
+  jurisdictions: Global
+  version: 1
+- id: PS-030
+  name: Medicine not working or causing unexpected harm in a cluster of patients
+  definition: Patients report a medicine does not work, or suffer unexpected reactions, often the first
+    sign that it is substandard or falsified.
+  areas:
+  - PS
+  typology: Substandard and falsified medicines
+  status: verified
+  sources:
+  - title: Identifying suspected substandard and falsified medical products (SFMPs) for healthcare professionals
+    publisher: World Health Organization
+    year: '2025'
+    url: https://cdn.who.int/media/docs/default-source/substandard-and-falsified/training-toolkit/identifying-suspected-sfmps-for-healthcare-professionals.pdf?sfvrsn=79a47c0_1&download=true
+    locator: Therapeutic effect
+    quote: Patients report that the product is not working properly (unexpected lack of efficacy), and/or
+      Patients suffer unexpected adverse reaction(s)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Acute Kidney Injury Among Children Likely Associated with Diethylene Glycol–Contaminated Medications
+      — The Gambia, June–September 2022
+    publisher: US CDC, MMWR 72(9)
+    year: '2023'
+    url: https://www.cdc.gov/mmwr/volumes/72/wr/mm7209a1.htm
+    quote: This investigation strongly suggests that medications contaminated with DEG or EG imported
+      into The Gambia led to this AKI cluster among children.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A cluster of acute kidney injury among young children in The Gambia, 2022, linked to contaminated
+    syrups (CDC MMWR).
+  cases:
+  - name: Contaminated paediatric syrups, The Gambia
+    year: '2022'
+    jurisdiction: The Gambia
+    what_happened: 78 suspected AKI cases were identified by 29 Sept 2022, of whom 66 died; testing found
+      four Maiden Pharmaceuticals Limited (Haryana, India) products contained diethylene glycol and ethylene
+      glycol (CDC MMWR, 2023; WHO alert N°6/2022).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.cdc.gov/mmwr/volumes/72/wr/mm7209a1.htm
+    source_title: 'CDC MMWR: Acute Kidney Injury Among Children ... The Gambia'
+  data_needed:
+  - Event
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - WHO Medical Product Alerts
+  - National pharmacovigilance databases
+  - Health ministry outbreak reports
+  levels:
+    faint: Health workers report unexpected treatment failures with one brand or batch.
+    strong: A cluster of unexplained serious illness or deaths shares exposure to the same product.
+    textbook: A national regulator or WHO confirms by lab analysis that the product is substandard or
+      falsified (WHO Medical Product Alert).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Drug resistance or wrong diagnosis can look like lack of efficacy.
+  - Known side effects or patient-specific reactions.
+  - Coincidental clusters of disease.
+  jurisdictions: Global
+  version: 1
+- id: PS-031
+  name: Packaging and labelling anomalies on medicines
+  definition: Packs are damaged, lack clear maker details, contain spelling errors, show altered batch
+    or expiry dates, inner and outer packs disagree, or the leaflet is in the wrong language.
+  areas:
+  - PS
+  typology: Substandard and falsified medicines
+  status: verified
+  sources:
+  - title: Identifying suspected substandard and falsified medical products (SFMPs) for healthcare professionals
+    publisher: World Health Organization
+    year: '2025'
+    url: https://cdn.who.int/media/docs/default-source/substandard-and-falsified/training-toolkit/identifying-suspected-sfmps-for-healthcare-professionals.pdf?sfvrsn=79a47c0_1&download=true
+    locator: Outer packaging
+    quote: Batch numbers and expiry/manufacturing dates appear altered
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Identifying suspected SFMPs for healthcare professionals
+    publisher: World Health Organization
+    year: '2025'
+    url: https://cdn.who.int/media/docs/default-source/substandard-and-falsified/training-toolkit/identifying-suspected-sfmps-for-healthcare-professionals.pdf?sfvrsn=79a47c0_1&download=true
+    locator: Inner packaging
+    quote: Batch numbers, manufacturing/expiry dates on inner packaging (e.g. blister pack) are different
+      from outer packaging
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'WHO also lists: product does not look, smell, taste or feel correct; empty or separated packaging
+    components; product not properly stored.'
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Note
+  checkable: records
+  lookup_sources:
+  - Manufacturer batch verification
+  - WHO Medical Product Alerts
+  - National regulator alerts
+  levels:
+    faint: One packaging anomaly (e.g. a spelling error).
+    strong: Several anomalies together, or batch numbers the stated manufacturer does not recognise.
+    textbook: Meets the published definition as worded (WHO warning signs); confirmed when the manufacturer
+      or regulator verifies the batch is not genuine.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Packaging redesigns and market-specific packs.
+  - Damage in transit.
+  - Legitimate multilingual or imported packs under emergency authorisation.
+  jurisdictions: Global
+  version: 1
+- id: PS-032
+  name: Odd supply source, price or sudden availability of scarce medicines
+  definition: A medicine that is usually scarce suddenly appears in quantity, or comes from an unusual
+    source, at an odd price, or with doubtful paperwork.
+  areas:
+  - PS
+  typology: Substandard and falsified medicines
+  status: verified
+  sources:
+  - title: Identifying suspected SFMPs for healthcare professionals
+    publisher: World Health Organization
+    year: '2025'
+    url: https://cdn.who.int/media/docs/default-source/substandard-and-falsified/training-toolkit/identifying-suspected-sfmps-for-healthcare-professionals.pdf?sfvrsn=79a47c0_1&download=true
+    locator: Supply source
+    quote: Any suspicion is raised on quantities available, e.g. products that are usually in short supply
+      are suddenly available regularly or in large quantities
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Identifying suspected SFMPs for healthcare professionals
+    publisher: World Health Organization
+    year: '2025'
+    url: https://cdn.who.int/media/docs/default-source/substandard-and-falsified/training-toolkit/identifying-suspected-sfmps-for-healthcare-professionals.pdf?sfvrsn=79a47c0_1&download=true
+    locator: 'Notes: Supply source'
+    quote: SFMPs can penetrate the legal supply chain through hospitals, clinics, pharmacies and wholesalers
+      who have obtained medical products from unknown sources and intermediaries without checking their
+      credentials or conducting any due diligence.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Scarce cancer drugs offered in bulk by an unknown wholesaler during a shortage.
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - ContractAward
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Wholesale dealer licence registers
+  - Public procurement records
+  - Drug shortage lists
+  levels:
+    faint: A buyer sources a scarce medicine from a new or unknown supplier.
+    strong: The supplier lacks a wholesale licence or cannot show the original manufacturer.
+    textbook: Meets the published definition as worded (WHO warning sign)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Hospitals and public buyers that source from unknown intermediaries without due diligence
+      are a published entry route.
+    source_url: https://cdn.who.int/media/docs/default-source/substandard-and-falsified/training-toolkit/identifying-suspected-sfmps-for-healthcare-professionals.pdf?sfvrsn=79a47c0_1&download=true
+  innocent_explanations:
+  - Shortages can end suddenly as supply recovers.
+  - Legitimate parallel trade within licensing rules.
+  - Emergency procurement from new but licensed suppliers.
+  jurisdictions: Global
+  version: 1
+- id: PS-033
+  name: High-risk excipients not tested, or industrial-grade chemicals relabelled as pharmaceutical grade
+  definition: A drug maker uses solvents such as glycerin or propylene glycol without testing each container
+    for toxic diethylene or ethylene glycol, relying instead on a supplier's certificate, or the ingredient
+    chain includes relabelled industrial chemicals.
+  areas:
+  - PS
+  typology: Substandard and falsified medicines
+  status: verified
+  sources:
+  - title: Testing of Glycerin, Propylene Glycol, Maltitol Solution, Hydrogenated Starch Hydrolysate,
+      Sorbitol Solution, and Other High-Risk Drug Components for Diethylene Glycol and Ethylene Glycol
+      (Guidance, Rev. 1)
+    publisher: US Food and Drug Administration
+    year: '2023'
+    url: https://fda.gov/media/167974/download
+    quote: The relevant safety limit for DEG and EG is not more than (NMT) 0.10%.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: WHO urges action to protect children from contaminated medicines
+    publisher: World Health Organization
+    year: '2023'
+    url: https://www.who.int/news/item/23-01-2023-who-urges-action-to-protect-children-from-contaminated-medicines
+    quote: pharmaceutical grade excipients from qualified and bona fide suppliers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Indonesia: a supplier put false labels on drums of ethylene glycol claiming pharmaceutical-grade
+    propylene glycol; a distributor issued analysis certificates without testing (court documents as reported,
+    2023).'
+  cases:
+  - name: Indonesian cough syrup deaths (Afi Farma and suppliers)
+    year: '2023'
+    jurisdiction: Indonesia (Kediri court)
+    what_happened: Contaminated syrups were linked to 204 child deaths; four Afi Farma officials received
+      two years each and four officials of suppliers CV Samudera Chemical and CV Anugerah Perdana Gemilang
+      ten years each for violating pharmaceutical production laws; the Afi Farma executives appealed.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.insurancejournal.com/news/international/2023/12/29/753784.htm
+    source_title: 'Insurance Journal (Reuters): Indonesian court papers reveal chain of events'
+  data_needed:
+  - Company
+  - Document
+  - Contract
+  - Payment
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - FDA warning letters and import alerts
+  - WHO Medical Product Alerts
+  - Court records
+  levels:
+    faint: A syrup maker buys solvents from chemical traders rather than pharmaceutical-grade suppliers.
+    strong: Certificates of analysis do not name the original manufacturer, or no in-house DEG/EG testing
+      records exist.
+    textbook: DEG or EG above 0.10% in a high-risk component, or failure to test samples from each container
+      of each lot as FDA recommends.
+    threshold_source: https://fda.gov/media/167974/download
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Distributors and repackers are a normal part of excipient supply.
+  - Smaller firms may use accredited contract labs rather than in-house testing.
+  jurisdictions: Global (FDA guidance US; WHO global)
+  version: 1
+- id: PS-034
+  name: Manufacturer gives no quality guarantees after a regulator alert
+  definition: After WHO or a regulator finds contamination, the named maker does not provide assurances
+    or evidence about the safety and quality of its products.
+  areas:
+  - PS
+  typology: Substandard and falsified medicines
+  status: verified
+  sources:
+  - title: 'Medical Product Alert N°6/2022: Substandard (contaminated) paediatric medicines'
+    publisher: World Health Organization
+    year: '2022'
+    url: https://www.who.int/news/item/05-10-2022-medical-product-alert-n-6-2022-substandard-(contaminated)-paediatric-medicines
+    quote: the stated manufacturer has not provided guarantees to WHO on the safety and quality of these
+      products.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Medical Product Alert N°1/2023: Substandard (contaminated) liquid dosage medicines'
+    publisher: World Health Organization
+    year: '2023'
+    url: https://www.who.int/news/item/11-01-2023-medical-product-alert-n-1-2023-substandard-%28contaminated%29-liquid-dosage-medicines
+    quote: To date, the stated manufacturer has not provided guarantees to WHO on the safety and quality
+      of these products.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Maiden Pharmaceuticals (Gambia, 2022); Marion Biotech (Uzbekistan, 2023).
+  cases:
+  - name: Uzbekistan cough syrup deaths (Dok-1 Max)
+    year: '2024'
+    jurisdiction: Uzbekistan (Tashkent city court)
+    what_happened: The court sentenced 23 people to between two and 20 years over the deaths of 68 children;
+      charges included bribery, tax evasion, sale of substandard or counterfeit medicines, abuse of office,
+      negligence and forgery. WHO had found DEG/EG in Marion Biotech products.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://securingindustry.com/pharmaceuticals/23-jailed-over-uzbekistan-cough-syrup-deaths/s40/a16018
+    source_title: 23 jailed over Uzbekistan cough syrup deaths (Securing Industry)
+  data_needed:
+  - Company
+  - PublicBody
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - WHO Medical Product Alerts
+  - National regulator notices
+  levels:
+    faint: A maker named in an alert issues no public response.
+    strong: The maker's products are found contaminated in more than one country.
+    textbook: Meets the published definition as worded (WHO alert states no guarantees provided).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Uzbek charges included bribery, abuse of office and forgery in the medicine supply chain.
+    source_url: https://securingindustry.com/pharmaceuticals/23-jailed-over-uzbekistan-cough-syrup-deaths/s40/a16018
+  innocent_explanations:
+  - The named maker may be a victim of falsification of its brand.
+  - Investigations by home-country regulators may be under way.
+  jurisdictions: Global
+  version: 1
+- id: PS-035
+  name: Unsafe online pharmacy signs
+  definition: A website sells prescription medicines without a prescription, without a licence or pharmacist,
+    at deep discounts, or sends medicines that look different or arrive in bad packaging.
+  areas:
+  - PS
+  typology: Falsified medicines online
+  status: verified
+  sources:
+  - title: How to Buy Medicines Safely From an Online Pharmacy
+    publisher: US Food and Drug Administration
+    url: https://www.fda.gov/consumers/consumer-updates/how-buy-medicines-safely-online-pharmacy
+    quote: Do not require a doctor's prescription.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: Section 6, p.21
+    quote: Counterfeit pharmaceuticals are widely advertised and offered for sale on social media platforms.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Operation Shield 2020: 453 websites shut down and 25 million units of counterfeit medicines seized
+    (Europol).'
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Address
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - State boards of pharmacy / NABP verified site lists
+  - EU common logo register
+  - Domain WHOIS
+  levels:
+    faint: A site sells prescription-only medicines without asking for a prescription.
+    strong: No pharmacy licence can be found, and payment is by prepaid card or cryptocurrency.
+    textbook: Meets the published definition as worded (FDA warning signs)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate telehealth services issue prescriptions online.
+  - Licensed foreign pharmacies serving their own markets.
+  jurisdictions: Global
+  version: 1
+- id: PS-036
+  name: Medicines diverted between markets or stolen from the supply chain
+  definition: Medicines approved for one country are sold in another using false paperwork, or are stolen
+    from factories, warehouses, pharmacies or hospitals, sometimes with insider help.
+  areas:
+  - PS
+  typology: Falsified medicines and diversion
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: Section 6, p.21
+    quote: Illegal diversion occurs when a genuine pharmaceutical is approved and intended for sale in
+      one country, but is illegally intercepted and sold in another country, often with the use of false
+      statements, declarations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Europol notes thefts facilitated by insiders such as employees, doctors and pharmacists.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Employment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Customs seizure data
+  - Regulator enforcement notices
+  levels:
+    faint: Packs labelled for another country found on sale.
+    strong: Paperwork for the shipment includes false declarations or prescriptions.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful parallel imports within the EU with repackaging.
+  - Approved emergency imports during shortages.
+  jurisdictions: EU; global
+  version: 1
+- id: PS-037
+  name: Regulator approval or certification that was careless or corrupted
+  definition: A regulator or certifier approves a product without proper checks, or officials in the approval
+    or import chain are bribed or forge documents.
+  areas:
+  - PS
+  typology: Regulatory failure in product safety
+  status: verified
+  sources:
+  - title: Substandard and falsified medical products (fact sheet)
+    publisher: World Health Organization
+    url: https://www.who.int/news-room/fact-sheets/detail/substandard-and-falsified-medical-products
+    quote: Falsified medical products deliberately misrepresent their identity, composition or source.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Indonesian court papers reveal chain of events (Reuters via Insurance Journal)
+    publisher: Insurance Journal / Reuters
+    year: '2023'
+    url: https://www.insurancejournal.com/news/international/2023/12/29/753784.htm
+    quote: thoughtlessly
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An Indonesian court said the drug regulator approved the Afi Farma products 'thoughtlessly' (as reported);
+    Uzbek charges included bribery and abuse of office.
+  cases: []
+  data_needed:
+  - PublicBody
+  - Person
+  - Company
+  - Payment
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Regulator approval registers
+  - Court records
+  - Asset declarations of officials
+  levels:
+    faint: Approval granted unusually fast or without visible inspection.
+    strong: Approval files lack test results, or officials have undisclosed ties to the applicant.
+    textbook: A court or official inquiry finds the approval negligent or obtained by bribery.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Uzbek cough syrup prosecutions included bribery and abuse of office.
+    source_url: https://securingindustry.com/pharmaceuticals/23-jailed-over-uzbekistan-cough-syrup-deaths/s40/a16018
+  innocent_explanations:
+  - Fast-track procedures are legal in emergencies.
+  - Reliance on another trusted regulator's approval is standard practice.
+  jurisdictions: Global
+  version: 1
+- id: PS-038
+  name: Illicit or counterfeit pesticides in the supply chain
+  definition: Pesticides that are fake, banned, unregistered, relabelled or diluted are sold to farmers,
+    often cheaply and online.
+  areas:
+  - PS
+  typology: Illicit agricultural inputs
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+    locator: Section 5, p.18
+    quote: The trade in illicit pesticides is a low-risk, high-profit crime.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Operation Silver Axe: six editions seized 3,771 tonnes of illegal pesticides (Europol).'
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Address
+  - Event
+  checkable: records
+  lookup_sources:
+  - National pesticide registers
+  - EU pesticides database
+  levels:
+    faint: Pesticides offered well below registered-product prices.
+    strong: Product not on the national pesticide register, or labels in an unexpected language.
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: Europol links illicit pesticide networks to environmental crimes.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  innocent_explanations:
+  - Generic products are legal once registered.
+  - Legal parallel trade of registered products.
+  jurisdictions: EU; global
+  version: 1
+not_reached:
+- The EU Safety Gate web report page (ec.europa.eu/safety-gate-alerts/screen/webReport) returned only
+  a title; the 2024 statistics come from the Spanish Ministry of Consumer Affairs summary, not the Commission's
+  own report.
+- EU ACN monthly food fraud reports (food.ec.europa.eu/food-safety/acn/ffn-monthly_en) and the full 2023
+  ACN annual report were not opened; only a Commission newsletter summary was read.
+- 'Huisman and van Ruth (2022): the full list of about 50 SSAFE questions is not in the article; only
+  indicator categories and examples were available.'
+- The NIH/PMC article on the 2008 melamine incident was blocked by a browser check; WHO pages did not
+  state why melamine was added or give prosecution outcomes in China, so no criminal outcome for that
+  case is recorded.
+- News24/Reuters article on Indonesian court papers was blocked by robots.txt; the Insurance Journal reprint
+  was used. The August 2024 Indonesian civil ruling (tuoitre.vn) was not opened.
+- The FDA BeSafeRx page failed to load; FDA's consumer update on buying medicines online was used instead.
+- WHO 2014 Information Note on methanol poisoning outbreaks was not opened directly; it is cited via the
+  UNDRR/ISC hazard profile.
+- Primary court records for the Czech methanol verdicts, the Uzbek verdicts and the UK horsemeat conviction
+  were not reached; trade press and public broadcaster reports describing the verdicts were used.
+- No primary source reached for the second UK horsemeat defendants (Ulrik Nielsen, Alex Beech); not included.
+- No published numeric thresholds found for food fraud or falsified-medicine warning signs beyond the
+  FDA 0.10% DEG/EG limit and the methanol outbreak size range.

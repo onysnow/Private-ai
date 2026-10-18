@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chart builder prototype</title>
+<style>
+:root{--page:#13131d;--card:#1a2328;--card2:#1c262b;--well:#26272b;--rule:#2e3a40;--rule2:#393941;--border:#4e4234;--ink:#f3e9d7;--text:#caaf9c;--muted:#927e5d;--amber:#d4a152;--plumL:#9a83a8;--brick:#9f3632;--night:#010005}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--page);color:var(--text);font:13.5px/1.45 Inter,"Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column}
+button,input,select{font:inherit;color:inherit}
+.top{height:52px;flex:none;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 14px}
+.top b{font:600 16px Georgia,serif;color:var(--ink);margin-right:6px}
+.title{background:transparent;border:1px solid transparent;border-radius:6px;padding:3px 8px;color:var(--ink);font:600 15px Georgia,serif;width:300px}.title:hover,.title:focus{border-color:var(--rule2);outline:none}
+.seg{display:inline-flex;border:1px solid var(--rule2);border-radius:9px;overflow:hidden}.seg button{all:unset;cursor:pointer;font-size:12.5px;padding:5px 11px;color:var(--muted);border-right:1px solid var(--rule2)}.seg button:last-child{border:0}.seg button.on{background:#3a2f1f;color:var(--amber)}
+.btn{all:unset;cursor:pointer;border:1px solid var(--rule2);border-radius:8px;padding:5px 10px;font-size:12.5px;color:var(--text);white-space:nowrap;background:var(--well);display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--border);color:var(--ink)}.btn.p{background:var(--amber);color:var(--night);border-color:var(--amber);font-weight:600}.btn.s{padding:3px 8px;font-size:12px}
+.sp{flex:1}
+.main{flex:1;display:grid;grid-template-columns:270px minmax(0,1fr) 300px;min-height:0}
+.pal,.insp{background:var(--card);overflow:auto;min-height:0}.pal{border-right:1px solid var(--border)}.insp{border-left:1px solid var(--border)}
+.ph{padding:10px 12px 6px;font:600 14px Georgia,serif;color:var(--ink)}.psub{padding:0 12px 8px;font-size:11.5px;color:var(--muted)}
+.ptabs{display:flex;border-bottom:1px solid var(--rule2)}.ptabs button{all:unset;cursor:pointer;flex:1;text-align:center;padding:7px 4px;font-size:12px;color:var(--muted);border-bottom:2px solid transparent}.ptabs button.on{color:var(--ink);border-bottom-color:var(--amber)}
+.search{margin:8px 12px;display:flex;background:var(--well);border:1px solid var(--rule2);border-radius:8px;padding:4px 8px}.search input{all:unset;flex:1;color:var(--ink)}
+.gh{padding:8px 12px 4px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.item{display:flex;gap:8px;align-items:center;margin:3px 10px;padding:6px 8px;border:1px solid var(--rule);border-left:3px solid var(--c);border-radius:8px;background:var(--card2);cursor:grab;font-size:12.5px;color:var(--ink)}
+.item:hover{border-color:#3a4a52;border-left-color:var(--c)}.item small{display:block;color:var(--muted);font-size:11px}
+.item .on{margin-left:auto;font-size:10.5px;color:var(--muted)}
+.cvwrap{position:relative;min-height:0;overflow:hidden;background:radial-gradient(circle,#232e33 1px,transparent 1.2px) 0 0/22px 22px,#161e22}
+svg#cv{width:100%;height:100%;display:block}
+.tools{position:absolute;left:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:3}
+.hint{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);text-align:center;color:var(--muted);font-size:14px;pointer-events:none}.hint b{color:var(--ink);font:600 18px Georgia,serif;display:block;margin-bottom:6px}
+.tip{position:absolute;z-index:6;width:250px;background:#10161a;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px #000a;padding:8px 10px;font-size:12px;pointer-events:none;display:none}
+.tip .r{display:flex;justify-content:space-between;border-top:1px solid #222c31;padding:3px 0}.tip .r span:first-child{color:var(--muted)}
+.sec{padding:10px 12px;border-bottom:1px solid var(--rule)}.sec h5{margin:0 0 6px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;gap:6px;align-items:center;margin:4px 0;flex-wrap:wrap}.row label{font-size:12px;color:var(--muted);min-width:70px}
+.sw{width:20px;height:20px;border-radius:5px;border:2px solid transparent;cursor:pointer}.sw.on{border-color:var(--ink)}
+.chk{display:flex;gap:6px;align-items:center;font-size:12.5px;margin:3px 0}
+select,.in{background:var(--well);border:1px solid var(--rule2);border-radius:7px;padding:3px 6px;color:var(--ink);font-size:12.5px}
+.adv{border-left:3px solid var(--c);background:var(--card2);border-radius:0 8px 8px 0;padding:6px 9px;margin:6px 0;font-size:12px}
+.adv b{color:var(--ink)}
+.ex{display:inline-block;border:1px dashed var(--plumL);color:var(--plumL);border-radius:6px;font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:0 5px}
+/* chart mode */
+.shelves{position:absolute;left:12px;right:12px;top:52px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;z-index:3}
+.shelf{border:1.5px dashed var(--rule2);border-radius:9px;padding:6px 8px;min-height:44px;background:#1a2328cc;font-size:12px}
+.shelf.over{border-color:var(--amber);background:#2a2a22}.shelf h6{margin:0 0 4px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.field{display:inline-flex;gap:5px;align-items:center;background:var(--well);border:1px solid var(--rule2);border-radius:999px;padding:1px 9px;font-size:12px;color:var(--ink);cursor:grab;margin:2px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#10161a;border:1px solid var(--amber);color:var(--ink);border-radius:10px;padding:8px 14px;font-size:13px;display:none;z-index:60}
+</style></head><body>
+<div class="top"><b>Chart builder</b><input class="title" id="title" value="Bellcastle money trail"><span class="seg" id="mode"><button data-m="diagram" class="on">Diagram</button><button data-m="chart">Chart</button></span>
+ <span class="sp"></span><button class="btn s" id="undo" title="Undo (Ctrl+Z)">↶</button><button class="btn s" id="redo" title="Redo (Ctrl+Shift+Z)">↷</button>
+ <button class="btn" id="checkBtn">Check this design</button><button class="btn" id="importBtn">Open a design…</button><input type="file" id="file" accept=".json,.wbchart" hidden><button class="btn p" id="exportBtn">Export design ▾</button></div>
+<div class="main">
+ <aside class="pal"><div class="ph">Your records</div><div class="psub">Drag anything onto the canvas. It keeps its link to the record, so it stays up to date.</div>
+  <div class="ptabs" id="ptabs"><button data-t="records" class="on">Records</button><button data-t="groups">Tags & collections</button><button data-t="shapes">Notes & shapes</button></div>
+  <div id="pbody"></div></aside>
+ <section class="cvwrap" id="wrap"><div class="tools" id="tools"></div><div id="shelves"></div><svg id="cv"></svg><div class="hint" id="hint"><b>Start with a party</b>Drag records from the left. Drag from a party's edge dot to another party to draw a connection.</div><div class="tip" id="tip"></div></section>
+ <aside class="insp" id="insp"></aside>
+</div><div class="toast" id="toast"></div>
+<script>
+// ---------- records (the demo investigation's real records) ----------
+const KIND={Person:{fill:'#314d65',ring:'#4d7a9b',n:'Person'},Company:{fill:'#4e4234',ring:'#b98d34',n:'Company'},Organization:{fill:'#3a5c52',ring:'#baac91',n:'Organisation'},Asset:{fill:'#45271f',ring:'#bc9574',n:'Property'}};
+const ICON={Person:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',Company:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-3h6v3M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01"/>',Organization:'<path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 2l9 5H3z"/>',Asset:'<path d="M3 10l9-7 9 7v11H3z"/>'};
+const R={
+ parties:[{id:'ala',name:'Alaric Voss',schema:'Person',country:'UK'},{id:'bel',name:'Bellcastle Trading Group',schema:'Company',country:'Cayman Is.'},{id:'har',name:'Harborline Civic Trust',schema:'Organization',country:'unknown'},{id:'ves',name:'MV Fair Tern (cargo vessel)',schema:'Asset',country:'unknown'},{id:'mer',name:'Meridian Holdings Ltd',schema:'Company',country:'UK'},{id:'pri',name:'Priya Kavanagh',schema:'Person',country:'unknown'}],
+ links:[{id:'L1',f:'bel',t:'mer',fam:'Ownership',v:'owns',label:'100%',sure:'supported'},{id:'L2',f:'bel',t:'mer',fam:'Payment',v:'paid',label:'USD 2,400,000',amount:2400000,date:'2023-11-14',sure:'disputed'},{id:'L3',f:'ala',t:'mer',fam:'Directorship',v:'directs',label:'since 2019',sure:'unverified'},{id:'L4',f:'mer',t:'ves',fam:'Ownership',v:'owns',label:'',sure:'unverified'},{id:'L5',f:'pri',t:'har',fam:'Employment',v:'works for',label:'',sure:'unverified'}],
+ claims:[{id:'C1',text:'Meridian Holdings Ltd is wholly owned by Bellcastle Trading Group.',status:'supported',conf:.8,ev:1},{id:'C2',text:'Bellcastle Trading Group paid Meridian Holdings Ltd $2.4M described as a consulting fee.',status:'disputed',conf:.5,ev:2},{id:'C3',text:'Alaric Voss has an undisclosed financial interest in the MV Fair Tern.',status:'unverified',conf:.2,ev:0}],
+ events:[{id:'E1',t:'Alaric Voss appointed director of Meridian',date:'2019-06-11',kind:'Events you recorded',status:'verified'},{id:'E2',t:'Bellcastle becomes sole owner of Meridian',date:'2021-02-01',kind:'Events you recorded',status:'verified'},{id:'E3',t:'Payment Bellcastle → Meridian (date)',date:'2023-11-14',kind:'Dates of relationships',status:'asserted'},{id:'E4',t:'Disputed $2.4M payment',date:'2023-11-14',kind:'Events you recorded',status:'disputed'},{id:'E5',t:'Riverside Gazette publishes',date:'2024-03-02',kind:'Events you recorded',status:'verified'},{id:'E6',t:'Lead opened: trace the fee',date:'2024-03-03',kind:'Events you recorded',status:'asserted'}],
+ evidence:[{id:'V1',q:'Director: Alaric Voss, appointed 2019-06-11.',src:'Companies Registry filing, p. 2'},{id:'V2',q:'Meridian Holdings Ltd is wholly owned by Bellcastle Trading Group.',src:'Companies Registry filing, p. 4'},{id:'V3',q:'Bank records show a transfer of $2,400,000 …',src:'Riverside Gazette ¶6'},{id:'V4',q:'A spokesperson … denied any ongoing financial relationship …',src:'Riverside Gazette ¶9'}],
+ tags:[{n:'Follow the money',c:'#8d692b',items:['bel','mer','L2']},{n:'Offshore',c:'#3e6181',items:['bel']}],
+ collections:[{n:'Bellcastle money trail',items:['bel','mer','L2','V3','V4']}],
+};
+const FAM={Ownership:'#d4a152',Directorship:'#baac91',Employment:'#baac91',Payment:'#a16948'};
+const SURE={supported:{n:'Shown by a source',c:'#3a5c52'},disputed:{n:'Sources disagree',c:'#9f3632'},unverified:{n:'Not yet shown',c:'#61503e'},verified:{n:'Verified',c:'#3a5c52'},asserted:{n:'Asserted',c:'#61503e'}};
+const SW=['#4d7a9b','#b98d34','#baac91','#a16948','#d4a152','#3a5c52','#9f3632','#9a83a8','#bc9574','#3e6181','#8d692b','#89352a'];
+const P=id=>R.parties.find(p=>p.id===id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+
+// ---------- state + history ----------
+let S={mode:'diagram',nodes:[],edges:[],sel:null,view:{x:0,y:0,k:1},opts:{bringLinks:true,snap:true,colourBy:'kind',sizeBy:'links'},chart:{x:null,y:null,color:null,size:null,facet:null}};
+const H={past:[],future:[]};
+const snap=()=>JSON.stringify({nodes:S.nodes,edges:S.edges,opts:S.opts,chart:S.chart});
+function commit(){H.past.push(snap());if(H.past.length>100)H.past.shift();H.future=[]}
+function restore(j){const o=JSON.parse(j);S.nodes=o.nodes;S.edges=o.edges;S.opts=o.opts;S.chart=o.chart;S.sel=null;render()}
+document.getElementById('undo').onclick=()=>{if(!H.past.length)return;H.future.push(snap());restore(H.past.pop())};
+document.getElementById('redo').onclick=()=>{if(!H.future.length)return;H.past.push(snap());restore(H.future.pop())};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();(e.shiftKey?document.getElementById('redo'):document.getElementById('undo')).click()}
+  if((e.key==='Delete'||e.key==='Backspace')&&S.sel&&document.activeElement.tagName!=='INPUT'){commit();if(S.sel.t==='n'){S.nodes=S.nodes.filter(n=>n.id!==S.sel.id);S.edges=S.edges.filter(x=>x.a!==S.sel.id&&x.b!==S.sel.id)}else S.edges=S.edges.filter(x=>x.id!==S.sel.id);S.sel=null;render()}});
+
+// ---------- palette ----------
+let ptab='records',pq='';
+function itemHTML(type,id,title,sub,c){const on=S.nodes.some(n=>n.ref===id&&n.type===type);return`<div class="item" draggable="true" data-drag="${type}:${id}" style="--c:${c}"><div style="flex:1">${esc(title)}<small>${esc(sub)}</small></div>${on?'<span class="on">on canvas</span>':''}</div>`}
+function renderPalette(){
+  const b=document.getElementById('pbody');let h='';
+  if(ptab==='records'){h+=`<div class="search"><input id="pq" placeholder="Find a record…" value="${esc(pq)}"></div>`;const m=s=>!pq||s.toLowerCase().includes(pq.toLowerCase());
+    if(S.mode==='chart'){h+=`<div class="gh" style="color:#d4a152">Fields to drop on the shelves</div>`+FIELDS.map(f=>`<div class="item" draggable="true" data-drag="field:${f.id}" style="--c:${f.c}"><div style="flex:1">${f.n}<small>${f.src} · ${f.type}</small></div></div>`).join('')}
+    else{h+=`<div class="gh" style="color:#b98d34">Parties</div>`+R.parties.filter(p=>m(p.name)).map(p=>itemHTML('party',p.id,p.name,`${KIND[p.schema].n} · ${p.country}`,KIND[p.schema].ring)).join('');
+    h+=`<div class="gh" style="color:#baac91">Claims</div>`+R.claims.filter(c=>m(c.text)).map(c=>itemHTML('claim',c.id,c.text.slice(0,58)+'…',`${SURE[c.status].n} · ${Math.round(c.conf*100)}%`,SURE[c.status].c)).join('');
+    h+=`<div class="gh" style="color:#caaf9c">Evidence</div>`+R.evidence.filter(v=>m(v.q)).map(v=>itemHTML('evidence',v.id,'“'+v.q+'”',v.src,'#caaf9c')).join('');
+    h+=`<div class="gh" style="color:#d4a152">Events</div>`+R.events.filter(v=>m(v.t)).map(v=>itemHTML('event',v.id,v.t,v.date,'#d4a152')).join('')}}
+  if(ptab==='groups'){h+=`<div class="psub" style="padding-top:8px">Dropping a tag or collection brings every record in it.</div><div class="gh">Tags</div>`+R.tags.map(t=>`<div class="item" draggable="true" data-drag="tag:${t.n}" style="--c:${t.c}"><div style="flex:1">${t.n}<small>${t.items.length} records</small></div></div>`).join('')+`<div class="gh">Collections</div>`+R.collections.map(t=>`<div class="item" draggable="true" data-drag="coll:${t.n}" style="--c:#d4a152"><div style="flex:1">${t.n}<small>${t.items.length} records</small></div></div>`).join('')}
+  if(ptab==='shapes'){h+=`<div class="gh">Your own marks</div><div class="psub">Marks you add are yours, not records: they are drawn in plum and never counted as findings.</div>`+[['note','Note','a box of text'],['group','Group','a frame around parties'],['label','Label','a heading on the canvas']].map(([k,n,s])=>`<div class="item" draggable="true" data-drag="mark:${k}" style="--c:#9a83a8"><div style="flex:1">${n}<small>${s}</small></div></div>`).join('')}
+  b.innerHTML=h;const q=document.getElementById('pq');if(q){q.oninput=()=>{pq=q.value;renderPalette();const n=document.getElementById('pq');n.focus();n.setSelectionRange(pq.length,pq.length)}}
+  b.querySelectorAll('[draggable]').forEach(el=>el.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',el.dataset.drag)));
+}
+document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;ptab=b.dataset.t;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));renderPalette()};
+
+// ---------- canvas ----------
+const wrap=document.getElementById('wrap'),cv=document.getElementById('cv'),tip=document.getElementById('tip');
+const toWorld=(cx,cy)=>{const r=cv.getBoundingClientRect();return{x:(cx-r.left-S.view.x)/S.view.k,y:(cy-r.top-S.view.y)/S.view.k}};
+const uid=()=>Math.random().toString(36).slice(2,8);
+function addParty(id,x,y){if(S.nodes.some(n=>n.type==='party'&&n.ref===id))return;S.nodes.push({id:uid(),type:'party',ref:id,x,y,style:{shape:'circle',fill:null,show:['name','kind'],auto:'off'}});
+  if(S.opts.bringLinks)for(const l of R.links){const other=l.f===id?l.t:l.t===id?l.f:null;if(!other)continue;const on=S.nodes.find(n=>n.type==='party'&&n.ref===other);const me=S.nodes.find(n=>n.ref===id&&n.type==='party');if(on&&!S.edges.some(e=>e.ref===l.id))S.edges.push({id:uid(),ref:l.id,a:l.f===id?me.id:on.id,b:l.f===id?on.id:me.id,style:{}})}}
+function addRef(ref,x,y){const p=P(ref);if(p)return addParty(ref,x,y);const l=R.links.find(z=>z.id===ref);if(l){addParty(l.f,x-120,y);addParty(l.t,x+120,y);return}
+  const c=R.claims.find(z=>z.id===ref);if(c)return S.nodes.push({id:uid(),type:'claim',ref,x,y,style:{}});const v=R.evidence.find(z=>z.id===ref);if(v)return S.nodes.push({id:uid(),type:'evidence',ref,x,y,style:{}});const ev=R.events.find(z=>z.id===ref);if(ev)S.nodes.push({id:uid(),type:'event',ref,x,y,style:{}})}
+wrap.addEventListener('dragover',e=>{e.preventDefault();const sh=e.target.closest('.shelf');document.querySelectorAll('.shelf').forEach(s=>s.classList.toggle('over',s===sh))});
+wrap.addEventListener('drop',e=>{e.preventDefault();const d=e.dataTransfer.getData('text/plain');if(!d)return;const[type,id]=[d.slice(0,d.indexOf(':')),d.slice(d.indexOf(':')+1)];
+  if(S.mode==='chart'){const sh=e.target.closest('.shelf');document.querySelectorAll('.shelf').forEach(s=>s.classList.remove('over'));if(sh&&type==='field'){commit();S.chart[sh.dataset.shelf]=id;render()}return}
+  const w=toWorld(e.clientX,e.clientY);commit();
+  if(type==='party'||type==='claim'||type==='evidence'||type==='event')addRef(id,snapV(w.x),snapV(w.y));
+  if(type==='tag'||type==='coll'){const g=(type==='tag'?R.tags:R.collections).find(t=>t.n===id);g.items.forEach((ref,i)=>addRef(ref,snapV(w.x+(i%3)*190-190),snapV(w.y+Math.floor(i/3)*130)))}
+  if(type==='mark')S.nodes.push({id:uid(),type:'mark',kind:id,x:snapV(w.x),y:snapV(w.y),text:id==='note'?'Write a note…':id==='label'?'A heading':'Group',w:id==='group'?320:200,h:id==='group'?200:70,style:{}});
+  render()});
+const snapV=v=>S.opts.snap?Math.round(v/22)*22:v;
+function nodeSize(n){if(n.type!=='party')return 0;const k=S.edges.filter(e=>e.a===n.id||e.b===n.id).length;if(S.opts.sizeBy==='links')return 16+4*Math.sqrt(k);if(S.opts.sizeBy==='money'){const m=R.links.filter(l=>l.amount&&(l.f===n.ref||l.t===n.ref)).reduce((s,l)=>s+l.amount,0);return m?16+Math.log10(m/1e4)*4:14}return 20}
+function nodeColour(n){const p=P(n.ref);if(n.style.fill)return{fill:n.style.fill+'55',ring:n.style.fill};if(S.opts.colourBy==='tag'){const t=R.tags.find(t=>t.items.includes(n.ref));return t?{fill:t.c+'66',ring:t.c}:{fill:'#26272b',ring:'#61503e'}}return KIND[p.schema]}
+function taper(a,b,w0,w1,color,dashed,bow){const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,c={x:(a.x+b.x)/2-dy/d*bow*d,y:(a.y+b.y)/2+dx/d*bow*d};const pts=[];for(let i=0;i<=36;i+=1){const t=i/36;pts.push({x:(1-t)**2*a.x+2*(1-t)*t*c.x+t*t*b.x,y:(1-t)**2*a.y+2*(1-t)*t*c.y+t*t*b.y})}
+  const S2=[0];for(let i=1;i<pts.length;i+=1)S2.push(S2[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));const T=S2[S2.length-1];
+  const piece=(i0,i1)=>{const L=[],Rr=[];for(let i=i0;i<=i1;i+=1){const p=pts[i],q=pts[Math.min(i+1,pts.length-1)],o=pts[Math.max(i-1,0)];let ux=q.x-o.x,uy=q.y-o.y;const n=Math.hypot(ux,uy)||1;ux/=n;uy/=n;const h=(w0+(w1-w0)*S2[i]/T)/2;L.push(`${p.x-uy*h},${p.y+ux*h}`);Rr.unshift(`${p.x+uy*h},${p.y-ux*h}`)}return`M${L.join(' L')} L${Rr.join(' L')} Z`};
+  let s='';if(!dashed)s=piece(0,pts.length-1);else{let i=0;while(i<pts.length-1){const s0=S2[i];let j=i;while(j<pts.length-1&&S2[j]-s0<9)j+=1;s+=piece(i,j);let k=j;while(k<pts.length-1&&S2[k]-S2[j]<6)k+=1;i=k}}
+  return{d:s,mid:pts[18]}}
+function render(){renderPalette();renderTools();renderShelves();renderInsp();if(S.mode==='chart')return renderChart();
+  document.getElementById('hint').style.display=S.nodes.length?'none':'block';
+  const{x,y,k}=S.view;let s=`<g transform="translate(${x},${y}) scale(${k})">`;
+  for(const n of S.nodes.filter(n=>n.type==='mark'&&n.kind==='group'))s+=`<g data-node="${n.id}"><rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="14" fill="rgba(49,34,55,.35)" stroke="#9a83a8" stroke-dasharray="5 4" ${sel(n)?'stroke-width="2.5"':''}/><text x="${n.x+12}" y="${n.y+20}" font-size="12" font-weight="700" fill="#9a83a8" letter-spacing=".06em">${esc(n.text.toUpperCase())}</text><rect data-resize="${n.id}" x="${n.x+n.w-12}" y="${n.y+n.h-12}" width="12" height="12" fill="#9a83a8" style="cursor:nwse-resize"/></g>`;
+  const pos=id=>S.nodes.find(n=>n.id===id);
+  const pairCount={};
+  for(const e of S.edges){const a=pos(e.a),b=pos(e.b);if(!a||!b)continue;const key=[e.a,e.b].sort().join();pairCount[key]=(pairCount[key]||0)+1;const bow=(pairCount[key]-1)*0.16;
+    const l=e.ref?R.links.find(z=>z.id===e.ref):null;const col=e.style.color||(l?FAM[l.fam]:'#9a83a8');const dashed=e.style.dash==='solid'?false:e.style.dash==='dashed'?true:(l?l.sure!=='supported':true);
+    const w=e.style.width==='money'&&l?.amount?2+Math.log10(l.amount/1e4)*1.6:e.style.width||3;
+    const ra=nodeSize(a)||40,rb=nodeSize(b)||40;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1;const A={x:a.x+dx/d*(ra+4),y:a.y+dy/d*(ra+4)},B={x:b.x-dx/d*(rb+5),y:b.y-dy/d*(rb+5)};
+    const t=taper(A,B,(l&&l.fam==='Family')?w:w*1.6,(l&&l.fam==='Family')?w:1.3,col,dashed,bow);
+    s+=`<g data-edge="${e.id}"><path d="${t.d}" fill="${col}" ${sel(e,'e')?'stroke="#f3e9d7" stroke-width="1.5"':''}/><path d="M${A.x},${A.y} Q${t.mid.x},${t.mid.y} ${B.x},${B.y}" stroke="transparent" stroke-width="16" fill="none"/>`;
+    const lab=e.style.label===false?'':l?`${l.v}${l.label?' · '+l.label:''}`:(e.note||'drawn by you');s+=`<text x="${t.mid.x}" y="${t.mid.y+(bow?20:-8)}" text-anchor="middle" font-size="11.5" fill="${col}" stroke="#161e22" stroke-width="4" paint-order="stroke">${esc(lab)}</text>`;
+    if(l&&l.sure==='disputed')s+=`<g transform="translate(${t.mid.x},${t.mid.y+6})"><circle r="8" fill="#9f3632" stroke="#161e22" stroke-width="2"/><text y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#f3e9d7">!</text></g>`;
+    if(!l)s+=`<g transform="translate(${t.mid.x},${t.mid.y+8})"><rect x="-38" y="-9" width="76" height="18" rx="9" fill="#312237" stroke="#9a83a8"/><text y="4" text-anchor="middle" font-size="10" font-weight="700" fill="#d9c8e3">NOT A RECORD</text></g>`;
+    s+='</g>'}
+  for(const n of S.nodes){if(n.type==='mark'&&n.kind==='group')continue;
+    if(n.type==='party'){const p=P(n.ref),c=nodeColour(n),r=nodeSize(n),shape=n.style.shape;
+      s+=`<g data-node="${n.id}" style="cursor:move">${sel(n)?`<circle cx="${n.x}" cy="${n.y}" r="${r+8}" fill="none" stroke="#f3e9d7" stroke-dasharray="3 3"/>`:''}`;
+      if(shape==='card'){s+=`<rect x="${n.x-90}" y="${n.y-24}" width="180" height="48" rx="10" fill="#1a2328" stroke="${c.ring}" stroke-width="2"/><circle cx="${n.x-66}" cy="${n.y}" r="13" fill="${c.fill}" stroke="${c.ring}" stroke-width="2"/><svg x="${n.x-74}" y="${n.y-8}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${c.ring}" stroke-width="2">${ICON[p.schema]}</svg><text x="${n.x-46}" y="${n.y-3}" font-size="12.5" font-weight="600" fill="#f3e9d7">${esc(p.name.length>18?p.name.slice(0,17)+'…':p.name)}</text><text x="${n.x-46}" y="${n.y+13}" font-size="10.5" fill="#927e5d">${n.style.show.includes('kind')?KIND[p.schema].n:''}${n.style.show.includes('country')?' · '+p.country:''}</text>`}
+      else{s+=`<circle cx="${n.x}" cy="${n.y}" r="${r+3}" fill="#161e22"/><circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${c.fill}" stroke="${c.ring}" stroke-width="2.5"/><svg x="${n.x-r*.55}" y="${n.y-r*.55}" width="${r*1.1}" height="${r*1.1}" viewBox="0 0 24 24" fill="none" stroke="${c.ring}" stroke-width="2.2">${ICON[p.schema]}</svg>`;
+        const lines=[n.style.show.includes('name')?p.name:null,n.style.show.includes('kind')?KIND[p.schema].n+(n.style.show.includes('country')?' · '+p.country:''):(n.style.show.includes('country')?p.country:null)].filter(Boolean);
+        lines.forEach((t,i)=>s+=`<text x="${n.x}" y="${n.y+r+16+i*14}" text-anchor="middle" font-size="${i?10.5:12.5}" font-weight="${i?400:600}" fill="${i?'#927e5d':'#caaf9c'}" stroke="#161e22" stroke-width="4" paint-order="stroke">${esc(t)}</text>`)}
+      if(n.style.auto!=='off')s+=`<g transform="translate(${n.x+(shape==='card'?84:r*.8)},${n.y-(shape==='card'?22:r*.8)})"><circle r="9" fill="#312237" stroke="#9a83a8"/><text y="4" text-anchor="middle" font-size="10" fill="#f3e9d7">${n.style.auto==='auto'?'⟳':'?'}</text></g>`;
+      const hx=shape==='card'?n.x+90:n.x+r+2;s+=`<circle data-handle="${n.id}" cx="${hx}" cy="${n.y}" r="5.5" fill="#d4a152" stroke="#161e22" stroke-width="2" style="cursor:crosshair" opacity=".85"/></g>`}
+    else if(n.type==='claim'||n.type==='evidence'||n.type==='event'){const rec=n.type==='claim'?R.claims.find(c=>c.id===n.ref):n.type==='evidence'?R.evidence.find(c=>c.id===n.ref):R.events.find(c=>c.id===n.ref);
+      const col=n.type==='claim'?SURE[rec.status].c:n.type==='event'?'#d4a152':'#caaf9c',txt=n.type==='claim'?rec.text:n.type==='evidence'?'“'+rec.q+'”':rec.date+' · '+rec.t;
+      const words=txt.split(' ');const lines=[''];for(const w of words){if((lines[lines.length-1]+' '+w).length>30)lines.push(w);else lines[lines.length-1]=(lines[lines.length-1]+' '+w).trim()}const L=lines.slice(0,4);
+      s+=`<g data-node="${n.id}" style="cursor:move"><rect x="${n.x-110}" y="${n.y-18}" width="220" height="${26+L.length*15}" rx="9" fill="#1a2328" stroke="${sel(n)?'#f3e9d7':'#2e3a40'}"/><rect x="${n.x-110}" y="${n.y-18}" width="4" height="${26+L.length*15}" fill="${col}"/><text x="${n.x-98}" y="${n.y-4}" font-size="10" font-weight="700" letter-spacing=".07em" fill="${col}">${n.type.toUpperCase()}${n.type==='claim'?' · '+SURE[rec.status].n.toUpperCase():''}</text>${L.map((t,i)=>`<text x="${n.x-98}" y="${n.y+12+i*15}" font-size="12" fill="#f3e9d7">${esc(t)}</text>`).join('')}<circle data-handle="${n.id}" cx="${n.x+110}" cy="${n.y}" r="5.5" fill="#d4a152" stroke="#161e22" stroke-width="2" style="cursor:crosshair"/></g>`}
+    else if(n.type==='mark'){s+=`<g data-node="${n.id}" style="cursor:move"><rect x="${n.x-n.w/2}" y="${n.y-n.h/2}" width="${n.w}" height="${n.h}" rx="8" fill="${n.kind==='label'?'transparent':'#312237'}" stroke="${sel(n)?'#f3e9d7':'#9a83a8'}" ${n.kind==='label'?'stroke-dasharray="3 3"':''}/><text x="${n.x}" y="${n.y+5}" text-anchor="middle" font-size="${n.kind==='label'?18:12.5}" font-family="${n.kind==='label'?'Georgia,serif':'Inter'}" fill="#f3e9d7">${esc(n.text)}</text></g>`}}
+  if(DRAW)s+=`<path d="M${DRAW.a.x},${DRAW.a.y} L${DRAW.p.x},${DRAW.p.y}" stroke="#9a83a8" stroke-width="2.5" stroke-dasharray="6 4" pointer-events="none"/>`;
+  cv.innerHTML=s+'</g>'}
+const sel=(o,t='n')=>S.sel&&S.sel.t===t&&S.sel.id===o.id;
+// interactions: move, pan, draw, resize, hover
+let DRAG=null,PAN=null,DRAW=null,RES=null;
+cv.addEventListener('pointerdown',e=>{if(S.mode==='chart')return;const h=e.target.closest('[data-handle]'),rs=e.target.closest('[data-resize]'),g=e.target.closest('[data-node]'),ed=e.target.closest('[data-edge]');const w=toWorld(e.clientX,e.clientY);
+  if(h){const n=S.nodes.find(z=>z.id===h.dataset.handle);DRAW={from:n.id,a:{x:+h.getAttribute('cx'),y:+h.getAttribute('cy')},p:w};return}
+  if(rs){commit();RES={n:S.nodes.find(z=>z.id===rs.dataset.resize),w0:w};return}
+  if(g){const n=S.nodes.find(z=>z.id===g.dataset.node);commit();S.sel={t:'n',id:n.id};DRAG={n,dx:w.x-n.x,dy:w.y-n.y,moved:false,kids:n.type==='mark'&&n.kind==='group'?S.nodes.filter(m=>m!==n&&m.x>n.x&&m.x<n.x+n.w&&m.y>n.y&&m.y<n.y+n.h).map(m=>({m,dx:m.x-n.x,dy:m.y-n.y})):[]};render();return}
+  if(ed){S.sel={t:'e',id:ed.dataset.edge};render();return}
+  S.sel=null;PAN={x:e.clientX,y:e.clientY,vx:S.view.x,vy:S.view.y};render()});
+window.addEventListener('pointermove',e=>{const w=toWorld(e.clientX,e.clientY);
+  if(DRAG){DRAG.n.x=snapV(w.x-DRAG.dx);DRAG.n.y=snapV(w.y-DRAG.dy);DRAG.kids.forEach(({m,dx,dy})=>{m.x=DRAG.n.x+dx;m.y=DRAG.n.y+dy});DRAG.moved=true;render();return}
+  if(RES){RES.n.w=Math.max(120,snapV(w.x-RES.n.x));RES.n.h=Math.max(80,snapV(w.y-RES.n.y));render();return}
+  if(PAN){S.view.x=PAN.vx+e.clientX-PAN.x;S.view.y=PAN.vy+e.clientY-PAN.y;render();return}
+  if(DRAW){DRAW.p=w;render();return}
+  hover(e)});
+window.addEventListener('pointerup',e=>{if(DRAW){const g=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-node]');const to=g&&S.nodes.find(z=>z.id===g.dataset.node);
+    if(to&&to.id!==DRAW.from){commit();S.edges.push({id:uid(),ref:null,a:DRAW.from,b:to.id,style:{},note:'drawn by you'});S.sel={t:'e',id:S.edges[S.edges.length-1].id};toast('You drew a connection. It is yours, not a record: make it a claim or research it to back it.')}DRAW=null;render()}
+  if(DRAG&&!DRAG.moved)H.past.pop();DRAG=null;PAN=null;RES=null});
+cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,k0=S.view.k,k=Math.max(.3,Math.min(2.5,k0*(e.deltaY<0?1.1:1/1.1)));S.view.x=mx-(mx-S.view.x)*k/k0;S.view.y=my-(my-S.view.y)*k/k0;S.view.k=k;render()},{passive:false});
+function hover(e){const g=e.target.closest?.('[data-node]'),ed=e.target.closest?.('[data-edge]');let h='';
+  if(g){const n=S.nodes.find(z=>z.id===g.dataset.node);if(n?.type==='party'){const p=P(n.ref);const ls=R.links.filter(l=>l.f===p.id||l.t===p.id);h=`<b style="color:#f3e9d7">${esc(p.name)}</b><div class="r"><span>Kind · country</span><span>${KIND[p.schema].n} · ${p.country}</span></div>${ls.map(l=>`<div class="r"><span>${l.f===p.id?'→':'←'} ${l.v}</span><span>${esc(P(l.f===p.id?l.t:l.f).name)}</span></div>`).join('')}<div class="r"><span>Tags</span><span>${R.tags.filter(t=>t.items.includes(p.id)).map(t=>t.n).join(', ')||'—'}</span></div><div style="color:#927e5d;margin-top:4px">Drag the gold dot to connect · click to style</div>`}}
+  else if(ed){const x=S.edges.find(z=>z.id===ed.dataset.edge);const l=x?.ref&&R.links.find(z=>z.id===x.ref);h=l?`<b style="color:#f3e9d7">${esc(P(l.f).name)} ${l.v} ${esc(P(l.t).name)}</b><div class="r"><span>Record</span><span>${l.fam}${l.label?' · '+esc(l.label):''}</span></div><div class="r"><span>How sure</span><span>${SURE[l.sure].n}</span></div>`:`<b style="color:#d9c8e3">Drawn by you</b><div style="color:#927e5d">Not a record. It is kept with the design, marked, and never counted.</div>`}
+  if(!h){tip.style.display='none';return}tip.innerHTML=h;tip.style.display='block';const r=wrap.getBoundingClientRect();tip.style.left=Math.min(r.width-260,e.clientX-r.left+14)+'px';tip.style.top=Math.min(r.height-tip.offsetHeight-6,e.clientY-r.top+14)+'px'}
+// canvas tools
+function renderTools(){const t=document.getElementById('tools');if(S.mode==='chart'){t.innerHTML=`<span class="btn s" style="cursor:default">Drop fields on the shelves below the bar · the chart redraws as you go</span>`;return}
+  t.innerHTML=`<span class="seg"><button data-arr="free" class="on">Free</button><button data-arr="control">Who controls whom</button><button data-arr="kind">By kind</button><button data-arr="circle">Circle</button></span>
+   <button class="btn s" id="fitBtn">⤢ Fit</button><button class="btn s" data-opt="bringLinks">${S.opts.bringLinks?'☑':'☐'} Bring links with a party</button><button class="btn s" data-opt="snap">${S.opts.snap?'☑':'☐'} Snap to grid</button>
+   <select data-sel="colourBy"><option value="kind" ${S.opts.colourBy==='kind'?'selected':''}>Colour: kind of party</option><option value="tag" ${S.opts.colourBy==='tag'?'selected':''}>Colour: your tags</option></select>
+   <select data-sel="sizeBy"><option value="links" ${S.opts.sizeBy==='links'?'selected':''}>Size: number of links</option><option value="money" ${S.opts.sizeBy==='money'?'selected':''}>Size: money moved</option><option value="same" ${S.opts.sizeBy==='same'?'selected':''}>Size: all the same</option></select>`;
+  document.getElementById('fitBtn').onclick=()=>{fit();render()};
+  t.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{commit();S.opts[b.dataset.opt]=!S.opts[b.dataset.opt];render()});
+  t.querySelectorAll('[data-sel]').forEach(b=>b.onchange=()=>{commit();S.opts[b.dataset.sel]=b.value;render()});
+  t.querySelectorAll('[data-arr]').forEach(b=>b.onclick=()=>{commit();arrange(b.dataset.arr);fit();render();toast(b.dataset.arr==='free'?'Free: everything stays where you put it':'Arranged by the rule. Move anything afterwards; the rule line will say “arranged, then moved by you”.')})}
+function arrange(rule){arrangeCore(rule);const ps2=S.nodes.filter(n=>n.type==='party'),bottom=Math.max(...ps2.map(n=>n.y),0)+170;S.nodes.filter(n=>['claim','evidence','event'].includes(n.type)).forEach((n,i)=>{n.x=snapV(260+i*260);n.y=snapV(bottom)})}
+function fit(){if(!S.nodes.length)return;const xs=S.nodes.flatMap(n=>[n.x-120,n.x+(n.w||120)]),ys=S.nodes.flatMap(n=>[n.y-60,n.y+(n.h||70)]);const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);const W=cv.clientWidth,H=cv.clientHeight-90;const k=Math.max(.3,Math.min(1.2,W/(x1-x0),H/(y1-y0)));S.view={k,x:(W-(x1-x0)*k)/2-x0*k,y:90+(H-(y1-y0)*k)/2-y0*k}}
+function arrangeCore(rule){const ps=S.nodes.filter(n=>n.type==='party');if(!ps.length)return;setTimeout(()=>{},0);const cx=520,cy=380;
+  if(rule==='circle')ps.forEach((n,i)=>{const a=-Math.PI/2+i*2*Math.PI/ps.length;n.x=snapV(cx+Math.cos(a)*220);n.y=snapV(cy+Math.sin(a)*170)});
+  if(rule==='kind'){const ks=[...new Set(ps.map(n=>P(n.ref).schema))];ks.forEach((k,c)=>ps.filter(n=>P(n.ref).schema===k).forEach((n,i)=>{n.x=snapV(200+c*280);n.y=snapV(230+i*170)}))}
+  if(rule==='control'){const lvl={};const owners=id=>R.links.filter(l=>(l.fam==='Ownership'||l.fam==='Directorship')&&l.t===id).map(l=>l.f);const depth=id=>{if(lvl[id]!=null)return lvl[id];const o=owners(id).filter(x=>ps.some(n=>n.ref===x));lvl[id]=o.length?1+Math.max(...o.map(depth)):0;return lvl[id]};
+    const by={};ps.forEach(n=>{const d=depth(n.ref);(by[d]=by[d]||[]).push(n)});Object.entries(by).forEach(([d,arr])=>arr.forEach((n,i)=>{n.x=snapV(200+(+d)*330);n.y=snapV(230+i*190)}))}}
+// inspector
+function renderInsp(){const el=document.getElementById('insp');let h='';
+  if(S.mode==='chart'){h=`<div class="ph">The chart</div><div class="sec"><h5>What it shows</h5><div style="font-size:12.5px">${chartSentence()}</div></div><div class="sec"><h5>Marks</h5><div class="row"><label>Colours</label>${SW.slice(0,6).map(c=>`<span class="sw" style="background:${c}"></span>`).join('')}</div><div class="row"><label>Bars start</label><span class="btn s" title="Rule 2: bar lengths must start at zero">at zero (locked)</span></div><div class="row"><label>Labels</label><select><option>Value on each bar</option><option>None</option></select></div></div>${adviceHTML()}`;el.innerHTML=h;return}
+  if(!S.sel){h=`<div class="ph">Design</div><div class="psub">Select a party, a connection or a mark to style it. Everything here goes into the design file you export.</div><div class="sec"><h5>On the canvas</h5><div class="chk">${S.nodes.filter(n=>n.type==='party').length} parties · ${S.edges.filter(e=>e.ref).length} links from records · ${S.edges.filter(e=>!e.ref).length} drawn by you · ${S.nodes.filter(n=>n.type!=='party').length} other items</div></div>
+    <div class="sec"><h5>Researching</h5>${S.nodes.filter(n=>n.type==='party'&&n.style.auto!=='off').map(n=>`<div class="chk">⟳ ${esc(P(n.ref).name)} <span style="color:#927e5d">· ${n.style.auto==='auto'?'automatic':'asks first'}</span></div>`).join('')||'<div class="chk" style="color:#927e5d">Nothing is set to research. Select a party to switch it on.</div>'}</div>${adviceHTML()}`;el.innerHTML=h;return}
+  if(S.sel.t==='n'){const n=S.nodes.find(z=>z.id===S.sel.id);if(!n){S.sel=null;return renderInsp()}
+    if(n.type==='party'){const p=P(n.ref);h=`<div class="ph">${esc(p.name)}</div><div class="psub">${KIND[p.schema].n} · ${p.country} · a record: it updates when the record does</div>
+    <div class="sec"><h5>Shape</h5><div class="row"><span class="seg">${[['circle','Dot'],['card','Card']].map(([v,l])=>`<button data-shape="${v}" class="${n.style.shape===v?'on':''}">${l}</button>`).join('')}</span></div></div>
+    <div class="sec"><h5>Colour</h5><div class="row">${SW.map(c=>`<span class="sw ${n.style.fill===c?'on':''}" data-fill="${c}" style="background:${c}"></span>`).join('')}</div><div class="row"><button class="btn s" data-fill="">Use the chart's rule (${S.opts.colourBy==='kind'?'kind of party':'tags'})</button></div></div>
+    <div class="sec"><h5>Show on the canvas</h5>${[['name','Name'],['kind','Kind'],['country','Country']].map(([v,l])=>`<label class="chk"><input type="checkbox" data-show="${v}" ${n.style.show.includes(v)?'checked':''}> ${l}</label>`).join('')}<div style="font-size:11.5px;color:#927e5d">Everything else is in the hover card.</div></div>
+    <div class="sec"><h5>Keep researching it</h5><div class="row"><span class="seg">${[['off','Off'],['ask','Ask first'],['auto','Automatic']].map(([v,l])=>`<button data-auto="${v}" class="${n.style.auto===v?'on':''}">${l}</button>`).join('')}</span></div><div style="font-size:11.5px;color:#927e5d">New findings show as a badge on it and wait in Research.</div><div class="row" style="margin-top:6px"><button class="btn s">⇄ Research in connection with…</button></div></div>`}
+    else if(n.type==='mark'){h=`<div class="ph">${n.kind==='group'?'Group':n.kind==='note'?'Note':'Label'}</div><div class="psub">Your own mark: not a record.</div><div class="sec"><h5>Text</h5><input class="in" style="width:100%" id="markText" value="${esc(n.text)}"></div>`}
+    else h=`<div class="ph">${n.type[0].toUpperCase()+n.type.slice(1)}</div><div class="psub">A record, shown as a card. Drag its gold dot to a party to show what it is about.</div>`}
+  else{const x=S.edges.find(z=>z.id===S.sel.id);if(!x){S.sel=null;return renderInsp()}const l=x.ref&&R.links.find(z=>z.id===x.ref);
+    h=`<div class="ph">${l?`${esc(P(l.f).name)} ${l.v} ${esc(P(l.t).name)}`:'A connection you drew'}</div><div class="psub">${l?`${l.fam} · ${SURE[l.sure].n}`:'Not a record. Marked “not a record” wherever the design is shown or exported.'}</div>
+    <div class="sec"><h5>Line</h5><div class="row"><label>Pattern</label><span class="seg">${[['auto','By how sure'],['solid','Solid'],['dashed','Dashed']].map(([v,lb])=>`<button data-dash="${v}" class="${(x.style.dash||'auto')===v?'on':''}">${lb}</button>`).join('')}</span></div>
+    <div class="row"><label>Width</label><span class="seg">${[[3,'Thin'],[5,'Thick'],['money','By money']].map(([v,lb])=>`<button data-width="${v}" class="${String(x.style.width||3)===String(v)?'on':''}">${lb}</button>`).join('')}</span></div>
+    <div class="row"><label>Colour</label>${SW.slice(0,8).map(c=>`<span class="sw ${x.style.color===c?'on':''}" data-ecol="${c}" style="background:${c}"></span>`).join('')}</div><label class="chk"><input type="checkbox" id="elabel" ${x.style.label===false?'':'checked'}> Show its words</label></div>
+    ${l?'':`<div class="sec"><h5>Back it up</h5><div class="row"><button class="btn s p">Make it a claim</button><button class="btn s">⇄ Research these two</button></div></div>`}`}
+  el.innerHTML=h;
+  el.querySelectorAll('[data-shape]').forEach(b=>b.onclick=()=>{commit();node().style.shape=b.dataset.shape;render()});
+  el.querySelectorAll('[data-fill]').forEach(b=>b.onclick=()=>{commit();node().style.fill=b.dataset.fill||null;render()});
+  el.querySelectorAll('[data-show]').forEach(b=>b.onchange=()=>{commit();const s=node().style.show;b.checked?s.push(b.dataset.show):s.splice(s.indexOf(b.dataset.show),1);render()});
+  el.querySelectorAll('[data-auto]').forEach(b=>b.onclick=()=>{commit();node().style.auto=b.dataset.auto;render();if(b.dataset.auto!=='off')toast(b.dataset.auto==='auto'?'It will be researched now and whenever its record changes':'New research waits for your click')});
+  el.querySelectorAll('[data-dash]').forEach(b=>b.onclick=()=>{commit();edge().style.dash=b.dataset.dash==='auto'?undefined:b.dataset.dash;render()});
+  el.querySelectorAll('[data-width]').forEach(b=>b.onclick=()=>{commit();edge().style.width=b.dataset.width==='money'?'money':+b.dataset.width;render()});
+  el.querySelectorAll('[data-ecol]').forEach(b=>b.onclick=()=>{commit();edge().style.color=b.dataset.ecol;render()});
+  const lb=document.getElementById('elabel');if(lb)lb.onchange=()=>{commit();edge().style.label=lb.checked?undefined:false;render()};
+  const mt=document.getElementById('markText');if(mt)mt.onchange=()=>{commit();node().text=mt.value;render()};
+}
+const node=()=>S.nodes.find(z=>z.id===S.sel.id),edge=()=>S.edges.find(z=>z.id===S.sel.id);
+// the advisor: the design rules, as advice
+function advice(){const a=[];
+  const drawn=S.edges.filter(e=>!e.ref).length;if(drawn)a.push(['#9a83a8','Connections drawn by you',`${drawn} on the canvas are not records. They are marked “not a record” in the design and in every export.`]);
+  const fills=new Set(S.nodes.filter(n=>n.style?.fill).map(n=>n.style.fill));const used=[...fills].filter(c=>Object.values(KIND).some(k=>k.ring===c)||Object.values(FAM).includes(c));
+  if(used.length)a.push(['#d4a152','A colour with two meanings',`You picked a colour the chart also uses for a kind of party or link (${used.join(', ')}). Readers may take it to mean that kind. Rule: one meaning per colour.`]);
+  const solid=S.edges.filter(e=>e.ref&&e.style.dash==='solid'&&R.links.find(l=>l.id===e.ref).sure!=='supported').length;if(solid)a.push(['#9f3632','Solid line on an unproven link',`${solid} link${solid>1?'s':''} not shown by a source ${solid>1?'are':'is'} drawn solid. Readers read solid as shown. The design keeps it, and the export carries the warning.`]);
+  if(S.mode==='chart'&&S.chart.y&&FIELDS.find(f=>f.id===S.chart.y)?.type==='amount')a.push(['#3a5c52','Numbers come from records','Every bar is computed from the payment records; you cannot type a value in.']);
+  if(!a.length)a.push(['#3a5c52','Nothing to flag','The design follows the chart rules.']);return a}
+function adviceHTML(){return`<div class="sec"><h5>Check this design</h5>${advice().map(([c,t,d])=>`<div class="adv" style="--c:${c}"><b>${t}</b><br>${d}</div>`).join('')}</div>`}
+document.getElementById('checkBtn').onclick=()=>{S.sel=null;render();document.getElementById('insp').scrollTop=9999;toast('The check is in the right panel')};
+
+// ---------- chart mode (shelves) ----------
+const FIELDS=[{id:'payer',n:'Payer',src:'Payments',type:'party',c:'#a16948'},{id:'payee',n:'Payee',src:'Payments',type:'party',c:'#a16948'},{id:'amount',n:'Amount',src:'Payments',type:'amount',c:'#a16948'},{id:'evdate',n:'Event date',src:'Events',type:'date',c:'#d4a152'},{id:'evkind',n:'Kind of event',src:'Events',type:'category',c:'#d4a152'},{id:'evstatus',n:'How sure (event)',src:'Events',type:'category',c:'#d4a152'},{id:'cstatus',n:'Claim status',src:'Claims',type:'category',c:'#baac91'},{id:'cconf',n:'Claim confidence',src:'Claims',type:'number',c:'#baac91'},{id:'cev',n:'Evidence count',src:'Claims',type:'number',c:'#baac91'},{id:'ptype',n:'Kind of party',src:'Parties',type:'category',c:'#b98d34'},{id:'pcount',n:'Number of parties',src:'Parties',type:'count',c:'#b98d34'}];
+const F=id=>FIELDS.find(f=>f.id===id);
+function renderShelves(){const el=document.getElementById('shelves');if(S.mode!=='chart'){el.innerHTML='';return}
+  el.innerHTML=`<div class="shelves">${[['x','Across'],['y','Up'],['color','Colour'],['size','Size'],['facet','Small multiples']].map(([k,n])=>`<div class="shelf" data-shelf="${k}"><h6>${n}</h6>${S.chart[k]?`<span class="field" draggable="true">${F(S.chart[k]).n} <a data-clear="${k}" style="cursor:pointer;color:#927e5d">✕</a></span>`:'<span style="color:#61503e">drop a field</span>'}</div>`).join('')}</div>`;
+  el.querySelectorAll('[data-clear]').forEach(b=>b.onclick=()=>{commit();S.chart[b.dataset.clear]=null;render()})}
+function chartSentence(){const c=S.chart;if(!c.x&&!c.y)return'Drop a field on Across or Up. The builder suggests the chart that fits what you drop (Mackinlay et al., “Show Me”, 2007).';return`${c.y?F(c.y).n:'Count'} by ${c.x?F(c.x).n:'—'}${c.color?', coloured by '+F(c.color).n:''}${c.size?', sized by '+F(c.size).n:''}.`}
+function renderChart(){document.getElementById('hint').style.display='none';const c=S.chart,W=cv.clientWidth,H=cv.clientHeight,top=150,left=90,bottom=60,right=40;let s='';
+  const x=c.x&&F(c.x),y=c.y&&F(c.y);
+  if(!x&&!y){s=`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="15" fill="#927e5d">Drag “Payer” onto Across and “Amount” onto Up, or “Event date” onto Across.</text>`;cv.innerHTML=s;return}
+  s+=`<text x="${left}" y="${top-14}" font-size="17" font-family="Georgia,serif" fill="#f3e9d7">${esc(document.getElementById('title').value)}</text>`;
+  if(x&&x.type==='date'){const evs=R.events,t0=Date.UTC(2019,0,1),t1=Date.UTC(2025,5,30),X=d=>left+(Date.parse(d)-t0)/(t1-t0)*(W-left-right);const cats=c.color?[...new Set(evs.map(e=>c.color==='evstatus'?e.status:e.kind))]:['Events'];
+    s+=`<line x1="${left}" x2="${W-right}" y1="${H-bottom}" y2="${H-bottom}" stroke="#393941"/>`;for(let yy=2019;yy<=2024;yy+=1)s+=`<text x="${X(yy+'-01-01')}" y="${H-bottom+18}" font-size="11" fill="#927e5d" text-anchor="middle">${yy}</text>`;
+    const laneH=(H-bottom-top)/Math.max(1,cats.length);cats.forEach((k,i)=>s+=`<text x="${left-10}" y="${top+laneH*(i+.5)}" text-anchor="end" font-size="11.5" fill="#caaf9c">${esc(k)}</text>`);
+    evs.forEach((e,i)=>{const lane=c.color?cats.indexOf(c.color==='evstatus'?e.status:e.kind):0;const col=c.color==='evstatus'?SURE[e.status].c:'#d4a152';const yy=top+laneH*(lane+.5);const nr=X(e.date)>W-260;s+=`<circle cx="${X(e.date)}" cy="${yy}" r="7" fill="${col}"/><text x="${X(e.date)+(nr?-10:10)}" text-anchor="${nr?'end':'start'}" y="${yy-10-(i%2)*14}" font-size="11" fill="#caaf9c">${esc(e.t)}</text>`})}
+  else if(x&&(x.type==='party'||x.type==='category')){let rows;
+    if(c.x==='payer'||c.x==='payee'){const m={};R.links.filter(l=>l.amount).forEach(l=>{const k=P(c.x==='payer'?l.f:l.t).name;m[k]=(m[k]||0)+(y?.id==='amount'?l.amount:1)});rows=Object.entries(m)}
+    else if(c.x==='cstatus'){const m={};R.claims.forEach(cl=>m[cl.status]=(m[cl.status]||0)+(y?.id==='cev'?cl.ev:1));rows=Object.entries(m)}
+    else if(c.x==='ptype'){const m={};R.parties.forEach(p=>m[KIND[p.schema].n]=(m[KIND[p.schema].n]||0)+1);rows=Object.entries(m)}
+    else if(c.x==='evkind'||c.x==='evstatus'){const m={};R.events.forEach(e=>{const k=c.x==='evkind'?e.kind:e.status;m[k]=(m[k]||0)+1});rows=Object.entries(m)}
+    else rows=[];rows.sort((a,b)=>b[1]-a[1]);const max=Math.max(...rows.map(r=>r[1]),1),bw=Math.min(120,(W-left-right)/Math.max(1,rows.length)-24);
+    s+=`<line x1="${left}" x2="${W-right}" y1="${H-bottom}" y2="${H-bottom}" stroke="#393941"/>`;
+    rows.forEach(([k,v],i)=>{const h=(v/max)*(H-bottom-top-20),xx=left+12+i*(bw+24),col=c.x==='cstatus'?SURE[k]?.c||'#d4a152':c.x==='ptype'?Object.values(KIND).find(z=>z.n===k)?.ring:'#a16948';
+      s+=`<rect x="${xx}" y="${H-bottom-h}" width="${bw}" height="${h}" rx="3" fill="${col}"/><text x="${xx+bw/2}" y="${H-bottom-h-6}" text-anchor="middle" font-size="12" font-weight="600" fill="#f3e9d7">${y?.id==='amount'?'USD '+(v/1e6).toFixed(1)+'M':v}</text><text x="${xx+bw/2}" y="${H-bottom+16}" text-anchor="middle" font-size="11" fill="#caaf9c">${esc(String(k).length>22?String(k).slice(0,21)+'…':k)}</text>`});
+    s+=`<text x="${left-50}" y="${top+10}" font-size="11" fill="#927e5d">${y?esc(y.n):'Count'}</text><text x="${left}" y="${H-12}" font-size="11" fill="#927e5d">Every bar is computed from the records · bars start at zero</text>`}
+  else if(x&&x.type==='number'){const W2=W-left-right,H2=H-bottom-top;s+=`<line x1="${left}" x2="${W-right}" y1="${H-bottom}" y2="${H-bottom}" stroke="#393941"/><line x1="${left}" x2="${left}" y1="${top}" y2="${H-bottom}" stroke="#393941"/>`;
+    R.claims.forEach(cl=>{const vx=c.x==='cconf'?cl.conf:cl.ev/3,vy=y?(y.id==='cev'?cl.ev/3:cl.conf):.5;s+=`<circle cx="${left+vx*W2}" cy="${H-bottom-vy*H2}" r="9" fill="${SURE[cl.status].c}"/><text x="${left+vx*W2+12}" y="${H-bottom-vy*H2+4}" font-size="11" fill="#caaf9c">${esc(cl.text.slice(0,40))}…</text>`});
+    s+=`<text x="${W/2}" y="${H-20}" text-anchor="middle" font-size="11" fill="#927e5d">${esc(x.n)}</text><text x="${left-10}" y="${top-4}" text-anchor="end" font-size="11" fill="#927e5d">${y?esc(y.n):''}</text>`}
+  cv.innerHTML=s}
+
+// ---------- design file: export / import ----------
+function designFile(withData){const roles={};let i=0;const roleOf=ref=>roles[ref]||(roles[ref]=withData?ref:`party_${++i}`);
+  return{format:'journalism-workbench/chart-design',version:1,title:document.getElementById('title').value,mode:S.mode,created:new Date().toISOString(),
+   contains:withData?'design and record references (only readable inside an investigation that holds these records)':'design only: no names, no records',
+   rules:{colourBy:S.opts.colourBy,sizeBy:S.opts.sizeBy,bringLinks:S.opts.bringLinks,snap:S.opts.snap},
+   nodes:S.nodes.map(n=>({role:n.type==='party'?roleOf(n.ref):n.type,kind:n.type==='party'?P(n.ref).schema:n.kind||n.type,ref:withData?n.ref:undefined,x:n.x,y:n.y,w:n.w,h:n.h,text:n.type==='mark'?n.text:undefined,style:n.style})),
+   connections:S.edges.map(e=>{const a=S.nodes.find(n=>n.id===e.a),b=S.nodes.find(n=>n.id===e.b);const l=e.ref&&R.links.find(z=>z.id===e.ref);return{from:a.type==='party'?roleOf(a.ref):a.type,to:b.type==='party'?roleOf(b.ref):b.type,record_kind:l?l.fam:null,drawn_by_hand:!e.ref,ref:withData?e.ref:undefined,style:e.style}}),
+   chart:S.chart}}
+document.getElementById('exportBtn').onclick=e=>{const m=document.createElement('div');m.style.cssText='position:fixed;right:14px;top:52px;z-index:70;background:#10161a;border:1px solid #4e4234;border-radius:10px;padding:8px;width:300px;font-size:12.5px';
+  m.innerHTML=`<div style="padding:4px 6px;color:#f3e9d7;font-weight:600">Export the design</div><button class="btn" data-x="tpl" style="width:100%;margin:4px 0;display:block">Design only (to share)<br><span style="font-size:11px;color:#927e5d">Layout, styles and rules. Parties become roles (party_1…). No names, no records.</span></button><button class="btn" data-x="data" style="width:100%;margin:4px 0;display:block">Design with record references<br><span style="font-size:11px;color:#927e5d">For your own team. Opens only where these records exist.</span></button><button class="btn" data-x="png" style="width:100%;margin:4px 0">Picture (PNG) for a story</button>`;
+  document.body.appendChild(m);setTimeout(()=>document.addEventListener('click',function off(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener('click',off)}}),0);
+  m.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{const k=b.dataset.x;if(k==='png'){toast('The picture carries the rule line, the key and a source line');m.remove();return}
+    const blob=new Blob([JSON.stringify(designFile(k==='data'),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(document.getElementById('title').value||'design').replace(/\W+/g,'-').toLowerCase()+(k==='data'?'.with-refs':'')+'.wbchart.json';a.click();m.remove();toast('Design file saved')})};
+document.getElementById('importBtn').onclick=()=>document.getElementById('file').click();
+document.getElementById('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;let d;try{d=JSON.parse(await f.text())}catch{return toast('That file is not a design file')}
+  if(d.format!=='journalism-workbench/chart-design')return toast('That file is not a Journalism Workbench design');
+  // a template's roles are filled with parties of the same kind, most-linked first; the reporter can swap any
+  commit();S.nodes=[];S.edges=[];const used=new Set(),idOf={};
+  // fill each role with the party of the same kind that matches the most of the template's connections to roles already filled (then the most-linked)
+  const fill={};const deg=id=>R.links.filter(l=>l.f===id||l.t===id).length;
+  const fits=(role,id)=>d.connections.filter(c=>!c.drawn_by_hand&&(c.from===role||c.to===role)).filter(c=>{const other=c.from===role?c.to:c.from,o=fill[other];if(!o)return false;const f=c.from===role?id:o,t=c.from===role?o:id;return R.links.some(l=>l.fam===c.record_kind&&l.f===f&&l.t===t)}).length;
+  const roles=d.nodes.filter(n=>n.role?.startsWith('party_')&&!n.ref);
+  const greedy=start=>{for(const k in fill)delete fill[k];if(start)fill[roles[0].role]=start;let score=0;for(const n of roles){if(fill[n.role])continue;const cand=R.parties.filter(p=>p.schema===n.kind&&!Object.values(fill).includes(p.id)).sort((a,b)=>fits(n.role,b.id)-fits(n.role,a.id)||deg(b.id)-deg(a.id))[0];if(cand){score+=fits(n.role,cand.id);fill[n.role]=cand.id}}return score};
+  // try every party of the first role's kind as the starting point and keep the filling that matches the most connections
+  if(roles.length){const best=R.parties.filter(p=>p.schema===roles[0].kind).map(p=>[p.id,greedy(p.id)]).sort((a,b)=>b[1]-a[1])[0];greedy(best?.[0])}
+  for(const n of d.nodes){let ref=n.ref||fill[n.role];
+    if(n.kind&&KIND[n.kind]&&ref){used.add(ref);const id=uid();idOf[n.role]=id;S.nodes.push({id,type:'party',ref,x:n.x,y:n.y,style:n.style})}
+    else if(n.role==='mark'||['note','group','label'].includes(n.kind)){S.nodes.push({id:uid(),type:'mark',kind:n.kind,x:n.x,y:n.y,w:n.w,h:n.h,text:n.text,style:n.style||{}})}}
+  for(const c of d.connections){const a=idOf[c.from],b=idOf[c.to];if(!a||!b)continue;const ra=S.nodes.find(n=>n.id===a).ref,rb=S.nodes.find(n=>n.id===b).ref;const l=c.drawn_by_hand?null:R.links.find(z=>z.fam===c.record_kind&&z.f===ra&&z.t===rb);S.edges.push({id:uid(),ref:l?.id||null,a,b,style:c.style||{},note:c.drawn_by_hand?'drawn by you':'no matching record here'})}
+  S.opts={...S.opts,...d.rules};if(d.chart)S.chart=d.chart;document.getElementById('title').value=d.title||'Imported design';fit();render();toast(`Opened “${d.title}”: ${S.nodes.length} items placed. Swap any party in the right panel.`)};
+document.getElementById('mode').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;S.mode=b.dataset.m;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));S.sel=null;render()};
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>el.style.display='none',2800)}
+document.getElementById('title').oninput=()=>{if(S.mode==='chart')render()};
+// start with a small example so the canvas is not empty
+addParty('bel',260,200);addParty('mer',560,200);addParty('ala',560,400);S.nodes.push({id:uid(),type:'claim',ref:'C2',x:300,y:400,style:{}});S.view={x:20,y:10,k:1};render();
+</script></body></html>

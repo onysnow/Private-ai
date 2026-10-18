@@ -1,0 +1,404 @@
+area: PS
+terms:
+- term: Substantial product hazard
+  definition: Under US consumer product law, a product defect that, because of how often it occurs, how
+    many units are out there or how bad the injury could be, creates a substantial risk of injury to the
+    public.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+  cases: []
+  related:
+  - Section 15(b) report
+  - Defect
+  indicators: []
+  areas:
+  - PS
+- term: Defect (CPSC)
+  definition: A fault, flaw or irregularity that makes a product weak, fail or fall short in form or function.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Section 15(b) report
+  definition: The report a US maker, importer, distributor or retailer must send the Consumer Product
+    Safety Commission within 24 hours of getting information that reasonably supports a conclusion that
+    a product could create a substantial product hazard.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Section 37 lawsuit report
+  definition: A US duty to report when one product model is the subject of at least three death or grievous-injury
+    lawsuits that end in settlement or plaintiff judgment within a 24-month period.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/15/2084
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Imputed knowledge
+  definition: The rule that a company is treated as knowing what its employees capable of understanding
+    the information knew, or what a reasonable firm would have known with due care.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-II/subchapter-B/part-1115
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Recall
+  definition: An action by a maker, or ordered by a regulator, to fix, replace, refund or take back a
+    product with a safety defect.
+  examples: []
+  source_url: https://www.nhtsa.gov/recalls
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: NHTSA
+  definition: The US National Highway Traffic Safety Administration, which collects vehicle complaints,
+    investigates defects and oversees vehicle recalls.
+  examples: []
+  source_url: https://www.nhtsa.gov/recalls
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Defect information report (Part 573)
+  definition: The report a vehicle or equipment maker must file with NHTSA within five working days of
+    deciding a defect is safety-related, including a chronology of the events behind that decision.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-573/section-573.6
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Early Warning Reporting (Part 579)
+  definition: US rules requiring vehicle makers to give NHTSA regular data on deaths, injuries, claims,
+    complaints, warranty claims and field reports, plus copies of defect communications and foreign recalls.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-579
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Foreign recall report
+  definition: A US vehicle maker's report to NHTSA, due within five working days, of a safety recall abroad
+    covering a vehicle or part identical or substantially similar to one sold in the US.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-579/subpart-B/section-579.11
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Safety Gate
+  definition: The European Union's rapid alert system through which national authorities share alerts
+    about dangerous non-food consumer products and the measures taken.
+  examples: []
+  source_url: https://ec.europa.eu/safety-gate-alerts/screen/webReport
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Alert and Cooperation Network (ACN) / EU Food Fraud Network
+  definition: The EU network of food authorities that exchanges food safety alerts and suspected agri-food
+    fraud cases and publishes monthly fraud reports.
+  examples: []
+  source_url: https://food.ec.europa.eu/food-safety/acn/ffn-monthly_en
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: EU food fraud criteria
+  definition: 'The four tests the EU Food Fraud Network uses to treat a case as suspected fraud rather
+    than simple non-compliance: breach of EU food law, intention, economic gain and deception of customers.'
+  examples: []
+  source_url: https://www.food.gov.uk/research/appendix-3-what-works-to-prevent-food-fraud-definitions-and-meanings-of-food-fraud
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Food crime
+  definition: Serious fraud and related crime in the supply of food, drink and animal feed; the UK National
+    Food Crime Unit groups it into seven types.
+  examples: []
+  source_url: https://www.gov.uk/food-crime
+  cases: []
+  related:
+  - Adulteration
+  - Substitution
+  - Misrepresentation
+  - Document fraud
+  - Waste diversion
+  - Illegal processing
+  - Theft
+  indicators: []
+  areas:
+  - PS
+- term: Adulteration
+  definition: Adding something not listed on the label to food to cut costs, add bulk or make it look
+    better.
+  examples: []
+  source_url: https://www.gov.uk/food-crime
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Substitution
+  definition: Swapping a food or ingredient for a cheaper or lower-quality one.
+  examples: []
+  source_url: https://www.gov.uk/food-crime
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Misrepresentation
+  definition: Labelling or selling food in a way that misleads about its quality, freshness, safety or
+    origin.
+  examples: []
+  source_url: https://www.gov.uk/food-crime
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Document fraud
+  definition: Making, using or holding fake papers to sell or market a product as something it is not.
+  examples: []
+  source_url: https://www.gov.uk/food-crime
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Waste diversion
+  definition: Putting food, drink or feed that should have been thrown away back into the supply chain.
+  examples: []
+  source_url: https://www.gov.uk/food-crime
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Illegal processing
+  definition: Slaughtering or preparing meat in places or ways that are not approved.
+  examples: []
+  source_url: https://www.gov.uk/food-crime
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Animal by-products (ABP) Category 1 and 3
+  definition: Parts of animals not for human food; Category 3 is low-risk material such as pet-food grade
+    meat, Category 1 is high-risk material that may only be rendered or burned.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5a7e20b740f0b62305b80fb8/elliot-review-final-report-july2014.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Elliott Review
+  definition: The UK government's independent review after the 2013 horsemeat scandal into how to protect
+    food supply networks from fraud.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/elliott-review-into-the-integrity-and-assurance-of-food-supply-networks-final-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Unannounced audit
+  definition: An inspection of a food site carried out without advance notice, which the Elliott Review
+    called the strongest mitigation against criminal activity.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5a7e20b740f0b62305b80fb8/elliot-review-final-report-july2014.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Food fraud vulnerability assessment (SSAFE)
+  definition: A structured questionnaire that rates how exposed a food business is to fraud, using indicators
+    of opportunity, motivation and control measures; it does not detect or predict fraud.
+  examples: []
+  source_url: https://link.springer.com/article/10.1007/s10611-021-10008-9
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Geographical indication / protected designation of origin
+  definition: A protected name for a product whose quality or reputation is tied to where it comes from;
+    falsely using it is an intellectual property infringement.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Substandard medical product
+  definition: An authorised medicine that fails quality standards or specifications, often because of
+    poor manufacturing or quality control.
+  examples: []
+  source_url: https://www.who.int/news-room/fact-sheets/detail/substandard-and-falsified-medical-products
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Falsified medical product
+  definition: A medicine that deliberately misrepresents its identity, composition or source.
+  examples: []
+  source_url: https://www.who.int/news-room/fact-sheets/detail/substandard-and-falsified-medical-products
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: SFMP
+  definition: WHO's abbreviation for substandard and falsified medical products.
+  examples: []
+  source_url: https://cdn.who.int/media/docs/default-source/substandard-and-falsified/training-toolkit/identifying-suspected-sfmps-for-healthcare-professionals.pdf?sfvrsn=79a47c0_1&download=true
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: WHO Medical Product Alert
+  definition: A WHO notice warning countries about a confirmed substandard or falsified medical product,
+    naming the product and stated maker.
+  examples: []
+  source_url: https://www.who.int/news/item/05-10-2022-medical-product-alert-n-6-2022-substandard-(contaminated)-paediatric-medicines
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Excipient
+  definition: An inactive ingredient in a medicine, such as the glycerin or propylene glycol solvent in
+    a syrup.
+  examples: []
+  source_url: https://www.who.int/news/item/23-01-2023-who-urges-action-to-protect-children-from-contaminated-medicines
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Diethylene glycol (DEG) and ethylene glycol (EG)
+  definition: Toxic industrial chemicals that have contaminated medicine solvents and caused mass poisonings,
+    mostly of children; FDA's safety limit is 0.10% in high-risk components.
+  examples: []
+  source_url: https://fda.gov/media/167974/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Certificate of analysis (COA)
+  definition: A supplier's document stating test results for a batch of material; FDA notes past poisonings
+    happened when makers relied on supplier COAs instead of testing.
+  examples: []
+  source_url: https://fda.gov/media/167974/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Acute kidney injury (AKI)
+  definition: Sudden kidney failure; the most consistent sign of DEG poisoning.
+  examples: []
+  source_url: https://www.cdc.gov/mmwr/volumes/72/wr/mm7209a1.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Compounding pharmacy
+  definition: A pharmacy that mixes or prepares medicines itself; the NECC case involved contaminated
+    compounded injections.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/owner-new-england-compounding-center-sentenced-racketeering-leading-nationwide-fungal
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Methanol poisoning outbreak
+  definition: A cluster of poisonings from drinks containing methanol, usually from illicit or informally
+    produced spirits; outbreaks have ranged from 10 to more than 800 victims.
+  examples: []
+  source_url: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Informal / illicit alcohol
+  definition: Alcohol produced or sold outside legal and taxed channels, without government or market
+    oversight.
+  examples: []
+  source_url: https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/ch0603
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Deferred prosecution agreement (DPA)
+  definition: A deal in which prosecutors file charges but agree to drop them after a set period if the
+    company pays penalties and meets conditions; it is not a conviction.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdny/programs/victim-witness-services/united-states-v-general-motors
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Organization Designation Authorization (ODA)
+  definition: An FAA arrangement under which company employees (unit members) carry out certain certification
+    tasks on the FAA's behalf.
+  examples: []
+  source_url: https://www.faa.gov/newsroom/Sec103_ExpertPanelReview_Report_Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: MCAS
+  definition: A flight-control software feature on the Boeing 737 MAX about which Boeing admitted two
+    technical pilots deceived the FAA's Aircraft Evaluation Group.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/boeing-charged-737-max-fraud-conspiracy-and-agrees-pay-over-25-billion
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS
+- term: Operation OPSON
+  definition: A joint Europol–INTERPOL operation against fake and substandard food and drink.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PS

@@ -1,0 +1,1083 @@
+area: OC
+terms:
+- term: Organised criminal group
+  definition: Three or more people who work together over time to commit serious crimes for money or other
+    gain.
+  examples: []
+  source_url: https://jus.uio.no/english/services/library/treaties/04/4-05/un-transnational-organized.html
+  cases: []
+  related:
+  - Structured group
+  - Serious crime
+  indicators: []
+  areas:
+  - OC
+- term: Structured group
+  definition: A group that did not form by chance just to commit one crime; it does not need formal roles
+    or a fixed membership.
+  examples: []
+  source_url: https://jus.uio.no/english/services/library/treaties/04/4-05/un-transnational-organized.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Serious crime
+  definition: Under UNTOC, an offence punishable by at least four years in prison.
+  examples: []
+  source_url: https://jus.uio.no/english/services/library/treaties/04/4-05/un-transnational-organized.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Proceeds of crime
+  definition: Any property gained, directly or indirectly, from committing an offence.
+  examples: []
+  source_url: https://jus.uio.no/english/services/library/treaties/04/4-05/un-transnational-organized.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Predicate offence
+  definition: The original crime that produced the money that is then laundered.
+  examples: []
+  source_url: https://jus.uio.no/english/services/library/treaties/04/4-05/un-transnational-organized.html
+  cases: []
+  related:
+  - Money laundering
+  indicators: []
+  areas:
+  - OC
+- term: Legal business structures (LBS)
+  definition: Ordinary registered companies and firms; Europol uses the term for businesses that criminal
+    networks own, infiltrate or use.
+  examples: []
+  source_url: https://eucrim.eu/news/abuse-of-legal-business-structures-through-criminal-networks/
+  cases: []
+  related:
+  - Front company
+  indicators: []
+  areas:
+  - OC
+- term: Front company
+  definition: A company that looks like a normal business but exists mainly to hide criminal activity,
+    such as sending illicit cargo inside legitimate trade.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+    networks in EU ports_Public_version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Shell company
+  definition: A company with little or no real operations, staff or premises; FinCEN lists shared or residential
+    addresses and no physical presence as warning signs.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Nominee
+  definition: A person who is officially named as owner or account holder for someone else; FINTRAC found
+    nominees were often family members or partners.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Beneficial owner
+  definition: The real person who ultimately owns or controls a company, as opposed to whoever is named
+    on paper; FINTRAC lists unclear beneficial ownership as a warning sign.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Funnel account
+  definition: An account that receives many cash deposits, often under the reporting limit, in one area,
+    with the money taken out quickly in another area.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A005.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Structuring
+  definition: Splitting cash transactions into smaller amounts, for example under $10,000 in the US, to
+    avoid currency transaction reports.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Currency Transaction Report (CTR)
+  definition: A US report banks must file on cash transactions over $10,000; evading it is a red flag.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: CMIR (FinCEN Form 105)
+  definition: The US report required when more than $10,000 in currency is carried across the border at
+    one time.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Bulk cash smuggling
+  definition: Physically moving large amounts of cash across a border to avoid reporting, often to return
+    drug profits to the source country.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Armored car service (ACS)
+  definition: A company that physically transports cash and valuables; FinCEN flags its use to move large
+    unexplained cash volumes.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Money services business (MSB)
+  definition: A non-bank business such as a money transmitter or currency exchanger; FinCEN flags cash
+    brought to border MSBs and quickly sent to Mexico.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Money mule
+  definition: A person used, knowingly or not, to move money or goods for others.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Chinese money laundering network (CMLN)
+  definition: Loosely organised, trust-based networks that launder money, including drug proceeds for
+    Mexican cartels, by swapping currencies and goods.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Mirror transactions
+  definition: A broker makes two equal but separate transactions in different countries so value moves
+    without money crossing a border.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Daigou
+  definition: Buying goods abroad on behalf of people in China; it can be misused to move value.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Trade-based money laundering (TBML)
+  definition: Hiding illicit money by faking or misdescribing trade in goods, such as false invoices or
+    exports with no real stock.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+    crime threat assessment 2022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Unexplained wealth
+  definition: Money or assets a person has that their known income cannot account for.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Precursor chemicals
+  definition: The basic chemicals used to make a drug such as fentanyl, for example 4-ANPP and norfentanyl.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Pill press
+  definition: A machine (with die molds) that presses powder into tablets; used to make fake pills containing
+    fentanyl.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Darknet marketplace
+  definition: A hidden online market, reached through anonymising software, where drugs and other illegal
+    goods are sold, usually for crypto.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2019-08-21/Fentanyl%20Advisory%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Mixer / tumbler
+  definition: A service that pools and shuffles cryptocurrency to hide where it came from.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Rip-on/rip-off
+  definition: Drugs are hidden in a legitimate company's container at origin and secretly removed at the
+    destination port, usually without the importer knowing.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+    networks in EU ports_Public_version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Extraction team
+  definition: People sent into a port, sometimes hidden inside a container, to remove drugs from shipments.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+    networks in EU ports_Public_version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: PIN code fraud (container release code)
+  definition: Criminals obtain the code that releases a container at the terminal and collect it pretending
+    to be the real client.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+    networks in EU ports_Public_version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Insider
+  definition: An employee in a port, logistics firm, customs or a bank who is bribed or pressured to help
+    criminals.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+    networks in EU ports_Public_version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Time-to-crime
+  definition: The time between a gun's first retail sale and its recovery by police; a short time suggests
+    trafficking.
+  examples: []
+  source_url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Obliterated serial number
+  definition: A gun's serial number that has been ground off or altered to stop tracing.
+  examples: []
+  source_url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Machine gun conversion device
+  definition: A part that turns a legal semi-automatic gun into an illegal fully automatic one.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-announces-publication-second-volume-national-firearms-commerce-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Free trade zone
+  definition: An area where goods can be stored or handled with lighter customs rules; Europol says these
+    are misused for counterfeit and tobacco trade.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+    crime threat assessment 2022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Counterfeit goods / IP crime
+  definition: Fake products that copy a brand or trademark, and the crimes around making and selling them.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+    crime threat assessment 2022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Manipulation of sports competitions (match-fixing)
+  definition: Deliberately changing the result or course of a sporting event to remove its unpredictability
+    for someone's gain.
+  examples: []
+  source_url: https://rm.coe.int/16801cdd7e
+  cases: []
+  related:
+  - Spot-fixing
+  indicators: []
+  areas:
+  - OC
+- term: Spot-fixing
+  definition: Fixing a specific event inside a match, such as a no-ball, rather than the result.
+  examples: []
+  source_url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2011/2914
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Illegal sports betting
+  definition: Betting whose type or operator is not allowed by the law where the bettor is located.
+  examples: []
+  source_url: https://rm.coe.int/16801cdd7e
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Irregular sports betting
+  definition: Betting that does not fit normal market patterns, or is on a match with unusual features.
+  examples: []
+  source_url: https://rm.coe.int/16801cdd7e
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Suspicious sports betting
+  definition: Betting that reliable and consistent evidence links to a manipulated match.
+  examples: []
+  source_url: https://rm.coe.int/16801cdd7e
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Inside information (sport)
+  definition: Non-public information about a competition that someone has because of their role in the
+    sport.
+  examples: []
+  source_url: https://rm.coe.int/16801cdd7e
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Ghost match
+  definition: A match that bookmakers take bets on but that was never played, or was invented.
+  examples: []
+  source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Betting monitoring / early warning system
+  definition: Services that watch betting markets and alert sports bodies to irregular odds movements.
+  examples: []
+  source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Proxy betting account
+  definition: A betting account in someone else's name used to hide who is really betting.
+  examples: []
+  source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Continuing criminal enterprise
+  definition: A US federal offence for organising a series of drug crimes with others for substantial
+    income; Guzmán was convicted of it.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/joaquin-el-chapo-guzman-sinaloa-cartel-leader-sentenced-life-prison-plus-30-years
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Deferred prosecution agreement (DPA)
+  definition: A deal in which prosecutors file charges but hold off prosecuting if the company pays penalties
+    and meets conditions; HSBC entered one in 2012.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/hsbc-holdings-plc-and-hsbc-bank-usa-na-admit-anti-money-laundering-and-sanctions-violations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Material support (to a terrorist organisation)
+  definition: A US offence of providing resources, including weapons, to a designated terrorist group;
+    Bout was convicted of conspiring to do this.
+  examples: []
+  source_url: https://www.justice.gov/archive/usao/nys/pressreleases/April12/boutviktorsentencing.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: County lines
+  definition: Drug dealing in which a city-based network sends drugs to other towns, taking orders through
+    a dedicated phone number and often using children or vulnerable people to carry and sell.
+  examples: []
+  source_url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+  cases: []
+  related:
+  - Deal line
+  - Cuckooing
+  - Child criminal exploitation
+  indicators: []
+  areas:
+  - OC
+- term: Deal line
+  definition: The mobile phone number a county lines network uses to take drug orders; it is treated as
+    a valuable brand and passed between members.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  cases: []
+  related:
+  - County lines
+  indicators: []
+  areas:
+  - OC
+- term: Cuckooing
+  definition: Taking over a vulnerable person's home to deal or store drugs, also called forced home invasion.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  cases: []
+  related:
+  - County lines
+  indicators: []
+  areas:
+  - OC
+- term: Child criminal exploitation
+  definition: When a person or group uses a power imbalance to coerce, control, manipulate or deceive
+    someone under 18 into crime.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  cases: []
+  related:
+  - County lines
+  - Debt bondage
+  indicators: []
+  areas:
+  - OC
+- term: Debt bondage
+  definition: Keeping someone working for a criminal group by making them owe a debt, often a fake one
+    or one created by a staged robbery.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  cases: []
+  related:
+  - Child criminal exploitation
+  indicators: []
+  areas:
+  - OC
+- term: Chip dumping
+  definition: Deliberately losing chips or money to another player, often in poker, to move value from
+    one account to another.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  cases: []
+  related:
+  - Collusion
+  indicators: []
+  areas:
+  - OC
+- term: Junket
+  definition: An arrangement in which an operator brings high-spending gamblers to a casino, often handling
+    their travel, credit and money.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Sham merchant
+  definition: An illegal operator that hides gambling payments by posing as a different kind of business
+    to the card networks.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: White-label arrangement
+  definition: A setup in which one company runs the gambling platform and licence while another puts its
+    own brand on it.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Cheap whites
+  definition: Cigarettes made legally in one country, mostly for smuggling into other markets where they
+    have no legal sale.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Counterfeit cigarettes
+  definition: Copies of branded cigarettes and packaging made by people who do not own the trademark.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Bootlegging
+  definition: Buying smaller amounts of tobacco in low-tax places or duty-free shops to resell where tax
+    is higher.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: In-transit system
+  definition: Customs rules that let goods pass through a country without paying duty, which smugglers
+    abuse by diverting the goods to the local market.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related:
+  - Pseudo export
+  indicators: []
+  areas:
+  - OC
+- term: Refining
+  definition: Exchanging small bank notes for large ones to make cash easier to carry and hide.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Smurfing
+  definition: Splitting cash into many small deposits made by several people from the same group so none
+    of them triggers a report.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related:
+  - Structuring
+  indicators: []
+  areas:
+  - OC
+- term: Piracy (UNCLOS)
+  definition: Illegal violence, detention or robbery committed for private ends by the crew of a private
+    ship against another ship on the high seas.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Kidnap for ransom (KFR)
+  definition: Seizing a person and demanding money for their release; FATF studies it as a source of criminal
+    profit and of terrorist financing.
+  examples: []
+  source_url: https://fatf-gafi.org/en/publications/Methodsandtrends/Organisedmaritimepiracyandrelatedkidnappingforransom.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Ransom air drop
+  definition: Delivering a ransom in cash by dropping it from an aircraft near the hijacked ship.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Hawala
+  definition: An informal money-transfer system in which brokers pay out money in one place against money
+    received in another and settle between themselves later, without moving funds through banks.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  cases: []
+  related:
+  - Alternative remittance system
+  indicators: []
+  areas:
+  - OC
+- term: Bearer negotiable instrument (BNI)
+  definition: A paper instrument, such as a bearer cheque, traveller's cheque, money order or promissory
+    note, that whoever holds it can cash.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Cash courier
+  definition: A person who physically carries cash or bearer instruments across a border, lawfully or
+    to smuggle it.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related:
+  - FATF Recommendation 32
+  indicators: []
+  areas:
+  - OC
+- term: FATF Recommendation 32
+  definition: The global standard requiring countries to detect cross-border movement of cash and BNIs,
+    with a declaration or disclosure duty above a threshold of no more than USD/EUR 15,000.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Cross-border report (CBR)
+  definition: A record customs makes of a cash declaration, a failure to declare, or a false declaration
+    at a border, which is passed to the financial intelligence unit.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Ungazetted entry point
+  definition: A border crossing that is not an officially designated port of entry, so using it with goods
+    or cash avoids customs.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: ESAAMLG
+  definition: The Eastern and Southern Africa Anti-Money Laundering Group, a FATF-style regional body
+    that sets and checks anti-money-laundering standards for its member countries.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Vehicle cloning
+  definition: Giving a stolen vehicle the identity (chassis number, plates, registration) of a legitimate
+    or written-off vehicle of the same model.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Chop shop
+  definition: A place where stolen vehicles are taken apart so the parts can be sold, or shipped as spares
+    and rebuilt elsewhere.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Pseudo export
+  definition: Declaring goods as in transit or for export when they are actually sold on the local market
+    without duty.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related:
+  - In-transit system
+  indicators: []
+  areas:
+  - OC
+- term: Round tripping (vehicles)
+  definition: Exporting a vehicle, deregistering it, and bringing it back or re-registering it elsewhere
+    to dodge duty or hide its history.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Bonded warehouse
+  definition: A customs-licensed warehouse where imported goods can be stored without paying duty until
+    they are released or re-exported.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Proxy registration
+  definition: Registering a vehicle or asset in the name of someone who is not the real owner.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Professional money laundering network
+  definition: People or businesses who launder money for criminals as a paid service, often through accounts
+    that behave like unlicensed money-transfer businesses.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  cases: []
+  related:
+  - Underground banking
+  indicators: []
+  areas:
+  - OC
+- term: Pay-through (transit) account
+  definition: An account where money comes in and goes straight back out, used to pass funds along rather
+    than for real business.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Fentanyl precursor
+  definition: A chemical used to make fentanyl or related synthetic opioids, often bought from overseas
+    chemical sellers.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Straw purchase
+  definition: Buying a gun for someone who is not allowed to buy or own one.
+  examples: []
+  source_url: https://www.atf.gov/firearms/tools-services-law-enforcement/atf-firearms-programs/dont-lie-other-guy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Privately made firearm (PMF, 'ghost gun')
+  definition: A gun made or assembled by someone other than a licensed manufacturer, with no maker's serial
+    number.
+  examples: []
+  source_url: https://www.atf.gov/rules-and-regulations/definition-frame-or-receiver
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: FFL
+  definition: Federal Firearms Licensee, a licensed US gun dealer or maker.
+  examples: []
+  source_url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iv-crime-guns-recovered-outside-us-and-traced-le/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Time-to-crime (TTC)
+  definition: Time between a gun's first retail sale and its recovery by police; short times suggest trafficking.
+  examples: []
+  source_url: https://www.atf.gov/firearms/docs/report/nfcta-volume-ii-part-iv-crime-guns-recovered-outside-us-and-traced-le/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Form 4473 and NICS
+  definition: The US gun-purchase form and the federal background-check system a dealer runs before a
+    sale.
+  examples: []
+  source_url: https://www.atf.gov/rules-and-regulations/definition-frame-or-receiver
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Arms diversion
+  definition: Arms ending up with users not authorised to have them, through theft, leakage, unauthorised
+    re-transfer, capture or state collapse.
+  examples: []
+  source_url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: End-user certificate (EUC)
+  definition: A document in which an arms importer states who will use the weapons, often with a promise
+    not to re-transfer them; CAR uses the abbreviation without defining it.
+  examples: []
+  source_url: https://old.thearmstradetreaty.org/hyper-images/file/CAR%2020180817%20CAR%20TYPOLOGY%20ATT/CAR%2020180817%20CAR%20TYPOLOGY%20ATT.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: BMP5
+  definition: Best Management Practices 5, industry and naval guidance for ships on deterring piracy in
+    high-risk areas.
+  examples: []
+  source_url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Skiff
+  definition: A small, fast open boat; BMP5 says pirates typically use them.
+  examples: []
+  source_url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Mothership
+  definition: A larger vessel, often a dhow, used to carry or tow pirate skiffs far out to sea.
+  examples: []
+  source_url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: AIS
+  definition: Automatic Identification System, the radio transponder ships use to broadcast identity and
+    position.
+  examples: []
+  source_url: https://wwwcdn.imo.org/localresources/en/OurWork/Security/Documents/BMP5%20small.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Suspicious approach vs attack
+  definition: BMP5 separates an aggressive approach from an attack, where weapons are discharged or boarding
+    is attempted.
+  examples: []
+  source_url: https://mscio.eu/bmp/bmp5/bmp5-annex-h
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Illegal IPTV
+  definition: Internet TV services that sell access to channels without the rights to distribute them.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Cybersquatting
+  definition: Registering a domain that copies or slightly misspells a brand to mislead buyers.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Declaration of Conformity
+  definition: A maker's statement that a product such as a toy meets EU safety rules; counterfeit toys
+    often lack one.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report.%20Intellectual%20property%20crime%20threat%20assessment%202022_2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Currency counterfeiting
+  definition: Fraudulently making or altering money, by any means (1929 Counterfeiting Convention, as
+    quoted by FATF).
+  examples: []
+  source_url: https://www.bportugal.pt/sites/default/files/anexos/gafi_doc_mt_contrafacao_en_0.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Skimming
+  definition: Copying payment card data, and often PINs, with devices fitted to ATMs or fuel pumps.
+  examples: []
+  source_url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/skimming
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Huachicol
+  definition: Mexican term for theft, adulteration or smuggling of fuel and oil, often by cartel-linked
+    thieves (huachicoleros).
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-Oil-Smuggling-FINAL-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Fiscal fuel theft (huachicol fiscal)
+  definition: Dodging Mexican fuel taxes by smuggling or misdeclaring fuel imported from the United States.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: SENER and CNE permits
+  definition: Mexican energy-ministry (SENER) and energy-commission (CNE) permits; FinCEN treats paying
+    parties lacking a SENER import permit as a red flag.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2026-06/FinCEN-Alert-Fiscal-Fuel-Theft.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: OFAC designation
+  definition: Placement of a person or company on the US Treasury sanctions list, freezing their US assets.
+  examples: []
+  source_url: https://home.treasury.gov/news/press-releases/sb0047
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Excise duty stamp
+  definition: A UK stamp on spirits showing duty was paid; a missing or non-fluorescing stamp is an HMRC
+    risk sign.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/excise-due-diligence-condition/eddc04060
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Transshipment (illegal)
+  definition: Routing goods through a third country and falsely claiming that country as origin to avoid
+    tariffs.
+  examples: []
+  source_url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Substantial transformation
+  definition: Processing that turns goods into a new product and so can change their country of origin;
+    repackaging alone does not.
+  examples: []
+  source_url: https://www.thomsonreuters.com/en-us/help/onesource-global-trade/regulatory-insights/2025/september-5th/cbp-red-flag-best-practice-illegal-transshipment.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Legal business structure (LBS)
+  definition: Europol's term for a lawful company that criminals use, infiltrate or own.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Violence-as-a-service
+  definition: Hiring out shootings, killings or intimidation to paid executors, often young and recruited
+    online.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Script kiddies
+  definition: Low-skill hackers whom networks pay to carry out set cyber tasks.
+  examples: []
+  source_url: https://www.uni.lu/wp-content/uploads/sites/8/2025/08/19162047/EU-SOCTA-2025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC

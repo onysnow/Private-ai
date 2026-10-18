@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>By kind, Paper Trail and dossier: redesign</title>
+<style>
+:root{--page:#13131d;--card:#1a2328;--card2:#1c262b;--band:#1f292e;--well:#26272b;--rule:#2e3a40;--rule2:#393941;--border:#4e4234;
+--ink:#f3e9d7;--text:#caaf9c;--muted:#927e5d;--soft:#bc9574;--night:#010005;--gold:#b98d34;--amber:#d4a152;--sage:#baac91;--copper:#a16948;--steel:#4d7a9b;--plum:#312237;--plumL:#9a83a8;--brick:#9f3632;--forest:#3a5c52;--umber:#61503e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font:14px/1.5 Inter,"Segoe UI",system-ui,sans-serif}
+button{font:inherit;color:inherit}
+.top{height:54px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:18px;padding:0 22px;position:sticky;top:0;z-index:30}
+.top b{font:600 17px Georgia,serif;color:var(--ink)}
+.tabs{display:flex;gap:4px}.tabs button{all:unset;cursor:pointer;padding:6px 12px;border-radius:8px;color:var(--muted);font-size:13px}.tabs button.on{background:#2a2a22;color:var(--amber)}
+.page{display:none;max-width:1360px;margin:0 auto;padding:18px 22px 30px}.page.on{display:block}
+.frame{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.fh{display:flex;justify-content:space-between;gap:16px;padding:14px 18px 10px;flex-wrap:wrap}.fh h3{margin:0;font:600 20px Georgia,serif;color:var(--ink)}.fh p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--rule2);border-radius:9px;overflow:hidden}.seg span{font-size:12px;padding:6px 11px;color:var(--muted);border-right:1px solid var(--rule2);white-space:nowrap}.seg span:last-child{border:0}.seg .on{background:#3a2f1f;color:var(--amber)}
+.rulebar{display:flex;gap:14px;align-items:center;padding:8px 18px;background:#222c31;border-top:1px solid var(--rule2);font-size:12.5px;color:var(--sage)}.rulebar b{color:var(--amber)}
+.explain{margin-left:auto;white-space:nowrap;border:1px solid var(--rule2);border-radius:8px;padding:3px 10px;color:var(--text);font-size:12px}
+.keystrip{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;padding:7px 18px;border-top:1px solid var(--rule2);border-bottom:1px solid var(--rule2);font-size:12px}
+.kh{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 2px 0 10px}.kh:first-child{margin-left:0}
+.kc{display:inline-flex;align-items:center;gap:6px;padding:1px 8px 1px 4px;border-radius:999px;white-space:nowrap}
+.ff{display:flex;gap:16px;flex-wrap:wrap;padding:8px 18px;border-top:1px solid var(--rule2);font-size:12px;color:var(--muted)}.ff b{color:var(--text)}.ff .hint{margin-left:auto}
+.cv{position:relative}
+.hov{position:absolute;z-index:5;width:290px;background:#10161a;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px #000a;padding:10px 12px;font-size:12.5px;pointer-events:none}
+.hov .t{color:var(--ink);font-weight:600;display:flex;gap:7px;align-items:center}.hov .r{display:flex;justify-content:space-between;border-top:1px solid #222c31;padding:3px 0}.hov .r span:first-child{color:var(--muted)}
+.btn{all:unset;cursor:pointer;border:1px solid var(--rule2);border-radius:8px;padding:5px 11px;font-size:12.5px;color:var(--text);white-space:nowrap;background:var(--well);display:inline-flex;gap:6px;align-items:center}
+.btn:hover{border-color:var(--border);color:var(--ink)}.btn.p{background:var(--amber);color:var(--night);border-color:var(--amber);font-weight:600}.btn.s{padding:3px 9px;font-size:12px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:0 8px;font-size:11.5px;font-weight:600;line-height:19px;white-space:nowrap}
+.ex{display:inline-block;border:1px dashed var(--plumL);color:var(--plumL);border-radius:6px;font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:0 5px;vertical-align:1px}
+.why{max-width:1360px;margin:14px auto 0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;font-size:13px;line-height:1.55}
+.why h4{margin:0 0 6px;font:600 16px Georgia,serif;color:var(--ink)}.why li{margin:4px 0}.why b{color:var(--ink)}.why i{color:var(--muted);font-style:normal}
+/* corpus */
+.status{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--rule2);background:#1d262b}
+.state{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:3px 12px;font-weight:700;font-size:12.5px}
+.state i{width:9px;height:9px;border-radius:50%}
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:0;padding:14px 18px;border-top:1px solid var(--rule2)}
+.ps{position:relative;padding:10px 12px;background:var(--card2);border:1px solid var(--rule);margin-right:14px;border-radius:10px}
+.ps:not(:last-child):after{content:"";position:absolute;right:-13px;top:50%;width:12px;height:2px;background:var(--rule2)}
+.ps:not(:last-child):before{content:"";position:absolute;right:-14px;top:calc(50% - 4px);border:5px solid transparent;border-left-color:var(--rule2);transform:translateX(5px)}
+.ps .n{font:600 24px Georgia,serif;color:var(--ink)}.ps .l{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700}.ps .d{font-size:12px;color:var(--text)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 18px}
+.box{background:var(--card2);border:1px solid var(--rule);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+.box .bh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:11px 14px 6px}.box .bh b{font:600 15px Georgia,serif;color:var(--ink)}.box .bh span{font-size:11.5px;color:var(--muted)}
+.box .bb{padding:0 14px 12px;flex:1;display:flex;flex-direction:column;gap:7px;font-size:12.5px}
+.box .bf{padding:8px 14px;border-top:1px solid var(--rule);font-size:11.5px;color:var(--muted)}
+.rank{display:grid;grid-template-columns:20px 1fr 90px 34px;gap:8px;align-items:center}.rank .bar{height:6px;border-radius:3px;background:var(--well);overflow:hidden}.rank .bar i{display:block;height:100%}
+.co{display:flex;gap:4px;flex-wrap:wrap;grid-column:2/5}.co span{font-size:11px;border:1px solid var(--rule2);border-radius:999px;padding:0 7px;color:var(--muted)}
+.wl{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #222c31}
+.in{background:var(--well);border:1px solid var(--rule2);border-radius:8px;padding:6px 10px;color:#6f5e44;font-size:12.5px;flex:1}
+.out{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid #222c31}
+.thumb{width:44px;height:34px;border-radius:6px;background:#141b1f;border:1px solid var(--rule2)}
+.xr{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:7px 0;border-top:1px solid #222c31}
+.offnote{display:none;margin:0 18px 14px;border:1px dashed var(--rule2);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--muted)}
+.off .offnote{display:block}.off .g2,.off .pipe{opacity:.38;filter:saturate(.4);pointer-events:none}
+.srcst{display:inline-flex;align-items:center;gap:5px}
+.stag{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--rule2);border-radius:999px;padding:0 8px 0 6px;font-size:11.5px;line-height:19px;color:var(--text);white-space:nowrap;cursor:pointer;margin:1px 0}
+.stag i{width:8px;height:8px;border-radius:2px;background:var(--c)}.stag:hover{border-color:var(--c)}.stag.sel{border-color:var(--c);background:#2a2a22;color:var(--ink)}.stag.dim{opacity:.45}
+.srcfilter{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:9px 18px;border-top:1px solid var(--rule2)}
+.stack{display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;margin:4px 0}
+/* dossier */
+.dh{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:16px 18px}
+.big{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;border:3px solid}
+.dh h2{margin:0;font:600 26px Georgia,serif;color:var(--ink)}.dh .sub{color:var(--muted);font-size:13px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:0 18px 14px}
+.tile{background:var(--card2);border:1px solid var(--rule);border-top:3px solid var(--c);border-radius:10px;padding:8px 10px}.tile .n{font:600 22px Georgia,serif;color:var(--ink)}.tile .l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}.tile .d{font-size:11.5px;color:var(--text)}
+.dg{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;padding:0 18px 18px}
+.col{display:flex;flex-direction:column;gap:14px}
+table.props{width:100%;border-collapse:collapse;font-size:12.5px}table.props td{padding:6px 4px;border-top:1px solid #222c31;vertical-align:top}table.props td:first-child{color:var(--muted);width:110px}
+.cl{border-left:4px solid var(--c);background:#1a2328;border-radius:0 8px 8px 0;padding:7px 10px}
+.strip{display:flex;align-items:center;gap:10px;border:1px dashed var(--rule2);border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--muted)}.strip b{color:var(--text);font-weight:600}
+.flagc{border:1px dashed var(--rule2);border-left:4px solid #9f3632;border-radius:10px;padding:8px 10px;font-size:12.5px}
+.bugnote{border:1px solid #743a2f;background:rgba(116,58,47,.18);border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--ink)}
+</style></head><body>
+<div class="top"><b>Journalism Workbench</b><div class="tabs" id="tabs"><button data-p="kind" class="on">Network · by kind</button><button data-p="corpus">Paper Trail</button><button data-p="dossier">Dossier: Alaric Voss</button></div><span style="margin-left:auto;font-size:12px;color:var(--muted)">Redesign prototype · demo investigation's records</span></div>
+
+<!-- ================= BY KIND ================= -->
+<section class="page on" id="p-kind">
+ <div class="frame">
+  <div class="fh"><div><h3>Who is linked to whom</h3><p>Reviewed relationships between the parties in this investigation.</p></div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="seg"><span class="on">Network</span><span>Grid</span></span><span class="seg"><span>Who controls whom</span><span>Around a party</span><span class="on">By kind</span><span>Linked groups</span></span></div></div>
+  <div class="rulebar"><span><b>Arranged by kind:</b> one column per kind of party, ordered so the kinds most often linked sit side by side; within a column, the most-linked party is at the top.</span><span class="explain">Explain this chart ◂</span></div>
+  <div class="keystrip" id="kkey"></div>
+  <div class="cv"><svg id="kind" viewBox="0 0 1300 330" style="display:block;width:100%"></svg><div class="hov" id="khov" style="display:none"></div></div>
+  <div class="ff"><span><b>6</b> parties in 4 kinds</span><span><b>5</b> links</span><span><b>1</b> sources disagree</span><span><b>3</b> not yet shown</span><span><b>0</b> links cross a name</span><span class="hint">Point at a column, party or link for more · right-click a party to research it</span></div>
+ </div>
+ <div class="why"><h4>What changed, and why</h4><ul>
+  <li><b>No empty canvas.</b> The drawing is as tall as its tallest column, not a fixed 600 px box, and the side key became the strip above, so the columns take the full width.</li>
+  <li><b>Column order now follows the links.</b> Before, people–companies–organisations–property put Priya's link to Harborline across the Companies column and through Meridian's name. Ordering columns so linked kinds are neighbours (organisations · people · companies · property) means every link here joins neighbouring columns: no line crosses a name. <i>The same principle as hive plots' axis ordering (Krzywinski et al. 2012) and as crossing reduction in layered drawing (Sugiyama et al. 1981).</i></li>
+  <li><b>Links leave a dot sideways.</b> Names sit under the dots, so a link that leaves and arrives horizontally never runs through a name. Links between two parties of the same kind (Bellcastle owns and paid Meridian) curve out to the column's side, labelled, instead of running vertically over the names.</li>
+  <li><b>Each column says what is in it:</b> a count, and where its parties are registered, as small chips. The band between two columns counts the links that cross it, by kind, so “Companies → Property: 1 owns” reads before any line is traced.</li>
+  <li><b>The red “!” sits on the payment's own curve,</b> clear of names. Direction is the tapered width (wide end at the source) agreed in pass 2; no arrowheads.</li>
+  <li><b>Pointing at a party</b> gives its card with Research in connection with…, Research this party, Tag and Note; pointing at a column lights its parties and links; pointing at a band lights the links it counts.</li></ul></div>
+</section>
+
+<!-- ================= PAPER TRAIL ================= -->
+<section class="page" id="p-corpus">
+ <div class="frame" id="corpusFrame">
+  <div class="fh"><div><h3>Paper Trail</h3><p>Every place the case's information comes from, in one panel: your documents, OpenAleph, outside databases and web lookups. Every record carries tags saying where it came from, and every tag is a filter.</p></div>
+   <span class="seg" id="corpSeg"><span data-s="on" class="on">Show OpenAleph running (example)</span><span data-s="off">Show it as on this machine (off)</span></span></div>
+  <div class="status" id="cstatus"></div>
+  <div class="srcfilter" id="sfilter"></div>
+  <div class="pipe" id="cpipe"></div>
+  <div class="g2">
+   <div class="box" style="grid-column:1/3"><div class="bh"><b>Waiting for you</b><span>matches and findings from every source, strongest first · <span class="ex">EXAMPLE</span></span></div><div class="bb" id="xref"></div><div class="bf">Accepting adds the finding to the record with its source tag; rejecting is remembered, and for OpenAleph sent back to it.</div></div>
+   <div class="box"><div class="bh"><b>Records by source</b><span>the tags on this case's parties · click a tag to filter</span></div><div class="bb" id="recs"></div><div class="bf">A party found in two sources carries both tags. The tags are worked out from where each fact came from, so they cannot drift.</div></div>
+   <div class="box"><div class="bh"><b>What stands out</b><span>names found most often, in documents and lookups · <span class="ex">EXAMPLE</span></span></div><div class="bb" id="stands"></div><div class="bf">Click a name to search it, watch it, or research it with a party.</div></div>
+   <div class="box"><div class="bh"><b>Watchlist</b><span>checked in every new document and lookup</span></div><div class="bb"><div style="display:flex;gap:6px"><span class="in">A name, or a search like “Jane Doe” OR Zanzibar</span><button class="btn p s">Watch</button></div><div id="watch"></div></div><div class="bf">A hit shows once, tagged with where it turned up, as something to make a lead or dismiss.</div></div>
+   <div class="box"><div class="bh"><b>Send out</b><span>made from confirmed records</span></div><div class="bb" id="outs"></div><div class="bf">Sending again updates the same diagram, timeline or list; where you moved things in OpenAleph stays.</div></div>
+  </div>
+ </div>
+ <div class="why"><h4>What changed, and why</h4><ul>
+  <li><b>One panel for every source.</b> “OpenAleph corpus” and “External connectors” were two panels for the same work: finding out whether a party appears somewhere else. Now OpenAleph, OpenSanctions, the outside Aleph server, Firecrawl, your documents and the planned free registries sit in one place, with one queue of things to decide. The split by tool was how the code was organised, not how a reporter works.</li>
+  <li><b>Where a record came from is a tag on it,</b> not the panel it sits in. The tags come from what the app already stores: every fact on a party is a statement with its dataset (a document, a source, or you), so a party's tags are the sources of its facts. Nothing new to keep in step.</li>
+  <li><b>Tags are filters everywhere.</b> Click one here, or pick sources in the filter row, and the queue, the counts and the lists narrow to them. The same source filter sits in search, the network charts, the timeline, the chart builder and exports, so “show me only what OpenSanctions and the registry filing say” is one click on any page.</li>
+  <li><b>Each source states its condition first</b> (connected, off, local copy, planned, paid) so nothing that cannot run looks usable. <i>Nielsen's first heuristic, visibility of system status (1994).</i></li>
+  <li><b>The pipeline counts are split by source,</b> so it shows where work is piling up and which source it is from.</li></ul></div>
+</section>
+
+<!-- ================= DOSSIER ================= -->
+<section class="page" id="p-dossier">
+ <div class="frame">
+  <div class="dh"><div class="big" style="background:#314d65;border-color:#4d7a9b"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4d7a9b" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+   <div><h2>Alaric Voss</h2><div class="sub">Person · British (nationality on record) · in the case since 4 Oct 2026 · <span class="pill" style="background:#89352a;color:#f3e9d7">Ask at interview</span></div></div>
+   <div class="acts"><button class="btn p">⇄ Research in connection with…</button><button class="btn">⌕ Research this party</button><button class="btn"># Tag</button><button class="btn">✎ Note</button><button class="btn">Edit</button><button class="btn">Show in the corpus</button></div></div>
+  <div class="tiles">
+   <div class="tile" style="--c:#baac91"><div class="l">Links</div><div class="n">1</div><div class="d">directs Meridian Holdings Ltd</div></div>
+   <div class="tile" style="--c:#61503e"><div class="l">Claims about him</div><div class="n">1</div><div class="d"><span class="pill" style="background:#61503e;color:#f3e9d7">○ not yet shown</span></div></div>
+   <div class="tile" style="--c:#caaf9c"><div class="l">Evidence</div><div class="n">1</div><div class="d">not attached to a claim</div></div>
+   <div class="tile" style="--c:#d4a152"><div class="l">Events</div><div class="n">1</div><div class="d">11 Jun 2019 · verified</div></div>
+   <div class="tile" style="--c:#9f3632"><div class="l">Red Flags</div><div class="n">0</div><div class="d">1 is one fact away</div></div>
+   <div class="tile" style="--c:#9a83a8"><div class="l">Outside lookups</div><div class="n">6</div><div class="d">sources picked · UK national</div></div>
+  </div>
+  <div class="dg">
+   <div class="col">
+    <div class="box"><div class="bh"><b>Connections</b><span>who he is linked to, and how sure each link is</span></div><div class="bb"><svg id="ego" viewBox="0 0 700 220" style="width:100%"></svg>
+      <div class="bugnote">Fixed here: the old dossier said “No ownership or directorship links are recorded for this entity” for him although he directs Meridian. The ownership chart only followed ownership and directors <i>into</i> companies, so a director's own chart was empty. A person's chart now starts from what they own or direct.</div></div></div>
+    <div class="box"><div class="bh"><b>What the records say about him</b><span>every value with its source</span></div><div class="bb"><table class="props"><tr><td>Name</td><td>Alaric Voss</td><td><span class="pill" style="background:#26272b;color:#927e5d">entered by a reporter</span></td></tr><tr><td>Nationality</td><td>British (gb)</td><td><span class="pill" style="background:#26272b;color:#927e5d">entered by a reporter</span></td></tr><tr><td>Date of birth</td><td style="color:var(--muted)">not recorded</td><td><button class="btn s">Look it up</button></td></tr></table>
+      <div class="strip" style="border-style:solid"><span>Different values for one property</span><b>none</b><span style="margin-left:auto">Merged records</span><b>none</b><span>Identity decisions</span><b>none</b></div></div></div>
+    <div class="box"><div class="bh"><b>Claims and evidence</b><span>how sure, and what stands behind it</span></div><div class="bb">
+      <div class="cl" style="--c:#61503e"><div style="display:flex;justify-content:space-between;gap:8px"><b style="color:var(--ink)">Alaric Voss has an undisclosed financial interest in the MV Fair Tern.</b><span class="pill" style="background:#61503e;color:#f3e9d7">○ not yet shown · 20%</span></div><div style="font-size:12px;color:var(--muted);margin-top:3px">No evidence attached for or against. <a style="color:var(--amber)">Attach evidence</a> · <a style="color:var(--amber)">Research Alaric Voss in connection with MV Fair Tern</a></div></div>
+      <div class="cl" style="--c:#caaf9c"><div><b style="color:var(--ink)">“Director: Alaric Voss, appointed 2019-06-11.”</b></div><div style="font-size:12px;color:var(--muted);margin-top:3px">Meridian Holdings Ltd — Companies Registry filing (2024 annual return), p. 2, Officers section · <span class="pill" style="background:#26272b;color:#bc9574">attached to the directorship, not yet reviewed</span> · <a style="color:var(--amber)">Review it</a> · <a style="color:var(--amber)">Trace</a></div></div></div></div>
+    <div class="box"><div class="bh"><b>On the timeline</b><span>events naming him</span></div><div class="bb"><svg id="dtl" viewBox="0 0 700 64" style="width:100%"></svg></div></div>
+   </div>
+   <div class="col">
+    <div class="box"><div class="bh"><b>Red Flags</b><span>for him</span></div><div class="bb"><div class="flagc" style="border-left-color:#393941"><b style="color:var(--ink)">Does he direct many other companies?</b><div style="color:var(--muted);margin-top:2px">One fact away: his officer appointments. “Mass” nominee directors appear in most FATF/Egmont concealment cases.</div><div style="margin-top:6px"><button class="btn p s">Look it up</button></div></div>
+      <div class="strip"><span>No pattern fires on him yet.</span></div></div></div>
+    <div class="box"><div class="bh"><b>Outside lookups</b><span>chosen because: person · UK national</span></div><div class="bb" id="dlook"></div><div class="bf">Lookups for this investigation: <b style="color:var(--text)">Automatic</b>. Every request is in Research → Everywhere it searched.</div></div>
+    <div class="box"><div class="bh"><b>Research involving him</b><span>runs and their trail</span></div><div class="bb"><div class="strip"><span>No research run yet.</span><button class="btn s" style="margin-left:auto">Research in connection with…</button></div><div class="strip"><span>Automatic screening</span><b style="margin-left:auto">ran when added · 0 matches</b></div></div></div>
+    <div class="box"><div class="bh"><b>Notes and leads</b><span>yours</span></div><div class="bb"><div class="in" style="min-height:52px">Write a note about him…</div><div class="strip"><span>No lead names him yet.</span><button class="btn s" style="margin-left:auto">Make a lead</button></div></div></div>
+   </div>
+  </div>
+ </div>
+ <div class="why"><h4>What changed, and why</h4><ul>
+  <li><b>Who he is and what can be done, first.</b> The name, kind, nationality and tags in a header, with the actions in one row: research, tag, note, edit. Before, “Edit entity” was a black block on a beige card and the counts ran together in one grey line.</li>
+  <li><b>Six tiles</b> say how much there is and how sure, in the status colours: before you read anything, you see one link, one claim not yet shown, one piece of evidence nobody has reviewed.</li>
+  <li><b>Connections as a picture,</b> with a second ring (who Meridian is linked to), drawn in the network's codes. The empty-chart bug is fixed for people.</li>
+  <li><b>Every property with its source,</b> and a gap (date of birth) with the lookup that would fill it.</li>
+  <li><b>Empty sections become one line,</b> not a heading over nothing: merges, identity decisions and conflicts share one strip. Leads, tasks and timeline headings with nothing under them are gone.</li>
+  <li><b>The right column is about what to do next:</b> red flags, lookups (with why these sources), research runs, notes and leads.</li></ul></div>
+</section>
+
+<script>
+const K={Person:{fill:'#314d65',ring:'#4d7a9b',name:'People',ic:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'},Company:{fill:'#4e4234',ring:'#b98d34',name:'Companies',ic:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-3h6v3M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>'},Organization:{fill:'#3a5c52',ring:'#baac91',name:'Organisations',ic:'<path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 2l9 5H3z"/>'},Asset:{fill:'#45271f',ring:'#bc9574',name:'Property',ic:'<path d="M3 10l9-7 9 7v11H3z"/><path d="M9 21v-6h6v6"/>'}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+function taper(pts,w0,w1,color,dashed,op=1){const S=[0];for(let i=1;i<pts.length;i+=1)S.push(S[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));const T=S[S.length-1];
+  const piece=(i0,i1)=>{const L=[],R=[];for(let i=i0;i<=i1;i+=1){const p=pts[i],q=pts[Math.min(i+1,pts.length-1)],o=pts[Math.max(i-1,0)];let dx=q.x-o.x,dy=q.y-o.y;const d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;const h=(w0+(w1-w0)*S[i]/T)/2;L.push(`${(p.x-dy*h).toFixed(1)},${(p.y+dx*h).toFixed(1)}`);R.unshift(`${(p.x+dy*h).toFixed(1)},${(p.y-dx*h).toFixed(1)}`)}return`M${L.join(' L')} L${R.join(' L')} Z`};
+  let d='';if(!dashed)d=piece(0,pts.length-1);else{let i=0;while(i<pts.length-1){const s0=S[i];let j=i;while(j<pts.length-1&&S[j]-s0<9)j+=1;d+=piece(i,j);let k=j;while(k<pts.length-1&&S[k]-S[j]<6)k+=1;i=k}}
+  return`<path d="${d}" fill="${color}" opacity="${op}"/>`}
+function bez(a,c1,c2,b,n=40){const o=[];for(let i=0;i<=n;i+=1){const t=i/n,u=1-t;o.push({x:u*u*u*a.x+3*u*u*t*c1.x+3*u*t*t*c2.x+t*t*t*b.x,y:u*u*u*a.y+3*u*u*t*c1.y+3*u*t*t*c2.y+t*t*t*b.y})}return o}
+const trim=(p,r0,r1)=>{const a=p[0],b=p[p.length-1];return p.filter(q=>Math.hypot(q.x-a.x,q.y-a.y)>r0&&Math.hypot(q.x-b.x,q.y-b.y)>r1)};
+
+// ---------- BY KIND ----------
+const PARTIES=[{id:'har',name:'Harborline Civic Trust',schema:'Organization',country:null,links:1},{id:'pri',name:'Priya Kavanagh',schema:'Person',country:null,links:1},{id:'ala',name:'Alaric Voss',schema:'Person',country:'gb',links:1},
+ {id:'mer',name:'Meridian Holdings Ltd',schema:'Company',country:'gb',links:4},{id:'bel',name:'Bellcastle Trading Group',schema:'Company',country:'ky',links:2},{id:'ves',name:'MV Fair Tern (cargo vessel)',schema:'Asset',country:null,links:1}];
+const LINKS=[{f:'pri',t:'har',c:'#baac91',lab:'works for',sure:'u'},{f:'ala',t:'mer',c:'#baac91',lab:'directs',sure:'u'},{f:'bel',t:'mer',c:'#d4a152',lab:'owns · 100%',sure:'s'},{f:'bel',t:'mer',c:'#a16948',lab:'paid USD 2.4M',sure:'d',amt:true},{f:'mer',t:'ves',c:'#d4a152',lab:'owns',sure:'u'}];
+const COLS=['Organization','Person','Company','Asset'],CTRY={gb:'UK',ky:'Cayman Is.'};
+function drawKind(hot){
+  const W=1300,colW=230,gap=(W-40-colW*COLS.length)/(COLS.length-1),x0=20,top=64,rowH=96;
+  const pos={};COLS.forEach((k,i)=>{const ps=PARTIES.filter(p=>p.schema===k).sort((a,b)=>b.links-a.links);ps.forEach((p,j)=>pos[p.id]={x:x0+i*(colW+gap)+colW/2,y:top+40+j*rowH,col:i,p})});
+  const rows=Math.max(...COLS.map(k=>PARTIES.filter(p=>p.schema===k).length)),H=top+40+rows*rowH-20;
+  document.getElementById('kind').setAttribute('viewBox',`0 0 ${W} ${H}`);
+  let s='';const lit=hot?.type;
+  COLS.forEach((k,i)=>{const X=x0+i*(colW+gap),ps=PARTIES.filter(p=>p.schema===k),ctr={};ps.forEach(p=>{const c=p.country?CTRY[p.country]:'country unknown';ctr[c]=(ctr[c]||0)+1});
+    const on=hot?.type==='col'&&hot.k===k;s+=`<g data-col="${k}"><rect x="${X}" y="8" width="${colW}" height="${H-16}" rx="12" fill="${on?'#24313a':'#1f292e'}" stroke="${on?K[k].ring:'transparent'}"/>
+    <svg x="${X+12}" y="16" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${K[k].ring}" stroke-width="2">${K[k].ic}</svg><text x="${X+34}" y="29" font-size="11.5" font-weight="700" letter-spacing=".08em" fill="${K[k].ring}">${K[k].name.toUpperCase()} · ${ps.length}</text>
+    ${Object.entries(ctr).map(([c,n],j)=>`<g transform="translate(${X+12+j*96},40)"><rect width="90" height="16" rx="8" fill="#26272b"/><text x="45" y="11.5" text-anchor="middle" font-size="10" fill="#927e5d">${esc(c)}${n>1?' · '+n:''}</text></g>`).join('')}</g>`});
+  // bands between neighbouring columns: counts of links by kind
+  for(let i=0;i<COLS.length-1;i+=1){const ls=LINKS.filter(l=>[pos[l.f].col,pos[l.t].col].sort().join()===`${i},${i+1}`);if(!ls.length)continue;const bx=x0+(i+1)*colW+i*gap+gap/2;
+    s+=`<g data-band="${i}"><rect x="${bx-gap/2+6}" y="14" width="${gap-12}" height="22" rx="11" fill="${hot?.type==='band'&&hot.i===i?'#3a2f1f':'#26272b'}"/><text x="${bx}" y="29" text-anchor="middle" font-size="10.5" fill="#caaf9c">${ls.map(l=>'1 '+(l.lab.startsWith('works')?'works for':l.lab.split(' ')[0])).join(' · ')}</text></g>`}
+  // links
+  const litLinks=new Set(hot?.type==='party'?LINKS.filter(l=>l.f===hot.id||l.t===hot.id):hot?.type==='col'?LINKS.filter(l=>pos[l.f].p.schema===hot.k||pos[l.t].p.schema===hot.k):hot?.type==='band'?LINKS.filter(l=>[pos[l.f].col,pos[l.t].col].sort().join()===`${hot.i},${hot.i+1}`):[]);
+  const same={};LINKS.forEach((l,i)=>{const a=pos[l.f],b=pos[l.t];let pts,mid;
+    const op=lit&&!litLinks.has(l)?0.18:1;
+    if(a.col===b.col){const k=`${l.f}${l.t}`;same[k]=(same[k]||0)+1;const side=colW/2-62+same[k]*30;const sx=a.x+side;pts=bez({x:a.x,y:a.y},{x:sx,y:a.y},{x:sx,y:b.y},{x:b.x,y:b.y});mid=pts[20];}
+    else{const dir=b.x>a.x?1:-1,dx=Math.abs(b.x-a.x)*0.5;pts=bez({x:a.x,y:a.y},{x:a.x+dir*dx,y:a.y},{x:b.x-dir*dx,y:b.y},{x:b.x,y:b.y});mid=pts[20]}
+    const w=l.amt?7:5;s+=taper(trim(pts,19,21),w,1.3,l.c,l.sure!=='s',op);
+    if(a.col===b.col)s+=`<text x="${a.x+104}" y="${(a.y+b.y)/2+(same[`${l.f}${l.t}`]===1?-4:14)}" font-size="11" fill="${l.c}" opacity="${op}" stroke="#1f292e" stroke-width="4" paint-order="stroke">${esc(l.lab)}</text>`;
+    if(l.sure==='d')s+=`<g transform="translate(${mid.x},${mid.y})" opacity="${op}"><circle r="8" fill="#9f3632" stroke="#1a2328" stroke-width="2"/><text y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#f3e9d7">!</text></g>`});
+  for(const p of PARTIES){const {x,y}=pos[p.id],k=K[p.schema],r=11+3*Math.sqrt(p.links-1),op=lit&&hot.type==='party'&&!(hot.id===p.id||LINKS.some(l=>litLinks.has(l)&&(l.f===p.id||l.t===p.id)))?0.3:1;
+    s+=`<g data-party="${p.id}" opacity="${op}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="${r+3}" fill="#1a2328"/><circle cx="${x}" cy="${y}" r="${r}" fill="${k.fill}" stroke="${k.ring}" stroke-width="2.5"/><svg x="${x-r*0.55}" y="${y-r*0.55}" width="${r*1.1}" height="${r*1.1}" viewBox="0 0 24 24" fill="none" stroke="${k.ring}" stroke-width="2.2">${k.ic}</svg>
+    <text x="${x}" y="${y+r+17}" text-anchor="middle" font-size="13" font-weight="600" fill="#caaf9c" stroke="#1f292e" stroke-width="4" paint-order="stroke">${esc(p.name)}</text><circle cx="${x}" cy="${y}" r="${r+10}" fill="transparent"/></g>`}
+  document.getElementById('kind').innerHTML=s;
+  document.getElementById('kkey').innerHTML=`<span class="kh">Parties</span>${COLS.map(k=>`<span class="kc"><svg width="16" height="16"><circle cx="8" cy="8" r="6.5" fill="${K[k].fill}" stroke="${K[k].ring}" stroke-width="2"/></svg>${K[k].name}</span>`).join('')}<span class="kh">Links</span>${[['#d4a152','Owns'],['#baac91','Directs or works for'],['#a16948','Paid']].map(([c,n])=>`<span class="kc"><svg width="34" height="12">${taper([...Array(20)].map((_,i)=>({x:2+i*1.6,y:6})),5,1.2,c,false)}</svg>${n}</span>`).join('')}<span class="kh">How sure</span><span class="kc"><svg width="34" height="12">${taper([...Array(20)].map((_,i)=>({x:2+i*1.6,y:6})),3,3,'#baac91',false)}</svg>shown by a source</span><span class="kc"><svg width="34" height="12">${taper([...Array(20)].map((_,i)=>({x:2+i*1.6,y:6})),3,3,'#baac91',true)}</svg>not yet shown</span><span class="kc"><svg width="14" height="14"><circle cx="7" cy="7" r="6" fill="#9f3632"/><text x="7" y="10.5" text-anchor="middle" font-size="9" font-weight="700" fill="#f3e9d7">!</text></svg>sources disagree</span>`;
+  return pos;
+}
+let KPOS=drawKind();
+const ksvg=document.getElementById('kind'),khov=document.getElementById('khov');
+ksvg.addEventListener('mousemove',e=>{const g=e.target.closest('[data-party],[data-col],[data-band]');let hot=null,h='';
+  if(g?.dataset.party){const p=PARTIES.find(x=>x.id===g.dataset.party);hot={type:'party',id:p.id};const ls=LINKS.filter(l=>l.f===p.id||l.t===p.id);
+    h=`<div class="t"><i style="width:10px;height:10px;border-radius:50%;background:${K[p.schema].ring}"></i>${esc(p.name)}</div><div class="r"><span>Kind · registered</span><span>${{Person:'Person',Company:'Company',Organization:'Organisation',Asset:'Property'}[p.schema]} · ${p.country?CTRY[p.country]:'unknown'}</span></div>${ls.map(l=>`<div class="r"><span>${l.f===p.id?'→':'←'} ${esc(l.lab)}</span><span>${esc(PARTIES.find(x=>x.id===(l.f===p.id?l.t:l.f)).name)}</span></div>`).join('')}<div style="margin-top:6px;color:var(--amber)">Click for: Research in connection with… · Research this party · Tag · Note</div>`}
+  else if(g?.dataset.col){const k=g.dataset.col;hot={type:'col',k};const n=PARTIES.filter(p=>p.schema===k).length;h=`<div class="t">${K[k].name}</div><div class="r"><span>Parties</span><span>${n}</span></div><div class="r"><span>Links in or out</span><span>${LINKS.filter(l=>[l.f,l.t].some(id=>PARTIES.find(p=>p.id===id).schema===k)).length}</span></div><div style="color:var(--muted)">Ordered by number of links, most at the top.</div>`}
+  else if(g?.dataset.band){hot={type:'band',i:+g.dataset.band};h=`<div class="t">Links between these two kinds</div><div style="color:var(--muted)">Lit in the drawing.</div>`}
+  KPOS=drawKind(hot);if(h){khov.innerHTML=h;khov.style.display='block';const cv=ksvg.parentElement.getBoundingClientRect();khov.style.left=Math.min(cv.width-300,e.clientX-cv.left+16)+'px';khov.style.top=Math.max(4,e.clientY-cv.top-10)+'px'}else khov.style.display='none'});
+ksvg.addEventListener('mouseleave',()=>{khov.style.display='none';KPOS=drawKind()});
+
+// ---------- SOURCES ----------
+const SRC=[
+ {id:'you',n:'You',k:'reporter',state:'always',c:'#caaf9c'},
+ {id:'docs',n:'Your documents',k:'read by OpenAleph, or the app’s own reader when it is off',state:'on',c:'#bc9574'},
+ {id:'oa',n:'OpenAleph',k:'this machine',state:'toggle',c:'#4d7a9b'},
+ {id:'os',n:'OpenSanctions',k:'local copy',state:'on',c:'#3a5c52'},
+ {id:'al',n:'Outside Aleph',k:'server you set',state:'on',c:'#8d692b'},
+ {id:'fc',n:'Firecrawl',k:'web search, paid credits',state:'on',c:'#a16948'},
+ {id:'reg',n:'Free registries',k:'Companies House, Wikidata, Electoral Commission…',state:'planned',c:'#9a83a8'}];
+let SEL=new Set(),OA='on';
+const S_=id=>SRC.find(x=>x.id===id);
+const tag=(id,on)=>{const x=S_(id);return`<span class="stag${on===false?' dim':''}" data-src="${id}" style="--c:${x.c}"><i></i>${esc(x.n)}</span>`};
+const live=id=>!(id==='oa'&&OA==='off')&&S_(id).state!=='planned';
+const pass=srcs=>!SEL.size||srcs.some(x=>SEL.has(x));
+const FIND=[['Meridian Holdings Ltd','Meridian Holdings Limited · company 0812…','oa','Companies House collection',.97,'name, company number'],['Bellcastle Trading Group','Bellcastle Trading Group Ltd · Cayman Islands','oa','ICIJ Offshore Leaks collection',.92,'name, country'],['Alaric Voss','Alaric VOSS · born 1971','oa','UK company officers collection',.86,'name, nationality'],['Alaric Voss','A. VOSS · offshore entity officer','os','OpenSanctions (local copy)',.71,'name only'],['Bellcastle Trading Group','“Bellcastle” in a 2022 shipping notice','fc','web search',.64,'name in page text'],['Meridian Holdings Ltd','Meridian Holdings Ltd','al','outside Aleph: company filings',.9,'name, address']];
+const RECS=[['Meridian Holdings Ltd','Company',['docs','you','oa']],['Bellcastle Trading Group','Company',['docs','you','oa','fc']],['Alaric Voss','Person',['docs','oa','os']],['MV Fair Tern (cargo vessel)','Property',['you']],['Priya Kavanagh','Person',['you']],['Harborline Civic Trust','Organisation',['you']]];
+function corpus(state){OA=state||OA;
+  document.getElementById('cstatus').innerHTML=SRC.map(x=>{const st=x.state==='toggle'?(OA==='off'?'off here':'connected'):x.state==='planned'?'planned':x.state==='always'?'':'ready';const bg=st==='connected'||st==='ready'?'#3a5c52':st==='off here'?'#26272b':st==='planned'?'#312237':'#26272b';return`<span class="srcst" title="${esc(x.k)}"><span class="stag" style="--c:${x.c}"><i></i>${esc(x.n)}</span>${st?`<span class="pill" style="background:${bg};color:${st==='off here'?'#927e5d':'#f3e9d7'}">${st}</span>`:''}</span>`}).join('')+'<span class="ex">EXAMPLE</span>'+(OA==='off'?`<div class="offnote" style="display:block;margin:6px 0 0;flex-basis:100%">OpenAleph is off on this machine, so its counts below are dashes and its findings are greyed. Everything else still runs. To turn it on: <code>docker compose --profile corpus up</code> and Settings → OpenAleph.</div>`:'');
+  document.getElementById('sfilter').innerHTML=`<span class="kh" style="margin:0">Show</span><span class="stag ${SEL.size?'':'sel'}" data-all="1" style="--c:#d4a152"><i></i>All sources</span>`+SRC.map(x=>`<span class="stag ${SEL.has(x.id)?'sel':''}" data-src="${x.id}" style="--c:${x.c}"><i></i>${esc(x.n)}</span>`).join('')+`<span style="margin-left:auto;font-size:11.5px;color:var(--muted)">This filter is the same on search, charts, timeline, builder and exports</span>`;
+  const by=['oa','os','al','fc','docs'].filter(id=>!SEL.size||SEL.has(id));
+  const st=[['Asked or sent','sources searched for your parties',{oa:12,os:6,al:6,fc:4,docs:0}],['Read','documents and pages',{oa:8,docs:3,fc:4,os:0,al:0}],['Names found','people, companies, emails',{oa:41,docs:9,fc:3,os:0,al:0}],['Matches','to parties in the case',{oa:3,os:1,al:1,fc:1,docs:0}],['Waiting for you','to accept or reject',{oa:3,os:1,al:1,fc:1,docs:0}]];
+  document.getElementById('cpipe').innerHTML=st.map(([l,d,m])=>{const parts=by.map(id=>[id,live(id)?m[id]||0:0]);const tot=parts.reduce((a,b)=>a+b[1],0);return`<div class="ps"><div class="l">${l}</div><div class="n">${tot}</div><div class="stack">${parts.filter(p=>p[1]).map(([id,v])=>`<i title="${esc(S_(id).n)}: ${v}" style="flex:${v};background:${S_(id).c}"></i>`).join('')||'<i style="flex:1;background:#26272b"></i>'}</div><div class="d">${d}</div></div>`}).join('');
+  document.getElementById('xref').innerHTML=FIND.filter(f=>pass([f[2]])).sort((a,b)=>b[4]-a[4]).map(([a,b,src,where,sc,m])=>{const on=live(src);return`<div class="xr" style="${on?'':'opacity:.4'}"><span><b style="color:var(--ink)">${esc(a)}</b> ↔ ${esc(b)}<br>${tag(src)} <span style="font-size:11.5px;color:var(--muted)">${esc(where)} · matched on ${m}</span></span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span style="display:flex;align-items:center;gap:6px;font-size:11.5px"><span style="display:inline-block;width:60px;height:5px;border-radius:3px;background:#26272b;overflow:hidden"><i style="display:block;height:100%;width:${sc*100}%;background:${sc>=.9?'#3a5c52':'#d4a152'}"></i></span>${Math.round(sc*100)}%</span><span style="display:flex;gap:4px"><button class="btn s" ${on?'':'disabled'}>Same</button><button class="btn s" ${on?'':'disabled'}>Not the same</button></span></span></div>`}).join('')||'<div style="color:var(--muted)">Nothing from these sources waits for you.</div>';
+  document.getElementById('recs').innerHTML=RECS.filter(r=>pass(r[2])).map(([n,k,ss])=>`<div class="wl" style="grid-template-columns:1fr"><span style="color:var(--ink)">${esc(n)} <span style="font-size:11.5px;color:var(--muted)">${k}</span><br>${ss.map(id=>tag(id,live(id))).join(' ')}</span></div>`).join('')||'<div style="color:var(--muted)">No party has a fact from these sources.</div>';
+  const names=[['Meridian Holdings Ltd','Company',14,['oa','docs']],['Bellcastle Trading Group','Company',11,['oa','fc']],['Alaric Voss','Person',6,['oa','os']],['Corbel Nominees Ltd','Company',4,['oa']],['jane.doe@meridian.example','Email',3,['docs']]].filter(r=>pass(r[3]));
+  document.getElementById('stands').innerHTML=names.map(([n,k,c,ss],i)=>{const kc={Company:'#b98d34',Person:'#4d7a9b',Email:'#927e5d'}[k];return`<div class="rank"><span style="color:var(--muted)">${i+1}</span><span style="color:var(--ink)"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${kc};margin-right:6px"></i>${esc(n)}${n==='Corbel Nominees Ltd'?' <span class="pill" style="background:#312237;color:#d9c8e3">not in the case yet</span>':''}</span><span class="bar"><i style="width:${c/14*100}%;background:${kc}"></i></span><span style="text-align:right">${c}</span><div class="co">${ss.map(id=>tag(id,live(id))).join('')}</div></div>`}).join('');
+  document.getElementById('watch').innerHTML=[['Alaric Voss','2 hits',['oa','os']],['"Corbel" OR "Limassol Nominees"','0 hits',[]]].map(([n,h,ss])=>`<div class="wl"><span style="color:var(--ink)">${esc(n)}<br>${ss.map(id=>tag(id,live(id))).join(' ')||'<span style="font-size:11.5px;color:var(--muted)">checked in every source</span>'}</span><span class="pill" style="background:${h.startsWith('0')?'#26272b':'#d4a152'};color:${h.startsWith('0')?'#927e5d':'#010005'}">${h}</span><button class="btn s">Check now</button></div>`).join('')+'<div style="font-size:11.5px;color:var(--muted)"><span class="ex">EXAMPLE</span> entries</div>';
+  document.getElementById('outs').innerHTML=[['Relationships as a diagram','6 parties, 5 links','sent 3 Oct · 2 links added since'],['Dated records as a timeline','6 events, 2019–2024','never sent'],['A list','choose records, a collection or a source tag','never sent']].map(([t,d,w])=>`<div class="out" style="grid-template-columns:1fr auto"><span><b style="color:var(--ink)">${t}</b> ${tag('oa',live('oa'))}<br><span style="font-size:11.5px;color:var(--muted)">${d} · ${w}</span></span><button class="btn s" ${live('oa')?'':'disabled'}>${w.startsWith('never')?'Send':'Update'}</button></div>`).join('');
+}
+document.getElementById('corpusFrame').addEventListener('click',e=>{const t=e.target.closest('[data-src],[data-all]');if(!t||!t.closest('#sfilter,#recs,#xref,#stands,#watch'))return;if(t.dataset.all)SEL.clear();else{const id=t.dataset.src;SEL.has(id)?SEL.delete(id):SEL.add(id)}corpus()});
+corpus('on');
+document.getElementById('corpSeg').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));corpus(b.dataset.s)};
+
+// ---------- DOSSIER ----------
+(function ego(){const W=700,H=220;let s='';const C={x:110,y:110},M={x:350,y:110},B={x:600,y:56},V={x:600,y:166};
+  s+=`<text x="110" y="20" text-anchor="middle" font-size="10.5" fill="#927e5d" letter-spacing=".07em">HIM</text><text x="350" y="20" text-anchor="middle" font-size="10.5" fill="#927e5d" letter-spacing=".07em">1 LINK AWAY</text><text x="590" y="20" text-anchor="middle" font-size="10.5" fill="#927e5d" letter-spacing=".07em">2 LINKS AWAY</text>`;
+  s+=taper(trim(bez(C,{x:230,y:110},{x:230,y:110},M),24,22),5,1.3,'#baac91',true);s+=`<text x="232" y="82" text-anchor="middle" font-size="11.5" fill="#baac91">directs · since 11 Jun 2019</text><text x="232" y="98" text-anchor="middle" font-size="10.5" fill="#927e5d">evidence attached, not yet reviewed</text>`;
+  s+=taper(trim(bez(B,{x:470,y:50},{x:470,y:110},M),20,22),5,1.3,'#d4a152',false,.6);s+=`<text x="470" y="64" text-anchor="middle" font-size="10.5" fill="#d4a152" opacity=".9">owns 100%</text>`;
+  s+=taper(trim(bez(M,{x:470,y:110},{x:470,y:170},V),22,18),5,1.3,'#d4a152',true,.6);s+=`<text x="520" y="170" text-anchor="middle" font-size="10.5" fill="#d4a152" opacity=".9">owns</text>`;
+  const dot=(p,k,r,n,op=1)=>`<g opacity="${op}"><circle cx="${p.x}" cy="${p.y}" r="${r+3}" fill="#1c262b"/><circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${K[k].fill}" stroke="${K[k].ring}" stroke-width="2.5"/><text x="${p.x}" y="${p.y+r+16}" text-anchor="middle" font-size="12.5" font-weight="600" fill="#caaf9c">${n}</text></g>`;
+  s+=dot(C,'Person',20,'Alaric Voss')+dot(M,'Company',18,'Meridian Holdings Ltd')+dot(B,'Company',14,'Bellcastle Trading Group',.7)+dot(V,'Asset',12,'MV Fair Tern',.7);
+  s+=`<circle cx="110" cy="110" r="27" fill="none" stroke="#d4a152" stroke-width="2"/>`;
+  document.getElementById('ego').innerHTML=s})();
+document.getElementById('dtl').innerHTML=(`<line x1="20" x2="680" y1="30" y2="30" stroke="#393941"/>${[2019,2020,2021,2022,2023,2024].map((y,i)=>`<text x="${20+i*132}" y="56" font-size="10" fill="#927e5d" text-anchor="middle">${y}</text>`).join('')}<circle cx="${20+0.45*132}" cy="30" r="7" fill="#d4a152"/><text x="${20+0.45*132+12}" y="26" font-size="11.5" fill="#caaf9c">11 Jun 2019 · appointed director of Meridian Holdings Ltd · verified</text>`);
+document.getElementById('dlook').innerHTML=[['Companies House officer search','other appointments','ran · 0 new'],['UK Parliament Register of Interests','registered interests','ran · nothing'],['Electoral Commission donations','political donations','ran · nothing'],['Wikidata','offices held, family','ran · nothing'],['OpenSanctions (local copy)','sanctions, PEPs','ran · no match'],['ICIJ Offshore Leaks (local copy)','offshore entities','ran · 1 possible “A. VOSS”']].map(([n,w,r])=>`<div style="display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:5px 0;border-top:1px solid #222c31"><span style="color:var(--ink)">${n}</span><span class="pill" style="background:${/possible/.test(r)?'#d4a152':'#26272b'};color:${/possible/.test(r)?'#010005':'#927e5d'}">${r}</span><span style="font-size:11.5px;color:var(--muted)">${w}</span></div>`).join('')+'<div style="font-size:11.5px;color:var(--muted)"><span class="ex">EXAMPLE</span> results</div>';
+document.getElementById('tabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p))};
+</script></body></html>

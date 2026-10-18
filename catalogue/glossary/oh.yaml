@@ -1,0 +1,190 @@
+area: OH
+terms:
+- term: Prevention of Future Deaths (PFD) report
+  definition: A report a coroner in England and Wales sends to organisations when an inquest reveals a
+    risk that further deaths could happen unless action is taken; recipients must respond within 56 days.
+  examples:
+  - PFD 2023-0534 required responses within 56 days of 19 December 2023.
+  source_url: https://www.judiciary.uk/prevention-of-future-death-reports/chloe-macdermott-prevention-of-future-deaths-report/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Online Safety Act 2023
+  definition: UK law that places safety duties on online services and makes Ofcom their regulator.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2023/50/section/61
+  cases: []
+  related:
+  - Ofcom
+  - Primary priority content
+  indicators: []
+  areas:
+  - OH
+- term: Ofcom
+  definition: The UK communications regulator, which enforces the Online Safety Act and can fine services
+    or seek court orders to block them.
+  examples: []
+  source_url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-investigates-online-suicide-forum
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Primary priority content
+  definition: The most serious category of content harmful to children under the Online Safety Act, including
+    content that encourages, promotes or gives instructions for suicide or self-injury.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2023/50/section/61
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Encouraging or assisting serious self-harm
+  definition: A UK criminal offence of doing an act capable of, and intended to, encourage or assist another
+    person's self-harm at the level of grievous bodily harm.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2023/50/section/184
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Encouraging or assisting suicide
+  definition: A criminal offence in England and Wales of doing an act capable of, and intended to, encourage
+    or assist another person's suicide or attempt; the target need not be a specific known person.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/Eliz2/9-10/60/section/2
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Content recommender system
+  definition: Software that chooses which content to show each user in feeds, often based on what they
+    engaged with before.
+  examples: []
+  source_url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Rabbit hole
+  definition: Informal name for the effect where engaging with harmful content leads a recommender to
+    serve ever more of it.
+  examples: []
+  source_url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/199101-new-priority-offences/main-docs/draft-updated-register-of-risks-relevant-extracts.pdf?v=414981
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Highly effective age assurance
+  definition: Ofcom's standard for age checks strong enough to reliably tell whether a user is a child.
+  examples: []
+  source_url: https://www.ofcom.org.uk/online-safety/protecting-children/new-rules-for-a-safer-generation-of-children-online
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Signposting
+  definition: Pointing a user clearly to help and support services, for example when they search for,
+    post or report harmful content.
+  examples: []
+  source_url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf?v=403579
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Illegal harms risk assessment
+  definition: A written assessment UK online services must complete of how likely their users are to encounter
+    illegal content, including suicide encouragement.
+  examples: []
+  source_url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-investigates-online-suicide-forum
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Provisional notice of contravention
+  definition: Ofcom's preliminary finding that a provider has broken its duties, which the provider can
+    answer before a final decision.
+  examples: []
+  source_url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-investigates-online-suicide-forum
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Statutory information request
+  definition: A legally binding demand from a regulator for information from a company it regulates.
+  examples: []
+  source_url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-investigates-online-suicide-forum
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Risk profile
+  definition: Ofcom's table of service types and features linked to higher risk of particular harms, used
+    by services in their risk assessments.
+  examples: []
+  source_url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Content tagging
+  definition: Features such as hashtags that label content by topic so users can find related posts.
+  examples: []
+  source_url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Sale of means
+  definition: Selling, or linking to sellers of, products intended for use as a means of suicide.
+  examples: []
+  source_url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/understanding-self-harm-and-suicide-content/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: FTC 6(b) order
+  definition: An order by the US Federal Trade Commission requiring companies to provide information for
+    a study, without being an enforcement action.
+  examples: []
+  source_url: https://www.ftc.gov/news-events/news/press-releases/2025/09/ftc-launches-inquiry-ai-chatbots-acting-companions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Companion chatbot
+  definition: An AI chatbot designed to act as a friend or confidant and hold ongoing personal conversations
+    with a user.
+  examples: []
+  source_url: https://www.ftc.gov/news-events/news/press-releases/2025/09/ftc-launches-inquiry-ai-chatbots-acting-companions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH
+- term: Content moderation
+  definition: The processes, human and automated, a service uses to review and remove content that breaks
+    its rules or the law.
+  examples: []
+  source_url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/effective-content-moderation/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OH

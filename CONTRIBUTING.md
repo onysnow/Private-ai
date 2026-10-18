@@ -4,7 +4,7 @@ Journalism Workbench is currently a closed personal project (see [LICENSE](LICEN
 
 ## Development setup
 
-- **Backend:** FastAPI + SQLAlchemy, Python 3.12 (`backend/requirements.txt`, `backend/requirements-local.txt`). On Windows, `Start Journalism Workbench.bat` provisions a private `.venv` and installs pinned dependencies automatically.
+- **Backend:** FastAPI + SQLAlchemy, Python 3.12. Dependencies are layered across three files (STRUCT-0026): `backend/requirements.txt` (runtime only -- what the Docker image installs), `backend/requirements-test.txt` (adds pytest/pytest-cov, `-r requirements.txt`), and `backend/requirements-local.txt` (adds mypy/ruff/black/pypdf for local dev and lint CI, `-r requirements-test.txt`). On Windows, `Start Journalism Workbench.bat` provisions a private `.venv` and installs pinned dependencies automatically.
 - **Frontend:** Next.js + React + TypeScript (`frontend/package.json`).
 - **Full stack** (Postgres + OpenAleph + frontend): `docker compose up --build`.
 

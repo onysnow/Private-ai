@@ -205,6 +205,18 @@ def decide_browser_write_access(
     if method.upper() in SAFE_BROWSER_METHODS:
         return AccessDecision(True)
 
+    # Check the origin allow-list before the Sec-Fetch-Site cross-site check: Chrome
+    # sends Sec-Fetch-Site: cross-site for any two different ports on 127.0.0.1/
+    # localhost, even when both are explicitly allow-listed (e.g. the standard
+    # two-process local-dev setup). An already-whitelisted origin must not be
+    # rejected by that same-host-different-port false positive.
+    if origin is not None:
+        normalized = _normalize_origin(origin)
+        allowed = {_normalize_origin(item) for item in allowed_origins}
+        allowed.discard("")
+        if normalized and normalized in allowed:
+            return AccessDecision(True)
+
     fetch_site = (sec_fetch_site or "").strip().lower()
     if fetch_site == "cross-site":
         return AccessDecision(False, 403, "Cross-site browser writes are not allowed.")
@@ -221,7 +233,7 @@ def decide_browser_write_access(
     return AccessDecision(True)
 
 
-async def enforce_api_access(request: Request, configured_token: str):
+async def enforce_api_access(request: Request, configured_token: str) -> JSONResponse | None:
     """Return a denial response for an unauthorized API request, otherwise None."""
     if not request.url.path.startswith("/api"):
         return None
@@ -246,7 +258,7 @@ async def enforce_api_access(request: Request, configured_token: str):
     )
 
 
-async def enforce_browser_write_access(request: Request, allowed_origins: list[str]):
+async def enforce_browser_write_access(request: Request, allowed_origins: list[str]) -> JSONResponse | None:
     if not request.url.path.startswith("/api"):
         return None
     decision = decide_browser_write_access(

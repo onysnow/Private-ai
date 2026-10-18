@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.routes import router
+from app.main import register_domain_routers
 from app.core.authorization import (
     AuthorizationScope,
     InvestigationAuthorizationError,
@@ -76,7 +76,7 @@ def _scoped_app(factory) -> FastAPI:
         finally:
             reset_current_authorization_scope(token)
 
-    app.include_router(router)
+    register_domain_routers(app)
     return app
 
 
@@ -157,3 +157,86 @@ def test_remote_scoped_routes_hide_other_investigations_and_filter_global_surfac
 
     with factory() as db:
         assert db.query(Entity).filter(Entity.caption == "Cross-scope write").count() == 0
+
+
+def _seed_presentation_and_relationship(factory, investigation_id: str, suffix: str) -> None:
+    """A deck, a write-up and a relationship edge in one investigation."""
+    from app.models.decks import Deck
+    from app.models.relationships import RelationshipEdge
+    from app.models.writeups import Writeup
+
+    with factory() as db:
+        ends = [
+            Entity(id=f"{name}-{suffix}", investigation_id=investigation_id, ftm_id=f"{name}-{suffix}", schema=schema,
+                   caption=name, properties={"name": [name]} if schema != "Ownership" else {})
+            for name, schema in (("owner", "Person"), ("asset", "Company"), ("link", "Ownership"))
+        ]
+        db.add_all(ends)
+        db.add_all([
+            Deck(id=f"deck-{suffix}", investigation_id=investigation_id, title="Deck", slides_json=[]),
+            Writeup(id=f"writeup-{suffix}", investigation_id=investigation_id, title="Write-up",
+                    content_json={"type": "doc", "content": []}),
+            RelationshipEdge(id=f"edge-{suffix}", investigation_id=investigation_id, relationship_entity_id=f"link-{suffix}",
+                             schema="Ownership", source_entity_id=f"owner-{suffix}", target_entity_id=f"asset-{suffix}",
+                             source_prop="owner", target_prop="asset"),
+        ])
+        db.commit()
+
+
+def test_decks_writeups_and_relationships_stay_inside_their_investigation(monkeypatch):
+    factory = _db_factory()
+    _seed(factory)
+    _seed_presentation_and_relationship(factory, "inv-allowed", "allowed")
+    _seed_presentation_and_relationship(factory, "inv-denied", "denied")
+    monkeypatch.setattr(settings, "api_auth_investigation_ids", "inv-allowed")
+    app = _scoped_app(factory)
+
+    with TestClient(app, base_url="https://journalism.example.test") as client:
+        for path in ("/api/decks/deck-{}", "/api/writeups/writeup-{}", "/api/relationships/edge-{}/evidence-reviews"):
+            assert client.get(path.format("allowed")).status_code == 200, path
+            denied = client.get(path.format("denied"))
+            assert denied.status_code == 404, path
+            assert denied.json()["detail"] == "Investigation not found"
+        assert client.get("/api/decks/deck-denied/export.pptx").status_code == 404
+        assert client.get("/api/writeups/writeup-denied/export.docx").status_code == 404
+        assert client.patch("/api/writeups/writeup-denied", json={"title": "Taken"}).status_code == 404
+        assert client.delete("/api/decks/deck-denied").status_code == 404
+
+    from app.models.decks import Deck
+    from app.models.writeups import Writeup
+    with factory() as db:
+        assert db.get(Deck, "deck-denied") is not None
+        assert db.get(Writeup, "writeup-denied").title == "Write-up"
+
+
+# Path parameters that name something other than an investigation's record:
+# console and settings routes are local-request-only, and these name a kind,
+# a provider, a property or a table rather than a row.
+_NOT_INVESTIGATION_RECORDS = {
+    "investigation_id", "user_id", "provider", "prop", "name", "kind", "pk", "asset", "source",
+    "aid", "bid", "cid", "qid", "rid", "tid", "uid",
+    # The base map (routes_basemap.py): a tile's zoom and column and row, a font
+    # stack and glyph range, a sprite file. The same for every investigation.
+    "z", "x", "y", "stack", "glyph_range",
+    # The indicator catalogue (routes_catalogue.py): the same for every investigation.
+    "indicator_id",
+    # A small real demo case (routes_demo.py, app/services/demo_cases.py): one of three fixed names.
+    "case_id",
+}
+
+
+def test_every_record_in_a_path_is_traced_to_its_investigation():
+    """A route that takes a record id the scope check cannot trace would let a
+    reporter limited to one investigation read another's record (the gap the
+    deck and write-up routes had)."""
+    import inspect
+    import re
+
+    from app.core import authorization
+    from app.main import app
+
+    source = inspect.getsource(authorization._resource_investigation_id)
+    params = {name for path in app.openapi()["paths"] if path.startswith("/api/") and not path.startswith("/api/console/")
+              for name in re.findall(r"{(\w+)}", path)}
+    untraced = {name for name in params - _NOT_INVESTIGATION_RECORDS if f'"{name}"' not in source}
+    assert not untraced, f"path parameters the investigation scope cannot trace: {sorted(untraced)}"

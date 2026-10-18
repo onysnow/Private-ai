@@ -1,0 +1,438 @@
+area: WS
+terms:
+- term: OSHA
+  definition: The US federal agency that sets and enforces workplace safety and health rules.
+  examples: []
+  source_url: https://www.osha.gov/enforcement/svep
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Severe Violator Enforcement Program (SVEP)
+  definition: An OSHA programme for employers with willful, repeat or failure-to-abate violations linked
+    to deaths, serious injuries or egregious conduct; brings follow-up inspections and corporate-wide
+    measures.
+  examples: []
+  source_url: https://www.osha.gov/enforcement/svep
+  cases: []
+  related:
+  - Willful violation
+  - Repeat violation
+  - Failure to abate
+  indicators: []
+  areas:
+  - WS
+- term: Willful violation
+  definition: A safety violation the employer committed knowingly or with plain indifference to the rule;
+    carries the highest civil penalties and, if it causes a death, possible criminal charges.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/666
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Repeat violation
+  definition: A citation for a hazard substantially similar to one in an earlier citation that has become
+    final.
+  examples: []
+  source_url: https://www.nsc.org/safety-first/osha-and-repeat-violations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Failure to abate
+  definition: Not correcting a cited hazard by the deadline; penalties can run for each day it continues.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/29/666
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Egregious (per-instance) citation
+  definition: OSHA's practice of citing each instance of a violation separately, used for the worst cases.
+  examples: []
+  source_url: https://www.osha.gov/enforcement/svep
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: High-gravity serious violation
+  definition: A serious violation OSHA rates at the highest severity and likelihood; only these count
+    toward SVEP's non-fatality criterion.
+  examples: []
+  source_url: https://www.osha.gov/enforcement/svep
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Enhanced Settlement Agreement
+  definition: A settlement under SVEP that can shorten an employer's term in the programme to two years
+    if an independently verified safety management system is put in place.
+  examples: []
+  source_url: https://www.osha.gov/enforcement/svep
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: State Plan
+  definition: A state-run workplace safety programme approved by OSHA that enforces rules in place of
+    federal OSHA.
+  examples: []
+  source_url: https://www.osha.gov/enforcement/svep
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: MSHA
+  definition: The US Mine Safety and Health Administration, which inspects mines and enforces the Mine
+    Act.
+  examples: []
+  source_url: https://www.msha.gov/compliance-and-enforcement/pattern-violations-pov
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Significant and Substantial (S&S) violation
+  definition: A mine violation reasonably likely to cause serious injury or illness.
+  examples: []
+  source_url: https://www.msha.gov/compliance-and-enforcement/pattern-violations-pov
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Pattern of Violations (POV)
+  definition: MSHA's process for mines with recurring S&S violations; a notice leads to withdrawal orders
+    for any further S&S violation.
+  examples: []
+  source_url: https://www.msha.gov/compliance-and-enforcement/pattern-violations-pov
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Elevated citations/orders
+  definition: MSHA's more severe enforcement actions under Mine Act sections 104(b), 104(d), 104(g) and
+    107(a), counted in POV screening.
+  examples: []
+  source_url: https://www.msha.gov/compliance-and-enforcement/pattern-violations-pov
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Withdrawal order
+  definition: An MSHA order removing miners from an affected area until a violation is fixed.
+  examples: []
+  source_url: https://www.msha.gov/compliance-and-enforcement/pattern-violations-pov
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Rock dust
+  definition: Inert stone dust spread in coal mines to stop coal dust from exploding; UBB had grossly
+    inadequate quantities.
+  examples: []
+  source_url: https://www.msha.gov/sites/default/files/Data_Reports/Fatals/Coal/Upper%20Big%20Branch/ExecutiveSummary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Leading indicator
+  definition: A forward-looking measure of safety activity, such as hazards fixed or training completed,
+    that can warn of problems before harm occurs.
+  examples: []
+  source_url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+  cases: []
+  related:
+  - Lagging indicator
+  indicators: []
+  areas:
+  - WS
+- term: Lagging indicator
+  definition: A measure of past harm, such as injury counts and rates.
+  examples: []
+  source_url: https://www.osha.gov/sites/default/files/OSHA_Leading_Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Process safety
+  definition: Managing the risk of fires, explosions and toxic releases from hazardous processes, distinct
+    from everyday personal injury safety.
+  examples: []
+  source_url: https://www.csb.gov/newsroom/detail.aspx?nid=205
+  cases: []
+  related:
+  - Personal safety
+  indicators: []
+  areas:
+  - WS
+- term: Process Safety Management (PSM)
+  definition: OSHA's standard for facilities handling highly hazardous chemicals; CSB noted OSHA's single
+    planned PSM inspection at Texas City.
+  examples: []
+  source_url: https://www.csb.gov/newsroom/detail.aspx?nid=205
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Chemical Safety Board (CSB)
+  definition: An independent US federal agency that investigates chemical accidents and issues safety
+    recommendations; it does not issue fines.
+  examples: []
+  source_url: https://www.csb.gov/investigations/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Combustible dust
+  definition: Fine particles of materials like sugar or grain that can explode when suspended in air and
+    ignited.
+  examples: []
+  source_url: https://www.csb.gov/imperial-sugar-company-dust-explosion-and-fire/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: FGAN (fertilizer-grade ammonium nitrate)
+  definition: A fertiliser that can detonate in a fire; the material at the West Fertilizer explosion.
+  examples: []
+  source_url: https://www.csb.gov/west-fertilizer-explosion-and-fire-/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Corporate manslaughter
+  definition: In the UK, the crime an organisation commits when the way its senior management runs it
+    causes a death through a gross breach of a duty of care.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2007/19/section/1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Gross breach
+  definition: Conduct falling far below what can reasonably be expected of the organisation in the circumstances.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2007/19/section/1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Senior management
+  definition: People who play significant roles in deciding or actually managing how the whole or a substantial
+    part of an organisation's activities are run.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2007/19/section/1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Gross negligence manslaughter
+  definition: The common-law offence used in England and Wales to prosecute individuals whose grossly
+    negligent failings cause a death.
+  examples: []
+  source_url: https://www.cps.gov.uk/legal-guidance/corporate-manslaughter
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: FMCSA
+  definition: The US Federal Motor Carrier Safety Administration, which registers and regulates interstate
+    truck and bus companies.
+  examples: []
+  source_url: https://www.gao.gov/products/GAO-12-364
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Chameleon carrier
+  definition: A truck or bus company that re-registers under a new identity to escape a poor safety record
+    or enforcement action.
+  examples: []
+  source_url: https://www.gao.gov/products/GAO-12-364
+  cases: []
+  related:
+  - Reincarnated carrier
+  - Affiliated carrier
+  indicators: []
+  areas:
+  - WS
+- term: Reincarnated / affiliated carrier
+  definition: FMCSA's terms for a carrier operating under a new identity or through a related company
+    to avoid orders, penalties or a negative compliance history.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-386/subpart-G/section-386.73
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Out-of-service order
+  definition: An FMCSA order barring a carrier, driver or vehicle from operating.
+  examples: []
+  source_url: https://www.fmcsa.dot.gov/newsroom/fmcsa-issues-cease-and-desist-order-against-sky-express-inc-prohibiting-illegal-bus-company
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Vetting program (FMCSA)
+  definition: FMCSA's review of new passenger and household-goods carrier applications, matching them
+    against data on poorly performing carriers.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-12-364.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: CSA / SMS
+  definition: FMCSA's Compliance, Safety, Accountability programme and its Safety Measurement System,
+    which ranks carriers by percentile on safety categories.
+  examples: []
+  source_url: https://csa.fmcsa.dot.gov/Documents/SBA_02142012_Final_508.pdf
+  cases: []
+  related:
+  - BASIC
+  indicators: []
+  areas:
+  - WS
+- term: BASIC
+  definition: 'One of seven FMCSA safety categories: Unsafe Driving, Fatigued Driving (HOS), Driver Fitness,
+    Controlled Substances/Alcohol, Vehicle Maintenance, Cargo-Related and Crash Indicator.'
+  examples: []
+  source_url: https://csa.fmcsa.dot.gov/Documents/SBA_02142012_Final_508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Intervention threshold
+  definition: The BASIC percentile above which FMCSA may intervene with a carrier; lower for passenger
+    and hazmat carriers.
+  examples: []
+  source_url: https://csa.fmcsa.dot.gov/Documents/SBA_02142012_Final_508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Rainscreen cladding panels
+  definition: Exterior panels fixed to a building's outer wall over insulation; at Grenfell, combustible
+    panels and insulation spread the fire.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Approved Document B
+  definition: UK government guidance on meeting the fire-safety requirements of the Building Regulations.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Class 0
+  definition: A UK classification for surface fire spread that remained in guidance after the department
+    knew it was inappropriate for judging cladding.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: BBA (British Board of Agrément)
+  definition: A UK body that certifies construction products; the Grenfell Inquiry found its scrutiny
+    of key products seriously deficient.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: LABC
+  definition: Local Authority Building Control, whose product certificates the Grenfell Inquiry criticised.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: TMO (Tenant Management Organisation)
+  definition: The Kensington and Chelsea TMO managed Grenfell Tower on behalf of the council (RBKC).
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Fire risk assessment
+  definition: A review of a building's fire hazards and the measures needed; at Grenfell the assessor
+    misrepresented qualifications and often did not follow up.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/66d817aa701781e1b341dbd3/CCS0923434692-004_GTI_Phase_2_Volume_1_BOOKMARKED.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Golden thread of information
+  definition: Hackitt's term for a complete, maintained record of how a higher-risk residential building
+    was designed, built and changed.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Higher-risk residential building (HRRB)
+  definition: Hackitt's category for tall residential buildings needing stricter safety regulation.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS
+- term: Race to the bottom
+  definition: Hackitt's description of an industry cutting corners on safety through ignorance, indifference
+    and unclear responsibilities.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5afc50c840f0b622e4844ab4/Building_a_Safer_Future_-_web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - WS

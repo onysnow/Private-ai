@@ -234,3 +234,25 @@ The settings status endpoint now exposes both `local_entity_suggestions_enabled`
 ## Compact reviewed-duplicate provenance (DEV 0.93)
 
 When post-merge review marks relationship edges as duplicates and selects a preferred presentation record, the compact graph and entity dossier now expose a read-only provenance inventory across all preserved duplicate edges. This includes the underlying relationship IDs, statement dataset/origin fingerprints, and every exact evidence/source record attached to those edges. The underlying records are not merged or deleted; `include_reconciled_duplicates=true` still returns them independently for audit.
+
+
+## Engineering hardening pass (post-DEV 1.24)
+
+Since DEV 1.24, the backend's former 3,600-line `routes.py` was split into
+16 domain-scoped route modules (`app/api/routes_*.py`) across 8 staged
+groups, with `routes.py` itself deleted once the split completed. A
+structured, multi-dimension engineering audit followed (architecture,
+code review, debugging, deploy-checklist, documentation, incident
+response, system design, tech debt, testing strategy, standup), producing
+40 tracked findings in `STRUCTURE_AUDIT.md`; the MATERIAL/BLOCKING ones
+are being worked through one at a time, each backed by real code changes,
+full regression runs, and a dedicated dev-log entry. A Firecrawl web/
+research connector was added alongside the existing Aleph/OpenSanctions
+connectors (see `docs/adr/0001-firecrawl-connector-provider.md`).
+
+This entry is intentionally a summary, not a substitute for detail: this
+project's day-to-day engineering log (session by session, one entry per
+unit of work) lives in [`dev-log.md`](dev-log.md), not here. This file
+stays the compact, product-facing milestone history; `dev-log.md` is
+where the granular "what changed and why" for each of those findings and
+splits actually lives.

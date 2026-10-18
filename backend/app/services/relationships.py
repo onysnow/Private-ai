@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import re
+from typing import Any
+
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import Entity, RelationshipEdge, Statement, Evidence, Source, ClaimEvidenceLink, Claim, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment
 from app.services.ftm import make_ftm_entity
 
@@ -37,6 +41,16 @@ RELATIONSHIP_SCHEMAS = {
         "target_label": "Employer",
         "label": "Employment",
     },
+    # FtM Payment interstitial: payer -> beneficiary. Amount/currency/date/purpose
+    # are ordinary FtM Payment properties; see app/services/financial_flows.py
+    # for the ledger view built from these edges.
+    "Payment": {
+        "source_prop": "payer",
+        "target_prop": "beneficiary",
+        "source_label": "Payer",
+        "target_label": "Beneficiary",
+        "label": "Payment",
+    },
     "UnknownLink": {
         "source_prop": "subject",
         "target_prop": "object",
@@ -54,9 +68,38 @@ def relationship_schema_info(schema: str) -> dict:
     return info
 
 
+_PARTIAL_ISO_DATE = re.compile(r"^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$")
+
+
+def validate_payment_properties(props: dict[str, list[str]]) -> None:
+    """Reject Payment values the financial ledger could not read back.
+
+    Only checks what is present: a Payment without an amount, currency or date
+    is still a valid FtM record, and the ledger lists it as incomplete rather
+    than guessing the missing value.
+    """
+    for value in props.get("amount", []):
+        try:
+            float(str(value).replace(",", ""))
+        except ValueError:
+            raise ValueError(f"Payment amount must be a number: {value!r}") from None
+    for value in props.get("currency", []):
+        if not re.fullmatch(r"[A-Za-z]{3}", str(value).strip()):
+            raise ValueError(f"Payment currency must be a 3-letter ISO 4217 code: {value!r}")
+    for prop in ("date", "startDate", "endDate"):
+        for value in props.get(prop, []):
+            if not _PARTIAL_ISO_DATE.match(str(value).strip()):
+                raise ValueError(f"Payment {prop} must be YYYY, YYYY-MM or YYYY-MM-DD: {value!r}")
+    if "currency" in props:
+        props["currency"] = [str(v).strip().upper() for v in props["currency"]]
+    if "amount" in props:
+        props["amount"] = [str(v).replace(",", "").strip() for v in props["amount"]]
+
+
 def relationship_caption(schema: str, source: Entity, target: Entity, properties: dict[str, list[str]]) -> str:
     info = relationship_schema_info(schema)
-    role = (properties.get("role") or [None])[0]
+    role_values = properties.get("role") or []
+    role = role_values[0] if role_values else None
     middle = role or info["label"]
     return f"{source.caption} — {middle} → {target.caption}"
 
@@ -92,6 +135,8 @@ def create_relationship(
             raise ValueError("Relationship evidence must belong to the same investigation")
 
     props = {key: list(values) for key, values in (properties or {}).items()}
+    if schema == "Payment":
+        validate_payment_properties(props)
     # Endpoint references are authoritative and cannot be overridden by request properties.
     props[info["source_prop"]] = [source.ftm_id]
     props[info["target_prop"]] = [target.ftm_id]
@@ -134,6 +179,10 @@ def create_relationship(
     if commit:
         db.commit()
         db.refresh(edge)
+        # The relationship goes to the OpenAleph collection (ADR-0006, Wave B).
+        # A caller that commits for itself (commit=False) queues the push after
+        # its own commit.
+        request_corpus_sync(db, investigation_id)
     else:
         db.flush()
     return edge
@@ -158,7 +207,8 @@ def relationship_evidence_attachments(db: Session, edge: RelationshipEdge) -> li
 
 RELATIONSHIP_EVIDENCE_STANCES = {"supports", "contradicts", "context", "superseded", "unresolved"}
 
-def review_relationship_evidence(db: Session, edge: RelationshipEdge, *, evidence_id: str, stance: str, rationale: str) -> RelationshipEvidenceReviewEvent:
+def review_relationship_evidence(db: Session, edge: RelationshipEdge, *, evidence_id: str, stance: str, rationale: str,
+                                 reviewer_type: str = "HUMAN") -> RelationshipEvidenceReviewEvent:
     if stance not in RELATIONSHIP_EVIDENCE_STANCES:
         raise ValueError(f"Unsupported relationship evidence stance: {stance}")
     if not rationale.strip():
@@ -172,13 +222,17 @@ def review_relationship_evidence(db: Session, edge: RelationshipEdge, *, evidenc
     attached = db.scalar(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.relationship_edge_id == edge.id, RelationshipEvidenceAttachment.evidence_id == evidence_id))
     if attached is None:
         raise ValueError("Evidence is not directly attached to this relationship")
-    event = RelationshipEvidenceReviewEvent(relationship_edge_id=edge.id, evidence_id=evidence_id, stance=stance, rationale=rationale.strip())
+    from app.ai.suite_vocab import REVIEWER_TYPES
+    if reviewer_type not in REVIEWER_TYPES:
+        raise ValueError(f"reviewer_type must be one of: {', '.join(REVIEWER_TYPES)}")
+    event = RelationshipEvidenceReviewEvent(relationship_edge_id=edge.id, evidence_id=evidence_id, stance=stance, rationale=rationale.strip(),
+                                            reviewer_type=reviewer_type)
     db.add(event); db.commit(); db.refresh(event)
     return event
 
 def relationship_evidence_review_history(db: Session, edge: RelationshipEdge) -> list[dict]:
     rows = db.scalars(select(RelationshipEvidenceReviewEvent).where(RelationshipEvidenceReviewEvent.relationship_edge_id == edge.id).order_by(RelationshipEvidenceReviewEvent.created_at, RelationshipEvidenceReviewEvent.id)).all()
-    return [{"id": r.id, "relationship_edge_id": r.relationship_edge_id, "evidence_id": r.evidence_id, "stance": r.stance, "rationale": r.rationale, "created_at": r.created_at} for r in rows]
+    return [{"id": r.id, "relationship_edge_id": r.relationship_edge_id, "evidence_id": r.evidence_id, "stance": r.stance, "rationale": r.rationale, "reviewer_type": r.reviewer_type, "created_at": r.created_at} for r in rows]
 
 def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
     source = db.get(Entity, edge.source_entity_id)
@@ -193,7 +247,7 @@ def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
                 "original_value": stmt.original_value, "first_seen": stmt.first_seen, "last_seen": stmt.last_seen,
             })
     attachments = relationship_evidence_attachments(db, edge)
-    attached_evidence = []
+    attached_evidence: list[dict[str, Any]] = []
     for attachment in attachments:
         ev = db.get(Evidence, attachment.evidence_id)
         src = db.get(Source, ev.source_id) if ev else None
@@ -245,6 +299,9 @@ def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
         "relationship_evidence_needs_review": any(item["latest_review"] is None or item["latest_review"]["stance"] in {"contradicts", "unresolved"} for item in attached_evidence),
         "relationship_evidence_attachment_count": len(attached_evidence),
         "relationship_evidence_review_counts": evidence_review_counts,
+        # A compact graph edge carries an aggregate advisory instead (see
+        # _apply_reconciliation_view); this key says which shape a reader holds.
+        "presentation_aggregate": False,
     }
     return {
         "id": edge.id,
@@ -252,6 +309,7 @@ def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
         "relationship_entity_id": edge.relationship_entity_id,
         "ftm_id": rel.ftm_id if rel else None,
         "schema": edge.schema,
+        "evidence_status": edge.evidence_status,
         "source_prop": edge.source_prop,
         "target_prop": edge.target_prop,
         "source": None if source is None else {
@@ -325,10 +383,10 @@ def _apply_reconciliation_view(
     visible: list[dict] = []
     suppressed_count = 0
     for row in rows:
-        state = states.get(row["id"])
+        row_state = states.get(row["id"])
         reconciliation = None
-        if state:
-            reconciliation = {**state}
+        if row_state:
+            reconciliation = {**row_state}
             reconciliation["suppressed_duplicate_ids"] = sorted(suppressed_by_preferred.get(row["id"], []))
             reconciliation["suppressed_duplicate_count"] = len(reconciliation["suppressed_duplicate_ids"])
             row["reconciliation"] = reconciliation
@@ -378,7 +436,7 @@ def _apply_reconciliation_view(
                     "claim_dependencies": deps,
                     "presentation_aggregate": True,
                 }
-        if state and state.get("suppressed_duplicate") and not include_reconciled_duplicates:
+        if row_state and row_state.get("suppressed_duplicate") and not include_reconciled_duplicates:
             suppressed_count += 1
             continue
         visible.append(row)
@@ -397,15 +455,36 @@ def investigation_relationships(
     schemas: set[str] | None = None,
     *,
     include_reconciled_duplicates: bool = True,
+    limit: int | None = None,
+    offset: int = 0,
 ) -> list[dict]:
+    """Relationships of an investigation, newest first.
+
+    STRUCT-0018 cycle 4: when reconciled duplicates are included (the list
+    endpoint's default) nothing is dropped after the fetch, so limit/offset
+    apply at the SQL level and serialize_relationship (several queries per
+    edge) runs only for the page. When duplicates are suppressed the view is
+    a post-fetch filter, so the slice is applied after it -- the page is
+    still exact, it just costs a full fetch, same as before this change.
+    """
     stmt = select(RelationshipEdge).where(RelationshipEdge.investigation_id == investigation_id)
     if schemas:
         stmt = stmt.where(RelationshipEdge.schema.in_(schemas))
-    edges = db.scalars(stmt.order_by(RelationshipEdge.created_at.desc())).all()
+    stmt = stmt.order_by(RelationshipEdge.created_at.desc(), RelationshipEdge.id)
+    sql_paged = include_reconciled_duplicates
+    if sql_paged:
+        if offset:
+            stmt = stmt.offset(offset)
+        if limit is not None:
+            stmt = stmt.limit(limit)
+    edges = db.scalars(stmt).all()
     rows = [serialize_relationship(db, edge) for edge in edges]
     rows, _ = _apply_reconciliation_view(
         db, investigation_id, rows, include_reconciled_duplicates=include_reconciled_duplicates
     )
+    if not sql_paged:
+        rows = rows[offset:] if offset else rows
+        rows = rows[:limit] if limit is not None else rows
     return rows
 
 

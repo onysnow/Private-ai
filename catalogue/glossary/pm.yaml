@@ -1,0 +1,249 @@
+area: PM
+terms:
+- term: Early intervention system (EIS)
+  definition: A database a police agency uses to spot officers whose records show a pattern of problems,
+    so supervisors can act before something serious happens.
+  examples: []
+  source_url: https://cops.usdoj.gov/RIC/Publications/cops-p105-pub.pdf
+  cases: []
+  related:
+  - Threshold
+  - Peer officer comparison
+  indicators: []
+  areas:
+  - PM
+- term: Threshold
+  definition: The count of incidents (for example complaints in a set period) that triggers a review of
+    an officer in an early intervention system.
+  examples:
+  - 'Miami-Dade: two or more citizen complaints in a quarter'
+  source_url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Peer officer comparison
+  definition: Judging an officer's numbers against officers with the same assignment, so busy beats are
+    not unfairly flagged.
+  examples: []
+  source_url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Use of force
+  definition: Physical coercion an officer applies to a person, from holds to deadly force, which most
+    agencies must report.
+  examples: []
+  source_url: https://policing.counciloncj.org/assessing-the-evidence/xv-early-intervention-systems-eis
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Excessive force / objective reasonableness
+  definition: Force is unlawful under the US Fourth Amendment when it is not objectively reasonable given
+    the crime, the immediate threat and whether the person resists or flees, judged without hindsight.
+  examples: []
+  source_url: https://supreme.justia.com/cases/federal/us/490/386/
+  cases: []
+  related:
+  - Graham v. Connor
+  indicators: []
+  areas:
+  - PM
+- term: Deprivation of rights under color of law (18 U.S.C. 242)
+  definition: The federal crime of an official wilfully violating someone's constitutional rights while
+    acting in an official role.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/242
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Pattern or practice (34 U.S.C. 12601)
+  definition: The federal law that lets the Justice Department sue a police agency whose officers routinely
+    violate people's rights.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/34/12601
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Consent decree
+  definition: A court-approved agreement in which a police agency agrees to reforms, overseen by an independent
+    monitor.
+  examples: []
+  source_url: https://www.justice.gov/crt/case-document/file/1223396/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Sustained complaint
+  definition: A complaint that the investigating body finds was proven.
+  examples: []
+  source_url: https://www.justice.gov/opa/file/925846/dl
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Code of silence
+  definition: An unwritten rule among officers not to report or give evidence against colleagues.
+  examples: []
+  source_url: https://libraryarchives.metro.net:443/DPGTL/publications/1991-ChristopherCommission-LAPD.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Giglio / potential impeachment information
+  definition: Information about a law-enforcement witness, such as findings of dishonesty or bias, that
+    prosecutors must give to the defence.
+  examples: []
+  source_url: https://www.justice.gov/jm/jm-9-5000-issues-related-trials-and-other-court-proceedings
+  cases: []
+  related:
+  - Brady list
+  indicators: []
+  areas:
+  - PM
+- term: Brady list
+  definition: An informal name for a prosecutor's list of officers with credibility problems that must
+    be disclosed in cases they work on.
+  examples: []
+  source_url: https://www.justice.gov/jm/jm-9-5000-issues-related-trials-and-other-court-proceedings
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Decertification / National Decertification Index (NDI)
+  definition: Revoking an officer's state licence to work in policing; the NDI is a national registry
+    of such revocations supplied by participating states.
+  examples: []
+  source_url: https://iadlest.org/our-services/ndi/about-ndi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Wandering officer
+  definition: An officer fired by one agency who is hired by another.
+  examples: []
+  source_url: https://yalelawjournal.org/article/the-wandering-officer
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Officer-involved shooting
+  definition: An incident in which a police officer fires a gun at a person.
+  examples: []
+  source_url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Knock and announce / no-knock warrant
+  definition: The rule that officers must announce themselves before entering under a warrant, and the
+    special warrants that excuse it.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/justice-department-finds-civil-rights-violations-louisville-metro-police-department-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Search warrant affidavit
+  definition: A sworn statement by an officer setting out the facts used to ask a judge for a search warrant.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/former-louisville-kentucky-police-detective-pleads-guilty-federal-crime-related-death-breonna
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Witness tampering
+  definition: Trying to influence, mislead or block a witness or investigator, including by giving false
+    accounts to them.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/three-former-memphis-tennessee-police-officers-convicted-federal-felonies-related-death-tyre
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Exoneration
+  definition: Official clearing of a person convicted of a crime, after new evidence shows they were wrongly
+    convicted.
+  examples: []
+  source_url: https://repository.law.umich.edu/pub_law_archive/776
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Racketeering (RICO)
+  definition: Federal crime of running or taking part in an enterprise through a pattern of crimes; used
+    against the Baltimore Gun Trace Task Force.
+  examples: []
+  source_url: https://www.justice.gov/usao-md/pr/two-baltimore-city-police-officers-convicted-federal-racketeering-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Hobbs Act robbery
+  definition: Federal crime of robbery or extortion that affects interstate commerce.
+  examples: []
+  source_url: https://www.justice.gov/usao-md/pr/two-baltimore-city-police-officers-convicted-federal-racketeering-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Sexual shakedown
+  definition: An officer demanding sex in exchange for not ticketing or arresting someone.
+  examples: []
+  source_url: https://www.prisonlegalnews.org/media/publications/international_association_of_chiefs_of_police_guide_to_addressing_sex_offenses_and_misconduct_by_law_enforcement_2011.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Failure to Comply / Manner of Walking charges
+  definition: Low-level municipal charges that DOJ found Ferguson used heavily and disproportionately
+    against Black residents.
+  examples: []
+  source_url: https://www.justice.gov/sites/default/files/crt/legacy/2015/03/04/ferguson_findings_summ_3-4-15.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Saturation policing
+  definition: Flooding chosen neighbourhoods with officers and stops, often by a special unit.
+  examples: []
+  source_url: https://justice.gov/crt/media/1379096/dl?inline=
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM
+- term: Network exposure (misconduct)
+  definition: Research finding that officers whose colleagues have force complaints are more likely to
+    get them too.
+  examples: []
+  source_url: https://www.ipr.northwestern.edu/news/2019/papachristos-police-misconduct-study.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PM

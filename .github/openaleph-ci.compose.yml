@@ -1,0 +1,15 @@
+# Added to docker-compose.yml by openaleph-live-ci.yml (COMPOSE_FILE) for a
+# throwaway OpenAleph on a GitHub-hosted runner. The runner guarantees 14 GB
+# of disk ("GitHub-hosted runners reference", docs.github.com), and the
+# OpenAleph images take most of what it has. Elasticsearch's default disk
+# watermarks are shares of the disk (no new shards past 90% used, every
+# index read-only past 95%), so on a nearly full disk OpenAleph answers 500
+# to every write. Here Elasticsearch stops only when less than 500 MB is
+# left. Elasticsearch reads settings from the environment as
+# discovery.type is read in docker-compose.yml.
+services:
+  elasticsearch:
+    environment:
+      cluster.routing.allocation.disk.watermark.low: 1gb
+      cluster.routing.allocation.disk.watermark.high: 700mb
+      cluster.routing.allocation.disk.watermark.flood_stage: 500mb

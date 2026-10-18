@@ -1,0 +1,1836 @@
+key: PL
+name: Pollution and environmental health
+scope: Illegal discharges, falsified monitoring, chronic non-compliance, drinking-water violations, PFAS,
+  coal ash, vehicle defeat devices, ships dumping oil at sea, and community air quality.
+indicators:
+- id: PL-001
+  name: Facility flagged in significant non-compliance (SNC) or as a High Priority Violator (HPV)
+  definition: A regulator has classed a facility's violations as serious (SNC under the Clean Water Act
+    or RCRA, HPV under the Clean Air Act) in its public compliance data.
+  areas:
+  - PL
+  typology: Chronic non-compliance
+  status: verified
+  sources:
+  - title: ECHO Watch List Reports
+    publisher: US EPA
+    url: https://echo.epa.gov/node/126
+    locator: Watch List page, definitions
+    quote: serious violations will be noted as "Significant Noncompliance" or SNC
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'National Compliance Initiative: Reducing Significant Non-Compliance with NPDES Permits'
+    publisher: US EPA
+    url: https://www.epa.gov/enforcement/national-compliance-initiative-reducing-significant-non-compliance-national-pollutant
+    locator: Background
+    quote: In fiscal year (FY) 2018, 20.3% of these facilities were in significant noncompliance (SNC)
+      with their permits.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A wastewater plant shown in EPA ECHO with SNC flags in several recent quarters
+  - A refinery listed as an HPV under the Clean Air Act
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - PublicBody
+  - Address
+  - Event
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - EPA ECHO facility search and Detailed Facility Report
+  - State environmental agency compliance databases
+  levels:
+    faint: SNC/HPV flag in one quarter
+    strong: SNC/HPV flag in several consecutive quarters
+    textbook: Flagged SNC or HPV in the regulator's own data
+    threshold_source: https://echo.epa.gov/node/126
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Data-entry or reporting errors in ECHO that the state later corrects
+  - A one-off upset or equipment failure already being fixed
+  - Permit limits tightened faster than a plant could be upgraded, with a compliance schedule in place
+  - Small public systems with too little money or staff rather than wilful violation
+  version: 1
+- id: PL-002
+  name: Serious violations left without formal enforcement past the expected timeline (EPA Watch List)
+  definition: A facility has stayed in serious non-compliance longer than the 180 to 360 days in which
+    regulators are expected to take formal action, and no formal action has been taken.
+  areas:
+  - PL
+  typology: Regulatory inaction
+  status: verified
+  sources:
+  - title: ECHO Watch List Reports
+    publisher: US EPA
+    url: https://echo.epa.gov/node/126
+    locator: Watch List page, enforcement timelines
+    quote: typically it is between 180 and 360 days.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: ECHO Watch List Reports
+    publisher: US EPA
+    url: https://echo.epa.gov/node/126
+    locator: Watch List page, purpose
+    quote: EPA maintains a "Watch List" to facilitate dialogue between EPA, state and local environmental
+      agencies
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A facility that appears on successive quarterly Watch List reports with no penalty order or consent
+    decree recorded
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Event
+  - CourtCase
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - EPA ECHO Watch List quarterly reports
+  - ECHO enforcement and case history
+  - State agency enforcement dockets
+  levels:
+    faint: In SNC/HPV with only informal actions (warning letters)
+    strong: Past 180 days in SNC/HPV with no formal action
+    textbook: Listed on EPA's Watch List (past the 180-360 day timeline without formal action)
+    threshold_source: https://echo.epa.gov/node/126
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Formal action is under negotiation but not yet recorded
+  - A state action exists but has not been entered into federal data
+  - The facility is being closed or rebuilt under an agreed plan
+  version: 1
+- id: PL-003
+  name: Repeated or large exceedances of permitted discharge limits
+  definition: A permit holder's own monitoring reports show pollutant levels over its permit limit repeatedly
+    or by a large margin over a six-month period.
+  areas:
+  - PL
+  typology: Illegal discharge
+  status: verified
+  sources:
+  - title: Effluent Exceedance Violations (ECHO training, April 2024)
+    publisher: US EPA ECHO
+    url: https://echo.epa.gov/system/files/Effluent%20Exceedance%20Violations_April%202024-508.pdf
+    locator: Chronic violation criterion
+    quote: equal or exceed the limit by 20 or 40 percent in any two or more months in a 6-month period
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Effluent Exceedance Violations (ECHO training, April 2024)
+    publisher: US EPA ECHO
+    url: https://echo.epa.gov/system/files/Effluent%20Exceedance%20Violations_April%202024-508.pdf
+    locator: Technical Review Criteria (TRC)
+    quote: equal or exceed the limit by 20 or 40 percent in any two or more months in a 6-month period
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - E. coli or ammonia exceedances at a municipal sewage plant month after month
+  - Metals exceeding limits by more than 20% at an industrial discharger
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Document
+  - Event
+  - Note
+  checkable: records
+  lookup_sources:
+  - EPA ECHO effluent charts (DMR data)
+  - State NPDES permit files
+  levels:
+    faint: A single month over the limit
+    strong: Exceedances in two or three months of a six-month period
+    textbook: Chronic (any exceedance in 4+ of 6 months) or TRC (Group I by 40% or Group II by 20% in
+      2+ of 6 months)
+    threshold_source: https://echo.epa.gov/system/files/Effluent%20Exceedance%20Violations_April%202024-508.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Heavy rainfall or snowmelt overwhelming a plant
+  - Laboratory or unit-conversion error in the report
+  - New, stricter permit limit taking effect
+  - Plant upgrade under construction with an agreed schedule
+  version: 1
+- id: PL-004
+  name: Missing, late or incomplete compliance monitoring reports
+  definition: A permit holder fails to file the discharge monitoring reports or other self-reports it
+    is required to submit, so regulators cannot see whether it is complying.
+  areas:
+  - PL
+  typology: Falsified or absent monitoring
+  status: verified
+  sources:
+  - title: 'National Compliance Initiative: Reducing Significant Non-Compliance with NPDES Permits'
+    publisher: US EPA
+    url: https://www.epa.gov/enforcement/national-compliance-initiative-reducing-significant-non-compliance-national-pollutant
+    locator: Types of SNC violations
+    quote: failure to submit reports that can mask serious deficiencies
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A facility page in ECHO showing DMR 'non-receipt' for several quarters
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - EPA ECHO DMR non-receipt flags
+  - State permit compliance files
+  levels:
+    faint: One report missing or late
+    strong: Several consecutive reports missing
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Electronic reporting (NetDMR) transfer failures
+  - Change of operator or consultant during the period
+  - Facility idle or not discharging, with the 'no discharge' code not entered
+  version: 1
+- id: PL-005
+  name: Monitoring results fabricated, or testing reported that was never done
+  definition: Discharge or water-quality reports show results from sampling or laboratory tests that did
+    not happen, or values changed to show compliance.
+  areas:
+  - PL
+  typology: Falsified monitoring
+  status: verified
+  sources:
+  - title: Laboratory operator sentenced to 40 months for fabricating industrial wastewater results
+    publisher: US Department of Justice
+    url: https://www.justice.gov/opa/pr/laboratory-operator-sentenced-40-months-fabricating-industrial-wastewater-results
+    locator: Press release, August 27, 2013
+    quote: such testing had not been done
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Chief executive officer sentenced to 36 months in prison for submitting hundreds of false monitoring
+      reports
+    publisher: US Department of Justice
+    url: https://www.justice.gov/opa/pr/chief-executive-officer-sentenced-36-months-prison-submitting-hundreds-false-monitoring
+    locator: Press release, September 12, 2022
+    quote: Gordon fabricated the test results and related reports
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Former Indiana water treatment plant superintendent sentenced to prison for falsifying reports
+    publisher: US Department of Justice
+    url: https://www.justice.gov/archives/opa/pr/former-indiana-water-treatment-plant-superintendent-sentenced-prison-falsifying-reports
+    locator: Press release, September 15, 2009
+    quote: falsifying discharge monitoring reports that concealed violations of the Clean Water Act
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Results that never vary, or that sit just under the limit every month
+  - Lab reports on letterhead of a lab that has no record of the samples
+  - One consultant filing reports for many clients with no lab invoices
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Organization
+  - Document
+  - Employment
+  - Contract
+  - Payment
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - State DMR files
+  - Laboratory accreditation registers
+  - Court records (PACER)
+  levels:
+    faint: Results unusually flat or always just below the limit
+    strong: Lab paperwork or chain-of-custody forms that cannot be matched to the named laboratory
+    textbook: A court or regulator finds the results fabricated
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Well-run plants do produce stable results
+  - Rounding or reporting conventions make values look uniform
+  - Clerical errors in copying lab results
+  version: 1
+- id: PL-006
+  name: Company gives the regulator a misleading picture of its compliance
+  definition: An operator reports or presents its performance in a way that hides discharges or breaches
+    from the regulator.
+  areas:
+  - PL
+  typology: Concealment
+  status: verified
+  sources:
+  - title: Record £90m fine for Southern Water following Environment Agency prosecution
+    publisher: UK Environment Agency / GOV.UK
+    url: https://www.gov.uk/government/news/record-90m-fine-for-southern-water-following-ea-prosecution
+    locator: Press release, 9 July 2021
+    quote: deliberately presented a misleading picture of compliance to the Environment Agency
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Self-reported spill data that does not match independent flow monitors or river testing
+  cases: []
+  data_needed:
+  - Company
+  - PublicBody
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Environment Agency public registers
+  - Company annual performance reports
+  - Court sentencing remarks
+  levels:
+    faint: Self-reported data differs from independent data
+    strong: Regulator opens an investigation into reporting accuracy
+    textbook: A court or regulator finds the company misled the regulator
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Faulty or uncalibrated monitors
+  - Different methods for counting events
+  - Honest misunderstanding of a permit condition
+  version: 1
+- id: PL-007
+  name: Sewage treatment works spilling before treating the flow its permit requires (flow-to-full-treatment
+    breaches)
+  definition: A sewage works discharges untreated or partly treated sewage while it is treating less than
+    the flow its permit requires it to treat first.
+  areas:
+  - PL
+  typology: Illegal discharge
+  status: verified
+  sources:
+  - title: Environment Agency investigation into sewage treatment works
+    publisher: UK Environment Agency
+    url: https://environmentagency.blog.gov.uk/2022/02/16/environment-agency-investigation-into-sewage-treatment-works
+    locator: Blog post, 16 February 2022
+    quote: The investigations were launched after companies revealed to us that they may be in breach
+      of their permit conditions.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2024/1203 on the protection of the environment through criminal law
+    publisher: European Union (EUR-Lex)
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401203
+    locator: Article 3(2)(a)
+    quote: the discharge, emission or introduction of a quantity of materials or substances, energy or
+      ionising radiation, into air, soil or water which causes or is likely to cause the death of, or
+      serious injury to, any person or substantial damage to the quality of air, soil or water
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Storm overflow at a works spilling in dry weather or while inflow is below the permitted flow-to-full-treatment
+    level
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Event duration monitoring (EDM) data published by English water companies and the Environment Agency
+  - Flow data obtained by environmental information requests
+  levels:
+    faint: Frequent spills at one works
+    strong: Spills recorded while inflow is below the permitted treatment level
+    textbook: Regulator finds a permit breach
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Heavy rainfall legitimately exceeding capacity
+  - Flow monitor error
+  - Permit conditions unclear about measurement points
+  version: 1
+- id: PL-008
+  name: Very high number and duration of illegal sewage or effluent discharges
+  definition: A utility or plant has many discharges, lasting a long total time, that are not allowed
+    by its permits.
+  areas:
+  - PL
+  typology: Illegal discharge
+  status: verified
+  sources:
+  - title: Record £90m fine for Southern Water following Environment Agency prosecution
+    publisher: UK Environment Agency / GOV.UK
+    url: https://www.gov.uk/government/news/record-90m-fine-for-southern-water-following-ea-prosecution
+    locator: Press release, 9 July 2021
+    quote: causing 6,971 illegal discharges over the offending period
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Thousands of discharges totalling tens of thousands of hours from treatment works into protected or
+    shellfish waters
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Environment Agency storm overflow spill data
+  - EPA ECHO sanitary sewer overflow data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful storm overflow use in exceptional rainfall
+  - Combined sewer systems designed to overflow in storms
+  - Monitors recording false spills
+  version: 1
+- id: PL-009
+  name: Failure to build, maintain and operate wastewater infrastructure while paying dividends
+  definition: A water company falls short on maintaining sewage infrastructure while paying shareholders
+    in ways a regulator later finds broke the rules.
+  areas:
+  - PL
+  typology: Under-investment
+  status: verified
+  sources:
+  - title: Ofwat fines Thames Water nearly £123m following two investigations
+    publisher: Water Magazine (reporting Ofwat decision of 28 May 2025)
+    url: https://www.watermagazine.co.uk/2025/05/28/ofwat-fines-thames-water-nearly-123m-following-two-investigations/
+    locator: Article, 28 May 2025
+    quote: uncovered failings that have amounted to a significant breach of the company's legal obligations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Dividends paid in the same years as rising spills and enforcement orders
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Payment
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Companies House filings
+  - Ofwat enforcement cases
+  - Annual reports
+  levels:
+    faint: Dividends paid while spill numbers rise
+    strong: Regulator opens an enforcement case
+    textbook: Regulator finds a breach of obligations
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Dividends paid within agreed regulatory rules
+  - Investment programmes that take years to show results
+  - Spill increases caused by more monitors being installed
+  version: 1
+- id: PL-010
+  name: Community drinking water system with health-based violations
+  definition: A public water system has broken a health-based drinking water standard, such as a maximum
+    contaminant level or a treatment requirement.
+  areas:
+  - PL
+  typology: Drinking water
+  status: verified
+  sources:
+  - title: 'National Enforcement and Compliance Initiative: Increasing Compliance with Drinking Water
+      Standards'
+    publisher: US EPA
+    url: https://epa.gov/enforcement/national-enforcement-and-compliance-initiative-increasing-compliance-drinking-water-0
+    locator: Background, FY 2022
+    quote: almost 3,000 CWSs had a health-based violation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Enforcement and Compliance Initiatives
+    publisher: US EPA
+    url: https://www.epa.gov/enforcement/national-enforcement-and-compliance-initiatives
+    locator: FY2024-2027 NECI list
+    quote: Seeks to improve community water systems’ compliance with the Safe Drinking Water Act
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A system listed by EPA among drinking water 'top violators'
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Address
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - EPA SDWIS / ECHO drinking water search
+  - Consumer Confidence Reports
+  - State drinking water program
+  levels:
+    faint: Monitoring or reporting violation only
+    strong: One health-based violation
+    textbook: Repeated health-based violations or listed as a top violator
+    threshold_source: https://epa.gov/enforcement/national-enforcement-and-compliance-initiative-increasing-compliance-drinking-water-0
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small systems lacking money and trained operators
+  - Naturally occurring contaminants (arsenic, radium) in source water
+  - New standards taking effect
+  version: 1
+- id: PL-011
+  name: Lead in tap water over the action level
+  definition: The 90th-percentile lead result from a water system's household tap samples is higher than
+    15 parts per billion, which triggers required follow-up.
+  areas:
+  - PL
+  typology: Drinking water
+  status: verified
+  sources:
+  - title: Lead & Copper Rule
+    publisher: Kansas Department of Health and Environment
+    url: https://www.kdhe.ks.gov/547/Lead-Copper-Rule
+    locator: Lead & Copper Rule page
+    quote: An AL is not a violation, but may trigger
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Lead & Copper Rule
+    publisher: Kansas Department of Health and Environment
+    url: https://www.kdhe.ks.gov/547/Lead-Copper-Rule
+    locator: Lead & Copper Rule page
+    quote: action level (AL) of 0.015 mg/L for Lead
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A city's 90th-percentile lead result rising above 15 ppb after a change of water source
+  cases: []
+  data_needed:
+  - PublicBody
+  - Address
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - State drinking water lead sampling results
+  - Consumer Confidence Reports
+  - SDWIS
+  levels:
+    faint: 90th percentile rising toward 15 ppb
+    strong: Individual homes far above 15 ppb
+    textbook: 90th-percentile result above 0.015 mg/L (15 ppb)
+    threshold_source: https://www.kdhe.ks.gov/547/Lead-Copper-Rule
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lead from a single home's plumbing rather than the system
+  - Sampling errors or stagnant water in unoccupied homes
+  - Short-lived disturbance from construction or line replacement
+  version: 1
+- id: PL-012
+  name: Water source or treatment changed without required corrosion control
+  definition: A water system changes its source or treatment without the corrosion control needed to stop
+    lead leaching from pipes.
+  areas:
+  - PL
+  typology: Drinking water
+  status: verified
+  sources:
+  - title: Flint Water Advisory Task Force Final Report
+    publisher: State of Michigan (Flint Water Advisory Task Force)
+    url: https://www.michigan.gov/documents/snyder/FWATF_FINAL_REPORT_21March2016_517805_7.pdf
+    locator: p. 9, Finding F-33
+    quote: There was and remains no justification for MDEQ not requiring corrosion control treatment
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A switch to river water to save money without adding orthophosphate
+  cases: []
+  data_needed:
+  - PublicBody
+  - Person
+  - Document
+  - Event
+  - Contract
+  checkable: records
+  lookup_sources:
+  - State drinking water permits and correspondence
+  - City council minutes
+  - Public records requests
+  levels:
+    faint: Source switch announced as a cost saving
+    strong: No corrosion control study before the switch
+    textbook: Official finding that corrosion control was required but not done
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Source water chemistry that does not need extra treatment
+  - Corrosion control already in place under another name
+  - Optimisation study under way with interim measures
+  version: 1
+- id: PL-013
+  name: Water sampling that avoids the highest-risk homes or is falsified
+  definition: A water system's compliance samples are taken in a way that misses homes with lead service
+    lines, or sample results are falsified.
+  areas:
+  - PL
+  typology: Falsified monitoring
+  status: verified
+  sources:
+  - title: Flint Water Advisory Task Force Final Report
+    publisher: State of Michigan (Flint Water Advisory Task Force)
+    url: https://www.michigan.gov/documents/snyder/FWATF_FINAL_REPORT_21March2016_517805_7.pdf
+    locator: p. 8, Finding F-25
+    quote: Flint personnel did not identify residences with LSLs, secure an adequate number of tap water
+      samples
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: ENRD Environmental Crimes Section bulletin
+    publisher: US Department of Justice, ENRD
+    url: https://www.justice.gov/enrd/page/file/851586/dl
+    locator: Philip Kraus case summary (falsifying drinking water samples)
+    quote: all six false statement counts
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sampling pool with few or no lead-service-line homes
+  - Samples taken after flushing taps
+  cases: []
+  data_needed:
+  - PublicBody
+  - Person
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - Lead and Copper Rule sampling site lists
+  - Service line inventories
+  - Public records requests
+  levels:
+    faint: Sample sites not matched to service line inventory
+    strong: Too few samples or sites without lead lines
+    textbook: Official finding or conviction for falsified or inadequate sampling
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Incomplete service line records
+  - Residents declining to take part
+  - Homes replaced or vacant since site lists were made
+  version: 1
+- id: PL-014
+  name: Regulator dismisses residents' complaints in an overburdened community
+  definition: Officials brush off residents' and outside experts' warnings about pollution, often in poorer
+    or minority communities.
+  areas:
+  - PL
+  typology: Environmental injustice / regulatory failure
+  status: verified
+  sources:
+  - title: Flint Water Advisory Task Force Final Report
+    publisher: State of Michigan (Flint Water Advisory Task Force)
+    url: https://www.michigan.gov/documents/snyder/FWATF_FINAL_REPORT_21March2016_517805_7.pdf
+    locator: p. 9, Finding F-36
+    quote: The Flint water crisis is a clear case of environmental injustice.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Flint Water Advisory Task Force Final Report
+    publisher: State of Michigan (Flint Water Advisory Task Force)
+    url: https://www.michigan.gov/documents/snyder/FWATF_FINAL_REPORT_21March2016_517805_7.pdf
+    locator: p. 6, Finding F-4
+    quote: '...at times, MDEQ staff were dismissive and unresponsive.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Complaints about water colour, smell or rashes logged without investigation
+  cases: []
+  data_needed:
+  - PublicBody
+  - Person
+  - Document
+  - Event
+  - Note
+  checkable: person
+  lookup_sources:
+  - Complaint logs via public records requests
+  - Agency emails
+  - Community meeting records
+  levels:
+    faint: Repeated complaints without visible follow-up
+    strong: Officials publicly deny a problem while data show it
+    textbook: Official inquiry finds complaints were dismissed
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complaints investigated and found unrelated to the source
+  - Limited agency staff
+  - Complaints about taste or odour that are not health risks
+  version: 1
+- id: PL-015
+  name: PFAS in drinking water above federal limits
+  definition: A water system's PFOA or PFOS level is above 4.0 nanograms per litre, or a PFAS mixture
+    exceeds the hazard index of 1.
+  areas:
+  - PL
+  typology: PFAS
+  status: verified
+  sources:
+  - title: PFAS National Primary Drinking Water Regulation (Federal Register, 26 April 2024)
+    publisher: US EPA / Federal Register
+    url: https://www.govinfo.gov/content/pkg/FR-2024-04-26/html/2024-07773.htm
+    locator: Summary
+    quote: the EPA is promulgating individual Maximum Contaminant Levels (MCLs) for PFOA and PFOS at 4.0
+      nanograms per liter
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PFAS National Primary Drinking Water Regulation (Federal Register, 26 April 2024)
+    publisher: US EPA / Federal Register
+    url: https://www.govinfo.gov/content/pkg/FR-2024-04-26/html/2024-07773.htm
+    locator: Compliance dates
+    quote: All systems must comply with the MCLs by April 26, 2029.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Enforcement and Compliance Initiatives
+    publisher: US EPA
+    url: https://www.epa.gov/enforcement/national-enforcement-and-compliance-initiatives
+    locator: FY2024-2027 NECI list
+    quote: Seeks to identify, investigate, and address PFAS contamination from major manufacturers and
+      other industrial parties
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A town downstream of a fluorochemical plant reporting PFOA above 4 ppt
+  cases: []
+  data_needed:
+  - PublicBody
+  - Company
+  - Address
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - EPA UCMR 5 results
+  - State PFAS sampling programs
+  - Consumer Confidence Reports
+  levels:
+    faint: Detectable PFAS in source water
+    strong: PFOA or PFOS above 4.0 ng/L before the 2029 compliance date
+    textbook: Above 4.0 ng/L for PFOA or PFOS, or hazard index over 1, after the compliance date
+    threshold_source: https://www.govinfo.gov/content/pkg/FR-2024-04-26/html/2024-07773.htm
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legacy contamination from firefighting foam at an airport or base rather than a current polluter
+  - Systems still within the time allowed to comply
+  - Laboratory detection variability near the limit
+  version: 1
+- id: PL-016
+  name: Company withholds information that its chemical poses a substantial risk
+  definition: A manufacturer fails to report to the regulator information it holds showing its chemical
+    may harm health or the environment.
+  areas:
+  - PL
+  typology: PFAS / concealment
+  status: verified
+  sources:
+  - title: EPA settles PFOA case against DuPont for largest environmental administrative penalty in agency
+      history
+    publisher: US EPA
+    url: https://19january2021snapshot.epa.gov/enforcement/reference-news-release-epa-settles-pfoa-case-against-dupont-largest-environmental_.html
+    locator: News release, 12/14/2005
+    quote: DuPont will pay $10.25 million
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Internal blood or animal studies not filed with EPA under TSCA section 8(e)
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Person
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - EPA TSCA 8(e) submissions database
+  - Litigation discovery documents
+  - EPA enforcement records
+  levels:
+    faint: Internal studies exist that were never filed
+    strong: Filing made years after the company held the data
+    textbook: Regulator finds a failure to report under TSCA 8(e)
+    threshold_source: https://19january2021snapshot.epa.gov/enforcement/reference-news-release-epa-settles-pfoa-case-against-dupont-largest-environmental_.html
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Company judged in good faith that the data did not show substantial risk
+  - Information already known to EPA
+  - Studies inconclusive at the time
+  version: 1
+- id: PL-017
+  name: Coal ash site with an inadequate groundwater monitoring network or analysis
+  definition: A coal ash disposal unit lacks enough properly placed wells, or its owner analyses the data
+    in ways that can miss contamination.
+  areas:
+  - PL
+  typology: Coal ash
+  status: verified
+  sources:
+  - title: 'Enforcement Alert: Coal Combustion Residuals (2023)'
+    publisher: US EPA
+    url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+    locator: Groundwater monitoring problems
+    quote: Failure to establish an adequate groundwater monitoring network
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Enforcement Alert: Coal Combustion Residuals (2023)'
+    publisher: US EPA
+    url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+    locator: Groundwater monitoring problems
+    quote: Failure to properly consider well data using same wells comparisons (intrawell)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Too few downgradient wells; background wells placed where ash already affects groundwater
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Utility CCR compliance websites (annual groundwater reports)
+  - EPA CCR enforcement records
+  levels:
+    faint: Few wells relative to unit size
+    strong: Repeated statistically significant increases explained away
+    textbook: EPA cites the network or analysis as deficient
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complex hydrogeology making well placement genuinely hard
+  - Network being expanded under an agreed plan
+  version: 1
+- id: PL-018
+  name: Coal ash contamination explained away as coming from another source
+  definition: An owner claims groundwater contamination near an ash unit comes from something else, without
+    adequate support.
+  areas:
+  - PL
+  typology: Coal ash
+  status: verified
+  sources:
+  - title: 'Enforcement Alert: Coal Combustion Residuals (2023)'
+    publisher: US EPA
+    url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+    locator: Groundwater monitoring problems
+    quote: Failure to adequately justify and support alternative contamination source demonstrations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated 'alternative source demonstrations' filed each time an increase is detected
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Utility CCR compliance websites
+  - State CCR permit files
+  levels:
+    faint: One alternative source demonstration
+    strong: Repeated demonstrations at the same unit
+    textbook: EPA finds the demonstration inadequately supported
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine natural or other industrial sources nearby
+  - Regional background levels of metals such as arsenic
+  version: 1
+- id: PL-019
+  name: Delayed or weak clean-up of coal ash groundwater contamination
+  definition: After contamination is found, the owner delays corrective action or picks a remedy, such
+    as natural attenuation, without technical support.
+  areas:
+  - PL
+  typology: Coal ash
+  status: verified
+  sources:
+  - title: 'Enforcement Alert: Coal Combustion Residuals (2023)'
+    publisher: US EPA
+    url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+    locator: Remedy selection and corrective action
+    quote: Failure to justify delays in implementation of corrective measures
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Enforcement Alert: Coal Combustion Residuals (2023)'
+    publisher: US EPA
+    url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+    locator: Remedy selection and corrective action
+    quote: selection and reliance on monitored natural attenuation as a groundwater remedy without technical
+      support
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Frequent Questions about Groundwater Monitoring and Corrective Action
+    publisher: US EPA
+    url: https://www.epa.gov/coal-combustion-residuals/frequent-questions-about-groundwater-monitoring-and-corrective-action-and
+    locator: Groundwater protection standard FAQ
+    quote: if a constituent of concern is detected above a statistically significant level
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Years between an assessment of corrective measures and selection of a remedy
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Utility CCR compliance websites
+  - State permit files
+  levels:
+    faint: Remedy selection later than the owner's own schedule
+    strong: Natural attenuation chosen without supporting data
+    textbook: EPA cites delay or unsupported remedy
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Natural attenuation can be valid where supported by data
+  - Delays from permitting or engineering studies
+  version: 1
+- id: PL-020
+  name: Coal ash closed with ash left in groundwater or liquids not removed
+  definition: An ash pond is closed in place without removing liquids or stopping water from reaching
+    the ash, or is declared cleaned out without proof.
+  areas:
+  - PL
+  typology: Coal ash
+  status: verified
+  sources:
+  - title: 'Enforcement Alert: Coal Combustion Residuals (2023)'
+    publisher: US EPA
+    url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+    locator: Closure with coal ash left in the unit
+    quote: Failure to implement measures to prevent releases of coal ash and contaminated leachate to
+      groundwater
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Enforcement Alert: Coal Combustion Residuals (2023)'
+    publisher: US EPA
+    url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+    locator: Closure by removal
+    quote: Failure to make an adequate assessment that all coal ash has been removed
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Enforcement and Compliance Initiatives
+    publisher: US EPA
+    url: https://www.epa.gov/enforcement/national-enforcement-and-compliance-initiatives
+    locator: Protecting Communities from Coal Ash Contamination
+    quote: Seeks to prioritize imminent threats and identify and meaningfully reduce significant risks
+      to water resources
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cap-in-place closure of an unlined pond where the ash sits below the water table
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Closure plans on utility CCR websites
+  - State permits
+  levels:
+    faint: Closure-in-place plan for an unlined unit
+    strong: Ash base below the groundwater table
+    textbook: EPA cites the closure as deficient
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Engineering reviews may show closure in place is protective
+  - Removal can carry its own risks and costs
+  version: 1
+- id: PL-021
+  name: Coal ash owner not posting required compliance documents publicly
+  definition: An owner fails to put required coal ash monitoring and closure documents on a public website.
+  areas:
+  - PL
+  typology: Coal ash / transparency
+  status: verified
+  sources:
+  - title: 'Enforcement Alert: Coal Combustion Residuals (2023)'
+    publisher: US EPA
+    url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+    locator: 2022 settlement, Comanche Station
+    quote: Failure to post required documents on a publicly accessible internet site
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Missing annual groundwater reports on a utility's CCR page
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Utility CCR compliance websites
+  - Internet Archive copies
+  levels:
+    faint: Reports posted late
+    strong: Required reports missing for a year or more
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Website migration breaking links
+  - Unit not yet subject to the posting requirement
+  version: 1
+- id: PL-022
+  name: Chemical accident prevention failures at facilities with hazardous substances
+  definition: A facility handling extremely hazardous substances such as anhydrous ammonia does not identify
+    hazards, maintain equipment or follow its risk management plan.
+  areas:
+  - PL
+  typology: Chemical accident risk
+  status: verified
+  sources:
+  - title: 'EPA Enforcement Alert: Ammonia refrigeration (Vol. 14, No. 2, February 2015)'
+    publisher: US EPA
+    url: https://epa.gov/sites/default/files/2015-02/documents/112renforcementalert.pdf
+    locator: Alert summary
+    quote: may not be fully implementing RMPs
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: National Enforcement and Compliance Initiatives
+    publisher: US EPA
+    url: https://www.epa.gov/enforcement/national-enforcement-and-compliance-initiatives
+    locator: Chemical Accident Risk Reduction
+    quote: Seeks to decrease the likelihood of chemical accidents at facilities handling extremely hazardous
+      substances.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Ice build-up making valves inaccessible; no qualified operator; corroded piping; missing emergency
+    shut-off valves
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - EPA RMP data (via public reading rooms)
+  - EPA ECHO
+  - CSB investigation reports
+  - Local emergency planning committee records
+  levels:
+    faint: RMP not updated on schedule
+    strong: Inspection cites maintenance or hazard-review failures
+    textbook: EPA finds RMP or General Duty Clause violations
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paperwork gaps at otherwise safe facilities
+  - Small operators unaware of the rules
+  - Equipment awaiting scheduled replacement
+  version: 1
+- id: PL-023
+  name: Benzene at a refinery fence line above the action level
+  definition: The rolling annual average benzene difference measured across a refinery's fence line exceeds
+    9 micrograms per cubic metre, requiring a root-cause analysis.
+  areas:
+  - PL
+  typology: Community air
+  status: verified
+  sources:
+  - title: The Benzene Fenceline Monitoring Dashboard
+    publisher: US EPA
+    url: https://awsedap.epa.gov/public/extensions/Fenceline_Monitoring/welcome.html
+    locator: Welcome page
+    quote: The benzene action level is 9 micrograms per cubic meter (µg/m3) for the rolling annual average
+      Δc.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A refinery reporting Δc above 9 µg/m3 for several consecutive periods
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - EPA Benzene Fenceline Monitoring Dashboard
+  levels:
+    faint: Δc rising toward 9 µg/m3
+    strong: Above 9 µg/m3 in repeated periods
+    textbook: Rolling annual average Δc above 9 µg/m3
+    threshold_source: https://awsedap.epa.gov/public/extensions/Fenceline_Monitoring/welcome.html
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Exceeding the action level is not itself a violation
+  - Neighbouring off-site sources affecting monitors
+  - Sampler contamination
+  version: 1
+- id: PL-024
+  name: Frequent unplanned 'emission events' or upsets releasing unauthorized pollution
+  definition: A plant repeatedly reports malfunctions, startups or shutdowns that release air pollution
+    beyond its permit, often without penalty.
+  areas:
+  - PL
+  typology: Community air
+  status: verified
+  sources:
+  - title: Polluter's Playbook (Texas emission events report, March 2023)
+    publisher: Environmental Integrity Project
+    url: https://environmentalintegrity.org/wp-content/uploads/2023/03/TX-Polluters-Playbook-Report-EMBARGOED-for-3.23.23.pdf
+    locator: p. 3
+    quote: Illegal pollution releases during upsets are ubiquitous in Texas.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Polluter's Playbook (Texas emission events report, March 2023)
+    publisher: Environmental Integrity Project
+    url: https://environmentalintegrity.org/wp-content/uploads/2023/03/TX-Polluters-Playbook-Report-EMBARGOED-for-3.23.23.pdf
+    locator: p. 4
+    quote: TCEQ penalizes only about three percent of unexpected emissions events each year.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Dozens of reported emission events per year at one chemical plant
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Texas TCEQ STEERS emission event reports
+  - State air agency incident logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine unforeseeable equipment failures
+  - Weather events such as hurricanes and freezes
+  - Prompt self-reporting that makes a careful operator look worse than one that under-reports
+  version: 1
+- id: PL-025
+  name: Poorly operated or excessive flaring
+  definition: A plant burns waste gas in flares too often or with too much steam or air, so the flare
+    destroys less pollution than assumed.
+  areas:
+  - PL
+  typology: Community air
+  status: verified
+  sources:
+  - title: EPA Enforcement Targets Flaring Efficiency Violations (EPA 325-F-012-002, August 2012)
+    publisher: US EPA Office of Civil Enforcement
+    url: https://19january2021snapshot.epa.gov/sites/static/files/documents/flaringviolations.pdf
+    locator: Enforcement alert
+    quote: These problems lead to significantly lower flare combustion efficiencies.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EPA Enforcement Targets Flaring Efficiency Violations (EPA 325-F-012-002, August 2012)
+    publisher: US EPA Office of Civil Enforcement
+    url: https://19january2021snapshot.epa.gov/sites/static/files/documents/flaringviolations.pdf
+    locator: Enforcement alert
+    quote: A source's failure to recognize and account for these emissions can result in NSR violations.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Black smoke from flares; routine rather than emergency flaring; oversteaming
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Flare monitoring reports required by refinery rules
+  - State emission event logs
+  - Satellite flaring data
+  levels:
+    faint: Visible smoke beyond 5 minutes in 2 hours
+    strong: Vent gas below 300 BTU/scf (assisted flares) or 200 BTU/scf (non-assisted)
+    textbook: EPA or a state finds flare efficiency violations
+    threshold_source: https://19january2021snapshot.epa.gov/sites/static/files/documents/flaringviolations.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Safety flaring during genuine emergencies
+  - Startup and shutdown periods
+  - Flares operated within manufacturer ranges
+  version: 1
+- id: PL-026
+  name: Emissions estimated from low-quality emission factors instead of measured
+  definition: A facility's reported air pollution relies on generic EPA emission factors, many of which
+    EPA's own inspector general rated below average or poor, rather than measurement.
+  areas:
+  - PL
+  typology: Under-reporting
+  status: verified
+  sources:
+  - title: EPA Can Improve Emissions Factors Development and Management (Report 2006-P-00017, at a glance)
+    publisher: US EPA Office of Inspector General
+    url: https://www.epa.gov/sites/production/files/2015-11/documents/20060322-2006-p-00017_glance.pdf
+    locator: At a glance
+    quote: the percentage of emissions factors rated below average or poor increased from 56 percent in
+      1996 to 62 percent in 2004.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: EPA Can Improve Emissions Factors Development and Management (Report 2006-P-00017, at a glance)
+    publisher: US EPA Office of Inspector General
+    url: https://www.epa.gov/sites/production/files/2015-11/documents/20060322-2006-p-00017_glance.pdf
+    locator: At a glance
+    quote: have been used for non-inventory purposes, such as setting permit limits
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Toxics Release Inventory figures derived from factors that fenceline monitors contradict
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - EPA Toxics Release Inventory (method codes)
+  - State emission inventories
+  - Permit applications
+  levels:
+    faint: Reported emissions based on factors, not measurement
+    strong: Independent monitoring shows levels well above factor-based estimates
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Emission factors are a permitted method for many sources
+  - Direct measurement can be impractical for fugitive sources
+  version: 1
+- id: PL-027
+  name: Neighbourhood in a modelled hot spot of cancer-causing industrial air pollution
+  definition: Modelling of industrial releases puts a neighbourhood's estimated excess cancer risk from
+    air toxics above 1 in 100,000.
+  areas:
+  - PL
+  typology: Community air / environmental justice
+  status: verified
+  sources:
+  - title: We're releasing the data behind our toxic air analysis
+    publisher: ProPublica
+    url: https://www.propublica.org/article/were-releasing-the-data-behind-our-toxic-air-analysis
+    locator: Methodology
+    quote: contiguous grid squares with estimated excess cancer risk above 1 in 100,000
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'National Enforcement and Compliance Initiative: Reducing Air Toxics in Overburdened Communities'
+    publisher: US EPA
+    url: https://epa.gov/enforcement/national-enforcement-and-compliance-initiative-reducing-air-toxics-overburdened
+    locator: Overview
+    quote: overburdened communities that suffer disproportionate impacts from higher levels or multiple
+      sources of toxic air pollution
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Ethylene oxide or chloroprene emitters near homes and schools
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - EPA RSEI model
+  - ProPublica toxic air hot spot data
+  - EPA AirToxScreen
+  - EJScreen-type tools
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Estimated excess cancer risk above 1 in 100,000 (ProPublica hot spot definition)
+    threshold_source: https://www.propublica.org/article/were-releasing-the-data-behind-our-toxic-air-analysis
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Model estimates rely on self-reported releases and may overstate or understate
+  - Facilities may have reduced emissions since the data year
+  - Risk is a screening estimate, not a measured health outcome
+  version: 1
+- id: PL-028
+  name: Pollution control equipment not installed, operated or maintained
+  definition: A facility does not install, run or maintain the controls and monitoring its air permit
+    requires.
+  areas:
+  - PL
+  typology: Community air
+  status: verified
+  sources:
+  - title: 'National Enforcement and Compliance Initiative: Reducing Air Toxics in Overburdened Communities'
+    publisher: US EPA
+    url: https://epa.gov/enforcement/national-enforcement-and-compliance-initiative-reducing-air-toxics-overburdened
+    locator: East Side Plating case summary
+    quote: failure to install controls on several nickel-plating tanks
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'National Enforcement and Compliance Initiative: Reducing Air Toxics in Overburdened Communities'
+    publisher: US EPA
+    url: https://epa.gov/enforcement/national-enforcement-and-compliance-initiative-reducing-air-toxics-overburdened
+    locator: Best Petroleum case summary
+    quote: failure to properly operate and maintain control equipment at a gasoline storage and loading
+      facility
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Scrubbers bypassed; vapour recovery out of service; monitoring not done
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - EPA ECHO air inspections
+  - State Title V deviation reports
+  levels:
+    faint: Deviation reports citing control downtime
+    strong: Repeated downtime or missing monitoring
+    textbook: Regulator finds controls not installed, operated or maintained
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Scheduled maintenance outages
+  - Equipment failures promptly repaired and reported
+  version: 1
+- id: PL-029
+  name: Vehicle or engine software that detects emissions tests (manufacturer defeat device)
+  definition: A manufacturer fits software that makes vehicles run cleanly in emissions tests but pollute
+    more on the road.
+  areas:
+  - PL
+  typology: Vehicle defeat devices
+  status: verified
+  sources:
+  - title: Volkswagen AG agrees to plead guilty and pay $4.3 billion in criminal and civil penalties
+    publisher: US Department of Justice
+    url: https://www.justice.gov/opa/pr/volkswagen-ag-agrees-plead-guilty-and-pay-43-billion-criminal-and-civil-penalties-six
+    locator: Press release
+    quote: designed and implemented a software to recognize whether a vehicle was undergoing standard
+      U.S. emissions testing on a dynamometer
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: United States and California announce diesel engine manufacturer Cummins Inc. agrees to pay
+    publisher: US Department of Justice
+    url: https://www.justice.gov/opa/pr/united-states-and-california-announce-diesel-engine-manufacturer-cummins-inc-agrees-pay
+    locator: Press release 24-32, 10 January 2024
+    quote: more than 630,000 of those trucks made in model years 2013-2019 had illegal emissions control
+      software defeat device features
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Independent on-road testing showing NOx many times the certified level
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Event
+  - CourtCase
+  - Vehicle
+  checkable: records
+  lookup_sources:
+  - EPA certification and recall data
+  - Independent on-road emissions studies
+  - Court records
+  levels:
+    faint: On-road emissions well above certification levels
+    strong: Regulator opens an investigation or recall
+    textbook: Court or regulator finds an undisclosed defeat device
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful auxiliary emission control strategies disclosed to regulators (e.g., engine protection)
+  - Real-world driving differs from test cycles
+  - Faulty or ageing emission components
+  version: 1
+- id: PL-030
+  name: Aftermarket 'delete' kits and tuners sold to disable emissions controls
+  definition: Businesses make or sell parts or software that remove or disable diesel particulate filters,
+    EGR or SCR systems, often marketed as for off-road or racing use.
+  areas:
+  - PL
+  typology: Vehicle defeat devices
+  status: verified
+  sources:
+  - title: Tampering & Aftermarket Defeat Devices (2019)
+    publisher: US EPA Air Enforcement Division
+    url: https://epa.gov/sites/default/files/2019-05/documents/tampering-aftermarket-defeat-devices-2019-mcdi-mtg-33pp.pdf
+    locator: ECM tuning products slide
+    quote: bypass, defeat, or render inoperative EGRs, DPFs, and other emission control devices
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'National Enforcement and Compliance Initiative: Stopping Aftermarket Defeat Devices'
+    publisher: US EPA
+    url: https://19january2025snapshot.epa.gov/enforcement/national-enforcement-and-compliance-initiative-stopping-aftermarket-defeat-devices
+    locator: Overview (more than 570,000 tons excess NOx)
+    quote: known sales of defeat devices for certain diesel trucks after 2009 and before 2020
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2024/1203 on the protection of the environment through criminal law
+    publisher: European Union (EUR-Lex)
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401203
+    locator: Article 3(2)(b)
+    quote: the placing on the market, in breach of a prohibition or another requirement aimed at protecting
+      the environment, of a product the use of which on a larger scale
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Listings for 'DPF delete pipe – off-road use only' or 'for racing use only' tuners
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Payment
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Online marketplaces and seller websites
+  - EPA enforcement case lists
+  - California CARB Executive Order database
+  levels:
+    faint: Products marketed with 'off-road' or 'race use only' disclaimers for road vehicle models
+    strong: Products that remove DPF, EGR or SCR for named road-truck models
+    textbook: Regulator or court finds sale of defeat devices
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine competition vehicles never used on public roads
+  - Parts with a CARB Executive Order or other certification
+  - Replacement parts that keep emission controls intact
+  version: 1
+- id: PL-031
+  name: Fleet or contractor running vehicles with emission controls removed
+  definition: A trucking, construction or haulage company operates vehicles whose emission controls have
+    been removed or reprogrammed, sometimes with falsified records.
+  areas:
+  - PL
+  typology: Vehicle tampering
+  status: verified
+  sources:
+  - title: Tampering & Aftermarket Defeat Devices (2019)
+    publisher: US EPA Air Enforcement Division
+    url: https://epa.gov/sites/default/files/2019-05/documents/tampering-aftermarket-defeat-devices-2019-mcdi-mtg-33pp.pdf
+    locator: CAA § 203(a)(3)(A) tampering slide
+    quote: an emission control component on a certified motor vehicle or engine
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 202 trucks at one Wisconsin carrier fitted with tuning products (Abbyland Trucking civil case)
+  cases: []
+  data_needed:
+  - Company
+  - Vehicle
+  - Person
+  - Document
+  - Contract
+  checkable: records
+  lookup_sources:
+  - State inspection and OBD records
+  - Public contracts with haulage firms
+  - EPA enforcement cases
+  levels:
+    faint: Visible black smoke ('rolling coal') from fleet vehicles
+    strong: Maintenance or purchase records for delete parts
+    textbook: Regulator or court finds tampering
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Fleet operators include public-contract haulers; EPA lists a fracking hauler and a construction
+      company
+    source_url: https://epa.gov/sites/default/files/2019-05/documents/tampering-aftermarket-defeat-devices-2019-mcdi-mtg-33pp.pdf
+  innocent_explanations:
+  - Older vehicles built before these controls were required
+  - Legitimate repairs that temporarily disable a component
+  version: 1
+- id: PL-032
+  name: Ship's oil-water separator bypassed ('magic pipe')
+  definition: Crew connect a hose or pipe that sends oily waste overboard around the ship's oil-water
+    separator.
+  areas:
+  - PL
+  typology: Ship oil pollution
+  status: verified
+  sources:
+  - title: The Years of Magic(al) Pipe Thinking
+    publisher: Blank Rome LLP
+    url: https://www.blankrome.com/publications/years-magical-pipe-thinking
+    locator: Article
+    quote: installed so-called magic pipes used to bypass the OWS
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Cruise line ordered to pay $40 million for illegal dumping of oil contaminated waste and falsifying
+      records
+    publisher: US Department of Justice (S.D. Fla.)
+    url: https://www.justice.gov/usao-sdfl/pr/cruise-line-ordered-pay-40-million-illegal-dumping-oil-contaminated-waste-and
+    locator: Press release, 19 April 2017
+    quote: so-called 'magic pipe' had been used on Aug. 23, 2013, to illegally discharge oily waste
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Directive (EU) 2024/1203 on the protection of the environment through criminal law
+    publisher: European Union (EUR-Lex)
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401203
+    locator: Article 3(2)(i)
+    quote: ship-source discharge of polluting substances falling within the scope of Article 3 of Directive
+      2005/35/EC
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Flanges or hoses in the engine room not on the ship's piping diagrams
+  cases: []
+  data_needed:
+  - Vessel
+  - Company
+  - Person
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - US Coast Guard / port state control detentions
+  - Ship ownership registries
+  levels:
+    faint: Port state detention for oil-filtering deficiencies
+    strong: Crew report or photo of bypass piping
+    textbook: Court finds a bypass was used
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Temporary piping used for lawful transfer to shore facilities
+  - Equipment modification documented and approved
+  version: 1
+- id: PL-033
+  name: Oil Record Book entries that do not match equipment use or omit discharges
+  definition: A ship's Oil Record Book records discharges as legal, or leaves them out, when equipment
+    logs or soundings show otherwise.
+  areas:
+  - PL
+  typology: Ship oil pollution / false records
+  status: verified
+  sources:
+  - title: The Years of Magic(al) Pipe Thinking
+    publisher: Blank Rome LLP
+    url: https://www.blankrome.com/publications/years-magical-pipe-thinking
+    locator: Article
+    quote: False statements in ORBs (or other documents) submitted to the Coast Guard constitute a federal-criminal
+      offense.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: ENRD Environmental Crimes Section bulletin
+    publisher: US Department of Justice, ENRD
+    url: https://www.justice.gov/enrd/page/file/851586/dl
+    locator: Oceanic Illsabe case summary (indictment)
+    quote: fictitious oil record book
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sludge tank levels falling without matching incinerator or shore-disposal entries
+  cases: []
+  data_needed:
+  - Vessel
+  - Company
+  - Person
+  - Document
+  checkable: records
+  lookup_sources:
+  - Court filings
+  - Shore reception facility receipts
+  - Port state control reports
+  levels:
+    faint: Waste generated is not matched by recorded disposal
+    strong: Entries contradict equipment logs
+    textbook: Court or regulator finds false Oil Record Book entries
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clerical errors by crew
+  - Estimating errors in tank soundings
+  version: 1
+- id: PL-034
+  name: Oil content monitor tricked or bypassed
+  definition: Crew feed clean seawater to the oil content monitor, or open valves, so it does not alarm
+    and records a false clean discharge.
+  areas:
+  - PL
+  typology: Ship oil pollution
+  status: verified
+  sources:
+  - title: Cruise line ordered to pay $40 million for illegal dumping of oil contaminated waste and falsifying
+      records
+    publisher: US Department of Justice (S.D. Fla.)
+    url: https://www.justice.gov/usao-sdfl/pr/cruise-line-ordered-pay-40-million-illegal-dumping-oil-contaminated-waste-and
+    locator: Press release, 19 April 2017
+    quote: The purpose was to prevent the oil content monitor from going into alarm mode and stopping
+      the overboard discharge.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Monitor records showing long discharges with zero readings
+  cases: []
+  data_needed:
+  - Vessel
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court filings
+  - Oil content monitor memory data in enforcement cases
+  levels:
+    faint: Unusually clean monitor readings during high waste production
+    strong: Monitor data contradicting tank soundings
+    textbook: Court finds the monitor was manipulated
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Calibration flushing with clean water is a normal maintenance step
+  - Well-functioning separators do produce low readings
+  version: 1
+- id: PL-035
+  name: Discharges at night or in remote international waters
+  definition: Illegal discharges are timed for darkness or far offshore where they are hard to detect.
+  areas:
+  - PL
+  typology: Ship oil pollution
+  status: verified
+  sources:
+  - title: The Years of Magic(al) Pipe Thinking
+    publisher: Blank Rome LLP
+    url: https://www.blankrome.com/publications/years-magical-pipe-thinking
+    locator: Article
+    quote: Many of these discharges occur at night in international waters where they cannot be detected
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Satellite-detected oil slicks along a ship's track overnight
+  cases: []
+  data_needed:
+  - Vessel
+  - Event
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - AIS ship tracking data
+  - Satellite oil-slick detection services
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful discharges of treated water within MARPOL limits
+  - Natural seeps or other vessels causing slicks
+  version: 1
+- id: PL-036
+  name: Crew told to lie to inspectors or obstruct an investigation
+  definition: Officers instruct crew to give false statements to inspectors, or evidence is destroyed,
+    during a pollution inquiry.
+  areas:
+  - PL
+  typology: Obstruction
+  status: verified
+  sources:
+  - title: ENRD Environmental Crimes Section bulletin
+    publisher: US Department of Justice, ENRD
+    url: https://www.justice.gov/enrd/page/file/851586/dl
+    locator: Oceanic Illsabe case summary (indictment)
+    quote: lie to the Coast Guard
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Cruise line ordered to pay $40 million for illegal dumping of oil contaminated waste and falsifying
+      records
+    publisher: US Department of Justice (S.D. Fla.)
+    url: https://www.justice.gov/usao-sdfl/pr/cruise-line-ordered-pay-40-million-illegal-dumping-oil-contaminated-waste-and
+    locator: Press release, 19 April 2017
+    quote: Graywater tanks overflowed into the bilges on a routine basis
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Removal of bypass piping before port inspection
+  cases: []
+  data_needed:
+  - Vessel
+  - Person
+  - Employment
+  - Event
+  - CourtCase
+  checkable: person
+  lookup_sources:
+  - Court filings
+  - Crew interviews
+  levels:
+    faint: Crew accounts that conflict
+    strong: Evidence of coordinated statements
+    textbook: Court finds obstruction or false statements
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Language barriers causing inconsistent answers
+  - Crew unaware of practices in other departments
+  version: 1
+- id: PL-037
+  name: Crew member or employee reports illegal pollution (whistleblower)
+  definition: An insider, such as a newly hired engineer, reports illegal discharges to authorities, often
+    with photos or records.
+  areas:
+  - PL
+  typology: Detection signal
+  status: verified
+  sources:
+  - title: The Years of Magic(al) Pipe Thinking
+    publisher: Blank Rome LLP
+    url: https://www.blankrome.com/publications/years-magical-pipe-thinking
+    locator: Article (APPS whistleblower provision)
+    quote: a whistleblower provision that permits the court to award up to half of any fine paid
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Cruise line ordered to pay $40 million for illegal dumping of oil contaminated waste and falsifying
+      records
+    publisher: US Department of Justice (S.D. Fla.)
+    url: https://www.justice.gov/usao-sdfl/pr/cruise-line-ordered-pay-40-million-illegal-dumping-oil-contaminated-waste-and
+    locator: Press release, 19 April 2017
+    quote: The newly hired engineer on the Caribbean Princess reported
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - APPS whistleblower award motions in federal court (e.g., $550,000 award in the Aquarosa case per DOJ
+    bulletin)
+  cases: []
+  data_needed:
+  - Person
+  - Vessel
+  - Company
+  - Document
+  - CourtCase
+  checkable: person
+  lookup_sources:
+  - Court whistleblower award motions
+  - Port state control records
+  levels:
+    faint: Anonymous tip
+    strong: Insider with documents or photos
+    textbook: Court awards whistleblower share after conviction
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Disgruntled employees making unfounded reports
+  - Misunderstanding of lawful procedures
+  version: 1
+- id: PL-038
+  name: Emergency decisions on a hazardous release based on incomplete or misleading company information
+  definition: Officials make decisions after a chemical release, such as burning off tank cars, on information
+    from the responsible company that later proves incomplete or misleading.
+  areas:
+  - PL
+  typology: Chemical accident / disclosure
+  status: verified
+  sources:
+  - title: Failed wheel bearing caused Norfolk Southern train derailment in East Palestine, Ohio
+    publisher: US National Transportation Safety Board
+    url: https://www-s.ntsb.gov/news/press-releases/Pages/NR20240625.aspx
+    locator: Press release, 25 June 2024
+    quote: The vent and burn was not necessary to prevent a tank car failure, NTSB investigators found.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Responsible company's contractors advising responders while expert dissent is not passed on
+  cases: []
+  data_needed:
+  - Company
+  - PublicBody
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - NTSB and CSB investigation dockets
+  - Incident command logs via records requests
+  levels:
+    faint: Responders rely solely on the responsible company's advice
+    strong: Contrary expert opinion not passed to decision-makers
+    textbook: Official inquiry finds decisions were based on incomplete or misleading information
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine uncertainty in a fast-moving emergency
+  - Precautionary decisions to protect lives
+  version: 1
+not_reached:
+- 'EPA 2014 Clean Air Act HPV Policy (https://www.epa.gov/sites/default/files/2015-01/documents/hpvpolicy2014.pdf):
+  the PDF had no machine-readable text, so the HPV criteria list and Day 0/45/150/180 timeline are not
+  quoted.'
+- 'ECHO Watch List help page (echo.epa.gov/help/facility-search/watch-list-help): fetch error, so the
+  exact Watch List entry criteria per statute are not quoted.'
+- 'EPA Super-Emitter Program page (methane, 100 kg/hr): fetch error, and the web search limit for this
+  turn was reached, so no methane super-emitter indicator is included.'
+- 'Ofwat''s own Thames Water decision page: fetch error. The case relies on Water Magazine''s report of
+  the 28 May 2025 decision.'
+- ProPublica toxic air datastore page redirected; the methodology article was used instead.
+- US Chemical Safety Board investigation reports were not fetched. Chemical accident cases from the 2015
+  EPA alert (Reddy Ice, Millbrook, Cold Storage Solutions) are not listed because their outcomes were
+  not confirmed.
+- 'Flint criminal prosecutions are not listed: outcomes were not verified from a primary source in this
+  run.'
+- The web search budget ran out (200 calls shared across agents) before searches on methane, MARPOL port
+  state control, INTERPOL/Europol pollution crime, the Lead and Copper Rule Improvements (10 ppb), and
+  PFAS discharge permits.

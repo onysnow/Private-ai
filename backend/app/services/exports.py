@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.core.time import utcnow_iso
 from app.core.config import settings
 from app.db.locking import investigation_export_snapshot, lock_investigation_transaction
+from app.jobs.corpus import request_corpus_sync
 from app.services.security import contained_path, resolve_storage_root
 from app.models.domain import (
     Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, ClaimReviewEvent, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment,
@@ -26,6 +27,8 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
+    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
+    Story, StorySection, StoryClaim, AIRunEvent,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -40,6 +43,9 @@ MODEL_BY_TABLE = {
         EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
+        AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
+        WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
+        Story, StorySection, StoryClaim, AIRunEvent,
     ]
 }
 
@@ -47,11 +53,42 @@ RESTORE_ORDER = [
     "investigations", "entities", "sources", "claims", "leads", "connector_runs",
     "documents", "investigation_corpus_bindings", "document_corpus_syncs", "statements", "evidence", "timeline_events", "reporting_tasks",
     "reporting_task_workflow_events", "lead_profiles", "lead_links", "lead_workflow_events", "claim_evidence_links", "claim_review_events",
-    "connector_findings", "resolution_decisions", "canonical_resolution_decisions", "canonical_entity_merge_audits", "post_merge_reconciliation_decisions", "property_conflict_decisions", "statement_assessments",
+    "connector_findings", "resolution_decisions",
+    # OpenAleph cross-references and reporters' decisions on them (ADR-0006,
+    # Wave B): review history. A decision may point at the resolution decision
+    # it added, so both restore after resolution_decisions.
+    "cross_reference_proposals", "cross_reference_decisions",
+    "canonical_resolution_decisions", "canonical_entity_merge_audits", "post_merge_reconciliation_decisions", "property_conflict_decisions", "statement_assessments",
     "statement_promotions", "enrichment_sessions", "enrichment_session_runs",
     "enrichment_session_findings", "cross_provider_decisions", "relationship_edges", "relationship_evidence_attachments", "relationship_evidence_review_events",
     "external_relationship_reviews", "external_relationship_promotions",
     "document_chunks", "extraction_candidates",
+    # Bulk imports and what happened to each file; an item points at its document.
+    "ingestion_batches", "ingestion_batch_items",
+    # Spreadsheet column mappings; the proposals they made are extraction candidates.
+    "table_mappings",
+    # Watched names and what they turned up; a hit may point at a document and a lead.
+    "watchlist_entries", "watchlist_hits",
+    # The reporter's own marks: tags before the records they are on, collections
+    # before their items; a note may point at the lead made from it.
+    "tags", "record_tags", "notes", "collections", "collection_items",
+    # Red Flags keep the reporter's decisions on them (dismissed and why, made a lead).
+    "pattern_flags",
+    # What a person checks, with their decisions; an item may point at its flag and its document.
+    "check_items",
+    # The Authority System Suite's own records for the case (gaps, replies, hypotheses, ...).
+    "case_records",
+    # The TAS reasoning review queue travels with the investigation: a restored
+    # backup keeps every proposed/accepted/rejected analysis and its reviewer note,
+    # exactly as extraction_candidates keeps the document review trail.
+    "ai_analysis_candidates",
+    # Writeups/decks may point at an ai_analysis_candidate (source_ai_candidate_id,
+    # nullable) when they were promoted from one, so they must restore after it.
+    "writeups", "decks",
+    # What the story needs (ADR-0010): a story may point at its write-up, so after writeups; its claims after claims.
+    "stories", "story_sections", "story_claims",
+    # Each AI run's steps as they happened (ADR-0012): the run record travels with the case.
+    "ai_run_events",
 ]
 
 
@@ -66,7 +103,7 @@ def _row_dict(row: Any) -> dict[str, Any]:
     return {attr.key: _json_value(getattr(row, attr.key)) for attr in mapper.column_attrs}
 
 
-def _rows(db: Session, model, ids: set[str] | None = None, id_col=None):
+def _rows(db: Session, model: type[Any], ids: set[str] | None = None, id_col: Any = None) -> list[Any]:
     stmt = select(model)
     if ids is not None:
         if not ids:
@@ -117,18 +154,23 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
     direct_models = [
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
-        ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate,
+        ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
+        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
+        Story, AIRunEvent,
     ]
-    direct = {
-        m.__tablename__: list(db.scalars(select(m).where(m.investigation_id == investigation_id)).all())
+    direct: dict[str, list[Any]] = {
+        m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
         for m in direct_models
     }
 
+    story_sections = _rows(db, StorySection, {x.id for x in direct["stories"]}, StorySection.story_id)
+    story_claims = _rows(db, StoryClaim, {x.id for x in story_sections}, StoryClaim.section_id)
+    batch_items = _rows(db, IngestionBatchItem, {x.id for x in direct["ingestion_batches"]}, IngestionBatchItem.batch_id)
     relationship_edge_ids = {x.id for x in direct["relationship_edges"]}
     relationship_evidence_reviews = _rows(db, RelationshipEvidenceReviewEvent, relationship_edge_ids, RelationshipEvidenceReviewEvent.relationship_edge_id)
     relationship_evidence_attachments = _rows(db, RelationshipEvidenceAttachment, relationship_edge_ids, RelationshipEvidenceAttachment.relationship_edge_id)
 
-    table_rows = {
+    table_rows: dict[str, list[Any]] = {
         "investigations": [inv], "entities": entities, "statements": statements,
         "sources": sources, "evidence": evidence, "claim_evidence_links": claim_links, "claim_review_events": claim_review_events,
         "claims": claims, "leads": leads, "lead_profiles": lead_profiles,
@@ -148,6 +190,20 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "external_relationship_promotions": direct["external_relationship_promotions"],
         "documents": documents, "investigation_corpus_bindings": corpus_bindings, "document_corpus_syncs": document_syncs, "document_chunks": chunks,
         "extraction_candidates": direct["extraction_candidates"],
+        "ai_analysis_candidates": direct["ai_analysis_candidates"],
+        "writeups": direct["writeups"], "decks": direct["decks"],
+        "cross_reference_proposals": direct["cross_reference_proposals"],
+        "cross_reference_decisions": direct["cross_reference_decisions"],
+        "ingestion_batches": direct["ingestion_batches"], "ingestion_batch_items": batch_items,
+        "watchlist_entries": direct["watchlist_entries"], "watchlist_hits": direct["watchlist_hits"],
+        "table_mappings": direct["table_mappings"],
+        "tags": direct["tags"], "record_tags": direct["record_tags"], "notes": direct["notes"],
+        "collections": direct["collections"], "collection_items": direct["collection_items"],
+        "pattern_flags": direct["pattern_flags"],
+        "check_items": direct["check_items"],
+        "case_records": direct["case_records"],
+        "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
+        "ai_run_events": direct["ai_run_events"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -161,9 +217,18 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         "entity": {row.get("id") for row in records.get("entities", [])},
         "claim": {row.get("id") for row in records.get("claims", [])},
         "evidence": {row.get("id") for row in records.get("evidence", [])},
+        # An accepted email or phone proposal made a statement on the entity
+        # the reporter chose (identifier_proposals.py, ADR-0006).
+        "statement": {row.get("id") for row in records.get("statements", [])},
+        # An accepted relationship proposal made a relationship edge
+        # (documents.py review_candidate, create_relationship).
+        "relationship": {row.get("id") for row in records.get("relationship_edges", [])},
     }
 
     counts = {"proposed": 0, "accepted": 0, "rejected": 0, "other": 0}
+    # "statement" and "relationship" are counted only when present, so a
+    # backup made before they could be accepted still matches the lineage its
+    # manifest declares (the restore compares the two dicts whole).
     accepted_by_type = {"entity": 0, "claim": 0, "evidence": 0}
     errors: list[str] = []
 
@@ -174,6 +239,15 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         source_id = doc.get("source_id")
         if source_id not in sources:
             errors.append(f"document {doc_id} references missing source {source_id}")
+        parent_id = doc.get("parent_document_id")
+        if parent_id is not None and parent_id not in documents:
+            errors.append(f"document {doc_id} references missing parent document {parent_id}")
+
+    for evidence in records.get("evidence", []):
+        # A picture as evidence points at its picture document.
+        picture = evidence.get("document_id")
+        if picture is not None and picture not in documents:
+            errors.append(f"evidence {evidence.get('id')} references missing picture document {picture}")
 
     for chunk_id, chunk in chunks.items():
         if not chunk_id:
@@ -193,10 +267,10 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         if document_id not in documents:
             errors.append(f"candidate {candidate_id} references missing document {document_id}")
         if chunk_id is not None:
-            chunk = chunks.get(chunk_id)
-            if chunk is None:
+            parent_chunk = chunks.get(chunk_id)
+            if parent_chunk is None:
                 errors.append(f"candidate {candidate_id} references missing chunk {chunk_id}")
-            elif chunk.get("document_id") != document_id:
+            elif parent_chunk.get("document_id") != document_id:
                 errors.append(f"candidate {candidate_id} chunk {chunk_id} belongs to a different document")
 
         record_type = candidate.get("accepted_record_type")
@@ -209,7 +283,7 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
             elif record_id not in accepted_tables[record_type]:
                 errors.append(f"accepted candidate {candidate_id} references missing {record_type} {record_id}")
             else:
-                accepted_by_type[record_type] += 1
+                accepted_by_type[record_type] = accepted_by_type.get(record_type, 0) + 1
         elif record_type or record_id:
             errors.append(f"non-accepted candidate {candidate_id} unexpectedly carries accepted-record linkage")
 
@@ -223,6 +297,29 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         "errors": errors,
     }
     return summary
+
+
+def _parents_first(rows: list[dict[str, Any]], parent_key: str = "parent_document_id") -> list[dict[str, Any]]:
+    """Rows ordered so the row another points at goes in first: an archive or
+    email before the files found in it (parent_document_id, ADR-0006), an
+    evidence item before the one that restates it (restates_evidence_id).
+    PostgreSQL checks the foreign key as each row goes in. Rows keep their
+    order otherwise."""
+    placed: set[Any] = set()
+    ordered: list[dict[str, Any]] = []
+    waiting = list(rows)
+    ids = {row.get("id") for row in rows}
+    while waiting:
+        ready = [row for row in waiting if row.get(parent_key) in placed
+                 or row.get(parent_key) is None or row.get(parent_key) not in ids]
+        if not ready:          # a cycle cannot be restored in any order; the insert will say so
+            ordered.extend(waiting)
+            break
+        for row in ready:
+            placed.add(row.get("id"))
+        ordered.extend(ready)
+        waiting = [row for row in waiting if row.get("id") not in placed]
+    return ordered
 
 
 def _require_lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
@@ -271,16 +368,16 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
     document_entries = []
     if include_documents:
         for doc in records["documents"]:
-            path = Path(doc.get("storage_path") or "")
-            if path.is_file():
-                raw = path.read_bytes()
+            raw_path = Path(doc.get("storage_path") or "")
+            if raw_path.is_file():
+                raw = raw_path.read_bytes()
                 ext_name = f"documents/raw/{doc['id']}/{_safe_name(doc['filename'])}"
                 file_payloads[ext_name] = raw
                 document_entries.append({"document_id": doc["id"], "archive_path": ext_name, "sha256": hashlib.sha256(raw).hexdigest()})
             else:
                 missing_documents.append({"document_id": doc["id"], "storage_path": doc.get("storage_path")})
 
-    manifest = {
+    manifest: dict[str, Any] = {
         "format": EXPORT_FORMAT,
         "version": EXPORT_VERSION,
         "generated_at": generated_at,
@@ -380,8 +477,12 @@ def preview_investigation_restore(
 
     # A portable investigation is restored as an isolated graph. Any primary-key collision
     # is treated as a hard conflict rather than relying on a database IntegrityError.
+    # Every row that carries an investigation_id must carry THIS investigation's: a backup
+    # is untrusted input, and without this check a crafted archive could attach rows to a
+    # different, already-present investigation (which the restore's own lock would not cover).
     for table in RESTORE_ORDER:
         model = MODEL_BY_TABLE[table]
+        scoped = "investigation_id" in {col.key for col in inspect(model).columns}
         for row in records.get(table, []):
             row_id = row.get("id")
             if row_id and db.get(model, row_id) is not None:
@@ -391,6 +492,26 @@ def preview_investigation_restore(
                     "id": str(row_id),
                     "message": f"{table} record already exists",
                 })
+            if scoped and row.get("investigation_id") != investigation_id:
+                conflicts.append({
+                    "kind": "foreign_investigation",
+                    "table": table,
+                    "id": str(row_id or "<missing-id>"),
+                    "message": f"{table} record belongs to investigation {row.get('investigation_id')!r}, not the backup's {investigation_id!r}",
+                })
+
+    # An import item has no investigation_id of its own: it must point only at
+    # a batch and a document inside this same backup.
+    backup_batches = {row.get("id") for row in records.get("ingestion_batches", [])}
+    backup_documents = {row.get("id") for row in records.get("documents", [])}
+    for row in records.get("ingestion_batch_items", []):
+        if row.get("batch_id") not in backup_batches or (row.get("document_id") is not None and row.get("document_id") not in backup_documents):
+            conflicts.append({
+                "kind": "foreign_investigation",
+                "table": "ingestion_batch_items",
+                "id": str(row.get("id") or "<missing-id>"),
+                "message": "ingestion_batch_items record points at a batch or document outside this backup",
+            })
 
     storage_root = resolve_storage_root(document_storage_dir)
     for entry in manifest.get("document_files", []):
@@ -406,7 +527,10 @@ def preview_investigation_restore(
                 "message": f"Document destination already exists: {dest}",
             })
 
-    missing_documents = list(manifest.get("missing_documents", []))
+    # build_investigation_export lists the files it could not include as
+    # "missing_document_files"; this read "missing_documents", which no backup
+    # has, so the preview always said none were missing.
+    missing_documents = list(manifest.get("missing_document_files", []))
     warnings: list[str] = []
     if missing_documents:
         warnings.append(
@@ -431,7 +555,7 @@ def preview_investigation_restore(
         "restore_api_enabled": settings.enable_restore_api,
     }
 
-def _coerce_datetimes(model, row: dict[str, Any]) -> dict[str, Any]:
+def _coerce_datetimes(model: type[Any], row: dict[str, Any]) -> dict[str, Any]:
     result = dict(row)
     mapper = inspect(model)
     for col in mapper.columns:
@@ -500,6 +624,10 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
             for table in RESTORE_ORDER:
                 model = MODEL_BY_TABLE[table]
                 rows = records.get(table, [])
+                if table == "documents":
+                    rows = _parents_first(rows)
+                elif table == "evidence":
+                    rows = _parents_first(rows, "restates_evidence_id")
                 for raw_row in rows:
                     row = dict(raw_row)
                     if table == "documents" and row["id"] in raw_locations:
@@ -536,5 +664,9 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                         pass
             raise
 
+    # The restored entities and relationships go to the OpenAleph collection
+    # like any other confirmed records (ADR-0006, Wave B); what this
+    # deployment's OpenAleph held for them is not in a backup, so all are sent.
+    request_corpus_sync(db, investigation_id)
     return {"investigation_id": investigation_id, "restored_counts": restored_counts, "manifest": manifest}
 

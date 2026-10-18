@@ -1,0 +1,292 @@
+area: VA
+terms:
+- term: Abuse (nursing home rule)
+  definition: Under US nursing home rules, deliberately causing injury, unreasonable confinement, intimidation
+    or punishment that results in harm, pain or mental anguish; it includes depriving a resident of needed
+    goods or services.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.5
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Neglect (nursing home rule)
+  definition: The failure of a facility or its staff to provide goods and services a resident needs to
+    avoid physical harm, pain, mental anguish or emotional distress.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.5
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Misappropriation of resident property
+  definition: Deliberately misplacing, exploiting or using a resident's belongings or money without consent.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.5
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Exploitation
+  definition: Taking advantage of a resident for personal gain through manipulation, intimidation, threats
+    or coercion.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.5
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Organisational or institutional abuse
+  definition: Abuse or neglect that comes from how a care service is run, such as poor staffing, rigid
+    routines and poor care standards, rather than from one individual.
+  examples: []
+  source_url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Closed culture
+  definition: In the CQC's words, a poor culture that can lead to harm, including human rights breaches
+    such as abuse; it is typical of isolated services where people cannot easily leave or speak up.
+  examples: []
+  source_url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Chemical restraint
+  definition: Using medication to restrict a person's behaviour or movement when it is not needed to treat
+    their medical symptoms.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.12
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Restraint, seclusion and long-term segregation
+  definition: 'Restrictive practices: physically holding or restricting a person, shutting them alone
+    in a room, or keeping them apart from others for long periods.'
+  examples: []
+  source_url: https://www.cqc.org.uk/publications/major-reports/restraint-seclusion-segregation-independent-care-education-treatment
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Skilled nursing facility (SNF)
+  definition: A US nursing home certified by Medicare to give skilled nursing or rehabilitation care;
+    the subject of the OIG audit of unreported incidents.
+  examples: []
+  source_url: https://oig.hhs.gov/oas/reports/region1/11600509.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: State Survey Agency
+  definition: The state body that inspects US nursing homes for CMS and receives facilities' reports of
+    suspected abuse.
+  examples: []
+  source_url: https://oig.hhs.gov/oas/reports/region1/11600509.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Injury of unknown source
+  definition: An injury that nobody saw happen and that cannot be explained, which US facilities must
+    treat as potentially reportable; OIG found facilities interpreted this inconsistently.
+  examples: []
+  source_url: https://oig.hhs.gov/oas/reports/region1/11600509.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Section 1150B reporting deadline
+  definition: The federal rule that suspected crimes against nursing home residents be reported within
+    2 hours if serious bodily injury results and within 24 hours otherwise.
+  examples: []
+  source_url: https://oig.hhs.gov/oas/reports/region1/11600509.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: F-tag (F600, F602, F603)
+  definition: CMS codes for nursing home deficiencies; F600, F602 and F603 cover abuse, misappropriation/exploitation
+    and involuntary seclusion and drive the Care Compare abuse icon.
+  examples: []
+  source_url: https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/downloads/usersguide.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Scope and severity (S/S)
+  definition: CMS's letter grade (A to L) for how widespread and how harmful a deficiency is; G and above
+    mean actual harm was found.
+  examples: []
+  source_url: https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/downloads/usersguide.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Immediate jeopardy (IJ)
+  definition: The most serious CMS deficiency level, meaning residents are in immediate danger of serious
+    harm or death; repeated IJ can lead to termination.
+  examples: []
+  source_url: https://www.cms.gov/files/document/qso-23-01-nh-revised-2026-01-28.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Special Focus Facility (SFF)
+  definition: A CMS program that picks the worst-performing nursing homes in each state, based on inspections
+    and complaint surveys, for more frequent inspection.
+  examples: []
+  source_url: https://www.cms.gov/files/document/qso-23-01-nh-revised-2026-01-28.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Care Compare abuse icon
+  definition: A warning symbol on the CMS Care Compare website for homes recently cited for abuse at harm
+    level or cited repeatedly.
+  examples: []
+  source_url: https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/downloads/usersguide.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Minimum Data Set (MDS)
+  definition: The standard resident assessments nursing homes submit to CMS; they feed quality measures,
+    and OIG found falls and diagnoses misreported in them.
+  examples: []
+  source_url: https://oig.hhs.gov/reports/all/2025/nursing-homes-failed-to-report-43-percent-of-falls-with-major-injury-and-hospitalization-among-their-medicare-enrolled-residents/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Staff turnover measure
+  definition: CMS's share of nurses or administrators who leave a home, counting staff who worked at least
+    120 hours in 90 days and then had a 90-day gap.
+  examples: []
+  source_url: https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/downloads/usersguide.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Critical incident
+  definition: A serious event in a group home, such as a death, assault, suicide attempt, unplanned hospitalisation
+    or missing person, that must be reported and reviewed.
+  examples: []
+  source_url: https://OIG.HHS.gov/reports-and-publications/featured-topics/group-homes/group-homes-joint-report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Mortality review
+  definition: A process for reporting and examining every death of a person in care, including its cause,
+    to spot preventable deaths.
+  examples: []
+  source_url: https://OIG.HHS.gov/reports-and-publications/featured-topics/group-homes/group-homes-joint-report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Serious case review (now safeguarding adults review)
+  definition: A multi-agency review in England commissioned after serious abuse or death to find what
+    agencies missed, such as the Winterbourne View review.
+  examples: []
+  source_url: https://sites.southglos.gov.uk/safeguarding/wp-content/uploads/sites/221/2023/07/WV-SCR-report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Safeguarding alert
+  definition: A report to a council in England that an adult may be at risk of abuse or neglect; at Winterbourne
+    View 40 alerts were handled as separate cases.
+  examples: []
+  source_url: https://sites.southglos.gov.uk/safeguarding/wp-content/uploads/sites/221/2023/07/WV-SCR-report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Mental Capacity Act / DoLS
+  definition: English law on decisions for people who lack capacity; Deprivation of Liberty Safeguards
+    authorise lawful restrictions, and poor use of them is a CQC red flag.
+  examples: []
+  source_url: https://www.cqc.org.uk/guidance-providers/all-services/how-cqc-identifies-responds-closed-cultures
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: IC(E)TR
+  definition: Independent Care (Education) and Treatment Reviews of people with a learning disability
+    or autism held in hospital, used in the CQC's 'Out of sight' review.
+  examples: []
+  source_url: https://www.cqc.org.uk/publications/major-reports/restraint-seclusion-segregation-independent-care-education-treatment
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Nurse aide registry
+  definition: A US state register of nurse aides that records findings of abuse, neglect or misappropriation;
+    homes must not hire people with such findings.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-G/part-483/subpart-B/section-483.12
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Guardianship
+  definition: A court process that appoints someone to make decisions for an adult judged unable to; GAO
+    found the extent of abuse by guardians unknown.
+  examples: []
+  source_url: https://gao.gov/products/gao-17-33
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Corporate Integrity Agreement
+  definition: A compliance agreement with HHS-OIG that a provider signs as part of a fraud settlement,
+    often with an independent monitor.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdoh/pr/extendicare-health-services-inc-agrees-pay-38-million-settle-false-claims-act
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA
+- term: Abuse of older people (WHO definition)
+  definition: A single or repeated act, or lack of action, within a relationship of trust that causes
+    harm or distress to an older person.
+  examples: []
+  source_url: https://www.who.int/news-room/fact-sheets/detail/abuse-of-older-people
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VA

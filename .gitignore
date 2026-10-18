@@ -13,14 +13,23 @@ backend/.env
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .venv/
 venv/
+.coverage
+backend/.coverage
 
 # Frontend dependencies/build output
 frontend/node_modules/
 frontend/.next/
+frontend/out/
+# The MapLibre worker, copied from node_modules before each build (frontend/scripts/copy-maplibre-worker.mjs).
+frontend/public/maplibre/
 node_modules/
 .next/
+frontend/tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Local generated snapshots / runtime artifacts
 journalism-workbench-*-source.tar.gz
@@ -29,3 +38,6 @@ SNAPSHOT_MANIFEST.json
 *.log
 .DS_Store
 Thumbs.db
+# Per-process coverage files (pytest-cov in reader subprocesses)
+.coverage.*
+backend/.coverage.*

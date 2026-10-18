@@ -1,0 +1,3220 @@
+{
+ "generated": "2026-10-11",
+ "conventions": {
+  "locator": "\"page N\" = 1-based PDF page (form-feed page in text/*.txt; === PAGE N === in enrich/txt; page image N for the OCR'd judgment). \"line N\" = 1-based index of the non-empty line in the doc's extracted .txt (more/articles/<id>.txt, more/docs/<id>.txt, enrich/txt/<id>.txt, or text/<id>.txt for HTML regulator releases).",
+  "quotes": "Verbatim substrings after whitespace normalisation. For the scanned Malaysian judgments the quote is transcribed from the page image; the OCR text (enrich/ocr/...) may differ by OCR noise; \"match\" records the fuzzy score.",
+  "docs": "New downloads listed in enrich/dl_log.jsonl (url, sha256, bytes). OCR of existing scanned PDFs in enrich/ocr/."
+ },
+ "payments": [
+  {
+   "id": "pay-myr-01",
+   "currency": "MYR",
+   "amount": "2081476926",
+   "amount_text": "RM2,081,476,926 (US$681 million)",
+   "payer": "tanore",
+   "payee": "malaysian-official-1",
+   "payee_account": "AmIslamic/AmPrivate Banking account ending 9694 (maps to acct-ampb-mr per judgment para 83)",
+   "date": {
+    "start": "2013-03-22",
+    "end": "2013-04-10",
+    "precision": "range",
+    "note": "nine credits; USD-side wires dated 21 and 25 Mar 2013 in DOJ/DPA"
+   },
+   "purpose": "Prosecution: diverted Project Catalyze (2013 bond) proceeds received as gratification (third charge); defence: Saudi royal donation (rejected by court).",
+   "entity_keys": [
+    "tanore",
+    "malaysian-official-1",
+    "acct-ampb-mr",
+    "ambank"
+   ],
+   "new_parties": [
+    "Najib Razak (named defendant; existing key malaysian-official-1 is the DOJ label)"
+   ],
+   "evidence": [
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 112",
+     "quote": "Receiving US$681 million (RM2.08 billion) belonging to a 1MDB subsidiary, transferred from Tanore Finance Corporation’s account into Najib’s Account 9694 in nine transactions between March 22 and April 10, 2013."
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 12",
+     "quote": "The first nine charges relate to the receiving of RM2,081,476,926 which formed the subject matter of the amended third charge under the MACC Act.",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.993"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 45",
+     "quote": "10-4-2013 RM602,000,000.00",
+     "note": "table row 9 \"Receiving the proceeds\"; last of nine tranches tabled at para [149]"
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-02",
+   "currency": "MYR",
+   "amount": "2034350000",
+   "amount_text": "RM2,034,350,000 (US$620 million)",
+   "payer": "malaysian-official-1",
+   "payee": "tanore",
+   "date": {
+    "start": "2013-08-02",
+    "end": "2013-08-23",
+    "precision": "range",
+    "note": "five tranches; instruction given 30-7-2013; DOJ dates a single $620,010,715 wire 26 Aug 2013"
+   },
+   "purpose": "Return of US$620m to Tanore (AG 2016: returned to the Saudi royal family because unused).",
+   "entity_keys": [
+    "malaysian-official-1",
+    "tanore"
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 12",
+     "quote": "Between 2 August 2013 and 23 August 2013, the accused transferred a sum of RM2,034,350,000 to Tanore Singapore.",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.964"
+    },
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 114",
+     "quote": "Transferring RM2.034 billion (US$620 million) in five transactions from Najib’s Account 9694 back to Tanore between August 2 and August 23, 2013."
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-03",
+   "currency": "MYR",
+   "amount": "22649000",
+   "amount_text": "RM22.649 million in five cheques (incl. RM20m to UMNO, RM100,000 to UMNO Batu Kawan)",
+   "payer": "malaysian-official-1",
+   "payee": "UMNO and others (new parties)",
+   "date": {
+    "start": "2013-08-02",
+    "end": "2013-08-14",
+    "precision": "range"
+   },
+   "purpose": "Use of proceeds: political party and speech-writing/social media services (charges 11-15).",
+   "entity_keys": [
+    "malaysian-official-1"
+   ],
+   "new_parties": [
+    "UMNO",
+    "UMNO Batu Kawan",
+    "Lim Soon Peng",
+    "ORB Solutions Sdn Bhd",
+    "Semarak Konsortium Satu"
+   ],
+   "evidence": [
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 113",
+     "quote": "Issuing five cheques totalling RM22.649 million between August 2 and August 14, 2013 — namely RM20 million to Umno, RM100,000 to Umno Batu Kawan"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 46",
+     "quote": "2-8-2013 RM20,000,000.00 Using via cheque no. 571854 Payment to UMNO"
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-04",
+   "currency": "MYR",
+   "amount": "161411646.34",
+   "amount_text": "RM161,411,646.34 (amended charges; para [40] gives RM162,436,711.87)",
+   "payer": "malaysian-official-1",
+   "payee": "malaysian-official-1",
+   "payer_account": "account ending 9694",
+   "payee_account": "new AmIslamic account ending 1880",
+   "date": {
+    "start": "2013-08-27",
+    "end": "2013-08-30",
+    "precision": "range",
+    "note": "two transfers, 27 and 30 Aug 2013"
+   },
+   "purpose": "Transfer of balance to a new personal account before closing account 9694 (charges 20-21).",
+   "entity_keys": [
+    "malaysian-official-1",
+    "ambank"
+   ],
+   "new_parties": [
+    "AmIslamic account ending 1880 (new BankAccount)"
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 47",
+     "quote": "a total of RM161,411,646.34 was transferred by the Accused from Account 9694 to Account 1880 through 2 transactions."
+    },
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 115",
+     "quote": "Transferring RM161.41 million in two transactions from Najib’s Account 9694 to his new personal AmIslamic bank account (Account 1880) on August 27 and August 30, 2013."
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-05",
+   "currency": "MYR",
+   "amount": "60629839.43",
+   "amount_text": "RM60,629,839.43 (approx. US$20 million)",
+   "payer": "Riyad Bank account (new party; DOJ 2016: PetroSaudi co-founder)",
+   "payee": "malaysian-official-1",
+   "payee_account": "acct-ampb-mr",
+   "date": {
+    "start": "2011-02-23",
+    "end": "2011-06-14",
+    "precision": "range"
+   },
+   "purpose": "Prosecution (accepted on conviction): gratification traceable to the 2009 IMTN and 2010 loan, via PetroSaudi JV phase (first charge).",
+   "entity_keys": [
+    "malaysian-official-1",
+    "acct-ampb-mr"
+   ],
+   "new_parties": [
+    "Riyad Bank sender account (DOJ: PETROSAUDI CO-FOUNDER; possibly tarek-obaid, not stated)"
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 281",
+     "quote": "between 23rd February 2011 and 14th June 2011, a total sum of approximately USD 20 million equivalent to RM60,629,839.43 of the proceeds that were credited into the accused’s account"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 59",
+     "quote": "That bank account belongs to MALAYSIAN OFFICIAL 1 and is the same account that received $20,000,000 from the PETROSAUDI CO-FOUNDER in 2011",
+     "note": "USD side; DOJ dates only to the year"
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-06",
+   "currency": "MYR",
+   "amount": "90899927.28",
+   "amount_text": "RM90,899,927.28 (US$5m + US$25m in Oct/Nov 2012 per DOJ)",
+   "payer": "blackstone-asia",
+   "payee": "malaysian-official-1",
+   "date": {
+    "start": "2012-10",
+    "end": "2012-11",
+    "precision": "month-range"
+   },
+   "purpose": "Second-phase gratification from the 2012 power-plant bonds (Tanjong/Mastika) routed via Aabar-BVI, investment funds and Blackstone.",
+   "entity_keys": [
+    "blackstone-asia",
+    "malaysian-official-1",
+    "acct-ampb-mr",
+    "aabar-bvi"
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 7",
+     "quote": "caused 1MDB to enter into two transactions as a result of which the accused obtained a sum of RM90,899,927.28 as gratification."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 59",
+     "quote": "Blackstone transferred $25,000,000 to the same AMPRIVATE BANKING-MR Account belonging to MALAYSIAN OFFICIAL 1."
+    }
+   ]
+  },
+  {
+   "id": "pay-gbp-myr-07",
+   "currency": "GBP",
+   "amount": "750000",
+   "amount_text": "GBP 750,000 (= RM4,093,500)",
+   "payer": "Blackrock Commodities (Global) Ltd (Eric Tan company; new party)",
+   "payee": "malaysian-official-1",
+   "date": {
+    "value": "2014-06-23",
+    "precision": "day",
+    "note": "described as \"allegedly\" in the summary of charges"
+   },
+   "purpose": "Part of fourth-charge gratification traced to the 2014 Aabar options buyback loan.",
+   "entity_keys": [
+    "malaysian-official-1",
+    "eric-tan",
+    "affinity-equity",
+    "aabar-bvi",
+    "1mehl"
+   ],
+   "new_parties": [
+    "Blackrock Commodities (Global) Ltd"
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 11",
+     "quote": "On 23 June 2014, a sum of GBP 750,000 equivalent to RM 4,093,500 was allegedly transferred to the accused's account.",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.983"
+    }
+   ]
+  },
+  {
+   "id": "pay-gbp-myr-08",
+   "currency": "GBP",
+   "amount": null,
+   "amount_text": "five sterling tranches; RM40,477,420.70 per prosecution submission (para [125]) vs RM45,837,485.70 in the charge summary (para [36])",
+   "payer": "Vista Equity International Partners Ltd (Barbados) (new party)",
+   "payee": "malaysian-official-1",
+   "date": {
+    "start": "2014-10-23",
+    "end": "2014-12-19",
+    "precision": "range"
+   },
+   "purpose": "Fourth-charge gratification from the US$975m Deutsche Bank loan routed via Aabar-Seychelles and Aabar Barbados.",
+   "entity_keys": [
+    "malaysian-official-1",
+    "aabar-seychelles",
+    "eric-tan",
+    "1mehl",
+    "deutsche-bank"
+   ],
+   "new_parties": [
+    "Vista Equity International Partners Ltd",
+    "Aabar International Investment PJS Ltd (Barbados)"
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 11",
+     "quote": "Between 23 October 2014 and 19 December 2014 Vista Equity through five tranches in sterling currency"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 37",
+     "quote": "the accused received RM40,477,420.70 by approving 1MEHL to obtain a loan through a Term Loan Facility up to USD 975,000,000 from Deutsche Bank AG"
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-09",
+   "currency": "MYR",
+   "amount": "42000000",
+   "amount_text": "RM42 million (RM27m + RM5m + RM10m)",
+   "payer": "SRC International Sdn Bhd (new party)",
+   "payee": "malaysian-official-1",
+   "date": {
+    "start": "2014-12",
+    "end": "2015-02",
+    "precision": "month-range",
+    "note": "ML charges dated 26 Dec 2014 - 10 Feb 2015"
+   },
+   "purpose": "Misappropriated SRC funds (from RM4bn KWAP loans) credited to two AmIslamic accounts; conviction 28 Jul 2020.",
+   "entity_keys": [
+    "malaysian-official-1",
+    "ambank"
+   ],
+   "new_parties": [
+    "SRC International Sdn Bhd",
+    "Retirement Fund Inc (KWAP)",
+    "AmIslamic accounts ending 1880 and 1906"
+   ],
+   "evidence": [
+    {
+     "doc": "edge-2020-src-guilty",
+     "locator": "line 10",
+     "quote": "for misappropriating RM27 million and RM5 million in December 2014, and another RM10 million in February 2015."
+    },
+    {
+     "doc": "edge-2020-src-guilty",
+     "locator": "line 17",
+     "quote": "between Dec 26, 2014, and Feb 10, 2015."
+    },
+    {
+     "doc": "malaymail-2020-guilty",
+     "locator": "line 86",
+     "quote": "Najib was complicit in the deposits of RM42 million from SRC International in his private account."
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-10",
+   "currency": "MYR",
+   "amount": "1053972936.58",
+   "kind": "court-ordered tax liability (not a transfer)",
+   "payer": "jho-low",
+   "payee": "Inland Revenue Board of Malaysia (LHDN) (new party)",
+   "date": {
+    "value": "2022-10-17",
+    "precision": "day",
+    "note": "grounds dated 17 Oct 2022; case manifest lists 2022-09-08"
+   },
+   "purpose": "Summary judgment for unpaid assessed tax for 2013 and 2014.",
+   "entity_keys": [
+    "jho-low"
+   ],
+   "new_parties": [
+    "LHDN (Inland Revenue Board of Malaysia)"
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2022-pa-21ncvc-1-01-2021-govt-v-low-taek-jho",
+     "locator": "page 56",
+     "quote": "I therefore allow the LHDN’s Application to enter judgment for RM1,053,972,936.58 with interest at 5% per annum"
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-11",
+   "currency": "MYR",
+   "amount": "11387888067.05",
+   "kind": "court-imposed fine (not a transfer)",
+   "payer": "malaysian-official-1",
+   "payee": "Government of Malaysia",
+   "date": {
+    "value": "2025-12-26",
+    "precision": "day"
+   },
+   "purpose": "Minimum statutory fine of five times the gratification on the four abuse-of-power charges; plus recoverable sum RM2,081,476,926.",
+   "entity_keys": [
+    "malaysian-official-1"
+   ],
+   "evidence": [
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 89",
+     "quote": "imposed the minimum statutory fine of five times the gratification amount, totalling RM11,387,888,067.05."
+    },
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 95",
+     "quote": "Sequerah also ordered Najib to pay the recoverable sum of RM2,081,476,926"
+    }
+   ]
+  },
+  {
+   "id": "pay-myr-12",
+   "currency": "MYR",
+   "amount": "8500000000",
+   "kind": "acquisition price (agreement)",
+   "payer": "1mdb-energy",
+   "payee": "Tanjong Power Holdings Sdn Bhd (new party)",
+   "date": {
+    "value": "2012-03-02",
+    "precision": "day",
+    "qualifier": "on or about"
+   },
+   "purpose": "Purchase of Tanjong Energy Holdings; MYR 2.5bn to be funded via Goldman (Project Magnolia).",
+   "entity_keys": [
+    "1mdb-energy",
+    "goldman-intl"
+   ],
+   "new_parties": [
+    "Tanjong Energy Holdings Sdn Bhd",
+    "Tanjong Power Holdings Sdn Bhd"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 41",
+     "quote": "to acquire Tanjong Energy Holdings Sdn Bhd (“Tanjong Energy”), a power production company, from Tanjong Power Holdings Sdn Bhd (“Tanjong Power”) for MYR 8.5 billion"
+    }
+   ]
+  },
+  {
+   "id": "pay-chf-01",
+   "currency": "CHF",
+   "amount": "95000000",
+   "kind": "regulatory disgorgement",
+   "payer": "bsi",
+   "payee": "Swiss Confederation (FINMA order)",
+   "date": {
+    "value": "2016-05-24",
+    "precision": "day",
+    "note": "press release date"
+   },
+   "purpose": "Disgorgement of profits for AML breaches in 1MDB business.",
+   "entity_keys": [
+    "bsi",
+    "finma"
+   ],
+   "evidence": [
+    {
+     "doc": "finma-2016-pr-bsi",
+     "locator": "line 3",
+     "quote": "Among other measures, FINMA has ordered the disgorgement of profits amounting to CHF 95 million."
+    }
+   ]
+  },
+  {
+   "id": "pay-chf-02",
+   "currency": "CHF",
+   "amount": "2500000",
+   "kind": "regulatory disgorgement",
+   "payer": "falcon",
+   "payee": "Swiss Confederation (FINMA order)",
+   "date": {
+    "value": "2016-10",
+    "precision": "month",
+    "note": "proceedings concluded \"at the beginning of October 2016\"; release dated 11 Oct 2016"
+   },
+   "purpose": "Disgorgement for AML breaches tied to ~USD 3.8bn of 1MDB-linked flows.",
+   "entity_keys": [
+    "falcon",
+    "finma"
+   ],
+   "evidence": [
+    {
+     "doc": "finma-2016-pr-falcon",
+     "locator": "line 142",
+     "quote": "FINMA has ordered the disgorgement of CHF 2.5 million in illegally generated profits."
+    },
+    {
+     "doc": "finma-2016-pr-falcon",
+     "locator": "line 131",
+     "quote": "FINMA concluded its enforcement proceedings against Falcon at the beginning of October 2016."
+    }
+   ]
+  },
+  {
+   "id": "pay-chf-03",
+   "currency": "CHF",
+   "amount": "6500000",
+   "kind": "regulatory disgorgement",
+   "payer": "rbs-coutts",
+   "payee": "Swiss Confederation (FINMA order)",
+   "date": {
+    "value": "2017-01",
+    "precision": "month",
+    "note": "concluded January 2017; release 2 Feb 2017"
+   },
+   "purpose": "Disgorgement for AML failures incl. the ~USD 700m 2009 inflow to Low's account.",
+   "entity_keys": [
+    "rbs-coutts",
+    "finma"
+   ],
+   "evidence": [
+    {
+     "doc": "finma-2017-pr-coutts",
+     "locator": "line 129",
+     "quote": "The Swiss Financial Market Supervisory Authority FINMA has ordered the bank to disgorge unlawfully generated profits of CHF 6.5 million."
+    },
+    {
+     "doc": "finma-2017-pr-coutts",
+     "locator": "line 130",
+     "quote": "In January 2017, FINMA concluded enforcement proceedings which had been running since the beginning of 2016 against Coutts & Co Ltd (“Coutts”)."
+    }
+   ]
+  },
+  {
+   "id": "pay-chf-04",
+   "currency": "CHF",
+   "amount": "450000000",
+   "kind": "court-ordered compensatory claim",
+   "payer": "tarek-obaid (anonymised \"A.\" in the judgment)",
+   "payee": "Swiss Confederation",
+   "date": {
+    "value": "2024-08-28",
+    "precision": "day"
+   },
+   "purpose": "Créance compensatrice (art. 71 CP) after fraud/money-laundering conviction; not yet final at publication.",
+   "entity_keys": [
+    "tarek-obaid",
+    "petrosaudi"
+   ],
+   "new_parties": [
+    "Swiss Federal Criminal Court",
+    "Patrick Mahony (\"B.\")"
+   ],
+   "note": "Defendants are anonymised (A. = Swiss/Saudi national, 7 years; B. = Swiss/British national, 6 years); mapping to Obaid/Mahony is by inference from nationality and the OAG 2023 indictment, not stated in the document.",
+   "evidence": [
+    {
+     "doc": "bstger-2024-sk-2023-24-dispositif-fr",
+     "locator": "page 5",
+     "quote": "Est prononcée en faveur de la Confédération suisse une créance compensatrice de CHF 450'000'000.– à l’encontre de A. (art. 71 CP)."
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-dispositif-fr",
+     "locator": "page 6",
+     "quote": "de CHF 12'000'000.– à l’encontre de B. (art. 71 CP)."
+    }
+   ]
+  },
+  {
+   "id": "pay-usd-ch-05",
+   "currency": "USD",
+   "amount": "1000000000",
+   "kind": "court-ordered restitution with 5% interest",
+   "payer": "tarek-obaid / Patrick Mahony (jointly)",
+   "payee": "1mdb (\"C. BHD\")",
+   "date": {
+    "value": "2024-08-28",
+    "precision": "day",
+    "note": "interest runs from 30 Sep 2009; further sums 418,791,000 from 14 Sep 2010; 30m/65m/110m from 20/23/27 May 2011; 125m from 25 Oct 2011"
+   },
+   "purpose": "Civil restitution in Swiss criminal judgment; plaintiff D. LTD's claims rejected.",
+   "entity_keys": [
+    "1mdb",
+    "tarek-obaid"
+   ],
+   "evidence": [
+    {
+     "doc": "bstger-2024-sk-2023-24-dispositif-fr",
+     "locator": "page 5",
+     "quote": "USD 1'000'000'000.– avec intérêts à 5% l’an dès le 30 septembre 2009;"
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-dispositif-fr",
+     "locator": "page 5",
+     "quote": "USD 418'791'000.– avec intérêts à 5% l’an dès le 14 septembre 2010;"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-01",
+   "currency": "SGD",
+   "amount": "13300000",
+   "kind": "regulatory penalty",
+   "payer": "bsi-singapore",
+   "payee": "mas",
+   "date": {
+    "value": "2016-05-24",
+    "precision": "day"
+   },
+   "purpose": "41 breaches of MAS Notice 1014.",
+   "entity_keys": [
+    "bsi-singapore",
+    "mas"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "line 34",
+     "quote": "MAS has also served BSI Bank notice to impose financial penalties amounting to $13.3 million for 41 breaches of MAS Notice 1014",
+     "note": "MAS writes \"$\" for Singapore dollars"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-02",
+   "currency": "SGD",
+   "amount": "4300000",
+   "kind": "regulatory penalty",
+   "payer": "falcon",
+   "payee": "mas",
+   "date": {
+    "value": "2016-10-11",
+    "precision": "day"
+   },
+   "purpose": "14 breaches of MAS Notice 1014; merchant-bank status withdrawn.",
+   "entity_keys": [
+    "falcon",
+    "mas"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "line 12",
+     "quote": "MAS has imposed on Falcon Bank financial penalties amounting to S$4.3 million for 14 breaches of MAS Notice 1014"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-03",
+   "currency": "SGD",
+   "amount": "300000",
+   "kind": "composition fine",
+   "payer": "falcon",
+   "payee": "mas",
+   "date": {
+    "value": null,
+    "precision": "unknown",
+    "note": "after the 2013 inspection; payment date not given"
+   },
+   "purpose": "Earlier AML breaches found in 2013 inspection.",
+   "entity_keys": [
+    "falcon",
+    "mas"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "line 7",
+     "quote": "Falcon Bank paid a composition fine of S$300,000 for these breaches"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-04",
+   "currency": "SGD",
+   "amount": "1000000",
+   "kind": "regulatory penalty",
+   "payer": "dbs",
+   "payee": "mas",
+   "date": {
+    "value": "2016-10-11",
+    "precision": "day"
+   },
+   "purpose": "10 breaches of MAS Notice 626.",
+   "entity_keys": [
+    "dbs",
+    "mas"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "line 17",
+     "quote": "MAS has imposed financial penalties amounting to S$1 million on DBS for 10 breaches and S$1.3 million on UBS for 13 breaches of MAS Notice 626"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-05",
+   "currency": "SGD",
+   "amount": "1300000",
+   "kind": "regulatory penalty",
+   "payer": "ubs",
+   "payee": "mas",
+   "date": {
+    "value": "2016-10-11",
+    "precision": "day"
+   },
+   "purpose": "13 breaches of MAS Notice 626 (UBS AG Singapore Branch).",
+   "entity_keys": [
+    "ubs",
+    "mas"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "line 17",
+     "quote": "MAS has imposed financial penalties amounting to S$1 million on DBS for 10 breaches and S$1.3 million on UBS for 13 breaches of MAS Notice 626"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-06",
+   "currency": "SGD",
+   "amount": "5200000",
+   "kind": "regulatory penalty",
+   "payer": "Standard Chartered Bank, Singapore Branch (new party)",
+   "payee": "mas",
+   "date": {
+    "value": "2016-12-02",
+    "precision": "day"
+   },
+   "purpose": "28 breaches of MAS Notice 626 (1MDB flows 2010-2013; Blackstone account bank).",
+   "entity_keys": [
+    "mas",
+    "blackstone-asia"
+   ],
+   "new_parties": [
+    "Standard Chartered Bank (Singapore)"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-scb-coutts",
+     "locator": "line 274",
+     "quote": "MAS has imposed on SCB financial penalties amounting to S$5.2 million for 28 breaches of MAS Notice 626"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-07",
+   "currency": "SGD",
+   "amount": "2400000",
+   "kind": "regulatory penalty",
+   "payer": "rbs-coutts (Coutts & Co Ltd, Singapore Branch)",
+   "payee": "mas",
+   "date": {
+    "value": "2016-12-02",
+    "precision": "day"
+   },
+   "purpose": "24 breaches of MAS Notice 1014.",
+   "entity_keys": [
+    "rbs-coutts",
+    "mas"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-scb-coutts",
+     "locator": "line 277",
+     "quote": "MAS has imposed on Coutts financial penalties amounting to S$2.4 million for 24 breaches of MAS Notice 1014"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-08",
+   "currency": "SGD",
+   "amount": "700000",
+   "kind": "regulatory penalty",
+   "payer": "Credit Suisse (new party)",
+   "payee": "mas",
+   "date": {
+    "value": "2017-05-30",
+    "precision": "day"
+   },
+   "purpose": "Breaches of MAS Notice 626.",
+   "entity_keys": [
+    "mas"
+   ],
+   "new_parties": [
+    "Credit Suisse (Singapore)"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2017-pr-cs-uob",
+     "locator": "line 272",
+     "quote": "MAS has imposed on Credit Suisse and UOB financial penalties amounting to S$0.7 million and S$0.9 million respectively"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-09",
+   "currency": "SGD",
+   "amount": "900000",
+   "kind": "regulatory penalty",
+   "payer": "United Overseas Bank (new party)",
+   "payee": "mas",
+   "date": {
+    "value": "2017-05-30",
+    "precision": "day"
+   },
+   "purpose": "Breaches of MAS Notice 626.",
+   "entity_keys": [
+    "mas"
+   ],
+   "new_parties": [
+    "United Overseas Bank (UOB)"
+   ],
+   "evidence": [
+    {
+     "doc": "mas-2017-pr-cs-uob",
+     "locator": "line 272",
+     "quote": "MAS has imposed on Credit Suisse and UOB financial penalties amounting to S$0.7 million and S$0.9 million respectively"
+    }
+   ]
+  },
+  {
+   "id": "pay-sgd-10",
+   "currency": "SGD",
+   "amount": "29100000",
+   "kind": "aggregate of the eight penalties above (cross-check: 13.3+4.3+1+1.3+5.2+2.4+0.7+0.9 = 29.1)",
+   "payer": "eight banks",
+   "payee": "mas",
+   "date": {
+    "value": "2017-05-30",
+    "precision": "day",
+    "note": "as-of date of the summary"
+   },
+   "entity_keys": [
+    "mas"
+   ],
+   "purpose": "MAS total for its 1MDB review.",
+   "evidence": [
+    {
+     "doc": "mas-2017-pr-cs-uob",
+     "locator": "line 287",
+     "quote": "Financial penalties of S$29.1 million in aggregate have been imposed on eight banks"
+    }
+   ]
+  },
+  {
+   "id": "pay-gbp-01",
+   "currency": "GBP",
+   "amount": "35000000",
+   "amount_text": "approximately £35 million",
+   "payer": "good-star",
+   "payee": "Macfarlanes LLP client account at RBS London (new party)",
+   "date": {
+    "value": "2010-03-19",
+    "precision": "day",
+    "qualifier": "on or about"
+   },
+   "purpose": "\"Completion UK Property\" - Stratton Street penthouse lease and flat (Mayfair).",
+   "entity_keys": [
+    "good-star",
+    "jho-low"
+   ],
+   "new_parties": [
+    "Macfarlanes LLP",
+    "Stratton Street (London) Limited",
+    "Seven Stratton Street (London) Limited"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 184",
+     "quote": "On or about March 19, 2010, approximately £35 million was wired from the Good Star Account to a Royal Bank of Scotland PLC (“RBS London”) account named “Macfarlanes LLP Client Account Number 1.”"
+    }
+   ]
+  },
+  {
+   "id": "pay-gbp-02",
+   "currency": "GBP",
+   "amount": "18000000",
+   "payer": "jho-low (via RBS Coutts, rerouted through One Universe Trust account at Rothschild)",
+   "payee": "Macfarlanes escrow (new party)",
+   "date": {
+    "value": "2010-08-04",
+    "precision": "day",
+    "qualifier": "on or about"
+   },
+   "purpose": "Purchase of the Qentas townhouse (price £17,000,000) by Lygon Place (London) Ltd.",
+   "entity_keys": [
+    "jho-low",
+    "rbs-coutts",
+    "good-star"
+   ],
+   "new_parties": [
+    "One Universe Trust",
+    "Lygon Place (London) Limited",
+    "Rothschild Bank"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 182",
+     "quote": "On or about August 4, 2010, LOW instructed RBS Coutts to send GBP £18,000,000 to an escrow account in the United Kingdom maintained by Macfarlanes."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 182",
+     "quote": "The purchase price was £17,000,000."
+    }
+   ]
+  },
+  {
+   "id": "pay-gbp-03",
+   "currency": "GBP",
+   "amount": "23250000",
+   "payer": "Qentas Holdings Limited (Riza Aziz; new party)",
+   "payee": "Lygon Place (London) Limited (Low; new party)",
+   "date": {
+    "value": "2012-07",
+    "precision": "uncertain",
+    "candidates": [
+     "2012-07-12",
+     "2012-07-27",
+     "2012-08"
+    ]
+   },
+   "purpose": "Sale of the Qentas townhouse from Low to Aziz; DOJ says laundered 1MDB money.",
+   "entity_keys": [
+    "riza-aziz",
+    "jho-low",
+    "shearman-sterling"
+   ],
+   "new_parties": [
+    "Qentas Holdings Limited",
+    "Lygon Place (London) Limited"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 183",
+     "quote": "Qentas acquired the QENTAS TOWNHOUSE from “Lygon Place (London) Limited” by deed dated July 27, 2012, for £23,250,000."
+    }
+   ]
+  },
+  {
+   "id": "pay-gbp-04",
+   "currency": "GBP",
+   "amount": "42476000",
+   "amount_text": "£42,476,000 bought with approximately $70,930,672",
+   "payer": "One Universe Trust account (new party)",
+   "payee": "Seneca World Ltd (\"Distribution to LTJ\") (new party)",
+   "date": {
+    "value": "2014-03-05",
+    "precision": "day",
+    "qualifier": "on or about"
+   },
+   "purpose": "Funds roughly equal to the £42m Stratton Office purchase by Eight Nine Stratton Street (London) Ltd on or about 13 Mar 2014.",
+   "entity_keys": [
+    "jho-low"
+   ],
+   "new_parties": [
+    "One Universe Trust",
+    "Seneca World Ltd",
+    "Eight Nine Stratton Street (London) Limited"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 188",
+     "quote": "One Universe Account records show that on or about March 5, 2014, One Universe exchanged approximately $70,930,672 for £42,476,000."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 189",
+     "quote": "on or about March 13, 2014, an entity called Eight Nine Stratton Street (London) Limited purchased the STRATTON OFFICE for a total of £42 million"
+    }
+   ]
+  },
+  {
+   "id": "pay-gbp-05",
+   "currency": "GBP",
+   "amount": "3183997",
+   "payer": "jho-low (LOW BSI Account)",
+   "payee": "Sotheby's (new party)",
+   "date": {
+    "value": "2014-07-31",
+    "precision": "day"
+   },
+   "purpose": "Initial payment for Monet \"Nympheas\" (bought 23 Jun 2014 for £33,829,500).",
+   "entity_keys": [
+    "jho-low",
+    "bsi"
+   ],
+   "new_parties": [
+    "Sotheby's"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 176",
+     "quote": "On July 31, 2014, a wire for £3,183,997 GBP (equivalent to approximately $5.4 million) was sent from the LOW BSI Account to an account maintained by Sotheby’s"
+    }
+   ]
+  },
+  {
+   "id": "pay-gbp-06",
+   "currency": "GBP",
+   "amount": "28500000",
+   "payer": "jho-low (LOW BSI Account)",
+   "payee": "Sotheby's (new party)",
+   "date": {
+    "value": "2014-10-23",
+    "precision": "day"
+   },
+   "purpose": "Balance for Monet \"Nympheas\".",
+   "entity_keys": [
+    "jho-low",
+    "bsi"
+   ],
+   "new_parties": [
+    "Sotheby's"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 176",
+     "quote": "That same day, a wire for £28,500,000 GBP (equivalent to approximately $45.7 million) was wired from the LOW BSI Account to Sotheby’s in the United Kingdom"
+    }
+   ]
+  },
+  {
+   "id": "pay-eur-01",
+   "currency": "EUR",
+   "amount": "26932500",
+   "payer": "Hong Kong art dealer (for an anonymous buyer; new party)",
+   "payee": "escrow account at UBS Bank S.A., Switzerland",
+   "date": {
+    "value": "2016-07-15",
+    "precision": "day"
+   },
+   "purpose": "Purchase of Monet \"Nympheas\" from Low; agreed price €25,227,025.83 (proceeds later named as a defendant asset).",
+   "entity_keys": [
+    "jho-low",
+    "ubs"
+   ],
+   "new_parties": [
+    "Hong Kong Art Dealer"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 177",
+     "quote": "On July 15, 2016, an art dealer in Hong Kong (“Hong Kong Art Dealer”) paid €26,932,500 into an escrow account at UBS Bank, S.A. in Switzerland"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 177",
+     "quote": "The agreed upon purchase price for the PETIT NYMPHEAS PAINTING was €25,227,025.83."
+    }
+   ]
+  },
+  {
+   "id": "pay-eur-02",
+   "currency": "EUR",
+   "amount": "101089075",
+   "kind": "balance due (invoice figure, not a wire record)",
+   "payer": "Equanimity trustees / world-view",
+   "payee": "Oceanco (shipyard; new party)",
+   "date": {
+    "value": "2014-06-05",
+    "precision": "before",
+    "note": "trustees agreed to pay \"before 5 June\"; email exchanged ~31 May 2014"
+   },
+   "purpose": "Contract balance, change orders and delivery payment for the Equanimity.",
+   "entity_keys": [
+    "equanimity",
+    "world-view",
+    "jho-low"
+   ],
+   "new_parties": [
+    "Oceanco"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 197",
+     "quote": "The balance owing under the contract, including the agreed change orders and delivery payment, is €101,089,075."
+    }
+   ]
+  },
+  {
+   "id": "pay-eur-03",
+   "currency": "EUR",
+   "amount": "3500000",
+   "payer": "jho-low and eric-tan",
+   "payee": "charter of yacht Topaz (owner not named)",
+   "date": {
+    "value": "2013-07",
+    "precision": "early-month",
+    "note": "\"early July 2013\", seven days"
+   },
+   "purpose": "Yacht rental paid with 2013 bond proceeds (invoice submitted to Falcon Bank).",
+   "entity_keys": [
+    "jho-low",
+    "eric-tan",
+    "falcon"
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 224",
+     "quote": "according to an invoice submitted to Falcon Bank, they paid €3.5 million for the rental, using proceeds of the 2013 bonds."
+    }
+   ]
+  }
+ ],
+ "ranged_dates": [
+  {
+   "id": "rd-01",
+   "subject": "US$681m (RM2.08bn) into Najib/Malaysian Official 1 account",
+   "kind": "conflicting granularity",
+   "versions": [
+    {
+     "source": "DOJ 2017 / DPA",
+     "date": "2013-03-21 and 2013-03-25 (two wires: $620m + $61m)"
+    },
+    {
+     "source": "Malaysian AG Jan 2016",
+     "date": "between 2013-03-22 and 2013-04-10"
+    },
+    {
+     "source": "High Court 2025",
+     "date": "nine RM credits 2013-03-22 .. 2013-04-10"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 50",
+     "quote": "On or about March 21, 2013, approximately $620 million was transferred from a shell entity beneficially owned or controlled by Low, Shell Company Account 7"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 100",
+     "quote": "[was] transferred into the personal account of [MALAYSIAN OFFICIAL 1] between 22.03.2013 and 10.04.2013,”"
+    },
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 112",
+     "quote": "in nine transactions between March 22 and April 10, 2013."
+    }
+   ],
+   "note": "USD wire dates vs ringgit credit dates; the two descriptions are not necessarily inconsistent (conversion and crediting lag) but the app should store both."
+  },
+  {
+   "id": "rd-02",
+   "subject": "Return of US$620m to Tanore",
+   "kind": "conflicting dates and tranche count",
+   "versions": [
+    {
+     "source": "Malaysian AG 2016",
+     "date": "2013-08 (month)"
+    },
+    {
+     "source": "DOJ 2017",
+     "date": "2013-08-26 (one wire $620,010,715)"
+    },
+    {
+     "source": "High Court 2025",
+     "date": "2013-08-02 .. 2013-08-23, five tranches; instruction 2013-07-30"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "edge-2016-ag-clears",
+     "locator": "line 13",
+     "quote": "Najib returned US$620 million (RM2.03 million) to the Saudi royal family in August 2013"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 99",
+     "quote": "On or about August 26, 2013, $620,010,715 was wired from a different account at AmBank to the Tanore Account"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 407",
+     "quote": "on 30-7-2013 the accused instructed AmIslamic Bank to transfer the sum of USD620,000,000.00 from Account 9694 back to Tanore (P1200). The first transfer took effect on 2-8-2013.",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.966"
+    }
+   ]
+  },
+  {
+   "id": "rd-03",
+   "subject": "US$330m second tranche to Good Star (2011)",
+   "kind": "range vs month vs different month",
+   "versions": [
+    {
+     "source": "DOJ 2016",
+     "date": "between 2011-05-20 and 2011-10-25 (four wires)"
+    },
+    {
+     "source": "Swiss court press release 2024",
+     "date": "2011-05"
+    },
+    {
+     "source": "Swiss OAG indictment release 2023",
+     "date": "2011-10 (with Sept 2010) for the 830m"
+    },
+    {
+     "source": "Swiss dispositif",
+     "date": "interest from 2011-05-20/23/27 and 2011-10-25"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 31",
+     "quote": "between May 20 and October 25, 2011, $330,000,000 was transferred from 1MDB to the Good Star Account over four wire transfers"
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 2",
+     "quote": "in May 2011 – after a small portion of the previously misappropriated funds had been repaid to 1MDB as interests"
+    },
+    {
+     "doc": "oag-2023-04-25-anklage-petrosaudi-de",
+     "locator": "line 26",
+     "quote": "im September 2010 und im Oktober 2011 im Rahmen eines islamischen Darlehens"
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-dispositif-fr",
+     "locator": "page 5",
+     "quote": "USD 125'000'000.– avec intérêts à 5% l’an dès le 25 octobre 2011."
+    }
+   ]
+  },
+  {
+   "id": "rd-04",
+   "subject": "US$700m to Good Star (2009)",
+   "kind": "season vs day",
+   "versions": [
+    {
+     "source": "FINMA Coutts 2017",
+     "date": "autumn 2009"
+    },
+    {
+     "source": "DOJ 2016 (JPM records)",
+     "date": "2009-09-30 (on or about)"
+    },
+    {
+     "source": "Swiss court 2024",
+     "date": "left 1MDB accounts 2009-09-30"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "finma-2017-pr-coutts",
+     "locator": "line 134",
+     "quote": "in the autumn of 2009, approximately USD 700 million was transferred to the account from the Malaysian sovereign wealth fund 1MDB."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 27",
+     "quote": "J.P. Morgan Chase bank records confirm that on or about September 30, 2009, the Good Star Account received the $700 million wire transfer from Deutsche Bank."
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 2",
+     "quote": "this amount left 1MDB’s corporate accounts on September 30, 2009."
+    }
+   ]
+  },
+  {
+   "id": "rd-05",
+   "subject": "2010 US$500m PetroSaudi tranche",
+   "kind": "approval date vs payment date vs amount",
+   "versions": [
+    {
+     "source": "Swiss court PR",
+     "date": "requested July 2010, approved 2010-09-09"
+    },
+    {
+     "source": "Swiss dispositif",
+     "date": "USD 418,791,000 with interest from 2010-09-14"
+    },
+    {
+     "source": "Malaysian High Court",
+     "date": "September 2010 (month)"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 2",
+     "quote": "This request was finally approved by 1MDB's Board of Directors on September 9, 2010."
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-dispositif-fr",
+     "locator": "page 5",
+     "quote": "USD 418'791'000.– avec intérêts à 5% l’an dès le 14 septembre 2010;"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 7",
+     "quote": "in September 2010, a sum of USD 500 million was sent to the Joint Venture Company."
+    }
+   ]
+  },
+  {
+   "id": "rd-06",
+   "subject": "Qentas townhouse sale (Low to Aziz, £23.25m)",
+   "kind": "three different dates in one complaint",
+   "versions": [
+    {
+     "date": "2012-07-12 (on or about)"
+    },
+    {
+     "date": "2012-07-27 (deed)"
+    },
+    {
+     "date": "2012-08 (month)"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 182",
+     "quote": "The property was purchased by Qentas Holdings Limited on or about July 12, 2012, for £23,250,000."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 183",
+     "quote": "by deed dated July 27, 2012, for £23,250,000."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 200",
+     "quote": "he used funds laundered through the sale of the QENTAS TOWNHOUSE to AZIZ for £23,250,000 in August 2012."
+    }
+   ]
+  },
+  {
+   "id": "rd-07",
+   "subject": "US$223,333,000 to Aabar-Seychelles (2014)",
+   "kind": "value date vs receipt date; amount rounded elsewhere",
+   "versions": [
+    {
+     "source": "DOJ 2017 para 429",
+     "date": "value date 2014-09-02, received 2014-09-03"
+    },
+    {
+     "source": "DOJ 2017 para 910",
+     "date": "2014-09-02 ($223,000,000)"
+    },
+    {
+     "source": "High Court 2025",
+     "date": "3 September (year implied 2014)"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 122",
+     "quote": "Deutsche Bank wire transferred $223,333,000 to the Aabar-Seychelles account with a value date of September 2, 2014."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 122",
+     "quote": "having been received by Aabar-Seychelles on September 3, 2014."
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 11",
+     "quote": "On 3 September a sum of USD 223,333,000 was transferred to Aabar Investments PJS Ltd (incorporated in Seychelles) at its account with UBS Singapore."
+    }
+   ]
+  },
+  {
+   "id": "rd-08",
+   "subject": "US$457,984,607 to Aabar-Seychelles (2014)",
+   "kind": "drawdown date vs wire date",
+   "versions": [
+    {
+     "date": "2014-09-29 (drawdown; also used as wire date at para 873)"
+    },
+    {
+     "date": "2014-09-30 (\"the following day\"; High Court)"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 123",
+     "quote": "Deutsche Bank wired $457,984,607 to the Aabar-Seychelles Account the following day."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 230",
+     "quote": "Deutsche Bank wired $457,984,607 in proceeds from the $975 million loan to the Aabar-Seychelles Account at UBS Bank in Singapore on or about September 29, 2014"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 11",
+     "quote": "On 30 September 2014, USD 457,984,607 was paid to Aabar Investments PJS Ltd"
+    }
+   ]
+  },
+  {
+   "id": "rd-09",
+   "subject": "Phase-1 gratification to Najib (US$20m / RM60.6m)",
+   "kind": "year only vs range",
+   "versions": [
+    {
+     "source": "DOJ 2016",
+     "date": "2011 (year)"
+    },
+    {
+     "source": "High Court 2025",
+     "date": "2011-02-23 .. 2011-06-14"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 59",
+     "quote": "is the same account that received $20,000,000 from the PETROSAUDI CO-FOUNDER in 2011"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 25",
+     "quote": "between 23rd February 2011 and 14th June 2011, a total sum of approximately USD 20 million"
+    }
+   ]
+  },
+  {
+   "id": "rd-10",
+   "subject": "SRC International offences",
+   "kind": "month-level and multi-month ranges",
+   "versions": [
+    {
+     "date": "CBT: 2014-12 and 2015-02 (months)"
+    },
+    {
+     "date": "Money laundering: 2014-12-26 .. 2015-02-10"
+    },
+    {
+     "date": "Abuse of power: 2011-08-17 .. 2012-02-08"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "edge-2020-src-guilty",
+     "locator": "line 10",
+     "quote": "for misappropriating RM27 million and RM5 million in December 2014, and another RM10 million in February 2015."
+    },
+    {
+     "doc": "edge-2020-src-guilty",
+     "locator": "line 14",
+     "quote": "between Aug 17, 2011 and Feb 8, 2012, under Section 23 of the Malaysian Anti-Corruption Commission Act 2009."
+    }
+   ]
+  },
+  {
+   "id": "rd-11",
+   "subject": "1MDB abuse-of-power and laundering charges against Najib",
+   "kind": "multi-year range",
+   "versions": [
+    {
+     "date": "2011-02-24 .. 2014-12-19 (abuse of power)"
+    },
+    {
+     "date": "2013-03-22 .. 2013-08-30 (21 AMLA counts)"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "malaymail-2025-saudi-donation-untenable",
+     "locator": "line 102",
+     "quote": "between February 24, 2011, and December 19, 2014."
+    },
+    {
+     "doc": "malaymail-2025-saudi-donation-untenable",
+     "locator": "line 104",
+     "quote": "he is accused of committing the offences at the same bank between March 22, 2013, and August 30, 2013."
+    }
+   ]
+  },
+  {
+   "id": "rd-12",
+   "subject": "Blackstone account activity",
+   "kind": "different ranges for the same account",
+   "versions": [
+    {
+     "source": "Singapore Court of Appeal 2026 (liquidators)",
+     "date": "2010-12 .. 2013-02"
+    },
+    {
+     "source": "DOJ 2016",
+     "date": "renamed Blackstone on or about 2011-05-26; Raffles wires ~2011-07 .. 2013-02"
+    },
+    {
+     "source": "DOJ 2016 para 471",
+     "date": "five Aabar-BVI wires \"between May and November 2012\" vs table ending 2012-12-14"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "sg-2026-sgca-12-blackstone-v-scb",
+     "locator": "page 7",
+     "quote": "The transactions involving the Blackstone Account occurred between December 2010 and February 2013."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 52",
+     "quote": "The account name was changed to Blackstone Asia Real Estate Partners on or about May 26, 2011."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 126",
+     "quote": "between May and November 2012, Aabar-BVI, of which QUBAISI was a purported director, sent five wires totaling approximately $637,000,000"
+    }
+   ]
+  },
+  {
+   "id": "rd-13",
+   "subject": "Overall scheme period",
+   "kind": "open-ended ranges that change between sources",
+   "versions": [
+    {
+     "source": "DOJ 2016",
+     "date": "2009 .. at least 2013"
+    },
+    {
+     "source": "DOJ 2017",
+     "date": "2009 .. at least 2014"
+    },
+    {
+     "source": "Swiss OAG 2016",
+     "date": "2009 .. 2013"
+    },
+    {
+     "source": "Swiss OAG 2023",
+     "date": "2009 .. at least 2015 (PetroSaudi strand)"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 6",
+     "quote": "over the course of an approximately four-year period, between approximately 2009 and at least 2013"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 7",
+     "quote": "over the course of an approximately five-year period, between approximately 2009 and at least 2014"
+    },
+    {
+     "doc": "oag-2016-01-29-entraide-fr",
+     "locator": "line 2",
+     "quote": "ces détournements auraient affecté quatre volets entre 2009 et 2013"
+    },
+    {
+     "doc": "oag-2023-04-25-anklage-petrosaudi-de",
+     "locator": "line 1",
+     "quote": "Die vorgeworfenen Taten erstreckten sich über einen Zeitraum von 2009 bis mindestens 2015"
+    }
+   ]
+  },
+  {
+   "id": "rd-14",
+   "subject": "Leissner/Ng/Low London meeting on Project Magnolia",
+   "kind": "\"late February\" vs \"February\"",
+   "versions": [
+    {
+     "source": "Indictment 2018",
+     "date": "late 2012-02"
+    },
+    {
+     "source": "DPA 2020",
+     "date": "2012-02"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2018-indictment-low-ng",
+     "locator": "page 12",
+     "quote": "In or around late February 2012, the defendants JHO LOW and ROGER NG, Co-Conspirator #1, lMDB Official #3 and others met in London"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 39",
+     "quote": "In or about February 2012, Leissner and Ng traveled to London to meet with Low and others to discuss the proposed bond transaction."
+    }
+   ]
+  },
+  {
+   "id": "rd-15",
+   "subject": "Attempts to onboard Low as a Goldman client",
+   "kind": "bounded \"in or around\" range",
+   "versions": [
+    {
+     "date": "~2009-09 .. ~2011-03"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2018-information-leissner",
+     "locator": "page 9",
+     "quote": "Between in or around September 2009 and in or around March 2011, the defendant TIM LEISSNER and others, including Co-Conspirator #2, supported at least three attempts"
+    }
+   ]
+  },
+  {
+   "id": "rd-16",
+   "subject": "Alfa Nero yacht meeting (Najib, Prince Turki, PetroSaudi)",
+   "kind": "month only",
+   "versions": [
+    {
+     "date": "2009-08"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "oag-2023-04-25-anklage-petrosaudi-de",
+     "locator": "line 11",
+     "quote": "Die Zusammenkunft fand im August 2009 auf der Yacht «Alfa Nero» in der Nähe von Cannes statt."
+    }
+   ]
+  },
+  {
+   "id": "rd-17",
+   "subject": "Drafting of the 4th \"Arab donation\" letter at the Mayfair Hotel, London",
+   "kind": "\"early 2015\" (witness testimony)",
+   "versions": [
+    {
+     "date": "early 2015"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 562",
+     "quote": "Saya sahkan saya pernah melihat deraf surat ini di skrin computer di Business Centre di Hotel Mayfair London pada awal tahun 2015."
+    }
+   ]
+  },
+  {
+   "id": "rd-18",
+   "subject": "Najib 1MDB judgment: verdict date vs written grounds",
+   "kind": "document date differs from event date",
+   "versions": [
+    {
+     "date": "2025-12-26 verdict and sentence"
+    },
+    {
+     "date": "2026-06-16 eFiling stamp on written grounds"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 87",
+     "quote": "PUTRAJAYA, Dec 26 ― Former prime minister Datuk Seri Najib Razak has been sentenced to imprisonment and a fine by the High Court today"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 1",
+     "quote": "WA-45-7-11/2018 Kand. 968 16/06/2026 10:41:44"
+    }
+   ]
+  },
+  {
+   "id": "rd-19",
+   "subject": "Najib v PP (audit-report tampering application)",
+   "kind": "internal impossibility in a court document",
+   "versions": [
+    {
+     "date": "judgment dated 2020-08-14"
+    },
+    {
+     "date": "refers to trial events on 2020-11-16"
+    },
+    {
+     "date": "charge period 2016-02-22 .. 2016-02-26"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2020-wa-44-117-06-2020-najib-v-pp",
+     "locator": "page 3",
+     "quote": "The events during the trial on the 16 November 2020 seemed to have precipitated the applicant’s application."
+    },
+    {
+     "doc": "mykh-2020-wa-44-117-06-2020-najib-v-pp",
+     "locator": "page 25",
+     "quote": "Dated: 14 August 2020."
+    },
+    {
+     "doc": "mykh-2020-wa-44-117-06-2020-najib-v-pp",
+     "locator": "page 2",
+     "quote": "Bahawa kamu di antara 22 Februari 2016 dan 26 Februari 2016"
+    }
+   ],
+   "note": "One of the two 2020 dates must be wrong; not resolvable from this document."
+  },
+  {
+   "id": "rd-20",
+   "subject": "Govt of Malaysia v Low Taek Jho (tax) judgment date",
+   "kind": "manifest date vs document date",
+   "versions": [
+    {
+     "source": "case manifest",
+     "date": "2022-09-08"
+    },
+    {
+     "source": "judgment",
+     "date": "2022-10-17"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "mykh-2022-pa-21ncvc-1-01-2021-govt-v-low-taek-jho",
+     "locator": "page 57",
+     "quote": "Dated: 17 October 2022"
+    }
+   ],
+   "note": "The September date may be the oral decision; the document only states 17 October 2022."
+  },
+  {
+   "id": "rd-21",
+   "subject": "Topaz yacht charter by Low and Tan",
+   "kind": "\"early July\"",
+   "versions": [
+    {
+     "date": "early 2013-07, seven days"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 224",
+     "quote": "LOW and TAN had chartered the 147-meter yacht for seven days in early July 2013"
+    }
+   ]
+  },
+  {
+   "id": "rd-22",
+   "subject": "Equanimity funding",
+   "kind": "range",
+   "versions": [
+    {
+     "date": "2014-01-07 .. 2014-06-03"
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 191",
+     "quote": "between January 7, 2014, and June 3, 2014, over $250 million in funds diverted from 1MDB was funneled into the World View Account in four major tranches"
+    }
+   ]
+  },
+  {
+   "id": "rd-23",
+   "subject": "1MDB Global transfers to the three overseas funds (2013)",
+   "kind": "conflicting dates between US and Malaysian sources",
+   "versions": [
+    {
+     "source": "DOJ 2017 Table 9",
+     "date": "2013-03-21 .. 2013-03-27"
+    },
+    {
+     "source": "Malaysian prosecution chart (HC para 160)",
+     "date": "\"20 and 23-3-2013\""
+    }
+   ],
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "3/21/13 - 3/27/2013 1MDB Global Enterprise $414,756,416"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 50",
+     "quote": "20 and 1MDB GIL transferred funds 23-3-2013 to: USD530,303,034.00 Cistenique USD414,141,416.00 EEMF USD646,464,649.00 Devonshire",
+     "note": "table cell text; row reads \"20 and 23-3-2013\""
+    }
+   ]
+  }
+ ],
+ "claims": [
+  {
+   "id": "cl-01",
+   "text": "Jho Low owned/controlled Good Star Limited, the company that received US$700m in 2009 instead of PetroSaudi.",
+   "status": "confirmed",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "Three separate legal systems: US civil complaints (bank records), Swiss Federal Criminal Court conviction (2024, appealable), Malaysian High Court finding (2025). Only common denominator is shared bank records obtained via mutual legal assistance.",
+   "evidence": [
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 2",
+     "quote": "Seven-tenths of this sum were transferred to a bank account held by a company owned by Jho Low",
+     "stance": "supports"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 275",
+     "quote": "USD700 million was in fact diverted into the account of a company owned",
+     "stance": "supports",
+     "note": "sentence continues on page 276: \"by Jho Low called Good Star Ltd., which was described as a wholly owned subsidiary of PSI.\" (para [620], court's findings)"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 276",
+     "quote": "by Jho Low called Good Star Ltd., which was described as a wholly owned subsidiary of PSI.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 26",
+     "quote": "Good Star’s sole shareholder and the signatory on its account was LOW – not PetroSaudi.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 26",
+     "quote": "Good Star is owned 100% by PetroSaudi International Limited.",
+     "stance": "contradicts",
+     "note": "1MDB OFFICER 2 to Deutsche Bank, 30 Sep 2009, as quoted by DOJ"
+    }
+   ]
+  },
+  {
+   "id": "cl-02",
+   "text": "The money in Najib's AmBank account in March-April 2013 (US$681m / RM2.08bn) was a personal political donation from the Saudi royal family.",
+   "status": "rejected",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "Rejection comes from three judicial decisions (SRC High Court 2020, Court of Appeal in SRC, 1MDB High Court 2025) plus Goldman's own admission in the US DPA; support comes from the Malaysian AG (2016), a Saudi foreign minister statement, and the defence. The AG finding was made by an office-holder appointed under the accused.",
+   "evidence": [
+    {
+     "doc": "edge-2016-ag-clears",
+     "locator": "line 10",
+     "quote": "was a personal donation to Najib from the Saudi royal family",
+     "stance": "supports"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 561",
+     "quote": "His Excellency Al-Jubeir who stated that “the funds were a genuine donation originating from Saudi Arabia” and that “the matter is closed”.",
+     "stance": "supports",
+     "note": "recited by the court, then discounted"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 561",
+     "quote": "the irresistible conclusion is that the Arab Donation narrative is not meritorious, the Arab Donation letters were forgeries",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 603",
+     "quote": "We too found this ‘Arab donation’ defence untenable for the same reasons as that found by",
+     "stance": "contradicts",
+     "note": "Court of Appeal (SRC appeal) as quoted in the 2025 grounds"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 50",
+     "quote": "On or about March 21, 2013, approximately $620 million was transferred from a shell entity beneficially owned or controlled by Low, Shell Company Account 7",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "id": "cl-03",
+   "text": "Malaysian Official 1 in the US filings is Najib Razak, then prime minister.",
+   "status": "confirmed",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "Inference from two independent documents describing the same statement: the DOJ quotes the Malaysian AG's 26 Jan 2016 release with \"[MALAYSIAN OFFICIAL 1]\" where the original says the prime minister; the Malaysian court convicted Najib over the same RM2,081,476,926/US$681m.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 100",
+     "quote": "[was] transferred into the personal account of [MALAYSIAN OFFICIAL 1] between 22.03.2013 and 10.04.2013,”",
+     "stance": "supports"
+    },
+    {
+     "doc": "edge-2016-ag-clears",
+     "locator": "line 10",
+     "quote": "deposited into personal accounts of the prime minister between March 22, 2013 and April 10, 2013",
+     "stance": "supports"
+    },
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 112",
+     "quote": "Receiving US$681 million (RM2.08 billion) belonging to a 1MDB subsidiary, transferred from Tanore Finance Corporation’s account into Najib’s Account 9694",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "id": "cl-04",
+   "text": "Najib abused his position to obtain about RM2.28bn of 1MDB money (four phases) and laundered RM2.08bn.",
+   "status": "confirmed",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "Malaysian High Court conviction (25 counts, 26 Dec 2025, under appeal) consistent with US DPA admissions about the same flows. Reporting of the total varies (RM2.3bn, nearly RM2.2bn, RM2.22bn); the four charged sums add to RM2,277,577,613.41.",
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 4",
+     "quote": "At the conclusion of this trial, this court found the accused guilty of all the charges and convicted him accordingly.",
+     "stance": "supports"
+    },
+    {
+     "doc": "malaymail-2025-najib-convicted-rm22b",
+     "locator": "line 87",
+     "quote": "four counts of abuse of power and 21 counts of money laundering involving nearly RM2.2 billion",
+     "stance": "supports"
+    },
+    {
+     "doc": "malaymail-2025-saudi-donation-untenable",
+     "locator": "line 102",
+     "quote": "Najib, 72, faces four charges of using his position to obtain RM2.3 billion in bribes from 1MDB funds",
+     "stance": "context"
+    }
+   ]
+  },
+  {
+   "id": "cl-05",
+   "text": "Najib misappropriated RM42m of SRC International funds.",
+   "status": "confirmed",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "High Court conviction (2020) upheld on appeal (Court of Appeal judgment quoted in the 2025 grounds); reported independently by The Edge, Malay Mail and BBC.",
+   "evidence": [
+    {
+     "doc": "malaymail-2020-guilty",
+     "locator": "line 87",
+     "quote": "I therefore find the accused guilty and convict the accused on all seven charges",
+     "stance": "supports"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 608",
+     "quote": "We agree with the learned trial judge that the Arab donation story is nothing but a concoction that is completely bereft of any credibility.",
+     "stance": "supports",
+     "note": "Court of Appeal, SRC appeal, quoted at 2025 grounds"
+    }
+   ]
+  },
+  {
+   "id": "cl-06",
+   "text": "The 1MDB-PetroSaudi joint venture was a genuine government-to-government deal in which PetroSaudi contributed US$2.7bn of energy assets.",
+   "status": "rejected",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "Swiss criminal court (fraud conviction), Swiss OAG indictment, Malaysian High Court findings and DOJ complaint are separate proceedings; Swiss judgment not final at time of release.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 17",
+     "quote": "PetroSaudi agreed to place into the 1MDB-PetroSaudi JV certain assets valued at approximately $2.7 billion",
+     "stance": "supports",
+     "note": "what the JV agreement provided"
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 1",
+     "quote": "PETROSAUDI would contribute significant oil assets to the joint venture on the other hand, both of which they knew to be untrue.",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "oag-2023-04-25-anklage-petrosaudi-de",
+     "locator": "line 16",
+     "quote": "das saudi-arabische Königreich war in Wirklichkeit nie am Geschäft beteiligt",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 275",
+     "quote": "There was also no official visit nor any event held to sign the JV contrary to what the accused had told PW15 via the telephone call.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "id": "cl-07",
+   "text": "The 2010 (US$500m) and 2011 (US$330m) PetroSaudi tranches were investments (French energy stake; Saudi drilling project).",
+   "status": "rejected",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "Swiss court finding; consistent with DOJ bank records showing the 2011 money went to Good Star.",
+   "evidence": [
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 2",
+     "quote": "In reality, this investment opportunity did not exist, and the funds were ultimately misappropriated by the participants in the offence, without any benefits to 1MDB.",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 2",
+     "quote": "USD 330 million was withdrawn from the sovereign wealth fund in order to finance an alleged – non-existent – drilling project",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 31",
+     "quote": "requested that 1MDB transmit $330 million to the Good Star Account.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "id": "cl-08",
+   "text": "Goldman Sachs had no knowledge of the misuse; the 1MDB misconduct was confined to rogue former employees who went around its policies (Goldman position 2018).",
+   "status": "rejected",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "medium"
+   },
+   "independence": "Earlier position reported by The Guardian (2018); contradicted by Goldman's own stipulated Statement of Facts (DPA 2020) and the Federal Reserve consent order. The Fed order was without admission; the DPA is an admission.",
+   "evidence": [
+    {
+     "doc": "grd-2018-doj-goldman",
+     "locator": "line 137",
+     "quote": "Goldman Sachs has said it is fully cooperating with the investigation and that it had no knowledge of how the money from the fund was being used.",
+     "stance": "supports"
+    },
+    {
+     "doc": "grd-2018-goldman-boss",
+     "locator": "line 151",
+     "quote": "“It is obviously very distressing to see two former Goldman Sachs employees went so blatantly around our policies and so blatantly broke the law,” Solomon told Bloomberg TV.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 35",
+     "quote": "In or about and between 2009 and 2014, Goldman, through certain of its agents and employees, together with others, knowingly and willfully conspired",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 6",
+     "quote": "high-level employees within the Company’s investment bank were involved in the misconduct described in the Statement of Facts and others ignored significant red flags",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "id": "cl-09",
+   "text": "US$4bn could not have been misappropriated from 1MDB given its audits (Malaysian government, Feb 2016).",
+   "status": "rejected",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "medium"
+   },
+   "independence": "Statement by a Malaysian minister vs later Swiss court, Malaysian court and US admissions; estimates of the total still differ (Swiss ~US$4bn investigated; DOJ 2016 >$3.5bn; DOJ 2017 ~$4.5bn; DOJ indictment >$2.7bn from the bonds alone).",
+   "evidence": [
+    {
+     "doc": "grd-2016-misinformation",
+     "locator": "line 140",
+     "quote": "Salleh said 1MDB had undergone extensive audits since 2009 and the $4bn figure “simply could not have been misappropriated under such conditions.”",
+     "stance": "supports"
+    },
+    {
+     "doc": "oag-2016-01-29-entraide-fr",
+     "locator": "line 3",
+     "quote": "Le montant des détournements investigués est d’environ USD 4 milliards",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2018-indictment-low-ng",
+     "locator": "page 7",
+     "quote": "more than $2.7 billion was instead misappropriated",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 1",
+     "quote": "to collect USD 1 billion on the basis of a false joint venture partnership between PETROSAUDI and 1MDB.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "id": "cl-10",
+   "text": "Najib did not take 1MDB money for personal gain (\"If I wanted to steal...\" July 2015).",
+   "status": "rejected",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "Denial by the accused vs. 2025 conviction.",
+   "evidence": [
+    {
+     "doc": "edge-2015-najib-denial",
+     "locator": "line 9",
+     "quote": "If I wanted to steal, surely I won’t steal the money and bring it into an account in Malaysia.",
+     "stance": "supports"
+    },
+    {
+     "doc": "malaymail-2025-najib-convicted-rm22b",
+     "locator": "line 94",
+     "quote": "the evidence pointed unmistakably to the fact that the monies were in fact derived from 1MDB funds,” the judge said.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "id": "cl-11",
+   "text": "The 2012-13 bond offerings were undertaken openly and lawfully (Jho Low spokesman, Nov 2018).",
+   "status": "rejected",
+   "grading": {
+    "evidence_strength": "moderate",
+    "agreement": "medium"
+   },
+   "independence": "Contradicted by Goldman's admission and Leissner's guilty plea (US). Low himself has not been tried, so no court has ruled on his own role; grade reflects that.",
+   "evidence": [
+    {
+     "doc": "fmt-2018-jholow-innocence",
+     "locator": "line 69",
+     "quote": "the bond offerings detailed in the indictment were undertaken openly and lawfully between experienced, well-regulated financial institutions and government entities.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 43",
+     "quote": "However, Shell Company 1 was not, in fact, associated with Aabar but was rather associated with Abu Dhabi Official 1, Abu Dhabi Official 2 and Low.",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2018-information-leissner",
+     "locator": "page 20",
+     "quote": "LEISSNER told the committee affirmatively that Co-Conspirator #1 was not involved in Project Maximus, though he knew that this statement was false at the time",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "id": "cl-12",
+   "text": "Aabar Investments PJS Limited (BVI), which received US$1.367bn of 2012 bond money, was not part of IPIC/Aabar.",
+   "status": "confirmed",
+   "grading": {
+    "evidence_strength": "moderate",
+    "agreement": "high"
+   },
+   "independence": "Agreement among adverse parties: IPIC/Aabar (2016 statement quoted by DOJ), Goldman (DPA admission) and Najib himself in his defence testimony; not itself a court finding.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "In that statement, IPIC and Aabar stated that, “Aabar BVI was not an entity within either corporate group”",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 43",
+     "quote": "However, Shell Company 1 was not, in fact, associated with Aabar but was rather associated with Abu Dhabi Official 1, Abu Dhabi Official 2 and Low.",
+     "stance": "supports"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 418",
+     "quote": "had gone behind the backs of the Board of Directors and entered into a bogus agreement with a fake entity, Aabar Investments PJS Limited",
+     "stance": "supports",
+     "note": "accused's own testimony"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 69",
+     "quote": "1MDB company records show documentary evidence of the ownership of Aabar BVI and of each payment made",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "id": "cl-13",
+   "text": "BSI, Falcon and Coutts breached anti-money-laundering rules over 1MDB flows.",
+   "status": "confirmed",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "high"
+   },
+   "independence": "Two independent regulators (FINMA in Switzerland, MAS in Singapore) reached parallel findings on each bank's home and branch operations.",
+   "evidence": [
+    {
+     "doc": "finma-2016-pr-falcon",
+     "locator": "line 128",
+     "quote": "Falcon Private Bank Ltd. has seriously breached money laundering regulations",
+     "stance": "supports"
+    },
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "line 12",
+     "quote": "MAS has imposed on Falcon Bank financial penalties amounting to S$4.3 million for 14 breaches of MAS Notice 1014",
+     "stance": "supports"
+    },
+    {
+     "doc": "finma-2017-pr-coutts",
+     "locator": "line 129",
+     "quote": "Coutts & Co Ltd has seriously breached money laundering regulations",
+     "stance": "supports"
+    },
+    {
+     "doc": "mas-2016-pr-scb-coutts",
+     "locator": "line 277",
+     "quote": "MAS has imposed on Coutts financial penalties amounting to S$2.4 million for 24 breaches of MAS Notice 1014",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "id": "cl-14",
+   "text": "Two PetroSaudi managers defrauded 1MDB of US$1bn and laundered the proceeds.",
+   "status": "confirmed",
+   "grading": {
+    "evidence_strength": "strong",
+    "agreement": "medium"
+   },
+   "independence": "Swiss first-instance conviction (not final when published) following an OAG indictment; consistent with DOJ allegations. Agreement \"medium\" because the conviction was appealable.",
+   "evidence": [
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 2",
+     "quote": "For these facts, the Criminal Chamber found the defendants guilty of fraud.",
+     "stance": "supports"
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 3",
+     "quote": "This judgment has not become effective yet.",
+     "stance": "context"
+    }
+   ]
+  }
+ ],
+ "existing_claims_review": [
+  {
+   "index": 0,
+   "text": "Goldman underwrote three bond offerings in 2012 and 2013 that raised about $6.5 billion for 1MDB and earned it more than $600 million in fees and revenue.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Goldman admission (DPA) + Fed order + Leissner information + MAS 2016 release on Leissner; amounts consistent."
+  },
+  {
+   "index": 1,
+   "text": "Goldman admitted conspiring to provide about $1.6 billion to, or for the benefit of, foreign officials and their relatives to win 1MDB business.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "medium",
+   "basis": "Single-source admission (DPA), but the DPA is stipulated true by Goldman; the Ng jury conviction (2022) is not in the document set."
+  },
+  {
+   "index": 2,
+   "text": "Leissner falsely told Goldman's control committees that Jho Low was not involved in the bond deals.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Guilty plea (Leissner) + Goldman admission."
+  },
+  {
+   "index": 3,
+   "text": "A day after Project Magnolia closed, about $577 million of the proceeds went to a BVI company named to look like Aabar but not associated with it.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "DPA admission + civil complaints; now also IPIC statement and Najib's own testimony that Aabar-BVI was a \"fake entity\" (cl-12)."
+  },
+  {
+   "index": 4,
+   "text": "About $681 million of Project Catalyze money reached an account of Malaysian Official 1 in March 2013.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Add Malaysian High Court conviction 2025 (RM2,081,476,926 = US$681m into account 9694); dates differ in granularity (see rd-01)."
+  },
+  {
+   "index": 5,
+   "text": "Malaysian Official 1 received about $30 million of Project Maximus proceeds in October and November 2012.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Add High Court: RM90,899,927.28 second-phase gratification, convicted on all charges."
+  },
+  {
+   "index": 6,
+   "text": "Leissner routed about $4.1 million in 2014 to a New York jeweler, partly to pay for jewelry for the wife of Malaysian Official 1.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Guilty plea + DPA; Leissner information para 44 also cites ~$1.3m of jewelry, consistent with the DPA (the $4.1m transfer paid in part for ~$1.3m jewelry)."
+  },
+  {
+   "index": 7,
+   "text": "Goldman Sachs (Malaysia) pleaded guilty and the parent agreed to a $2.3 billion criminal penalty and $606 million disgorgement.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Court filing."
+  },
+  {
+   "index": 8,
+   "text": "The Federal Reserve found Goldman failed to adequately investigate a suspicious intermediary on the 1MDB deals and fined it $154 million.",
+   "current_status": "supported",
+   "suggested_status": "supported",
+   "evidence_strength": "moderate",
+   "agreement": "high",
+   "basis": "Consent order without admission; keep \"supported\" (regulator finding), not \"confirmed\"."
+  },
+  {
+   "index": 9,
+   "text": "Singapore's MAS shut BSI Bank's Singapore operation for serious anti-money-laundering breaches and referred six staff, including Yeo Jiawei, to prosecutors.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "MAS + FINMA parallel findings against BSI; Singapore Court of Appeal 2026 also describes BSI accounts used to move 1MDB money (as allegations of liquidators)."
+  },
+  {
+   "index": 10,
+   "text": "Swiss regulator FINMA found BSI seriously breached money-laundering rules in its 1MDB business and ordered it to give up CHF 95 million in profits.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "FINMA order + MAS parallel action; OAG opened criminal case vs BSI (2016)."
+  },
+  {
+   "index": 11,
+   "text": "MAS closed Falcon Private Bank's Singapore branch and fined DBS and UBS over 1MDB-related fund flows.",
+   "current_status": "supported",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "MAS release; FINMA independently sanctioned Falcon (CHF 2.5m)."
+  },
+  {
+   "index": 12,
+   "text": "Jho Low was the beneficial owner of Good Star Limited, the company that received $1.03 billion meant for the PetroSaudi joint venture.",
+   "current_status": "unverified",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Now upheld by Swiss court (2024) and Malaysian High Court (2025) findings; see cl-01."
+  },
+  {
+   "index": 13,
+   "text": "Aabar-BVI sent $238 million to Riza Aziz's Red Granite Capital, money that helped fund Red Granite Pictures and \"The Wolf of Wall Street\".",
+   "current_status": "unverified",
+   "suggested_status": "supported",
+   "evidence_strength": "moderate",
+   "agreement": "medium",
+   "basis": "Still civil allegation for the $238m; Malaysian High Court [1659] says 2011-2012 sums were channelled to \"entities controlled by Riza Aziz (Red Granite)\", but Aziz's own money-laundering case is not in the set."
+  },
+  {
+   "index": 14,
+   "text": "Khadem al-Qubaisi received $472.75 million of 2012 bond money through the Blackstone account.",
+   "current_status": "unverified",
+   "suggested_status": "supported",
+   "evidence_strength": "moderate",
+   "agreement": "medium",
+   "basis": "Amounts match DPA \"Abu Dhabi Official 1\"; no court finding naming Qubaisi in the set."
+  },
+  {
+   "index": 15,
+   "text": "Jho Low used more than $250 million diverted from 1MDB to buy the superyacht Equanimity.",
+   "current_status": "unverified",
+   "suggested_status": "unverified",
+   "evidence_strength": "moderate",
+   "agreement": "low",
+   "basis": "Single civil complaint; no judgment in the set (2018-19 recovery/sale records not obtained)."
+  },
+  {
+   "index": 16,
+   "text": "1MDB general counsel Jasmine Loo received 1MDB money and used $3.1 million of it to buy a London property.",
+   "current_status": "unverified",
+   "suggested_status": "supported",
+   "evidence_strength": "moderate",
+   "agreement": "medium",
+   "basis": "Two DOJ complaints; Loo testified as a prosecution witness in the Najib trial (2025 grounds) but no finding on the London flat found."
+  },
+  {
+   "index": 17,
+   "text": "1MDB officials made the $700 million transfer of September 2009 to PetroSaudi as settlement of amounts the joint venture owed it.",
+   "current_status": "disputed",
+   "suggested_status": "rejected",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Swiss court: false JV; \"a loan does not appear to have ever been made\" (DOJ); Malaysian HC [620]; FINMA Coutts notes transposed parties. See cl-06 and dl-02."
+  },
+  {
+   "index": 18,
+   "text": "The $681 million that reached Malaysian Official 1's account was a personal donation from the Saudi royal family.",
+   "current_status": "disputed",
+   "suggested_status": "rejected",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Three Malaysian judicial decisions reject the donation story (cl-02)."
+  },
+  {
+   "index": 19,
+   "text": "The $1.367 billion 1MDB paid to Aabar-BVI in 2012 was a refundable deposit held as collateral for IPIC's guarantee.",
+   "current_status": "disputed",
+   "suggested_status": "disputed",
+   "evidence_strength": "moderate",
+   "agreement": "low",
+   "basis": "Still conflicting accounts within DOJ complaint; Malaysian court uses \"purportedly as a security deposit\". No adjudication found."
+  },
+  {
+   "index": 20,
+   "text": "Aabar Investments PJS Limited (BVI) was owned by IPIC's subsidiary Aabar.",
+   "current_status": "disputed",
+   "suggested_status": "rejected",
+   "evidence_strength": "moderate",
+   "agreement": "high",
+   "basis": "Ownership by IPIC/Aabar is denied by IPIC, by Goldman's admission and by Najib's testimony (cl-12); only the incumbency certificate and 1MDB records support it."
+  },
+  {
+   "index": 21,
+   "text": "Husseiny invested his own personal money in Red Granite Pictures.",
+   "current_status": "disputed",
+   "suggested_status": "disputed",
+   "evidence_strength": "weak",
+   "agreement": "low",
+   "basis": "No new evidence found."
+  },
+  {
+   "index": 22,
+   "text": "In 2014, 1MDB agreed to pay $989 million to buy back the options it had granted Aabar.",
+   "current_status": "disputed",
+   "suggested_status": "disputed",
+   "evidence_strength": "moderate",
+   "agreement": "low",
+   "basis": "Malaysian HC [28]-[30] describes the US$175m part-redemption but no single agreed price; keep disputed."
+  },
+  {
+   "index": 23,
+   "text": "Malaysian Official 1 was Malaysia's prime minister at the time of the bond deals.",
+   "current_status": "lead",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "See cl-03: DOJ's bracketed quotation of the AG release replaces \"the prime minister\" with [MALAYSIAN OFFICIAL 1]; Malaysian conviction covers the same sums."
+  },
+  {
+   "index": 24,
+   "text": "Malaysian courts have convicted people over the 1MDB diversions described in these filings.",
+   "current_status": "lead",
+   "suggested_status": "confirmed",
+   "evidence_strength": "strong",
+   "agreement": "high",
+   "basis": "Najib convicted: SRC (High Court 28 Jul 2020, upheld) and 1MDB (High Court 26 Dec 2025, appeal filed)."
+  },
+  {
+   "index": 25,
+   "text": "The assets named in the US forfeiture complaints, including the Equanimity, were recovered and returned to Malaysia after 2025.",
+   "current_status": "lead",
+   "suggested_status": "lead",
+   "evidence_strength": "weak",
+   "agreement": "low",
+   "basis": "Not researched here: no forfeiture judgment or repatriation record obtained."
+  },
+  {
+   "index": 26,
+   "text": "\"Abu Dhabi Official 1\" and \"Abu Dhabi Official 2\" in the DPA are Khadem al-Qubaisi and Mohamed al-Husseiny.",
+   "current_status": "lead",
+   "suggested_status": "supported",
+   "evidence_strength": "moderate",
+   "agreement": "medium",
+   "basis": "Still inference from matching amounts/dates; FINMA/MAS name Husseiny (Falcon chairman) but not as \"Abu Dhabi Official 2\"."
+  }
+ ],
+ "disputed_links": [
+  {
+   "id": "dl-01",
+   "link": "good-star -> owner",
+   "schema": "Ownership",
+   "side_a": "PetroSaudi International owns 100% of Good Star (1MDB OFFICER 2, 2009); JV agreement books the payment as a loan payable to PetroSaudi Holdings (Cayman).",
+   "side_b": "Jho Low owns/controls Good Star (DOJ bank records; Swiss court; Malaysian High Court).",
+   "current_view": "side_b (court findings)",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 26",
+     "quote": "Good Star is owned 100% by PetroSaudi International Limited.",
+     "stance": "side_a"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 276",
+     "quote": "The JV Agreement reflected this payment as a loan payable by the JVCo. to PetroSaudi Holdings (Cayman).",
+     "stance": "side_a",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.981"
+    },
+    {
+     "doc": "bstger-2024-sk-2023-24-press-release",
+     "locator": "page 2",
+     "quote": "Seven-tenths of this sum were transferred to a bank account held by a company owned by Jho Low",
+     "stance": "side_b"
+    },
+    {
+     "doc": "oag-2023-04-25-anklage-petrosaudi-de",
+     "locator": "line 22",
+     "quote": "wurden 700 Millionen USD auf ein Konto einer Gesellschaft, deren wirtschaftlicher Berechtigter Taek Jho LOW war, bei einer Bank in der Schweiz überwiesen.",
+     "stance": "side_b"
+    }
+   ]
+  },
+  {
+   "id": "dl-02",
+   "link": "1mdb -> good-star US$700m: purpose",
+   "schema": "Payment.purpose",
+   "side_a": "Repayment/settlement of JV debt owed to PetroSaudi (\"loan\").",
+   "side_b": "Diversion through a false JV; no loan existed; supporting documents had the parties transposed.",
+   "current_view": "side_b",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 28",
+     "quote": "US$700 million was remitted to PSI directly as settlement of all the amounts owed by the JVCo. to PSI.",
+     "stance": "side_a"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 28",
+     "quote": "a loan does not appear to have ever been made by PetroSaudi to the 1MDB-PetroSaudi JV",
+     "stance": "side_b"
+    },
+    {
+     "doc": "finma-2017-pr-coutts",
+     "locator": "line 134",
+     "quote": "the documents presented in support of the transaction contained obvious mistakes, not least the fact that the identities of the contracting parties were transposed.",
+     "stance": "side_b"
+    },
+    {
+     "doc": "sr-2015-heist",
+     "locator": "line 60",
+     "quote": "the USD$700 million so-called “loan” that was supposedly repaid to PetroSaudi as part of the joint venture agreement, was in fact directed into the Swiss bank account of a company called Good Star",
+     "stance": "side_b"
+    }
+   ]
+  },
+  {
+   "id": "dl-03",
+   "link": "aabar-bvi -> owner (aabar / ipic)",
+   "schema": "Ownership",
+   "side_a": "Aabar Investments PJS is sole shareholder (BVI incumbency certificate); 1MDB records document ownership.",
+   "side_b": "Not in IPIC/Aabar group (IPIC 2016); associated with Abu Dhabi officials and Low (Goldman DPA); \"fake entity\" (Najib testimony).",
+   "current_view": "side_b, not adjudicated",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "That certificate lists QUBAISI and HUSSEINY as Aabar-BVI’s Directors and “Aabar Investments PJS” as its sole shareholder.",
+     "stance": "side_a"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "In that statement, IPIC and Aabar stated that, “Aabar BVI was not an entity within either corporate group”",
+     "stance": "side_b"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 418",
+     "quote": "entered into a bogus agreement with a fake entity, Aabar Investments PJS Limited and siphoned away US$576,943,490.00.",
+     "stance": "side_b"
+    }
+   ]
+  },
+  {
+   "id": "dl-04",
+   "link": "1mdb-energy -> aabar-bvi US$1.367bn: purpose",
+   "schema": "Payment.purpose",
+   "side_a": "Refundable security deposit / collateral for IPIC guarantee (1MDB accounts; Malaysian prosecution narrative says \"purportedly\").",
+   "side_b": "Non-refundable consideration for the guarantee (what bankers were told) and in fact a diversion.",
+   "current_view": "disputed",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 54",
+     "quote": "In their audited financial statements for the year ending on March 31, 2014, 1MDB booked their substantial payments to Aabar-BVI as an asset rather than a payment",
+     "stance": "side_a"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 8",
+     "quote": "involved certain funds going to Aabar Investments PJS Ltd (BVI), purportedly as a security deposit for Aabar’s holding company IPIC issuing a guarantee for structured loan notes",
+     "stance": "side_a_reported_skeptically"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 54",
+     "quote": "LOW and 1MDB officers represented to bank officials involved in the transfer of the $1.367 billion that the funds represented non-refundable payments to Aabar-BVI in consideration of IPIC’s guarantee of the 2012 bonds.",
+     "stance": "side_b"
+    }
+   ]
+  },
+  {
+   "id": "dl-05",
+   "link": "overseas funds -> tanore (Mar 2013): routing and amounts",
+   "schema": "Payment",
+   "side_a": "DOJ: Devonshire $210m, Enterprise $250m, Cistenique $375m directly to Tanore (total $835m); 1MDB Global sent Enterprise $414,756,416 and Cistenique $531,090,534.",
+   "side_b": "Malaysian prosecution chart: Devonshire $210m to Tanore and $430m to Granton, Granton $430m to Tanore, EEMF $250m to Tanore; 1MDB GIL sent Cistenique USD530,303,034 and EEMF USD414,141,416.",
+   "current_view": "unresolved; the court convicted on the RM figures without the app being able to reconcile the USD routing",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "the Overseas Investment Funds collectively transferred a total of $835,000,000 to the Tanore Account.",
+     "stance": "side_a"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "3/22/2013 Cistenique ING Bank Tanore $375,000,000",
+     "stance": "side_a"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 50",
+     "quote": "21-3-2013 Granton transferred funds to USD430,000,000.00 Tanore",
+     "stance": "side_b",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.921",
+     "note": "table row read left-to-right: date | Granton transferred funds to Tanore | USD430,000,000.00"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 9",
+     "quote": "Devonshire transferred certain funds to Granton Property Holding Ltd which is a company controlled by Eric Tan",
+     "stance": "side_b",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.973"
+    }
+   ]
+  },
+  {
+   "id": "dl-06",
+   "link": "which Najib account returned the US$620m",
+   "schema": "Payment.payer_account",
+   "side_a": "DOJ: received into AMPRIVATE BANKING-MR, returned from a different AmBank account (AMPRIVATE BANKING-MY).",
+   "side_b": "Malaysian court: received into and returned from the same account 9694, which it calls AmPrivate Banking - MR.",
+   "current_view": "unresolved",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 99",
+     "quote": "On or about August 26, 2013, $620,010,715 was wired from a different account at AmBank to the Tanore Account held in the name of AMPRIVATE BANKING-MY.",
+     "stance": "side_a"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 25",
+     "quote": "credited into the accused AmPrivate Banking – MR account ending ‘9694’ originated from 1MDB.",
+     "stance": "side_b",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.989"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 407",
+     "quote": "instructed AmIslamic Bank to transfer the sum of USD620,000,000.00 from Account 9694 back to Tanore",
+     "stance": "side_b",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.939"
+    }
+   ]
+  },
+  {
+   "id": "dl-07",
+   "link": "Najib -> source of RM in account 9694 / earlier deposits",
+   "schema": "Payment.purpose",
+   "side_a": "Defence: donations pledged by King Abdullah, incl. USD 79,999,976 from the Saudi Ministry of Finance and USD 99,999,919 from Prince Faisal.",
+   "side_b": "Court: no credible link to the Saudi royal family; letters forged; money derived from 1MDB.",
+   "current_view": "side_b (court finding)",
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 80",
+     "quote": "he did receive a total of USD 79,999,976 (RM243,699,926.32) from the Ministry of Finance, Riyadh.",
+     "stance": "side_a"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 560",
+     "quote": "there is no credible, contemporaneous, or reliable documentary evidence that directly connects the large sums deposited into the accused’s personal accounts to King Abdullah or any member of the Saudi royal family.",
+     "stance": "side_b"
+    }
+   ]
+  },
+  {
+   "id": "dl-08",
+   "link": "1mdb-petrosaudi-jv counterparty",
+   "schema": "Ownership/contract party",
+   "side_a": "Board and public told the JV was with PetroSaudi International (PSI).",
+   "side_b": "JV agreement was actually signed with PetroSaudi Holdings (Cayman) Ltd.",
+   "current_view": "side_b (court finding)",
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 6",
+     "quote": "the so-called Joint Venture Agreement was entered into not with PSI but with a company called Petro Saudi Holdings (Cayman) Ltd.",
+     "stance": "side_b",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.977"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 275",
+     "quote": "PW9 testified that the Joint Venture Agreement (exh. P363) was executed with a company called Petro Saudi Holdings (Cayman) Ltd. and not with PSI.",
+     "stance": "side_b"
+    }
+   ]
+  },
+  {
+   "id": "dl-09",
+   "link": "1mehl -> aabar options buyback price",
+   "schema": "Payment.amount",
+   "side_a": "US$989m (agreement shown to BSI/Deutsche Bank).",
+   "side_b": "US$2.45bn (version shown to UBS); price left open in Settlement Agreement.",
+   "current_view": "disputed (existing claim 22)",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 122",
+     "quote": "The consideration for the purchase was also increased from $989 million to $2.45 billion.",
+     "stance": "both"
+    }
+   ]
+  }
+ ],
+ "superseded": [
+  {
+   "id": "ss-01",
+   "fact": "Date Sullivan & Cromwell paid $34,406,188 to Park Laurel NYC Ltd (seller)",
+   "earlier": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "2013-11-20"
+   },
+   "later": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "2012-11-20"
+   },
+   "kind": "corrected date (2016 figure inconsistent with its own closing date of 19 Nov 2012)",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 92",
+     "quote": "Citibank records show that on or about November 20, 2013, the day after the closing, $34,406,188 was transferred",
+     "stance": "superseded"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 92",
+     "quote": "on or about November 19, 2012, the date of the closing for the purchase of the PARK LAUREL CONDOMONIUM.",
+     "stance": "context"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 143",
+     "quote": "Citibank records show that on or about November 20, 2012, the day after the closing, $34,406,188 was transferred",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-02",
+   "fact": "Date of $10,786,706 wire from Sullivan & Cromwell to ADKMIC (\"GREAT DELIGHT LTD\")",
+   "earlier": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "2013-08-13"
+   },
+   "later": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "2012-08-13"
+   },
+   "kind": "corrected date",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 89",
+     "quote": "On or about August 13, 2013, Sullivan & Cromwell wire transferred $10,786,706 to a bank account at BSI Bank in Singapore held by ADKMIC",
+     "stance": "superseded"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 140",
+     "quote": "On or about August 13, 2012, Sullivan & Cromwell wire transferred $10,786,706 to a bank account at BSI Bank in Singapore held by ADKMIC",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-03",
+   "fact": "Total misappropriated from 1MDB",
+   "earlier": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "over $3.5 billion"
+   },
+   "later": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "roughly $4.5 billion"
+   },
+   "kind": "revised estimate (2014 Deutsche Bank loan phase added)",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "The Defendant Asset represents a portion of the proceeds of over $3.5 billion misappropriated from 1MDB.",
+     "stance": "superseded"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 14",
+     "quote": "The DEFENDANT ASSET represents a portion of the proceeds of roughly $4.5 billion misappropriated from 1MDB.",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-04",
+   "fact": "Length of the scheme",
+   "earlier": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "2009 - at least 2013 (four years)"
+   },
+   "later": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "2009 - at least 2014 (five years)"
+   },
+   "kind": "revised range",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 6",
+     "quote": "over the course of an approximately four-year period, between approximately 2009 and at least 2013",
+     "stance": "superseded"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 7",
+     "quote": "over the course of an approximately five-year period, between approximately 2009 and at least 2014",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-05",
+   "fact": "Holder of the River Dee account that received $5m from Blackstone (6 Dec 2012)",
+   "earlier": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "1MDB OFFICER 3 (anonymised)"
+   },
+   "later": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "LOO (Jasmine Loo, named)"
+   },
+   "kind": "identity disclosed",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 59",
+     "quote": "Blackstone Transferred $5 million to an Account Controlled by 1MDB OFFICER 3",
+     "stance": "superseded"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 78",
+     "quote": "Blackstone Transferred $5 million to an Account Controlled by LOO",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-06",
+   "fact": "Direct Aabar-BVI to Blackstone total (Table 5)",
+   "earlier": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "$636,000,000 in text"
+   },
+   "later": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "table rows sum to $637,000,000; para 471 says ~$637,000,000"
+   },
+   "kind": "internal discrepancy, never corrected (repeated in 2017 and 2019 complaints)",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 51",
+     "quote": "five wire transfers totaling $636,000,000 were sent from the Aabar-BVI Swiss Account",
+     "stance": "one_side"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 52",
+     "quote": "5/25/2012 $295,000,000 Aabar-BVI Blackstone 7/25/2012 $133,000,000 Aabar-BVI Blackstone 10/23/2012 $75,000,000 Aabar-BVI Blackstone",
+     "stance": "other_side",
+     "note": "with 11/23/2012 $95,000,000 and 12/14/2012 $39,000,000 the rows total $637,000,000"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 178",
+     "quote": "five wires totaling approximately $637,000,000 from its account at BSI Lugano in Switzerland to the Blackstone Account",
+     "stance": "other_side"
+    }
+   ]
+  },
+  {
+   "id": "ss-07",
+   "fact": "Indirect Aabar-BVI to Blackstone total (via Enterprise/Cistenique)",
+   "earlier": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "~$465 million (summary)"
+   },
+   "later": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "$455,000,000 (detailed: 285+75+95)"
+   },
+   "kind": "internal discrepancy (also $366,000,000 \"on or about October 24, 2012\"); repeated in 2017/2019",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 40",
+     "quote": "an additional approximately $465 million to the Blackstone Account.",
+     "stance": "one_side"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 54",
+     "quote": "Cistenique and Enterprise were used as intermediaries to pass $455,000,000 from Aabar-BVI to the Blackstone Account.",
+     "stance": "other_side"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 126",
+     "quote": "On or about October 24, 2012, Aabar-BVI also caused an additional $366,000,000 to be sent to Blackstone via intermediaries.",
+     "stance": "third_version"
+    }
+   ]
+  },
+  {
+   "id": "ss-08",
+   "fact": "Amount deposited into Najib's accounts in 2013",
+   "earlier": {
+    "doc": "edge-2015-najib-denial",
+    "value": "up to US$700 million (WSJ, July 2015); \"RM2.6b\" in later headlines"
+   },
+   "later": {
+    "doc": "edge-2016-ag-clears",
+    "value": "US$681 million (RM2.08 billion); court: RM2,081,476,926"
+   },
+   "kind": "initial press figure refined by official sources",
+   "evidence": [
+    {
+     "doc": "edge-2015-najib-denial",
+     "locator": "line 10",
+     "quote": "up to US$700 million was transferred to Najib’s personal bank accounts with AmBank in 2013, just before the 13th general election.",
+     "stance": "superseded"
+    },
+    {
+     "doc": "edge-2016-ag-clears",
+     "locator": "line 6",
+     "quote": "after close to six months of investigations into the RM2.6 billion channelled into Najib’s bank accounts",
+     "stance": "superseded",
+     "note": "2015-16 press figure (headline: RM2.6b)"
+    },
+    {
+     "doc": "edge-2016-ag-clears",
+     "locator": "line 10",
+     "quote": "the sum of US$681 million (RM2.08 billion) deposited into personal accounts of the prime minister",
+     "stance": "superseding"
+    },
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 95",
+     "quote": "Sequerah also ordered Najib to pay the recoverable sum of RM2,081,476,926",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-09",
+   "fact": "Ringgit value of the US$620m returned (AG statement)",
+   "earlier": {
+    "doc": "edge-2016-ag-clears",
+    "value": "RM2.03 million (typo in article)"
+   },
+   "later": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "RM2.03 billion (DOJ quoting the AG release)"
+   },
+   "kind": "typo corrected by a quoting source",
+   "evidence": [
+    {
+     "doc": "edge-2016-ag-clears",
+     "locator": "line 13",
+     "quote": "Najib returned US$620 million (RM2.03 million) to the Saudi royal family in August 2013",
+     "stance": "superseded"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 100",
+     "quote": "a sum of USD620 million (RM2.03 billion) was returned by [MALAYSIAN OFFICIAL 1]",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-10",
+   "fact": "Fourth-charge gratification (2014) to Najib",
+   "earlier": {
+    "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+    "value": "RM4,093,500 + RM45,837,485.70 = RM49,930,985.70 (summary of charges, paras [31]-[36])"
+   },
+   "later": {
+    "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+    "value": "RM44,570,920.70 (= RM4,093,500 + RM40,477,420.70; prosecution submission and sentencing)"
+   },
+   "kind": "amended/inconsistent amount within the judgment; sentencing fine uses RM44,570,920.70",
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 12",
+     "quote": "allegedly transferred a sum equivalent to RM 45,837,485.70 to the accused's account. This sum together with the RM 4,093,500 earlier mentioned formed the subject matter of the fourth charge.",
+     "stance": "superseded"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 39",
+     "quote": "in the year 2014 alone, he received gratification amounting to RM44,570,920.70.",
+     "stance": "superseding"
+    },
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 108",
+     "quote": "RM44,570,920.70.",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-11",
+   "fact": "Transfer from account 9694 to account 1880",
+   "earlier": {
+    "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+    "value": "RM162,436,711.87 (para [40])"
+   },
+   "later": {
+    "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+    "value": "RM161,411,646.34 (charges 20 and 21 as amended)"
+   },
+   "kind": "amended charge",
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 13",
+     "quote": "RM162,436,711.87 and closed his account ending 9694.",
+     "stance": "superseded"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 47",
+     "quote": "In respect of charges charges 20 and 21 (amended), a total of RM161,411,646.34 was transferred by the Accused from Account 9694 to Account 1880 through 2 transactions.",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-12",
+   "fact": "Tanore-traceable money returned to Tanore in Aug 2013",
+   "earlier": {
+    "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+    "value": "RM2,034,350,000 (gross transfers)"
+   },
+   "later": {
+    "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+    "value": "RM1,897,416,277.51 (FIFO-traced; charge 10 amended because part was the accused's \"clean money\")"
+   },
+   "kind": "amended charge after tracing",
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 406",
+     "quote": "transferred RM1,897,416,277.51 to Tanore (Charges 10 Amended, 16 to 19)",
+     "stance": "superseding"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 407",
+     "quote": "this transfer involved a portion of clean money and a portion of funds from Tanore",
+     "stance": "context"
+    }
+   ]
+  },
+  {
+   "id": "ss-13",
+   "fact": "Total credited to account 9694",
+   "earlier": {
+    "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+    "value": "RM2,081,476,926 (charges; sentencing)"
+   },
+   "later": {
+    "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+    "value": "RM2,082,476,926.00 at para [1006]"
+   },
+   "kind": "typographical inconsistency inside the grounds (RM1,000,000 difference); 2,081,476,926 matches the nine tranche figures",
+   "evidence": [
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 407",
+     "quote": "Account 9694 had received a total of RM2,082,476,926.00 which corresponded with the evidence that Account no.9694 had received funds in 9 tranches.",
+     "stance": "inconsistent"
+    },
+    {
+     "doc": "mykh-2025-wa-45-7-11-2018-pp-v-najib-1mdb",
+     "locator": "page 12",
+     "quote": "The first nine charges relate to the receiving of RM2,081,476,926 which formed the subject matter of the amended third charge under the MACC Act.",
+     "stance": "prevailing",
+     "match": "OCR text (tesseract); quote transcribed from page image, fuzzy-matched to OCR: 0.993"
+    }
+   ]
+  },
+  {
+   "id": "ss-14",
+   "fact": "SRC sentence",
+   "earlier": {
+    "doc": "malaymail-2020-guilty",
+    "value": "12 years, RM210 million fine"
+   },
+   "later": {
+    "doc": "malaymail-2025-najib-convicted-rm22b",
+    "value": "six-year term, RM50 million fine"
+   },
+   "kind": "sentence later reduced (mechanism not in the sources held)",
+   "evidence": [
+    {
+     "doc": "malaymail-2020-guilty",
+     "locator": "line 99",
+     "quote": "Najib was fined RM210 million and will spend a total of 12 years in prison",
+     "stance": "superseded"
+    },
+    {
+     "doc": "malaymail-2025-najib-convicted-rm22b",
+     "locator": "line 98",
+     "quote": "Najib is now about halfway through his six-year jail term, which will end in August 2028 or August 2029, depending on whether he pays the RM50 million fine imposed in the SRC case.",
+     "stance": "superseding"
+    }
+   ]
+  },
+  {
+   "id": "ss-15",
+   "fact": "Total gratification in the 1MDB abuse-of-power charges",
+   "earlier": {
+    "doc": "malaymail-2025-saudi-donation-untenable",
+    "value": "RM2.3 billion"
+   },
+   "later": {
+    "doc": "malaymail-2025-najib-convicted-rm22b",
+    "value": "nearly RM2.2 billion / RM2.22 billion"
+   },
+   "kind": "inconsistent reporting; sum of the four charged amounts is RM2,277,577,613.41 (fine of RM11,387,888,067.05 is exactly five times that)",
+   "evidence": [
+    {
+     "doc": "malaymail-2025-saudi-donation-untenable",
+     "locator": "line 102",
+     "quote": "four charges of using his position to obtain RM2.3 billion in bribes from 1MDB funds",
+     "stance": "one_side"
+    },
+    {
+     "doc": "malaymail-2025-najib-sentenced",
+     "locator": "line 103",
+     "quote": "to secure financial benefits totalling RM2.22 billion across four phases of the 1MDB scheme.",
+     "stance": "other_side"
+    }
+   ]
+  },
+  {
+   "id": "ss-16",
+   "fact": "Table 13 heading in DOJ complaints",
+   "earlier": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "value": "\"Relevant Wire Transfers from Granton to Dragon Dynasty\""
+   },
+   "later": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "same heading; rows show Granton to Dragon Market"
+   },
+   "kind": "uncorrected labelling error",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 111",
+     "quote": "Table 13: Relevant Wire Transfers from Granton to Dragon Dynasty Date Sending Party Receiving Party Amount 3/25/2013 Granton Dragon Market $378,000,000",
+     "stance": "inconsistent"
+    }
+   ]
+  },
+  {
+   "id": "ss-17",
+   "fact": "DLA Piper payment to LHP account (26 Dec 2013)",
+   "earlier": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "$56,500,000 (para 691)"
+   },
+   "later": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "value": "$56,499,980 (para 710)"
+   },
+   "kind": "rounding inconsistency within one complaint",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 186",
+     "quote": "DLA Piper transferred approximately $56,500,000 to the LHP Account",
+     "stance": "one_side"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 192",
+     "quote": "DLA Piper transferred approximately $56,499,980 to the LHP Account",
+     "stance": "other_side"
+    }
+   ]
+  }
+ ]
+}

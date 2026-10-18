@@ -1,0 +1,2297 @@
+key: DA
+name: Domestic abuse, coercive control and stalking
+scope: Non-fatal coercive control; stalking and harassment campaigns; police and court failures short
+  of a death; forced marriage and honour-based abuse or killing; protective-order breaches; sex-selective
+  abortion.
+indicators:
+- id: DA-001
+  name: Isolation from family, friends and support
+  definition: The person is cut off from relatives, friends, colleagues or professionals who might help
+    them, by the partner or family member.
+  areas:
+  - DA
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Controlling or coercive behaviour, examples of behaviours
+    quote: isolating the victim from friends, family or support
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32, restrictive behaviours
+    quote: Isolating the victim from family, friends, colleagues and professionals who may be trying to
+      support them
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist (quick start guidance)
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 4
+    quote: Do you feel isolated from family/friends?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Friends and relatives report losing contact after a relationship began
+  - Messages to the person are intercepted or go unanswered
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Moving to a new area or job
+  - Deliberate choice to step back from certain friends
+  - Illness, caring duties or depression reducing contact
+  jurisdictions: England and Wales (guidance); concept used widely
+  version: 1
+- id: DA-002
+  name: Monitoring of time, movements and daily activities
+  definition: The partner tracks where the person goes, makes them account for their time, or checks their
+    phone and social media.
+  areas:
+  - DA
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Controlling or coercive behaviour, examples
+    quote: excessive monitoring, including phone or social media checks
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32, controlling behaviours
+    quote: Controlling or monitoring the victim's daily activities and behaviour, for example making them
+      account for their time
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 12
+    quote: Does [name of abuser(s)] try to control everything you do and/or are they excessively jealous?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Constant calls demanding whereabouts
+  - Partner insists on reading messages
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agreed location-sharing for safety
+  - Shared family calendars or devices
+  - Care arrangements for an ill or disabled person
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-003
+  name: Technology-facilitated monitoring or control
+  definition: Smart devices, social media, spyware or electronic accounts are used to watch, control or
+    upset the person.
+  areas:
+  - DA
+  typology: Coercive control; stalking
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32
+    quote: Using digital systems, such as smart devices or social media, to coerce, control, upset and
+      monitor the victim
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Protection from Harassment Act 1997, s.2A(3)(d)
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/1997/40/section/2A
+    locator: s.2A(3)(d)
+    quote: monitoring the use by a person of the internet, email or any other form of electronic communication,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Stalking and Harassment legal guidance
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+    locator: Cyber-stalking list
+    quote: accessing spyware or malware
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Spyware found on the person's phone
+  - Covert location tracking
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Parental-control or family-safety apps installed openly
+  - Shared accounts set up by agreement
+  - Device management by an employer
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-004
+  name: Economic abuse or financial control
+  definition: The partner controls money, accounts, debts, wages or benefits so that the person cannot
+    get or keep money or buy what they need.
+  areas:
+  - DA
+  typology: Economic abuse
+  status: verified
+  sources:
+  - title: Domestic Abuse Act 2021, s.1(4)
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2021/17/section/1
+    locator: s.1(4)
+    quote: “Economic abuse” means any behaviour that has a substantial adverse effect on B's ability to—
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32
+    quote: Economic abuse (e.g. coerced debt, controlling spending/bank accounts/investments/mortgages/benefit
+      payments);
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Examples of behaviours
+    quote: controlling finances or withholding money
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13, employment
+    quote: Subject to financial control e.g. confiscation of wages/income
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Debts taken out in the person's name
+  - Wages paid into an account only the partner controls
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Ownership
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Couple agreed one partner manages household finances
+  - Joint mortgage or loan taken by agreement
+  - Formal financial deputyship for someone lacking capacity
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-005
+  name: Rules, micro-management and punishment
+  definition: The partner sets rules about appearance, routine or behaviour and punishes or humiliates
+    the person for breaking them.
+  areas:
+  - DA
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Characteristics of controlling or coercive behaviour
+    quote: micro-management of daily life, setting rules with consequences for disobedience or isolating
+      the victim
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Examples of behaviours
+    quote: dictating appearance, routines or daily activities
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Examples of behaviours
+    quote: constant criticism, humiliation and threats
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rules on clothing or who the person may speak to
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Mutually agreed household routines
+  - Religious or cultural practice chosen freely by the person
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-006
+  name: Exploiting vulnerabilities (disability, language, culture, health care)
+  definition: The partner uses the person's disability, language barrier, cultural isolation or need for
+    care or medication to control them.
+  areas:
+  - DA
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Characteristics of controlling or coercive behaviour
+    quote: exploitation of victim vulnerabilities, such as disability, language barriers or cultural isolation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32, emotional and psychological abuse
+    quote: Abuse relating to faith or beliefs;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13, health
+    quote: Accompanied to doctors or clinics
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Partner refuses to interpret, or always attends medical appointments
+  - Medication or mobility equipment withheld (guidance para 32, paraphrased)
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A carer or relative genuinely needed to interpret or assist
+  - The person asked to be accompanied
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-007
+  name: Control of immigration documents or threats of removal
+  definition: The partner keeps or destroys passports or visas, or threatens to report the person to immigration
+    authorities or send them abroad.
+  areas:
+  - DA
+  typology: Coercive control; forced marriage
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32, restrictive behaviours
+    quote: Withholding and/or destroying the victim's immigration documents, e.g. passports and visas;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Multi-agency statutory guidance for dealing with forced marriage
+    publisher: HM Government
+    year: '2023'
+    url: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+    locator: Forced marriage overseas
+    quote: may not have direct access to their phone, passport and money
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Spouse on a dependent visa has no access to own passport
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - Address
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Document retention is also a published trafficking indicator; the CCB guidance lists it as
+      a coercive-control behaviour.
+    source_url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+  innocent_explanations:
+  - Documents stored together in a family safe by agreement
+  - Documents held by a solicitor or authority during an application
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-008
+  name: Using children or child arrangements to control
+  definition: The partner threatens to take or harm the children, or uses contact arrangements or maintenance
+    as leverage.
+  areas:
+  - DA
+  typology: Coercive control; post-separation abuse
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32
+    quote: Using children to control the victim, e.g. threatening to take the children away, threatening
+      to harm the children;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 7
+    quote: Is there conflict over child contact?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated disputes in family court after separation
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary contested custody disputes
+  - Genuine safeguarding concerns raised in good faith
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-009
+  name: Threats to expose private information or intimate images
+  definition: The partner threatens to reveal, or reveals, sensitive information such as intimate images,
+    health status or sexuality, to control the person.
+  areas:
+  - DA
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32, threatening behaviours
+    quote: Threats to expose/exposure of sensitive information (e.g. sexual activity, private sexual photos
+      or films,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Threats to send images to an employer or family
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Heated statements in a breakup with no intent or follow-through (still needs checking)
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-010
+  name: False allegations to agencies and manipulation of professionals
+  definition: The abuser makes false reports to police, children's services or benefits agencies, makes
+    counter-allegations, or manipulates professionals to make the victim look like the problem.
+  areas:
+  - DA
+  typology: Coercive control; system abuse
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32
+    quote: The suspect may make a counter-allegation of abuse, or argue that they have acted in self-defence,
+      making it difficult to identify and distinguish between the
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Para 84
+    quote: The suspect may make a counter-allegation of abuse, or argue that they have acted in self-defence,
+      making it difficult to identify and distinguish between the
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Para 53
+    quote: The suspect may make a counter-allegation of abuse, or argue that they have acted in self-defence,
+      making it difficult to identify and distinguish between the
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Characteristics of controlling or coercive behaviour
+    quote: perpetrators disguising their behaviour, including attempts to manipulate police
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated unfounded referrals to children's services about the ex-partner
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - CourtCase
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine concerns reported in good faith
+  - Both parties reporting each other in a mutual dispute
+  - Genuine self-defence
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-011
+  name: Using the courts to continue abuse
+  definition: The abuser uses legal proceedings, for example by not turning up to hearings, to keep pressure
+    on the victim.
+  areas:
+  - DA
+  typology: Post-separation abuse; system abuse
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Para 84
+    quote: Using the courts to continue to abuse the victim, for example by not turning up to court dates,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Many applications or adjournments in family proceedings by one party
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary use of legal rights
+  - Missed hearings through illness or lack of legal aid
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-012
+  name: Abuser threatens or attempts suicide to control
+  definition: The abuser uses threats of suicide, especially to stop the victim leaving.
+  areas:
+  - DA
+  typology: Coercive control; risk factor
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Para 84
+    quote: Making threats of suicide as a method of controlling the victim, especially to prevent them
+      from leaving.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 22
+    quote: Has [name of abuser(s)] ever threatened or attempted suicide?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: DASH lists abuser suicide threats among high-risk factors relevant to homicide risk.
+    source_url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+  innocent_explanations:
+  - Genuine mental-health crisis without controlling intent (still a safeguarding concern)
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-013
+  name: Harming or threatening pets
+  definition: The abuser harms, threatens to harm or gives away pets to control or frighten the person.
+  areas:
+  - DA
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32
+    quote: Using pets to control or coerce a victim, e.g. harming, or threatening to harm or give away
+      pets;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 19
+    quote: Has [name of abuser(s)] ever mistreated an animal or the family pet?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - CourtCase
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rehoming a pet by agreement or for welfare reasons
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-014
+  name: Reproductive coercion
+  definition: The partner controls the person's contraception, pregnancy or fertility decisions.
+  areas:
+  - DA
+  typology: Coercive control
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32
+    quote: Reproductive coercion, including restricting a victim’s access to birth control; refusing to
+      use a birth control method;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 9 (pregnancy as a risk period)
+    quote: Are you pregnant or have you recently had a baby (within the last 18 months)?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shared, freely agreed family-planning decisions
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-015
+  name: Control of work or turning up at the workplace
+  definition: The partner stops the person working, dictates their work, or follows or appears at their
+    workplace.
+  areas:
+  - DA
+  typology: Coercive control; stalking
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Section 2, para 32
+    quote: Following the victim and/or appearing unexpectedly, e.g. at their place of work
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Examples of behaviours
+    quote: restricting movement, work or access to communications
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13, employment
+    quote: Leaving work accompanied
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Employee always collected and dropped at work; cannot attend business trips
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shared transport arrangements
+  - Caring responsibilities limiting work
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-016
+  name: Serious effect on the victim (fear of violence, daily life disrupted)
+  definition: The behaviour makes the person fear violence on at least two occasions, or causes serious
+    alarm or distress that substantially changes their daily life.
+  areas:
+  - DA
+  typology: Coercive control offence element
+  status: pending
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Para 19
+    quote: If it causes person B to fear, on two or more occasions, that violence will be used against
+      them
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Signs of serious effect
+    quote: a serious effect includes the victim fearing violence on at least two occasions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Victim changes routes, quits job, or stops going out
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  - CourtCase
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: Fear of violence on one occasion or noticeable change in routine
+    strong: Repeated fear or clear withdrawal from usual activities
+    textbook: Fear of violence on two or more occasions, or serious alarm or distress with a substantial
+      adverse effect on day-to-day activities
+    threshold_source: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+  threshold_verified: false
+  cross_hints: []
+  innocent_explanations:
+  - Changes in routine for unrelated reasons (illness, new job, bereavement)
+  jurisdictions: England and Wales (Serious Crime Act 2015 s.76)
+  version: 1
+- id: DA-017
+  name: Recent separation and post-separation abuse
+  definition: Controlling or abusive behaviour continues or worsens after the relationship ends, or the
+    victim has recently separated or tried to.
+  areas:
+  - DA
+  typology: Post-separation abuse; risk factor
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Para 23
+    quote: Such behaviour, however, often continues or intensifies when a relationship has ended
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 6
+    quote: Have you separated or tried to separate from [name of abuser(s)] within the past year?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Contact and threats increase after divorce filing
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Separation or attempted separation within the past year combined with continuing abuse (DASH
+      Q6 wording)
+    threshold_source: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Separation is a DASH high-risk question also used in homicide risk work.
+    source_url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+  innocent_explanations:
+  - Necessary contact over children, property or divorce
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-018
+  name: Escalation and repeat police callouts
+  definition: Abuse is becoming more frequent or more severe, and police have been called repeatedly to
+    the same household.
+  areas:
+  - DA
+  typology: Risk escalation
+  status: pending
+  sources:
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: 'Question 10 (also Q11: Is the abuse getting worse?)'
+    quote: Is the abuse happening more often?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: 'Referral criteria: Potential escalation'
+    quote: the number of police callouts to the victim as a result of domestic violence in the past 12
+      months
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several police incident logs at one address in a year
+  cases: []
+  data_needed:
+  - Address
+  - Event
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: Two police callouts in 12 months
+    strong: Rising frequency or severity reported
+    textbook: '3 or more police callouts in a 12-month period (SafeLives: common practice starting point)'
+    threshold_source: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+  threshold_verified: false
+  cross_hints:
+  - target_area: HO
+    reason: Escalation is a homicide risk factor in DASH.
+    source_url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+  innocent_explanations:
+  - Callouts for unrelated disputes, noise or third-party issues at the address
+  - Better reporting rather than more abuse
+  jurisdictions: UK (MARAC practice)
+  version: 1
+- id: DA-019
+  name: High-risk DASH assessment (14 or more yes answers)
+  definition: A domestic abuse risk checklist records many risk factors at once, which by itself meets
+    the usual referral threshold for a multi-agency risk conference.
+  areas:
+  - DA
+  typology: Risk assessment
+  status: verified
+  sources:
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: 'Recommended referral criteria to MARAC: Visible high risk'
+    quote: If you have ticked 14 or more 'yes' boxes the case would normally meet the Marac referral criteria.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Professional judgement
+    quote: if a professional has serious concerns about a victim's situation, they should refer the case
+      to Marac.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inquest or review shows a high DASH score but no MARAC referral
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 14 or more 'yes' answers on the DASH checklist, or professional judgement of serious concern
+    threshold_source: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: DASH covers strangulation, weapons and threats to kill, which are homicide risk factors (HO-325
+      to HO-350).
+    source_url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+  innocent_explanations:
+  - Checklist completed on incomplete information
+  - Risk later reduced by safety measures
+  jurisdictions: UK
+  version: 1
+- id: DA-020
+  name: Breach of bail, injunction or protective order
+  definition: The suspect breaks bail conditions, a court injunction, a restraining order or a stalking
+    protection order, or an agreement about contact.
+  areas:
+  - DA
+  typology: Order breach
+  status: verified
+  sources:
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 23
+    quote: Has [name of abuser(s)] ever broken bail/an injunction and/or formal agreement for when they
+      can see you and/or the children?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Stalking and Harassment legal guidance
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+    locator: Restraining orders
+    quote: Breach of an order is a criminal offence.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Court records show repeated breach convictions
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Sanction
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Any proven breach (a single act is enough, per CPS guidance)
+    threshold_source: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Contact initiated by the protected person
+  - Breach through misunderstanding of order terms
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-021
+  name: Suspect's previous violence or criminal history
+  definition: The suspect has hurt other people before or has a police or criminal record.
+  areas:
+  - DA
+  typology: Risk factor
+  status: verified
+  sources:
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 18 (and Q24 on criminal history)
+    quote: Do you know if [name of abuser(s)] has hurt anyone else?
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Global Study on Homicide 2018: Gender-related killing of women and girls'
+    publisher: UNODC
+    url: https://www.unodc.org/documents/data-and-analysis/GSH2018/GSH18_Gender-related_killing_of_women_and_girls.pdf
+    locator: p.38
+    quote: Nearly a quarter of the men who killed their intimate partner were previously identified by
+      authorities as being violent towards them
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Prior partner obtained a protective order against the same person
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Sanction
+  - Family
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - Prior protective-order records
+  - News archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Prior violence known to authorities before partner killings (UNODC).
+    source_url: https://www.unodc.org/documents/data-and-analysis/GSH2018/GSH18_Gender-related_killing_of_women_and_girls.pdf
+  innocent_explanations:
+  - Old unrelated convictions
+  - Name confusion with another person
+  jurisdictions: UK
+  version: 1
+- id: DA-022
+  name: Domestic abuse as a factor in an unexpected death or suicide
+  definition: A sudden death, including a suspected suicide, follows a history of domestic abuse or coercive
+    control that may have contributed.
+  areas:
+  - DA
+  typology: Death review
+  status: verified
+  sources:
+  - title: Dynamic of domestic abuse (APP)
+    publisher: College of Policing
+    url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+    locator: Officers should consider
+    quote: domestic abuse, including controlling or coercive behaviour, as a contributing factor when
+      attending an unexpected death
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 5
+    quote: Are you feeling depressed or having suicidal thoughts?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inquest notes prior police contacts about abuse
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - CourtCase
+  - Document
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: College of Policing says to consider abuse in unexpected deaths and suspected suicides.
+    source_url: https://www.college.police.uk/app/domestic-abuse/dynamic-domestic-abuse
+  innocent_explanations:
+  - Death unrelated to the relationship
+  - Abuse history alleged but not substantiated
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-023
+  name: Police treat coercive control as isolated incidents or record it as another offence
+  definition: Police respond to single incidents and record them as assaults, missing the pattern of coercive
+    control.
+  areas:
+  - DA
+  typology: Institutional failure
+  status: verified
+  sources:
+  - title: 'Controlling or coercive behaviour: statutory guidance framework'
+    publisher: UK Home Office
+    year: '2023'
+    url: https://www.gov.uk/government/publications/controlling-or-coercive-behaviour-statutory-guidance-framework/controlling-or-coercive-behaviour-statutory-guidance-framework-accessible
+    locator: Para 38
+    quote: Without an understanding of such behaviour, cases can be missed.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Many ABH or common-assault records but no coercive-control charge for the same couple
+  cases: []
+  data_needed:
+  - Event
+  - CourtCase
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Evidence did not meet the coercive-control threshold
+  - Victim did not disclose the wider pattern
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-024
+  name: Police fail to risk-assess or investigate stalking reports
+  definition: Stalking reports, or linked evidence such as found weapons, are not risk-assessed or investigated.
+  areas:
+  - DA
+  typology: Institutional failure
+  status: verified
+  sources:
+  - title: 'Gracie Spinks: Prevention of future deaths report'
+    publisher: Courts and Tribunals Judiciary (Assistant Coroner, Derby and Derbyshire)
+    year: '2023'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/gracie-spinks-prevention-of-future-deaths-report/
+    locator: Matters of concern
+    quote: there may be an ongoing lack of understanding about the importance of completing comprehensive
+      risk assessments which include the initial identification of risk and also, importantly, a regular
+      re-assessment of risk as the investigation progresses.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Stalking and Harassment legal guidance
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+    locator: Risk assessment
+    quote: S-DASH which enables them to ask additional questions to identify high risk cases of stalking
+      or harassment.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Gracie Spinks (2021, Derbyshire)
+  cases:
+  - name: Gracie Spinks
+    year: '2023'
+    jurisdiction: England (Derbyshire)
+    what_happened: Gracie Spinks reported a work supervisor's stalking to her employer and to Derbyshire
+      Constabulary in early 2021; a rucksack of weapons later found to belong to him was treated as found
+      property. The coroner's report found officers failed to record any risk assessment and raised concerns
+      about stalking investigation.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.judiciary.uk/prevention-of-future-death-reports/gracie-spinks-prevention-of-future-deaths-report/
+    source_title: 'Gracie Spinks: Prevention of future deaths report'
+  data_needed:
+  - Event
+  - PublicBody
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Stalking that preceded a killing, with police risk-assessment failures.
+    source_url: https://www.judiciary.uk/prevention-of-future-death-reports/gracie-spinks-prevention-of-future-deaths-report/
+  innocent_explanations:
+  - Risk assessment done but not recorded in the file seen
+  - Report lacked information linking it to stalking
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-025
+  name: Fixated, obsessive, unwanted and repeated (FOUR) behaviour
+  definition: A pattern of fixated, obsessive, unwanted and repeated intrusive behaviour that causes fear
+    or distress, which marks stalking rather than one-off harassment.
+  areas:
+  - DA
+  typology: Stalking
+  status: verified
+  sources:
+  - title: Stalking and Harassment legal guidance
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+    locator: Definition
+    quote: '"Stalking" may be understood as a pattern of Fixated, Obsessive, Unwanted and Repeated (FOUR)
+      behaviour which is intrusive.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What is stalking
+    publisher: Suzy Lamplugh Trust
+    url: https://www.suzylamplugh.org/what-is-stalking
+    locator: Definition
+    quote: A pattern of fixated and obsessive behaviour which is repeated, persistent, intrusive and causes
+      fear of violence
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Months of messages, gifts and appearances after contact was refused
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: Stalking already appears as SA-014 and SA-018.
+    source_url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+  innocent_explanations:
+  - Mutual conflict or business disputes with repeated contact
+  - Persistent but legitimate contact (debt collection, legal process)
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-026
+  name: Following, loitering, watching or spying
+  definition: Someone follows the person, hangs around places they go, or watches them.
+  areas:
+  - DA
+  typology: Stalking
+  status: verified
+  sources:
+  - title: Protection from Harassment Act 1997, s.2A(3)
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/1997/40/section/2A
+    locator: s.2A(3)(e); also (a) following a person and (g) watching or spying on a person
+    quote: loitering in any place (whether public or private),
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Dash risk checklist
+    publisher: SafeLives
+    url: https://safelives.org.uk/wp-content/uploads/Dash-risk-checklist-quick-start-guidance.pdf
+    locator: Question 8
+    quote: Does [name of abuser(s)] constantly text, call, contact, follow, stalk or harass you?
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - CCTV or witnesses place the same person near the victim's home repeatedly
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Event
+  - Vehicle
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Living or working nearby
+  - Coincidental shared routes
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-027
+  name: Repeated unwanted contact by any means
+  definition: Repeated messages, calls, gifts or contact attempts after the person has made clear they
+    are unwanted.
+  areas:
+  - DA
+  typology: Stalking
+  status: verified
+  sources:
+  - title: Protection from Harassment Act 1997, s.2A(3)(b)
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/1997/40/section/2A
+    locator: s.2A(3)(b)
+    quote: contacting, or attempting to contact, a person by any means,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What is stalking
+    publisher: Suzy Lamplugh Trust
+    url: https://www.suzylamplugh.org/what-is-stalking
+    locator: Examples
+    quote: regularly sending flowers or gifts, making unwanted or malicious communication,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hundreds of messages from new accounts after blocking
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Necessary contact over shared children, work or property
+  - Contact was not yet known to be unwanted
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-028
+  name: Publishing material about the person or in their name; reputation damage
+  definition: Someone posts statements about the person, posts as if they were the person, or works to
+    damage their reputation.
+  areas:
+  - DA
+  typology: Stalking; cyber-stalking
+  status: verified
+  sources:
+  - title: Protection from Harassment Act 1997, s.2A(3)(c)
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/1997/40/section/2A
+    locator: s.2A(3)(c)(ii)
+    quote: purporting to originate from a person,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Stalking and Harassment legal guidance
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+    locator: Cyber-stalking list
+    quote: damaging the reputation of the victim
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fake profile in the victim's name
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate criticism or journalism
+  - Parody clearly labelled
+  - Account impersonation by an unrelated third party
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-029
+  name: Identity misuse against the person
+  definition: Someone signs the person up to services or buys goods and services in their name.
+  areas:
+  - DA
+  typology: Cyber-stalking
+  status: verified
+  sources:
+  - title: Stalking and Harassment legal guidance
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+    locator: Cyber-stalking list
+    quote: identity theft such as subscribing the victim to services, purchasing goods and services in
+      their name
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Unordered deliveries and subscriptions arriving in a burst
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Unrelated fraud by strangers
+  - Data breach
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-030
+  name: 'Proxy harassment: getting others to harass'
+  definition: Someone tricks or encourages other people online to harass or threaten the person.
+  areas:
+  - DA
+  typology: Cyber-stalking
+  status: verified
+  sources:
+  - title: Stalking and Harassment legal guidance
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+    locator: Cyber-stalking list
+    quote: tricking other internet users into harassing or threatening a victim
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Posts directing followers to the person's contact details
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Organic public pile-on with no coordinator
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-031
+  name: Interfering with property or devices
+  definition: Someone damages or tampers with the person's property, or sabotages their devices with spam
+    or viruses.
+  areas:
+  - DA
+  typology: Stalking
+  status: verified
+  sources:
+  - title: Protection from Harassment Act 1997, s.2A(3)(f)
+    publisher: legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/1997/40/section/2A
+    locator: s.2A(3)(f)
+    quote: interfering with any property in the possession of a person,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Stalking and Harassment legal guidance
+    publisher: Crown Prosecution Service
+    url: https://www.cps.gov.uk/legal-guidance/stalking-and-harassment
+    locator: Cyber-stalking list
+    quote: electronic sabotage such as spamming and sending viruses
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What is stalking
+    publisher: Suzy Lamplugh Trust
+    url: https://www.suzylamplugh.org/what-is-stalking
+    locator: Examples
+    quote: damaging property and physical or sexual assault
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated car damage at the victim's home
+  cases: []
+  data_needed:
+  - Person
+  - Vehicle
+  - Address
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Random vandalism or common malware
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-032
+  name: Stalker is a former intimate partner
+  definition: The stalker is an ex-partner, the most common relationship in helpline data and one that
+    published screening tools treat as needing extra questions.
+  areas:
+  - DA
+  typology: Stalking; risk factor
+  status: verified
+  sources:
+  - title: What is stalking
+    publisher: Suzy Lamplugh Trust
+    url: https://www.suzylamplugh.org/what-is-stalking
+    locator: Statistics
+    quote: About 45% of people who contact the Helpline are being stalked by ex-intimates
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Screening Assessment for Stalking and Harassment (SASH)
+    publisher: Stalking Risk Profile (McEwan et al.)
+    url: https://www.stalkingriskprofile.com/?p=98
+    locator: SASH description (extra questions for former sexual or dating partners)
+    quote: 13 questions relevant to all stalking situations, and an additional 3 questions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Post-breakup contact over shared children or property
+  jurisdictions: UK; Australia (SASH)
+  version: 1
+- id: DA-033
+  name: Absence from education and failure to return from abroad
+  definition: A young person has long or repeated absences, asks for extended leave, or does not come
+    back from a trip to the family's country of origin.
+  areas:
+  - DA
+  typology: Forced marriage
+  status: verified
+  sources:
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13, education
+    quote: Request for extended leave of absence and failure to return from visits to country of origin.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Multi-agency statutory guidance for dealing with forced marriage
+    publisher: HM Government
+    year: '2023'
+    url: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+    locator: Warning signs
+    quote: failure to return from visits to country of origin
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Pupil missing from school roll after summer holiday abroad
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Address
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family emergency or illness abroad
+  - Lawful move or change of school
+  - Elective home education
+  jurisdictions: UK
+  version: 1
+- id: DA-034
+  name: Unreasonable restrictions and withdrawal from education or activities
+  definition: The young person is kept at home, withdrawn from school or a day centre, barred from activities,
+    or stopped from going on to further education.
+  areas:
+  - DA
+  typology: Forced marriage; honour-based abuse
+  status: verified
+  sources:
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13
+    quote: Being withdrawn from school by those with parental responsibility.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13
+    quote: Removal from a day centre of a person with a physical or learning disability
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13
+    quote: Prevented from going on to further/higher education
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Health reasons
+  - Family financial hardship
+  - Young person's own choice
+  jurisdictions: UK
+  version: 1
+- id: DA-035
+  name: Surveillance or escort by family members
+  definition: Siblings or cousins watch the person at school, or they are always accompanied to work,
+    doctors or clinics.
+  areas:
+  - DA
+  typology: Forced marriage; honour-based abuse
+  status: verified
+  sources:
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13, education
+    quote: Surveillance by siblings or cousins at school.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Siblings attend the same school
+  - Protective accompaniment the person wants
+  jurisdictions: UK
+  version: 1
+- id: DA-036
+  name: Sudden announcement of engagement to a stranger
+  definition: A young person's engagement to someone they do not know is announced suddenly, often with
+    fear about upcoming holidays.
+  areas:
+  - DA
+  typology: Forced marriage
+  status: verified
+  sources:
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13
+    quote: Sudden announcement of engagement to a stranger
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13
+    quote: Fear about forthcoming school holidays
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Arranged marriage freely consented to (arranged is not forced)
+  jurisdictions: UK
+  version: 1
+- id: DA-037
+  name: Family history of forced or early marriage, or sibling self-harm
+  definition: Siblings were forced or married early, or have self-harmed or died by suicide, or there
+    are serious family disputes.
+  areas:
+  - DA
+  typology: Forced marriage
+  status: verified
+  sources:
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: 's.3.13, family history (also: Early marriage of siblings; Self harm or suicide of siblings)'
+    quote: Siblings forced to marry
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Siblings married young by their own choice where lawful
+  - Unrelated family tragedy
+  jurisdictions: UK
+  version: 1
+- id: DA-038
+  name: 'Police contacts at the family home: missing reports, abuse, threats'
+  definition: The person or siblings are reported missing, there are reports of domestic abuse or harassment
+    at the home, or threats to kill.
+  areas:
+  - DA
+  typology: Forced marriage; honour-based abuse
+  status: verified
+  sources:
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13, police
+    quote: Victim or other siblings within the family reported missing
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13
+    quote: Threats to kill and attempts to kill or harm
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13
+    quote: Running away from home
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Address
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Threats to kill in a family context; guidance warns of so-called honour killings.
+    source_url: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+  innocent_explanations:
+  - Ordinary teenage running away
+  - Unrelated neighbour disputes
+  jurisdictions: UK
+  version: 1
+- id: DA-039
+  name: Health signs listed for forced marriage
+  definition: Health workers see self-harm, depression, isolation, eating disorders, substance misuse,
+    unwanted pregnancy or FGM, which the guidance lists as possible forced-marriage signs.
+  areas:
+  - DA
+  typology: Forced marriage
+  status: verified
+  sources:
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.13, health
+    quote: Depression/ Isolation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - These conditions have many unrelated causes; the guidance says indicators alone are not proof
+  jurisdictions: UK
+  version: 1
+- id: DA-040
+  name: Abuse to defend family or community 'honour'
+  definition: Violence, threats or coercion committed to protect family or community honour for a supposed
+    breach of its code of behaviour.
+  areas:
+  - DA
+  typology: Honour-based abuse
+  status: verified
+  sources:
+  - title: '''Honour''-Based Abuse and Forced Marriage: Guidance on Identifying and Flagging Cases'
+    publisher: Crown Prosecution Service
+    url: https://cps.gov.uk/legal-guidance/honour-based-violence-and-forced-marriage-guidance-identifying-and-flagging-cases
+    locator: Definition
+    quote: which has or may have been committed to protect or defend the honour of an individual, family
+      and/ or community
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Global Study on Homicide 2018: Gender-related killing'
+    publisher: UNODC
+    url: https://www.unodc.org/documents/data-and-analysis/GSH2018/GSH18_Gender-related_killing_of_women_and_girls.pdf
+    locator: p.31
+    quote: Honour-related killings of women and girls are usually committed by family members when they
+      consider
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several relatives involved in threats against one family member
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: 'UNODC: honour-related killings are usually committed by family members.'
+    source_url: https://www.unodc.org/documents/data-and-analysis/GSH2018/GSH18_Gender-related_killing_of_women_and_girls.pdf
+  innocent_explanations:
+  - Ordinary family disagreement about relationships with no threats or coercion
+  jurisdictions: England and Wales (CPS flagging)
+  version: 1
+- id: DA-041
+  name: Agencies use family mediation or reconciliation in forced-marriage cases
+  definition: Professionals involve the family or community through mediation or family conferences, which
+    statutory guidance says they must not do because it can put the person in danger.
+  areas:
+  - DA
+  typology: Institutional failure
+  status: verified
+  sources:
+  - title: Multi-agency statutory guidance for dealing with forced marriage
+    publisher: HM Government
+    year: '2023'
+    url: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+    locator: Family counselling and mediation
+    quote: there have been cases of individuals being murdered by their families during mediation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Multi-agency practice guidelines: Handling cases of Forced Marriage'
+    publisher: HM Government Forced Marriage Unit
+    year: '2014'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/322307/HMG_MULTI_AGENCY_PRACTICE_GUIDELINES_v1_180614_FINAL.pdf
+    locator: s.3.16 One Chance rule
+    quote: may possibly only have one chance to save a life.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Case file shows the family was told of the person's disclosure
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Any agency-initiated family mediation in a forced-marriage case (guidance says agencies
+      do not do this)
+    threshold_source: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The adult person independently chose to contact family
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-042
+  name: Child marriage
+  definition: Any arrangement that causes a child to marry before 18; in England and Wales this has been
+    an offence since 27 February 2023, with or without coercion.
+  areas:
+  - DA
+  typology: Forced marriage
+  status: verified
+  sources:
+  - title: Multi-agency statutory guidance for dealing with forced marriage
+    publisher: HM Government
+    year: '2023'
+    url: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+    locator: Definition
+    quote: any conduct for the purpose of causing a child to marry before their eighteenth birthday
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Religious or unregistered ceremony involving a 16-year-old
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Any marriage-related conduct involving someone under 18 in England and Wales after 27 February
+      2023
+    threshold_source: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful marriages under 18 before the 2023 change or in other jurisdictions (still worth noting)
+  - Age recorded wrongly
+  jurisdictions: England and Wales
+  version: 1
+- id: DA-043
+  name: Marriage used for residence or citizenship
+  definition: A marriage appears motivated by getting a visa or UK residence for a spouse, which the guidance
+    lists among forced-marriage motives.
+  areas:
+  - DA
+  typology: Forced marriage
+  status: verified
+  sources:
+  - title: Multi-agency statutory guidance for dealing with forced marriage
+    publisher: HM Government
+    year: '2023'
+    url: https://www.gov.uk/government/publications/the-right-to-choose-government-guidance-on-forced-marriage/multi-agency-statutory-guidance-for-dealing-with-forced-marriage-and-multi-agency-practice-guidelines-handling-cases-of-forced-marriage-accessible
+    locator: Motives
+    quote: assisting claims for UK residence and citizenship
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine consensual marriage across borders, which commonly involves a visa
+  jurisdictions: UK
+  version: 1
+- id: DA-044
+  name: Dowry-related harassment
+  definition: A bride is harassed or abused by the groom's family over dowry, which in some cases ends
+    in her death.
+  areas:
+  - DA
+  typology: Gender-related killing
+  status: verified
+  sources:
+  - title: 'Global Study on Homicide 2018: Gender-related killing'
+    publisher: UNODC
+    url: https://www.unodc.org/documents/data-and-analysis/GSH2018/GSH18_Gender-related_killing_of_women_and_girls.pdf
+    locator: p.32
+    quote: female dowry deaths account for 40 to 50 per cent of all female homicides recorded annually
+      in India
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Payment
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Dowry deaths are a large share of female homicides in India (UNODC).
+    source_url: https://www.unodc.org/documents/data-and-analysis/GSH2018/GSH18_Gender-related_killing_of_women_and_girls.pdf
+  innocent_explanations:
+  - Customary gifts given freely without demands
+  jurisdictions: South Asia (UNODC)
+  version: 1
+- id: DA-045
+  name: Sex ratio at birth above the biological norm
+  definition: In a population, more boys are born per 100 girls than the natural 104 to 106, which points
+    to prenatal sex selection.
+  areas:
+  - DA
+  typology: Gender-biased sex selection
+  status: verified
+  sources:
+  - title: Sex Imbalances at Birth
+    publisher: UNFPA Asia and Pacific Regional Office
+    year: '2012'
+    url: https://www.unfpa.org/sites/default/files/pub-pdf/Sex%20Imbalances%20at%20Birth.%20PDF%20UNFPA%20APRO%20publication%202012.pdf
+    locator: p.9, executive summary
+    quote: the standard biological level of 104-106
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Sex Imbalances at Birth (landing page)
+    publisher: UNFPA
+    year: '2012'
+    url: https://www.unfpa.org/publications/sex-imbalances-birth
+    locator: Overview
+    quote: range between 110 and 120 male births per 100 female births
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Preventing gender-biased sex selection: an interagency statement'
+    publisher: OHCHR, UNFPA, UNICEF, UN Women, WHO
+    year: '2012'
+    url: https://www.who.int/publications/i/item/9789241501460
+    locator: Overview
+    quote: including the problem of imbalanced sex ratios caused by sex selection.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - District birth registration showing 115 boys per 100 girls
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - PublicBody
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: Above 106 male births per 100 female births
+    strong: 110 or more
+    textbook: 110 to 120 or higher male births per 100 female births (UNFPA)
+    threshold_source: https://www.unfpa.org/publications/sex-imbalances-birth
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small samples (a few hundred births) give noisy ratios
+  - Incomplete or biased birth registration of girls
+  - Under-reporting rather than selection
+  jurisdictions: International
+  version: 1
+- id: DA-046
+  name: Sex ratio rising with birth order
+  definition: The imbalance is larger for third and later births, as families with daughters select sons.
+  areas:
+  - DA
+  typology: Gender-biased sex selection
+  status: verified
+  sources:
+  - title: Sex Imbalances at Birth
+    publisher: UNFPA Asia and Pacific Regional Office
+    year: '2012'
+    url: https://www.unfpa.org/sites/default/files/pub-pdf/Sex%20Imbalances%20at%20Birth.%20PDF%20UNFPA%20APRO%20publication%202012.pdf
+    locator: p.28
+    quote: the adverse sex ratio at birth increases with birth parity
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Ratio of 120 for third births in Taiwan cited by UNFPA
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small numbers of higher-order births produce noisy ratios
+  jurisdictions: International
+  version: 1
+- id: DA-047
+  name: Rising child sex ratio
+  definition: The ratio of boys to girls among young children is rising between censuses.
+  areas:
+  - DA
+  typology: Gender-biased sex selection
+  status: verified
+  sources:
+  - title: Sex Imbalances at Birth
+    publisher: UNFPA Asia and Pacific Regional Office
+    year: '2012'
+    url: https://www.unfpa.org/sites/default/files/pub-pdf/Sex%20Imbalances%20at%20Birth.%20PDF%20UNFPA%20APRO%20publication%202012.pdf
+    locator: p.21
+    quote: The recent decennial rise in child sex ratio from 108 to 109
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - India 2011 provisional census
+  cases: []
+  data_needed:
+  - Document
+  - PublicBody
+  - Note
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Census undercount of girls
+  - Migration patterns
+  jurisdictions: International (India example)
+  version: 1
+- id: DA-048
+  name: 'Conditions for sex selection: son preference, prenatal sex detection, low fertility'
+  definition: Strong son preference, available prenatal sex detection and falling family size together
+    drive sex selection.
+  areas:
+  - DA
+  typology: Gender-biased sex selection
+  status: verified
+  sources:
+  - title: Sex Imbalances at Birth
+    publisher: UNFPA Asia and Pacific Regional Office
+    year: '2012'
+    url: https://www.unfpa.org/sites/default/files/pub-pdf/Sex%20Imbalances%20at%20Birth.%20PDF%20UNFPA%20APRO%20publication%202012.pdf
+    locator: p.10
+    quote: Son preference constitutes the primary factor behind sex selection.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Sex Imbalances at Birth
+    publisher: UNFPA Asia and Pacific Regional Office
+    year: '2012'
+    url: https://www.unfpa.org/sites/default/files/pub-pdf/Sex%20Imbalances%20at%20Birth.%20PDF%20UNFPA%20APRO%20publication%202012.pdf
+    locator: p.10
+    quote: low fertility represents the third factor
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Clinics advertising early sex determination where it is prohibited
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Clinic advertising
+  - Regulator enforcement notices
+  - Census and birth registration
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Prenatal scanning for legitimate medical reasons
+  - Falling fertility for economic reasons
+  jurisdictions: International
+  version: 1
+not_reached:
+- The run's WebSearch budget (shared limit of 200 per turn) ran out on the first search, so every source
+  was reached by direct fetch of known URLs only; no wider search was possible.
+- SafeLives Dash page lists no questions; questions taken from the quick-start guidance PDF instead.
+- SASH questions and SHARP's 14 factors are not public on the pages opened (SASH needs a request; SHARP
+  lists harms, not factors).
+- 'HMICFRS ''Living in fear'' (2017) stalking report and ''The depths of dishonour'' (2015) honour-based
+  violence report: justiceinspectorates.gov.uk fetches failed.'
+- 'Police response to stalking super-complaint report and the police-perpetrated domestic abuse super-complaint
+  report on gov.uk: fetches failed (URLs guessed may be wrong).'
+- 'IOPC findings on the Shana Grice case: fetch failed.'
+- 'CPS news on the Shafilea Ahmed convictions: fetch failed; no case entry made.'
+- WHO interagency statement PDF (iris.who.int) failed; only the landing page was used.
+- BAILII blocked automated access; R v Challen [2019] EWCA Crim 916 was read on caselaw.nationalarchives.gov.uk
+  but not entered as a case (see notes).
+- College of Policing stalking APP page is a navigation page; linked PDFs (advice for investigators/first
+  responders) were not opened.
+- Remaining 26k characters of the CCB guidance and 37k of the 2023 forced marriage guidance were not read
+  (annexes).
+- No US, Canadian or Australian legal sources were reached (e.g. US federal stalking statute, Australian
+  coercive control laws).

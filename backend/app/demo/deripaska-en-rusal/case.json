@@ -1,0 +1,769 @@
+{
+ "investigation": {
+  "name": "Demo · real case: Deripaska, En+ and Rusal (OFAC 2018)",
+  "question": "How did Oleg Deripaska own and control En+, Rusal and their sister companies, and what changed when OFAC lifted sanctions on them?",
+  "description": "A demo built from two public records: OFAC's Federal Register notice of the 6 April 2018 Russia designations, and Treasury's 19 December 2018 letter to Congress on lifting sanctions on En+, Rusal and EuroSibEnergo. Addresses are kept exactly as each entry spells them. Loaded to show the shared-address red flag (BO-032) and sanctions and PEP data on real records."
+ },
+ "entities": [
+  {
+   "key": "deripaska",
+   "schema": "Person",
+   "caption": "Oleg Vladimirovich Deripaska",
+   "properties": {
+    "name": [
+     "Oleg Vladimirovich Deripaska"
+    ],
+    "alias": [
+     "DERIPASKA, Oleg Vladimirovich"
+    ],
+    "nationality": [
+     "ru"
+    ],
+    "citizenship": [
+     "ru",
+     "cy"
+    ],
+    "birthDate": [
+     "1968-01-02"
+    ],
+    "birthPlace": [
+     "Dzerzhinsk, Nizhny Novgorod Region, Russia"
+    ],
+    "gender": [
+     "male"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "Moscow, Russia",
+     "64 Severnaya Street, Oktyabrsky, Khutor, Ust-Labinsky District, Krasnodar Territory 352332, Russia",
+     "5, Belgrave Square, Belgravia, London SW1X 8PH, United Kingdom"
+    ],
+    "notes": [
+     "Designated for acting for or on behalf of a senior official of the Government of the Russian Federation, and for the energy sector."
+    ]
+   },
+   "note": "Acted for a senior official, per OFAC: a close associate of a PEP, not an official himself.",
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 1, 83 FR 19138, Individuals no. 3",
+     "quote": "3. DERIPASKA, Oleg Vladimirovich, Moscow, Russia; 64 Severnaya Street, Oktyabrsky, Khutor, Ust-Labinsky District, Krasnodar Territory 352332, Russia; 5, Belgrave Square, Belgravia, London SW1X 8PH, United Kingdom; DOB 02 Jan 1968; POB Dzerzhinsk, Nizhny Novgorod Region, Russia; citizen Russia; alt. citizen Cyprus; Gender Male (individual)"
+    },
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 1, 83 FR 19138, Individuals no. 3",
+     "quote": "for having acted or purported to act for or on behalf of, directly or indirectly, a senior official of the of the Government of the Russian Federation."
+    }
+   ]
+  },
+  {
+   "key": "kerimov",
+   "schema": "Person",
+   "caption": "Suleiman Abusaidovich Kerimov",
+   "properties": {
+    "name": [
+     "Suleiman Abusaidovich Kerimov"
+    ],
+    "alias": [
+     "KERIMOV, Suleyman"
+    ],
+    "nationality": [
+     "ru"
+    ],
+    "birthDate": [
+     "1966-03-12"
+    ],
+    "birthPlace": [
+     "Derbent, Republic of Dagestan, Russia"
+    ],
+    "gender": [
+     "male"
+    ],
+    "topics": [
+     "sanction",
+     "role.pep"
+    ],
+    "address": [
+     "Moscow, Russia",
+     "Antibes, France"
+    ]
+   },
+   "note": "Designated as an official of the Russian government: a politically exposed person on this record.",
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Individuals no. 8",
+     "quote": "8. KERIMOV, Suleiman Abusaidovich"
+    },
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Individuals no. 8",
+     "quote": "Antibes, France; DOB 12 Mar 1966; POB Derbent, Republic of Dagestan, Russia; citizen Russia; Gender Male (individual) [UKRAINE–EO13661]. Designated pursuant to section 1(a)(ii)(A) of E.O. 13661 for being an official of the Government of the Russian Federation."
+    }
+   ]
+  },
+  {
+   "key": "barker",
+   "schema": "Person",
+   "caption": "Lord Gregory Barker",
+   "properties": {
+    "name": [
+     "Lord Gregory Barker"
+    ],
+    "nationality": [
+     "gb"
+    ],
+    "topics": [
+     "role.pep"
+    ],
+    "position": [
+     "Former Minister of State for Energy and Climate Change for the United Kingdom"
+    ]
+   },
+   "note": "A former UK minister: a politically exposed person.",
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 2, Letter section 2",
+     "quote": "The Petitioners, led by Lord Gregory Barker, the former Minister of State for Energy and Climate Change for the United Kingdom,"
+    }
+   ]
+  },
+  {
+   "key": "basic-element",
+   "schema": "Company",
+   "caption": "Basic Element Limited",
+   "properties": {
+    "name": [
+     "BASIC ELEMENT LIMITED"
+    ],
+    "alias": [
+     "BAZOVY ELEMENT"
+    ],
+    "registrationNumber": [
+     "84039"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "Esplanade 44, Saint Helier JE4 9WG, Jersey",
+     "30 Rochdelskaya Street, Moscow 123022, Russia"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 2",
+     "quote": "BASIC ELEMENT LIMITED (a.k.a. BAZOVY ELEMENT), Esplanade 44, Saint Helier JE4 9WG, Jersey; 30 Rochdelskaya Street, Moscow 123022, Russia; Registration ID 84039"
+    }
+   ]
+  },
+  {
+   "key": "b-finance",
+   "schema": "Company",
+   "caption": "B-Finance Ltd",
+   "properties": {
+    "name": [
+     "B–FINANCE LTD"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "Vanterpool Plaza, 2nd Floor, Wickhams Cay, Road Town, Tortola, Virgin Islands, British"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 3",
+     "quote": "B–FINANCE LTD, Vanterpool Plaza, 2nd Floor, Wickhams Cay, Road Town, Tortola, Virgin Islands, British"
+    }
+   ]
+  },
+  {
+   "key": "en-plus",
+   "schema": "Company",
+   "caption": "En+ Group plc",
+   "properties": {
+    "name": [
+     "EN+ GROUP PLC"
+    ],
+    "alias": [
+     "En+"
+    ],
+    "registrationNumber": [
+     "91061"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "Esplanade 44, Saint Helier JE4 9WG, Jersey",
+     "8 Cleveland Row, London SW1A 1DH, United Kingdom",
+     "1 Vasilisy Kozhinoy St., Moscow 121096, Russia"
+    ]
+   },
+   "note": "Sanctions terminated after the December 2018 Terms of Removal (Treasury's letter gives 30 days' notice).",
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 4",
+     "quote": "EN+ GROUP PLC, Esplanade 44, Saint Helier JE4 9WG, Jersey; 8 Cleveland Row, London SW1A 1DH, United Kingdom; 1 Vasilisy Kozhinoy St., Moscow 121096, Russia; Registration ID 91061"
+    }
+   ]
+  },
+  {
+   "key": "rusal",
+   "schema": "Company",
+   "caption": "United Company Rusal plc (Rusal)",
+   "properties": {
+    "name": [
+     "UNITED COMPANY RUSAL PLC"
+    ],
+    "alias": [
+     "Rusal"
+    ],
+    "registrationNumber": [
+     "94939",
+     "F–17314",
+     "51566843"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "44 Esplanade, St. Helier JE4 9WG, Jersey",
+     "1 Vasilisy Kozhinoy Str., Moscow 121096, Russia",
+     "11/F Central Twr., 28 Queen’s Rd. C, Central District, Hong Kong"
+    ]
+   },
+   "note": "The same Jersey and Moscow addresses as En+, written differently in the same notice.",
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 14",
+     "quote": "UNITED COMPANY RUSAL PLC, 44 Esplanade, St. Helier JE4 9WG, Jersey; 1 Vasilisy Kozhinoy Str., Moscow 121096, Russia; 11/F Central Twr., 28 Queen’s Rd. C, Central District, Hong Kong; Registration ID 94939; Company Number F–17314 (Hong Kong); Business Number 51566843 (Hong Kong)"
+    }
+   ]
+  },
+  {
+   "key": "ese",
+   "schema": "Company",
+   "caption": "JSC EuroSibEnergo (ESE)",
+   "properties": {
+    "name": [
+     "JSC EUROSIBENERGO"
+    ],
+    "alias": [
+     "ESE"
+    ],
+    "registrationNumber": [
+     "5087746073817"
+    ],
+    "taxNumber": [
+     "7706697347"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "165 Chkalova Street, Divnogorsk, Krasnoyarsk Krai 663091, Russia",
+     "1 Vasilisy Kozhinoy Street, Moscow 121096, Russia"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 7",
+     "quote": "JSC EUROSIBENERGO, 165 Chkalova Street, Divnogorsk, Krasnoyarsk Krai 663091, Russia; 1 Vasilisy Kozhinoy Street, Moscow 121096, Russia; Registration ID 5087746073817; Tax ID No. 7706697347"
+    }
+   ]
+  },
+  {
+   "key": "russian-machines",
+   "schema": "Company",
+   "caption": "Russian Machines",
+   "properties": {
+    "name": [
+     "RUSSIAN MACHINES"
+    ],
+    "alias": [
+     "RUSSKIE MASHINY"
+    ],
+    "registrationNumber": [
+     "1112373000596"
+    ],
+    "taxNumber": [
+     "2373000582"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "Ul. Rochdelskaya 15, 8, Moscow 123022, Russia"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 13",
+     "quote": "RUSSIAN MACHINES (a.k.a. RUSSKIE MASHINY), Ul. Rochdelskaya 15, 8, Moscow 123022, Russia; Registration ID 1112373000596; Tax ID No. 2373000582"
+    }
+   ]
+  },
+  {
+   "key": "gaz",
+   "schema": "Company",
+   "caption": "GAZ Group",
+   "properties": {
+    "name": [
+     "GAZ GROUP"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "88 Lenin Avenue, Nizhny Novgorod 603950, Russia",
+     "15/1 Rochdelskaya Str., Moscow 123022, Russia"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 5",
+     "quote": "GAZ GROUP, 88 Lenin Avenue, Nizhny Novgorod 603950, Russia; 15/1 Rochdelskaya Str., Moscow 123022, Russia"
+    }
+   ]
+  },
+  {
+   "key": "agroholding",
+   "schema": "Company",
+   "caption": "Agroholding Kuban",
+   "properties": {
+    "name": [
+     "AGROHOLDING KUBAN"
+    ],
+    "alias": [
+     "KUBAN AGRO",
+     "KUBAN AGROHOLDING"
+    ],
+    "topics": [
+     "sanction"
+    ],
+    "address": [
+     "77 Mira St., Ust-Labinsk, Krasnodar Territory 352330, Russia",
+     "1 Montazhnaya St., Ust-Labinsk, Krasnodar Territory, Russia",
+     "116 Mira St., Ust-Labinsk, Krasnodar Territory, Russia",
+     "1 G. Konshinykh St., Krasnodar Territory, Russia",
+     "2 Rabochaya St., Ust-Labinsk, Krasnodar Territory, Russia"
+    ]
+   },
+   "note": "The notice breaks “Ust-Labinsk” across lines twice; the address values join it back.",
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 1",
+     "quote": "AGROHOLDING KUBAN (a.k.a. KUBAN AGRO; a.k.a. KUBAN AGROHOLDING), 77 Mira St., Ust-Labinsk, Krasnodar Territory 352330, Russia; 1 Montazhnaya St., Ust- Labinsk, Krasnodar Territory, Russia; 116 Mira St., Ust-Labinsk, Krasnodar Territory, Russia; 1 G. Konshinykh St., Krasnodar Territory, Russia; 2 Rabochaya St., Ust- Labinsk, Krasnodar Territory, Russia"
+    }
+   ]
+  },
+  {
+   "key": "glencore",
+   "schema": "Company",
+   "caption": "Glencore",
+   "properties": {
+    "name": [
+     "Glencore"
+    ],
+    "jurisdiction": [
+     "ch"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 4, Letter section 4",
+     "quote": "the Swiss company Glencore, or its subsidiary, swaps shares in Rusal for a direct ownership interest in En+."
+    }
+   ]
+  }
+ ],
+ "relationships": [
+  {
+   "schema": "Ownership",
+   "source": "deripaska",
+   "target": "basic-element",
+   "properties": {
+    "role": [
+     "Owned or controlled (OFAC's designation basis)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 2",
+     "quote": "Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by Oleg Vladimirovich DERIPASKA"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "deripaska",
+   "target": "b-finance",
+   "properties": {
+    "role": [
+     "Owned or controlled (OFAC's designation basis)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 3",
+     "quote": "Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by Oleg Vladimirovich DERIPASKA"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "deripaska",
+   "target": "en-plus",
+   "properties": {
+    "percentage": [
+     "70"
+    ],
+    "role": [
+     "About 70 percent before the December 2018 Terms of Removal"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 4, Letter section 4",
+     "quote": "Deripaska's stake in En+ will fall from approximately 70 percent to 44.95 percent, and his stake cannot be increased."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "deripaska",
+   "target": "en-plus",
+   "properties": {
+    "percentage": [
+     "44.95"
+    ],
+    "role": [
+     "Agreed stake after the Terms of Removal (December 2018)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 4, Letter section 4",
+     "quote": "Deripaska's stake in En+ will fall from approximately 70 percent to 44.95 percent, and his stake cannot be increased."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "deripaska",
+   "target": "rusal",
+   "properties": {
+    "percentage": [
+     "0.01"
+    ],
+    "role": [
+     "Direct"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 2, Letter section 1",
+     "quote": "Deripaska has a 0.01 percent direct ownership interest in Rusal"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "en-plus",
+   "target": "rusal",
+   "properties": {
+    "percentage": [
+     "56.88"
+    ],
+    "role": [
+     "Controlling stake"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 6, Letter section 4",
+     "quote": "Rusal and En+ agreed that En+, once it is no longer subject to sanctions, shall continue to control Rusal through a 56.88 percent stake"
+    },
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 14",
+     "quote": "(Linked To: EN+ GROUP PLC). Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by EN+ GROUP PLC"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "en-plus",
+   "target": "ese",
+   "properties": {
+    "percentage": [
+     "100"
+    ],
+    "role": [
+     "Wholly owned subsidiary"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 6, Letter section 4",
+     "quote": "ESE is a Russian power company and a wholly owned subsidiary of En+."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "deripaska",
+   "target": "russian-machines",
+   "properties": {
+    "role": [
+     "Owned or controlled (OFAC's designation basis)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 13",
+     "quote": "Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by Oleg Vladimirovich DERIPASKA"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "basic-element",
+   "target": "russian-machines",
+   "properties": {
+    "role": [
+     "Owned or controlled (OFAC's designation basis)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 13",
+     "quote": "controlled by BASIC ELEMENT LIMITED, a person determined to be subject to E.O. 13661."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "russian-machines",
+   "target": "gaz",
+   "properties": {
+    "role": [
+     "Owned or controlled (OFAC's designation basis)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 5",
+     "quote": "(Linked To: DERIPASKA, Oleg Vladimirovich; Linked To: RUSSIAN MACHINES). Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by Oleg Vladimirovich DERIPASKA"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "deripaska",
+   "target": "gaz",
+   "properties": {
+    "role": [
+     "Owned or controlled (OFAC's designation basis)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 5",
+     "quote": "Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by Oleg Vladimirovich DERIPASKA"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "deripaska",
+   "target": "agroholding",
+   "properties": {
+    "role": [
+     "Owned or controlled (OFAC's designation basis)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 1",
+     "quote": "Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by Oleg Vladimirovich DERIPASKA"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "basic-element",
+   "target": "agroholding",
+   "properties": {
+    "role": [
+     "Owned or controlled (OFAC's designation basis)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 1",
+     "quote": "(Linked To: DERIPASKA, Oleg Vladimirovich; Linked To: BASIC ELEMENT LIMITED). Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by Oleg Vladimirovich DERIPASKA"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "glencore",
+   "target": "en-plus",
+   "properties": {
+    "role": [
+     "Direct ownership interest to be received in a share swap (Terms of Removal)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 4, Letter section 4",
+     "quote": "the Swiss company Glencore, or its subsidiary, swaps shares in Rusal for a direct ownership interest in En+."
+    }
+   ]
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "barker",
+   "target": "en-plus",
+   "properties": {
+    "role": [
+     "Led the Petitioners (En+, Rusal, ESE) in delisting negotiations with OFAC"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 2, Letter section 2",
+     "quote": "The Petitioners, led by Lord Gregory Barker, the former Minister of State for Energy and Climate Change for the United Kingdom,"
+    }
+   ]
+  }
+ ],
+ "events": [
+  {
+   "date": "2018-04-06",
+   "precision": "day",
+   "title": "OFAC designates Deripaska, Kerimov and the Deripaska companies",
+   "description": "Published in the Federal Register on 1 May 2018.",
+   "entity": "deripaska",
+   "evidence": {
+    "doc": "fr-ofac-2018-09147",
+    "locator": "page 1, 83 FR 19138",
+    "quote": "On April 6, 2018, OFAC determined that the property and interests in property subject to U.S. jurisdiction of the following persons are blocked under the relevant sanctions authorities listed below."
+   }
+  },
+  {
+   "date": "2018-12-19",
+   "precision": "day",
+   "title": "Treasury tells Congress it will lift sanctions on En+, Rusal and ESE in 30 days",
+   "description": "Deripaska stays sanctioned.",
+   "entity": "en-plus",
+   "evidence": {
+    "doc": "ofac-delisting-letter",
+    "locator": "page 1, Letter, p. 1",
+    "quote": "Treasury intends to terminate the sanctions imposed on En+ Group plc (\"En+\"), UC Rusal pie (\"Rusal\"), and JSC EuroSibEnergo (\"ESE\") in 30 days."
+   }
+  }
+ ],
+ "claims": [
+  {
+   "text": "Under the Terms of Removal, Deripaska's stake in En+ falls from about 70 percent to 44.95 percent and cannot be increased.",
+   "status": "supported",
+   "rationale": "Stated by Treasury in its notification to Congress.",
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 4, Letter section 4",
+     "quote": "Deripaska's stake in En+ will fall from approximately 70 percent to 44.95 percent, and his stake cannot be increased.",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "En+ keeps control of Rusal through a 56.88 percent stake.",
+   "status": "supported",
+   "rationale": "Stated by Treasury in its notification to Congress.",
+   "evidence": [
+    {
+     "doc": "ofac-delisting-letter",
+     "locator": "page 6, Letter section 4",
+     "quote": "Rusal and En+ agreed that En+, once it is no longer subject to sanctions, shall continue to control Rusal through a 56.88 percent stake",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "Basic Element, En+ and Rusal give the same registered address in Jersey.",
+   "status": "unverified",
+   "rationale": "OFAC's notice writes it two ways (“Esplanade 44, Saint Helier” and “44 Esplanade, St. Helier”); confirm in the Jersey registry.",
+   "evidence": [
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 2",
+     "quote": "BASIC ELEMENT LIMITED (a.k.a. BAZOVY ELEMENT), Esplanade 44, Saint Helier JE4 9WG, Jersey; 30 Rochdelskaya Street, Moscow 123022, Russia; Registration ID 84039",
+     "stance": "supports"
+    },
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 2, 83 FR 19139, Entities no. 4",
+     "quote": "EN+ GROUP PLC, Esplanade 44, Saint Helier JE4 9WG, Jersey; 8 Cleveland Row, London SW1A 1DH, United Kingdom; 1 Vasilisy Kozhinoy St., Moscow 121096, Russia; Registration ID 91061",
+     "stance": "supports"
+    },
+    {
+     "doc": "fr-ofac-2018-09147",
+     "locator": "page 3, 83 FR 19140, Entities no. 14",
+     "quote": "UNITED COMPANY RUSAL PLC, 44 Esplanade, St. Helier JE4 9WG, Jersey; 1 Vasilisy Kozhinoy Str., Moscow 121096, Russia; 11/F Central Twr., 28 Queen’s Rd. C, Central District, Hong Kong; Registration ID 94939; Company Number F–17314 (Hong Kong); Business Number 51566843 (Hong Kong)",
+     "stance": "supports"
+    }
+   ]
+  }
+ ],
+ "leads": [
+  {
+   "title": "Check the Jersey registry for Esplanade 44, St Helier",
+   "priority": "normal",
+   "detail": "Which other companies are registered at the address Basic Element, En+ and Rusal share?"
+  },
+  {
+   "title": "Who holds the shares Deripaska gave up?",
+   "priority": "high",
+   "detail": "The letter names VTB Bank (pledged shares), Glencore (share swap) and a charitable foundation. Find the post-2019 En+ register."
+  }
+ ],
+ "watchlist": [
+  "Oleg Deripaska",
+  "En+ Group",
+  "United Company Rusal",
+  "Basic Element"
+ ]
+}

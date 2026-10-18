@@ -1,0 +1,234 @@
+area: CT
+terms:
+- term: Price fixing
+  definition: An agreement between competitors to raise, lower, hold or stabilise prices or price-related
+    terms.
+  examples: []
+  source_url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/price-fixing
+  cases: []
+  related:
+  - Cartel
+  - Per se violation
+  indicators: []
+  areas:
+  - CT
+- term: Market division (market allocation)
+  definition: An agreement between competitors to share out customers, products or territories so they
+    do not compete for them.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related:
+  - Customer allocation
+  indicators: []
+  areas:
+  - CT
+- term: Customer allocation
+  definition: A type of market division where each competitor is given particular customers or customer
+    types and the others leave them alone.
+  examples: []
+  source_url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/market-division-or-customer-allocation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Bid rigging
+  definition: Competitors agree in advance who will win a contract that the buyer puts out to competitive
+    bidding.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related:
+  - Complementary bidding
+  - Bid rotation
+  indicators: []
+  areas:
+  - CT
+- term: Complementary (cover or courtesy) bid
+  definition: A bid submitted only to look like competition, priced too high or with terms the buyer will
+    not accept.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Bid rotation
+  definition: Conspirators all bid but take turns being the lowest bidder.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Sherman Act
+  definition: The 1890 US federal law that bans agreements among competitors to fix prices, rig bids or
+    divide markets; breaking it is a felony.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Per se violation
+  definition: Conduct that is illegal in itself, so it cannot be excused by arguing the agreed prices
+    were reasonable.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Policing mechanism
+  definition: A way for cartel members to check that everyone keeps to the agreement.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Fringe sellers
+  definition: Small sellers that hold only a small share of a market dominated by a few major sellers.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Article 101 TFEU
+  definition: The EU treaty rule that prohibits agreements and concerted practices between businesses
+    that restrict competition.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Concerted practice
+  definition: Coordination between firms that stops short of a formal agreement but knowingly replaces
+    competition with cooperation; public announcements can form part of one.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Unilateral public announcement (signalling)
+  definition: A firm's public statement, such as about future pricing intentions, that can tell rivals
+    its strategy without committing it to customers.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Hub-and-spoke arrangement
+  definition: Indirect information sharing between competitors through a common supplier, distributor,
+    platform or software provider at the centre.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Commercially sensitive information
+  definition: Information such as planned prices and quantities whose exchange reduces uncertainty between
+    competitors; aggregated and historical data is generally less strategic.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Algorithmic collusion
+  definition: Use of pricing algorithms to make an explicit cartel more stable, to coordinate through
+    shared software, or to reach collusive prices without human agreement.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/algorithms-how-they-can-reduce-competition-and-harm-consumers/algorithms-how-they-can-reduce-competition-and-harm-consumers
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Autonomous tacit collusion
+  definition: Pricing algorithms learning on their own to keep prices high without any information sharing
+    or agreement between firms.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/algorithms-how-they-can-reduce-competition-and-harm-consumers/algorithms-how-they-can-reduce-competition-and-harm-consumers
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Repricing software
+  definition: Software that automatically changes a seller's prices, often in response to competitors'
+    prices on online marketplaces.
+  examples: []
+  source_url: https://www.gov.uk/cma-cases/online-sales-of-discretionary-consumer-products
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Leniency (immunity) policy
+  definition: A regulator's policy that lets the first cartel member to report and cooperate avoid a fine;
+    GB eye was not fined in the posters case under it.
+  examples: []
+  source_url: https://www.gov.uk/cma-cases/online-sales-of-discretionary-consumer-products
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Director disqualification
+  definition: A UK order or undertaking that bars a person from acting as a company director for a period
+    after their company broke competition law.
+  examples: []
+  source_url: https://www.gov.uk/cma-cases/online-sales-of-discretionary-consumer-products
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Deferred prosecution agreement
+  definition: An agreement where prosecutors put charges on hold while a company pays a penalty and cooperates,
+    as Sandoz did in 2020.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/major-generic-pharmaceutical-company-admits-antitrust-crimes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Treble damages
+  definition: Under US law, victims of price fixing and bid rigging may sue to recover up to three times
+    the damage they suffered.
+  examples: []
+  source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT
+- term: Output restriction
+  definition: An agreement among competitors to limit production, sales or output, treated as just as
+    illegal as direct price fixing.
+  examples: []
+  source_url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/price-fixing
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CT

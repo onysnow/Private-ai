@@ -1,0 +1,3869 @@
+key: LE
+name: Labour exploitation and wage theft
+scope: 'Labour exploitation short of forced labour (wage theft, underpayment). Red flags from ''Off the
+  Books: Practical Guidance for Business'' (Migrant Justice Institute with Walk Free and the Australian
+  Anti-Slavery Commissioner, August 2026). Misclassification: workers required to get an ABN to get or
+  keep a job; contractors supervised like employees. Sham casual work: casual hours match permanent staff,
+  no casual loading. Missing penalty rates, or flat rates that ignore loadings. Supplier refuses to provide
+  payslips, timesheets or proof of payment. Wages partly paid in cash. Many workers'' payslips show identical
+  hours. Delayed pay or unexplained deductions. Shifts cut after a worker raises concerns.'
+indicators:
+- id: LE-001
+  name: Workers required to get an ABN or sign a contractor agreement to get or keep the job
+  definition: The business makes workers register as self-employed contractors (in Australia, by getting
+    an Australian Business Number) as a condition of being hired or kept on, so it can avoid employee
+    pay and record-keeping duties.
+  areas:
+  - LE
+  typology: Misclassification and sham contracting
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.5, Red flags (Examining contractor / ABN risks)
+    quote: Workers report they were required to get an ABN to obtain or keep the job.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.4, section 1
+    quote: Deliberately misrepresenting an employee as a contractor is known as sham contracting and is
+      an offence that carries significant penalties.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Independent contractors
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/find-help-for/independent-contractors
+    locator: Sham contracting
+    quote: If the business knew (or should have known) that the worker was an employee, there may be a
+      sham contracting arrangement.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Fact Sheet 13: Employee or Independent Contractor Classification Under the FLSA'
+    publisher: US Department of Labor, Wage and Hour Division
+    url: https://www.dol.gov/agencies/whd/fact-sheets/13-flsa-employment-relationship
+    locator: Titles and labels
+    quote: a worker may be an employee under the FLSA regardless of the title or label they are given.
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  examples:
+  - Job advert or onboarding message says 'must have ABN'.
+  - 'Worker quote in source: ''They tell you to get an ABN so they don''t have to pay night or weekend
+    rates, but they still treat you like an employee.'' (OTB p.5)'
+  cases:
+  - name: Village Concrete Inc. (US Department of Labor v. Village Concrete)
+    year: '2024'
+    jurisdiction: US (E.D. Virginia)
+    what_happened: WHD found the contractor treated 29 workers as contractors rather than employees, denied
+      overtime, and falsified records; nearly $1.2 million in back wages, liquidated damages and civil
+      money penalties under a consent judgment.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.dol.gov/newsroom/releases/whd/whd20240423
+    source_title: US Department of Labor news release, 23 April 2024
+  data_needed:
+  - Employment (employer, employee, role, startDate, summary)
+  - Contract (authority, contractor, title, signingDate)
+  - Person
+  - Company (registrationNumber, taxNumber)
+  - Document (job adverts, onboarding forms)
+  checkable: person
+  lookup_sources:
+  - Australian Business Register (ABN Lookup)
+  - Company registry
+  - Job advertising sites
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: The guidance says ABN misuse can compound other forced-labour indicators and signal heightened
+      modern slavery risk.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  - target_area: FR
+    reason: Misclassifying employees as contractors shifts tax and superannuation obligations; the ATO
+      handles superannuation, phoenix activity and the shadow economy (OTB p.11 referral table).
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - The worker genuinely runs their own business and serves several clients.
+  - The worker asked to be engaged as a contractor for their own tax or flexibility reasons.
+  - Some industries (e.g. certain trades, freelance media) commonly and lawfully use contractors.
+  jurisdictions: Australia (ABN, Fair Work Act 2009); US equivalent under FLSA
+  version: 1
+- id: LE-002
+  name: Contractor engagement in a sector where workers are normally employees
+  definition: A business engages many workers as contractors in jobs (cleaning, hospitality, retail, care,
+    warehouses, car washes, nail salons, meat and farm work) where genuine independent contracting is
+    unusual.
+  areas:
+  - LE
+  typology: Misclassification and sham contracting
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.5, Red flags
+    quote: ABN engagement in sectors where workers are generally employees.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.4, section 1
+    quote: Alarmingly, one in five worked on an ABN in an industry where genuine independent contracting
+      is unusual, including hospitality, retail, commercial cleaning, health care, aged care, childcare
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A cleaning subcontractor whose entire workforce invoices as sole traders.
+  cases: []
+  data_needed:
+  - Company (sector, classification)
+  - Employment
+  - Contract
+  - Document (supplier workforce breakdown by site and role)
+  checkable: records
+  lookup_sources:
+  - Industry classification in company registry
+  - ABN Lookup
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some specialist workers in these sectors are genuine contractors (e.g. a self-employed consultant).
+  - Short, project-based engagements may lawfully use contractors.
+  jurisdictions: Australia; similar risk sectors in US and UK
+  version: 1
+- id: LE-003
+  name: Contractor relies on a single business for all or most income
+  definition: A so-called contractor earns all or nearly all of their income from one business, which
+    suggests they are really that business's employee.
+  areas:
+  - LE
+  typology: Misclassification and sham contracting
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.5, Red flags
+    quote: A contractor relies on a single business for all or most income.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Fact Sheet 13: Employee or Independent Contractor Classification Under the FLSA'
+    publisher: US Department of Labor, Wage and Hour Division
+    url: https://www.dol.gov/agencies/whd/fact-sheets/13-flsa-employment-relationship
+    locator: Economic reality factors
+    quote: Degree of permanence of the work relationship.
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  examples:
+  - Invoices from one 'contractor' all addressed to the same company over two years.
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, date)
+  - Contract
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A new genuine business may have one client at first.
+  - Some genuine contractors choose a long exclusive engagement.
+  jurisdictions: Australia, US
+  version: 1
+- id: LE-004
+  name: Contractors controlled like employees
+  definition: Contractors cannot refuse work, set their hours, negotiate price or delegate the work, use
+    the business's tools, and do the same work under the same supervision as employees.
+  areas:
+  - LE
+  typology: Misclassification and sham contracting
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.5, Red flags
+    quote: A contractor cannot refuse work, set hours or negotiate price.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.5, Red flags
+    quote: ABN contractors and employees perform the same work under the same supervision.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Independent contractors
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/find-help-for/independent-contractors
+    locator: 'Indicators: control, delegating, tools'
+    quote: Performs work under the direction and control of their employer.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Fact Sheet 13: Employee or Independent Contractor Classification Under the FLSA'
+    publisher: US Department of Labor, Wage and Hour Division
+    url: https://www.dol.gov/agencies/whd/fact-sheets/13-flsa-employment-relationship
+    locator: Economic reality factors
+    quote: Nature and degree of control.
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  examples:
+  - Contractor rostered by a supervisor, wears company uniform, uses company equipment, cannot send a
+    substitute.
+  cases: []
+  data_needed:
+  - Employment
+  - Contract
+  - Document (rosters, supervision records)
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Safety rules or client site rules may require some supervision of genuine contractors.
+  - Some contractors use the client's equipment for site access or safety reasons.
+  jurisdictions: Australia (whole-of-relationship / start-of-relationship tests); US (economic reality
+    test)
+  version: 1
+- id: LE-005
+  name: Contractor or 'ABN rate' pay below the minimum for equivalent employees
+  definition: Workers engaged as contractors, or on so-called 'ABN rates' or 'cash job rates', are paid
+    less per hour than the legal minimum for an employee doing the same work.
+  areas:
+  - LE
+  typology: Underpayment
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.4, section 1 (chart)
+    quote: Businesses that engaged workers on an ABN paid far less than they would have been required
+      to pay an employee under the Fair Work Act, and well beneath the casual minimum wage.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.13, Case study, worker interviews
+    quote: they are hired on “ABN rates” or “cash job” rates.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Survey finding: 43% of ABN workers were paid below the National Minimum Wage ($23.23/hr) and 79%
+    below the casual minimum wage ($29.04/hr) (OTB p.4).'
+  cases: []
+  data_needed:
+  - Payment (amount, date, payer, beneficiary)
+  - Employment (role)
+  - Document (invoices, applicable award rates)
+  checkable: lookups
+  lookup_sources:
+  - Fair Work Ombudsman pay guides / modern awards
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Hourly pay below the applicable legal minimum for an employee doing the same work (the source
+      cites the National Minimum Wage of $23.23/hr and casual minimum of $29.04/hr at the time of the
+      survey).
+    threshold_source: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A genuine contractor may set a low price to win work.
+  - The hourly figure may be miscalculated if the contractor also works for other clients or the invoice
+    covers a fixed job.
+  jurisdictions: Australia
+  version: 1
+- id: LE-006
+  name: Casual employees working the same steady hours as permanent staff
+  definition: Workers labelled 'casual' have regular hours matching permanent staff, which may show a
+    sham casual arrangement used to avoid leave and other entitlements.
+  areas:
+  - LE
+  typology: Sham casual employment
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.6, Red flags (Detecting harmful use of casual employment)
+    quote: Casual employees’ work hours match those of permanent staff.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Casual employees
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/starting-employment/types-of-employees/casual-employees
+    locator: Sham casual arrangements
+    quote: knowingly say something false to convince a current or former full-time or part-time employee
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: New rules for changing from casual to full-time or part-time employment
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2024'
+    url: https://www.fairwork.gov.au/about-us/workplace-laws/legislation-changes/closing-loopholes/casual-employment-changes/casual-conversion
+    locator: Eligibility to give notice section
+    quote: have been employed for at least 6 months (12 months if employed by a small business)
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
+  examples:
+  - Rosters show a 'casual' worker on the same 38-hour weekly pattern for two years.
+  cases: []
+  data_needed:
+  - Employment (role, startDate)
+  - Document (rosters, time records)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: A worker labelled casual has worked regular, steady hours like permanent staff, but for less
+      than 6 months (less than 12 months at a small business).
+    strong: A worker labelled casual has worked regular, steady hours matching permanent staff for at
+      least 6 months (12 months if the employer is a small business) and is still treated as casual.
+    textbook: A worker has been employed as a casual for at least 6 months (12 months at a small business)
+      on hours matching permanent staff, has the right to give notice to change to permanent under the
+      employee choice pathway, and is still kept on casual terms.
+    threshold_source: https://www.fairwork.gov.au/about-us/workplace-laws/legislation-changes/closing-loopholes/casual-employment-changes/casual-conversion
+    threshold_note: The 6- and 12-month figures are the Fair Work Act eligibility window for a casual
+      to give notice to change to full-time or part-time (the employee choice pathway). This applies from
+      26 February 2025 for casuals employed before 26 August 2024 by non-small businesses, and from 26
+      August 2025 for small business employees. It is a legal window, not a test that proves a sham arrangement.
+      The Fair Work casual employees page separately uses 'a regular and systematic basis over at least
+      12 months', but for flexible-working and unpaid-parental-leave rights, not for conversion. Australia
+      only.
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - FWO notes a regular pattern of work alone does not mean there is a firm commitment to ongoing work;
+    genuine casuals can work regular shifts.
+  - Worker may prefer casual loading over leave.
+  jurisdictions: Australia
+  version: 2
+- id: LE-007
+  name: No casual loading paid or shown on pay slips
+  definition: Casual workers do not receive the extra casual loading (usually 25%) on top of their base
+    rate, or their pay slips do not show it separately.
+  areas:
+  - LE
+  typology: Underpayment
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.6, Red flags
+    quote: Casual workers do not receive a 25% casual loading on top of their hourly rate (or other loading
+      rate under an enterprise agreement), or pay slips don’t separately identify casual loadings.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Casual employees
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/starting-employment/types-of-employees/casual-employees
+    locator: Casual loading
+    quote: a higher pay rate for being a casual employee.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pay slip shows only a single flat hourly rate for a casual cleaner.
+  cases: []
+  data_needed:
+  - Document (pay slips)
+  - Payment
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Modern award / enterprise agreement text
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Casual pay does not include the 25% casual loading (or the loading set by the applicable
+      enterprise agreement).
+    threshold_source: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some awards or agreements set a single specific casual rate that already includes the loading.
+  - Payroll software may roll the loading into one line.
+  jurisdictions: Australia
+  version: 1
+- id: LE-008
+  name: Shifts cut or withdrawn after a worker raises concerns
+  definition: A worker's hours drop suddenly after they complain, ask for pay slips, or query their pay,
+    suggesting retaliation.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.6, Red flags
+    quote: Shifts are reduced or withdrawn after concerns are raised.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.7, Due diligence tips
+    quote: Track changes in shift allocation – sudden reductions could signal retaliation following worker
+      complaints, or requests for pay slips etc.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Roster data show a worker dropping from five shifts to none the week after emailing a pay query.
+  cases: []
+  data_needed:
+  - Document (rosters, complaint records, emails)
+  - Email
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Intimidation and threats are ILO forced-labour indicators; the guidance asks whether workers
+      are threatened if they refuse shifts or raise concerns.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - Business demand fell.
+  - Under casual employment the employer can lawfully offer or not offer work (OTB p.7).
+  - Worker asked for fewer shifts.
+  jurisdictions: Australia; general
+  version: 1
+- id: LE-009
+  name: Night, weekend or overtime penalty rates missing from pay slips
+  definition: Workers doing night, weekend or overtime shifts are not paid the higher legal rates for
+    those hours, or pay slips do not show them.
+  areas:
+  - LE
+  typology: Underpayment
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.7, Red flags (Checking after hours and weekend work)
+    quote: After-hours, night or weekend penalty rates not accurately reflected in pay slips.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Wage theft 2021-23
+    publisher: Economic Policy Institute (Margaret Poydock and Jiayi Zhang)
+    year: '2024'
+    url: https://www.epi.org/publication/wage-theft-2021-23/
+    locator: Forms of wage theft
+    quote: Overtime violations
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Survey: 83% of respondents worked nights and weekends, and 75% of those were underpaid by an average
+    of $9.40 per hour (OTB p.7).'
+  cases: []
+  data_needed:
+  - Document (pay slips, rosters)
+  - Payment
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Modern award pay guides
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - An enterprise agreement may lawfully set different penalty rates.
+  - A higher base rate may lawfully absorb penalties if the agreement allows it and the worker is no worse
+    off.
+  jurisdictions: Australia (penalty rates); US (overtime over 40 hours a week)
+  version: 1
+- id: LE-010
+  name: Flat hourly rates that ignore loadings and penalties
+  definition: Workers are paid one flat hourly rate (for example $15, $20, $25) whatever the hours or
+    day, unrelated to legal minimums.
+  areas:
+  - LE
+  typology: Underpayment
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.7, Red flags
+    quote: Workers paid flat rates that do not incorporate applicable loadings and penalty rates.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.8
+    quote: Some employers also impose flat hourly rates ($15, $20, $25) that bear no relationship to legal
+      minimums for the work
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Minimum wage increase starts today
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2026'
+    url: https://www.fairwork.gov.au/newsroom/media-releases/2026-media-releases/july-2026/20260701-minimum-wage-increase-media-release
+    locator: Media release, opening paragraphs
+    quote: The National Minimum Wage is now $1,004.90 per week (based on a 38-hour week for a full-time
+      employee), or $26.44 per hour. ... must receive at least $33.05 per hour, which includes the 25
+      per cent casual loading
+    quote_verified: true
+    licence: Not stated on page (Fair Work Ombudsman website copyright, generally CC BY 4.0 for fairwork.gov.au
+      content - not confirmed)
+    checked: '2026-10-10'
+  examples:
+  - 'Case study: ''Pay slips have flat rates and do not reflect overtime.'' (OTB p.13)'
+  cases: []
+  data_needed:
+  - Document (pay slips)
+  - Payment
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Modern award pay guides
+  levels:
+    faint: A flat hourly rate at or just above $26.44 that stays the same on nights, weekends and public
+      holidays, so no penalty rates or loadings are added on top of the minimum
+    strong: A flat rate below $33.05 an hour paid to casual workers, meaning the 25 per cent casual loading
+      is missing
+    textbook: A flat rate below $26.44 an hour, the National Minimum Wage from 1 July 2026
+    threshold_source: https://www.fairwork.gov.au/newsroom/media-releases/2026-media-releases/july-2026/20260701-minimum-wage-increase-media-release
+    threshold_note: 'Australia only. The National Minimum Wage is the legal floor for adults with no award.
+      Most modern awards set higher base rates and also require penalty rates, so a flat rate can break
+      the law even when it is above $26.44. Check the award that applies. The rate changes every 1 July:
+      the previous figures were $24.95 an hour and $31.19 for casuals (FWO media release, 1 July 2025).
+      The rates in the Walk Free and MJI guidance ($15, $20, $25) are examples, not thresholds.'
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A lawful annualised salary or above-award flat rate can cover loadings if it leaves the worker no
+    worse off.
+  jurisdictions: Australia
+  version: 2
+- id: LE-011
+  name: Rosters, time records, access logs, pay slips and payments do not match
+  definition: Independent records of when people were at work (access cards, CCTV, register log-ins, housekeeping
+    logs) show more hours than the rosters, time sheets or pay slips report.
+  areas:
+  - LE
+  typology: Record falsification
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.7, Red flags
+    quote: Mismatch between rosters, pay slips, time records, and payments.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Red flags
+    quote: Mismatch between rosters, access logs or operational data and what pay slips report.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: A Report of the Fair Work Ombudsman's Inquiry into 7-Eleven
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2016'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+    locator: Section 4.3, p.16
+    quote: Rosters and time records provided by some stores failed to match CCTV footage.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Case study: ''Access-card data and housekeeping logs indicate work outside recorded hours.'' (OTB
+    p.13)'
+  - 7-Eleven inquiry used register log-ins, CCTV, fuel dip records and food temperature logs to test recorded
+    hours (s4.6).
+  cases:
+  - name: Fair Work Ombudsman Inquiry into 7-Eleven
+    year: '2016'
+    jurisdiction: Australia
+    what_happened: FWO inspectors found significant underpayments in 7 of 20 stores visited, rosters that
+      failed to match CCTV, and franchisees creating false records to satisfy head-office audits.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+    source_title: A Report of the Fair Work Ombudsman's Inquiry into 7-Eleven
+  data_needed:
+  - Document (rosters, time sheets, pay slips, access logs, CCTV logs)
+  - Payment
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shared log-in codes or access cards (the 7-Eleven inquiry noted many stores shared codes).
+  - Workers staying on site for personal reasons after a shift.
+  - Clock errors or time-zone settings.
+  jurisdictions: General
+  version: 1
+- id: LE-012
+  name: Too few workers on the payroll to cover the hours the business is open
+  definition: The payroll records fewer paid hours or fewer employees than are needed to staff the business
+    for its opening hours, suggesting unrecorded (off-the-books) workers or hours.
+  areas:
+  - LE
+  typology: Record falsification / off-the-books work
+  status: verified
+  sources:
+  - title: A Report of the Fair Work Ombudsman's Inquiry into 7-Eleven
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2016'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+    locator: Section 4.3, p.17; Section 4.4.1, p.19
+    quote: recorded half the hours worked by employees, to make it appear they were paid double
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - '7-Eleven inquiry: 12 of 20 stores had too few employees on payroll to cover 24/7 operation; one store''s
+    payroll showed 103.74 hours in a week against the 168 hours needed (s4.3 p.17, s4.4.1 p.19).'
+  cases: []
+  data_needed:
+  - Company (opening hours)
+  - Employment
+  - Document (payroll summaries)
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Business opening hours (website, maps listings)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Total paid hours in a period are fewer than the minimum staffed hours the business must
+      have operated (e.g. 168 hours a week for a single-staffed 24/7 store).
+    threshold_source: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Unrecorded workers paid off the books also signal undeclared wages; the ATO handles the shadow
+      economy.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - Owner-operators or family members working unpaid lawfully (e.g. the owner covering shifts).
+  - Some staff paid through a separate entity or labour hire firm.
+  jurisdictions: General
+  version: 1
+- id: LE-013
+  name: After-hours work concentrated among temporary visa holders and casuals
+  definition: Night and weekend shifts, which are less supervised and attract higher rates, are mostly
+    given to temporary visa holders and casual workers.
+  areas:
+  - LE
+  typology: Risk factor
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.7, Red flags
+    quote: After hours work concentrated among temporary visa holders and casual workers.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.7
+    quote: After-hours and weekend shifts are typically less supervised, with fewer managers and co-workers
+      present.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Night cleaning crew at a hotel made up almost entirely of student-visa holders.
+  cases: []
+  data_needed:
+  - Employment
+  - Person (nationality, visa type if known)
+  - Document (rosters)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Students may prefer night and weekend shifts around study.
+  - Visa work-hour limits may push workers toward particular shifts.
+  jurisdictions: Australia
+  version: 1
+- id: LE-014
+  name: Fatigue and more safety incidents on nights or overtime
+  definition: Long shifts, short breaks, back-to-back shifts and more accidents or near misses during
+    night or overtime work.
+  areas:
+  - LE
+  typology: Excessive hours
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.7, Red flags
+    quote: Signs of fatigue (e.g. long shifts, insufficient breaks, back-to-back shifts).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.7, Red flags
+    quote: Higher incidence of safety incidents or near misses during nights or overtime.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Incident reports cluster in the last hours of 14-hour shifts.
+  cases: []
+  data_needed:
+  - Document (incident reports, rosters)
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Workplace safety regulator incident data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Excessive overtime and abusive working conditions are ILO forced-labour indicators listed
+      in the guidance.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - Night work is inherently riskier (lighting, fatigue) even when lawful.
+  - Seasonal peaks.
+  jurisdictions: General
+  version: 1
+- id: LE-015
+  name: No pay slips given
+  definition: Workers receive no pay slip, or do not know how to get one.
+  areas:
+  - LE
+  typology: Record-keeping breach
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.8
+    quote: The absence of pay slips is a strong indicator of underpayment.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Pay slips
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/pay-and-wages/paying-wages/pay-slips
+    locator: Time limit
+    quote: Pay slips have to be given to an employee within 1 working day of pay day, even if an employee
+      is on leave.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: What is phoenix activity
+    publisher: Australian Taxation Office
+    url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+    locator: Warning signs for employees
+    quote: you don't receive a payslip
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Survey: among workers given no pay slip, 67% were paid below the National Minimum Wage (OTB p.9).'
+  cases: []
+  data_needed:
+  - Document (pay slips)
+  - Employment
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: No pay slip given within 1 working day of pay day (Australia).
+    threshold_source: https://www.fairwork.gov.au/pay-and-wages/paying-wages/pay-slips
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The ATO lists not receiving a payslip as a warning sign of phoenix activity.
+    source_url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+  innocent_explanations:
+  - Pay slips issued electronically and the worker has not found them.
+  - Small employer unaware of the rule (still a breach, but not deliberate).
+  jurisdictions: Australia; comparable record rules elsewhere
+  version: 1
+- id: LE-016
+  name: Pay slips show identical hours for many workers
+  definition: Pay slips across a workforce show the same hours or identical start and finish times, suggesting
+    they were generated to look compliant rather than recording real work.
+  areas:
+  - LE
+  typology: Record falsification
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Red flags (Identifying misleading payslips)
+    quote: Pay slips show uniform hours or identical times for all workers.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Twenty cleaners' pay slips all show exactly 30.00 hours every week.
+  cases: []
+  data_needed:
+  - Document (pay slips)
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Fixed rostered shifts that genuinely do not vary.
+  - Salaried staff paid for standard contracted hours.
+  jurisdictions: General
+  version: 1
+- id: LE-017
+  name: Same superannuation (pension) number on many workers' pay slips
+  definition: Many workers' pay slips list the same superannuation fund member number, suggesting contributions
+    are not really being paid to each worker.
+  areas:
+  - LE
+  typology: Record falsification / unpaid entitlements
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Red flags
+    quote: Pay slips show the same superannuation number across many workers.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Five pay slips from different workers share one super member number.
+  cases: []
+  data_needed:
+  - Document (pay slips)
+  - Person
+  - BankAccount / account identifiers
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Payroll software showing the fund's ABN or USI (same for everyone) rather than the member number.
+  jurisdictions: Australia
+  version: 1
+- id: LE-018
+  name: Pay slips record fewer hours at a higher rate (the 'half pay' trick)
+  definition: Pay slips show fewer hours than were worked at an inflated hourly rate, so the total matches
+    what was paid and the rate looks lawful.
+  areas:
+  - LE
+  typology: Record falsification
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.8
+    quote: I work for 12 hours at $20 an hour, but the pay slip shows 6 hours at $40 an hour. Everything
+      looks legal.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: A Report of the Fair Work Ombudsman's Inquiry into 7-Eleven
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2016'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+    locator: Section 3.3, p.9; Section 4.4.1, p.18
+    quote: reverse-engineered the number of hours to be entered to ensure it paid the desired gross payment
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Survey: 8% received pay slips that omitted hours worked, making the hourly rate appear higher (OTB
+    p.8).'
+  cases:
+  - name: Fair Work Ombudsman Inquiry into 7-Eleven
+    year: '2016'
+    jurisdiction: Australia
+    what_happened: Inquiry described stores recording half the hours worked so wages appeared to be paid
+      at double the rate (the 'half pay scam').
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+    source_title: A Report of the Fair Work Ombudsman's Inquiry into 7-Eleven
+  data_needed:
+  - Document (pay slips, rosters, access logs)
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Payroll errors.
+  - Worker's own memory of hours may be wrong; check against independent records.
+  jurisdictions: Australia; general
+  version: 1
+- id: LE-019
+  name: Supplier refuses to provide pay slips, time sheets or proof of payment
+  definition: A supplier or labour contractor will not share basic wage records when a client or investigator
+    asks.
+  areas:
+  - LE
+  typology: Supply-chain concealment
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Red flags
+    quote: The supplier refuses to provide pay slips, timesheets and sample bank transfers.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Cleaning contractor cites 'privacy' and refuses to provide any sample records.
+  cases: []
+  data_needed:
+  - Document (correspondence)
+  - Email
+  - Contract
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine privacy concerns; records may be shareable only in redacted form.
+  - Contract does not give the client audit rights.
+  jurisdictions: General
+  version: 1
+- id: LE-020
+  name: Wages paid partly or fully in cash
+  definition: Workers are paid some or all wages in cash, which can be used to hide underpayment.
+  areas:
+  - LE
+  typology: Concealment
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Red flags
+    quote: Wages paid partly or fully in cash.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.8
+    quote: While cash payments are a lawful form of payment, the research indicates that cash payments
+      may be used improperly to conceal underpayments.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Harvest Trail Inquiry report
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2018'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    locator: p.4, Executive summary
+    quote: cash payments and a transient workforce
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Survey: 23% were paid some or all of their wages in cash (OTB p.8).'
+  cases: []
+  data_needed:
+  - Payment (method)
+  - Document (signed cash records)
+  - Employment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Cash wages are a classic shadow-economy marker; the guidance refers such issues to the ATO.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - Cash pay is lawful; FWO recommends both parties sign a record each pay period.
+  - Worker has no bank account yet (new arrival).
+  jurisdictions: General
+  version: 1
+- id: LE-021
+  name: Recorded wages do not match bank transfers
+  definition: The wages shown in pay records differ from the amounts that actually reach workers' bank
+    accounts.
+  areas:
+  - LE
+  typology: Record falsification
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Red flags
+    quote: Records of hours worked and wages paid don’t match bank transfers.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pay slip net pay $900; bank statement shows $600 received.
+  cases: []
+  data_needed:
+  - Payment (amount, date, payer, beneficiary, beneficiaryAccount)
+  - BankAccount
+  - Document (pay slips, bank statements)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful salary sacrifice or worker-authorised deductions paid elsewhere.
+  - Split payments to several accounts at the worker's request.
+  jurisdictions: General
+  version: 1
+- id: LE-022
+  name: Late, irregular or delayed wage payments
+  definition: Wages are not paid on a regular schedule, or arrive late.
+  areas:
+  - LE
+  typology: Underpayment
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Red flags
+    quote: Wage payments not made on a consistent schedule, or delayed payments.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: What is phoenix activity
+    publisher: Australian Taxation Office
+    url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+    locator: Warning signs for employees
+    quote: your pay is late or less than what it should be, or you're being paid less than the minimum
+      wage
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Frequency of pay
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2026'
+    url: https://www.fairwork.gov.au/pay-and-wages/paying-wages/frequency-of-pay
+    locator: Frequency of pay page, opening section
+    quote: 'Employees must be paid at least monthly and can be paid by one, or a combination of, the following:'
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
+  examples:
+  - Bank statements show wage deposits at irregular 3 to 7 week gaps.
+  cases: []
+  data_needed:
+  - Payment (date)
+  - BankAccount
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: Pay dates are irregular or come later than the agreed schedule, but workers are still paid
+      at least monthly
+    strong: Payments are often late enough that the gap between pays comes close to a month
+    textbook: Wages are not paid at least monthly, which breaks the legal minimum pay frequency
+    threshold_source: https://www.fairwork.gov.au/pay-and-wages/paying-wages/frequency-of-pay
+    threshold_note: Australia (Fair Work Act 2009 s323(1)(c), a civil remedy provision; the FWO page restates
+      it). Awards and agreements often set weekly or fortnightly pay, and missing those dates is also
+      a breach, but no number is published for that. The Walk Free/MJI guidance and the ATO phoenix page
+      describe late pay without a figure. The FWO 7-Eleven report says one worker 'sometimes waited weeks
+      for payment' (p.23), which is a case, not a threshold.
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Withholding of wages is an ILO forced-labour indicator listed in the guidance.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - One-off bank or payroll system failure.
+  - Change of payroll provider.
+  jurisdictions: General
+  version: 2
+- id: LE-023
+  name: Unlawful or unexplained deductions from pay
+  definition: Money is taken out of wages for things like alleged misconduct, breakages, till shortfalls,
+    uniforms, tools or equipment without a lawful basis, or in a way that drops pay below the minimum.
+  areas:
+  - LE
+  typology: Illegal deductions
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Red flags
+    quote: Deductions from pay, especially if unlawful, unexplained or undocumented in the contract.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Deducting pay
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/pay-and-wages/deductions-and-related-issues/deducting-pay
+    locator: When an employer can deduct
+    quote: the employee agrees in writing and it's mainly for the employee's benefit.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: UK Labour Market Enforcement Strategy 2022 to 2023
+    publisher: Director of Labour Market Enforcement (UK Government)
+    year: '2023'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1143364/uk-labour-market-enforcement-strategy-2022-2023.pdf
+    locator: Section 1.1, Figure 1.1 footnote, p.6
+    quote: '*Low-paid retail staff have the cost of their uniforms unlawfully deducted from their pay,
+      bringing them below the national minimum wage.'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 29 CFR 531.35 'Free and clear' payment; 'kickbacks'
+    publisher: US Code of Federal Regulations (via Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/29/531.35
+    locator: §531.35
+    quote: finally and unconditionally or "free and clear."
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  - title: 'Employment Rights Act 1996, section 18: Limits on amount and time of making deductions'
+    publisher: UK Parliament (legislation.gov.uk, The National Archives)
+    year: '1996'
+    url: https://www.legislation.gov.uk/ukpga/1996/18/section/18
+    locator: s.18(1)
+    quote: the amount or aggregate amount of the deduction or deductions shall not exceed one-tenth of
+      the gross amount of the wages payable to the worker on that day
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-10'
+  examples:
+  - 'Worker quote: ''They took two weeks’ pay because I lost a key.'' (OTB p.9)'
+  - 'US: requiring workers to buy tools for the job is a violation in any week the cost cuts into minimum
+    or overtime wages (29 CFR 531.35).'
+  cases: []
+  data_needed:
+  - Document (pay slips, contracts, deduction authorities)
+  - Payment
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Applicable award or agreement
+  levels:
+    faint: Deductions for till shortfalls or missing stock appear on pay slips, below one-tenth of gross
+      pay for that pay day
+    strong: Deductions for shortfalls or missing stock reach about one-tenth of gross pay on a pay day
+    textbook: Deductions for cash shortages or stock deficiencies exceed one-tenth of the gross wages
+      payable on that pay day (UK retail employment)
+    threshold_source: https://www.legislation.gov.uk/ukpga/1996/18/section/18
+    threshold_note: 'The one-tenth cap is set by UK law (Employment Rights Act 1996 s18(1)) and covers
+      only retail work and only deductions for cash shortages or stock deficiencies. Other rules have
+      no percentage: in the US (29 CFR 531.35) and under the UK national minimum wage, a deduction must
+      not take pay below the minimum wage. In Australia (FWO), a deduction must be agreed in writing and
+      be mainly for the employee''s benefit. The Walk Free/MJI guidance gives no number, only a worker
+      quote about losing ''two weeks'' pay'' for a lost key.'
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: GLAA lists being 'disciplined through punishment or fines' as a sign of labour exploitation
+      in its modern slavery guide.
+    source_url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+  innocent_explanations:
+  - Lawful deductions with written agreement for the worker's benefit (e.g. salary sacrifice, union fees).
+  - Deductions required by law (tax, court-ordered garnishment).
+  - Some awards allow deductions for breakages in narrow cases.
+  jurisdictions: Australia, UK, US
+  version: 2
+- id: LE-024
+  name: 'Cashback: workers made to hand back part of their wages'
+  definition: The employer pays the correct wage on paper, then requires workers to return part of it
+    in cash or by transfer, so records look lawful while real pay is lower.
+  areas:
+  - LE
+  typology: Cashback scheme
+  status: pending
+  sources:
+  - title: Requirements to spend or pay back money
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/pay-and-wages/deductions-and-related-issues/requirements-to-spend-or-pay-back-money
+    locator: Cashback schemes
+    quote: an unlawful requirement for an employee to spend or pay money.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: A Report of the Fair Work Ombudsman's Inquiry into 7-Eleven
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2016'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+    locator: Section 4.6, p.27
+    quote: '''cash back'' arrangements where an employer required the employee to return some or all of
+      a wage payment.'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Due diligence tips
+    quote: Interview a sample of workers to assess risk of “cashback” payments (a situation where workers
+      are required to return a part of their wage)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 29 CFR 531.35 'Free and clear' payment; 'kickbacks'
+    publisher: US Code of Federal Regulations (via Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/29/531.35
+    locator: §531.35
+    quote: finally and unconditionally or "free and clear."
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  examples:
+  - Regular ATM cash withdrawals by a worker shortly after each pay day, matching a fixed share of pay.
+  - Transfers from worker accounts back to accounts of the employer's director.
+  cases:
+  - name: Fair Work Ombudsman v Rubee Enterprises Pty Ltd and Fares Ghazale (Canteen Cuisine, Albury)
+    year: '2017'
+    jurisdiction: Australia (Federal Circuit Court)
+    what_happened: Court found workers were forced to withdraw cash and hand it back, false time-and-wages
+      records were given to inspectors, and visa support was threatened; penalties of $532,910 in civil
+      proceedings brought by the FWO.
+    outcome: fined_by_regulator
+    outcome_verified: false
+    source_url: https://www.fairwork.gov.au/newsroom/media-releases/2017-media-releases/february-2017/20170208-rubee-penalty
+    source_title: 'FWO media release: Record penalties of $532,000 in FWO cashback case'
+  - name: Fair Work Ombudsman v Innovative Associates Pty Ltd and Dila Ram Kharel
+    year: '2026'
+    jurisdiction: Australia (Federal Circuit and Family Court)
+    what_happened: A worker was required to transfer amounts into bank accounts in the director's name,
+      which were then used to pay her wages, leaving her with no wages at all; $177,000 in penalties in
+      proceedings brought by the FWO.
+    outcome: fined_by_regulator
+    outcome_verified: false
+    source_url: https://www.fairwork.gov.au/newsroom/media-releases/2026-media-releases/september-2026/20260901-innovative-associates-penalty-media-release
+    source_title: FWO media release, 1 September 2026
+  data_needed:
+  - Payment (payer, beneficiary, amount, date)
+  - BankAccount
+  - Person
+  - Directorship
+  - Company
+  checkable: records
+  lookup_sources:
+  - Company registry (to link recipient accounts to directors)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: In the Rubee case the employer threatened to withdraw visa support if workers refused the
+      cashback, a coercion element.
+    source_url: https://www.fairwork.gov.au/newsroom/media-releases/2017-media-releases/february-2017/20170208-rubee-penalty
+  - target_area: ML
+    reason: Round-tripping wages back to the employer creates paper wage expenses that are partly returned
+      as cash, which may also shift tax liabilities.
+    source_url: https://www.fairwork.gov.au/newsroom/media-releases/2026-media-releases/september-2026/20260901-innovative-associates-penalty-media-release
+  innocent_explanations:
+  - Worker repaying a genuine personal loan or rent to an employer who is also a landlord (check whether
+    it is reasonable and for the employer's benefit).
+  - Family members pooling money.
+  jurisdictions: Australia, US
+  version: 1
+- id: LE-025
+  name: Workers pay to get or keep the job (recruitment fees, bonds, kickbacks)
+  definition: Job seekers or workers are charged upfront fees, bonds or other payments to be hired or
+    stay employed.
+  areas:
+  - LE
+  typology: Recruitment fees
+  status: verified
+  sources:
+  - title: Requirements to spend or pay back money
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/pay-and-wages/deductions-and-related-issues/requirements-to-spend-or-pay-back-money
+    locator: When an employer cannot require spending or payback
+    quote: ask employees to pay money to keep their job
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Harvest Trail Inquiry report
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2018'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    locator: p.41
+    quote: charging job finding/placement bonds
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 20 CFR 655.135 Assurances and obligations of H-2A employers
+    publisher: US Code of Federal Regulations (via Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/20/655.135
+    locator: §655.135(j)
+    quote: kickbacks, bribes, tributes, in kind payments, and free labor.
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  examples:
+  - 'FWO example: applicant told to pay $5,000 upfront before being employed.'
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, purpose)
+  - Person
+  - Company
+  - Document (recruitment agreements)
+  checkable: person
+  lookup_sources:
+  - Labour hire / recruitment agency licence registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Fees that create debt can amount to debt bondage, an ILO forced-labour indicator; the guidance
+      asks whether workers pay fees in a way that creates debt bondage.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - Lawful fees paid to a genuine training provider or licensing body chosen by the worker.
+  - Visa application fees the worker must pay by law (varies by scheme).
+  jurisdictions: Australia, US (H-2A)
+  version: 1
+- id: LE-026
+  name: Unpaid trials or long unpaid 'training' periods
+  definition: Workers are made to work unpaid for a 'trial' or 'training' period longer than needed to
+    show their skills, or without direct supervision.
+  areas:
+  - LE
+  typology: Unpaid work
+  status: verified
+  sources:
+  - title: Unpaid trials
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/starting-employment/unpaid-work/unpaid-trials
+    locator: When an unpaid trial may be unlawful
+    quote: it isn't necessary to demonstrate the skills required for the job, or has continued for longer
+      than is actually needed
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.13, Case study, worker interviews
+    quote: Workers report unpaid training and extended unpaid “trial” periods.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A cafe runs repeated unpaid 'trial shifts' with different applicants and never hires them.
+  cases: []
+  data_needed:
+  - Employment (startDate)
+  - Document (rosters, job adverts)
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Unpaid trial longer than needed to demonstrate skills (FWO: could range from an hour to
+      one shift), or not directly supervised.'
+    threshold_source: https://www.fairwork.gov.au/starting-employment/unpaid-work/unpaid-trials
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short, supervised skills demonstration is lawful.
+  - Genuine vocational placements under a recognised course.
+  jurisdictions: Australia
+  version: 1
+- id: LE-027
+  name: Off-the-clock work
+  definition: Workers are required or allowed to work before or after their paid shift, or on breaks,
+    without pay.
+  areas:
+  - LE
+  typology: Unpaid working time
+  status: verified
+  sources:
+  - title: 'Fact Sheet 22: Hours Worked Under the FLSA'
+    publisher: US Department of Labor, Wage and Hour Division
+    url: https://www.dol.gov/agencies/whd/fact-sheets/22-flsa-hours-worked
+    locator: Work not requested but suffered or permitted
+    quote: Work not requested but suffered or permitted to be performed is work time that must be paid
+      for by the employer.
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  - title: UK Labour Market Enforcement Strategy 2022 to 2023
+    publisher: Director of Labour Market Enforcement (UK Government)
+    year: '2023'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1143364/uk-labour-market-enforcement-strategy-2022-2023.pdf
+    locator: Section 2.5.7, p.26
+    quote: if workers are asked to arrive 15 minutes before the start of a shift.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Wage theft 2021-23
+    publisher: Economic Policy Institute (Margaret Poydock and Jiayi Zhang)
+    year: '2024'
+    url: https://www.epi.org/publication/wage-theft-2021-23/
+    locator: Forms of wage theft
+    quote: Off-the-clock violations
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Access logs show staff badge in 20 minutes before rostered start every day for unpaid briefings or
+    security checks.
+  cases: []
+  data_needed:
+  - Document (access logs, time records, rosters)
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Workers arriving early voluntarily for personal reasons without working.
+  - Commute or bona fide meal breaks that are not work time under the rules.
+  jurisdictions: US, UK, general
+  version: 1
+- id: LE-028
+  name: Employer or managers keep workers' tips
+  definition: Owners, managers or supervisors take a share of tips meant for staff, including through
+    tip pools.
+  areas:
+  - LE
+  typology: Tip theft
+  status: verified
+  sources:
+  - title: Tips (FLSA)
+    publisher: US Department of Labor, Wage and Hour Division
+    url: https://www.dol.gov/agencies/whd/flsa/tips
+    locator: Tips prohibition
+    quote: managers and supervisors also may not keep tips received by employees, including through tip
+      pools
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  - title: Wage theft 2021-23
+    publisher: Economic Policy Institute (Margaret Poydock and Jiayi Zhang)
+    year: '2024'
+    url: https://www.epi.org/publication/wage-theft-2021-23/
+    locator: Forms of wage theft
+    quote: Tipped minimum wage violations
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Card-tip totals in the till system exceed tips distributed to staff.
+  cases: []
+  data_needed:
+  - Payment
+  - Document (POS tip reports, tip pool records)
+  - Employment (role)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Card processing fees deducted from card tips may be allowed in some jurisdictions.
+  - Lawful tip pools shared with non-managerial back-of-house staff.
+  jurisdictions: US (FLSA)
+  version: 1
+- id: LE-029
+  name: Workers given 'manager' or salaried titles to avoid overtime
+  definition: Employees are labelled managers or paid a salary and treated as exempt from overtime when
+    their pay or duties do not meet the legal tests.
+  areas:
+  - LE
+  typology: Exemption misclassification
+  status: verified
+  sources:
+  - title: 'Fact Sheet 17A: Exemption for Executive, Administrative, Professional, Computer & Outside
+      Sales Employees'
+    publisher: US Department of Labor, Wage and Hour Division
+    url: https://www.dol.gov/agencies/whd/fact-sheets/17a-overtime
+    locator: Job titles; salary basis
+    quote: Job titles do not determine exempt status.
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  examples:
+  - 'Village Concrete: WHD found salaried workers wrongly classified as overtime-exempt (DOL release,
+    23 April 2024).'
+  cases:
+  - name: Village Concrete Inc. (US Department of Labor v. Village Concrete)
+    year: '2024'
+    jurisdiction: US (E.D. Virginia)
+    what_happened: Consent judgment after WHD found contractor misclassification, salaried workers wrongly
+      classified as exempt, falsified records and unpaid travel time; $563,938 back wages plus equal liquidated
+      damages and $67,473 civil money penalties.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.dol.gov/newsroom/releases/whd/whd20240423
+    source_title: US Department of Labor news release, 23 April 2024
+  data_needed:
+  - Employment (role)
+  - Payment (amount)
+  - Document (job descriptions)
+  checkable: lookups
+  lookup_sources:
+  - DOL salary threshold rules; state labour law
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Treated as exempt while paid below the salary level in the fact sheet (stated as $684 per
+      week) or without meeting the duties tests.
+    threshold_source: https://www.dol.gov/agencies/whd/fact-sheets/17a-overtime
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Worker genuinely meets the duties and salary tests.
+  - State law may set a different threshold.
+  jurisdictions: US (FLSA)
+  version: 1
+- id: LE-030
+  name: Pay slip names a different employer, or the employer's name or ABN keeps changing
+  definition: The company on the pay slip is not the one the worker thinks they work for, or the business
+    changes name or registration number while the address, phone and staff stay the same.
+  areas:
+  - LE
+  typology: Phoenix activity
+  status: verified
+  sources:
+  - title: What is phoenix activity
+    publisher: Australian Taxation Office
+    url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+    locator: Warning signs for employees, contractors and visa holders
+    quote: the company's name or ABN changes, but the phone number or address stays the same
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: What is phoenix activity
+    publisher: Australian Taxation Office
+    url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+    locator: Warning signs for employees, contractors and visa holders
+    quote: your payslip has a different employer name to whom you believe you work for
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three successive companies at the same address employ the same staff over four years.
+  cases: []
+  data_needed:
+  - Company (name, registrationNumber, incorporationDate, dissolutionDate, address)
+  - Address
+  - Directorship
+  - Employment
+  - Document (pay slips)
+  checkable: lookups
+  lookup_sources:
+  - Company registry (ASIC)
+  - ABN Lookup
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The ATO defines phoenix activity as avoiding company debts by moving assets to a new entity,
+      leaving employees and creditors unpaid.
+    source_url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+  innocent_explanations:
+  - Legitimate restructuring or a payroll company within a corporate group.
+  - Genuine sale of a business to a new owner.
+  jurisdictions: Australia; similar patterns elsewhere
+  version: 1
+- id: LE-031
+  name: Labour contractor deregistered or directors with past liquidated companies
+  definition: The labour supplier has been deregistered, or its directors have run companies that were
+    liquidated, a pattern used to escape unpaid wage debts.
+  areas:
+  - LE
+  typology: Phoenix activity
+  status: verified
+  sources:
+  - title: What is phoenix activity
+    publisher: Australian Taxation Office
+    url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+    locator: Warning signs for businesses and creditors
+    quote: company directors who have been involved with liquidated companies before
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Harvest Trail Inquiry report
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2018'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    locator: p.38
+    quote: deregistration of the business
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: ASIC action to disqualify company directors
+    publisher: Australian Securities and Investments Commission (ASIC)
+    year: '2024'
+    url: https://www.asic.gov.au/about-asic/news-centre/articles/asic-action-to-disqualify-company-directors/
+    locator: Article body, paragraph on the brief to the ASIC Hearing Delegate
+    quote: To disqualify a director, the relevant companies must be in liquidation and ASIC must have
+      received two or more initial statutory reports (s533(1) reports) from liquidators in the last seven
+      years.
+    quote_verified: true
+    licence: Not stated on page (ASIC website copyright terms apply)
+    checked: '2026-10-10'
+  examples:
+  - 'Harvest Trail Inquiry: a labour hire contractor (now deregistered) and deregistration used as a tactic
+    to evade responsibility (pp.35, 38).'
+  cases: []
+  data_needed:
+  - Company (status, dissolutionDate)
+  - Directorship (director, organization, startDate, endDate)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Company registry (ASIC)
+  - Insolvency notices
+  - Banned and disqualified persons register
+  levels:
+    faint: A director of the labour supplier has been involved with a company that went into liquidation,
+      but fewer than two such companies in the last seven years (or the supplier itself has been deregistered).
+    strong: A director has been involved with two or more companies that went into liquidation, whether
+      or not within the last seven years.
+    textbook: A director has been involved with two or more companies in liquidation in the last seven
+      years, with liquidators' initial statutory reports lodged for them. This is the threshold at which
+      ASIC can disqualify a director.
+    threshold_source: https://www.asic.gov.au/about-asic/news-centre/articles/asic-action-to-disqualify-company-directors/
+    threshold_note: 'Counts prior liquidated companies per director. Australia only, under Corporations
+      Act s206F. The same article adds: ''the law only requires people to be involved in two or more failed
+      companies to be considered for director disqualification''. ASIC also says not every failure meets
+      the threshold. The Senate Economics References Committee report on insolvency in the construction
+      industry (ch. 7, para 7.4) says the same thing: two or more companies wound up within seven years.
+      Its page blocked direct download, so the ASIC page is the one cited. Deregistration alone has no
+      published number.'
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Phoenix activity is an insolvency and tax abuse as well as a wage abuse (ATO).
+    source_url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+  innocent_explanations:
+  - Directors of genuinely failed businesses who started again lawfully.
+  - Voluntary deregistration of a solvent dormant company.
+  jurisdictions: Australia
+  version: 2
+- id: LE-032
+  name: Superannuation or other entitlements not paid
+  definition: Compulsory retirement contributions (superannuation) or other entitlements are missing.
+  areas:
+  - LE
+  typology: Unpaid entitlements
+  status: verified
+  sources:
+  - title: What is phoenix activity
+    publisher: Australian Taxation Office
+    url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+    locator: Warning signs for employees
+    quote: your super or other employment entitlements are not being paid
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.9, Due diligence tips
+    quote: Use sample of bank transfers and superannuation payments to cross check against time records.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pay slips show super accrued but the fund statement shows no contributions.
+  cases: []
+  data_needed:
+  - Payment
+  - Document (pay slips, fund statements)
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Superannuation fund statements (from worker)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Contributions paid quarterly and not yet due.
+  - Worker earning below a threshold where it applies, or not eligible.
+  jurisdictions: Australia
+  version: 1
+- id: LE-033
+  name: Several layers of subcontracting or labour hire
+  definition: Work passes through a chain of contractors and labour hire firms, which blurs who the employer
+    is and raises the risk of underpayment.
+  areas:
+  - LE
+  typology: Supply-chain structure
+  status: verified
+  sources:
+  - title: Harvest Trail Inquiry report
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2018'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    locator: p.36
+    quote: multiple levels of subcontracting increases the risk of non-compliance
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Harvest Trail Inquiry report
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2018'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    locator: p.43
+    quote: the FWO was unable to definitively confirm an employment relationship
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Ley 32/2006, de 18 de octubre, reguladora de la subcontratación en el Sector de la Construcción
+      (consolidated text)
+    publisher: Boletín Oficial del Estado (Spain), Jefatura del Estado
+    year: '2006'
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2006-18205
+    locator: Artículo 5, apartado 2, letras c) y d) (letra f bars labour-only subcontractors from subcontracting)
+    quote: c) El primer y segundo subcontratistas podrán subcontratar la ejecución de los trabajos que,
+      respectivamente, tengan contratados, salvo en los supuestos previstos en la letra f) del presente
+      apartado. d) El tercer subcontratista no podrá subcontratar los trabajos que hubiera contratado
+      con otro subcontratista o trabajador autónomo.
+    quote_verified: true
+    licence: BOE consolidated legislation; reuse permitted under BOE terms (not stated on the extract)
+    checked: '2026-10-10'
+  examples:
+  - Growers -> labour hire company -> sub-contractor -> 'team leader' paying workers in cash.
+  cases: []
+  data_needed:
+  - Contract (authority, contractor)
+  - ContractAward
+  - Company
+  - Employment
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Company registry
+  - Labour hire licence registers
+  levels:
+    faint: Work passes from the contractor to a first or second subcontractor, which the law allows, but
+      the chain is getting longer.
+    strong: 'Work reaches a third-level subcontractor, the last tier that may hold the work. Also strong:
+      a labour-only subcontractor appears anywhere in the chain.'
+    textbook: A third-level subcontractor (or a self-employed worker, or a labour-only subcontractor)
+      passes the work on again. That breaks the published limit on chain length.
+    threshold_source: https://www.boe.es/buscar/act.php?id=BOE-A-2006-18205
+    threshold_note: The pattern counts layers in the chain. The only published numeric cap found is Spain's
+      construction-sector law, which ends the chain at the third subcontractor. The catalogue's own Australian
+      source (FWO Harvest Trail Inquiry) says multiple levels raise the risk but gives no number. Apply
+      this as a benchmark outside Spanish construction, not as a legal limit.
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Specialist subcontracting is normal in construction and facilities services.
+  - Seasonal surges handled through licensed labour hire.
+  jurisdictions: Australia; general
+  version: 2
+- id: LE-034
+  name: Contract price too low to pay legal wages
+  definition: The price a client pays a labour supplier (for example a fixed per-room cleaning rate, or
+    a quote below market) is too low to cover lawful wages for the work required.
+  areas:
+  - LE
+  typology: Pricing pressure
+  status: verified
+  sources:
+  - title: What is phoenix activity
+    publisher: Australian Taxation Office
+    url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+    locator: Warning signs for businesses and creditors
+    quote: quotes that are lower than market value
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.15, Remediation and longer-term action
+    quote: Renegotiate a rate for a target number of rooms so compliance is achievable.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Contract pays $X per room; at award rates a cleaner would need more time per room than the price allows.
+  cases: []
+  data_needed:
+  - Contract (amount)
+  - ContractAward
+  - Company
+  - Document (tender documents, award rates)
+  checkable: lookups
+  lookup_sources:
+  - Award pay rates
+  - Public procurement records (for government contracts)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Below-market quotes on public contracts can also indicate bid rigging or collusive tendering;
+      the ATO lists below-market quotes as a phoenix warning sign.
+    source_url: https://www.ato.gov.au/about-ato/tax-avoidance/the-fight-against-tax-crime/our-focus/phoenix-activity/what-is-phoenix-activity
+  innocent_explanations:
+  - Supplier has genuine efficiencies (equipment, scale).
+  - Loss-leading bid to win a client.
+  jurisdictions: General
+  version: 1
+- id: LE-035
+  name: Unlicensed labour hire provider
+  definition: A labour hire firm supplies workers in a state that requires labour hire licensing but holds
+    no licence, or a host uses such a firm.
+  areas:
+  - LE
+  typology: Regulatory breach
+  status: verified
+  sources:
+  - title: Labour Hire Authority (Victoria) home page
+    publisher: Labour Hire Authority, Victoria
+    url: https://labourhireauthority.vic.gov.au/
+    locator: Home page
+    quote: Hosts must only work with licensed providers.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.11, referral table
+    quote: Four states in Australia have labour hire regulation with varying responsibility for licencing,
+      compliance and enforcement.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Labour supplier name absent from the state licence register.
+  cases: []
+  data_needed:
+  - Company (registrationNumber)
+  - Contract
+  - Document (licence register entry)
+  checkable: lookups
+  lookup_sources:
+  - State labour hire licence registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Provider supplies labour in a licensing state without a current licence.
+    threshold_source: https://labourhireauthority.vic.gov.au/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licence held under a different trading name.
+  - Arrangement is not 'labour hire' under the Act (e.g. genuine outsourced service).
+  jurisdictions: Australia (VIC, QLD, SA, ACT)
+  version: 1
+- id: LE-036
+  name: Piece rates paid without a written piecework agreement
+  definition: Workers (often harvest workers) are paid per bin or per kilo without the signed written
+    agreement the award requires, and may earn below the minimum.
+  areas:
+  - LE
+  typology: Underpayment (piece rates)
+  status: verified
+  sources:
+  - title: Harvest Trail Inquiry report
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2018'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    locator: p.23
+    quote: a piecework agreement must be in writing and signed by the employer and the employee
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Harvest Trail Inquiry report
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2018'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    locator: p.29, Finding 2
+    quote: over 100 of those employers were not engaging pieceworkers correctly
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pickers paid per bin with no signed agreement and no hours recorded.
+  cases:
+  - name: Fair Work Ombudsman Harvest Trail Inquiry
+    year: '2018'
+    jurisdiction: Australia
+    what_happened: Inquiry found non-compliance in 55.6% (465) of investigations in the horticulture sector,
+      including piecework misuse, record-keeping failures, cash pay and labour hire contractors that were
+      later deregistered.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    source_title: Harvest Trail Inquiry report
+  data_needed:
+  - Contract
+  - Document (piecework agreements, output records)
+  - Payment
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Horticulture Award
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Piece rates paid with no written, signed piecework agreement.
+    threshold_source: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agreement exists but was not produced.
+  - Piece rates under a different instrument with different rules.
+  jurisdictions: Australia (Horticulture Award)
+  version: 1
+- id: LE-037
+  name: Workers made to use and pay for the employer's transport or accommodation
+  definition: Workers are required to use transport or housing chosen by the employer or contractor and
+    charged for it, sometimes in cash in advance.
+  areas:
+  - LE
+  typology: Dependency and charges
+  status: verified
+  sources:
+  - title: Harvest Trail Inquiry report
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2018'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/1461/fair-work-ombudsman-harvest-trail-inquiry-report.pdf
+    locator: p.41
+    quote: requiring workers to use specific transport providers between accommodation and the work site
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Spot the signs (modern slavery)
+    publisher: Gangmasters and Labour Abuse Authority (UK)
+    year: '2020'
+    url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+    locator: Finances
+    quote: be charged for services they don't want or need
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Grower notice quoted in the inquiry: ''Please bring $150 for your rent to be paid in advance, please
+    bring cash.'' (HTI pp.41-42)'
+  cases: []
+  data_needed:
+  - Payment
+  - Address
+  - Person
+  - Company
+  - Document (notices, rental agreements)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: GLAA lists depending on the employer for work, transport and accommodation without any choice
+      as a sign of modern slavery.
+    source_url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+  innocent_explanations:
+  - Remote work sites where employer housing and transport are the only practical option, charged at fair
+    rates.
+  - Seasonal Worker schemes that allow approved, documented deductions.
+  jurisdictions: Australia, UK
+  version: 1
+- id: LE-038
+  name: False records produced for audits or inspectors
+  definition: The employer creates false rosters, time sheets or wage records to pass a client audit or
+    a labour inspection.
+  areas:
+  - LE
+  typology: Record falsification
+  status: verified
+  sources:
+  - title: A Report of the Fair Work Ombudsman's Inquiry into 7-Eleven
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2016'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+    locator: Executive summary, p.4
+    quote: instances where franchisees created false and misleading records to satisfy 7-Eleven's auditing
+      and payroll regime
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: A Report of the Fair Work Ombudsman's Inquiry into 7-Eleven
+    publisher: Fair Work Ombudsman (Australia)
+    year: '2016'
+    url: https://www.fairwork.gov.au/sites/default/files/migration/763/7-eleven-inquiry-report.pdf
+    locator: Section 5.1.4.2, p.36
+    quote: falsified rosters put up in store on weeks visits were expected
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Pay slips
+    publisher: Fair Work Ombudsman (Australia)
+    url: https://www.fairwork.gov.au/pay-and-wages/paying-wages/pay-slips
+    locator: False or misleading pay slips
+    quote: It's unlawful for employers to give pay slips that they know are false or misleading.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Rosters on the wall change only in weeks when audits are announced.
+  cases:
+  - name: Fair Work Ombudsman v Rubee Enterprises Pty Ltd and Fares Ghazale
+    year: '2017'
+    jurisdiction: Australia (Federal Circuit Court)
+    what_happened: Court found the employer knowingly provided false time-and-wages records to Fair Work
+      inspectors and did not issue pay slips.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fairwork.gov.au/newsroom/media-releases/2017-media-releases/february-2017/20170208-rubee-penalty
+    source_title: 'FWO media release: Record penalties of $532,000 in FWO cashback case'
+  - name: Village Concrete Inc.
+    year: '2024'
+    jurisdiction: US (E.D. Virginia)
+    what_happened: WHD found the company falsified records to suggest overtime had been paid; resolved
+      by consent judgment.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.dol.gov/newsroom/releases/whd/whd20240423
+    source_title: US Department of Labor news release, 23 April 2024
+  data_needed:
+  - Document (rosters, audit reports, versions of records)
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Records corrected after a genuine error was found.
+  - Draft and final rosters differ for operational reasons.
+  jurisdictions: Australia, US
+  version: 1
+- id: LE-039
+  name: Children employed in hazardous work or night shifts
+  definition: Minors are employed in work the law bans for their age, such as cleaning dangerous machinery
+    overnight, often through a contractor, sometimes after age warnings were ignored.
+  areas:
+  - LE
+  typology: Child labour (non-forced)
+  status: verified
+  sources:
+  - title: US Department of Labor news release on Packers Sanitation Services Inc. (PSSI)
+    publisher: US Department of Labor, Wage and Hour Division
+    year: '2023'
+    url: https://www.dol.gov/newsroom/releases/whd/whd20230217-1
+    locator: News release, 17 February 2023
+    quote: systems flagged some young workers as minors, but the company ignored the flags
+    quote_verified: true
+    licence: US federal government work
+    checked: '2026-10-09'
+  - title: 'Fact Sheet #43: Child Labor Provisions of the Fair Labor Standards Act (FLSA) for Nonagricultural
+      Occupations'
+    publisher: US Department of Labor, Wage and Hour Division
+    year: '2016'
+    url: https://www.dol.gov/agencies/whd/fact-sheets/43-child-labor-non-agriculture
+    locator: Age requirements section; hours limits for 14- and 15-year-olds listed under Child Labor
+      Regulation No. 3 (29 C.F.R. 570.35)
+    quote: no one under 18 may be employed in any occupation the Secretary of Labor has declared to be
+      hazardous.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-10'
+  examples:
+  - At least 102 minors aged 13 to 17 cleaning slaughterhouse equipment on overnight shifts at 13 plants
+    in 8 states.
+  cases:
+  - name: Packers Sanitation Services Inc. (PSSI)
+    year: '2023'
+    jurisdiction: US (8 states)
+    what_happened: WHD found at least 102 minors employed in hazardous occupations at 13 meat processing
+      plants; the company paid $1,544,076 in civil money penalties after a December 2022 consent order.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.dol.gov/newsroom/releases/whd/whd20230217-1
+    source_title: US Department of Labor news release, 17 February 2023
+  data_needed:
+  - Person (birthDate)
+  - Employment (employer, employee, role)
+  - Contract (sanitation contractor and plant owner)
+  - Company
+  - Document (HR records, ID documents)
+  checkable: records
+  lookup_sources:
+  - School enrolment records (by a person)
+  - Contract records between plant owners and sanitation contractors
+  levels:
+    faint: 'A 14- or 15-year-old works outside the permitted window: before 7 a.m. or after 7 p.m. (after
+      9 p.m. between June 1 and Labor Day), or more than 3 hours on a school day.'
+    strong: A worker under 18 is employed by or through a contractor on night shifts or around dangerous
+      machinery.
+    textbook: A worker under 18 is employed in an occupation the Secretary of Labor has declared hazardous
+      (US FLSA).
+    threshold_source: https://www.dol.gov/agencies/whd/fact-sheets/43-child-labor-non-agriculture
+    threshold_note: 'Countable by worker age and hours worked. The same fact sheet gives the hours for
+      14- and 15-year-olds: ''between 7 a.m. and 7 p.m.—except between June 1 and Labor day when the evening
+      hour is extended to 9 p.m.''; ''no more than 3 hours on a school day''; ''no more than 18 hours
+      during a week when school is in session''. US federal law only; state laws may be stricter. Text
+      was read through a page summary tool, so check the exact wording on the page before publishing.'
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Unaccompanied migrant children working in hazardous jobs can also be trafficking victims;
+      check HT indicators.
+    source_url: https://www.dol.gov/newsroom/releases/whd/whd20230217-1
+  innocent_explanations:
+  - Worker presented false adult identity documents.
+  - Age rules differ by job and jurisdiction; some youth work is lawful.
+  jurisdictions: US (FLSA child labor provisions); general
+  version: 2
+- id: LE-040
+  name: No written contract and no say over conditions
+  definition: Workers have no employment contract and cannot negotiate their pay, hours or where they
+    work.
+  areas:
+  - LE
+  typology: Vulnerability
+  status: verified
+  sources:
+  - title: Spot the signs (modern slavery)
+    publisher: Gangmasters and Labour Abuse Authority (UK)
+    year: '2020'
+    url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+    locator: Working conditions
+    quote: be unable to negotiate working conditions
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Spot the signs (modern slavery)
+    publisher: Gangmasters and Labour Abuse Authority (UK)
+    year: '2020'
+    url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+    locator: Working conditions
+    quote: have no contract
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Worker hired by text message, never given terms in writing.
+  cases: []
+  data_needed:
+  - Employment
+  - Contract
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: GLAA lists these as signs of modern slavery; the line between exploitation and forced labour
+      is crossed when threats or coercion are added.
+    source_url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+  innocent_explanations:
+  - Many lawful casual jobs have only verbal agreements.
+  - Low-skill roles commonly have fixed terms set by awards.
+  jurisdictions: UK, general
+  version: 1
+- id: LE-041
+  name: Wages paid into an account controlled by someone else
+  definition: A worker's pay goes into a bank account others use, or someone else holds their bank card.
+  areas:
+  - LE
+  typology: Financial control
+  status: verified
+  sources:
+  - title: Spot the signs (modern slavery)
+    publisher: Gangmasters and Labour Abuse Authority (UK)
+    year: '2020'
+    url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+    locator: Finances
+    quote: have wages paid into an account used by other people
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Spot the signs (modern slavery)
+    publisher: Gangmasters and Labour Abuse Authority (UK)
+    year: '2020'
+    url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+    locator: Finances
+    quote: have bank cards/documents held by someone else
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Several workers' wages go into accounts sharing one address and one phone number.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment (beneficiaryAccount)
+  - Person
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Control of a worker's earnings is a GLAA modern-slavery sign and points to trafficking or
+      debt bondage.
+    source_url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+  - target_area: ML
+    reason: Multiple accounts controlled by one third party can be money-mule or funnel accounts.
+    source_url: https://www.gla.gov.uk/media/6093/spot-the-signs-glaa-18082020.pdf
+  innocent_explanations:
+  - Joint account with a spouse or family member.
+  - Worker without a bank account using a relative's account temporarily.
+  jurisdictions: UK, general
+  version: 1
+- id: LE-042
+  name: Visa holders working beyond permitted hours or fearing visa loss
+  definition: Temporary visa holders work more hours than their visa allows, or are threatened with loss
+    of visa support, which makes them afraid to complain.
+  areas:
+  - LE
+  typology: Vulnerability / leverage
+  status: verified
+  sources:
+  - title: UK Labour Market Enforcement Strategy 2022 to 2023
+    publisher: Director of Labour Market Enforcement (UK Government)
+    year: '2023'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1143364/uk-labour-market-enforcement-strategy-2022-2023.pdf
+    locator: Section 2.4.4.3, p.18
+    quote: Workers on student visas have been found to be working substantially in excess of their permitted
+      hours and being exploited
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.10, Verify
+    quote: Many migrants on temporary visas fear that reporting workplace issues will cost them their
+      job or visa.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Rubee case: employer threatened to withdraw visa support if workers refused to hand back wages (FWO
+    2017 release).'
+  cases:
+  - name: Fair Work Ombudsman v Rubee Enterprises Pty Ltd and Fares Ghazale
+    year: '2017'
+    jurisdiction: Australia (Federal Circuit Court)
+    what_happened: Court found the employer threatened to withdraw visa support if workers refused the
+      cashback scheme.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fairwork.gov.au/newsroom/media-releases/2017-media-releases/february-2017/20170208-rubee-penalty
+    source_title: 'FWO media release: Record penalties of $532,000 in FWO cashback case'
+  data_needed:
+  - Person (nationality)
+  - Passport
+  - Employment
+  - Document (rosters)
+  checkable: person
+  lookup_sources:
+  - Visa conditions (from the worker)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: The guidance asks whether migrant workers are exploited due to immigration dependence, a step
+      toward modern slavery.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - Visa holder working lawful extra hours during permitted holiday periods.
+  - Worker chooses extra hours for income without any employer pressure.
+  jurisdictions: UK, Australia
+  version: 1
+- id: LE-043
+  name: 'Severe underpayment: the further below minimum, the higher the forced-labour risk'
+  definition: Pay far below the legal minimum, which research links to more forced-labour indicators,
+    so it should trigger a deeper check.
+  areas:
+  - LE
+  typology: Escalation marker
+  status: verified
+  sources:
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.1, Introduction
+    quote: The more severely a worker is underpaid, the more likely they are to report indicators of forced
+      labour, as defined by the International Labour Organization.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Off the Books: Practical Guidance for Business'
+    publisher: Migrant Justice Institute, Walk Free and the Office of the Australian Anti-Slavery Commissioner
+    year: '2026'
+    url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+    locator: p.1, Introduction
+    quote: Underpayment should be treated as a signal that deeper harm could be taking place.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Wage theft 2021-23
+    publisher: Economic Policy Institute (Margaret Poydock and Jiayi Zhang)
+    year: '2024'
+    url: https://www.epi.org/publication/wage-theft-2021-23/
+    locator: Definition
+    quote: Wage theft is the failure to pay workers the full wages to which they are legally entitled.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Survey: two thirds of temporary migrant employees were underpaid; one in four by at least $10 per
+    hour (OTB p.1).'
+  cases: []
+  data_needed:
+  - Payment
+  - Employment
+  - Document (pay slips, award rates)
+  checkable: lookups
+  lookup_sources:
+  - Minimum wage and award rate tables
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Pay below the applicable legal minimum; the source's survey chart groups underpayment in
+      bands of $1-5, $6-10, $11-15, $16-20 and $21+ per hour below individual minimum entitlements, with
+      forced-labour indicators rising across the bands (no single cut-off is set).
+    threshold_source: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: The source shows forced-labour indicators (long hours with no breaks, unsafe conditions, being
+      unable to leave, deception) rise as underpayment deepens.
+    source_url: https://cdn.walkfree.org/content/uploads/2026/08/06115628/GD551-off-the-books-guidance_DIGITAL_spreads.pdf
+  innocent_explanations:
+  - Calculation error about which award or classification applies.
+  - Worker is a genuine contractor or volunteer where minimums do not apply.
+  jurisdictions: Australia; general
+  version: 1
+- id: LE-044
+  name: Labour relations consultant active in an organising campaign, but no LM-10 or LM-20 on file
+  definition: An employer brings in an outside consultant or law firm to run or shape its response to
+    a union drive, yet neither the employer (Form LM-10) nor the consultant (Form LM-20) has filed the
+    disclosure the federal law requires.
+  areas:
+  - LE
+  typology: Undisclosed persuader activity
+  status: verified
+  sources:
+  - title: 'OLMS Newsletter 01-16: Persuader Rule'
+    publisher: US Department of Labor, Office of Labor-Management Standards
+    year: '2016'
+    url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+    locator: Persuader rule summary
+    quote: agrees to manage a campaign or program to avoid or counter a union organizing
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 433 (LMRDA section 203), Report of employers
+    publisher: Legal Information Institute, Cornell Law School (text of US Code)
+    url: https://www.law.cornell.edu/uscode/text/29/433
+    locator: Section 203(a)(4) and 203(b)
+    quote: any agreement or arrangement with a labor relations consultant or other independent contractor
+      or organization
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 CFR Part 406, Reporting by labor relations consultants and other persons
+    publisher: US Government, Electronic Code of Federal Regulations
+    url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-406
+    locator: 406.2(a)
+    quote: The report shall be filed within 30 days after entering into an agreement or arrangement of
+      the type described in this section.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 CFR Part 405, Employer reports
+    publisher: US Government, Electronic Code of Federal Regulations
+    url: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-405
+    locator: '405.2'
+    quote: within 90 days after the end of each of its fiscal years, a report signed by its president
+      and treasurer
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'No Holds Barred: The Intensification of Employer Opposition to Organizing (EPI Briefing Paper
+      235)'
+    publisher: Economic Policy Institute (Kate Bronfenbrenner, Cornell University)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: Table 3, p. 10
+    quote: Hired management consultant 75%
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Workers report meetings run by outside 'labor relations' speakers, but the OLMS online disclosure
+    search shows no LM-20 naming the employer.
+  - An employer's LM-10 is absent for the fiscal year in which a union election took place and a law firm
+    was publicly described as advising on the campaign.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Organization
+  - Contract
+  - Payment
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - OLMS Online Public Disclosure Room (LM-10, LM-20, LM-21 filings)
+  - NLRB case search (election petitions and dates)
+  - Worker testimony or campaign materials naming the consultant
+  levels:
+    faint: A consultant is named in campaign materials or worker accounts; filing status not yet checked
+    strong: Filings checked and no LM-20 found more than 30 days after the consultant was engaged, or
+      no LM-10 more than 90 days after the employer's fiscal year end
+    textbook: A persuader agreement exists (consultant undertook activities to persuade employees) and
+      no LM-20 was filed within 30 days and/or no LM-10 within 90 days after fiscal year end
+    threshold_source: https://www.ecfr.gov/current/title-29/subtitle-B/chapter-II/subchapter-A/part-406
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Persuader reporting is a disclosure regime for paid third-party influence, comparable to lobbying
+      registration gaps.
+    source_url: https://www.law.cornell.edu/uscode/text/29/433
+  innocent_explanations:
+  - The consultant only gave advice to the employer, which is exempt from reporting under section 203(c).
+  - The filing exists but under a different name of the employer, a parent company or the law firm's legal
+    name.
+  - The engagement began recently and the 30-day or 90-day filing window has not closed.
+  - The scope of reportable 'indirect' persuasion changed with the 2016 rule; its later status was not
+    verified here and must be checked before treating an omission as a breach.
+  jurisdictions: United States (LMRDA, federal private sector)
+  version: 1
+- id: LE-045
+  name: Consultant directs supervisors, scripts communications or sets personnel policies behind the scenes
+  definition: An outside consultant never speaks to workers directly but plans what supervisors say and
+    do, writes the anti-union materials handed to staff, runs union-avoidance seminars for managers, or
+    designs personnel actions aimed at defeating the union.
+  areas:
+  - LE
+  typology: Undisclosed persuader activity
+  status: verified
+  sources:
+  - title: 'OLMS Newsletter 01-16: Persuader Rule'
+    publisher: US Department of Labor, Office of Labor-Management Standards
+    year: '2016'
+    url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+    locator: Reportable activities (a)-(d)
+    quote: planning, directing, or coordinating activities undertaken by supervisors or other employer
+      representatives
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'OLMS Newsletter 01-16: Persuader Rule'
+    publisher: US Department of Labor, Office of Labor-Management Standards
+    year: '2016'
+    url: https://www.dol.gov/agencies/olms/about/newsletter/2016/1
+    locator: Reportable activities (b)-(c)
+    quote: conducting a union avoidance seminar for supervisors or other employer representatives
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: Seventy-seven percent hold supervisory one-on-ones, and two-thirds hold them at least weekly
+      throughout the campaign.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Supervisors read near-identical talking points across many sites during the same week.
+  - Leaflets distributed to staff carry a consultant's document metadata or template layout.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Employment
+  - Document
+  - Event
+  - Contract
+  checkable: records
+  lookup_sources:
+  - Leaked or disclosed campaign materials
+  - LM-20 'description of activities' fields
+  - NLRB hearing transcripts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary HR training on lawful communication during campaigns is common.
+  - Supervisors may share materials drafted in-house by the company's own staff, which is not consultant
+    persuasion.
+  - Whether indirect persuasion is reportable depends on the interpretation in force; the 2016 rule's
+    later status was not verified here.
+  jurisdictions: United States
+  version: 1
+- id: LE-046
+  name: Employer pays employees or an employee committee to campaign against the union or report on co-workers
+  definition: Money or favours go to particular workers, or to a worker group, so that they persuade colleagues
+    against organising or pass on information about union activity.
+  areas:
+  - LE
+  typology: Undisclosed persuader activity
+  status: verified
+  sources:
+  - title: 29 U.S.C. 433 (LMRDA section 203)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/433
+    locator: Section 203(a)(2)
+    quote: any payment (including reimbursed expenses) to any of his employees, or any group or committee
+      of such employees
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: assisting the establishment of an anti-union committee (30% of the campaigns)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An 'employee voice committee' formed during the drive whose members receive paid time, bonuses or
+    expenses.
+  - Payments to particular staff appear on payroll or expense records only during the campaign period.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - LM-10 (employer report of payments to employees)
+  - Payroll and expense records
+  - Worker testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary wages and expenses for regular work are not reportable payments.
+  - Staff committees on safety or social events exist in many workplaces for reasons unrelated to unions.
+  - Section 203(a)(2) excludes payments made with prior disclosure to the other employees, so a disclosed
+    arrangement may be lawful.
+  jurisdictions: United States
+  version: 1
+- id: LE-047
+  name: Surveillance of union activity, or creating the impression of it
+  definition: The employer watches, records, photographs or hires others to gather information on workers'
+    union activity, or acts in ways that make workers believe they are being watched.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Create the impression that you are spying on employees' union activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Photograph or videotape employees engaged in peaceful union or other protected activities.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 433 (LMRDA section 203)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/433
+    locator: Section 203(a)(3)
+    quote: any expenditure, during the fiscal year, where an object thereof, directly or indirectly, is
+      to
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: In addition to interrogation, 14% of employers use surveillance, primarily electronic (11%)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'No Holds Barred, EPI 2019 follow-up: Unlawful'
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: Employers are charged with making threats, engaging in surveillance activities, or harassing
+      workers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Managers photograph staff handing out leaflets in the car park.
+  - A supervisor tells a worker the names of people who attended an off-site union meeting.
+  - Payments to an investigations firm during a campaign period.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Organization
+  - Payment
+  - Contract
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - NLRB charges and decisions
+  - LM-10 (expenditures to obtain information on employees)
+  - Worker testimony, photos, internal emails
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Routine security cameras and IT monitoring that existed before the campaign and were not focused on
+    union activity.
+  - Managers who happen to be present in public areas during union events.
+  - Workers may voluntarily tell managers about union activity without being asked.
+  jurisdictions: United States (NLRA); ILO freedom-of-association principles not reached
+  version: 1
+- id: LE-048
+  name: Coercive questioning, one-on-one interrogation or pressure to appear in campaign videos
+  definition: Managers question workers about their own or colleagues' union views, often in one-on-one
+    meetings, or ask individuals to appear in anti-union campaign material.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Coercively question employees about their own or coworkers' union activities or sympathies.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Solicit individual employees to appear in a campaign video.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 2
+    quote: In 63% of elections employers used supervisor one-on-one meetings to interrogate workers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Workers called individually into an office and asked how they plan to vote.
+  - Staff asked by managers to film testimonials against the union.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Document
+  - Note
+  checkable: person
+  lookup_sources:
+  - Worker interviews
+  - NLRB complaints and decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Casual, non-coercive conversation about the union between friendly colleagues and a supervisor.
+  - Lawful interviews to prepare a legal defence, when the required assurances are given.
+  - Ordinary performance one-on-ones that do not touch on union views.
+  jurisdictions: United States
+  version: 1
+- id: LE-049
+  name: Threats of closure, job loss, or cuts to wages and benefits if workers unionise
+  definition: Workers are told or shown that the workplace may close, jobs may go, or pay and benefits
+    may be cut if they choose a union.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Threaten employees with adverse consequences, such as closing the workplace,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: Fifty-seven percent of employers make plant closing threats.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: 47% threaten wage or benefit cuts
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 158(c) (NLRA section 8(c))
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/158
+    locator: Section 8(c)
+    quote: if such expression contains no threat of reprisal or force or promise of benefit
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A slide in a staff meeting showing a closed site 'that unionised'.
+  - Manager tells workers bonuses will end if the union wins.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Worker interviews and recordings
+  - Campaign leaflets and slides
+  - NLRB charges and decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Employers may lawfully state views and opinions that contain no threat or promise (section 8(c)).
+  - A genuine, objectively based prediction of economic consequences beyond the employer's control may
+    be lawful.
+  - A closure may be planned for business reasons unrelated to the union.
+  jurisdictions: United States
+  version: 1
+- id: LE-050
+  name: Threats to report workers to immigration authorities during an organising campaign
+  definition: Workers, often migrants, are warned that supporting the union could lead to their being
+    reported to immigration enforcement.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: employers make threats of referral to Immigration Customs and Enforcement (ICE)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Threaten employees with adverse consequences if they engage in protected, concerted activity.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sudden demands for re-verification of work documents only for workers known to back the union.
+  - Supervisors mention immigration status in the same meeting as the union vote.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Worker interviews
+  - NLRB charges
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Fear of visa or status loss is already an LE warning sign (LE-042); immigration threats in
+      campaigns use the same leverage.
+    source_url: https://files.epi.org/page/-/pdf/bp235.pdf
+  innocent_explanations:
+  - Routine, scheduled employment-eligibility checks applied to all staff regardless of union activity.
+  - A government audit initiated independently of the employer.
+  jurisdictions: United States
+  version: 1
+- id: LE-051
+  name: Promises, raises, bonuses or solicited grievances during the campaign
+  definition: During an organising drive the employer promises or hands out new benefits, unscheduled
+    pay rises or favours, or invites complaints with an implied promise to fix them, to win votes against
+    the union.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Imply a promise of benefits by soliciting grievances from employees during a union organizing
+      campaign.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Confer benefits on employees during a union organizing campaign to induce employees to vote
+      against the union.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: Table 3, p. 11; p. 12
+    quote: bribes and special favors (22%)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A pay rise announced weeks after an election petition, outside the usual pay-review cycle.
+  - '''Open-door'' listening sessions launched only after the union filed.'
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Payment
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Pay history and announcement dates compared with NLRB petition date
+  - Internal memos
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The rise or benefit was decided and scheduled before the campaign began.
+  - Industry-wide wage pressure or a statutory minimum-wage increase.
+  - Regular staff surveys that pre-date the campaign.
+  jurisdictions: United States
+  version: 1
+- id: LE-052
+  name: Scheduled raises or benefit changes withheld and blamed on the union
+  definition: A pay rise or benefit change that would normally have happened is held back during the campaign,
+    without a clear assurance it will come whatever the outcome.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Withhold changes in wages or benefits during a union organizing campaign that would have been
+      made had the union not been on the scene, unless you make clear to employees that the change will
+      occur whether or not they select the union
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 15
+    quote: alterations in benefits or working conditions have increased from 17% to 22%
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Annual raise given at other non-union sites but not at the site with a pending election.
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Payment
+  - Event
+  checkable: records
+  lookup_sources:
+  - Pay records across sites
+  - Company announcements
+  - NLRB charges
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Company-wide pay freeze for financial reasons applied equally to all sites.
+  - Employer gave a clear assurance that the change will happen regardless of the vote.
+  jurisdictions: United States
+  version: 1
+- id: LE-053
+  name: Mandatory anti-union 'captive audience' meetings
+  definition: Workers are required, under threat of discipline, to attend meetings where management argues
+    against the union.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Board Rules Captive-Audience Meetings Unlawful (Amazon.com Services LLC)
+    publisher: National Labor Relations Board
+    year: '2024'
+    url: https://www.nlrb.gov/news-outreach/news-story/board-rules-captive-audience-meetings-unlawful
+    locator: News release, 13 November 2024
+    quote: an employer violates the National Labor Relations Act by requiring employees under threat of
+      discipline or discharge
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 12
+    quote: Nearly 90% of employers use captive audience meetings, holding on average 10.4 meetings a year.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rota shows compulsory 'information sessions' about the union with attendance taken.
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Employment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Rotas and attendance sheets
+  - Meeting invitations
+  - NLRB decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Meetings where staff are told in advance attendance is voluntary, with no penalty and no attendance
+    records, remained permitted under the 2024 decision.
+  - Routine mandatory staff meetings on operations or safety.
+  - The 2024 rule applies prospectively only, and a later Board may revisit it; current status was not
+    verified here.
+  jurisdictions: United States
+  version: 1
+- id: LE-054
+  name: Union supporters fired, disciplined, demoted or laid off
+  definition: Workers active in the organising effort lose their jobs, are disciplined, suspended, demoted
+    or not recalled, in a pattern that tracks their union activity.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Discriminating against employees because of their union activities (Section 8(a)(3))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+    locator: Examples
+    quote: employers may not discharge, lay off, or discipline employees
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Unlawful: U.S. employers are charged with violating federal law in 41.5% of all union election
+      campaigns'
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: one out of five union election campaigns involves a charge that a worker was illegally fired
+      for union activity.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 2
+    quote: employers threatened to close the plant in 57% of elections, discharged workers in 34%
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Starbucks Corp. v. McKinney, 602 U.S. (2024)
+    publisher: Supreme Court of the United States (via Legal Information Institute)
+    year: '2024'
+    url: https://www.law.cornell.edu/supremecourt/text/23-367
+    locator: Opinion, facts
+    quote: Starbucks ultimately fired multiple employees involved with the media event for violating company
+      policy.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Organising committee members dismissed for minor policy breaches soon after going public.
+  - Discipline records show a jump for named union supporters after the petition date.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - NLRB case search (8(a)(3) charges, complaints, decisions)
+  - Court records for 10(j) injunctions
+  - Discipline and termination records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Retaliation for raising concerns about pay overlaps with retaliation for union activity.
+    source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+  innocent_explanations:
+  - Genuine misconduct or performance problems that would have led to the same action regardless of union
+    activity.
+  - Layoffs driven by documented business downturns applied to all staff.
+  - Coincidental timing; NLRB charges are allegations until decided.
+  jurisdictions: United States
+  version: 1
+- id: LE-055
+  name: Retaliation against workers who file charges or testify
+  definition: Workers who file, plan to file, or are suspected of filing a charge with the labour board,
+    or who give evidence, are punished.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Discriminating against employees for NLRB activity (Section 8(a)(4))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-for-nlrb-activity-section-8a4
+    locator: Examples
+    quote: Discharge or otherwise discriminate against employees for announcing an intent to file a charge,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 158(a)(4)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/158
+    locator: Section 8(a)(4)
+    quote: to discharge or otherwise discriminate against an employee because he has filed charges
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Worker named as a witness in an NLRB hearing is moved to worse shifts the following week.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - NLRB case dockets
+  - Rota and discipline records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Action taken for documented reasons unrelated to the charge.
+  - Changes applied across a whole team, not only to the witness.
+  jurisdictions: United States
+  version: 1
+- id: LE-056
+  name: Rules that ban union talk, insignia or off-duty access
+  definition: The employer introduces or enforces rules that stop workers discussing the union at work
+    while other non-work talk is allowed, bans union buttons or shirts, or bars off-duty workers from
+    outdoor non-working areas.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Prohibit employees from wearing union buttons, t-shirts, and other union insignia unless special
+      circumstances warrant.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Deny off-duty employees access to outside nonworking areas of your property, unless business
+      reasons justify it.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A new dress-code memo issued days after union pins appear.
+  - Handbook revised during the drive to forbid 'solicitation' on breaks.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Employee handbooks and their revision dates
+  - NLRB decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine safety or customer-contact uniform rules ('special circumstances').
+  - Neutral rules on solicitation during working time that apply to all topics.
+  - Security reasons for restricting site access.
+  jurisdictions: United States
+  version: 1
+- id: LE-057
+  name: Messaging that choosing a union is futile
+  definition: Workers are told that voting for a union will change nothing, for example that the company
+    will never agree to anything.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Convey the message that selecting a union would be futile.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Leaflet saying bargaining will 'start from zero' and the company will never sign.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Company
+  checkable: records
+  lookup_sources:
+  - Campaign materials
+  - NLRB decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accurate statements that bargaining outcomes are not guaranteed and can go either way are lawful opinion.
+  jurisdictions: United States
+  version: 1
+- id: LE-058
+  name: Polling workers on union support without safeguards
+  definition: The employer surveys or polls staff about union support without a lawful purpose, assurances
+    against reprisal and a secret ballot.
+  areas:
+  - LE
+  typology: Coercion during organising
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Poll your employees to determine the extent of their support for a union, unless you comply
+      with certain safeguards.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A named, non-anonymous online survey asking whether staff want 'third-party representation'.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Company
+  checkable: records
+  lookup_sources:
+  - Survey copies
+  - Worker testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Anonymous engagement surveys run for years that do not ask about union support.
+  - Polls run with the required safeguards.
+  jurisdictions: United States
+  version: 1
+- id: LE-059
+  name: Employer-backed decertification petition
+  definition: Management starts, solicits signatures for, or gives more than minimal support to a petition
+    to remove an existing union.
+  areas:
+  - LE
+  typology: Interference with representation
+  status: verified
+  sources:
+  - title: Interfering with employee rights (Section 7 & 8(a)(1))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-employee-rights-section-7-8a1
+    locator: Examples of employer conduct
+    quote: Initiate, solicit employees to sign, or lend more than minimal support to or approval of a
+      decertification
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Decertification petition circulated on company time by supervisors or drafted with the employer's
+    lawyers.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - CourtCase
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - NLRB case search (RD decertification petitions)
+  - Worker testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Workers genuinely dissatisfied with their union may file on their own initiative.
+  - Employers may give minimal, ministerial information when asked.
+  jurisdictions: United States
+  version: 1
+- id: LE-060
+  name: Company-dominated committee or favoured union
+  definition: The employer sets up, controls or supports a workers' body or a preferred union, or recognises
+    a minority union, to head off an independent one.
+  areas:
+  - LE
+  typology: Interference with representation
+  status: verified
+  sources:
+  - title: 29 U.S.C. 158(a)(2)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/158
+    locator: Section 8(a)(2)
+    quote: to dominate or interfere with the formation or administration of any labor organization
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with or dominating a union (Section 8(a)(2))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-or-dominating-a-union-section-8a2
+    locator: Examples
+    quote: Recognize, bargain with, or execute an agreement with a minority union
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Interfering with or dominating a union (Section 8(a)(2))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/interfering-with-or-dominating-a-union-section-8a2
+    locator: Examples
+    quote: Recognize a union after you are notified that another union has filed a valid election petition.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A 'workers' council' launched during a drive, with members picked by management and meeting on company
+    premises.
+  - Quick recognition of a little-known union days after a rival files for an election.
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Person
+  - Payment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - NLRB case search
+  - LM-2/LM-3 union filings (OLMS) for the favoured organisation
+  - Committee minutes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful employee involvement groups dealing with production or quality, not wages and conditions.
+  - Voluntary recognition of a union with proven majority support and no rival petition.
+  jurisdictions: United States
+  version: 1
+- id: LE-061
+  name: Closing, relocating or transferring work to escape the union
+  definition: The employer shuts a site, moves work to another site or contractor, or reassigns work in
+    order to avoid its obligations to unionised staff or to scare workers at other sites.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Discriminating against employees because of their union activities (Section 8(a)(3))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+    locator: Examples
+    quote: Transfer work (e.g., to another plant or other employees) in order to avoid your obligations
+      under the Act.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Discriminating against employees because of their union activities (Section 8(a)(3))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+    locator: Examples
+    quote: Close one of your facilities, if your motive is to chill unionism at any remaining facility
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The first store in a chain to unionise closes within months, while nearby non-union stores stay open.
+  - Work at a unionised depot moved to a newly formed subcontractor.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Event
+  - Contract
+  - Ownership
+  - Document
+  checkable: records
+  lookup_sources:
+  - Site opening and closure records
+  - WARN Act notices
+  - Corporate registries for new entities
+  - NLRB decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: LE
+    reason: Transferring work to new entities or contractors can be checked with the same company-registry
+      methods.
+    source_url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+  innocent_explanations:
+  - Documented loss-making site or lease expiry decided before the union drive.
+  - Restructuring applied equally to union and non-union sites.
+  jurisdictions: United States
+  version: 1
+- id: LE-062
+  name: Refusing to hire job applicants because of union ties
+  definition: Applicants are turned down or not considered because of their union membership, history
+    or sympathies.
+  areas:
+  - LE
+  typology: Retaliation
+  status: verified
+  sources:
+  - title: Discriminating against employees because of their union activities (Section 8(a)(3))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/discriminating-against-employees-because-of-their-union
+    locator: Examples
+    quote: Refuse to hire or consider job applicants because of their union membership, activities, or
+      sympathies.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - After a site changes hands, the new owner hires few or none of the previously unionised staff.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Employment
+  - Ownership
+  - Event
+  checkable: records
+  lookup_sources:
+  - Hiring records
+  - NLRB charges and decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Applicants rejected on neutral, documented qualifications.
+  - Reduced headcount needs after a change of owner.
+  jurisdictions: United States
+  version: 1
+- id: LE-063
+  name: Misconduct around the vote itself
+  definition: Around an NLRB election the employer gives a mass speech on company time within 24 hours
+    of voting, keeps a list of who has voted, electioneers at the polls, talks at length to people queuing
+    to vote, or alters an official Board notice.
+  areas:
+  - LE
+  typology: Election interference
+  status: verified
+  sources:
+  - title: Election-related content
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content
+    locator: Examples of objectionable conduct
+    quote: Make an election speech on company time to a massed assembly of employees within 24 hours of
+      the election.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Election-related content
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content-0
+    locator: Examples of objectionable conduct
+    quote: Keep a list of employees who have voted.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Election-related content
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content-0
+    locator: Examples of objectionable conduct
+    quote: Alter an official Board document to make it look like the Board favors a particular outcome.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Managers stand by the polling area talking to voters in the queue.
+  - Copies of the NLRB sample ballot marked 'No' distributed by management.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Person
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - NLRB election objections and hearing officer reports
+  - Worker photos and accounts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A mass speech on company time within 24 hours of the election, or any listed conduct, as
+      stated by the NLRB
+    threshold_source: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/election-related-content
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Voluntary off-the-clock meetings are treated differently from mass speeches on company time.
+  - Normal operational presence of managers in areas near the polling place.
+  jurisdictions: United States
+  version: 1
+- id: LE-064
+  name: Campaign misconduct serious enough to void the election
+  definition: After asking for an election the employer commits unfair labour practices that would require
+    the result to be set aside; under the 2023 Cemex standard the Board orders the employer to bargain
+    instead of rerunning the vote.
+  areas:
+  - LE
+  typology: Election interference
+  status: verified
+  sources:
+  - title: Board issues decision announcing new framework for union representation (Cemex)
+    publisher: National Labor Relations Board
+    year: '2023'
+    url: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+    locator: News release
+    quote: the Board will order the employer to recognize and bargain with the union.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Board issues decision announcing new framework for union representation (Cemex)
+    publisher: National Labor Relations Board
+    year: '2023'
+    url: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+    locator: News release
+    quote: if an employer who seeks an election commits any unfair labor practice that would require setting
+      aside the election
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Unlawful (EPI)
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: Employers are charged with violating federal law in 41.5% of all union election campaigns.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Many separate ULP findings between petition and vote, as in Cemex (more than 20 instances).
+  cases: []
+  data_needed:
+  - Company
+  - CourtCase
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - NLRB case search (C cases linked to R cases)
+  - NLRB Board decisions
+  levels:
+    faint: One or more ULP charges filed against the employer during the critical period
+    strong: Multiple charges or a regional complaint covering the campaign period
+    textbook: An unfair labour practice that would require setting aside the election, per the Cemex standard
+    threshold_source: https://www.nlrb.gov/news-outreach/news-story/board-issues-decision-announcing-new-framework-for-union-representation
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Charges are allegations; many are withdrawn, settled or dismissed.
+  - Unions may file charges tactically; count findings, not just filings.
+  - The Cemex framework may be revisited by a later Board; current status was not verified here.
+  jurisdictions: United States
+  version: 1
+- id: LE-065
+  name: Many unfair labour practice charges against the same employer
+  definition: An employer accumulates labour-board charges across sites or campaigns, a pattern that research
+    links to campaigns of employer opposition.
+  areas:
+  - LE
+  typology: Pattern of violations
+  status: verified
+  sources:
+  - title: Unlawful (EPI)
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: More than half (54.4%) of employers in elections involving more than 60 employees
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Unlawful (EPI)
+    publisher: Economic Policy Institute
+    year: '2019'
+    url: https://www.epi.org/publication/unlawful-employer-opposition-to-union-election-campaigns/
+    locator: Key findings
+    quote: illegally coercing, threatening, or retaliating against workers for supporting a union
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - NLRB case search shows charges against the same company filed by workers at dozens of locations in
+    the same year.
+  cases: []
+  data_needed:
+  - Company
+  - CourtCase
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - NLRB case search
+  - Court dockets for 10(j) injunction petitions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large employers with many sites attract more charges simply by size.
+  - Charges are allegations, not findings.
+  - Coordinated filing by a union campaign may raise counts.
+  jurisdictions: United States
+  version: 1
+- id: LE-066
+  name: No first contract long after the union wins
+  definition: Workers vote for a union but no first collective agreement follows for a year or more.
+  areas:
+  - LE
+  typology: Bargaining avoidance
+  status: verified
+  sources:
+  - title: No Holds Barred (EPI Briefing Paper 235)
+    publisher: Economic Policy Institute (Kate Bronfenbrenner)
+    year: '2009'
+    url: https://files.epi.org/page/-/pdf/bp235.pdf
+    locator: p. 3
+    quote: 52% are still without a contract a year later, and 37% are still without a contract two years
+      after an election.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Union certified at a site two years ago; bargaining sessions rare and no agreement signed.
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - CourtCase
+  - Event
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - NLRB certification dates
+  - Union and employer statements
+  - FMCS notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - First contracts genuinely take time; the published research shows long delays are common.
+  - Hard bargaining on both sides is lawful.
+  - Delay caused by pending legal challenges to certification.
+  jurisdictions: United States
+  version: 1
+- id: LE-067
+  name: 'Bad-faith bargaining: refusing to meet, withholding information, bypassing the union, unilateral
+    changes or withdrawing recognition'
+  definition: After a union is recognised, the employer stalls or undermines bargaining by not meeting,
+    refusing relevant information, dealing directly with workers, changing terms without bargaining, or
+    withdrawing recognition from a union with majority support.
+  areas:
+  - LE
+  typology: Bargaining avoidance
+  status: verified
+  sources:
+  - title: Bargaining in good faith with employees' union representative (Section 8(d) & 8(a)(5))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/bargaining-in-good-faith-with-employees-union-representative
+    locator: Examples
+    quote: Bypass the union and deal directly with employees.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Bargaining in good faith with employees' union representative (Section 8(d) & 8(a)(5))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/bargaining-in-good-faith-with-employees-union-representative
+    locator: Examples
+    quote: Refuse to furnish information the union requests that is relevant to the bargaining process
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Bargaining in good faith with employees' union representative (Section 8(d) & 8(a)(5))
+    publisher: National Labor Relations Board
+    url: https://www.nlrb.gov/about-nlrb/rights-we-protect/the-law/bargaining-in-good-faith-with-employees-union-representative
+    locator: Examples
+    quote: Withdraw recognition from a union that enjoys majority support.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 29 U.S.C. 158(a)(5)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/29/158
+    locator: Section 8(a)(5)
+    quote: to refuse to bargain collectively with the representatives of his employees
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bargaining sessions cancelled repeatedly; new benefits rolled out only at non-union sites; information
+    requests unanswered for months.
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - NLRB 8(a)(5) charges and decisions
+  - Bargaining session logs and correspondence
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Scheduling difficulties on both sides.
+  - Information requested is not relevant or is confidential and alternatives were offered.
+  - Withdrawal of recognition based on objective evidence that the union lost majority support.
+  jurisdictions: United States
+  version: 1
+not_reached:
+- 'UK GLAA ''spot the signs'' A5 leaflet (https://www.gla.gov.uk/media/qwpdjic2/spot-the-signs-leaflet-a5.pdf):
+  direct download returned HTML, not the PDF; the 2020 GLAA PDF was read through WebFetch instead.'
+- 'Fair Work Ombudsman v Quest South Perth Holdings Pty Ltd [2015] HCA 45 (High Court sham-contracting
+  case): the High Court summary page did not include facts or orders, and the full judgment was not opened,
+  so it is not used as a case.'
+- '29 CFR 531.35 and 20 CFR 655.135: eCFR fetch failed; read through Cornell LII, where the fetch tool
+  limits verbatim quote length, so quotes are short fragments.'
+- 'DOL tipped employees Fact Sheet #15 (fetch error); the DOL FLSA tips page was used instead.'
+- ILO Forced Labour Convention No. 29, Article 2 text (NORMLEX fetch failed); the forced labour definition
+  is taken from the Off the Books guidance.
+- 'Off the Books main report (Migrant Justice Institute, 2026), the source of the practical guidance''s
+  statistics: not opened.'
+- 'GOV.UK national minimum wage employer guidance (accommodation offset, deductions): the fetched page
+  held only an overview.'
+- 'ATO illegal phoenix activity overview page: had no definition; the ''What is phoenix activity'' subpage
+  was used.'
+- '7-Eleven inquiry report: only the first 100,000 characters were read; Harvest Trail Inquiry report:
+  only the first 100,000 characters were read.'
+- 'Not researched: US DOL H-2B rules, state-level wage theft laws (e.g. California, New York), UK HMRC
+  national minimum wage naming lists, and ILO guidance on ''decent work'' deficits.'
+- The web search budget for this turn was used up after one search, so research relied on direct fetches
+  of known primary-source URLs.
+- 'OLMS persuader and LM-10/LM-20 compliance pages on dol.gov (other than the 2016 newsletter) did not
+  load: they returned fetch errors.'
+- The 2018 Federal Register rescission of the 2016 persuader rule was not reached (the URL tried went
+  to an unrelated notice), so the persuader rule now in force, including whether 'indirect' persuasion
+  is reportable, is not verified.
+- The 2016 persuader final rule in the Federal Register was not reached (the URL tried went to an unrelated
+  notice).
+- ILO Convention 98 and the Committee on Freedom of Association compilation (normlex.ilo.org and ilo.org)
+  returned server errors, so no non-US standards are included.
+- NLRB news releases on Starbucks (Buffalo) and on the Amazon Bessemer rerun election were not reached,
+  so those are not listed as cases.
+- OLMS criminal enforcement yearly pages were not searched for persuader-reporting convictions.
+- EPI's 2023 union-avoidance spending report did not load.
+- Supreme Court PDF for Starbucks v. McKinney failed; the Cornell LII copy was used instead.
+- Whether the Amazon (2024) captive-audience rule and the Cemex (2023) framework still stand after later
+  changes to the NLRB was not verified.

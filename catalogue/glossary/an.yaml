@@ -1,0 +1,266 @@
+area: AN
+terms:
+- term: Animal fighting venture
+  definition: Under US federal law, any event in or affecting interstate commerce in which at least two
+    animals are made to fight for sport, wagering or entertainment, excluding hunting.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/7/2156
+  cases: []
+  related:
+  - Dogfighting
+  - Cockfighting
+  indicators: []
+  areas:
+  - AN
+- term: Dogfighting
+  definition: A blood sport in which dogs are forced to fight each other for spectators' entertainment
+    or profit.
+  examples: []
+  source_url: https://www.aspca.org/animal-cruelty/dogfighting
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Pit
+  definition: The enclosure, which ASPCA describes as 14 to 20 square feet, in which fighting dogs are
+    made to fight.
+  examples: []
+  source_url: https://www.aspca.org/investigations-rescue/dogfighting
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Gaff
+  definition: A sharp spur made to be attached to a bird's leg for cockfighting; trading one across state
+    or national lines is a federal offence.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/7/2156
+  cases: []
+  related:
+  - Cockfighting
+  indicators: []
+  areas:
+  - AN
+- term: Stud fee
+  definition: A payment for breeding from a male dog; in the Johnson case DOJ said he took stud fees from
+    favoured fighting bloodlines.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/former-nfl-player-sentenced-5-years-prison-operating-large-scale-dog-fighting-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Animal crushing / crush video
+  definition: Under 18 U.S.C. 48, purposely causing serious bodily injury to a living mammal, bird, reptile
+    or amphibian; making or distributing videos of it in interstate commerce is also a crime.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/48
+  cases: []
+  related:
+  - PACT Act
+  indicators: []
+  areas:
+  - AN
+- term: PACT Act
+  definition: The Preventing Animal Cruelty and Torture Act, 18 U.S.C. 48, formerly the Animal Crush Video
+    statute.
+  examples: []
+  source_url: https://www.justice.gov/enrd/animal-welfare
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Animal Welfare Act (US)
+  definition: Federal law (7 U.S.C. 2131-2159) setting minimum care standards for animals exhibited to
+    the public, sold as pets, used in research or transported commercially; enforced by USDA APHIS.
+  examples: []
+  source_url: https://www.aphis.usda.gov/awa
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: APHIS Animal Care
+  definition: The USDA unit that licenses, registers and inspects facilities under the Animal Welfare
+    Act.
+  examples: []
+  source_url: https://www.aphis.usda.gov/awa
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Dealer / exhibitor licence
+  definition: The USDA licence needed by anyone operating as a dealer, exhibitor or auction operator under
+    the Animal Welfare Act, unless exempt.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/9/2.1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Four-or-fewer breeding females exemption
+  definition: People with four or fewer breeding female pet animals who sell only offspring born and raised
+    on their premises do not need a federal licence; the limit applies across the household.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/9/2.1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Retail pet store exemption
+  definition: Retail pet stores, as defined in the regulations, are exempt from federal AWA licensing.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/9/2.1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Animal Care Public Search Tool
+  definition: USDA's public database of AWA licensees and registrants, inspection reports, enforcement
+    actions, teachable moments and research facility annual reports.
+  examples: []
+  source_url: https://www.aphis.usda.gov/awa/annual-inspection-reports
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Routine, pre-licensing and focused inspections
+  definition: USDA's unannounced compliance checks of licensees, checks before a licence is granted, and
+    inspections prompted by complaints or reports of unlicensed activity.
+  examples: []
+  source_url: https://www.aphis.usda.gov/awa/annual-inspection-reports
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: APHIS Form 7023
+  definition: The annual report USDA-registered research facilities must file on their use of regulated
+    animals.
+  examples: []
+  source_url: https://www.aphis.usda.gov/awa/research-facility-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Animal hoarding
+  definition: Keeping more animals than one can care for, defined by failure to provide even minimal nutrition,
+    sanitation, shelter and veterinary care.
+  examples: []
+  source_url: https://www.aspca.org/animal-cruelty/animal-hoarding
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Puppy mill
+  definition: ASPCA's term for commercial breeding operations that keep dogs in cruel conditions to keep
+    producing puppies; ASPCA pages reached gave no formal definition.
+  examples: []
+  source_url: https://www.aspca.org/animal-cruelty/puppy-mills
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Puppy laundering
+  definition: Passing commercially bred puppies through sham nonprofits so they are sold as rescues or
+    adoptable animals.
+  examples: []
+  source_url: https://www.aspca.org/barred-from-love/how-avoid-cruelty/problem-pet-sellers
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: NIBRS animal cruelty categories
+  definition: 'The FBI''s National Incident-Based Reporting System has recorded animal cruelty since 2016
+    in four groups: gross neglect, torture, organised abuse and sexual abuse.'
+  examples: []
+  source_url: https://www.fbi.gov/news/stories/-tracking-animal-cruelty
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: The Link
+  definition: The connection between animal abuse and violence against people, such as domestic violence,
+    child abuse and elder abuse.
+  examples: []
+  source_url: https://nationallinkcoalition.org/faqs/what-is-the-link
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Animal welfare (WOAH)
+  definition: The physical and mental state of an animal in relation to the conditions in which it lives
+    and dies.
+  examples: []
+  source_url: https://www.woah.org/en/what-we-do/animal-health-and-welfare/animal-welfare/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Five Freedoms
+  definition: Freedom from hunger and thirst, from fear and distress, from heat stress and physical discomfort,
+    and from pain, injury and disease, plus freedom to express normal behaviour.
+  examples: []
+  source_url: https://www.woah.org/en/what-we-do/animal-health-and-welfare/animal-welfare/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Duty of care (UK Animal Welfare Act 2006, s.9)
+  definition: A person responsible for an animal commits an offence if they do not take reasonable steps
+    to meet its needs for environment, diet, normal behaviour, housing with or apart from others, and
+    protection from pain, injury and disease.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2006/45/section/9
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Twenty-Eight Hour Law
+  definition: A federal law (49 U.S.C. 80502) on transporting animals; DOJ ENRD lists it among the animal
+    welfare statutes it enforces.
+  examples: []
+  source_url: https://www.justice.gov/enrd/animal-welfare
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Humane Methods of Slaughter Act
+  definition: A federal law (7 U.S.C. 1901-1907) on humane slaughter of livestock, enforced in part by
+    DOJ ENRD.
+  examples: []
+  source_url: https://www.justice.gov/enrd/animal-welfare
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN
+- term: Horse Protection Act
+  definition: A federal law (15 U.S.C. 1821-1831) protecting horses; DOJ ENRD lists it among the animal
+    welfare statutes it enforces.
+  examples: []
+  source_url: https://www.justice.gov/enrd/animal-welfare
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AN

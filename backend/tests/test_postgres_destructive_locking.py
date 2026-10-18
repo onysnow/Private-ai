@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from app.db.locking import investigation_lock_key, lock_investigation_transaction
-from app.services import exports, lifecycle
+from app.services import entity_merge, exports, lifecycle
 
 
 class _FakeSession:
@@ -76,6 +76,28 @@ def test_delete_acquires_lock_before_mutable_preview(monkeypatch, tmp_path):
     monkeypatch.setattr(lifecycle, "preview_investigation_deletion", fake_preview)
     with pytest.raises(ValueError, match="outside"):
         lifecycle.delete_investigation(object(), inv_id, tmp_path, confirmation=inv_id)
+    assert order == [f"lock:{inv_id}", "preview"]
+
+
+def test_entity_merge_acquires_lock_before_preview(monkeypatch):
+    """Without this ordering, two concurrent execute_entity_merge calls for the
+    same investigation could both compute the same pre-merge preview/digest
+    before either acquires the lock, both pass the staleness check, and both
+    run the reference-move loop -- see the code-review finding this closes."""
+    order: list[str] = []
+    inv_id = "merge-race-id"
+    monkeypatch.setattr(entity_merge, "lock_investigation_transaction", lambda db, target: order.append(f"lock:{target}"))
+
+    def fake_preview(db, source, target):
+        order.append("preview")
+        return {"preview_digest": "stale-digest", "resolution": None, "blockers": []}
+
+    monkeypatch.setattr(entity_merge, "preview_entity_merge", fake_preview)
+
+    source = SimpleNamespace(investigation_id=inv_id, id="entity-source")
+    target = SimpleNamespace(id="entity-target")
+    with pytest.raises(ValueError, match="stale"):
+        entity_merge.execute_entity_merge(object(), source, target, preview_digest="fresh-digest")
     assert order == [f"lock:{inv_id}", "preview"]
 
 

@@ -1,0 +1,158 @@
+area: CG
+terms:
+- term: Dérive sectaire (cultic deviance)
+  definition: The French official term for a group or individual using pressure or techniques to put someone
+    in a state of psychological or physical subjection that harms them, those around them or society.
+  examples:
+  - Miviludes' 17 indicative criteria
+  source_url: https://www.miviludes.interieur.gouv.fr/comprendre-prevenir-et-lutter/comment-identifier-derive-sectaire
+  cases: []
+  related:
+  - Sujétion psychologique
+  - Miviludes
+  indicators: []
+  areas:
+  - CG
+- term: Sujétion psychologique ou physique (psychological or physical subjection)
+  definition: A state in which a person's judgement is altered by serious or repeated pressure or techniques
+    so that they lose part of their free will; French law since 2024 punishes placing or keeping someone
+    in that state.
+  examples: []
+  source_url: https://www.miviludes.interieur.gouv.fr/comprendre-et-prevenir/que-dit-loi
+  cases: []
+  related:
+  - Abus frauduleux de l'état de faiblesse
+  indicators: []
+  areas:
+  - CG
+- term: Abus frauduleux de l'état de faiblesse (About-Picard law, 2001)
+  definition: The French criminal offence (Code pénal articles 223-15-2 to 223-15-4) of fraudulently exploiting
+    a person's weakness, including weakness from psychological or physical subjection.
+  examples: []
+  source_url: https://www.miviludes.interieur.gouv.fr/comprendre-et-prevenir/que-dit-loi
+  cases: []
+  related:
+  - Sujétion psychologique
+  indicators: []
+  areas:
+  - CG
+- term: Miviludes
+  definition: France's Interministerial Mission for Vigilance and Combat against Cultic Deviances, a government
+    body that monitors cultic harm and publishes criteria and annual reports.
+  examples: []
+  source_url: https://www.miviludes.interieur.gouv.fr/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: PSNC (pratique de soins non conventionnelle)
+  definition: Non-conventional health practice; Miviludes' term for alternative treatments outside recognised
+    medicine.
+  examples: []
+  source_url: https://www.miviludes.interieur.gouv.fr/nos-ressources/glossaire
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: CIAOSN
+  definition: Belgium's Information and Advice Centre on Harmful Sectarian Organisations.
+  examples: []
+  source_url: https://www.miviludes.interieur.gouv.fr/nos-ressources/glossaire
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: FECRIS
+  definition: European Federation of Centres of Research and Information on Sectarianism, a network of
+    associations.
+  examples: []
+  source_url: https://www.miviludes.interieur.gouv.fr/nos-ressources/glossaire
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: Group psychological abuse
+  definition: The systematic, continued use of pressure, control, manipulation and coercion strategies
+    by a group to dominate members and secure their submission.
+  examples: []
+  source_url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2017.01.002
+  cases: []
+  related:
+  - PAEGS
+  indicators: []
+  areas:
+  - CG
+- term: PAEGS (Psychological Abuse Experienced in Groups Scale)
+  definition: A 2017 research questionnaire measuring how much group psychological abuse a former member
+    experienced, built on a six-part taxonomy.
+  examples: []
+  source_url: https://journals.copmadrid.org/ejpalc/art/j.ejpal.2017.01.002
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: Group Psychological Abuse Scale (GPA)
+  definition: An earlier (1994) questionnaire by Chambers, Langone and Dole measuring varieties of cultic
+    abuse; its items were not reachable.
+  examples: []
+  source_url: https://articles2.icsahome.com/articles/the-group-psychological-abuse-scale-csj-11-1-1994
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: Milieu control
+  definition: Lifton's term for a group's control of information and communication around and within members,
+    isolating them from wider society.
+  examples: []
+  source_url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+  cases: []
+  related:
+  - Thought reform
+  indicators: []
+  areas:
+  - CG
+- term: Thought reform
+  definition: Robert J. Lifton's 1961 framework of eight features of totalist environments used to reshape
+    people's thinking.
+  examples: []
+  source_url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: Loaded language
+  definition: Group jargon and stock phrases that narrow members' thinking (Lifton's 'loading the language').
+  examples: []
+  source_url: https://en.wikipedia.org/wiki/Thought_Reform_and_the_Psychology_of_Totalism
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: Collateral (NXIVM/DOS)
+  definition: Compromising material that DOS members had to hand over, which prosecutors said was used
+    to stop them leaving or talking.
+  examples: []
+  source_url: https://www.justice.gov/usao-edny/pr/nxivm-leader-keith-raniere-sentenced-120-years-prison-racketeering-and-sex-trafficking
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG
+- term: Forced labour
+  definition: Work obtained through threats, coercion or abuse rather than free agreement; a US federal
+    crime Ray was convicted of.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdny/pr/lawrence-ray-convicted-racketeering-violent-assault-extortion-sex-trafficking-forced
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CG

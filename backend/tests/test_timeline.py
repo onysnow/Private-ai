@@ -109,7 +109,7 @@ def test_reporter_timeline_event_exposes_claim_evidence_source_context_without_c
     claim = client.post("/api/claims", json={
         "investigation_id": inv["id"], "text": "Jane joined the board on April 1", "status": "disputed", "confidence": .45,
     }).json()
-    link = client.post(f"/api/claims/{claim["id"]}/evidence", json={
+    link = client.post(f"/api/claims/{claim['id']}/evidence", json={
         "evidence_id": evidence["id"], "stance": "supports", "note": "Minutes state effective date",
     })
     assert link.status_code == 200

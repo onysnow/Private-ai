@@ -1,0 +1,605 @@
+area: CA
+terms:
+- term: Institutional child sexual abuse
+  definition: Sexual abuse of a child that happens in, or is connected to, an organisation such as a school,
+    church, club, care home or detention centre, including how that organisation responds.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Situational risk
+  definition: Risk created when the setting gives adults the chance to be alone with children or form
+    close relationships with them.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related:
+  - Vulnerability risk
+  - Propensity risk
+  - Institutional risk
+  indicators: []
+  areas:
+  - CA
+- term: Vulnerability risk
+  definition: Risk that comes from the characteristics of the children in a setting, such as age, disability
+    or earlier maltreatment.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Propensity risk
+  definition: Risk from a concentration of adults inclined to abuse, or of children with harmful sexual
+    behaviours, in one setting.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Institutional risk
+  definition: Risk from how an organisation is run, such as putting reputation first or not listening
+    to children.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Grooming
+  definition: Deliberate steps an abuser takes to build trust with a child and the people around them,
+    to make abuse possible and avoid being caught.
+  examples: []
+  source_url: https://childabuseroyalcommission.gov.au/getattachment/b8c8cc19-ad65-44f5-951e-3b1705156da2/Grooming-and-child-sexual-abuse-in-institutional-c
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Institutional grooming
+  definition: Grooming aimed at an organisation itself, using its features and trust to get around its
+    safety measures.
+  examples: []
+  source_url: https://childabuseroyalcommission.gov.au/getattachment/b8c8cc19-ad65-44f5-951e-3b1705156da2/Grooming-and-child-sexual-abuse-in-institutional-c
+  cases: []
+  related:
+  - Grooming
+  indicators: []
+  areas:
+  - CA
+- term: Closed institution / total institution
+  definition: A setting where children live or spend most of their time cut off from outside contact and
+    scrutiny, such as boarding houses, residential homes and detention.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/schools
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Clericalism
+  definition: The idea that clergy hold a special status above lay people; the Royal Commission placed
+    it at the centre of the factors that enabled abuse in religious institutions.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/religious-institutions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Harmful sexual behaviours
+  definition: Sexual behaviour by children that is outside what is developmentally expected and can harm
+    other children.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/schools
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Low-level concern
+  definition: Under English school guidance, any worry, however small, that an adult has acted against
+    the staff code of conduct without reaching the harm threshold.
+  examples:
+  - being overfriendly with children
+  - having favourites
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Harm threshold
+  definition: 'The English guidance test for a serious allegation: the adult harmed or may have harmed
+    a child, may have committed an offence against a child, or behaved in a way showing risk or unsuitability.'
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: LADO (Local Authority Designated Officer)
+  definition: The local council officer in England who must be consulted about allegations that staff
+    or volunteers have harmed or may pose a risk to children.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: DBS (Disclosure and Barring Service)
+  definition: The body in England and Wales that runs criminal-record checks and bars unsuitable people
+    from working with children; employers have a legal duty to refer certain cases to it.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Settlement (compromise) agreement
+  definition: A deal where an employee resigns, the employer drops discipline, and both agree wording
+    for future references; English guidance says it must not be used where there is a risk to children.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Position of trust (offence)
+  definition: Under section 16 of the Sexual Offences Act 2003 (England and Wales), it is an offence for
+    an adult in a position of trust to have sexual activity with a person under 18 in their care, even
+    if consensual.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Transferable risk
+  definition: Behaviour outside work that may make a person unsuitable to work with children.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Child Safe Standards / National Principles for Child Safe Organisations
+  definition: Ten standards recommended by the Australian Royal Commission, adopted as national principles
+    that set out what a child-safe organisation does, from leadership to complaint handling.
+  examples: []
+  source_url: https://humanrights.gov.au/resource-hub/resources-for-organisations-businesses/child-safe-organisations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Mandatory reporting
+  definition: A legal duty on certain people, such as those in positions of trust, to report known or
+    suspected child sexual abuse; IICSA recommended making it law in England and Wales.
+  examples: []
+  source_url: https://www.iicsa.org.uk/reports-recommendations/publications/inquiry/final-report/executive-summary
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Royal Commission into Institutional Responses to Child Sexual Abuse
+  definition: Australia's national public inquiry (2013-2017) into how institutions responded to child
+    sexual abuse; its Final Report has 17 volumes.
+  examples: []
+  source_url: https://www.royalcommission.gov.au/child-abuse/final-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: IICSA (Independent Inquiry into Child Sexual Abuse)
+  definition: The statutory inquiry for England and Wales, chaired by Professor Alexis Jay, which published
+    its final report in 2022.
+  examples: []
+  source_url: https://www.iicsa.org.uk/reports-recommendations/publications/inquiry/final-report/executive-summary
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Investigating grand jury
+  definition: In Pennsylvania, a panel of citizens that can compel evidence and issue a public report
+    on matters it investigates, as in the 2018 report on six Catholic dioceses.
+  examples: []
+  source_url: https://WWW.BISHOP-ACCOUNTABILITY.ORG/PA_40th_GJ/2018_08_14_Interim_Redacted_PA_GJ_Report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: MAAPP (Minor Athlete Abuse Prevention Policies)
+  definition: Mandatory rules from the U.S. Center for SafeSport for Olympic and Paralympic sport bodies,
+    covering one-on-one contact, messaging, travel, lodging, massage and locker rooms.
+  examples: []
+  source_url: https://maapp.uscenterforsafesport.org/wp-content/uploads/2025/01/Weightlifting_2025-MAAPP_01.01.25.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Observable and interruptible
+  definition: MAAPP standard that any one-on-one contact between an adult and a minor athlete must happen
+    where others can see it and walk in.
+  examples: []
+  source_url: https://maapp.uscenterforsafesport.org/wp-content/uploads/2025/01/Weightlifting_2025-MAAPP_01.01.25.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Open and Transparent (communications)
+  definition: MAAPP rule that one-to-one electronic messages with a minor athlete must copy a parent,
+    another family adult or another adult participant.
+  examples: []
+  source_url: https://maapp.uscenterforsafesport.org/wp-content/uploads/2025/01/Weightlifting_2025-MAAPP_01.01.25.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Clery Act
+  definition: US federal law requiring colleges receiving federal aid to report campus crimes and issue
+    timely warnings; the Department of Education can fine institutions that fail.
+  examples: []
+  source_url: https://www.cbsnews.com/philadelphia/news/feds-investigating-sandusky-fine-penn-state-a-record-2-4m/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Out-of-home care
+  definition: Care for children who cannot live with their parents, such as foster care, kinship care
+    and residential care.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/contemporary-out-home-care
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Carers register
+  definition: An official list of authorised foster and kinship carers that the Royal Commission recommended
+    each Australian state create so concerns can follow carers.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/recordkeeping-and-information-sharing
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Background (criminal records) check
+  definition: A check of a person's criminal record before they work with children; the CDC notes it will
+    miss most offenders, who have never been caught.
+  examples: []
+  source_url: https://stacks.cdc.gov/view/cdc/7538/cdc_7538_DS1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Child sexual exploitation (CSE)
+  definition: A form of child sexual abuse where a person or group uses a power imbalance to coerce, manipulate
+    or deceive someone under 18 into sexual activity in exchange for something, or for the abuser's gain;
+    it can happen in person or online.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5a7f8e3640f0b62305b87dbc/CSE_Guidance_Core_Document_13.02.2017.pdf
+  cases: []
+  related:
+  - Group-based CSE
+  - Grooming
+  indicators: []
+  areas:
+  - CA
+- term: Child sexual abuse material (CSAM) / child sexual exploitation material (CSEM)
+  definition: Any visual or audio depiction of the sexual abuse or exploitation of a person under 18;
+    the preferred terms instead of 'child pornography'.
+  examples: []
+  source_url: https://assets-sea.ijm.org/documents/IJM_Scale_of_Harm_Summary_Report_Sept_2023.pdf
+  cases: []
+  related:
+  - Hash matching
+  indicators: []
+  areas:
+  - CA
+- term: Live-streamed child sexual abuse / OSAEC
+  definition: Abuse of a child shown in real time over video, usually paid for by a remote offender; IJM
+    and Philippine authorities call the wider problem online sexual abuse and exploitation of children
+    (OSAEC).
+  examples: []
+  source_url: https://assets-sea.ijm.org/documents/IJM_Scale_of_Harm_Summary_Report_Sept_2023.pdf
+  cases: []
+  related:
+  - Facilitator
+  - Demand-side offender
+  indicators: []
+  areas:
+  - CA
+- term: Facilitator
+  definition: The person, often in the child's country and sometimes a relative, who arranges the abuse
+    and receives payment from offenders abroad.
+  examples: []
+  source_url: https://austrac.gov.au/sites/default/files/2019-11/Fintel%20Alliance%20Financial%20Indicators%20Report.pdf
+  cases: []
+  related:
+  - Live-streamed child sexual abuse
+  indicators: []
+  areas:
+  - CA
+- term: Demand-side offender
+  definition: An offender, typically in a wealthier country, who pays for and directs live-streamed abuse
+    or buys material.
+  examples: []
+  source_url: https://assets-sea.ijm.org/documents/IJM_Scale_of_Harm_Summary_Report_Sept_2023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Sextortion (sexual extortion)
+  definition: Blackmail in which someone threatens to share a person's sexual images unless paid or sent
+    more images.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/exploitation-eng
+  cases: []
+  related:
+  - Financially motivated sextortion
+  indicators: []
+  areas:
+  - CA
+- term: Financially motivated sextortion
+  definition: Sextortion where criminals, using fake personas, coerce victims (often teenage boys) into
+    sending sexual images and then demand money.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-09/FinCEN-Notice-FMS-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Luring (online enticement)
+  definition: Befriending or enticing a child online, often through social media, to get sexual content
+    or arrange a meeting.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/exploitation-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Group-based child sexual exploitation ('grooming gangs')
+  definition: Sexual exploitation of children by two or more offenders acting together, the subject of
+    the 2025 UK national audit.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/national-audit-on-group-based-child-sexual-exploitation-and-abuse/national-audit-on-group-based-child-sexual-exploitation-and-abuse-accessible
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Money mule
+  definition: A person whose account is used to receive and pass on criminal proceeds, sometimes knowingly
+    and sometimes through coercion.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-09/FinCEN-Notice-FMS-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Peer-to-peer (P2P) payment
+  definition: A transfer between individuals through an app or online service, such as cash apps.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-09/FinCEN-Notice-FMS-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Unhosted wallet
+  definition: A cryptocurrency wallet controlled directly by its user rather than held by an exchange
+    or other regulated provider.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-09/FinCEN-Notice-FMS-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Privacy coin
+  definition: A cryptocurrency, such as Monero, Zcash or Dash, designed to hide transaction details.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/exploitation-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Prepaid access card
+  definition: A card loaded with value in advance that can be redeemed or spent elsewhere, often in another
+    country.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-09/FinCEN-Notice-FMS-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Jurisdictions of Concern
+  definition: 'FinCEN''s list of countries where subjects of sextortion-related suspicious transactions
+    were located: Cote d''Ivoire, the United States, the Philippines, Monaco, Burkina Faso, the Dominican
+    Republic, Kenya, Benin and Nigeria.'
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-09/FinCEN-Notice-FMS-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Suspicious activity report (SAR) / suspicious transaction report (STR)
+  definition: A confidential report a financial institution files with its financial intelligence unit
+    when it suspects a transaction is linked to crime; FinCEN asks filers to use the key term FIN-2025-SEXTORTION.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/2025-09/FinCEN-Notice-FMS-508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Reasonable grounds to suspect
+  definition: 'Canada''s threshold for reporting: more than a hunch, based on facts, context and several
+    indicators together, without needing proof.'
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/exploitation-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Project Shadow
+  definition: A Canadian public-private partnership co-led by Scotiabank and the Canadian Centre for Child
+    Protection to detect laundering of online child exploitation proceeds.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/exploitation-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Fintel Alliance
+  definition: AUSTRAC's public-private financial intelligence partnership, which published Australia's
+    child exploitation financial indicators.
+  examples: []
+  source_url: https://austrac.gov.au/sites/default/files/2019-11/Fintel%20Alliance%20Financial%20Indicators%20Report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Ongoing customer due diligence
+  definition: A bank's legal duty to keep monitoring customers and transactions for money-laundering and
+    other crime risk; Westpac's failure here covered 262 customers.
+  examples: []
+  source_url: https://www.austrac.gov.au/sites/default/files/2020-10/Chief%20Executive%20Officer%20of%20the%20Australian%20Transaction%20Reports%20and%20Analysis%20Centre%20v%20Westpac%20Banking%20Corporation%20%5B2020%5D%20FCA%201538.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Hash matching
+  definition: Automatically comparing digital fingerprints of uploaded files against databases of known
+    abuse material to detect it.
+  examples: []
+  source_url: https://www.ofcom.org.uk/siteassets/resources/documents/online-safety/information-for-industry/illegal-harms/overview.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Illegal harms codes (Online Safety Act)
+  definition: Ofcom's codes of practice setting what UK online services must do against illegal content,
+    including grooming protections for children.
+  examples: []
+  source_url: https://www.ofcom.org.uk/siteassets/resources/documents/online-safety/information-for-industry/illegal-harms/overview.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Transparency notice
+  definition: A legal notice from Australia's eSafety Commissioner requiring a platform to report on its
+    safety measures; failing to comply can bring penalties.
+  examples: []
+  source_url: https://esafety.gov.au/newsroom/media-releases/x-corp-penalised-after-failing-to-fully-comply-with-transparency-notice-about-child-sexual-exploitation-material
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: CyberTipline
+  definition: NCMEC's US reporting system for suspected online child sexual exploitation, used as the
+    main data source on sextortion trends.
+  examples: []
+  source_url: https://ncmec.org/blog/2024/where-is-sextortion-happening-new-trends-growing-crisis
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Return home interview
+  definition: A conversation with a child after they have been missing, meant to find out why and what
+    happened; IICSA found these often inadequate.
+  examples: []
+  source_url: https://www.iicsa.org.uk/reports-recommendations/publications/investigation/cs-organised-networks/executive-summary
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Child abduction warning notice (CAWN)
+  definition: A police notice telling an adult they have no permission to associate with a named child;
+    IICSA warned it can be used instead of a full investigation.
+  examples: []
+  source_url: https://www.iicsa.org.uk/reports-recommendations/publications/investigation/cs-organised-networks/executive-summary
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Looked-after child
+  definition: A child in the care of a local authority in the UK.
+  examples: []
+  source_url: https://www.east-ayrshire.gov.uk/Resources/PDF/I/independent-inquiry-cse-in-rotherham.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Out-of-area placement
+  definition: Placing a child in care in a home outside their own local authority area, which IICSA found
+    can add to exploitation risk.
+  examples: []
+  source_url: https://www.iicsa.org.uk/reports-recommendations/publications/investigation/cs-organised-networks/part-l-conclusions-and-recommendations/l1-conclusions.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Violent online networks (e.g. '764')
+  definition: Online groups the FBI says target minors and other vulnerable people, using threats, blackmail
+    and manipulation to coerce them.
+  examples: []
+  source_url: https://ic3.gov/PSA/2025/PSA250306
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: AI-generated CSAM
+  definition: Child sexual abuse material created or altered with generative AI, flagged by WeProtect
+    and Europol as a growing threat.
+  examples: []
+  source_url: https://www.weprotect.org/wp-content/uploads/Global-Threat-Asssesment-2023-Press-Release.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
