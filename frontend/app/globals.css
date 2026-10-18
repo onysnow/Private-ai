@@ -1,6 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4. The layer order puts the effect system's native layer (fx-components, vendor/onysnow-effects)
+   below utilities: a utility class still wins over an effect rule, as it did under v3. This statement has to
+   come before the import, which declares the order of Tailwind's own layers. */
+@layer theme, base, components, fx-components, utilities;
+@import 'tailwindcss';
+@config '../tailwind.config.js';
+
+/* v4's preflight leaves buttons with the default arrow; v3's gave them the hand. Kept as it was. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* Was an unlayered rule further down. Unlayered CSS beats every utility under v4, so it overrode text-sm and
+     font-medium on buttons and inputs; in the base layer a class wins over it, as it did under v3. */
+  select,
+  input,
+  button,
+  textarea {
+    font: inherit;
+  }
+}
 
 /* Dark Academia palette, sourced from Ony's reference swatch (shop5, "Dark Academia").
    The swatch is two halves: a LEFT set of deep, muted tones and a RIGHT set of lighter,
@@ -65,7 +85,7 @@
    gap: 16px} written after @tailwind utilities beat every grid-cols-* and
    gap-* next to it (the style panel's selects came out 18px wide). */
 .shell{max-width:1180px;margin:auto;padding:36px 24px}.top{display:flex;justify-content:space-between;align-items:center}.badge{background:var(--surface-2);border:1px solid var(--surface-3);border-radius:999px;padding:7px 11px;color:var(--text-muted)}.hero{padding:56px 0 32px}.hero h1{font-family:var(--font-heading);font-size:56px;max-width:820px;line-height:1.05;margin:12px 0}.hero p{font-size:19px;line-height:1.6;color:var(--text-muted);max-width:760px}.card{background:var(--surface-1);border:1px solid var(--surface-3);border-radius:14px;padding:20px;min-height:160px}.card h3{margin-top:0;font-family:var(--font-heading)}.muted{color:var(--text-muted)}.accent{color:var(--accent-1)}.workflow{margin-top:30px;background:var(--surface-1);border:1px solid var(--surface-3);border-radius:14px;padding:22px}.steps{display:flex;gap:10px;flex-wrap:wrap}.step{padding:10px 14px;background:var(--surface-2);border-radius:10px}@media(max-width:800px){.hero h1{font-size:40px}}
-select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.searchrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 /* flex:1 alone has flex-basis:0%, so inputs kept shrinking toward zero to stay
    on one line instead of wrapping -- in a half-width page-grid-2 card, three
    inputs plus a button squeezed down until their placeholders ("Exact locator
@@ -495,12 +515,16 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
 }
 
 /* Glossary hover cards (features/glossary/glossary-text.tsx). */
-.gt-term { color: inherit; text-decoration: underline dotted var(--accent-1); text-underline-offset: 3px; cursor: help; }
-.gt-term:hover, .gt-term:focus-visible { color: #f0d9a8; }
-.gt-card { position: fixed; z-index: 60; width: 320px; padding: 10px 12px; background: var(--ground); border: 1px solid #8d692b; border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.45); color: var(--text-muted); font-size: 13px; line-height: 1.45; pointer-events: none; }
-.gt-card[hidden] { display: none; }
-.gt-card b { color: #f0d9a8; } .gt-card small { display: block; margin-top: 6px; color: #8f8478; }
+/* In the components layer with the glossary page's rules: `.gl-page a` (more specific) has to beat `.gt-term`,
+   which an unlayered rule would not allow under v4. */
+@layer components {
+  .gt-term { color: inherit; text-decoration: underline dotted var(--accent-1); text-underline-offset: 3px; cursor: help; }
+  .gt-term:hover, .gt-term:focus-visible { color: #f0d9a8; }
+  .gt-card { position: fixed; z-index: 60; width: 320px; padding: 10px 12px; background: var(--ground); border: 1px solid #8d692b; border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.45); color: var(--text-muted); font-size: 13px; line-height: 1.45; pointer-events: none; }
+  .gt-card[hidden] { display: none; }
+  .gt-card b { color: #f0d9a8; } .gt-card small { display: block; margin-top: 6px; color: #8f8478; }
+}
 
 /* The investigation's type on Red Flags (features/red-flags/red-flags-panel.tsx). */
 .rf-type { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 16px; padding: 8px 12px; border: 1px solid #3a3229; border-radius: 10px; background: #151d22; font-size: 13px; }

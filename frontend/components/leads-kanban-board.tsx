@@ -81,7 +81,7 @@ function LeadCardView({lead, onStatusChange, onTraceLink, onTraceTask, onTaskSta
   const links = lead.links || [];
   const tasks = lead.tasks || [];
   return (
-    <div className="rounded-lg border bg-card p-3 text-card-foreground shadow-sm space-y-2">
+    <div className="rounded-lg border bg-card p-3 text-card-foreground shadow-xs space-y-2">
       <div className="flex items-start justify-between gap-2">
         <button type="button" className="text-left font-medium leading-snug cursor-grab active:cursor-grabbing" {...dragHandleProps}>
           {lead.title}
