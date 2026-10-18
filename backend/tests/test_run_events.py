@@ -82,6 +82,32 @@ def test_a_run_records_each_step_in_order_and_the_review_is_appended(monkeypatch
 
 
 @requires_suite
+def test_you_can_mark_one_thought_to_check_and_it_joins_the_run_record(monkeypatch):
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    seeded = _seeded_investigation(client)
+    inv = seeded["investigation"]["id"]
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient(_valid_case_synthesis(seeded["evidence"]["id"])))
+    reply = ok(client.post(f"/api/investigations/{inv}/assistant/case-synthesis", json={"question": "What did Ada North sign?"}))
+    run_id = reply["job"]["id"]
+    events = ok(client.get(f"/api/investigations/{inv}/ai-runs/{run_id}/events"))["events"]
+    said = next(e for e in events if e["self_reported"] and e["node"] == "tas/class")
+    thought = said["detail"]["thought"]
+
+    mark = ok(client.post(f"/api/investigations/{inv}/ai-runs/{run_id}/thoughts/{thought}/mark", json={"mark": "to_check", "reason": "Only one filing"}))
+    assert (mark["n"], mark["node"], mark["verdict"], mark["status"], mark["parent"]) == (len(events) + 1, "review", "TO_CHECK", "neutral", said["n"])
+    assert mark["text"] == f"You marked {thought} to check: Only one filing" and mark["detail"] == {"thought": thought, "mark": "to_check", "reason": "Only one filing"}
+    assert mark["refs"] == said["refs"]
+    after = ok(client.get(f"/api/investigations/{inv}/ai-runs/{run_id}/events", params={"after": len(events)}))["events"]
+    assert [e["n"] for e in after] == [mark["n"]]
+
+    assert client.post(f"/api/investigations/{inv}/ai-runs/{run_id}/thoughts/CLM-9999/mark", json={"mark": "keep"}).status_code == 404
+    assert client.post(f"/api/investigations/{inv}/ai-runs/{run_id}/thoughts/{thought}/mark", json={"mark": "maybe"}).status_code == 422
+    other = ok(client.post("/api/investigations", json={"name": "Other"}))["id"]
+    assert client.post(f"/api/investigations/{other}/ai-runs/{run_id}/thoughts/{thought}/mark", json={"mark": "keep"}).status_code == 404
+
+
+@requires_suite
 def test_a_run_stopped_by_the_citation_check_ends_with_a_stopped_turn(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"

@@ -82,4 +82,14 @@ describe('BeforeYouRun', () => {
     await user.click(screen.getByRole('button', {name: 'Save'}));
     await waitFor(() => expect(api.lastBody(`PUT ${BASE}/profile`)).toMatchObject({reason: 'Named people', source_tier_floor: 'D', premises: []}));
   });
+
+  it('offers a sample run when the case has none yet', async () => {
+    mockApi({'GET /api/investigations/inv-1/ai-runs': {runs: []}, [`GET ${BASE}/profile`]: PLAN.profile});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: 'Watch a sample run'}));
+    expect(await screen.findByText('sample — not a real run')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Ask the case'}));
+    expect(await screen.findByLabelText('Your question')).toBeInTheDocument();
+  });
 });

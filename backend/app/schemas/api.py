@@ -371,6 +371,11 @@ class AIAnalysisCandidateReviewRequest(BaseModel):
     decision: str
     note: str | None = None
 
+class AiThoughtMarkRequest(BaseModel):
+    """Your mark on one thought of an AI run (mockup AI_1, the trace drawer's "To check"): kept in the run record."""
+    mark: Literal["to_check", "keep", "reject"]
+    reason: str | None = Field(default=None, max_length=500)
+
 class AppUserCreate(BaseModel):
     display_name: str
     global_role: str = "member"

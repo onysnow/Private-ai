@@ -212,6 +212,7 @@ import {
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
+  markAiRunThought,
   markRedFlagInnocent,
   markStoryReady,
   openalephIntegrationStatus,
@@ -890,6 +891,9 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagError,
   MakeLeadFromRedFlagResponse,
+  MarkAiRunThoughtData,
+  MarkAiRunThoughtError,
+  MarkAiRunThoughtResponse,
   MarkRedFlagInnocentData,
   MarkRedFlagInnocentError,
   MarkRedFlagInnocentResponse,
@@ -4873,6 +4877,36 @@ export const listAiRunEventsInfiniteOptions = (
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Mark Ai Run Thought
+ *
+ * Your mark on one thought (a claim, gap or hypothesis the model said), appended to the run record as a step by
+ * you that follows the thought. Accept and reject of the whole answer stay on the candidate's review.
+ */
+export const markAiRunThoughtMutation = (
+  options?: Partial<Options<MarkAiRunThoughtData>>,
+): UseMutationOptions<
+  MarkAiRunThoughtResponse,
+  MarkAiRunThoughtError,
+  Options<MarkAiRunThoughtData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MarkAiRunThoughtResponse,
+    MarkAiRunThoughtError,
+    Options<MarkAiRunThoughtData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await markAiRunThought({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 /**

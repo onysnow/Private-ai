@@ -23,6 +23,8 @@ in backups, and a stream.
   settings in force and the echoed changes, the route and the module loaded, the packet, any instruction found inside
   the evidence, the model call's start and end, the shape check, the citation check, one chain per thought of the
   answer, the candidate saved, the run ending (or stopping, with its plain message), and later the reporter's review.
+  Your mark on one thought (To check, keep, reject; `POST …/ai-runs/{run_id}/thoughts/{thought_id}/mark`, added 18 Oct) is
+  a step too: node `review`, its parent the thought, `detail` {thought, mark, reason}. The latest mark wins; nothing is changed.
 - **Status is the app's, never the model's.** It comes from tables in app/ai/run_events.py (claim classes per TAS
   Standard §4; a gap is a finding, not a failure). What the model says is recorded `self_reported` and stays so until
   an app check (the citation check per thought) confirms it, as the suite's FABRICATION_CONTROLS require.

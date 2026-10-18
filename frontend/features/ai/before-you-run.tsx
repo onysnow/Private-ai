@@ -82,6 +82,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   const [saving, setSaving] = useState(false);
   const [reason, setReason] = useState('');
   const [runId, setRunId] = useState<string | null>(null);
+  const [sampleOnly, setSampleOnly] = useState(false);
   // Asked to watch a run from elsewhere (a Chain of Custody AI step): open it in step 3.
   const asked = useWorkbenchStore(s => s.aiRun);
   useEffect(() => { if (asked) { setRunId(asked.runId); setStep(3); } }, [asked]);
@@ -200,12 +201,16 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
         <small>{new Date(r.created_at.endsWith('Z') ? r.created_at : `${r.created_at}Z`).toLocaleString(undefined, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})} · {r.events} steps{r.problems ? ` · ${r.problems} problem${r.problems === 1 ? '' : 's'}` : ''}{r.review_status ? ` · ${r.review_status}` : ''}</small>
         <button type="button" className="br-quiet" onClick={() => { setRunId(r.run_id); setStep(3); }}>Watch it again</button></li>)}
     </ul></div>}
+    {earlier.isSuccess && earlier.data.runs.length === 0 && <p className="br-tray">No runs yet in this case. <button type="button" className="br-quiet"
+      onClick={() => { setRunId(null); setSampleOnly(true); setStep(3); }}>Watch a sample run</button></p>}
   </section>;
 
   if (step === 3 || step === 4) return <section className="br br-live" aria-label="AI runs">
     {outcome && !outcome.ok && <p role="alert" className="br-bad">{outcome.text}</p>}
     {!runId && running && <p role="status">Sending the run…</p>}
-    {runId && <WatchTheRun investigationId={investigationId} runId={runId} onBack={() => setStep(2)}/>}
+    {(runId || sampleOnly) && <WatchTheRun investigationId={investigationId} runId={runId} sample={sampleOnly && !runId}
+      onBack={() => { setSampleOnly(false); setStep(runId ? 2 : 1); }}
+      onRunAgain={r => { setSampleOnly(false); setQuestion(r.question); setModule(r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setTheory(r.theory ?? ''); setStep(2); }}/>}
   </section>;
 
   return <section className="br" aria-label="AI runs">

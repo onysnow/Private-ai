@@ -12,7 +12,8 @@ import type {KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {
-  getAiAnalysisCandidateEndpointOptions, listAiRunEventsOptions, listAiRunEventsQueryKey, listAiRunsOptions, reviewAiAnalysisCandidateEndpointMutation,
+  getAiAnalysisCandidateEndpointOptions, listAiRunEventsOptions, listAiRunEventsQueryKey, listAiRunsOptions, markAiRunThoughtMutation,
+  reviewAiAnalysisCandidateEndpointMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {AiRunEventOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -104,11 +105,15 @@ function calmNow(): boolean {
   return document.documentElement.dataset.motion === 'calm' || Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 }
 
-export function WatchTheRun({investigationId, runId, onBack}: {investigationId: string; runId: string | null; onBack?: () => void}): ReactElement {
+export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample: startSample = false}: {
+  investigationId: string; runId: string | null; onBack?: () => void; sample?: boolean;
+  /** Run again with new instructions: back to the plan with this run's question (research AI §5 "Run again"). */
+  onRunAgain?: (r: {question: string; module: string; theory: string | null}) => void;
+}): ReactElement {
   const queryClient = useQueryClient();
   const caseName = useWorkbenchStore(s => s.investigationName);
-  const runs = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && !runId});
-  const [sample, setSample] = useState(false);
+  const runs = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  const [sample, setSample] = useState(startSample);
   const realId = runId ?? runs.data?.runs[0]?.run_id ?? null;
   const id = sample ? 'sample' : realId;
   // While the stream is connected, a slow poll only picks up the run's own status; without it, poll every second.
@@ -120,6 +125,9 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
   });
   const run = sample ? SAMPLE_RUN : q.data?.run;
   const events = useMemo(() => (sample ? SAMPLE_EVENTS : q.data?.events ?? []), [sample, q.data]);
+  // Compare two runs of the same question: the parts whose verdict changed glow, the rest stay dim (research AI §4).
+  const [compareId, setCompareId] = useState<string | null>(null);
+  const other = useQuery({...listAiRunEventsOptions({path: {investigation_id: investigationId, run_id: compareId ?? ''}, query: {after: 0}}), enabled: Boolean(compareId)});
   const stream = useRunStream(investigationId, sample ? null : realId, Boolean(q.data && !q.data.run.finished));
   streaming.current = stream.mode === 'live';
   const byN = useMemo(() => new Map(events.map(e => [e.n, e])), [events]);
@@ -204,6 +212,9 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
   const focused = focus !== null ? byN.get(focus) : undefined;
   const thought = focused && (focused.self_reported ? focused : chain.find(e => e.self_reported));
   const thoughtId = (thought?.detail as {thought?: string} | null)?.thought;
+  // The latest mark you gave this thought, read back from the run record.
+  const marked = thoughtId ? [...events].reverse().map(e => e.node === 'review' ? (e.detail as {thought?: string; mark?: string} | null) : null)
+    .find(d => d?.thought === thoughtId)?.mark : undefined;
 
   const nextProblem = () => {
     const after = problems.find(p => p.n > (focus ?? 0)) ?? problems[0];
@@ -234,6 +245,21 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
     void candidate.refetch();
   }});
   const [copied, setCopied] = useState(false);
+  // Your mark on one thought ("To check"), kept in the run record as a step by you (POST …/thoughts/{id}/mark).
+  const mark = useMutation({...markAiRunThoughtMutation(), onSuccess: () => {
+    void queryClient.invalidateQueries({queryKey: listAiRunEventsQueryKey({path: {investigation_id: investigationId, run_id: realId ?? ''}, query: {after: 0}})});
+  }});
+  const sameQuestion = (runs.data?.runs ?? []).filter(r => run && r.run_id !== run.run_id && r.finished
+    && r.question.trim().toLowerCase() === run.question.trim().toLowerCase());
+  // A node's verdict in one run: its worst step (stopped, then in between, then verified, then a finding).
+  const RANK: Record<string, number> = {bad: 3, partial: 2, good: 1, neutral: 0};
+  const verdictAt = (list: Ev[], k: string): Status | null => {
+    const at = list.filter(e => e.kind !== 'SETTING' && nodeOf(e) === k);
+    return at.length ? at.reduce((w, e) => (RANK[e.status] > RANK[w] ? e.status as Status : w), at[0].status as Status) : null;
+  };
+  const changes = compareId && other.data ? ORDER.filter(k => AT[k]).map(k => ({k, before: verdictAt(other.data.events, k), after: verdictAt(events, k)}))
+    .filter(c => c.before !== c.after) : [];
+  const changed = new Set(changes.map(c => c.k));
   // Hover: a node's tally in words, or a wire's count and kinds (research AI §4 "Hover").
   const [hover, setHover] = useState<{x: number; y: number; text: string} | null>(null);
   // Ctrl+wheel zooms the map around the pointer; the wheel over the strip zooms the lanes in time. The page never scrolls.
@@ -304,7 +330,9 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
 
   // The time axis: real seconds from the first step to the last (or to now while the run is live).
   const t0 = events[0] ? utc(events[0].at) : 0;
-  const tEnd = Math.max(events.length ? utc(events[events.length - 1].at) : 0, run?.finished || !t0 ? 0 : now);
+  // The run's own steps set the axis; your review, given later, sits at the right edge rather than squeezing the run.
+  const own = events.filter(e => e.node !== 'review');
+  const tEnd = Math.max(own.length ? utc(own[own.length - 1].at) : 0, run?.finished || !t0 ? 0 : now);
   const span = Math.max(1000, tEnd - t0);
   const xOf = (e: Ev) => (t0 ? Math.min(100, ((utc(e.at) - t0) / span) * 100) : 0);
   // The lanes show the window the wheel has zoomed to (the whole run by default).
@@ -362,7 +390,8 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
     const onLit = chain.some(e => nodeOf(e) === k);
     const small = shape === 'chip' || shape === 'mini';
     const labelY = shape === 'circle' ? 44 : shape === 'hex' ? 30 : shape === 'person' ? 36 : shape === 'cand' ? -3 : shape === 'double' ? 30 : 32;
-    return <g key={k} className={`wr-node ${shape}${dim ? ' dim' : ''}${onLit ? ' lit' : ''}${focus !== null && !onLit ? ' faded' : ''}${k === 'model' && writing ? ' writing' : ''}`}
+    const comparing = Boolean(compareId && other.data);
+    return <g key={k} className={`wr-node ${shape}${dim ? ' dim' : ''}${onLit ? ' lit' : ''}${(focus !== null && !onLit) || (comparing && !changed.has(k)) ? ' faded' : ''}${comparing && changed.has(k) ? ' changed' : ''}${k === 'model' && writing ? ' writing' : ''}`}
       transform={`translate(${p.x} ${p.y})`} role="button" tabIndex={0} aria-label={name} data-k={k}
       onClick={() => t?.last && setFocus(t.last.n)} onKeyDown={e => { if (e.key === 'Enter' && t?.last) setFocus(t.last.n); else along(e, k); }}
       onMouseEnter={() => showTally(k, opts.hint ? `${label} ${opts.hint}` : label)} onMouseLeave={() => setHover(null)}
@@ -424,7 +453,11 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
   const worst = chain.find(e => e.status === 'bad') ?? chain.find(e => isProblem(e)) ?? thought ?? focused;
   const cap = chain.map(e => (e.detail as {capped_to?: string} | null)?.capped_to).find(Boolean);
   const refsOf = (thought ?? focused)?.refs ?? [];
-  const removed = chain.find(e => e.kind === 'BLOCK') ?? events.find(e => e.kind === 'BLOCK' && e.refs.some(r => refsOf.some(x => x.record_id === r.record_id)));
+  const removed = chain.find(e => e.kind === 'BLOCK')
+    ?? events.find(e => e.kind === 'BLOCK' && thoughtId && (e.detail as {thought?: string} | null)?.thought === thoughtId)
+    ?? events.find(e => e.kind === 'BLOCK' && e.refs.some(r => refsOf.some(x => x.record_id === r.record_id)));
+  // The cap may sit on any step about this thought, not only on its own chain.
+  const capOf = cap ?? (thoughtId ? events.map(e => (e.detail as {thought?: string; capped_to?: string} | null)).find(d => d?.thought === thoughtId && d.capped_to)?.capped_to : undefined);
 
   // The drawer's steps: the parent chain, filtered by the search (kind, #n, rule, node or verdict).
   const needle = stepSearch.trim().toLowerCase().replace(/^#/, '');
@@ -474,11 +507,16 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
         : liveRun ? <span className="wr-pill live">● LIVE · {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}{catchUp > 1 ? ` · ${catchUp}× to catch up` : ''}</span>
         : run?.status === 'failed' ? <span className="wr-pill bad" title={run.message ?? undefined}>Stopped · {stamp(run.created_at)}</span>
         : <span className="wr-pill">{replay ? 'Replay of run' : 'Run record'} · {run ? stamp(run.created_at) : ''}</span>}
+      {sameQuestion.length > 0 && <select className="wr-pill wr-compare" aria-label="Compare with another run of this question" value={compareId ?? ''}
+        onChange={e => setCompareId(e.target.value || null)}>
+        <option value="">Compare…</option>
+        {sameQuestion.map(r => <option key={r.run_id} value={r.run_id}>with {stamp(r.created_at)}{r.problems ? ` · ${r.problems} problems` : ''}</option>)}
+      </select>}
       <button type="button" className="wr-pill" onClick={() => setFull(f => !f)} aria-pressed={full}>Events: {full ? 'full' : 'summary'}</button>
       <button type="button" className={`wr-pill${problems.length ? ' bad' : ''}`} onClick={nextProblem} disabled={!problems.length}>{problems.length} problem{problems.length === 1 ? '' : 's'} <kbd>N</kbd></button>
       <button type="button" className="wr-pill" aria-pressed={calm} onClick={() => setCalm(c => !c)}>Calm</button>
       <button type="button" className="wr-pill" aria-pressed={log} onClick={() => setLog(l => !l)}>Log <kbd>L</kbd></button>
-      {onBack && <button type="button" className="wr-pill" onClick={onBack}>Back to the plan</button>}
+      {onBack && <button type="button" className="wr-pill" onClick={onBack}>{sample && !realId ? 'Ask the case' : 'Back to the plan'}</button>}
     </header>
     {q.isError && <p role="alert" className="br-bad">{errorMessage(q.error, 'Could not read the run')}</p>}
 
@@ -513,7 +551,7 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
             {WIRES.map(([a, b]) => {
               const k = `${a}>${b}`;
               const onChain = chain.some(e => nodeOf(e) === a) && chain.some(e => nodeOf(e) === b);
-              return isStream(k) ? null : <path key={k} className={onChain ? 'lit' : ''} d={wire(a, b)}/>;
+              return isStream(k) ? null : <path key={k} className={`${onChain ? 'lit' : ''}${changed.has(a) && changed.has(b) ? ' changed' : ''}`} d={wire(a, b)}/>;
             })}
           </g>
           <g className="wr-wirehits">
@@ -576,7 +614,9 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
         </svg>
         <div className="wr-under">
           <p className="wr-focus" aria-live="polite"><span className="br-eyebrow">Thought in focus</span>
-            {thought ? <><b>{thoughtId} · {thought.text}</b><small>Everything else dims to about a third. Esc clears.</small></>
+            {compareId && other.data ? <><b>Compared with the run of {stamp(other.data.run.created_at)} · {changes.length ? `${changes.length} part${changes.length === 1 ? '' : 's'} changed` : 'nothing changed'}</b>
+              <small>{changes.map(c => `${c.k.replace(/^gate:|^tas\//, '')}: ${c.before ? WORD[c.before] : 'not reached'} → ${c.after ? WORD[c.after] : 'not reached'}`).join(' · ') || 'Every part ended with the same verdict.'}</small></>
+              : thought ? <><b>{thoughtId} · {thought.text}</b><small>Everything else dims to about a third. Esc clears.</small></>
               : run?.status === 'failed' ? <><b className="wr-bad">Stopped</b><small>{(run.message ?? run.error ?? 'The run stopped').replace(/[.\s]*$/, '.')} Press N for the step that stopped it.</small></>
               : <><b>None chosen</b><small>Click a light, a chip or a tally to follow one thought from input to output.</small></>}</p>
           <ul className="wr-legend" aria-label="Key">
@@ -615,12 +655,13 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
             {candidateId && candidate.isLoading ? <div className="wr-skeleton" aria-label="Loading the answer"><i/><i/><i/></div>
               : <dl className="br-facts">
               {claim && <><dt>Class</dt><dd>{words(String(claim.classification ?? ''))} <span className="br-chip ai">model says</span></dd>
-                <dt>Confidence</dt><dd>model: {claim.confidence_term ? words(String(claim.confidence_term)).toLowerCase() : 'not given (old format)'}{cap ? <> → <b>capped: {cap}</b></> : null}</dd></>}
+                <dt>Confidence</dt><dd>model: {claim.confidence_term ? words(String(claim.confidence_term)).toLowerCase() : 'not given (old format)'}{capOf ? <> → <b>capped: {capOf}</b></> : null}</dd></>}
+              {!claim && capOf && <><dt>Confidence</dt><dd><b>capped: {capOf}</b></dd></>}
               {links.length > 0 && <><dt>Weakest link</dt><dd><span className="wr-links" aria-hidden="true">{links.map(e => <i key={e.n} className={`${e.status}${e === weakest ? ' weak' : ''}`} title={`#${e.n} ${e.text}`}/>)}</span>
-                {weakest ? <> {cap ? 'capped by' : 'weakest:'} step #{weakest.n}: {weakest.text}</> : ' every step held'}</dd></>}
+                {weakest ? <> {capOf ? 'capped by' : 'weakest:'} step #{weakest.n}: {weakest.text}</> : ' every step held'}</dd></>}
               <dt>Removed</dt><dd>{removed ? removed.text : 'nothing removed'}</dd></dl>}</section>
           <section aria-label="Ledger"><h4><b>4</b> Ledger</h4><p className="wr-chips">
-            {thoughtId && <span className="br-chip">{thoughtId} proposed</span>}
+            {thoughtId && <span className="br-chip">{thoughtId} {marked === 'to_check' ? 'to check · you' : marked === 'reject' ? 'rejected · you' : marked === 'keep' ? 'kept · you' : 'proposed'}</span>}
             {candidateId && <span className="br-chip">AIC {candidateId.slice(0, 8)} {reviewed ? words(candidate.data?.review_status) : 'sent for you'}</span>}
             <span className="br-chip">Judgement ledger · no outcome yet</span></p></section>
         </div>
@@ -631,10 +672,16 @@ export function WatchTheRun({investigationId, runId, onBack}: {investigationId: 
           {rejecting && <form className="br-add" onSubmit={e => { e.preventDefault(); if (candidateId) review.mutate({path: {candidate_id: candidateId}, body: {decision: 'reject', note: reason.trim()}}); }}>
             <input aria-label="Why reject it" value={reason} onChange={e => setReason(e.target.value)} autoFocus/><button type="submit" disabled={!reason.trim()}>Reject</button></form>}
           {reviewed && <span className="br-ok">{words(candidate.data?.review_status)}</span>}
-          <button type="button" disabled title="Review applies to the whole answer; marking one claim to check is not built yet">○ To check</button>
+          {thoughtId && run?.finished && !sample && <button type="button" aria-pressed={marked === 'to_check'} disabled={mark.isPending}
+            title={marked === 'to_check' ? 'On your list to check; press again to take it off' : 'Put this thought on your list to check; it is kept in the run record'}
+            onClick={() => mark.mutate({path: {investigation_id: investigationId, run_id: realId ?? '', thought_id: thoughtId}, body: {mark: marked === 'to_check' ? 'keep' : 'to_check', reason: null}})}>
+            {marked === 'to_check' ? '◉ To check' : '○ To check'}</button>}
           <button type="button" onClick={() => { void navigator.clipboard?.writeText(citation()); setCopied(true); }}>{copied ? 'Copied' : 'Copy cite'}</button>
+          {onRunAgain && run && !sample && run.finished && <button type="button" title="Back to the plan with this question, to change the instructions; the packet is built again from the case as it is now, and the new run is a new record"
+            onClick={() => onRunAgain({question: run.question, module: run.module, theory: run.working_theory ?? null})}>Run again…</button>}
           {review.isError && <span role="alert" className="br-bad">{errorMessage(review.error, 'Not saved')}</span>}
-          <small>Accept and reject apply to the whole answer.</small>
+          {mark.isError && <span role="alert" className="br-bad">{errorMessage(mark.error, 'Not saved')}</span>}
+          <small>Accept and reject apply to the whole answer; To check marks this thought only.</small>
         </footer>
       </aside>}
     </div>

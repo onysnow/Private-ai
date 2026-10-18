@@ -100,8 +100,7 @@ describe('WatchTheRun', () => {
     expect(within(drawer).getByText('model says')).toBeInTheDocument();
     expect(within(drawer).getByText(/model: likely/)).toBeInTheDocument();
     expect(within(drawer).queryByText(/capped/)).toBeNull();
-    expect(within(drawer).getByText(/Accept and reject apply to the whole answer/)).toBeInTheDocument();
-    expect(within(drawer).getByRole('button', {name: /To check/})).toBeDisabled();
+    expect(within(drawer).getByText(/Accept and reject apply to the whole answer; To check marks this thought only/)).toBeInTheDocument();
     await user.click(within(drawer).getByRole('button', {name: 'Close the trace'}));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -189,6 +188,55 @@ describe('WatchTheRun', () => {
     render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-1"/></QueryProvider>);
     expect(await screen.findByText(/Stopped · 10 Oct/)).toBeInTheDocument();
     expect(screen.getByText(/a cited record is not in the packet/)).toBeInTheDocument();
+  });
+});
+
+describe('WatchTheRun, your marks and other runs', () => {
+  it('marks one thought to check, and reads the mark back from the run record', async () => {
+    const events = record(2);
+    const markEvent = {...events[events.length - 1], n: events.length + 1, kind: 'CHECK', node: 'review', status: 'neutral', verdict: 'TO_CHECK',
+      text: 'You marked CLM-0001 to check', parent: 11, self_reported: false, detail: {thought: 'CLM-0001', mark: 'to_check', reason: null}};
+    let marked = false;
+    const api = mockApi({
+      [`GET ${EV}`]: () => ({run: {...RUN, events: events.length}, events: marked ? [...events, markEvent] : events}),
+      'GET /api/ai-analysis-candidates/cand-1': CAND,
+      'POST /api/investigations/inv-1/ai-runs/run-1/thoughts/CLM-0001/mark': () => { marked = true; return markEvent; },
+    });
+    render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', {name: '○ To check'}));
+    expect(api.lastBody('POST /api/investigations/inv-1/ai-runs/run-1/thoughts/CLM-0001/mark')).toEqual({mark: 'to_check', reason: null});
+    expect(await within(screen.getByRole('dialog')).findByRole('button', {name: '◉ To check'})).toHaveAttribute('aria-pressed', 'true');
+    expect(within(screen.getByRole('dialog')).getByText('CLM-0001 to check · you')).toBeInTheDocument();
+  });
+
+  it('compares with an earlier run of the same question and names what changed', async () => {
+    const now = record(2);
+    const before = record(2).map(e => (e.node === 'tas/corroboration' ? {...e, status: 'good'} : e));
+    mockApi({
+      [`GET ${EV}`]: {run: {...RUN, events: now.length}, events: now},
+      'GET /api/investigations/inv-1/ai-runs/run-0/events': {run: {...RUN, run_id: 'run-0', created_at: '2026-10-09T09:00:00Z', events: before.length}, events: before},
+      'GET /api/investigations/inv-1/ai-runs': {runs: [RUN, {...RUN, run_id: 'run-0', created_at: '2026-10-09T09:00:00Z'}]},
+      'GET /api/ai-analysis-candidates/cand-1': CAND,
+    });
+    render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.selectOptions(await screen.findByRole('combobox', {name: 'Compare with another run of this question'}), 'run-0');
+    expect(await screen.findByText(/Compared with the run of 9 Oct .* 1 part changed/)).toBeInTheDocument();
+    expect(screen.getByText(/corroboration: verified → in between/)).toBeInTheDocument();
+    expect(document.querySelectorAll('.wr-node.changed')).toHaveLength(1);
+  });
+
+  it('runs again from the plan with the same question', async () => {
+    const again = vi.fn();
+    const events = record(2);
+    mockApi({[`GET ${EV}`]: {run: {...RUN, events: events.length}, events}, 'GET /api/ai-analysis-candidates/cand-1': CAND});
+    render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-1" onRunAgain={again}/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
+    await user.click(screen.getByRole('button', {name: 'Run again…'}));
+    expect(again).toHaveBeenCalledWith({question: RUN.question, module: 'case_synthesis', theory: null});
   });
 });
 

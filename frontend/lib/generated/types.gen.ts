@@ -707,6 +707,22 @@ export type AiRunsOut = {
 };
 
 /**
+ * AiThoughtMarkRequest
+ *
+ * Your mark on one thought of an AI run (mockup AI_1, the trace drawer's "To check"): kept in the run record.
+ */
+export type AiThoughtMarkRequest = {
+  /**
+   * Mark
+   */
+  mark: 'to_check' | 'keep' | 'reject';
+  /**
+   * Reason
+   */
+  reason?: string | null;
+};
+
+/**
  * ApiAccessStatusOut
  */
 export type ApiAccessStatusOut = {
@@ -22406,6 +22422,50 @@ export type ListAiRunEventsResponses = {
 
 export type ListAiRunEventsResponse =
   ListAiRunEventsResponses[keyof ListAiRunEventsResponses];
+
+export type MarkAiRunThoughtData = {
+  body: AiThoughtMarkRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Run Id
+     */
+    run_id: string;
+    /**
+     * Thought Id
+     */
+    thought_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/thoughts/{thought_id}/mark';
+};
+
+export type MarkAiRunThoughtErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MarkAiRunThoughtError =
+  MarkAiRunThoughtErrors[keyof MarkAiRunThoughtErrors];
+
+export type MarkAiRunThoughtResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiRunEventOut;
+};
+
+export type MarkAiRunThoughtResponse =
+  MarkAiRunThoughtResponses[keyof MarkAiRunThoughtResponses];
 
 export type InvestigationCaseSynthesisData = {
   body: CaseSynthesisRequest;

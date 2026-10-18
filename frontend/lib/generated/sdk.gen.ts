@@ -621,6 +621,9 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagErrors,
   MakeLeadFromRedFlagResponses,
+  MarkAiRunThoughtData,
+  MarkAiRunThoughtErrors,
+  MarkAiRunThoughtResponses,
   MarkRedFlagInnocentData,
   MarkRedFlagInnocentErrors,
   MarkRedFlagInnocentResponses,
@@ -1281,6 +1284,9 @@ import {
   zMakeLeadFromNoteResponse,
   zMakeLeadFromRedFlagPath,
   zMakeLeadFromRedFlagResponse,
+  zMarkAiRunThoughtBody,
+  zMarkAiRunThoughtPath,
+  zMarkAiRunThoughtResponse,
   zMarkRedFlagInnocentBody,
   zMarkRedFlagInnocentPath,
   zMarkRedFlagInnocentResponse,
@@ -5291,6 +5297,42 @@ export const listAiRunEvents = <ThrowOnError extends boolean = false>(
       await zListAiRunEventsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/events',
     ...options,
+  });
+
+/**
+ * Mark Ai Run Thought
+ *
+ * Your mark on one thought (a claim, gap or hypothesis the model said), appended to the run record as a step by
+ * you that follows the thought. Accept and reject of the whole answer stay on the candidate's review.
+ */
+export const markAiRunThought = <ThrowOnError extends boolean = false>(
+  options: Options<MarkAiRunThoughtData, ThrowOnError>,
+): RequestResult<
+  MarkAiRunThoughtResponses,
+  MarkAiRunThoughtErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MarkAiRunThoughtResponses,
+    MarkAiRunThoughtErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMarkAiRunThoughtBody,
+          path: zMarkAiRunThoughtPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMarkAiRunThoughtResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/ai-runs/{run_id}/thoughts/{thought_id}/mark',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

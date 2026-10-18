@@ -285,6 +285,16 @@ export const zAiRunsOut = z.object({
 });
 
 /**
+ * AiThoughtMarkRequest
+ *
+ * Your mark on one thought of an AI run (mockup AI_1, the trace drawer's "To check"): kept in the run record.
+ */
+export const zAiThoughtMarkRequest = z.object({
+  mark: z.enum(['to_check', 'keep', 'reject']),
+  reason: z.string().max(500).nullish(),
+});
+
+/**
  * ApiAccessStatusOut
  */
 export const zApiAccessStatusOut = z.object({
@@ -9679,6 +9689,19 @@ export const zListAiRunEventsQuery = z.object({
  * Successful Response
  */
 export const zListAiRunEventsResponse = zAiRunEventsOut;
+
+export const zMarkAiRunThoughtBody = zAiThoughtMarkRequest;
+
+export const zMarkAiRunThoughtPath = z.object({
+  investigation_id: z.string(),
+  run_id: z.string(),
+  thought_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMarkAiRunThoughtResponse = zAiRunEventOut;
 
 export const zInvestigationCaseSynthesisBody = zCaseSynthesisRequest;
 

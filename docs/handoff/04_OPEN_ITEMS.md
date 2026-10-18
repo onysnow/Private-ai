@@ -33,7 +33,7 @@
 - **Chain of Custody:** scroll-over replay along the log; draw-in motion; the claim card's Done checklist.
 - **AI:**
   - "Ask the case" as a four-step entry from elsewhere;
-  - per-claim review of AI candidates (today, accept/reject applies to the whole answer);
+  - per-claim Keep / Correct / Reject on the AI review sheet (AI_1's drawer marks one thought To check, kept in the run record);
   - the "More" row of umbrella session flags (no runtime in the app).
 - **Story:** AI-draft marks, Notes tab, version history, hovering a citation for its quote, dragging claims into the
   text, Leads as Now / Next / Later, the export sheet.

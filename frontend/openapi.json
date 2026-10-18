@@ -1176,6 +1176,37 @@
         "title": "AiRunsOut",
         "type": "object"
       },
+      "AiThoughtMarkRequest": {
+        "description": "Your mark on one thought of an AI run (mockup AI_1, the trace drawer's \"To check\"): kept in the run record.",
+        "properties": {
+          "mark": {
+            "enum": [
+              "to_check",
+              "keep",
+              "reject"
+            ],
+            "title": "Mark",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "mark"
+        ],
+        "title": "AiThoughtMarkRequest",
+        "type": "object"
+      },
       "ApiAccessStatusOut": {
         "properties": {
           "investigation_scope_configured": {
@@ -48622,6 +48653,84 @@
           }
         },
         "summary": "List Ai Run Events"
+      }
+    },
+    "/api/investigations/{investigation_id}/ai-runs/{run_id}/thoughts/{thought_id}/mark": {
+      "post": {
+        "description": "Your mark on one thought (a claim, gap or hypothesis the model said), appended to the run record as a step by\nyou that follows the thought. Accept and reject of the whole answer stay on the candidate's review.",
+        "operationId": "mark_ai_run_thought",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "thought_id",
+            "required": true,
+            "schema": {
+              "title": "Thought Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiThoughtMarkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiRunEventOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Mark Ai Run Thought"
       }
     },
     "/api/investigations/{investigation_id}/assistant/case-synthesis": {

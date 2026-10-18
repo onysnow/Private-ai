@@ -15,12 +15,13 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.ai.run_events import run_events, serialize_event
+from app.ai.run_events import RunRecorder, run_events, serialize_event
 from app.api.dependencies import authorize_request_resource
 from app.db.session import SessionLocal, get_db
 from app.jobs.handlers import AI_REASONING
 from app.models.domain import AIRunEvent, BackgroundJob, Investigation
-from app.schemas.responses import AiRunEventsOut, AiRunsOut
+from app.schemas.api import AiThoughtMarkRequest
+from app.schemas.responses import AiRunEventOut, AiRunEventsOut, AiRunsOut
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -62,6 +63,28 @@ def list_ai_run_events(investigation_id: str, run_id: str, after: int = Query(de
     """The run and its events after `after` (0 = from the start)."""
     job = _run_row(db, investigation_id, run_id)
     return {"run": serialize_run(db, job), "events": [serialize_event(e) for e in run_events(db, investigation_id, run_id, after)]}
+
+
+_MARKS = {"to_check": ("neutral", "TO_CHECK", "You marked {t} to check"), "keep": ("good", "KEPT", "You kept {t}"),
+          "reject": ("bad", "REJECTED", "You rejected {t}")}
+
+
+@router.post("/investigations/{investigation_id}/ai-runs/{run_id}/thoughts/{thought_id}/mark", response_model=AiRunEventOut)
+def mark_ai_run_thought(investigation_id: str, run_id: str, thought_id: str, body: AiThoughtMarkRequest, db: Session = Depends(get_db)) -> Any:
+    """Your mark on one thought (a claim, gap or hypothesis the model said), appended to the run record as a step by
+    you that follows the thought. Accept and reject of the whole answer stay on the candidate's review."""
+    job = _run_row(db, investigation_id, run_id)
+    if job.status not in ("succeeded", "failed", "cancelled"):
+        raise HTTPException(409, "The run is still going; mark its thoughts when it has finished")
+    said = [e for e in run_events(db, investigation_id, run_id) if e.self_reported and (e.detail or {}).get("thought") == thought_id]
+    if not said:
+        raise HTTPException(404, "No such thought in this run")
+    status, verdict, words = _MARKS[body.mark]
+    reason = (body.reason or "").strip() or None
+    rec = RunRecorder(db, investigation_id, run_id)
+    n = rec.emit("CHECK", "review", system="app", status=status, verdict=verdict, parent=said[0].n, refs=said[0].refs,
+                 text=words.format(t=thought_id) + (f": {reason}" if reason else ""), detail={"thought": thought_id, "mark": body.mark, "reason": reason})
+    return serialize_event(next(e for e in run_events(db, investigation_id, run_id, (n or 1) - 1) if e.n == n))
 
 
 def _read(investigation_id: str, run_id: str, after: int) -> tuple[list[dict], bool]:

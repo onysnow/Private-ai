@@ -43,12 +43,19 @@ Built from research AI §4–5 (the PDF and `docs/design/REDESIGN_RESEARCH.md` a
   - The weakest-link chain; the cap shows only when a step records `detail.capped_to`.
   - "Copy cite" carries the passage, the record ids and a link `/act?inv=…&run=…&step=n#ai-runs`, which reopens the
     trace.
+  - "To check" marks one thought (pressed again, takes it off). The mark is a step by you in the run record
+    (`POST …/thoughts/{thought_id}/mark`, ADR-0012) and shows in the ledger as "CLM-n to check · you".
+  - "Run again…" goes back to the plan with the run's question and theory; the packet is built again, and the new run
+    is a new record. It does not restart from the chosen step: the reasoning module has no way to take a given packet.
+  - Confidence shows a cap recorded on any step about the thought; "Removed" finds a BLOCK tied to the thought.
 - **States:**
   - A failed run says "Stopped" with its message.
   - A run without steps says it was made before steps were recorded.
-  - "Play a sample run" (`features/ai/run-sample.ts`, labelled "sample — not a real run") is in Watch's empty state.
-    Watch only opens with a run, so the button is reachable only once Ask has an entry for it (not added: it changes
-    AI_2).
+  - "Play a sample run" (`features/ai/run-sample.ts`, labelled "sample — not a real run"): the Ask step offers "Watch a
+    sample run" when the case has no runs.
+- **Compare:** "Compare…" in the header lists finished runs of the same question. Parts whose verdict changed glow,
+  the rest dim, and the caption lists each change as "before → after". Steps you add later (review, marks) stay at the
+  right edge of the time axis.
 
 Not built, because the run record does not hold it:
 - packet tile titles and pages;
@@ -58,12 +65,10 @@ Not built, because the run record does not hold it:
 - B4 split lights;
 - the B6 membrane.
 
-Not built, needing a decision or an ADR:
-- per-claim "To check" (a disabled button for now);
-- comparing two runs;
-- the dashboard mini strip (another screen);
-- the WebGL bloom in Rain Noir;
-- "Run again from this step".
+Not built:
+- the dashboard's one-line mini strip (another screen; research AI §4 "Front and centre");
+- the WebGL bloom in Rain Noir (needs an ADR);
+- restarting from a chosen step with the same packet (needs a packet override in `run_reasoning_module`).
 
 `tools/seed_run.py` ends as a stopped run (the deliberate out-of-packet citation), with the job marked failed.
 

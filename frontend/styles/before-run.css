@@ -264,3 +264,7 @@ html[data-motion='calm'] .wr-sparks { display: none; }
 .wr-skeleton { display: grid; gap: 5px; } .wr-skeleton i { height: 10px; border-radius: 4px; background: color-mix(in srgb, var(--text-muted) 18%, transparent); }
 .wr-skeleton i:nth-child(2) { width: 70%; } .wr-skeleton i:nth-child(3) { width: 45%; }
 .wr-drawer:focus { outline: none; }
+.wr-node.changed > rect, .wr-node.changed > circle, .wr-node.changed > polygon { stroke: var(--wr-partial); stroke-width: 2.4; filter: drop-shadow(0 0 5px var(--wr-partial)); }
+.wr-wires path.changed { stroke: var(--wr-partial); stroke-width: 2.2; filter: drop-shadow(0 0 3px var(--wr-partial)); }
+.wr-compare { appearance: none; background: transparent; font-family: inherit; }
+.wr-compare option { background: var(--surface-1); color: var(--text); }
