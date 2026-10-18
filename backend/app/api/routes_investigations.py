@@ -20,6 +20,7 @@ from app.ai.reasoning import (
     TAS_MODULES,
     ReasoningInputError,
     list_ai_analysis_candidates,
+    packet_of_run,
     validate_reasoning_request,
 )
 from app.api.dependencies import MAX_OFFSET, authorize_request_resource
@@ -177,7 +178,7 @@ def investigation_question_context(
         raise HTTPException(404, str(exc))
 
 
-async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None, run_options: dict | None = None, premises: list[str] | None = None, changes: list[dict] | None = None) -> dict[str, Any]:
+async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None, run_options: dict | None = None, premises: list[str] | None = None, changes: list[dict] | None = None, packet_from: dict | None = None) -> dict[str, Any]:
     """Validate, then run as a background job (Foundation Fixes fix 4).
 
     In the Docker stack the run is queued and this answers 202 with the job
@@ -192,6 +193,11 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
             investigation_id=investigation_id, module=module, working_theory=working_theory,
             control_flags=control_flags, record_refs=record_refs, run_options=run_options, premises=premises,
         )
+        if packet_from:
+            # Refused before anything is queued: the earlier run must be this case's and must have kept its packet.
+            packet_of_run(db, investigation_id=investigation_id, run_id=str(packet_from["run_id"]))
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))
     except ReasoningInputError as exc:
         raise HTTPException(400, str(exc))
     scope = current_authorization_scope()
@@ -202,7 +208,7 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
             "module": module, "question": question, "working_theory": working_theory, "max_results": max_results,
             "include_external_leads": include_external_leads, "record_refs": record_refs,
             "control_flags": control_flags if module in TAS_MODULES else None, "resolved_control_flags": resolved_flags,
-            "run_options": run_options, "premises": premises, "changes": changes,
+            "run_options": run_options, "premises": premises, "changes": changes, "packet_from": packet_from,
             "actor_id": scope.actor_id if scope is not None else "local-owner",
         },
         message="Waiting for the model",
@@ -226,6 +232,7 @@ def _run_extras(body: CaseSynthesisRequest | HypothesisTestRequest) -> dict[str,
         "run_options": body.options.model_dump(exclude_none=True) if body.options else None,
         "premises": body.premises,
         "changes": [c.model_dump() for c in body.changes] if body.changes else None,
+        "packet_from": body.packet_from.model_dump() if body.packet_from else None,
     }
 
 

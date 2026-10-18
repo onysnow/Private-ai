@@ -122,3 +122,30 @@ def test_a_run_stopped_by_the_citation_check_ends_with_a_stopped_turn(monkeypatc
     assert any(e["kind"] == "BLOCK" for e in events)
     assert events[-1]["kind"] == "TURN" and events[-1]["status"] == "bad" and events[-1]["verdict"] == "STOPPED"
     assert run["problems"] >= 2
+
+
+@requires_suite
+def test_run_again_from_a_step_takes_the_same_packet_with_new_instructions(monkeypatch):
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    seeded = _seeded_investigation(client)
+    inv = seeded["investigation"]["id"]
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient(_valid_case_synthesis(seeded["evidence"]["id"])))
+    first = ok(client.post(f"/api/investigations/{inv}/assistant/case-synthesis", json={"question": "What did Ada North sign?"}))
+    first_events = ok(client.get(f"/api/investigations/{inv}/ai-runs/{first['job']['id']}/events"))["events"]
+    packet = next(e for e in first_events if e["node"] == "retrieval")
+
+    again = ok(client.post(f"/api/investigations/{inv}/assistant/case-synthesis", json={
+        "question": "What did Ada North sign?", "options": {"devils_advocate": "ON"},
+        "packet_from": {"run_id": first["job"]["id"], "step": packet["n"]}}))
+    assert again["job"]["id"] != first["job"]["id"], "the new run is a new record"
+    events = ok(client.get(f"/api/investigations/{inv}/ai-runs/{again['job']['id']}/events"))["events"]
+    reused = next(e for e in events if e["node"] == "retrieval")
+    assert reused["text"].startswith(f"Packet taken again from run {first['job']['id'][:8]} (step {packet['n']})")
+    assert reused["refs"] == packet["refs"]
+    assert reused["detail"]["reused_from"] == {"run_id": first["job"]["id"], "step": packet["n"]}
+    assert any(e["text"] == "devils_advocate = on (default off)" for e in events)
+
+    other = ok(client.post("/api/investigations", json={"name": "Other"}))["id"]
+    assert client.post(f"/api/investigations/{other}/assistant/case-synthesis", json={
+        "question": "x", "packet_from": {"run_id": first["job"]["id"], "step": 1}}).status_code == 404

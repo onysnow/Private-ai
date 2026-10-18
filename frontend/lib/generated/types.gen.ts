@@ -1964,6 +1964,7 @@ export type CaseSynthesisRequest = {
    */
   max_results?: number;
   options?: RunOptionsIn | null;
+  packet_from?: PacketFromIn | null;
   /**
    * Premises
    */
@@ -9264,6 +9265,7 @@ export type HypothesisTestRequest = {
    */
   max_results?: number;
   options?: RunOptionsIn | null;
+  packet_from?: PacketFromIn | null;
   /**
    * Premises
    */
@@ -11944,6 +11946,22 @@ export type OwnershipChainOwnerOut = {
    * Paths
    */
   paths: number;
+};
+
+/**
+ * PacketFromIn
+ *
+ * Run again from a step of an earlier run (mockup AI_1, research AI §5): the same packet, new instructions.
+ */
+export type PacketFromIn = {
+  /**
+   * Run Id
+   */
+  run_id: string;
+  /**
+   * Step
+   */
+  step: number;
 };
 
 /**

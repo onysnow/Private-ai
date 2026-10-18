@@ -36,8 +36,8 @@ export const FORMATS: {id: Format; name: string; line: string; ready: boolean}[]
 ];
 
 /** The named board effects that can be switched off one by one (mockup HOME_2). */
-export type NamedEffect = 'bokeh' | 'rain' | 'grain' | 'iris' | 'shutter' | 'neon';
-export const NAMED_EFFECTS: NamedEffect[] = ['bokeh', 'rain', 'grain', 'iris', 'shutter', 'neon'];
+export type NamedEffect = 'bokeh' | 'rain' | 'grain' | 'iris' | 'shutter' | 'neon' | 'bloom';
+export const NAMED_EFFECTS: NamedEffect[] = ['bokeh', 'rain', 'grain', 'iris', 'shutter', 'neon', 'bloom'];
 /** Neon starts off (research §04.11: "steady only, off by default"). */
 const OFF_AT_FIRST: NamedEffect[] = ['neon'];
 export type Appearance = {theme: ThemeId; effects: Effects; motion: Motion; format: Format; off: NamedEffect[]};

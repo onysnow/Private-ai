@@ -33,7 +33,7 @@ export function useRunStream(investigationId: string, runId: string | null, live
   const queryClient = useQueryClient();
   const [state, setState] = useState<StreamState>({mode: 'off', from: 0});
   useEffect(() => {
-    if (!runId || !live || typeof ReadableStream === 'undefined') { setState({mode: 'off', from: 0}); return; }
+    if (!runId || !investigationId || !live || typeof ReadableStream === 'undefined') { setState({mode: 'off', from: 0}); return; }
     const key = listAiRunEventsQueryKey({path: {investigation_id: investigationId, run_id: runId}, query: {after: 0}});
     const ctrl = new AbortController();
     let failures = 0;

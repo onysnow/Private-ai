@@ -92,4 +92,31 @@ describe('BeforeYouRun', () => {
     await user.click(screen.getByRole('button', {name: 'Ask the case'}));
     expect(await screen.findByLabelText('Your question')).toBeInTheDocument();
   });
+
+  it('runs again from a step with the same packet and the instructions set in the plan', async () => {
+    const ev = (n: number, o: Record<string, unknown>) => ({n, at: '2026-10-12T10:00:05Z', system: 'app', rule: null, status: 'good', verdict: null, refs: [],
+      parent: n > 1 ? 1 : null, self_reported: false, detail: null, kind: 'CHECK', node: 'retrieval', text: 'x', ...o});
+    const events = [ev(1, {kind: 'TURN', node: 'run', status: 'neutral', text: 'Case synthesis asked'}),
+      ev(2, {node: 'retrieval', text: 'Packet built: 3 records', refs: [{record_type: 'evidence', record_id: 'ev-58'}]})];
+    window.history.replaceState(null, '', '/act?inv=inv-1&run=job-1&step=2');
+    const api = mockApi({
+      [`GET ${BASE}/profile`]: PLAN.profile,
+      [`POST ${BASE}/plan`]: PLAN,
+      [`POST ${BASE}/case-synthesis`]: {candidate_id: 'cand-1', job, review_status: 'proposed', payload: {}},
+      'GET /api/investigations/inv-1/ai-runs/job-1/events': {run: {...RUN, events: 2}, events},
+      'GET /api/investigations/inv-1/ai-runs': {runs: [RUN]},
+      'GET /api/ai-analysis-candidates/cand-1': {id: 'cand-1', investigation_id: 'inv-1', module: 'case_synthesis', review_status: 'proposed', confidence: 0.5,
+        created_at: '2026-10-12T10:01:00Z', payload: {}, rejection_reason: null, request: {}, reviewed_at: null, reviewer_note: null, trace: null,
+        accepted_record_id: null, accepted_record_type: null, checked_citation_count: 0, checked_citation_ids: []},
+    });
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: 'Run again from this step…'}));
+    expect(await screen.findByText('Same packet as run job-1')).toBeInTheDocument();
+    const go = await screen.findByRole('button', {name: /Run and watch/});
+    await waitFor(() => expect(go).toBeEnabled());
+    await user.click(go);
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/case-synthesis`)).toMatchObject({question: RUN.question, packet_from: {run_id: 'job-1', step: 2}}));
+    window.history.replaceState(null, '', '/');
+  });
 });

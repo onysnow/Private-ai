@@ -180,7 +180,13 @@ describe('WatchTheRun', () => {
     await user.click(await screen.findByRole('button', {name: 'Play a sample run'}));
     expect(await screen.findByText('sample — not a real run')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: '✓ Accept'})).toBeNull();
-  });
+    // The sample carries the crosswalk split and the precedence stop the app draws when a record holds them.
+    expect(await screen.findByRole('button', {name: 'B4 crosswalk, TAS to LAS, Verified and Unverified'}, {timeout: 8000})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'B6 precedence, before DAS, stopped: An attributed claim cannot carry a recommendation'})).toBeInTheDocument();
+    expect(document.querySelector('.wr-membrane.bad')).not.toBeNull();
+    expect(screen.getByRole('button', {name: /^LAS 03 Soundness|^03 Soundness/})).toBeInTheDocument();
+    expect(document.querySelector('.wr-bloom')).toBeNull();
+  }, 15000);
 
   it('says why a stopped run stopped', async () => {
     const events = record(1);
@@ -228,15 +234,15 @@ describe('WatchTheRun, your marks and other runs', () => {
     expect(document.querySelectorAll('.wr-node.changed')).toHaveLength(1);
   });
 
-  it('runs again from the plan with the same question', async () => {
+  it('runs again from a step: back to the plan with the same question and packet', async () => {
     const again = vi.fn();
     const events = record(2);
     mockApi({[`GET ${EV}`]: {run: {...RUN, events: events.length}, events}, 'GET /api/ai-analysis-candidates/cand-1': CAND});
     render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-1" onRunAgain={again}/></QueryProvider>);
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
-    await user.click(screen.getByRole('button', {name: 'Run again…'}));
-    expect(again).toHaveBeenCalledWith({question: RUN.question, module: 'case_synthesis', theory: null});
+    await user.click(screen.getByRole('button', {name: 'Run again from this step…'}));
+    expect(again).toHaveBeenCalledWith({question: RUN.question, module: 'case_synthesis', theory: null, from: {run_id: 'run-1', step: expect.any(Number)}});
   });
 });
 

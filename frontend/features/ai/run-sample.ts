@@ -34,6 +34,13 @@ export const SAMPLE_EVENTS: AiRunEventOut[] = [
   ev({kind: 'CHECK', node: 'cp-01', system: 'umbrella', status: 'partial', text: 'Right of reply needed before publication (CP-01)', parent: 15, detail: {thought: 'CLM-0009'}}, 49),
   ev({kind: 'BLOCK', node: 'gate:citation', status: 'bad', verdict: 'NOT_IN_PACKET', text: '"Beneficial owner": no passage says it', parent: 15, detail: {thought: 'CLM-0009'}}, 50),
   ev({kind: 'RULE', node: 'tas/08', system: 'tas', rule: 'Module 08 gaps', status: 'neutral', verdict: 'GAP', self_reported: true, text: '2017 owner filing missing', parent: 12, detail: {thought: 'GAP-0004'}}, 51),
+  ev({kind: 'ROUTE', node: 'router', system: 'las', rule: 'AGENTS.md trigger table row 4', status: 'good', text: 'LAS: the answer draws a conclusion beyond a source', parent: 1}, 52),
+  ev({kind: 'LOAD', node: 'las/03', system: 'las', rule: 'AG-050', status: 'good', text: 'Loaded 03_SOUNDNESS_CHECK.md', parent: 21, detail: {label: 'Soundness'}}, 52),
+  ev({kind: 'CHECK', node: 'boundary:tas→las', system: 'umbrella', rule: 'INTEROP §3', status: 'partial', verdict: 'PARTIALLY_VERIFIED',
+    text: 'Partially verified: the part TAS confirmed crosses as verified, the rest as unverified, never rounded', parent: 13,
+    detail: {thought: 'CLM-0008', split: [{verdict: 'VERIFIED', status: 'good'}, {verdict: 'UNVERIFIED', status: 'partial'}]}}, 53),
+  ev({kind: 'BLOCK', node: 'boundary:las→das', system: 'umbrella', rule: 'B6', status: 'bad', verdict: 'BLOCKED',
+    text: 'An attributed claim cannot carry a recommendation', parent: 15, detail: {thought: 'CLM-0009'}}, 54),
   ev({kind: 'WRITE', node: 'candidate', status: 'good', verdict: 'PROPOSED', text: 'Saved as a sample: proposed for your review', parent: 12}, 72),
   ev({kind: 'TURN', node: 'run', status: 'good', verdict: 'PROPOSED', text: 'Proposed for your review', parent: 1}, 72),
 ];
@@ -41,5 +48,5 @@ export const SAMPLE_EVENTS: AiRunEventOut[] = [
 export const SAMPLE_RUN: AiRunOut = {
   run_id: 'sample', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who controlled Fernhill Ltd between 2016 and 2023, and how?',
   working_theory: null, created_at: at(0), started_at: at(0), finished_at: at(72), candidate_id: null, review_status: null,
-  events: SAMPLE_EVENTS.length, problems: 3, message: 'sample — not a real run', error: null,
+  events: SAMPLE_EVENTS.length, problems: 5, message: 'sample — not a real run', error: null,
 };

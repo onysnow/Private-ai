@@ -83,6 +83,8 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   const [reason, setReason] = useState('');
   const [runId, setRunId] = useState<string | null>(null);
   const [sampleOnly, setSampleOnly] = useState(false);
+  // Run again from a step of an earlier run (AI_1's drawer): the same packet, the instructions set here.
+  const [packetFrom, setPacketFrom] = useState<{run_id: string; step: number} | null>(null);
   // Asked to watch a run from elsewhere (a Chain of Custody AI step): open it in step 3.
   const asked = useWorkbenchStore(s => s.aiRun);
   useEffect(() => { if (asked) { setRunId(asked.runId); setStep(3); } }, [asked]);
@@ -148,12 +150,13 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     if (!body || !p?.where.callable || running) return;
     setRunning(true); setOutcome(null);
     const runBody = {question: body.question, max_results: 30, include_external_leads: true, severity_floor: body.severity_floor,
-      source_tier_floor: body.source_tier_floor, options: body.options, premises, changes: echo};
+      source_tier_floor: body.source_tier_floor, options: body.options, premises, changes: echo, packet_from: packetFrom};
     try {
       const reply = module === 'hypothesis_test'
         ? (await investigationHypothesisTest({path: {investigation_id: investigationId}, body: {...runBody, working_theory: theory.trim()}, throwOnError: true})).data
         : (await investigationCaseSynthesis({path: {investigation_id: investigationId}, body: runBody, throwOnError: true})).data;
       setRunId(reply.job.id);
+      setPacketFrom(null);
       if (watch) setStep(3);
       if (!reply.candidate_id && reply.job) {
         const done = await waitForJob(api, reply.job.id, undefined, {intervalMs: 2000});
@@ -210,7 +213,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     {!runId && running && <p role="status">Sending the run…</p>}
     {(runId || sampleOnly) && <WatchTheRun investigationId={investigationId} runId={runId} sample={sampleOnly && !runId}
       onBack={() => { setSampleOnly(false); setStep(runId ? 2 : 1); }}
-      onRunAgain={r => { setSampleOnly(false); setQuestion(r.question); setModule(r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setTheory(r.theory ?? ''); setStep(2); }}/>}
+      onRunAgain={r => { setSampleOnly(false); setPacketFrom(r.from ?? null); setQuestion(r.question); setModule(r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setTheory(r.theory ?? ''); setStep(2); }}/>}
   </section>;
 
   return <section className="br" aria-label="AI runs">
@@ -240,7 +243,9 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
         <p className="br-title">The plan <small>Edit any step before it runs</small><button type="button" className="br-quiet" onClick={() => setStep(1)}>Edit plan</button></p>
         <div className="br-qcard"><p className="br-eyebrow">Your question</p><p className="br-q">{question}</p>
           {module === 'hypothesis_test' && theory && <p className="br-theory">Theory: {theory}</p>}
-          {p && <p className="br-tray"><b>{p.packet.records} records go in</b> · {p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
+          {packetFrom && <p className="br-tray br-reuse" role="status"><b>Same packet as run {packetFrom.run_id.slice(0, 8)}</b> (from its step {packetFrom.step}): the records it sent go in again, with the instructions set here.
+            <button type="button" className="br-quiet" onClick={() => setPacketFrom(null)}>Build a new packet</button></p>}
+          {p && !packetFrom && <p className="br-tray"><b>{p.packet.records} records go in</b> · {p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
             {p.packet.leads_only > 0 && <><br/>{p.packet.leads_only} outside lead{p.packet.leads_only === 1 ? '' : 's'} count as leads only</>}</p>}
         </div>
         {plan.isError && <p role="alert" className="br-bad">{errorMessage(plan.error, 'Could not work out the plan')}</p>}

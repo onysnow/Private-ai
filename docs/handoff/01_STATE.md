@@ -45,8 +45,6 @@ Built from research AI §4–5 (the PDF and `docs/design/REDESIGN_RESEARCH.md` a
     trace.
   - "To check" marks one thought (pressed again, takes it off). The mark is a step by you in the run record
     (`POST …/thoughts/{thought_id}/mark`, ADR-0012) and shows in the ledger as "CLM-n to check · you".
-  - "Run again…" goes back to the plan with the run's question and theory; the packet is built again, and the new run
-    is a new record. It does not restart from the chosen step: the reasoning module has no way to take a given packet.
   - Confidence shows a cap recorded on any step about the thought; "Removed" finds a BLOCK tied to the thought.
 - **States:**
   - A failed run says "Stopped" with its message.
@@ -57,18 +55,23 @@ Built from research AI §4–5 (the PDF and `docs/design/REDESIGN_RESEARCH.md` a
   the rest dim, and the caption lists each change as "before → after". Steps you add later (review, marks) stay at the
   right edge of the time axis.
 
-Not built, because the run record does not hold it:
-- packet tile titles and pages;
-- "INTEROP";
-- the other TAS modules;
-- RAS/QAS/LAS/DAS contents;
-- B4 split lights;
-- the B6 membrane.
+- **Run again from this step…:** goes back to the plan with the question and the same packet. The request carries
+  `packet_from {run_id, step}`; the server reads the earlier run's packet back from its candidate's prompt
+  (`packet_of_run` in `app/ai/reasoning.py`) and records "Packet taken again from run … (step n)". The new run is a new
+  record. A run that kept no candidate cannot be run again this way (400).
+- **B4 and B6:** the map draws the B4 crosswalk (a PARTIALLY VERIFIED claim splits into a verified and an unverified
+  light, INTEROP §3) and the B6 precedence membrane (lit red for the rest of the run when it stops a step) from events
+  at `boundary:tas→las` and `boundary:las→das` (`detail.split` for B4). Modules of RAS, QAS, LAS or DAS (`las/03`…)
+  become chips in their column, at most five, then "+ n modules". The app runs no LAS or DAS, so no recorded run has
+  these today; the sample run shows them.
+- **The case home's AI strip** (`features/ai/ai-strip.tsx`, under Switch case): "AI: n drafts waiting for review · last
+  run hh:mm" with the last run's four tallies, "AI off" when AI is off, and while a run is live the miniature (five
+  column dots, the model ring, the problem count). Clicking opens the run in Act › AI runs.
+- **Rain Noir bloom** on the lights: `features/effects/run-bloom.tsx`, ADR-0013, a named effect in Appearance.
 
 Not built:
-- the dashboard's one-line mini strip (another screen; research AI §4 "Front and centre");
-- the WebGL bloom in Rain Noir (needs an ADR);
-- restarting from a chosen step with the same packet (needs a packet override in `run_reasoning_module`).
+- packet tile titles and pages, "INTEROP" on the umbrella band (the run record holds ids only);
+- the B4/B6 events themselves in a real run: they need the app to run LAS and DAS.
 
 `tools/seed_run.py` ends as a stopped run (the deliberate out-of-packet citation), with the job marked failed.
 

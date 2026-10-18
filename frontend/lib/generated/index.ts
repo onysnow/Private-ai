@@ -1697,6 +1697,7 @@ export type {
   OwnershipChainNodeOut,
   OwnershipChainOut,
   OwnershipChainOwnerOut,
+  PacketFromIn,
   PartyYearsOut,
   PatchClaimSuiteData,
   PatchClaimSuiteError,

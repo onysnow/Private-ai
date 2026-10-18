@@ -16,9 +16,14 @@ import {
   reviewAiAnalysisCandidateEndpointMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {AiRunEventOut} from '../../lib/generated/types.gen';
+import {currentAppearance, onAppearanceChange} from '../../lib/theme';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {RunBloom} from '../effects/run-bloom';
+import type {Flight} from '../effects/run-bloom';
+import {webglAvailable} from '../effects/webgl';
 import {SAMPLE_EVENTS, SAMPLE_RUN} from './run-sample';
 import {useRunStream} from './run-stream';
+import {thoughtTallies} from './run-tally';
 
 type Ev = AiRunEventOut;
 type Status = 'good' | 'partial' | 'bad' | 'neutral';
@@ -29,12 +34,13 @@ const AT: Record<string, Pt> = {
   run: {x: 70, y: 110}, retrieval: {x: 70, y: 215}, controls: {x: 500, y: 28}, router: {x: 185, y: 150}, model: {x: 165, y: 305},
   'gate:schema': {x: 290, y: 130}, 'gate:citation': {x: 290, y: 215}, 'gate:quote': {x: 252, y: 300}, 'gate:chart': {x: 292, y: 300}, 'gate:writing': {x: 332, y: 300},
   'tas/08': {x: 495, y: 122}, 'tas/06': {x: 495, y: 122}, 'app/draft': {x: 290, y: 60}, 'tas/class': {x: 495, y: 158}, 'tas/corroboration': {x: 495, y: 194},
+  'boundary:tas→las': {x: 640, y: 322}, 'boundary:las→das': {x: 735, y: 200},
   'cp-01': {x: 495, y: 290}, 'cp-02': {x: 32, y: 318}, 'cp-03': {x: 80, y: 318}, candidate: {x: 905, y: 110}, review: {x: 905, y: 300},
 };
 const HALF: Record<string, Pt> = {
   run: {x: 50, y: 22}, retrieval: {x: 50, y: 14}, router: {x: 21, y: 21}, model: {x: 26, y: 26}, 'gate:schema': {x: 18, y: 16}, 'gate:citation': {x: 18, y: 16},
   'gate:quote': {x: 18, y: 8}, 'gate:chart': {x: 18, y: 8}, 'gate:writing': {x: 18, y: 8}, 'tas/08': {x: 40, y: 11}, 'tas/06': {x: 40, y: 11}, 'tas/class': {x: 40, y: 11},
-  'tas/corroboration': {x: 40, y: 11}, 'cp-01': {x: 14, y: 16}, 'cp-02': {x: 14, y: 16}, 'cp-03': {x: 14, y: 16}, candidate: {x: 50, y: 20}, review: {x: 22, y: 22}, 'app/draft': {x: 40, y: 11},
+  'tas/corroboration': {x: 40, y: 11}, 'cp-01': {x: 14, y: 16}, 'cp-02': {x: 14, y: 16}, 'cp-03': {x: 14, y: 16}, 'boundary:tas→las': {x: 30, y: 9}, 'boundary:las→das': {x: 4, y: 120}, candidate: {x: 50, y: 20}, review: {x: 22, y: 22}, 'app/draft': {x: 40, y: 11},
 };
 const SYSTEMS: Array<{key: string; name: string; x: number; w: number; trigger: string}> = [
   {key: 'ras', name: 'RAS', x: 390, w: 80, trigger: 'if the answer had relied on published research'},
@@ -46,22 +52,25 @@ const SYSTEMS: Array<{key: string; name: string; x: number; w: number; trigger: 
 const TAS_MODULES = 10;
 // The pipeline in reading order, for the arrow keys (research AI §4 "arrow keys move along the pipeline").
 const ORDER = ['run', 'retrieval', 'cp-02', 'cp-03', 'router', 'model', 'gate:schema', 'gate:citation', 'gate:quote', 'gate:chart', 'gate:writing',
-  'tas/08', 'tas/06', 'tas/class', 'tas/corroboration', 'cp-01', 'candidate', 'review'];
+  'tas/08', 'tas/06', 'tas/class', 'tas/corroboration', 'cp-01', 'boundary:tas→las', 'boundary:las→das', 'candidate', 'review'];
 const NOTES_KEY = 'pai:watch-run-notes';
 const LANES: Array<{key: string; label: string; match: (e: Ev) => boolean}> = [
   {key: 'router', label: 'Router', match: e => e.kind === 'ROUTE' || e.kind === 'LOAD' || e.node === 'controls'},
   {key: 'model', label: 'Model', match: e => e.node === 'model'},
   {key: 'checks', label: 'Checks', match: e => e.node.startsWith('gate:') || e.node === 'retrieval'},
-  {key: 'tas', label: 'TAS', match: e => e.system === 'tas' && e.kind !== 'ROUTE' && e.kind !== 'LOAD'},
-  {key: 'las', label: 'LAS', match: () => false},
-  {key: 'das', label: 'DAS', match: () => false},
+  {key: 'tas', label: 'TAS', match: e => e.system === 'tas' && e.kind !== 'ROUTE' && e.kind !== 'LOAD' && !e.node.startsWith('boundary:')},
+  {key: 'las', label: 'LAS', match: e => (e.system === 'las' && e.kind !== 'ROUTE') || e.node === 'boundary:tas→las'},
+  {key: 'das', label: 'DAS', match: e => (e.system === 'das' && e.kind !== 'ROUTE') || e.node === 'boundary:las→das'},
   {key: 'write', label: 'Write', match: e => e.kind === 'WRITE' || e.kind === 'TURN'},
   {key: 'you', label: 'You', match: e => e.node === 'review'},
 ];
 const WORD: Record<Status, string> = {good: 'verified', partial: 'in between', bad: 'stopped', neutral: 'a finding'};
 const STREAM_OVER = 12;
 const isProblem = (e: Ev) => e.status === 'bad' || (e.status === 'partial' && !e.self_reported);
-const nodeOf = (e: Ev) => (AT[e.node] ? e.node : e.node === 'cp-02' || e.node === 'cp-03' ? e.node : e.node.startsWith('gate:') ? 'gate:citation' : e.system === 'tas' ? 'tas/class' : 'run');
+// A module of a system the app does not run yet (RAS, QAS, LAS, DAS): drawn as a chip in that system's column when a
+// record holds one. B4 (the TAS → LAS crosswalk) and B6 (precedence before DAS) are boundaries (INTEROP §3, §8).
+const OTHER_MODULE = /^(ras|qas|las|das)\/./;
+const nodeOf = (e: Ev) => (AT[e.node] || OTHER_MODULE.test(e.node) ? e.node : e.node === 'cp-02' || e.node === 'cp-03' ? e.node : e.node.startsWith('gate:') ? 'gate:citation' : e.system === 'tas' ? 'tas/class' : 'run');
 const words = (v: string | null | undefined) => (v ? (v.charAt(0) + v.slice(1).toLowerCase()).replace(/_/g, ' ') : '');
 const utc = (iso: string) => Date.parse(iso.endsWith('Z') ? iso : `${iso}Z`);
 const stamp = (iso: string) => new Date(utc(iso)).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false}).replace(',', '');
@@ -108,7 +117,7 @@ function calmNow(): boolean {
 export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample: startSample = false}: {
   investigationId: string; runId: string | null; onBack?: () => void; sample?: boolean;
   /** Run again with new instructions: back to the plan with this run's question (research AI §5 "Run again"). */
-  onRunAgain?: (r: {question: string; module: string; theory: string | null}) => void;
+  onRunAgain?: (r: {question: string; module: string; theory: string | null; from?: {run_id: string; step: number}}) => void;
 }): ReactElement {
   const queryClient = useQueryClient();
   const caseName = useWorkbenchStore(s => s.investigationName);
@@ -120,14 +129,14 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   const streaming = useRef(false);
   const q = useQuery({
     ...listAiRunEventsOptions({path: {investigation_id: investigationId, run_id: realId ?? ''}, query: {after: 0}}),
-    enabled: Boolean(realId) && !sample,
+    enabled: Boolean(realId) && Boolean(investigationId) && !sample,
     refetchInterval: query => (query.state.data?.run.finished ? false : streaming.current ? 5000 : 1000),
   });
   const run = sample ? SAMPLE_RUN : q.data?.run;
   const events = useMemo(() => (sample ? SAMPLE_EVENTS : q.data?.events ?? []), [sample, q.data]);
   // Compare two runs of the same question: the parts whose verdict changed glow, the rest stay dim (research AI §4).
   const [compareId, setCompareId] = useState<string | null>(null);
-  const other = useQuery({...listAiRunEventsOptions({path: {investigation_id: investigationId, run_id: compareId ?? ''}, query: {after: 0}}), enabled: Boolean(compareId)});
+  const other = useQuery({...listAiRunEventsOptions({path: {investigation_id: investigationId, run_id: compareId ?? ''}, query: {after: 0}}), enabled: Boolean(compareId) && Boolean(investigationId)});
   const stream = useRunStream(investigationId, sample ? null : realId, Boolean(q.data && !q.data.run.finished));
   streaming.current = stream.mode === 'live';
   const byN = useMemo(() => new Map(events.map(e => [e.n, e])), [events]);
@@ -168,11 +177,14 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   // Lights in flight: each newly shown step travels for about a second, then only its node keeps the verdict.
   const [flying, setFlying] = useState<number[]>([]);
   const prevShown = useRef(0);
+  const flightStart = useRef(new Map<number, number>());
   const timers = useRef<number[]>([]);
   useEffect(() => {
     const fresh = shown > prevShown.current ? events.slice(prevShown.current, shown).map(e => e.n) : [];
     prevShown.current = shown;
     if (!fresh.length || calm) return;
+    const at = performance.now();
+    for (const n of fresh) flightStart.current.set(n, at);
     setFlying(f => [...f, ...fresh].slice(-80));
     timers.current.push(window.setTimeout(() => setFlying(f => f.filter(n => !fresh.includes(n))), 1100 / speed));
   }, [shown, events, calm, speed]);
@@ -249,6 +261,21 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   const mark = useMutation({...markAiRunThoughtMutation(), onSuccess: () => {
     void queryClient.invalidateQueries({queryKey: listAiRunEventsQueryKey({path: {investigation_id: investigationId, run_id: realId ?? ''}, query: {after: 0}})});
   }});
+  // Positions: the fixed map plus a chip per module of RAS, QAS, LAS or DAS the record holds (at most 5 a column,
+  // the rest folded into "+ n modules", the suite viewer's rule).
+  const otherModules = useMemo(() => {
+    const by: Record<string, string[]> = {};
+    for (const e of events) if (OTHER_MODULE.test(e.node)) { const sys = e.node.split('/')[0]; by[sys] ??= []; if (!by[sys].includes(e.node)) by[sys].push(e.node); }
+    return by;
+  }, [events]);
+  const P = useMemo(() => {
+    const out: Record<string, Pt> = {...AT};
+    for (const [sys, mods] of Object.entries(otherModules)) {
+      const col = SYSTEMS.find(x => x.key === sys);
+      if (col) mods.forEach((m, i) => { out[m] = {x: col.x, y: 132 + Math.min(i, 5) * 34}; });
+    }
+    return out;
+  }, [otherModules]);
   const sameQuestion = (runs.data?.runs ?? []).filter(r => run && r.run_id !== run.run_id && r.finished
     && r.question.trim().toLowerCase() === run.question.trim().toLowerCase());
   // A node's verdict in one run: its worst step (stopped, then in between, then verified, then a finding).
@@ -257,7 +284,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
     const at = list.filter(e => e.kind !== 'SETTING' && nodeOf(e) === k);
     return at.length ? at.reduce((w, e) => (RANK[e.status] > RANK[w] ? e.status as Status : w), at[0].status as Status) : null;
   };
-  const changes = compareId && other.data ? ORDER.filter(k => AT[k]).map(k => ({k, before: verdictAt(other.data.events, k), after: verdictAt(events, k)}))
+  const changes = compareId && other.data ? ORDER.filter(k => P[k]).map(k => ({k, before: verdictAt(other.data.events, k), after: verdictAt(events, k)}))
     .filter(c => c.before !== c.after) : [];
   const changed = new Set(changes.map(c => c.k));
   // Hover: a node's tally in words, or a wire's count and kinds (research AI §4 "Hover").
@@ -266,6 +293,17 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   const [zoom, setZoom] = useState({k: 1, cx: 500, cy: 210});
   const [win, setWin] = useState({from: 0, to: 1});
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  // Rain Noir's bloom on the lights (ADR-0013): its own switch in Appearance, never under Calm or reduced motion.
+  const [bloom, setBloom] = useState(false);
+  useEffect(() => {
+    const read = () => {
+      const a = currentAppearance();
+      setBloom(a.theme === 'rain-noir' && a.effects === 'full' && a.motion !== 'calm' && !a.off.includes('bloom') && webglAvailable());
+    };
+    read();
+    return onAppearanceChange(read);
+  }, []);
   const lanesRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const map = mapRef.current;
@@ -364,14 +402,11 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   for (const e of visible) if (e.self_reported && edgeKey(e)) streams.set(edgeKey(e), (streams.get(edgeKey(e)) ?? 0) + 1);
   const isStream = (k: string) => (streams.get(k) ?? 0) > STREAM_OVER;
 
-  const counts = {good: 0, partial: 0, bad: 0, neutral: 0} as Record<Status, number>;
-  for (const e of visible) if (e.self_reported) {
-    const confirm = events.find(x => x.parent === e.n && x.node === 'gate:citation');
-    counts[((confirm?.status === 'bad' ? 'bad' : e.status) as Status)] += 1;
-  }
+  // Only the thoughts shown so far count; their confirmation may come later in the record.
+  const counts = thoughtTallies([...visible.filter(e => e.self_reported), ...events.filter(e => e.node === 'gate:citation')]) as Record<Status, number>;
 
   const wire = (a: string, b: string) => {
-    const from = AT[a], to = AT[b], ha = HALF[a] ?? {x: 20, y: 16}, hb = HALF[b] ?? {x: 20, y: 16};
+    const from = P[a], to = P[b], ha = HALF[a] ?? {x: 20, y: 16}, hb = HALF[b] ?? {x: 20, y: 16};
     if (Math.abs(to.x - from.x) < 70) { // stacked: bottom to top
       const sy = from.y + (to.y > from.y ? ha.y : -ha.y), ty = to.y + (to.y > from.y ? -hb.y : hb.y);
       return `M${from.x} ${sy} L${to.x} ${ty}`;
@@ -383,7 +418,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
     ['router', tasOn ? loadNode : 'app/draft'], ['gate:citation', 'tas/class'], ['tas/class', 'tas/corroboration'], ['tas/class', 'candidate'], ['candidate', 'review']];
 
   const node = (k: string, label: string, shape: 'diamond' | 'circle' | 'double' | 'hex' | 'person' | 'qtile' | 'chip' | 'mini' | 'cand', sub?: string[], opts: {dim?: boolean; icon?: string; hint?: string} = {}) => {
-    const p = AT[k];
+    const p = P[k];
     const t = tally[k];
     const dim = opts.dim ?? false;
     const name = `${label}${opts.hint ? ` (${opts.hint})` : ''}${t ? `, ${(['good', 'partial', 'bad', 'neutral'] as Status[]).filter(s => t[s]).map(s => `${t[s]} ${WORD[s]}`).join(', ')}` : ''}${dim ? ', not run in the app' : ''}`;
@@ -417,7 +452,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   };
   // Hover words for a node: "TAS · 5 verified · 6 in between · 2 stopped".
   const showTally = (k: string, label: string) => {
-    const t = tally[k], p = AT[k];
+    const t = tally[k], p = P[k];
     const parts = t ? (['good', 'partial', 'bad', 'neutral'] as Status[]).filter(st => t[st]).map(st => `${t[st]} ${WORD[st]}`) : [];
     setHover({x: p.x, y: p.y - (HALF[k]?.y ?? 16) - 12, text: [label, ...(parts.length ? parts : ['nothing yet'])].join(' · ')});
   };
@@ -430,10 +465,51 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
     nodes[(at + step + nodes.length) % nodes.length]?.focus();
   };
 
+  const verdictOf = (e: Ev) => words(e.verdict) || WORD[e.status as Status];
+  const moduleLabel = (m: string) => {
+    const named = events.find(e => e.node === m && (e.detail as {label?: string} | null)?.label);
+    const code = m.split('/')[1];
+    return named ? `${code} ${(named.detail as {label: string}).label}` : `${m.split('/')[0].toUpperCase()} ${code}`;
+  };
+  // B4: a PARTIALLY VERIFIED claim splits in two at the crosswalk, one VERIFIED, one UNVERIFIED (INTEROP §3, LAS
+  // Module 03 rule 7: never rounded). B6: precedence before DAS; a step it stopped keeps the membrane lit for the run.
+  type Split = {verdict: string; status: string};
+  const splitOf = (e: Ev) => ((e.detail as {split?: Split[]} | null)?.split ?? []);
+  const b4 = visible.filter(e => e.node === 'boundary:tas→las');
+  const b6 = visible.filter(e => e.node === 'boundary:las→das');
+  const b6Stopped = b6.find(e => e.status === 'bad');
+  const lastB4 = b4[b4.length - 1];
+  const boundaries = <g className="wr-boundaries">
+    <g className={`wr-boundary${b4.length ? '' : ' dim'}${chain.some(e => e.node === 'boundary:tas→las') ? ' lit' : ''}`} role="button" tabIndex={0} data-k="boundary:tas→las"
+      aria-label={`B4 crosswalk, TAS to LAS${lastB4 ? `, ${splitOf(lastB4).map(x => words(x.verdict)).join(' and ') || verdictOf(lastB4)}` : ', nothing crossed'}`}
+      onClick={() => lastB4 && setFocus(lastB4.n)} onKeyDown={e => { if (e.key === 'Enter' && lastB4) setFocus(lastB4.n); else along(e, 'boundary:tas→las'); }}>
+      <title>B4 crosswalk: a verification status crossing from TAS to LAS; PARTIALLY VERIFIED splits, never rounded</title>
+      <rect className="wr-hit" x={P['boundary:tas→las'].x - 14} y={P['boundary:tas→las'].y - 18} width={78} height={50}/>
+      <path d={`M${P['boundary:tas→las'].x} ${P['boundary:tas→las'].y - 14} v28`}/>
+      {lastB4 && splitOf(lastB4).map((x, i) => <g key={i}><Mark status={x.status} x={P['boundary:tas→las'].x + 12} y={P['boundary:tas→las'].y - 7 + i * 14} r={4.5}/>
+        <text x={P['boundary:tas→las'].x + 20} y={P['boundary:tas→las'].y - 4 + i * 14} className="wr-sub left">{words(x.verdict).toLowerCase()}</text></g>)}
+      <text x={P['boundary:tas→las'].x} y={P['boundary:tas→las'].y + 26} className="wr-sub">B4 crosswalk</text></g>
+    <g className={`wr-membrane${b6Stopped ? ' bad' : b6.length ? '' : ' dim'}${chain.some(e => e.node === 'boundary:las→das') ? ' lit' : ''}`} role="button" tabIndex={0} data-k="boundary:las→das"
+      aria-label={`B6 precedence, before DAS${b6Stopped ? `, stopped: ${b6Stopped.text}` : ', nothing stopped'}`}
+      onClick={() => b6[b6.length - 1] && setFocus((b6Stopped ?? b6[b6.length - 1]).n)} onKeyDown={e => { if (e.key === 'Enter' && b6.length) setFocus((b6Stopped ?? b6[b6.length - 1]).n); else along(e, 'boundary:las→das'); }}>
+      <title>B6 precedence: what may not reach a decision (DAS){b6Stopped ? ` · stopped: ${b6Stopped.text}` : ''}</title>
+      <rect className="wr-hit" x={P['boundary:las→das'].x - 5} y={90} width={10} height={250}/>
+      <path d={`M${P['boundary:las→das'].x} 90 V340`}/>
+      {b6Stopped && <Mark status="bad" x={P['boundary:las→das'].x} y={P['boundary:las→das'].y} r={7}/>}
+      <text x={P['boundary:las→das'].x} y={352} className="wr-sub">B6 precedence</text></g>
+  </g>;
+
   const lights = calm ? [] : visible.filter(e => flying.includes(e.n)).filter(e => e.parent && byN.get(e.parent) && !isStream(edgeKey(e))).map(e => {
-    const from = AT[nodeOf(byN.get(e.parent!)!)];
-    const to = AT[nodeOf(e)];
+    const from = P[nodeOf(byN.get(e.parent!)!)];
+    const to = P[nodeOf(e)];
     if (!from || !to || (from.x === to.x && from.y === to.y)) return null;
+    const split = e.node === 'boundary:tas→las' ? splitOf(e) : [];
+    if (split.length) {
+      const las = SYSTEMS.find(x => x.key === 'las')!;
+      return <g key={`l${e.n}`}>{split.map((x, i) => <circle key={i} r={4.5} className={`wr-light ${x.status}`} opacity={0}>
+        <animateMotion dur={`${0.5 / speed}s`} fill="freeze" path={`M${to.x} ${to.y} Q${(to.x + las.x) / 2} ${to.y + (i ? 10 : -30)} ${las.x} ${to.y + (i ? 0 : -60)}`}/>
+        <animate attributeName="opacity" values="1;1;0" dur={`${1 / speed}s`} fill="freeze"/></circle>)}</g>;
+    }
     const mid = {x: (from.x + to.x) / 2, y: Math.min(from.y, to.y) - 26};
     // A soft dot with a short glowing tail; good steps travel dimmer with a shorter tail, problems at full brightness.
     const path = `M${from.x} ${from.y} Q${mid.x} ${mid.y} ${to.x} ${to.y}`;
@@ -447,9 +523,14 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
     </g>;
   });
   const lightsInFlight = lights.filter(Boolean).length;
+  const flights: Flight[] = bloom && !calm ? visible.filter(e => flying.includes(e.n) && e.parent && byN.get(e.parent)).flatMap(e => {
+    const from = P[nodeOf(byN.get(e.parent!)!)], to = P[nodeOf(e)];
+    if (!from || !to || (from.x === to.x && from.y === to.y)) return [];
+    return [{n: e.n, from, to, mid: {x: (from.x + to.x) / 2, y: Math.min(from.y, to.y) - 26}, start: flightStart.current.get(e.n) ?? performance.now(),
+      dur: 450 / speed, status: e.self_reported && e.status !== 'bad' ? 'self' : e.status}];
+  }) : [];
 
   const tickLabels = [0, 0.25, 0.5, 0.75, 1].map(f => ({f, text: t0 ? clock(t0 + span * (win.from + f * (win.to - win.from))) : ''}));
-  const verdictOf = (e: Ev) => words(e.verdict) || WORD[e.status as Status];
   const worst = chain.find(e => e.status === 'bad') ?? chain.find(e => isProblem(e)) ?? thought ?? focused;
   const cap = chain.map(e => (e.detail as {capped_to?: string} | null)?.capped_to).find(Boolean);
   const refsOf = (thought ?? focused)?.refs ?? [];
@@ -528,7 +609,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
       </ol> : <div className="wr-map" ref={mapRef}>
         {zoom.k > 1 && <button type="button" className="wr-pill wr-fit" onClick={() => setZoom({k: 1, cx: 500, cy: 210})}>Fit · {Math.round(zoom.k * 100)}%</button>}
         {run?.finished && events.length === 0 && <p className="wr-old" role="status">This run was made before steps were recorded. Showing what was stored: question, packet, reply.</p>}
-        <svg viewBox={`${zoom.cx - 500 / zoom.k} ${zoom.cy - 210 / zoom.k} ${1000 / zoom.k} ${420 / zoom.k}`} role="group" aria-label="The run as a map: input, router and model, app checks, the suite's systems, output" preserveAspectRatio="xMidYMid meet">
+        <svg ref={svgRef} viewBox={`${zoom.cx - 500 / zoom.k} ${zoom.cy - 210 / zoom.k} ${1000 / zoom.k} ${420 / zoom.k}`} role="group" aria-label="The run as a map: input, router and model, app checks, the suite's systems, output" preserveAspectRatio="xMidYMid meet">
           <g className="wr-band"><rect x={200} y={8} width={600} height={40} rx={20}/>
             <text x={262} y={32} textAnchor="middle" className="dimtext"><title>Boundaries between the suite’s systems: not in the app yet</title>Boundaries</text>
             <g className="wr-controls" transform="translate(500 28)" role="button" tabIndex={0} aria-label={`Controls, ${overrides} override${overrides === 1 ? '' : 's'}`}
@@ -539,13 +620,14 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
           {[['Input', 70], ['Router', 185], ['App checks', 290]].map(([h, x]) => <text key={h} className="wr-col" x={x as number} y={72}>{String(h).toUpperCase()}</text>)}
           <text className="wr-col" x={905} y={72}>OUTPUT</text>
           {SYSTEMS.map(s => {
-            const on = s.key === 'tas' && tasOn;
+            const on = s.key === 'tas' ? tasOn : events.some(e => e.system === s.key || (e.kind === 'ROUTE' && e.system === s.key));
             return <g key={s.key} className={`wr-sys${on ? '' : ' dim'}`}><title>{on ? `${s.name}: ${s.trigger}` : `${s.name} not triggered: ${s.trigger}${s.key === 'tas' ? '' : ' · not in the app yet'}`}</title>
               <rect x={s.x - s.w / 2} y={82} width={s.w} height={262} rx={10}/>
               <text x={s.x} y={100} className="wr-label">{s.name}</text>
               {!on && <text x={s.x} y={116} className="wr-sub">not triggered</text>}
-              {on && <text x={s.x} y={232} className="wr-sub">+ {TAS_MODULES - 1} modules</text>}
-              {on && <text x={s.x} y={243} className="wr-sub tiny">not run here</text>}</g>;
+              {on && s.key === 'tas' && <text x={s.x} y={232} className="wr-sub">+ {TAS_MODULES - 1} modules</text>}
+              {on && s.key === 'tas' && <text x={s.x} y={243} className="wr-sub tiny">not run here</text>}
+              {on && (otherModules[s.key]?.length ?? 0) > 5 && <text x={s.x} y={132 + 5 * 34 + 4} className="wr-sub">+ {otherModules[s.key].length - 5} modules</text>}</g>;
           })}
           <g className="wr-wires">
             {WIRES.map(([a, b]) => {
@@ -563,19 +645,19 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
               return <path key={k} d={wire(a, b)} onMouseEnter={ev => {
                 const svg = (ev.currentTarget.ownerSVGElement as SVGSVGElement), pt = svg.createSVGPoint();
                 pt.x = ev.clientX; pt.y = ev.clientY;
-                const m = svg.getScreenCTM(); const at = m ? pt.matrixTransform(m.inverse()) : {x: (AT[a].x + AT[b].x) / 2, y: (AT[a].y + AT[b].y) / 2};
+                const m = svg.getScreenCTM(); const at = m ? pt.matrixTransform(m.inverse()) : {x: (P[a].x + P[b].x) / 2, y: (P[a].y + P[b].y) / 2};
                 setHover({x: at.x, y: at.y - 10, text});
               }} onMouseLeave={() => setHover(null)}><title>{text}</title></path>;
             })}
             {[...streams.entries()].filter(([k]) => isStream(k)).map(([k, n]) => {
               const [a, b] = k.split('>');
-              const mx = (AT[a].x + AT[b].x) / 2, my = (AT[a].y + AT[b].y) / 2;
+              const mx = (P[a].x + P[b].x) / 2, my = (P[a].y + P[b].y) / 2;
               return <g key={`s${k}`}><path className="wr-stream" d={wire(a, b)} style={{strokeWidth: Math.min(16, 3 + n / 3)}}/>
                 <text x={mx} y={my - 8} className="wr-streamcount">{n} claims</text></g>;
             })}
           </g>
           {node('run', 'Question', 'qtile', lines(run?.question ?? '', 17, 2))}
-          <g className={`wr-packet${packet ? '' : ' dim'}`} transform={`translate(${AT.retrieval.x} ${AT.retrieval.y - 22})`} role="button" tabIndex={0}
+          <g className={`wr-packet${packet ? '' : ' dim'}`} transform={`translate(${P.retrieval.x} ${P.retrieval.y - 22})`} role="button" tabIndex={0}
             aria-label={`Packet, ${packet?.refs.length ?? 0} records`} onClick={() => tally.retrieval?.last && setFocus(tally.retrieval.last.n)}
             onKeyDown={e => { if (e.key === 'Enter' && tally.retrieval?.last) setFocus(tally.retrieval.last.n); }}>
             {(packet?.refs ?? []).slice(0, 3).map((r, i) => <g key={i} transform={`translate(0 ${i * 26})`}><rect x={-50} y={-11} width={100} height={22} rx={5}/>
@@ -590,6 +672,8 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
           {tasOn && node(loadNode, loadNode === 'tas/06' ? '06 Hypotheses' : '08 Synthesis', 'chip')}
           {tasOn && node('tas/class', `Classify ×${classified}`, 'chip')}
           {tasOn && events.some(e => e.node === 'tas/corroboration') && node('tas/corroboration', 'Corroboration', 'chip')}
+          {Object.values(otherModules).flatMap(mods => mods.slice(0, 5)).map(m => node(m, moduleLabel(m), 'chip'))}
+          {boundaries}
           {node('cp-01', 'CP-01', 'hex', ['right of reply'], {dim: !events.some(e => e.node === 'cp-01')})}
           {node('candidate', 'Candidate', 'cand', [candidateId ? `AIC ${candidateId.slice(0, 8)}` : 'none saved'])}
           <g className="wr-tally" transform="translate(858 150)">
@@ -603,15 +687,16 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
           {node('cp-03', 'CP-03', 'hex', undefined, {dim: !events.some(e => e.node === 'cp-03'), hint: 'publication approval'})}
           {lights}
           {notes && <g className="wr-note" role="note">
-            <g transform={`translate(${AT.model.x + 34} ${AT.model.y - 44})`}><rect width={190} height={34} rx={6}/>
+            <g transform={`translate(${P.model.x + 34} ${P.model.y - 44})`}><rect width={190} height={34} rx={6}/>
               <text x={8} y={14}>Lights leave the model only</text><text x={8} y={27}>after it has answered.</text></g>
-            <g transform={`translate(${AT['tas/class'].x + 48} ${AT['tas/class'].y + 46})`}><rect width={190} height={46} rx={6}/>
+            <g transform={`translate(${P['tas/class'].x + 48} ${P['tas/class'].y + 46})`}><rect width={190} height={46} rx={6}/>
               <text x={8} y={14}>Each light is one thought. Click a</text><text x={8} y={27}>light, a chip or a tally to trace it.</text>
               <text x={8} y={40} className="wr-note-ok" role="button" tabIndex={0} onClick={dismissNotes} onKeyDown={e => { if (e.key === 'Enter') dismissNotes(); }}>Got it</text></g>
           </g>}
           {hover && <g className="wr-hover" transform={`translate(${hover.x} ${hover.y})`} aria-hidden="true">
             <rect x={-hover.text.length * 2.9 - 8} y={-13} width={hover.text.length * 5.8 + 16} height={18} rx={5}/><text y={0}>{hover.text}</text></g>}
         </svg>
+        {bloom && !calm && <RunBloom flights={flights} svgRef={svgRef} host={mapRef}/>}
         <div className="wr-under">
           <p className="wr-focus" aria-live="polite"><span className="br-eyebrow">Thought in focus</span>
             {compareId && other.data ? <><b>Compared with the run of {stamp(other.data.run.created_at)} · {changes.length ? `${changes.length} part${changes.length === 1 ? '' : 's'} changed` : 'nothing changed'}</b>
@@ -677,8 +762,8 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
             onClick={() => mark.mutate({path: {investigation_id: investigationId, run_id: realId ?? '', thought_id: thoughtId}, body: {mark: marked === 'to_check' ? 'keep' : 'to_check', reason: null}})}>
             {marked === 'to_check' ? '◉ To check' : '○ To check'}</button>}
           <button type="button" onClick={() => { void navigator.clipboard?.writeText(citation()); setCopied(true); }}>{copied ? 'Copied' : 'Copy cite'}</button>
-          {onRunAgain && run && !sample && run.finished && <button type="button" title="Back to the plan with this question, to change the instructions; the packet is built again from the case as it is now, and the new run is a new record"
-            onClick={() => onRunAgain({question: run.question, module: run.module, theory: run.working_theory ?? null})}>Run again…</button>}
+          {onRunAgain && run && !sample && run.finished && <button type="button" title="Back to the plan with this question and the same packet, to change the instructions; the new run is a new record and this one is kept"
+            onClick={() => onRunAgain({question: run.question, module: run.module, theory: run.working_theory ?? null, from: focused ? {run_id: run.run_id, step: focused.n} : undefined})}>Run again from this step…</button>}
           {review.isError && <span role="alert" className="br-bad">{errorMessage(review.error, 'Not saved')}</span>}
           {mark.isError && <span role="alert" className="br-bad">{errorMessage(mark.error, 'Not saved')}</span>}
           <small>Accept and reject apply to the whole answer; To check marks this thought only.</small>

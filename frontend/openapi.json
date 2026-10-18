@@ -3283,6 +3283,16 @@
               }
             ]
           },
+          "packet_from": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PacketFromIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "premises": {
             "anyOf": [
               {
@@ -20103,6 +20113,16 @@
               }
             ]
           },
+          "packet_from": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PacketFromIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "premises": {
             "anyOf": [
               {
@@ -24591,6 +24611,28 @@
           "direct"
         ],
         "title": "OwnershipChainOwnerOut",
+        "type": "object"
+      },
+      "PacketFromIn": {
+        "description": "Run again from a step of an earlier run (mockup AI_1, research AI §5): the same packet, new instructions.",
+        "properties": {
+          "run_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Run Id",
+            "type": "string"
+          },
+          "step": {
+            "minimum": 1.0,
+            "title": "Step",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "run_id",
+          "step"
+        ],
+        "title": "PacketFromIn",
         "type": "object"
       },
       "PartyYearsOut": {

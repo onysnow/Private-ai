@@ -266,5 +266,33 @@ html[data-motion='calm'] .wr-sparks { display: none; }
 .wr-drawer:focus { outline: none; }
 .wr-node.changed > rect, .wr-node.changed > circle, .wr-node.changed > polygon { stroke: var(--wr-partial); stroke-width: 2.4; filter: drop-shadow(0 0 5px var(--wr-partial)); }
 .wr-wires path.changed { stroke: var(--wr-partial); stroke-width: 2.2; filter: drop-shadow(0 0 3px var(--wr-partial)); }
-.wr-compare { appearance: none; background: transparent; font-family: inherit; }
+.wr-compare { appearance: none; background: transparent; font-family: inherit; width: auto; max-width: 170px; }
 .wr-compare option { background: var(--surface-1); color: var(--text); }
+.wr-boundary, .wr-membrane { cursor: pointer; outline: none; }
+.wr-boundary path { stroke: var(--text-muted); stroke-width: 3; stroke-linecap: round; }
+.wr-boundary.lit path, .wr-membrane.lit path { stroke: var(--wr-partial); }
+.wr-boundary.dim, .wr-membrane.dim { opacity: .4; }
+.wr-membrane path { stroke: var(--line); stroke-width: 2; stroke-dasharray: 2 5; }
+.wr-membrane.bad path { stroke: var(--wr-bad); stroke-width: 3; stroke-dasharray: none; filter: drop-shadow(0 0 6px var(--wr-bad)); }
+.wr-boundary:focus-visible path, .wr-membrane:focus-visible path { stroke: var(--focus-ring, var(--accent-1)); }
+.wr-hit { fill: transparent; stroke: none; }
+/* The case home's AI strip (features/ai/ai-strip.tsx): one line beside the bell. */
+.ai-strip { --wr-good: var(--status-supported); --wr-bad: var(--status-disputed); --wr-partial: var(--flag-strong); }
+.ai-strip { all: unset; cursor: pointer; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0; padding: 4px 10px; border-radius: 999px;
+  font-size: 12px; color: var(--text-muted); box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ai-strip.off { cursor: default; opacity: .7; }
+.ai-strip:focus-visible { outline: 2px solid var(--focus-ring, var(--accent-1)); outline-offset: 2px; }
+.ai-strip.live { color: var(--text); box-shadow: inset 0 0 0 1px var(--wr-bad); }
+.ai-strip .ai-live { color: var(--wr-bad); font-weight: 600; }
+.ai-strip svg circle { fill: none; stroke: var(--text-muted); stroke-width: 1.3; opacity: .45; }
+.ai-strip svg circle.on { fill: var(--wr-good); stroke: var(--wr-good); opacity: 1; }
+.ai-strip svg circle.ring { stroke: var(--wr-partial); opacity: .8; transform-box: fill-box; transform-origin: center; }
+.ai-strip svg circle.ring.writing { animation: wr-breathe 2.4s ease-in-out infinite; }
+html[data-motion='calm'] .ai-strip svg circle.ring.writing { animation: none; }
+@media (prefers-reduced-motion: reduce) { .ai-strip svg circle.ring.writing { animation: none; } }
+.ai-strip b.bad { color: var(--wr-bad); }
+.ai-strip > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ai-tallies { flex: none; display: inline-flex; gap: 6px; font: 600 11px var(--font-mono); }
+.ai-tallies i { font-style: normal; } .ai-tallies .good { color: var(--wr-good); } .ai-tallies .partial { color: var(--wr-partial); }
+.ai-tallies .bad { color: var(--wr-bad); } .ai-tallies .neutral { color: var(--text-muted); }
+.wr-bloom { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; border-radius: 14px; }

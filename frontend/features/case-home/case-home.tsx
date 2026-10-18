@@ -34,6 +34,7 @@ import {MiniNetwork} from './mini-network';
 import {PagePicture} from './decision-card';
 import {HOLD_MS, useDecisions} from './use-decisions';
 import {useWheelStep} from './wheel-step';
+import {AiStrip} from '../ai/ai-strip';
 
 const CLAIM_STATUS: Record<string, ClaimStatus> = {
   supported: 'supported', confirmed: 'supported', disputed: 'disputed', rejected: 'ruled_out', lead: 'unshown', unverified: 'unshown',
@@ -473,6 +474,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
         <h1>{investigation.name}</h1>
         <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
           Switch case <kbd>⌘O</kbd></button>
+        {!preview && <AiStrip investigationId={id}/>}
       </div>
       {!preview && <HomeTools/>}
       <CaseQuestion investigation={investigation}/>

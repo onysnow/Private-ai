@@ -5040,6 +5040,16 @@ export const zOwnershipChainOut = z.object({
 });
 
 /**
+ * PacketFromIn
+ *
+ * Run again from a step of an earlier run (mockup AI_1, research AI §5): the same packet, new instructions.
+ */
+export const zPacketFromIn = z.object({
+  run_id: z.string().min(1).max(64),
+  step: z.number().int().gte(1),
+});
+
+/**
  * PartyYearsOut
  *
  * The years a party's dated events and links touch (pointing at it lights them).
@@ -5867,6 +5877,7 @@ export const zCaseSynthesisRequest = z.object({
   include_external_leads: z.boolean().optional().default(true),
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   options: zRunOptionsIn.nullish(),
+  packet_from: zPacketFromIn.nullish(),
   premises: z.array(z.string()).max(10).nullish(),
   question: z.string().min(1).max(4000),
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
@@ -5881,6 +5892,7 @@ export const zHypothesisTestRequest = z.object({
   include_external_leads: z.boolean().optional().default(true),
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   options: zRunOptionsIn.nullish(),
+  packet_from: zPacketFromIn.nullish(),
   premises: z.array(z.string()).max(10).nullish(),
   question: z.string().min(1).max(4000),
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),

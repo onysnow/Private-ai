@@ -62,6 +62,7 @@ const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeI
   {id: 'iris', name: 'Iris when a feature opens', line: '8-blade shutter · fades if calm', themes: ['rain-noir']},
   {id: 'shutter', name: 'Shutter corners on save', line: 'Brackets only, no flash', themes: ['rain-noir']},
   {id: 'neon', name: 'Neon title on Textbook flags', line: 'Steady only, never flicker', themes: ['rain-noir']},
+  {id: 'bloom', name: 'Bloom on the AI run’s lights', line: 'WebGL · Watch the run only · stops if calm', themes: ['rain-noir']},
 ];
 
 /** A format drawn small: where its panels sit. */

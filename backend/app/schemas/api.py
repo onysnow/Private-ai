@@ -320,6 +320,12 @@ class RunChangeIn(BaseModel):
     text: str = Field(max_length=300)
 
 
+class PacketFromIn(BaseModel):
+    """Run again from a step of an earlier run (mockup AI_1, research AI §5): the same packet, new instructions."""
+    run_id: str = Field(min_length=1, max_length=64)
+    step: int = Field(ge=1)
+
+
 class CaseSynthesisRequest(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
     max_results: int = Field(default=30, ge=1, le=100)
@@ -329,6 +335,7 @@ class CaseSynthesisRequest(BaseModel):
     options: RunOptionsIn | None = None
     premises: list[str] | None = Field(default=None, max_length=10)
     changes: list[RunChangeIn] | None = Field(default=None, max_length=50)
+    packet_from: PacketFromIn | None = None
 
 
 class HypothesisTestRequest(BaseModel):
@@ -343,6 +350,7 @@ class HypothesisTestRequest(BaseModel):
     options: RunOptionsIn | None = None
     premises: list[str] | None = Field(default=None, max_length=10)
     changes: list[RunChangeIn] | None = Field(default=None, max_length=50)
+    packet_from: PacketFromIn | None = None
 
 
 class RunPlanRequest(BaseModel):
