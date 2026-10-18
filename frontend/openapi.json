@@ -20459,6 +20459,15 @@
             ],
             "title": "Amount"
           },
+          "certainty": {
+            "enum": [
+              "shown",
+              "not_yet_shown",
+              "disputed"
+            ],
+            "title": "Certainty",
+            "type": "string"
+          },
           "currency": {
             "anyOf": [
               {
@@ -20529,6 +20538,17 @@
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
           },
           "problems": {
             "items": {
@@ -20607,6 +20627,7 @@
           "evidence_count",
           "supporting_evidence_count",
           "flowType",
+          "certainty",
           "problems"
         ],
         "title": "IncompleteTransactionOut",

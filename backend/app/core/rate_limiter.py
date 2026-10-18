@@ -20,6 +20,8 @@ class FixedWindowRateLimiter:
     unreadable file is ignored, never fatal.
     """
 
+    MAX_KEYS = 4096  # bound memory: a flood of distinct sources cannot grow the table forever
+
     def __init__(self, limit: int, window_seconds: int = 60, *, state_file: str | Path | None = None):
         self.limit = max(1, int(limit))
         self.window_seconds = max(1, int(window_seconds))
@@ -76,10 +78,21 @@ class FixedWindowRateLimiter:
                 start, count = current, 0
             count += 1
             self._windows[key] = (start, count)
+            self._evict(current)
             allowed = count <= self.limit
             retry_after = max(1, int(self.window_seconds - (current - start)))
             self._save()
             return allowed, retry_after
+
+    def _evict(self, current: float) -> None:
+        if len(self._windows) <= self.MAX_KEYS:
+            return
+        for stale in [k for k, (start, _c) in self._windows.items() if current - start >= self.window_seconds]:
+            del self._windows[stale]
+        if len(self._windows) > self.MAX_KEYS:  # all still live: drop the oldest windows
+            oldest = sorted(self._windows, key=lambda k: self._windows[k][0])[: len(self._windows) - self.MAX_KEYS]
+            for k in oldest:
+                del self._windows[k]
 
     def reset(self, key: str) -> None:
         with self._lock:
