@@ -15,18 +15,20 @@ The full checklist lives in `docs/project-notes/MOCKUP_BUILD_LIST.md`. This page
 | ACT_1 | Act › Red Flags | |
 | ACT_2 | Act › Story | |
 | AI_2 | Act › AI runs (Ask, then Instructions & plan) | |
+| AI_1 | Act › AI runs › Watch (step 3) | Matched to the mockup in Rain Noir, 1440×900, 18 Oct. See "AI_1 notes" below |
 
 ## Half-built
 
-- **AI_1 "Watch the run"** (Act › AI runs › step 3). The backend is complete:
-  - the run record table `ai_run_events` (ADR-0012), written at every step of `run_reasoning_module`;
-  - `GET /investigations/{id}/ai-runs`;
-  - `…/ai-runs/{run_id}/events?after=n`;
-  - `…/events/stream` (Server-Sent Events).
+## AI_1 notes
 
-  The screen is a first pass: an SVG map with lights, lanes, a log view (L), a trace drawer, and Accept / Reject /
-  Copy cite. **It has not been matched to `AI_1-watch-the-run.png`.** The legend row and the system columns'
-  "why" text overlap, the transport strip sits below the fold, and the map's proportions differ from the mockup.
+The screen reads the run record by polling every second (`GET …/ai-runs/{run_id}/events?after=0`); the SSE route exists
+but the screen does not use it yet. The Watch step has no title or stepper of its own: its one-line header is the mockup's.
+Not drawn, because the run record does not hold it: packet tile titles and pages (the record has ids only), a confidence
+cap (no step records one, so the drawer shows it only when `detail.capped_to` exists), "INTEROP", the other TAS modules
+(shown as "+ 9 modules · not run here"), RAS/QAS/LAS/DAS contents. "To check" is a disabled button: review applies to the
+whole answer. Streams (more than 12 claims on one wire) are built and unit-tested but the demo data has at most 7.
+Wheel zoom on the map, per-wire hover counts and the first-use notes are not built.
+`tools/seed_run.py` now ends the run as stopped (the deliberate out-of-packet citation), with the job marked failed.
 
 ## Not started
 

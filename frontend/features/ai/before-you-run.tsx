@@ -200,8 +200,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     </ul></div>}
   </section>;
 
-  if (step === 3 || step === 4) return <section className="br" aria-label="AI runs">
-    <header className="br-head"><h2>Watch the run</h2>{stepper}</header>
+  if (step === 3 || step === 4) return <section className="br br-live" aria-label="AI runs">
     {outcome && !outcome.ok && <p role="alert" className="br-bad">{outcome.text}</p>}
     {!runId && running && <p role="status">Sending the run…</p>}
     {runId && <WatchTheRun investigationId={investigationId} runId={runId} onBack={() => setStep(2)}/>}

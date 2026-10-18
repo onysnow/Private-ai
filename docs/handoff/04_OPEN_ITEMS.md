@@ -32,7 +32,6 @@
   - top 20 flows plus "others" for very large ledgers.
 - **Chain of Custody:** scroll-over replay along the log; draw-in motion; the claim card's Done checklist.
 - **AI:**
-  - AI_1 matched to its mockup;
   - "Ask the case" as a four-step entry from elsewhere;
   - per-claim review of AI candidates (today, accept/reject applies to the whole answer);
   - the "More" row of umbrella session flags (no runtime in the app).

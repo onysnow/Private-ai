@@ -65,7 +65,7 @@ describe('BeforeYouRun', () => {
     }));
     const sent = api.lastBody(`POST ${BASE}/case-synthesis`) as {changes: Array<{kind: string; text: string}>};
     expect(sent.changes.map(c => c.text)).toEqual(['evidence:ev-58 · material · ignored', 'devils_advocate off → on', 'research_depth normal → exhaustive', 'premise + USER_STIPULATED']);
-    expect(await screen.findByRole('heading', {name: /Watch the run/})).toBeInTheDocument();
+    expect(await screen.findByRole('region', {name: 'Watch the run'})).toBeInTheDocument();
     expect(await screen.findByText('Run record')).toBeInTheDocument();
   });
 
