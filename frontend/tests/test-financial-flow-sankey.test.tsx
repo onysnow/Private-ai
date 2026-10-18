@@ -132,4 +132,12 @@ describe('FinancialFlowSankey', () => {
     expect(screen.getByRole('note')).toHaveTextContent('The USD flows form a cycle (A → B → A)');
     expect(chartSpy).not.toHaveBeenCalled();
   });
+
+  it('draws the tooltip as plain text, so a party name holding markup is never run as HTML', () => {
+    const evil = '<img src=x onerror=alert(1)>';
+    render(<FinancialFlowSankey transactions={[txn({id: 't1', from: evil, to: 'B', amount: 10, currency: 'USD'})]}/>);
+    const tooltip = chartSpy.mock.calls[0][0].option.tooltip;
+    expect(tooltip.renderMode).toBe('richText');
+    expect(tooltip.formatter({dataType: 'edge', name: `${evil} > B`, value: 10, data: {flowType: 'direct'}})).not.toContain('<br');
+  });
 });

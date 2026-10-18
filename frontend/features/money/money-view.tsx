@@ -13,6 +13,7 @@ import type {ReactElement} from 'react';
 
 import {LevelChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
+import {onScreen, typingInto} from '../../lib/on-screen';
 import {
   createLeadEndpointMutation, getInvestigationFinancialFlowsOptions, getInvestigationMoneyChecksOptions, getRedFlagsOptions, listLeadsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
@@ -120,11 +121,11 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   const flaggedIds = new Set(structuring.flatMap(f => f.links));
 
   // Keys: J / K walk the ledger rows (date order), L shows the ledger, Esc clears what is traced.
+  const rootRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
-      const t = e.target;
-      if (e.metaKey || e.ctrlKey || e.altKey || (t instanceof Element && t.closest('input, textarea, select, [contenteditable="true"]'))) return;
+      if (!onScreen(rootRef.current) || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || typingInto(e.target)) return;
       const k = e.key.toLowerCase();
       if (k === 'j' || k === 'k') {
         if (!txs.length) return;
@@ -142,7 +143,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   const toggle = (ids: string[]) => setTraced(now => ids.every(id => now.includes(id)) ? now.filter(id => !ids.includes(id)) : [...new Set([...now, ...ids])]);
   const status = ledgerQ.isError ? errorMessage(ledgerQ.error, 'Could not read the ledger') : ledgerQ.isPending ? 'Reading the ledger…' : '';
 
-  return <section className="mn" aria-label="Where the money went">
+  return <section className="mn" aria-label="Where the money went" ref={rootRef}>
     <header className="mn-head">
       <div className="mn-titles">
         <h2>Where did the money go, and where does it appear or vanish?</h2>

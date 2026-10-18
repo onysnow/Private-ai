@@ -224,3 +224,71 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
         assert user.token_revoked_at is None
         assert user.disabled is True
         assert scope_for_persisted_token(db, new_token) is None
+
+
+def _viewer(db, token="viewer-only"):
+    db.add(Investigation(id="inv-a", name="A"))
+    db.add(AppUser(id="viewer", display_name="Viewer", token_digest=token_digest(token)))
+    db.add(InvestigationMembership(user_id="viewer", investigation_id="inv-a", role="viewer"))
+    db.commit()
+    return scope_for_persisted_token(db, token)
+
+
+def test_every_model_resolves_to_its_investigation_for_the_write_guard():
+    """A model the guard cannot place in an investigation would let a viewer write to it (code review 18 Oct)."""
+    from app.models.domain import Investigation as Inv
+    resolved_through_parent = {
+        "ClaimEvidenceLink", "ClaimReviewEvent", "DocumentChunk", "EnrichmentSessionFinding", "EnrichmentSessionRun", "Evidence",
+        "IngestionBatchItem", "LeadLink", "LeadProfile", "LeadWorkflowEvent", "RelationshipEvidenceAttachment",
+        "RelationshipEvidenceReviewEvent", "Statement", "StoryClaim", "StorySection",
+    }
+    not_case_owned = {"AppUser", "Investigation"}
+    missing = sorted(m.class_.__name__ for m in Inv.registry.mappers
+                     if "investigation_id" not in {c.key for c in m.columns}
+                     and m.class_.__name__ not in resolved_through_parent | not_case_owned)
+    assert missing == [], f"teach app/db/mutation_guard.py where these belong: {missing}"
+
+
+def test_viewer_cannot_rename_or_delete_story_sections():
+    from app.models.domain import Story, StorySection
+    factory = _factory()
+    with factory() as db:
+        scope = _viewer(db)
+        story = Story(investigation_id="inv-a")
+        db.add(story)
+        db.commit()
+        section = StorySection(story_id=story.id, title="Who bought the land")
+        db.add(section)
+        db.commit()
+        with authorization_scope_context(scope):
+            section.title = "Renamed by a viewer"
+            try:
+                lock_pending_investigation_mutations(db)
+            except InvestigationAuthorizationError:
+                db.rollback()
+            else:
+                raise AssertionError("a viewer must not rename a story section")
+            db.delete(db.get(StorySection, section.id))
+            try:
+                lock_pending_investigation_mutations(db)
+            except InvestigationAuthorizationError:
+                db.rollback()
+            else:
+                raise AssertionError("a viewer must not delete a story section")
+        assert db.get(StorySection, section.id).title == "Who bought the land"
+
+
+def test_viewer_cannot_retry_or_cancel_jobs():
+    import pytest
+    from fastapi import HTTPException
+    from app.api.routes_jobs import _visible_job, _writable_job
+    from app.models.jobs import BackgroundJob
+    factory = _factory()
+    with factory() as db:
+        scope = _viewer(db)
+        db.add(BackgroundJob(id="job-1", kind="ai_reasoning", investigation_id="inv-a", status="failed"))
+        db.commit()
+        assert _visible_job(db, scope, "job-1").id == "job-1", "a viewer can still follow the job"
+        with pytest.raises(HTTPException) as refused:
+            _writable_job(db, scope, "job-1")
+        assert refused.value.status_code == 403

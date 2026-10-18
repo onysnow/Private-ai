@@ -310,3 +310,22 @@ def test_leads_relationships_and_documents_are_prefiltered_without_losing_joined
     scored_rows_of_interest = [v for v in scored if ('Unrelated chore' in map(str, v) or 'Nowhere Inc' in ' '.join(map(str, v)) or 'memo.pdf' in map(str, v))]
     assert scored_rows_of_interest == [], f"non-matching rows reached Python scoring: {scored_rows_of_interest}"
     assert all(mentions(v) for v in scored), "the prefilter let through a row the scorer could not possibly match"
+
+
+def test_search_finds_names_with_accented_capitals_and_folded_letters():
+    """SQL lower() lowers ASCII only on SQLite and never folds "ß"; such words must still be found (code review 18 Oct)."""
+    client = TestClient(app)
+    inv = client.post('/api/investigations', json={'name': 'Accents'}).json()
+    for caption in ('Émile Zola', 'Øresund Holdings', 'Karl Strauß'):
+        assert client.post('/api/entities', json={'investigation_id': inv['id'], 'schema': 'LegalEntity', 'caption': caption,
+                                                  'properties': {'name': [caption]}}).status_code == 200
+    claim = client.post('/api/claims', json={'investigation_id': inv['id'], 'text': 'Émile Zola signed the Øresund lease.',
+                                             'status': 'unverified', 'confidence': 0.5})
+    assert claim.status_code == 200, claim.text
+    for query, expected in (('Émile', 'Émile Zola'), ('øresund', 'Øresund Holdings'), ('STRAUSS', 'Karl Strauß')):
+        body = client.get('/api/search', params={'q': query, 'investigation_id': inv['id']}).json()
+        texts = [r.get('title') or '' for r in body['results']] if isinstance(body, dict) else [r.get('title') or '' for r in body]
+        assert any(expected in t for t in texts), (query, texts)
+    hits = client.get('/api/search', params={'q': 'Émile', 'investigation_id': inv['id']}).json()
+    kinds = {r['record_type'] for r in (hits['results'] if isinstance(hits, dict) else hits)}
+    assert 'claim' in kinds, kinds

@@ -27,6 +27,15 @@ def _visible_job(db: Session, scope: AuthorizationScope, job_id: str) -> Backgro
     return job
 
 
+def _writable_job(db: Session, scope: AuthorizationScope, job_id: str) -> BackgroundJob:
+    """A job the caller may retry, cancel or stop: retrying re-runs its work (a paid AI run included), so read access
+    to the case is not enough. The status changes are plain UPDATEs the ORM write guard never sees."""
+    job = _visible_job(db, scope, job_id)
+    if not scope.unrestricted and (job.investigation_id is None or not scope.allows_write(job.investigation_id)):
+        raise HTTPException(403, "You can read this case but not change it")
+    return job
+
+
 @router.get("/jobs", response_model=list[BackgroundJobOut], responses={
     422: {"model": ValidationErrorOut | ErrorOut, "description": "The input does not match the route, or the status is not a job status"},
 })
@@ -53,7 +62,7 @@ def get_job_endpoint(job_id: str, request: Request, db: Session = Depends(get_db
 
 @router.post("/jobs/{job_id}/retry", response_model=BackgroundJobOut)
 async def retry_job_endpoint(job_id: str, request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
-    job = _visible_job(db, scope_for_request(request), job_id)
+    job = _writable_job(db, scope_for_request(request), job_id)
     try:
         job = requeue_for_retry(db, job)
     except ValueError as exc:
@@ -65,7 +74,7 @@ async def retry_job_endpoint(job_id: str, request: Request, db: Session = Depend
 
 @router.post("/jobs/{job_id}/cancel", response_model=BackgroundJobOut)
 async def cancel_job_endpoint(job_id: str, request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
-    job = _visible_job(db, scope_for_request(request), job_id)
+    job = _writable_job(db, scope_for_request(request), job_id)
     try:
         if job.status == "running":
             # A document being read stops at its next page (app/jobs/records.py request_stop).

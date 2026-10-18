@@ -11,6 +11,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
+import {onScreen, typingInto} from '../../lib/on-screen';
 import {
   getAiAnalysisCandidateEndpointOptions, listAiRunEventsOptions, listAiRunEventsQueryKey, listAiRunsOptions, markAiRunThoughtMutation,
   reviewAiAnalysisCandidateEndpointMutation,
@@ -154,6 +155,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   // Very large live runs: when more than 40 steps wait to be shown, the clock runs 1.6× until it has caught up.
   const catchUp = run && !run.finished && playing && events.length - shown > 40 ? 1.6 : 1;
   const opened = useRef<string | null>(null);
+  const rootRef = useRef<HTMLElement | null>(null);
   useEffect(() => { setCalm(calmNow()); }, []);
   useEffect(() => {
     if (!run || opened.current === run.run_id) return;
@@ -235,7 +237,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      if (!onScreen(rootRef.current) || e.defaultPrevented || typingInto(target)) return;
       if (e.key === 'n' || e.key === 'N') { e.preventDefault(); nextProblem(); }
       else if (e.key === 'l' || e.key === 'L') { e.preventDefault(); setLog(v => !v); }
       else if (e.key === ' ' && target?.closest?.('.wr') && target.tagName !== 'BUTTON' && target.getAttribute('role') !== 'button') { e.preventDefault(); setPlaying(p => !p); }
@@ -581,7 +583,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
     }
   };
 
-  return <section className="wr" aria-label="Watch the run">
+  return <section className="wr" aria-label="Watch the run" ref={rootRef}>
     <header className="wr-head">
       <h2><span>{caseName || 'Case'}</span> · Act · AI runs · <b>{(words(run?.module) || 'Run').replace(/^./, c => c.toUpperCase())}</b> · {run ? stamp(run.created_at) : ''}</h2>
       {sample ? <span className="wr-pill">sample — not a real run</span>

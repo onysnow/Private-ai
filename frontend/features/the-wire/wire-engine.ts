@@ -10,6 +10,7 @@
 // It draws straight into SVG (hundreds of moving parts each frame), so it is plain DOM
 // code mounted by the-wire.tsx; every listener is removed by the returned destroy().
 import type {WireEntityOut, WireLinkOut, WireOut} from '../../lib/generated/types.gen';
+import {onScreen} from '../../lib/on-screen';
 
 export type WireHooks = {
   active: () => boolean;
@@ -1065,7 +1066,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
   let stepIdx = -1;
   const ringOrder = () => [...(adj[focus] || [])].sort((a, b) => (node[a].tgt.a || 0) - (node[b].tgt.a || 0));
   on<KeyboardEvent>(window, 'keydown', e => {
-    if (!hooks.active() || e.metaKey || e.ctrlKey || e.altKey) return;
+    // The Wire shares its stage with Money: act only when its own tab is the one showing.
+    if (!hooks.active() || !onScreen(root) || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
     const t = e.target as HTMLElement | null;
     if (t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName))) return;
     if (e.key === '/') { e.preventDefault(); sIn.focus(); } else if (e.key === 'l' || e.key === 'L') toggleLens();

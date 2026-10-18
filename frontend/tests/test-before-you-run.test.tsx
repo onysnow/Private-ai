@@ -119,4 +119,31 @@ describe('BeforeYouRun', () => {
     await waitFor(() => expect(api.lastBody(`POST ${BASE}/case-synthesis`)).toMatchObject({question: RUN.question, packet_from: {run_id: 'job-1', step: 2}}));
     window.history.replaceState(null, '', '/');
   });
+
+  it('runs on Ctrl+Enter only while its tab shows, and never from a field elsewhere', async () => {
+    const api = mockApi({
+      [`GET ${BASE}/profile`]: PLAN.profile,
+      [`POST ${BASE}/plan`]: PLAN,
+      [`POST ${BASE}/case-synthesis`]: {candidate_id: 'cand-1', job, review_status: 'proposed', payload: {}},
+      'GET /api/investigations/inv-1/ai-runs': {runs: []},
+    });
+    const {rerender} = render(<QueryProvider><div><BeforeYouRun investigationId="inv-1"/></div><textarea aria-label="The write-up"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    await waitFor(() => expect(screen.getByRole('button', {name: /Run and watch/})).toBeEnabled());
+    // Ctrl+Enter typed into another screen's editor is a line break there, not a run.
+    await user.click(screen.getByLabelText('The write-up'));
+    await user.keyboard('{Control>}{Enter}{/Control}');
+    // The same keys while the AI runs tab is hidden (another tab of the stage showing) do nothing either.
+    rerender(<QueryProvider><div hidden><BeforeYouRun investigationId="inv-1"/></div><textarea aria-label="The write-up"/></QueryProvider>);
+    document.body.focus();
+    await user.keyboard('{Control>}{Enter}{/Control}');
+    expect(api.calls(`POST ${BASE}/case-synthesis`)).toHaveLength(0);
+    // Shown again, with focus on the page, the keys run the plan.
+    rerender(<QueryProvider><div><BeforeYouRun investigationId="inv-1"/></div><textarea aria-label="The write-up"/></QueryProvider>);
+    (document.activeElement as HTMLElement | null)?.blur();
+    await user.keyboard('{Control>}{Enter}{/Control}');
+    await waitFor(() => expect(api.calls(`POST ${BASE}/case-synthesis`)).toHaveLength(1));
+  });
 });

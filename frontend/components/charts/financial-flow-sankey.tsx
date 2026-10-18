@@ -84,12 +84,13 @@ export function FinancialFlowSankey({
     }
     return {
       tooltip: {
-        trigger: 'item', backgroundColor: SWATCH.card, borderColor: '#4e4234', textStyle: {color: SWATCH.parchment, fontSize: 12},
+        // Party names come from documents and outside records: plain text only, never HTML (richText mode).
+        trigger: 'item', renderMode: 'richText', backgroundColor: SWATCH.card, borderColor: '#4e4234', textStyle: {color: SWATCH.parchment, fontSize: 12},
         formatter: (rawParams: unknown) => {
           const params = rawParams as {dataType?: string; name?: string; value?: number; data?: {flowType?: string}};
           if (params.dataType === 'edge') {
             const flowType = params.data?.flowType ?? 'direct';
-            return `${params.name}<br/>${activeCurrency} ${(params.value ?? 0).toLocaleString()} (${flowType})`;
+            return `${params.name}\n${activeCurrency} ${(params.value ?? 0).toLocaleString()} (${flowType})`;
           }
           return String(params.name ?? '');
         },

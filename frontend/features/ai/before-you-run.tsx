@@ -9,6 +9,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
+import {onScreen, typingInto} from '../../lib/on-screen';
 import {api} from '../../lib/api-instance';
 import {describeJob, waitForJob} from '../../lib/jobs';
 import {
@@ -171,9 +172,16 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       void queryClient.invalidateQueries({queryKey: listAiRunsQueryKey({path: {investigation_id: investigationId}})});
     }
   };
+  // Ctrl/Cmd+Enter runs the plan only from this tab while it shows, never from a field elsewhere (the write-up's
+  // editor uses the same keys for a line break).
+  const planRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
     if (!active || step !== 2) return;
-    const key = (e: globalThis.KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); void run(true); } };
+    const key = (e: globalThis.KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key !== 'Enter' || e.defaultPrevented || !onScreen(planRef.current)) return;
+      if (typingInto(e.target) && !(e.target instanceof Element && planRef.current?.contains(e.target))) return;
+      e.preventDefault(); void run(true);
+    };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
   });
@@ -216,7 +224,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       onRunAgain={r => { setSampleOnly(false); setPacketFrom(r.from ?? null); setQuestion(r.question); setModule(r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setTheory(r.theory ?? ''); setStep(2); }}/>}
   </section>;
 
-  return <section className="br" aria-label="AI runs">
+  return <section className="br" aria-label="AI runs" ref={planRef}>
     <header className="br-head"><h2>Before you run <small>{p?.module_label ?? ''} · how strict, what it may use, what leaves this computer</small></h2>{stepper}</header>
     <div className="br-cols">
       <div className="br-col br-left" aria-label="Operating instructions" role="region">

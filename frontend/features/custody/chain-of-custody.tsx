@@ -13,6 +13,7 @@ import type {ReactElement, ReactNode} from 'react';
 
 import {StatusChip, type ClaimStatus} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
+import {onScreen, typingInto} from '../../lib/on-screen';
 import {getClaimCustodyChainOptions, listClaimsOptions, recheckHashMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -101,13 +102,13 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
   const fileOf = (c: CustodyCardOut) => chain?.rows.find(r => r.cards.some(x => x.id === c.id))?.cards.find(x => x.kind === 'file')?.document_id ?? null;
   useEffect(() => { setPicked(null); recheck.reset(); }, [chosen]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const rootRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
-      const t = e.target;
-      if (e.metaKey || e.ctrlKey || e.altKey || (t instanceof Element && t.closest('input, textarea, select, [contenteditable="true"]'))) return;
+      if (!onScreen(rootRef.current) || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || typingInto(e.target)) return;
       if (e.key === 'l' || e.key === 'L') { e.preventDefault(); setAsList(v => !v); }
-      else if (e.key === 'Escape' && chosen) openClaim(chosen);
+      else if (e.key === 'Escape' && chosen && !document.querySelector('[role="dialog"]:not([hidden])')) openClaim(chosen);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -131,7 +132,7 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
     : !claims.data?.length ? 'No claim yet. A Chain of Custody starts from a claim: add one in Claims.'
     : chainQ.isError ? errorMessage(chainQ.error, 'Could not trace this claim') : chainQ.isPending ? 'Tracing the claim…' : '';
 
-  return <section className="cc" aria-label="Chain of Custody">
+  return <section className="cc" aria-label="Chain of Custody" ref={rootRef}>
     <header className="cc-head">
       <h2>How this fact got here</h2>
       {chain && <p className="cc-seal"><button type="button" className="cc-seal-btn" onClick={() => void copySeal()}

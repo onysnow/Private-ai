@@ -116,6 +116,20 @@ describe('WatchTheRun', () => {
     expect(api.lastBody('POST /api/ai-analysis-candidates/cand-1/review')).toEqual({decision: 'accept', note: null});
   });
 
+  it('ignores its keys while hidden behind another tab', async () => {
+    const events = record(2);
+    mockApi({[`GET ${EV}`]: {run: {...RUN, events: events.length}, events}, 'GET /api/ai-analysis-candidates/cand-1': CAND});
+    const {rerender} = render(<QueryProvider><div hidden><WatchTheRun investigationId="inv-1" runId="run-1"/></div></QueryProvider>);
+    const user = userEvent.setup();
+    await waitFor(() => expect(document.querySelector('.wr-map')).not.toBeNull());
+    await user.keyboard('nl');
+    expect(document.querySelector('.wr-drawer')).toBeNull();
+    expect(document.querySelector('.wr-log')).toBeNull();
+    rerender(<QueryProvider><div><WatchTheRun investigationId="inv-1" runId="run-1"/></div></QueryProvider>);
+    await user.keyboard('n');
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
   it('swaps the map for the plain log with L', async () => {
     open();
     const user = userEvent.setup();

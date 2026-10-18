@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable
 
-from sqlalchemy import String, cast, func, or_, select
+from sqlalchemy import String, cast, func, or_, select, true
 from sqlalchemy.sql import ColumnElement
 from typing import Any
 from sqlalchemy.orm import Session, aliased
@@ -87,10 +87,17 @@ def _prefilter(tokens: list[str], *columns: Any) -> ColumnElement[bool]:
     their keys/values stay substring-searchable, mirroring the str(...)-based text
     _score() builds from them in Python.
     """
+    # SQL lower() is not Python's casefold(): SQLite's lowers ASCII only ("Émile" stays "Émile"), neither folds "ß" to
+    # "ss", and JSON columns store non-ASCII as \u escapes. A token outside ASCII could then never match, so the
+    # prefilter steps aside and _score(), which casefolds in Python, decides alone (code review 18 Oct).
+    if any(not token.isascii() for token in tokens):
+        return true()
+    # casefold() turns "ß" into "ss", so a typed "strauss" must also reach a stored "Strauß".
+    variants = [v for token in tokens for v in ({token, token.replace("ss", "ß")} if "ss" in token else {token})]
     exprs: list = []
     for column in columns:
         text_col = func.lower(cast(column, String))
-        exprs.extend(text_col.contains(token) for token in tokens)
+        exprs.extend(text_col.contains(token) for token in variants)
     return or_(*exprs)
 
 
