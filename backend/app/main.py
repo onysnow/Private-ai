@@ -319,7 +319,7 @@ def create_app(
         denial = None if persisted_scope is not None else await enforce_api_access(request, app_settings.api_auth_token)
         if denial is not None:
             if denial.status_code == 401:
-                rate_key = f"{client_host or ''}|{request.url.hostname or ''}"
+                rate_key = f"{client_host or ''}"
                 allowed_failure, retry_after = failure_limiter.hit(rate_key)
                 if not allowed_failure:
                     denial = JSONResponse(
@@ -340,7 +340,7 @@ def create_app(
                 )
             return denial
         if not local_request:
-            failure_limiter.reset(f"{client_host or ''}|{request.url.hostname or ''}")
+            failure_limiter.reset(f"{client_host or ''}")
         browser_denial = await enforce_browser_write_access(request, app_settings.cors_origins)
         if browser_denial is not None:
             browser_denial.headers["X-Request-ID"] = request_id

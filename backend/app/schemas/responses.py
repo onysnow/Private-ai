@@ -2591,6 +2591,8 @@ class IncompleteTransactionOut(ResponseModel):
     supporting_evidence_count: int
     status: str | None = None
     flowType: Literal["direct", "inferred"]
+    certainty: Literal["shown", "not_yet_shown", "disputed"]
+    locator: str | None = None
     problems: list[str]
 
 

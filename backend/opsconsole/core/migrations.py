@@ -69,7 +69,15 @@ def plan(ctx: ConsoleContext, target: str) -> dict[str, Any]:
         with redirect_stdout(buf):
             command.upgrade(_config(ctx), f"{start}:{target}", sql=True)
     except Exception as exc:
-        raise ConsoleError(400, "plan_failed", f"{exc.__class__.__name__}: {str(exc)[:500]}") from exc
+        if "--sql mode" not in str(exc):
+            raise ConsoleError(400, "plan_failed", f"{exc.__class__.__name__}: {str(exc)[:500]}") from exc
+        # Some migrations (SQLite batch rebuilds) cannot be rendered as offline SQL.
+        # Say which ones would run instead of failing the whole plan.
+        pending = [e for e in reversed(state.get("history") or []) if not e.get("applied")]
+        lines = ["-- SQL preview is not available for this database: some migrations rebuild tables",
+                 "-- and need a live connection. These migrations would run, oldest first:"]
+        lines += [f"-- {e['revision']}  {e.get('message', '')}".rstrip() for e in pending]
+        return {"from": start, "to": target, "sql": "\n".join(lines) + "\n"}
     return {"from": start, "to": target, "sql": buf.getvalue()}
 
 

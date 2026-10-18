@@ -234,8 +234,12 @@ def test_fixture_host_replies(fixture_host: Any, monkeypatch: pytest.MonkeyPatch
 @pytest.fixture
 def workbench(tmp_path: Path) -> Iterator[tuple[TestClient, Any, Console]]:
     from app.core.config import Settings
+    from app.db.session import Base, engine
     from app.main import create_app
 
+    # create_app(bootstrap_schema=False) leaves the tables to the caller; without
+    # this the test passed only when an earlier test in the run had made them.
+    Base.metadata.create_all(engine)
     settings = Settings(console_dir=str(tmp_path / "console"), console_writes="changesets_and_sql",
                         app_log_file=str(tmp_path / "app.jsonl"), audit_log_file=str(tmp_path / "audit.jsonl"))
     app = create_app(settings, bootstrap_schema=False)

@@ -9469,6 +9469,10 @@ export type IncompleteTransactionOut = {
    */
   amount?: number | null;
   /**
+   * Certainty
+   */
+  certainty: 'shown' | 'not_yet_shown' | 'disputed';
+  /**
    * Currency
    */
   currency?: string | null;
@@ -9500,6 +9504,10 @@ export type IncompleteTransactionOut = {
    * Id
    */
   id: string;
+  /**
+   * Locator
+   */
+  locator?: string | null;
   /**
    * Problems
    */
