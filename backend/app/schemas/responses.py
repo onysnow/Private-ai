@@ -1870,6 +1870,8 @@ class InvestigationOut(ResponseModel):
     is_demo: bool
     # The type as the reporter chose it (catalogue areas); null while the app chooses (GET .../type).
     type_areas: list[str] | None = None
+    # This case's default AI run settings (null until the reporter saves them).
+    ai_run_profile: dict | None = None
     created_at: Timestamp
 
 
@@ -2591,6 +2593,8 @@ class IncompleteTransactionOut(ResponseModel):
     supporting_evidence_count: int
     status: str | None = None
     flowType: Literal["direct", "inferred"]
+    certainty: Literal["shown", "not_yet_shown", "disputed"]
+    locator: str | None = None
     problems: list[str]
 
 

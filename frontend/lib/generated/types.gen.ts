@@ -4443,11 +4443,7 @@ export type CorpusStatusOut = {
    * State
    */
   state:
-    | 'not_configured'
-    | 'no_collection'
-    | 'unreachable'
-    | 'working'
-    | 'idle';
+    'not_configured' | 'no_collection' | 'unreachable' | 'working' | 'idle';
 };
 
 /**
@@ -6795,13 +6791,7 @@ export type DropStageOut = {
    * Key
    */
   key:
-    | 'received'
-    | 'checked'
-    | 'read'
-    | 'passages'
-    | 'inside'
-    | 'names'
-    | 'ready';
+    'received' | 'checked' | 'read' | 'passages' | 'inside' | 'names' | 'ready';
   /**
    * Label
    */
@@ -9469,6 +9459,10 @@ export type IncompleteTransactionOut = {
    */
   amount?: number | null;
   /**
+   * Certainty
+   */
+  certainty: 'shown' | 'not_yet_shown' | 'disputed';
+  /**
    * Currency
    */
   currency?: string | null;
@@ -9500,6 +9494,10 @@ export type IncompleteTransactionOut = {
    * Id
    */
   id: string;
+  /**
+   * Locator
+   */
+  locator?: string | null;
   /**
    * Problems
    */
@@ -9870,6 +9868,12 @@ export type InvestigationMembershipPut = {
  * InvestigationOut
  */
 export type InvestigationOut = {
+  /**
+   * Ai Run Profile
+   */
+  ai_run_profile?: {
+    [key: string]: unknown;
+  } | null;
   /**
    * Created At
    *
@@ -11020,12 +11024,7 @@ export type MissingValueOut = {
    * Record Type
    */
   record_type:
-    | 'entity'
-    | 'relationship'
-    | 'evidence'
-    | 'claim'
-    | 'event'
-    | 'source';
+    'entity' | 'relationship' | 'evidence' | 'claim' | 'event' | 'source';
   /**
    * Rule
    */
@@ -16176,12 +16175,7 @@ export type TimelineEventCreate = {
    * Grade
    */
   grade?:
-    | 'confirmed'
-    | 'likely'
-    | 'weak'
-    | 'unsubstantiated'
-    | 'unknown'
-    | null;
+    'confirmed' | 'likely' | 'weak' | 'unsubstantiated' | 'unknown' | null;
   /**
    * Investigation Id
    */
@@ -17532,13 +17526,7 @@ export type WireEntityOut = {
    * Kind
    */
   kind:
-    | 'person'
-    | 'company'
-    | 'org'
-    | 'vehicle'
-    | 'property'
-    | 'account'
-    | 'other';
+    'person' | 'company' | 'org' | 'vehicle' | 'property' | 'account' | 'other';
   /**
    * Name
    */

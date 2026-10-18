@@ -20459,6 +20459,15 @@
             ],
             "title": "Amount"
           },
+          "certainty": {
+            "enum": [
+              "shown",
+              "not_yet_shown",
+              "disputed"
+            ],
+            "title": "Certainty",
+            "type": "string"
+          },
           "currency": {
             "anyOf": [
               {
@@ -20529,6 +20538,17 @@
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
           },
           "problems": {
             "items": {
@@ -20607,6 +20627,7 @@
           "evidence_count",
           "supporting_evidence_count",
           "flowType",
+          "certainty",
           "problems"
         ],
         "title": "IncompleteTransactionOut",
@@ -21163,6 +21184,18 @@
       },
       "InvestigationOut": {
         "properties": {
+          "ai_run_profile": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Run Profile"
+          },
           "created_at": {
             "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",

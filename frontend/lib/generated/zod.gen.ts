@@ -3823,6 +3823,7 @@ export const zIdentityMergeAuditOut = z.object({
  */
 export const zIncompleteTransactionOut = z.object({
   amount: z.number().nullish(),
+  certainty: z.enum(['shown', 'not_yet_shown', 'disputed']),
   currency: z.string().nullish(),
   dateTime: z.string().nullish(),
   evidence: z.string().nullish(),
@@ -3831,6 +3832,7 @@ export const zIncompleteTransactionOut = z.object({
   from: z.string().nullish(),
   from_entity_id: z.string().nullish(),
   id: z.string(),
+  locator: z.string().nullish(),
   problems: z.array(z.string()),
   relationship_id: z.string(),
   statedPurpose: z.string().nullish(),
@@ -4005,6 +4007,7 @@ export const zInvestigationMembershipPut = z.object({
  * InvestigationOut
  */
 export const zInvestigationOut = z.object({
+  ai_run_profile: z.record(z.unknown()).nullish(),
   created_at: z
     .string()
     .regex(
