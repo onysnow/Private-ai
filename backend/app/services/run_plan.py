@@ -178,7 +178,7 @@ def _past_run_minutes(db: Session) -> list[float]:
                BackgroundJob.started_at.is_not(None), BackgroundJob.finished_at.is_not(None))
         .order_by(BackgroundJob.finished_at.desc()).limit(5)
     ).all()
-    return [round((f - s).total_seconds() / 60, 1) for s, f in rows if f >= s]
+    return [round((f - s).total_seconds() / 60, 1) for s, f in rows if s is not None and f is not None and f >= s]
 
 
 def build_run_plan(db: Session, investigation_id: str, *, module: str, question: str, working_theory: str | None = None,

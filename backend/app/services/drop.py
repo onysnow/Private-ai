@@ -70,18 +70,18 @@ def drop(db: Session, investigation_id: str) -> dict[str, Any]:
             if status == "proposed":
                 waiting[doc_id][kind] += 1
                 unsure += (confidence or 0) < 0.8
-        for doc_id, name in db.execute(select(WatchlistHit.document_id, WatchlistEntry.query)
-                                       .join(WatchlistEntry, WatchlistEntry.id == WatchlistHit.entry_id)
-                                       .where(WatchlistHit.document_id.in_(ids))):
-            hits[doc_id] += 1
+        for hit_doc_id, name in db.execute(select(WatchlistHit.document_id, WatchlistEntry.query)
+                                           .join(WatchlistEntry, WatchlistEntry.id == WatchlistHit.entry_id)
+                                           .where(WatchlistHit.document_id.in_(ids))):
+            hits[hit_doc_id or ""] += 1
             hit_names.add(name)
         for row in db.scalars(select(BackgroundJob).where(BackgroundJob.subject_id.in_(ids), BackgroundJob.kind == "extract_document")
                               .order_by(BackgroundJob.created_at)):
             jobs[row.subject_id or ""] = row  # the latest one wins
-        for doc_id, name in db.execute(select(CheckItem.document_id, PatternFlag.indicator_id)
-                                       .join(PatternFlag, PatternFlag.id == CheckItem.flag_id)
-                                       .where(CheckItem.document_id.in_(ids))):
-            fed[doc_id or ""].add(name)
+        for fed_doc_id, name in db.execute(select(CheckItem.document_id, PatternFlag.indicator_id)
+                                           .join(PatternFlag, PatternFlag.id == CheckItem.flag_id)
+                                           .where(CheckItem.document_id.in_(ids))):
+            fed[fed_doc_id or ""].add(name)
 
     children: dict[str, list[Document]] = defaultdict(list)
     for d in docs:

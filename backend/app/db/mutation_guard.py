@@ -106,7 +106,7 @@ def collect_mutation_investigation_ids(db: Session, objects: Iterable[object] | 
     story_ids = {obj.story_id for obj in rows if isinstance(obj, StorySection) and obj.story_id}
     section_ids = {obj.section_id for obj in rows if isinstance(obj, StoryClaim) and obj.section_id}
 
-    def add_ids(stmt: Select[tuple[str]]) -> None:
+    def add_ids(stmt: Select[str]) -> None:
         investigation_ids.update(value for value in db.scalars(stmt).all() if value)
 
     if entity_ids:

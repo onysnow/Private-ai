@@ -164,7 +164,7 @@ def _message_chunks(message: EmailMessage, prefix: str = "") -> tuple[list[dict]
 
 
 def _parse(data: bytes) -> EmailMessage:
-    return email.message_from_bytes(data, policy=policy.default)  # type: ignore[return-value]
+    return email.message_from_bytes(data, policy=policy.default)
 
 
 def read_eml(path: Path) -> tuple[list[dict], list[str]]:

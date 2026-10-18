@@ -51,7 +51,7 @@ def add_chart_to_deck(db: Session, deck: Deck, spec: VisualSpec, *, heading: str
     deck then draws and checks it again in its own theme, as it does on
     every save."""
     visual = _resolved(db, deck.investigation_id, spec, style)
-    slide = {"kind": "content", "heading": (heading or "").strip() or spec.title, "bullets": [], "evidence": [],
+    slide: dict[str, Any] = {"kind": "content", "heading": (heading or "").strip() or spec.title, "bullets": [], "evidence": [],
              "notes": visual["text"].get("description") or "", "visual": visual}
     return update_deck(db, deck, {"slides_json": [*copy.deepcopy(deck.slides_json or []), slide]})
 

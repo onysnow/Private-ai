@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import yaml  # type: ignore[import-untyped]  # stubs (types-PyYAML) not installed; ADR-0007
+import yaml
 
 from app.catalogue.models import AREAS, Area, Glossary, Indicator, Status
 

@@ -635,7 +635,7 @@ def claim_sources(db: Session, investigation_id: str) -> list[dict[str, Any]]:
         by_claim.setdefault(claim_id, []).append((STANCE_ORDER.get(stance, 3), stance, title or "", locator, source_id))
     leads: Counter[str] = Counter(claim_id for (claim_id,) in db.execute(
         select(LeadLink.claim_id).join(Lead, Lead.id == LeadLink.lead_id)
-        .where(Lead.investigation_id == investigation_id, Lead.status.in_(OPEN_LEAD), LeadLink.claim_id.is_not(None))))
+        .where(Lead.investigation_id == investigation_id, Lead.status.in_(OPEN_LEAD), LeadLink.claim_id.is_not(None))) if claim_id is not None)
     out = []
     for claim_id in sorted(set(by_claim) | set(leads)):
         items = sorted(by_claim.get(claim_id, []), key=lambda t: (t[0], t[2], t[3] or ""))

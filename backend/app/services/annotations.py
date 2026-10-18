@@ -196,9 +196,10 @@ def marks_for(db: Session, investigation_id: str, keys: list[tuple[str, str]]) -
         select(Note.record_type, Note.record_id, func.count())
         .where(Note.investigation_id == investigation_id, Note.record_id.in_(ids))
         .group_by(Note.record_type, Note.record_id)).all()
-    for record_type, record_id, n in note_rows:
-        if (record_type, record_id) in out:
-            out[(record_type, record_id)]["note_count"] = n
+    for note_type, note_record_id, n in note_rows:
+        note_key = (note_type or "", note_record_id or "")
+        if note_key in out:
+            out[note_key]["note_count"] = n
     return out
 
 

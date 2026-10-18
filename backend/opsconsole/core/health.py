@@ -143,8 +143,8 @@ def run_checks(ctx: ConsoleContext, *, only: list[str] | None, principal: Princi
                 run.log(f"{entry['status']:5} {check.id} ({entry['count']}) {entry['ms']}ms")
                 ctx.bus.publish("checks", {"run_id": run.id, "check": entry})
         ctx.store.check_results_write(run.id, results)
-        status = "failed" if summary["fail"] or summary["error"] else "passed"
-        return status, {"summary": summary, "checked": len(results)}, None
+        outcome = "failed" if summary["fail"] or summary["error"] else "passed"
+        return outcome, {"summary": summary, "checked": len(results)}, None
 
     return ctx.supervisor.start("checks", fn, selection=",".join(only) if only else None, principal_id=principal.id)
 
