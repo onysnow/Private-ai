@@ -149,7 +149,7 @@ html[data-motion='calm'] .wr-node.writing .ring { animation: none; }
 .wr-mark.bad rect { fill: color-mix(in srgb, var(--wr-bad) 55%, #3a0d0d); stroke: var(--wr-bad); stroke-width: 1.4; } .wr-mark.bad path { stroke: #fff; stroke-width: 1.4; }
 .wr-mark.neutral { fill: none; stroke: var(--text); stroke-width: 1.4; }
 .wr-mark.self { fill: none; stroke: var(--wr-ai); stroke-width: 1.4; stroke-dasharray: 2.5 2; }
-.wr-tally text { fill: var(--text-muted); font: 10.5px var(--font-ui); }
+.wr-tally text { fill: var(--text-muted); font: 10px var(--font-ui); }
 .wr-light { fill: var(--wr-good); color: var(--wr-good); filter: drop-shadow(0 0 4px currentColor); }
 .wr-light.partial { color: var(--wr-partial); } .wr-light.bad { color: var(--wr-bad); filter: drop-shadow(0 0 7px currentColor); } .wr-light.self { color: var(--wr-ai); }
 .wr-light.partial { fill: var(--wr-partial); } .wr-light.bad { fill: var(--wr-bad); } .wr-light.neutral { fill: var(--text); }

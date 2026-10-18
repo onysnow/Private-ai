@@ -444,7 +444,8 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
         : small ? <text y={shape === 'mini' ? 3 : 4} className={shape === 'mini' ? 'wr-sub' : 'wr-label chip'}>{label}</text>
         : <><text y={labelY} className="wr-label">{label}</text>{(sub ?? []).map((l, i) => <text key={i} y={labelY + 12 + i * 11} className="wr-sub">{l}</text>)}</>}
       {t?.last && shape !== 'mini' && <Mark status={t.last.status} self={t.last.self_reported} x={shape === 'qtile' || shape === 'cand' ? 48 : small ? 38 : 18} y={shape === 'qtile' ? -20 : shape === 'cand' ? -18 : small ? -9 : -16} r={5.5}/>}
-      {t && t.bad > 0 && <text className="wr-stopmark" x={shape === 'qtile' || shape === 'cand' ? -58 : small ? -48 : -24} y={shape === 'qtile' || shape === 'cand' ? 4 : small ? 4 : -10} aria-hidden="true">⊘</text>}
+      {t && t.bad > 0 && <text className="wr-stopmark" x={shape === 'qtile' || shape === 'cand' ? -58 : small ? -48 : shape === 'person' || shape === 'circle' ? -38 : -24}
+        y={shape === 'qtile' || shape === 'cand' || small ? 4 : shape === 'person' || shape === 'circle' ? 4 : -10} aria-hidden="true">⊘</text>}
       {!calm && last && last.status === 'bad' && nodeOf(last) === k && <g key={`spark${last.n}`} className="wr-sparks" aria-hidden="true">
         {[[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([dx, dy], i) => <path key={i} d={`M${dx * 10} ${dy * 10} l${dx * 7} ${dy * 7}`}>
           <animate attributeName="opacity" values="0;1;0" dur="0.6s" fill="freeze"/></path>)}</g>}
@@ -676,7 +677,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
           {boundaries}
           {node('cp-01', 'CP-01', 'hex', ['right of reply'], {dim: !events.some(e => e.node === 'cp-01')})}
           {node('candidate', 'Candidate', 'cand', [candidateId ? `AIC ${candidateId.slice(0, 8)}` : 'none saved'])}
-          <g className="wr-tally" transform="translate(858 150)">
+          <g className="wr-tally" transform="translate(914 150)">
             {(['good', 'partial', 'bad', 'neutral'] as Status[]).map((s, i) => <g key={s} transform={`translate(0 ${i * 16})`}><Mark status={s} x={6} y={0} r={4.5}/><text x={18} y={4}>{counts[s]} {WORD[s]}</text></g>)}
           </g>
           {node('review', 'Your review', 'person', [reviewed ? words(candidate.data?.review_status) : 'waits for you'])}
