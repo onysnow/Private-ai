@@ -26,6 +26,7 @@ import {getDropHistoryOptions, getDropHistoryQueryKey, getDropOptions, getDropQu
 import {cancelJobEndpoint, createIngestionBatch, retryJobEndpoint} from '../../lib/generated/sdk.gen';
 import type {DropHistoryEntryOut, DropLaneOut, DropOut, DropStageOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {PagePicture} from '../case-home/decision-card';
 import {batchLabel, upload} from '../documents/documents-panel';
@@ -166,7 +167,7 @@ function DropHistory({investigationId, onShow}: {investigationId: string; onShow
   return <ol className="dp-history" aria-label="Every drop, newest first">{drops.map(d => {
     const found = Object.entries(d.proposals).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${c} ${kindWord(k, c)}`).join(', ');
     return <li key={d.id}>
-      <header><b>{d.label}</b><time dateTime={String(d.created_at)}>{new Date(d.created_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</time>
+      <header><b>{d.label}</b><time dateTime={String(d.created_at)}>{apiTime(d.created_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</time>
         {d.one_at_a_time && <span className="dp-chip">One at a time</span>}</header>
       <p className="dp-quiet">{[n(d.files, 'file saved', 'files saved'), d.files_inside ? `${d.files_inside} inside them` : '', d.duplicates ? `${d.duplicates} already in the case` : '',
         d.refused ? `${d.refused} not taken` : ''].filter(Boolean).join(' · ')}</p>
@@ -471,7 +472,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
       </section>}
       <section className="dp-card" aria-label="This drop">
         <p className="dp-eyebrow">This drop</p>
-        {t!.started_at && <p className="dp-quiet">Since {new Date(t!.started_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</p>}
+        {t!.started_at && <p className="dp-quiet">Since {apiTime(t!.started_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</p>}
         <dl>
           <div><dt>Files</dt><dd>{t!.files} dropped{t!.files_inside ? ` · ${t!.files_inside} inside` : ''}</dd></div>
           {ocr && <div><dt>OCR language</dt><dd>{ocr.pdf_ocr_enabled ? language : 'OCR off'}</dd></div>}

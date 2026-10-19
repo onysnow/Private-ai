@@ -22,6 +22,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {CurrencyMoneyChecksOut, FinancialTransactionOut, MoneyCheckOut, RedFlagOut, RoundTripOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {apiTime} from '../../lib/timestamps';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {amountText, layout, pathOf, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
 
@@ -47,7 +48,7 @@ const day = (d: string | null) => {
   return dd ? `${dd} ${MONTHS[+m - 1]} ${y}` : m ? `${MONTHS[+m - 1]} ${y}` : y;
 };
 const ran = (iso: string) => {
-  const d = new Date(iso);
+  const d = apiTime(iso);
   return `${d.getDate()} ${MONTHS[d.getMonth()]}, ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 };
 

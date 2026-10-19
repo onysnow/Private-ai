@@ -18,6 +18,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {AiRunEventOut} from '../../lib/generated/types.gen';
 import {currentAppearance, onAppearanceChange} from '../../lib/theme';
+import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {RunBloom} from '../effects/run-bloom';
 import type {Flight} from '../effects/run-bloom';
@@ -75,7 +76,7 @@ const isProblem = (e: Ev) => e.status === 'bad' || (e.status === 'partial' && !e
 const OTHER_MODULE = /^(ras|qas|las|das)\/./;
 const nodeOf = (e: Ev) => (AT[e.node] || OTHER_MODULE.test(e.node) ? e.node : e.node === 'cp-02' || e.node === 'cp-03' ? e.node : e.node.startsWith('gate:') ? 'gate:citation' : e.system === 'tas' ? 'tas/class' : 'run');
 const words = (v: string | null | undefined) => (v ? (v.charAt(0) + v.slice(1).toLowerCase()).replace(/_/g, ' ') : '');
-const utc = (iso: string) => Date.parse(iso.endsWith('Z') ? iso : `${iso}Z`);
+const utc = (iso: string) => apiTime(iso).getTime();
 const stamp = (iso: string) => new Date(utc(iso)).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false}).replace(',', '');
 const clock = (ms: number) => new Date(ms).toLocaleTimeString('en-GB', {hour12: false});
 const who = (e: Ev) => (e.node === 'review' ? 'you' : e.self_reported ? 'model says' : e.system === 'app' ? 'app · enforced' : e.system);
