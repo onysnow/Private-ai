@@ -455,6 +455,38 @@ def test_a_connector_credential_failure_does_not_answer_with_the_internal_reason
     assert r.status_code == 500 and "/home/ops" not in r.text
 
 
+
+
+
+# --- the query workbench's read mode is read-only in the database itself on SQLite ---
+
+def test_read_mode_is_enforced_by_sqlite_not_only_by_the_keyword_screen(tmp_path):
+    from sqlalchemy import create_engine, text as _text
+
+    from opsconsole.core import sqlscreen
+    engine = create_engine(f"sqlite:///{tmp_path / 'c.db'}")
+    with engine.begin() as conn:
+        conn.execute(_text("create table t (id integer primary key, v text)"))
+        conn.execute(_text("insert into t (v) values ('a')"))
+    with engine.connect() as conn:
+        out = sqlscreen.run_read(conn, "select v from t", params=None, max_rows=10, max_bytes=10_000, timeout_seconds=5)
+        assert out["rows"] == [["a"]]
+        # A write that got past the screen would be refused by the database.
+        with sqlscreen._sqlite_query_only(conn):
+            try:
+                conn.execute(_text("insert into t (v) values ('b')"))
+            except Exception as exc:
+                assert "readonly" in str(exc).lower() or "read-only" in str(exc).lower()
+            else:
+                raise AssertionError("SQLite accepted a write while query_only was on")
+        conn.rollback()
+        # Switched back afterwards, so the same connection can write again.
+        conn.execute(_text("insert into t (v) values ('c')"))
+        conn.commit()
+    with engine.connect() as conn:
+        assert [r[0] for r in conn.execute(_text("select v from t order by id"))] == ["a", "c"]
+
+
 # --- E-03: a claim cannot be created already Supported or Confirmed ----------
 
 def test_a_claim_cannot_be_created_as_supported_or_confirmed():
