@@ -74,7 +74,7 @@ Consequences: (a) social posts are already capped by the suite; (b) a "Capture" 
 
 | Tool | What it does | Licence | Latest | Fit | Caveat |
 |---|---|---|---|---|---|
-| **Bellingcat Auto Archiver** | URL → media (via yt-dlp and other extractors), hashes, screenshots, WACZ, RFC 3161 and OpenTimestamps timestamps; deletion detection (1.2.0); Bluesky, Reddit, LinkedIn extractors | MIT | 1.2.9, 2026-09-01 | **Full** for capture | Extractors break with platform changes; some need logins/cookies; its own dependency licences not checked |
+| **Bellingcat Auto Archiver** | URL → media (via yt-dlp and other extractors), hashes, screenshots, WACZ, RFC 3161 and OpenTimestamps timestamps; deletion detection (1.2.0); Bluesky, Reddit, LinkedIn extractors | MIT | 1.2.9, 2026-09-01 | **Full** for capture | Extractors break with platform changes; some need logins/cookies. **Its dependencies (PyPI 1.2.9) include `bgutil-ytdlp-pot-provider` (GPL-3), `opentimestamps` (LGPL-3), desktop-automation packages (`pyautogui`, `pyperclip`, `seleniumbase`), cloud clients (`boto3`, Google API, `gspread`), `telethon`, `instaloader`, `python-twitter-v2`, and a pinned `numpy==2.1.3`; it needs Python >=3.10,<3.13 (the backend image is 3.12). Run it as a separate process in its own environment, not imported into the backend** |
 | **browsertrix-crawler / Browsertrix** | Real-browser crawl to WARC/WACZ with logged-in sessions | AGPL-3 | n/a | **Full** for web fidelity | AGPL: separate process only. Heavy |
 | ArchiveBox | Self-hosted archive: HTML, SingleFile, WARC, PDF, screenshot, media | MIT | 0.9.73, 2026-10-06 | Partial | Own UI and DB; weaker on hashing/timestamps |
 | warcio | WARC read/write | Apache-2.0 | 1.8.1, 2026-03-31 | Building block | Write our own WARC |
@@ -93,7 +93,7 @@ Consequences: (a) social posts are already capped by the suite; (b) a "Capture" 
 
 | Library | Licence | Latest | Note |
 |---|---|---|---|
-| **yt-dlp** | Unlicense | 2026.8.19 (2026-08-19) | Works for many platforms; breaks and is updated often. Platform coverage [memory] |
+| **yt-dlp** | Unlicense | 2026.8.19 (2026-08-19) | Its `supportedsites.md` [read] lists extractors for Twitter/X, Instagram (incl. stories), TikTok, Facebook, YouTube, Reddit, Bluesky, VK, Weibo, Rumble, LinkedIn, Substack, Naver, Kakao, Bilibili and Truth Social; **none for Mastodon or Threads**. The list says "Not all sites listed here are guaranteed to work; websites are constantly changing". Listed does not mean working today |
 | gallery-dl | **GPL-2.0-only** | 1.32.17 (2026-10-17) | Separate process only |
 | Instaloader | MIT | 4.15.4 (2026-10-12) | Public profiles; rate-limited |
 | TikTok-Api (unofficial) | MIT | 7.3.3 (2026-04-01) | Fragile |
