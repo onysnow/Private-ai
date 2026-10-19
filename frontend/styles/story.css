@@ -12,7 +12,8 @@
 .sy-bad { color: var(--status-disputed); } .sy-warn { color: var(--flag-strong); } .sy-ok { color: var(--status-supported); }
 .sy-quiet { margin: 4px 0; color: var(--text-muted); font-size: 12.5px; }
 .sy-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr); gap: 14px; align-items: start; }
-@media (max-width: 1150px) { .sy-body { grid-template-columns: 1fr; } }
+.sy-body.with-pane { grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr) minmax(260px, 300px); }
+@media (max-width: 1150px) { .sy-body, .sy-body.with-pane { grid-template-columns: 1fr; } }
 .sy-left, .sy-right { min-width: 0; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel, none); padding: 12px 14px; display: grid; gap: 10px; align-content: start; }
 .sy-left-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .sy-eyebrow { margin: 0; font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
@@ -85,6 +86,8 @@
 .sy-export { margin-left: auto; display: grid; justify-items: end; gap: 2px; }
 .sy-export button { all: unset; cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 12.5px; box-shadow: inset 0 0 0 1px var(--line); }
 .sy-export small { font-size: 11px; color: var(--text-muted); }
+/* Not ready for publication: the button's edge is dashed (not yet shown), as the mockup draws it; it still opens the sheet. */
+.sy-export:not(.ready) button:not(:disabled) { box-shadow: none; border: 1px dashed var(--text-muted); padding: 4px 11px; color: var(--text-muted); }
 .sy-start { display: grid; gap: 8px; justify-items: start; padding: 20px 4px; font-size: 13px; }
 .sy-start small { color: var(--text-muted); }
 .sy-cited { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 13px; }
@@ -121,3 +124,85 @@
 .sent-mark { position: absolute; left: -24px; width: 16px; height: 16px; margin-top: 5px; display: inline-grid; place-items: center; border-radius: 50%;
   font: 700 10px var(--font-mono); box-shadow: inset 0 0 0 1.2px var(--text-muted); color: var(--text-muted); user-select: none; }
 .sent-mark-disputed { color: var(--status-disputed); box-shadow: inset 0 0 0 1.2px var(--status-disputed); }
+
+.k-ai { width: 0 !important; height: 12px !important; border-left: 2px solid var(--ai-mark); }
+.sy-foot b { color: var(--text); font-weight: 650; }
+.sy-doc-meta { margin: 2px 0 0 26px; font-size: 11.5px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.sy-link { all: unset; cursor: pointer; color: var(--accent-2, var(--accent-1)); font-size: 11.5px; text-decoration: underline; text-underline-offset: 3px; }
+.sy-link:focus-visible, .sy-pane button:focus-visible, .sy-sheet button:focus-visible { outline: 2px solid var(--accent-2, var(--accent-1)); outline-offset: 2px; border-radius: 4px; }
+.sy-claim[draggable=true] { cursor: grab; }
+.sy-claim[draggable=true]:active { cursor: grabbing; }
+
+/* A citation's hover card, and the drop target while a claim is dragged over the text. */
+.wu-body { position: relative; border-radius: 10px; }
+.wu-body.drop { outline: 1.5px dashed var(--accent-2, var(--accent-1)); outline-offset: 2px; }
+.wu-hover { position: absolute; z-index: 5; width: min(340px, 92%); display: grid; gap: 6px; padding: 10px 12px; border-radius: 10px; background: var(--surface-3);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .35), inset 0 0 0 1px var(--line); animation: sy-in .12s ease-out; }
+.wu-hover small { font-size: 11px; color: var(--text-muted); }
+.wu-hover q { font: 500 14px/1.45 var(--font-read); quotes: '“' '”'; }
+.wu-hover button { all: unset; cursor: pointer; font-size: 12px; color: var(--accent-2, var(--accent-1)); }
+.wu-hover-none { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+@keyframes sy-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+
+/* A paragraph an AI drafted, until a person keeps it: the plum left rule and its "AI draft · date" tag (status grammar). */
+.wu-text p.ai-para { padding-left: 12px; border-left: 2px solid var(--ai-mark); }
+.ai-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 4px; font: 400 11.5px var(--font-ui); color: var(--text-muted); user-select: none; }
+.ai-bar button { all: unset; cursor: pointer; color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.ai-bar button:focus-visible { outline: 2px solid var(--ai-mark); outline-offset: 2px; }
+
+/* What opens beside the text: a citation's passage, the version history. */
+.sy-pane { position: sticky; top: 8px; min-width: 0; display: grid; gap: 10px; align-content: start; padding: 12px 14px; border-radius: 14px; background: var(--surface-1);
+  box-shadow: var(--shadow-panel, none), inset 0 0 0 1px var(--line); max-height: calc(100vh - 40px); overflow-y: auto; animation: sy-in .14s ease-out; outline: none; }
+.sy-pane > header { display: flex; align-items: center; gap: 8px; }
+.sy-pane > header b { font: 600 13px var(--font-ui); }
+.sy-pane-esc { color: var(--text-muted); font-size: 11px; } .sy-pane-esc kbd { padding: 0 5px; border-radius: 4px; background: var(--surface-2); font: 600 10.5px var(--font-mono); }
+.sy-pane-claim { margin: 0; display: grid; gap: 6px; font: 500 14px/1.4 var(--font-read); justify-items: start; }
+.sy-passages { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.sy-passages li { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: var(--surface-2); }
+.sy-passages li.against { box-shadow: inset 2px 0 0 var(--status-disputed); }
+.sy-passages small { font: 500 10.5px var(--font-mono); color: var(--text-muted); }
+.sy-passages blockquote { margin: 0; font: 400 14px/1.5 var(--font-read); }
+.sy-pane-btn, .sy-confirm button, .sy-name button, .sy-notes button[type=submit], .sy-confirm-inline button { all: unset; cursor: pointer; padding: 5px 11px; border-radius: 8px; font-size: 12px; box-shadow: inset 0 0 0 1px var(--line); justify-self: start; }
+.sy-confirm { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--flag-strong) 10%, var(--surface-2)); }
+.sy-confirm p { margin: 0 0 4px; flex-basis: 100%; font-size: 12.5px; }
+.sy-confirm button.primary { background: var(--accent-1); color: var(--ground); box-shadow: none; font-weight: 650; }
+.sy-name { display: grid; gap: 4px; font-size: 12px; color: var(--text-muted); }
+.sy-name span { display: flex; gap: 6px; }
+.sy-name input, .sy-notes textarea { flex: 1; min-width: 0; padding: 6px 8px; border-radius: 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); font: inherit; font-size: 12.5px; }
+.sy-versions { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.sy-versions button { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; padding: 6px 8px; border-radius: 8px; font-size: 12.5px; }
+.sy-versions button:hover, .sy-versions button:focus-visible { background: var(--surface-2); }
+.sy-versions button > span:last-child { display: grid; gap: 1px; }
+.sy-versions small { color: var(--text-muted); font-size: 11px; }
+.v-mark { color: var(--accent-1); } .v-auto .v-mark, .v-before_restore .v-mark { color: var(--text-muted); }
+.sy-version-text { border-radius: 10px; background: var(--surface-2); padding: 4px 6px; max-height: 50vh; overflow-y: auto; }
+.wu-readonly { min-height: 0; font-size: 14px; padding-left: 22px; }
+
+/* The Notes tab. */
+.sy-notes { display: grid; gap: 10px; font-size: 13px; }
+.sy-notes form { display: grid; gap: 6px; }
+.sy-notes label { font-size: 12px; color: var(--text-muted); }
+.sy-note-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.sy-note-list li { display: grid; gap: 3px; padding: 8px 10px; border-radius: 10px; background: var(--surface-2); justify-items: start; }
+.sy-note-list p { margin: 0; white-space: pre-wrap; font: 400 14px/1.45 var(--font-read); }
+.sy-note-list small { color: var(--text-muted); font-size: 11px; }
+.sy-confirm-inline { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; }
+
+/* The Export sheet. */
+.sy-sheet-back { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(0, 0, 0, .45); padding: 20px; }
+.sy-sheet { width: min(640px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; display: grid; gap: 12px; padding: 16px 18px; border-radius: 16px; background: var(--surface-1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .45), inset 0 0 0 1px var(--line); color: var(--text); font-family: var(--font-ui); animation: sy-in .14s ease-out; }
+.sy-sheet > header { display: flex; align-items: center; } .sy-sheet > header b { font: 400 22px var(--font-display, var(--font-ui)); }
+.sy-formats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; }
+.sy-formats li { display: grid; gap: 6px; align-content: start; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; }
+.sy-formats li.off { box-shadow: none; border: 1px dashed var(--line); }
+.sy-formats b small { font: 500 10.5px var(--font-mono); color: var(--text-muted); margin-left: 4px; }
+.sy-formats span { color: var(--text-muted); }
+.sy-formats button { all: unset; cursor: pointer; justify-self: start; padding: 5px 11px; border-radius: 8px; font-size: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.sy-formats button:disabled { cursor: default; opacity: .55; }
+.sy-why { font-size: 11px; color: var(--text-muted); }
+.sy-checks { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; font-size: 12.5px; }
+.sy-checks li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; }
+.sy-checks li.ok span { color: var(--status-supported); } .sy-checks li.open span { color: var(--text-muted); }
+
+@media (prefers-reduced-motion: reduce) { .wu-hover, .sy-pane, .sy-sheet { animation: none; } }
