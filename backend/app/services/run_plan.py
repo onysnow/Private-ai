@@ -29,8 +29,9 @@ from app.ai.reasoning import (
     packet_of_run,
     resolve_handoff,
 )
-from app.ai.systems import SUITE_MODULES
 from app.ai.run_events import instructions_in_packet
+from app.ai.suite import POSSIBLE_NEXT, ROUTES, SYSTEM_ORDER
+from app.ai.systems import SUITE_MODULES
 from app.core.config import Settings
 from app.core.config import settings as default_settings
 from app.models.domain import BackgroundJob, Investigation
@@ -71,21 +72,11 @@ LOCKED = [
     {"text": "Nothing joins the case until you accept it", "by": "every result is a proposal (review queue)"},
 ]
 
+# What each module is called on screen and the system and module it runs, from the suite service's routes.
 MODULE_TEXT = {
-    "case_synthesis": ("Case synthesis", "TAS 08"),
+    **{key: (r.title, f"{r.system.upper()} {r.node.split('/', 1)[1]}") for key, r in ROUTES.items() if r.system != "app"},
     "hypothesis_test": ("Test a theory", "TAS 06"),
     "presentation_draft": ("Draft a brief", "app"),
-    **{key: (m.title, f"{m.system.upper()} {m.node.split('/', 1)[1]}") for key, m in SUITE_MODULES.items()},
-}
-
-# Which next run the router's trigger table points to from each answer (AGENTS.md rows 1-7), by the conditions
-# its output meets: a synthesis states conclusions (LAS), names gaps (EGS) and people (EHS); a theory test is
-# tested against data (QAS) and has records to seek (EGS).
-NEXT_FROM = {
-    "case_synthesis": ("las_argument_check", "evidence_plan", "ehs_harm_minimisation"),
-    "hypothesis_test": ("quant_framing", "evidence_plan"),
-    "ehs_harm_minimisation": ("ehs_public_interest",),
-    "das_framing": ("das_options",),
 }
 
 
@@ -198,23 +189,23 @@ def _steps(module: str, options: dict[str, str], include_external_leads: bool, r
     return steps
 
 
-SYSTEM_WHY = [
-    ("RAS", "published research"), ("TAS", "facts about real people, firms and documents"),
-    ("QAS", "a theory tested against data"), ("LAS", "conclusions beyond what a source says"),
-    ("DAS", "choosing between options"), ("EGS", "planning how to obtain evidence"),
-    ("EHS", "publishing what could cause harm"),
-]
+SYSTEM_WHY = {
+    "ras": "published research", "tas": "facts about real people, firms and documents",
+    "qas": "a theory tested against data", "las": "conclusions beyond what a source says",
+    "das": "choosing between options", "egs": "planning how to obtain evidence",
+    "ehs": "publishing what could cause harm",
+}
 
 
 def _systems(module: str) -> list[dict]:
     """Which systems the answer will need, by the suite's trigger table (AGENTS.md: triggers are conditions on what
     is about to be produced): the one this run uses, and the ones a next run from its answer would (`next_run`)."""
-    running = "tas" if module in TAS_MODULES else (SUITE_MODULES[module].system if module in SUITE_MODULES else "app")
-    nexts = {SUITE_MODULES[n].system for n in NEXT_FROM.get(module, ())}
+    running = ROUTES[module].system
+    nexts = {ROUTES[n].system for n in POSSIBLE_NEXT.get(module, ())}
     rows = []
-    for name, why in SYSTEM_WHY:
-        state = "runs" if name.lower() == running else ("next_run" if name.lower() in nexts else "not_expected")
-        rows.append({"system": name, "why": why, "state": state})
+    for system in SYSTEM_ORDER:
+        state = "runs" if system == running else ("next_run" if system in nexts else "not_expected")
+        rows.append({"system": system.upper(), "why": SYSTEM_WHY[system], "state": state})
     return rows
 
 

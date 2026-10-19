@@ -484,6 +484,29 @@ class PresentationDraftRequest(BaseModel):
     record_refs: list[RecordRef] = Field(min_length=1, max_length=200)
 
 
+class AssistantRunRequest(BaseModel):
+    """Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+    test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+    uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+    (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+    check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+    then holds the goal)."""
+    module: Literal["case_synthesis", "hypothesis_test", "presentation_draft"] | SuiteModuleName
+    question: str = Field(min_length=1, max_length=4000)
+    working_theory: str | None = Field(default=None, max_length=2000)
+    max_results: int = Field(default=30, ge=1, le=100)
+    include_external_leads: bool = True
+    severity_floor: SeverityFloor | None = None
+    source_tier_floor: SourceTierFloor | None = None
+    options: RunOptionsIn | None = None
+    premises: list[str] | None = Field(default=None, max_length=10)
+    changes: list[RunChangeIn] | None = Field(default=None, max_length=50)
+    packet_from: PacketFromIn | None = None
+    handoff_from: str | None = Field(default=None, max_length=64)
+    context: str | None = Field(default=None, max_length=4000)
+    record_refs: list[RecordRef] | None = Field(default=None, max_length=200)
+
+
 class PromoteToWriteupRequest(BaseModel):
     title: str | None = None
 

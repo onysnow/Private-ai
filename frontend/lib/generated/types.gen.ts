@@ -169,6 +169,10 @@ export type AiAnalysisCandidateOut = {
    */
   module: string;
   /**
+   * Next Runs
+   */
+  next_runs?: Array<AiNextRunOut>;
+  /**
    * Payload
    */
   payload: {
@@ -333,6 +337,10 @@ export type AiAuthoritySuiteOut = {
    */
   source: string | null;
   /**
+   * Systems
+   */
+  systems?: Array<AiSuiteSystemOut>;
+  /**
    * Tas Version
    */
   tas_version: string | null;
@@ -474,6 +482,34 @@ export type AiModuleStatusOut = {
    * Vendored Tas
    */
   vendored_tas: boolean;
+};
+
+/**
+ * AiNextRunOut
+ *
+ * A next run the suite service routes an answer to, by what the answer contains.
+ */
+export type AiNextRunOut = {
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Row
+   */
+  row: number | null;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Why
+   */
+  why: string;
 };
 
 /**
@@ -767,6 +803,69 @@ export type AiRunsOut = {
 };
 
 /**
+ * AiSuiteModuleOut
+ */
+export type AiSuiteModuleOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Node
+   */
+  node: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * AiSuiteSystemOut
+ *
+ * One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+ * CHANGELOG numbers them, `latest_change` its newest entry.
+ */
+export type AiSuiteSystemOut = {
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Latest Change
+   */
+  latest_change: string | null;
+  /**
+   * Modules
+   */
+  modules: Array<AiSuiteModuleOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Present
+   */
+  present: boolean;
+  /**
+   * Row
+   */
+  row: number;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Version
+   */
+  version: string | null;
+};
+
+/**
  * AiThoughtMarkRequest
  *
  * Your mark on one thought of an AI run (mockup AI_1, the trace drawer's "To check"): kept in the run record.
@@ -1016,6 +1115,80 @@ export type AppUserUpdatedOut = {
    * Token Status
    */
   token_status: 'active' | 'disabled' | 'revoked';
+};
+
+/**
+ * AssistantRunRequest
+ *
+ * Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+ * test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+ * uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+ * (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+ * check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+ * then holds the goal).
+ */
+export type AssistantRunRequest = {
+  /**
+   * Changes
+   */
+  changes?: Array<RunChangeIn> | null;
+  /**
+   * Context
+   */
+  context?: string | null;
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module:
+    | 'case_synthesis'
+    | 'hypothesis_test'
+    | 'presentation_draft'
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
+  options?: RunOptionsIn | null;
+  packet_from?: PacketFromIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Record Refs
+   */
+  record_refs?: Array<RecordRef> | null;
+  /**
+   * Severity Floor
+   */
+  severity_floor?: 'ALL' | 'MATERIAL' | 'BLOCKING' | null;
+  /**
+   * Source Tier Floor
+   */
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
 };
 
 /**
@@ -23635,6 +23808,54 @@ export type SaveInvestigationRunProfileResponses = {
 
 export type SaveInvestigationRunProfileResponse =
   SaveInvestigationRunProfileResponses[keyof SaveInvestigationRunProfileResponses];
+
+export type InvestigationAssistantRunData = {
+  body: AssistantRunRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/run';
+};
+
+export type InvestigationAssistantRunErrors = {
+  /**
+   * Response 422 Investigation Assistant Run
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
+   */
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Assistant Run
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationAssistantRunError =
+  InvestigationAssistantRunErrors[keyof InvestigationAssistantRunErrors];
+
+export type InvestigationAssistantRunResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
+};
+
+export type InvestigationAssistantRunResponse =
+  InvestigationAssistantRunResponses[keyof InvestigationAssistantRunResponses];
 
 export type InvestigationSuiteRunData = {
   body: SuiteRunRequest;

@@ -6,8 +6,24 @@ trimmed from that system's `EVALUATION/OUTPUT_SCHEMAS.md`, its value lists check
 (`tests/test_authority_suite_drift.py`), and the rules the app can read mechanically. Every answer is a proposal and
 writes nothing else.
 
-Code: `backend/app/ai/systems.py` (the modules), `backend/app/ai/interop.py` (what crosses between runs),
-`POST /api/investigations/{id}/assistant/suite-run`. Tests: `backend/tests/test_suite_systems.py`.
+Vendored at `onysnow/Authority-System-Suite@d2b2186` (the suite's `main`, 18 October 2026).
+
+## One service
+
+`backend/app/ai/suite.py` is the one front door to the suite. It holds every AI module's route (system, trigger
+table row, prompt files, what it starts from), the vendored version of each system, and `next_runs`, which routes
+an answer onward by what it contains (a synthesis with inferences → LAS, with gaps → EGS, naming people who would
+be published about → EHS; a theory test → QAS and EGS). The run pipeline, the plan, the settings status and the
+endpoint all read from it; `tests/test_suite_service.py` checks every route against the trigger table in the
+vendored `AGENTS.md`.
+
+One endpoint runs everything: `POST /api/investigations/{id}/assistant/run` with a `module`. The older per-module
+endpoints (`case-synthesis`, `hypothesis-test`, `presentation-draft`, `suite-run`) are the same route with the
+module fixed, kept so the current screens keep working.
+
+Beneath the service the modules stay in their own files: TAS's contracts in `backend/app/ai/reasoning.py`, the
+other six systems in `backend/app/ai/systems.py`, the boundaries in `backend/app/ai/interop.py`. Tests:
+`backend/tests/test_suite_systems.py`, `test_suite_service.py`.
 
 ## What runs
 
@@ -70,6 +86,9 @@ listed in the run record (BLOCK · HELD), field by field, with the rule:
    leaves it empty and says so).
 10. **QAS: audit verdict spelled with spaces** (`PASS WITH CORRECTIONS`, `systems/qas/EVALUATION/OUTPUT_SCHEMAS.md:200,204`)
     against INTEROP.md:203 and RAS's `PASS_WITH_CORRECTIONS`, and against QAS's own underscore rule.
+11. **TAS: one Tier A source, corroborated or not.** Module 08 rule 8 (DIR-0052, new in d2b2186) says "one
+    source, however detailed or authoritative, is not corroboration"; Standard §4.3 still lets one Tier A source
+    carry CORROBORATED FACT. The run record's flag on a single-source CORROBORATED_FACT still cites §4.3.
 
 ## Not built yet
 

@@ -26,43 +26,102 @@ from app.ai.reasoning import (
     validate_reasoning_request,
 )
 from app.api.dependencies import MAX_OFFSET, authorize_request_resource
-from app.core.authorization import current_authorization_scope, require_scope_investigation_admin, scope_for_request
+from app.core.authorization import (
+    current_authorization_scope,
+    require_scope_investigation_admin,
+    scope_for_request,
+)
 from app.core.config import settings
 from app.db.session import get_db
 from app.jobs.handlers import AI_REASONING
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
-from app.schemas.responses import (
-    AiAnalysisCandidatesOut, AiModelFailedOut, AiOutputRejectedOut, AiReasoningRunOut, ClaimOut, ErrorOut, ConnectorFindingOut, ConnectorRunOut, CorpusSearchOut, CorpusStatusOut, DemoSeedOut, DocumentOut,
-    EvidencePoolRow, FinancialLedgerOut, GraphOut, MoneyChecksOut, InvestigationDeletionPreview, InvestigationDeletionResult,
-    InvestigationOut, LeadOut, LeadQueueOut, RunPlanOut, RunProfileOut, OpenAlephCorpusBindingOut, OpenAlephOperationFailureOut,
-    QuestionContextOut, RelationshipOut, ReportingTaskOut, SourceOut, TimelineOut, ValidationErrorOut, file_response, upstream,
-)
 from app.schemas.api import (
-    CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
-    InvestigationQuestionContextRequest, PresentationDraftRequest, RunPlanRequest, RunProfileIn, SuiteRunRequest,
+    AssistantRunRequest,
+    CaseSynthesisRequest,
+    HypothesisTestRequest,
+    InvestigationCreate,
+    InvestigationQuestionContextRequest,
+    PresentationDraftRequest,
+    RunPlanRequest,
+    RunProfileIn,
+    SuiteRunRequest,
+)
+from app.schemas.responses import (
+    AiAnalysisCandidatesOut,
+    AiModelFailedOut,
+    AiOutputRejectedOut,
+    AiReasoningRunOut,
+    ClaimOut,
+    ConnectorFindingOut,
+    ConnectorRunOut,
+    CorpusSearchOut,
+    CorpusStatusOut,
+    DemoSeedOut,
+    DocumentOut,
+    ErrorOut,
+    EvidencePoolRow,
+    FinancialLedgerOut,
+    GraphOut,
+    InvestigationDeletionPreview,
+    InvestigationDeletionResult,
+    InvestigationOut,
+    LeadOut,
+    LeadQueueOut,
+    MoneyChecksOut,
+    OpenAlephCorpusBindingOut,
+    OpenAlephOperationFailureOut,
+    QuestionContextOut,
+    RelationshipOut,
+    ReportingTaskOut,
+    RunPlanOut,
+    RunProfileOut,
+    SourceOut,
+    TimelineOut,
+    ValidationErrorOut,
+    file_response,
+    upstream,
 )
 from app.services.assistant_context import build_question_context
-from app.services.run_plan import build_run_plan, get_profile as get_run_profile, save_profile as save_run_profile
+from app.services.demo_seed import seed_demo_investigation
 from app.services.exports import build_investigation_export
+from app.services.financial_flows import investigation_financial_ledger
 from app.services.investigations import (
     create_investigation as _create_investigation,
+)
+from app.services.investigations import (
     lead_queue as _lead_queue,
+)
+from app.services.investigations import (
     list_investigation_claims as _list_investigation_claims,
+)
+from app.services.investigations import (
     list_investigation_connector_findings as _list_investigation_connector_findings,
+)
+from app.services.investigations import (
     list_investigation_connector_runs as _list_investigation_connector_runs,
+)
+from app.services.investigations import (
     list_investigation_documents as _list_investigation_documents,
+)
+from app.services.investigations import (
     list_investigation_evidence as _list_investigation_evidence,
+)
+from app.services.investigations import (
     list_investigation_leads as _list_investigation_leads,
+)
+from app.services.investigations import (
     list_investigation_reporting_tasks as _list_investigation_reporting_tasks,
+)
+from app.services.investigations import (
     list_investigation_sources as _list_investigation_sources,
+)
+from app.services.investigations import (
     list_investigations as _list_investigations,
 )
-from app.services.demo_seed import seed_demo_investigation
-from app.services.financial_flows import investigation_financial_ledger
-from app.services.money_checks import investigation_money_checks
 from app.services.lifecycle import delete_investigation, preview_investigation_deletion
+from app.services.money_checks import investigation_money_checks
 from app.services.openaleph_corpus import (
     ensure_openaleph_collection,
     get_binding,
@@ -77,6 +136,9 @@ from app.services.relationships import (
     investigation_graph,
     investigation_relationships,
 )
+from app.services.run_plan import build_run_plan
+from app.services.run_plan import get_profile as get_run_profile
+from app.services.run_plan import save_profile as save_run_profile
 from app.services.timeline import investigation_timeline
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -191,6 +253,8 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
     """
     if not settings.enable_ai_features or not (settings.ai_provider or "").strip():
         raise HTTPException(400, "AI reasoning endpoints are not enabled on this deployment (enable_ai_features and ai_provider must both be set)")
+    if packet_from and handoff_from:
+        raise HTTPException(400, "A run starts either from an earlier run's packet (packet_from) or from an accepted answer (handoff_from), not both")
     try:
         resolved_flags = validate_reasoning_request(
             investigation_id=investigation_id, module=module, working_theory=working_theory,
@@ -316,6 +380,26 @@ async def investigation_hypothesis_test(
         working_theory=body.working_theory,
         control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
         **_run_extras(body),
+    )
+
+
+@router.post("/investigations/{investigation_id}/assistant/run", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
+async def investigation_assistant_run(
+    investigation_id: str, body: AssistantRunRequest, request: Request, response: Response, db: Session = Depends(get_db),
+) -> Any:
+    """Any AI run, through the one route the suite service gives its module (app/ai/suite.py): TAS, the other six
+    systems, or the app-local draft. The per-module endpoints below are this same route with the module fixed.
+    Every answer is a proposal and writes nothing else."""
+    flags = {"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor}
+    return await _run_reasoning_endpoint(
+        request, response, db, investigation_id=investigation_id, module=body.module, question=body.question,
+        max_results=body.max_results, include_external_leads=body.include_external_leads,
+        working_theory=body.working_theory, control_flags=flags if any(flags.values()) else None,
+        record_refs=[ref.model_dump() for ref in body.record_refs] if body.record_refs else None,
+        run_options=body.options.model_dump(exclude_none=True) if body.options else None, premises=body.premises,
+        changes=[c.model_dump() for c in body.changes] if body.changes else None,
+        packet_from=body.packet_from.model_dump() if body.packet_from else None,
+        handoff_from=body.handoff_from, context=body.context,
     )
 
 
