@@ -14643,6 +14643,10 @@ export type RunPlanOut = {
  */
 export type RunPlanPacketOut = {
   /**
+   * Below Tier Floor
+   */
+  below_tier_floor: Array<RunPlanTierCountOut>;
+  /**
    * By Type
    */
   by_type: Array<RunPlanTypeCountOut>;
@@ -14783,6 +14787,20 @@ export type RunPlanSystemOut = {
    * Why
    */
   why: string;
+};
+
+/**
+ * RunPlanTierCountOut
+ */
+export type RunPlanTierCountOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Tier
+   */
+  tier: string;
 };
 
 /**

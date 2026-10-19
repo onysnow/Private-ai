@@ -34,7 +34,7 @@ from app.ai.suite import POSSIBLE_NEXT, ROUTES, SYSTEM_ORDER
 from app.ai.systems import SUITE_MODULES
 from app.core.config import Settings
 from app.core.config import settings as default_settings
-from app.models.domain import BackgroundJob, Investigation
+from app.models.domain import BackgroundJob, Evidence, Investigation, Source
 from app.services.assistant_context import build_question_context
 
 # What each setting is called on screen, its values in plain words, and what it does (the suite name stays in
@@ -209,6 +209,30 @@ def _systems(module: str) -> list[dict]:
     return rows
 
 
+TIERS = "ABCDEF"
+
+
+def _below_tier_floor(db: Session, citations: list[dict], floor: str) -> list[dict]:
+    """Records in the packet whose source sits below the tier floor, by tier (mockup AI_2 "3 Tier E web pages left
+    out by the tier floor"). They still go in; the floor keeps them from counting toward a fact (TAS CONTROL_SURFACE
+    §4 source_tier_floor). A source with no tier set yet is not counted: its tier is unknown."""
+    below = set(TIERS[TIERS.index(floor) + 1:])
+    by_tier: dict[str, int] = {}
+    for c in citations:
+        if c["record_type"] == "source":
+            source_id: str | None = c["record_id"]
+        elif c["record_type"] == "evidence":
+            ev = db.get(Evidence, c["record_id"])
+            source_id = ev.source_id if ev is not None else None
+        else:
+            source_id = c.get("source_id")
+        src = db.get(Source, source_id) if source_id else None
+        tier = src.source_tier if src is not None else None
+        if tier in below:
+            by_tier[tier] = by_tier.get(tier, 0) + 1
+    return [{"tier": t, "count": by_tier[t]} for t in TIERS if t in by_tier]
+
+
 def _past_run_minutes(db: Session) -> list[float]:
     rows = db.execute(
         select(BackgroundJob.started_at, BackgroundJob.finished_at)
@@ -275,7 +299,8 @@ def build_run_plan(db: Session, investigation_id: str, *, module: str, question:
         "question": question.strip(), "working_theory": working_theory,
         "packet": {
             "records": len(citations), "by_type": [{"record_type": k, "count": v} for k, v in sorted(by_type.items(), key=lambda kv: -kv[1])],
-            "leads_only": leads, "first": [{"record_type": c["record_type"], "record_id": c["record_id"], "title": c.get("title") or ""} for c in citations[:6]],
+            "leads_only": leads,
+            "below_tier_floor": _below_tier_floor(db, citations, resolved_flags["source_tier_floor"]), "first": [{"record_type": c["record_type"], "record_id": c["record_id"], "title": c.get("title") or ""} for c in citations[:6]],
         },
         "steps": _suite_steps(module, handoff, len(citations)) if suite is not None
         else _steps(module, resolved_options, include_external_leads, len(citations)),

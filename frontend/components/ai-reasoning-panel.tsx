@@ -27,6 +27,7 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Download, FileText, Presentation} from 'lucide-react';
+import {askBeforeYouRun} from '../features/ai/before-you-run';
 import {RecordPicker} from './presentation/record-picker';
 import type {SelectedRef} from './presentation/record-picker';
 import {DraftPreview} from './presentation/draft-preview';
@@ -244,17 +245,11 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
     }
     if(!question.trim())return;
     if(module==='hypothesis_test'&&!theory.trim()){setRunStatus('A working theory is required for a hypothesis test.');return}
-    setRunning(true);setRunStatus('Running… the model output is validated against the retrieval packet before it can be reviewed.');
-    try{
-      const body:Record<string,unknown>={question:question.trim(),max_results:maxResults,include_external_leads:includeLeads};
-      if(module==='hypothesis_test')body.working_theory=theory.trim();
-      const path=module==='case_synthesis'?'case-synthesis':'hypothesis-test';
-      const result=await startRun(`/api/investigations/${investigationId}/assistant/${path}`,body);
-      setRunStatus(`Proposed for review (candidate ${result.candidate_id}). Nothing has been written to the investigation.`);
-      await loadQueue();
-      await open(result.candidate_id);
-    }catch(error){setRunStatus(runFailureMessage(error));await loadQueue()}
-    finally{setRunning(false)}
+    // Case synthesis and theory tests go through Before you run (Act › AI runs): the plan, the settings and what
+    // leaves the computer are seen before anything is sent. Nothing runs from here.
+    if(module!=='case_synthesis'&&module!=='hypothesis_test')return;
+    setRunStatus('');
+    askBeforeYouRun(investigationId,{module,question:question.trim(),theory:module==='hypothesis_test'?theory.trim():'',maxResults,includeLeads});
   };
 
   const review=async(decision:'accept'|'reject')=>{

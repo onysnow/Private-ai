@@ -6287,6 +6287,14 @@ export const zRunPlanSystemOut = z.object({
 });
 
 /**
+ * RunPlanTierCountOut
+ */
+export const zRunPlanTierCountOut = z.object({
+  count: z.number().int(),
+  tier: z.string(),
+});
+
+/**
  * RunPlanTypeCountOut
  */
 export const zRunPlanTypeCountOut = z.object({
@@ -6298,6 +6306,7 @@ export const zRunPlanTypeCountOut = z.object({
  * RunPlanPacketOut
  */
 export const zRunPlanPacketOut = z.object({
+  below_tier_floor: z.array(zRunPlanTierCountOut),
   by_type: z.array(zRunPlanTypeCountOut),
   first: z.array(zRunPlanRecordOut),
   leads_only: z.number().int(),

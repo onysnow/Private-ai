@@ -6,7 +6,7 @@ import {act, cleanup, render, screen, waitFor, within} from '@testing-library/re
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
-import {BeforeYouRun} from '../features/ai/before-you-run';
+import {BeforeYouRun, askBeforeYouRun} from '../features/ai/before-you-run';
 import {acceptedByAPerson, reviewItems} from '../features/ai/claim-review';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -70,6 +70,33 @@ describe('Ask the case from elsewhere', () => {
     expect(await screen.findByRole('region', {name: 'Watch the run'})).toBeInTheDocument();
     act(() => useWorkbenchStore.getState().openAskCase('New question'));
     expect(await screen.findByLabelText('Your question')).toHaveValue('New question');
+  });
+});
+
+describe('Run module from the AI drafts panel', () => {
+  it('opens Before you run with the module, question and theory chosen there, and runs nothing', async () => {
+    const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, 'GET /api/investigations/inv-1/ai-runs': {runs: [RUN]}, [`POST ${BASE}/plan`]: PLAN});
+    const tab = document.body.appendChild(Object.assign(document.createElement('a'), {href: '#ai-runs'}));
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    await screen.findByText('Earlier runs');
+    act(() => askBeforeYouRun('inv-1', {module: 'hypothesis_test', question: 'Did Ada act alone?', theory: 'Ada acted alone.', maxResults: 12, includeLeads: true}));
+    expect(await screen.findByRole('heading', {name: /Before you run/})).toBeInTheDocument();
+    expect(window.location.hash).toBe('#ai-runs');
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toMatchObject({module: 'hypothesis_test', question: 'Did Ada act alone?', working_theory: 'Ada acted alone.', max_results: 12}));
+    expect(screen.getByText(/packet up to 30 → 12 records/)).toBeInTheDocument();
+    expect(api.calls(`POST ${BASE}/case-synthesis`)).toHaveLength(0);
+    expect(api.calls(`POST ${BASE}/hypothesis-test`)).toHaveLength(0);
+    tab.remove();
+  });
+
+  it('reads a request from the address once, when it opens on another page', async () => {
+    const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, 'GET /api/investigations/inv-1/ai-runs': {runs: [RUN]}, [`POST ${BASE}/plan`]: PLAN});
+    window.history.replaceState(null, '', '/act/?inv=inv-1&ask=Who%20owns%20Fernhill%3F&module=case_synthesis&leads=off#ai-runs');
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByRole('heading', {name: /Before you run/})).toBeInTheDocument();
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toMatchObject({module: 'case_synthesis', question: 'Who owns Fernhill?', include_external_leads: false}));
+    expect(window.location.search).toBe('?inv=inv-1');
+    expect(window.location.hash).toBe('#ai-runs');
   });
 });
 

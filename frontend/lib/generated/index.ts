@@ -2053,6 +2053,7 @@ export type {
   RunPlanRequest,
   RunPlanStepOut,
   RunPlanSystemOut,
+  RunPlanTierCountOut,
   RunPlanTypeCountOut,
   RunPlanWhereOut,
   RunProfileIn,

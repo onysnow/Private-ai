@@ -59,6 +59,27 @@ def test_the_plan_lists_the_steps_the_settings_add_and_flags_instructions_inside
     assert plan["changed_from_case_default"] == ["devils_advocate", "research_depth"]
 
 
+@requires_suite
+def test_the_plan_counts_the_records_whose_source_sits_below_the_tier_floor():
+    settings.enable_ai_features = False
+    settings.ai_provider = ""
+    inv = _seeded_investigation(client)["investigation"]["id"]
+    tiers = {"E": 2, "F": 1, "B": 1, None: 1}
+    for tier, n in tiers.items():
+        src = ok(client.post("/api/sources", json={"investigation_id": inv, "title": f"Harbour page {tier}", "source_type": "web"}))
+        if tier:
+            ok(client.patch(f"/api/sources/{src['id']}/suite", json={"source_tier": tier}))
+        for i in range(n):
+            ok(client.post("/api/evidence", json={"source_id": src["id"], "quote": f"Harbour land moved {tier} {i}.", "locator": "p.1"}))
+
+    plan = ok(client.post(f"/api/investigations/{inv}/assistant/plan", json={"question": "harbour land moved", "max_results": 100}))
+    assert plan["packet"]["below_tier_floor"] == [{"tier": "E", "count": 3}, {"tier": "F", "count": 2}]
+
+    plan = ok(client.post(f"/api/investigations/{inv}/assistant/plan", json={
+        "question": "harbour land moved", "max_results": 100, "source_tier_floor": "A"}))
+    assert plan["packet"]["below_tier_floor"] == [{"tier": "B", "count": 2}, {"tier": "E", "count": 3}, {"tier": "F", "count": 2}]
+
+
 def test_safety_limits_and_unknown_options_are_refused():
     with pytest.raises(reasoning_module.ReasoningInputError, match="safety limit"):
         reasoning_module.normalize_run_options({"announce": "OFF"})

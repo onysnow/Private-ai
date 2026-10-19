@@ -48,6 +48,43 @@ const STATE_WORDS: Record<string, string> = {runs: 'runs', next_run: 'would appl
 // The plan's steps a setting adds (run_plan.py _steps): the setting's key, and its value with and without the step.
 const OPTIONAL_STEPS: Array<{key: string; on: string; off: string}> = [{key: 'devils_advocate', on: 'ON', off: 'OFF'}, {key: 'research_depth', on: 'EXHAUSTIVE', off: 'NORMAL'}];
 const PACKET_DEFAULT = 30;
+
+/** A run asked for from elsewhere with its module chosen (the AI drafts panel's "Run module"): it opens here, never
+ *  runs directly. Handed to a mounted Before you run, or kept until one mounts; from another page it travels in the
+ *  address (?ask=…&module=…&theory=…#ai-runs) and is read once on mount. */
+export type BeforeRunRequest = {module: Module; question: string; theory: string; maxResults?: number; includeLeads?: boolean};
+let pendingRequest: BeforeRunRequest | null = null;
+const requestListeners = new Set<(r: BeforeRunRequest) => void>();
+export function askBeforeYouRun(investigationId: string, request: BeforeRunRequest): void {
+  const tab = typeof document !== 'undefined' ? document.querySelector('a[href="#ai-runs"]') : null;
+  if (!tab) {
+    // Not on Act: go there with the request in the address.
+    const q = new URLSearchParams({inv: investigationId, ask: request.question, module: request.module});
+    if (request.theory) q.set('theory', request.theory);
+    if (request.maxResults !== undefined && request.maxResults !== PACKET_DEFAULT) q.set('max', String(request.maxResults));
+    if (request.includeLeads === false) q.set('leads', 'off');
+    window.location.assign(`/act/?${q.toString()}#ai-runs`);
+    return;
+  }
+  if (requestListeners.size) requestListeners.forEach(l => l(request)); else pendingRequest = request;
+  // Act's section tabs follow the address's #; open the AI runs tab.
+  window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}#ai-runs`);
+  window.dispatchEvent(new HashChangeEvent('hashchange'));
+}
+function requestFromAddress(): BeforeRunRequest | null {
+  const params = new URLSearchParams(window.location.search);
+  const question = params.get('ask');
+  if (question === null) return null;
+  const asked: Module = params.get('module') === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis';
+  const theory = params.get('theory') ?? '';
+  const max = Number(params.get('max'));
+  const includeLeads = params.get('leads') !== 'off';
+  // Read once: a later visit to the tab does not open it again.
+  ['ask', 'module', 'theory', 'max', 'leads'].forEach(k => params.delete(k));
+  const rest = params.toString();
+  window.history.replaceState(window.history.state, '', `${window.location.pathname}${rest ? `?${rest}` : ''}${window.location.hash}`);
+  return {module: asked, question, theory, maxResults: max >= 1 && max <= 100 ? Math.round(max) : PACKET_DEFAULT, includeLeads};
+}
 /** How long past runs took on this machine, in words: "under a minute", "about 2 min", "about 1–4 min". */
 export function runTime(minutes: number[]): string {
   if (!minutes.length) return 'not measured yet: no run has finished here';
@@ -131,6 +168,25 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     // A link from Decide's "Not sure? Review it claim by claim" opens that answer's review (step 4).
     const review = params.get('review');
     if (linked && review) { setReviewId(review); setStep(4); }
+  }, []);
+  // A run asked for with its module chosen (askBeforeYouRun): the plan for it, or step 1 while the question or the
+  // theory is still missing. Nothing runs until Run.
+  useEffect(() => {
+    const take = (r: BeforeRunRequest) => {
+      setDrawer(false); setEditing(false); setPacketFrom(null); setRunId(null); setSampleOnly(false);
+      setModule(r.module); setQuestion(r.question); setTheory(r.theory);
+      // The packet asked for, echoed to the run record as a change from the default would be here.
+      const size = r.maxResults ?? PACKET_DEFAULT, leads = r.includeLeads ?? true;
+      setMaxResults(size); setIncludeLeads(leads);
+      setEcho([...(size !== PACKET_DEFAULT ? [{at: clock(), kind: 'SETTING' as const, text: `packet up to ${PACKET_DEFAULT} → ${size} records`}] : []),
+        ...(!leads ? [{at: clock(), kind: 'SETTING' as const, text: 'outside leads in the packet on → off'}] : [])]);
+      setStep(r.question.trim() && (r.module === 'case_synthesis' || r.theory.trim()) ? 2 : 1);
+    };
+    const waiting = pendingRequest ?? requestFromAddress();
+    pendingRequest = null;
+    if (waiting) take(waiting);
+    requestListeners.add(take);
+    return () => { requestListeners.delete(take); };
   }, []);
   const earlier = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && step === 1});
   const [outcome, setOutcome] = useState<{ok: boolean; text: string} | null>(null);
@@ -304,6 +360,8 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
         <p className="br-tray"><b>{p.packet.records} records go in</b> · {p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
         {maxResults !== PACKET_DEFAULT && <> · up to {maxResults}</>}
         {p.packet.leads_only > 0 && <><br/>{p.packet.leads_only} outside lead{p.packet.leads_only === 1 ? '' : 's'} count as leads only</>}
+        {p.packet.below_tier_floor.map(t => <span key={t.tier} className="br-floor" title="They still go in the packet; the tier floor keeps them from counting toward a fact">
+          <br/>{t.count} Tier {t.tier} record{t.count === 1 ? '' : 's'} left out by the tier floor · leads only</span>)}
         {!includeLeads && <><br/>Outside leads stay out of this packet</>}</p></div>}
     </div>
     {plan.isError && <p role="alert" className="br-bad">{errorMessage(plan.error, 'Could not work out the plan')}</p>}
@@ -398,6 +456,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
             <div className="br-boxes" aria-hidden="true"><span>Your case<small>{p.packet.records} records</small></span><i>→</i>
               <span className={p.where.runs_on_this_computer ? '' : 'out'}>Model<small>{p.where.model ?? 'none chosen'}</small></span><i>→</i>
               <span className="never">Outside<small>never called</small></span></div>
+            <p className="br-lookups">Runs make no outside lookups yet: the model reads only the packet. The Outside lookups setting is kept with the run for when they do.</p>
             {!p.where.enabled && <p className="br-bad">AI is off. Turn it on in <a href="/settings">Settings</a>.</p>}
             {p.where.enabled && !p.where.provider && <p className="br-bad">No model chosen. Choose one in <a href="/settings">Settings</a>.</p>}
           </div>

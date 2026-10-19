@@ -88,6 +88,21 @@ describe('BeforeYouRun', () => {
     expect(runTime([2.1, 1.9])).toBe('about 2 min on this machine');
   });
 
+  it('counts the records the tier floor leaves out, and says runs make no outside lookups', async () => {
+    const plan = {...PLAN, packet: {...PLAN.packet, below_tier_floor: [{tier: 'E', count: 3}, {tier: 'F', count: 1}]}};
+    mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: plan});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    const region = await screen.findByRole('region', {name: 'The plan'});
+    expect(await within(region).findByText('3 Tier E records left out by the tier floor · leads only')).toBeInTheDocument();
+    expect(within(region).getByText('1 Tier F record left out by the tier floor · leads only')).toBeInTheDocument();
+    const where = screen.getByRole('region', {name: 'Where it runs, what it costs'});
+    expect(within(where).getByText(/Runs make no outside lookups yet/)).toBeInTheDocument();
+    expect(within(where).queryByText(/stop and ask/)).not.toBeInTheDocument();
+  });
+
   it('saves this case’s default only with a reason', async () => {
     const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: PLAN,
       [`PUT ${BASE}/profile`]: {...PLAN.profile, saved: true, reason: 'Named people', saved_at: '2026-10-12T10:00:00Z'}});
