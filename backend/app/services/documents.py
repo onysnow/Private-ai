@@ -5,7 +5,7 @@ from typing import Iterable, NamedTuple
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
-from app.models.domain import Document, DocumentChunk, DocumentCorpusSync, ExtractionCandidate, Source, Evidence, Claim, ClaimEvidenceLink, Entity, Statement, Investigation, RelationshipEdge
+from app.models.domain import Document, DocumentChunk, DocumentCorpusSync, ExtractionCandidate, Source, Evidence, Claim, ClaimEvidenceLink, Entity, Statement, Investigation, RelationshipEdge, TableMapping
 from app.services.ftm import make_ftm_entity
 from app.services.identifier_proposals import accept_identifier
 from app.services.security import contained_path, resolve_storage_root
@@ -241,7 +241,8 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
     ``find_names`` runs the Workbench's own pattern name-finder (when
     ENABLE_LOCAL_ENTITY_SUGGESTIONS is on). The caller turns it off when
     OpenAleph's ftm-analyze has analysed the document: the pattern finder is
-    the fallback only (ADR-0004, decision 5; ADR-0006).
+    the fallback only (ADR-0004, decision 5; ADR-0006). It never runs on a
+    table that already has a column mapping.
 
     Returns None when the document (or its investigation) was deleted before
     this ran. Extraction failures remain a valid committed document state: the
@@ -267,6 +268,10 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
     for record in held:
         for name in entity_names(record)[1:]:
             existing.setdefault(norm_name(name), (record.id, record.schema))
+    # A table already mapped to records (app/services/table_mappings.py) has its names from its
+    # columns: reading its cells again as running text would only add junk names.
+    mapped = db.scalar(select(TableMapping.id).where(TableMapping.document_id == doc.id).limit(1)) is not None
+    find_names = find_names and not mapped
     try:
         chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
         # One proposal per name (and per claim sentence) in a document, with every place it is

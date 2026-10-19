@@ -215,3 +215,24 @@ def test_only_tables_can_be_mapped():
     reply = client.get(f"/api/documents/{memo['id']}/table")
     assert reply.status_code == 400 and reply.json()["detail"] == "Only CSV, TSV and XLSX files can be mapped to entities"
     assert client.get("/api/documents/nope/table").status_code == 404
+
+
+def test_a_mapped_table_is_not_read_again_by_the_text_name_finder(tmp_path, monkeypatch):
+    """A table whose columns are already mapped (as the demo's payments table is,
+    before it is read) is read for its text, but its cells are not run through
+    the pattern name-finder: its names come from the mapping."""
+    from app.core.config import settings
+    from app.services.documents import extract_document, store_document
+    from app.services.table_mappings import run_mapping
+
+    monkeypatch.setattr(settings, "enable_local_entity_suggestions", True)
+    inv = _investigation()
+    with SessionLocal() as db:
+        doc = store_document(db, investigation_id=inv, title="ledger.csv", filename="ledger.csv", mime_type="text/csv",
+                             data=LEDGER, storage_dir=tmp_path)
+        run_mapping(db, doc, PAYMENTS, sheet=None, created_by=None)
+        read = extract_document(db, doc.id)
+        assert read is not None and read.extraction_status == "complete"
+        doc_id = doc.id
+    entities = client.get(f"/api/documents/{doc_id}/candidates", params={"candidate_type": "entity"}).json()
+    assert entities and all((row["payload"].get("rationale") or {}).get("rule") == "column_mapping" for row in entities)
