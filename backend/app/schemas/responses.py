@@ -2558,6 +2558,7 @@ class FinancialTransactionOut(ResponseModel):
     id: str
     relationship_id: str
     dateTime: str | None = None
+    dateEnd: str | None = Field(default=None, description="The end of a payment made over a span (FtM endDate); dateTime is its start.")
     from_: str = Field(alias="from")
     to: str
     from_entity_id: str
@@ -2583,6 +2584,7 @@ class IncompleteTransactionOut(ResponseModel):
     id: str
     relationship_id: str
     dateTime: str | None = None
+    dateEnd: str | None = Field(default=None, description="The end of a payment made over a span (FtM endDate); dateTime is its start.")
     from_: str | None = Field(default=None, alias="from")
     to: str | None = None
     from_entity_id: str | None = None

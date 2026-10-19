@@ -8976,6 +8976,12 @@ export type FinancialTransactionOut = {
    */
   currency: string;
   /**
+   * Dateend
+   *
+   * The end of a payment made over a span (FtM endDate); dateTime is its start.
+   */
+  dateEnd?: string | null;
+  /**
    * Datetime
    */
   dateTime?: string | null;
@@ -9749,6 +9755,12 @@ export type IncompleteTransactionOut = {
    * Currency
    */
   currency?: string | null;
+  /**
+   * Dateend
+   *
+   * The end of a payment made over a span (FtM endDate); dateTime is its start.
+   */
+  dateEnd?: string | null;
   /**
    * Datetime
    */

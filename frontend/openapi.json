@@ -19660,6 +19660,18 @@
             "title": "Currency",
             "type": "string"
           },
+          "dateEnd": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The end of a payment made over a span (FtM endDate); dateTime is its start.",
+            "title": "Dateend"
+          },
           "dateTime": {
             "anyOf": [
               {
@@ -20915,6 +20927,18 @@
               }
             ],
             "title": "Currency"
+          },
+          "dateEnd": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The end of a payment made over a span (FtM endDate); dateTime is its start.",
+            "title": "Dateend"
           },
           "dateTime": {
             "anyOf": [
