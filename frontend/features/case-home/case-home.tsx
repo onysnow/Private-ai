@@ -10,7 +10,7 @@
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {DragEvent, ReactElement, ReactNode} from 'react';
 
 import {LevelChip, StatusChip} from '../../components/status';
@@ -168,7 +168,7 @@ function StandingStrip({investigationId}: {investigationId: string}): ReactEleme
     {cell('dec', s?.to_decide ?? '·', 'to decide · need a person', '/decide', undefined, 'need')}
     {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? `money traced from ${s.money.from_sources ?? 0} source${s.money.from_sources === 1 ? '' : 's'} · ${s.money.payments} payment${s.money.payments === 1 ? '' : 's'}` : 'money traced', '/see#money-flows')}
     {cell('yrs', s?.timeline.from ? (s.timeline.from === s.timeline.to ? s.timeline.from : `${s.timeline.from}–${s.timeline.to?.slice(2)}`) : '—',
-      s ? `${s.timeline.events} events · ${s.timeline.years.length} years` : 'events', '/see#timeline')}
+      s ? `${s.timeline.events} events · ${continuousYears(s.timeline.years).length} years` : 'events', '/see#timeline')}
     {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread` : 'documents', '/bring-in#document-ingestion')}
   </ul>;
 }
@@ -390,22 +390,38 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
   </section>;
 }
 
+type RailYear = {year: string; events: number; flags?: number};
+
+/** Every year from the first dated item to the last, in order: a year with nothing
+ *  in it stays on the rail as an empty tick, so the rail reads as continuous time. */
+export function continuousYears(years: RailYear[]): RailYear[] {
+  const known = new Map(years.filter(y => /^\d{4}$/.test(y.year)).map(y => [Number(y.year), y]));
+  if (!known.size) return [];
+  const first = Math.min(...known.keys());
+  const last = Math.max(...known.keys());
+  return Array.from({length: last - first + 1}, (_, i) => known.get(first + i) ?? {year: String(first + i), events: 0, flags: 0});
+}
+
 function YearRail({investigationId}: {investigationId: string}): ReactElement {
   const standingQuery = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const standing = standingQuery.data;
   const asOf = useWorkbenchStore(state => state.asOf);
   const setAsOf = useWorkbenchStore(state => state.setAsOf);
-  const years = standing?.timeline.years ?? [];
+  const years = useMemo(() => continuousYears(standing?.timeline.years ?? []), [standing]);
   const most = Math.max(1, ...years.map(y => y.events));
   const pointed = usePointedYears();
   const lit = new Set(pointed.years);
+  // A long case scrolls the rail; it opens on the latest years.
+  const rail = useRef<HTMLElement>(null);
+  useEffect(() => { if (rail.current) rail.current.scrollLeft = rail.current.scrollWidth; }, [years.length]);
   if (standingQuery.isPending && investigationId) return <div className="ch-years" aria-busy="true"/>;
   if (!years.length) return <div className="ch-years ch-quiet">Dated events place the case in time here.</div>;
-  return <nav className="ch-years" aria-label="Years in the case">
-    {years.slice(-10).map(y => {
+  return <nav ref={rail} className="ch-years" aria-label="Years in the case">
+    {years.map(y => {
       const on = asOf === Number(y.year);
       const flags = y.flags ?? 0;
-      const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit'].filter(Boolean).join(' ');
+      const empty = !y.events && !flags;
+      const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit', empty && 'empty'].filter(Boolean).join(' ');
       return <button key={y.year} type="button" className={cls} aria-pressed={on} onClick={() => setAsOf(on ? null : Number(y.year))}
         title={on ? 'Show all years again' : `Show the case as of ${y.year}`}>
         <b>{y.year}</b><small aria-label={`${y.events} event${y.events === 1 ? '' : 's'}${flags ? `, ${flags} Red Flag${flags === 1 ? '' : 's'}` : ''}`}>

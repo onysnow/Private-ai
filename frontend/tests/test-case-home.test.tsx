@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {CaseHome, sourceLine, yearSpan} from '../features/case-home/case-home';
+import {CaseHome, continuousYears, sourceLine, yearSpan} from '../features/case-home/case-home';
 import {DecideScreen} from '../features/case-home/decide-screen';
 import {pageOf} from '../features/case-home/decision-card';
 import {HOLD_MS, markTerms} from '../features/case-home/use-decisions';
@@ -167,6 +167,15 @@ describe('Case home', () => {
     expect(await screen.findByText('lights 2017–18 everywhere')).toBeInTheDocument();
     await waitFor(() => expect(within(rail).getByRole('button', {name: /2018/})).toHaveClass('lit'));
     expect(within(rail).getByRole('button', {name: /2016/})).not.toHaveClass('lit');
+  });
+
+  it('shows every year on the rail, a year without events as an empty tick', async () => {
+    routes({'GET /api/investigations/inv-1/standing': {...standing, timeline: {...standing.timeline, years: [{year: '2016', events: 4, flags: 0}, {year: '2019', events: 2, flags: 0}]}}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const rail = await screen.findByRole('navigation', {name: 'Years in the case'});
+    expect(within(rail).getAllByRole('button').map(b => b.querySelector('b')?.textContent)).toEqual(['2016', '2017', '2018', '2019']);
+    expect(within(rail).getByRole('button', {name: /2017/})).toHaveClass('empty');
+    expect(within(rail).getByRole('button', {name: /2016/})).not.toHaveClass('empty');
   });
 
   it('says where the document being read is, page by page', async () => {
@@ -394,6 +403,14 @@ describe('sourceLine', () => {
     expect(sourceLine(undefined)).toBe('No passage yet');
     expect(sourceLine({count: 0, leads_open: 1})).toBe('No passage yet · 1 lead open');
     expect(sourceLine({count: 2, sources_for: 2, names: ['Filing']})).toBe('2 sources for · Filing');
+  });
+});
+
+describe('continuousYears', () => {
+  it('keeps every year from the first to the last, a year with nothing as an empty tick', () => {
+    expect(continuousYears([{year: '2019', events: 1, flags: 0}, {year: '2016', events: 0, flags: 2}]).map(y => [y.year, y.events, y.flags]))
+      .toEqual([['2016', 0, 2], ['2017', 0, 0], ['2018', 0, 0], ['2019', 1, 0]]);
+    expect(continuousYears([])).toEqual([]);
   });
 });
 
