@@ -155,4 +155,16 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
 );
 FormMessage.displayName = 'FormMessage';
 
-export {useFormField, Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField};
+/** The message for the whole form (a save that failed for no one field's reason, lib/forms.ts showServerErrors). */
+function FormRootError({className}: {className?: string}): React.ReactElement | null {
+  const {errors} = useFormState();
+  const message = errors.root?.message;
+  if (!message) return null;
+  return (
+    <p className={cn('rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive-foreground', className)} role="alert">
+      {message}
+    </p>
+  );
+}
+
+export {useFormField, Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormRootError, FormField};

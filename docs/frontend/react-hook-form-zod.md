@@ -1,9 +1,8 @@
 # React Hook Form + Zod adoption (issue #41)
 
-Status: infra landed 2026-09-24. `page.tsx`'s existing hand-rolled forms are
-untouched -- converting them is separate, deliberately out-of-scope follow-on
-work (see MIGRATION_NOTES.md's one-workflow-section-per-PR strategy for the
-shadcn migration, which this follows the same way).
+Status: infra landed 2026-09-24; the shared layer for bad input (`lib/forms.ts`)
+landed 2026-10-19. The hand-wired forms in `features/` are not converted yet:
+each change that shows a new message on screen waits on Ony's approval (mockups first).
 
 ## What's here
 
@@ -13,6 +12,14 @@ shadcn migration, which this follows the same way).
   association, `aria-describedby`, and `aria-invalid` automatically so a call
   site never has to hand-derive ids.
 - `components/ui/label.tsx` -- the Radix Label wrapper `form.tsx` depends on.
+- `lib/forms.ts` -- the one way a form handles bad input: `useZodForm(schema,
+  props)` (useForm with the Zod resolver, checked on leaving each field and on
+  submit), `submitWith(form, save, fallback, paths?)` (the submit handler: a
+  failed save comes back on the form, never thrown) and `showServerErrors`.
+- `lib/api-client.ts` -- a 422 from FastAPI reads in words ("caption: Field
+  required"), and `ApiHttpError.fieldErrors` keeps each refused field's path
+  (the leading `body`/`query`/`path` dropped) and message.
+- `FormRootError` in `components/ui/form.tsx` -- the message for the whole form.
 - `lib/entity-schema.ts` + `components/entity-form.tsx` -- the first concrete,
   full-lifecycle example: entry, Zod validation (including a nested/
   structured field -- each property is `{key, valuesText}`, validated and
@@ -29,8 +36,7 @@ shadcn migration, which this follows the same way).
    This keeps validation error messages attached to the field the reporter
    actually sees, even when the wire format is more structured (arrays,
    nested objects) than the form.
-2. Build the form component with `useForm({resolver: zodResolver(schema),
-   defaultValues, mode: 'onBlur'})`.
+2. Build the form component with `useZodForm(schema, {defaultValues})`.
 3. For edit mode, accept an optional prop carrying the existing record, derive
    `defaultValues` from it, and `useEffect(() => form.reset(deriveDefaults(entity)), [entity?.id])`
    so switching which record is being edited re-populates the form without
@@ -38,10 +44,12 @@ shadcn migration, which this follows the same way).
 4. Wrap fields in `<FormField control={form.control} name="..." render={({field}) => (...)} />`,
    and put the actual input inside `<FormControl>` so it gets the automatic
    aria wiring.
-5. On submit, call the caller-supplied `onSubmit(payload)` inside a try/catch;
-   on rejection, `form.setError('root', {message})` rather than throwing, so
-   the form stays open with the reporter's input intact and a visible error
-   (`form.formState.errors.root?.message`) instead of losing their work.
+5. Submit with `onSubmit={submitWith(form, save, 'Could not save …')}` and put
+   `<FormRootError/>` above the buttons. A field the server refuses lands under
+   that field (and takes focus); a field the request names differently is mapped
+   with the fourth argument (`{title: 'name'}`); anything else is one message for
+   the whole form, in the server's words or the fallback. The form stays open
+   with the reporter's input intact.
 6. A field array of repeatable structured entries (e.g. this file's
    `properties`) uses `useFieldArray({control: form.control, name: '...'})`.
    Avoid nesting a second `useFieldArray` inside a per-row component keyed off

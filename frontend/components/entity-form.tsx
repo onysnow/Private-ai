@@ -11,8 +11,7 @@
 // edit to it.
 import * as React from 'react';
 import {useEffect} from 'react';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useFieldArray, useForm} from 'react-hook-form';
+import {useFieldArray} from 'react-hook-form';
 
 import type {CanonicalEntity} from '@/lib/api-types';
 import {
@@ -22,7 +21,8 @@ import {
   type EntityFormValues,
 } from '@/lib/entity-schema';
 import {Button} from '@/components/ui/button';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormRootError} from '@/components/ui/form';
+import {submitWith, useZodForm} from '@/lib/forms';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 
@@ -53,11 +53,7 @@ function entityToDefaults(entity: CanonicalEntity | null | undefined): EntityFor
 
 export function EntityForm({entity, onSubmit, onCancel}: EntityFormProps): React.ReactElement {
   const isEdit = Boolean(entity);
-  const form = useForm<EntityFormValues>({
-    resolver: zodResolver(entityFormSchema),
-    defaultValues: entityToDefaults(entity),
-    mode: 'onBlur',
-  });
+  const form = useZodForm<EntityFormValues>(entityFormSchema, {defaultValues: entityToDefaults(entity)});
   const {fields, append, remove} = useFieldArray({control: form.control, name: 'properties'});
 
   // Edit workflow: re-populate the form from defaultValues whenever the
@@ -68,17 +64,9 @@ export function EntityForm({entity, onSubmit, onCancel}: EntityFormProps): React
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entity?.id]);
 
-  const rootError = form.formState.errors.root?.message;
-
-  const handleSubmit = form.handleSubmit(async (values) => {
-    try {
-      await onSubmit(entityFormValuesToProperties(values));
-    } catch (error) {
-      form.setError('root', {
-        message: error instanceof Error ? error.message : 'Could not save this entity. Please try again.',
-      });
-    }
-  });
+  // A refused save comes back on the field the server names (caption, schema), else for the whole form.
+  const handleSubmit = submitWith(form, values => onSubmit(entityFormValuesToProperties(values)),
+    'Could not save this entity. Please try again.');
 
   return (
     <Form {...form}>
@@ -156,14 +144,7 @@ export function EntityForm({entity, onSubmit, onCancel}: EntityFormProps): React
           ))}
         </div>
 
-        {rootError && (
-          <p
-            className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive-foreground"
-            role="alert"
-          >
-            {rootError}
-          </p>
-        )}
+        <FormRootError />
 
         <div className="flex gap-2">
           <Button type="submit" disabled={form.formState.isSubmitting}>
