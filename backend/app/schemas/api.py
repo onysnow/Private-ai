@@ -355,11 +355,31 @@ class HypothesisTestRequest(BaseModel):
     packet_from: PacketFromIn | None = None
 
 
+SuiteModuleName = Literal["research_vetting", "quant_framing", "las_argument_check", "das_framing", "das_options",
+                          "evidence_plan", "ehs_harm_minimisation", "ehs_public_interest"]
+
+
+class SuiteRunRequest(BaseModel):
+    """One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an
+    answer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.
+    `context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and
+    access limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given
+    by the logic check only."""
+    module: SuiteModuleName
+    question: str = Field(min_length=1, max_length=4000)
+    handoff_from: str | None = Field(default=None, max_length=64)
+    context: str | None = Field(default=None, max_length=4000)
+    premises: list[str] | None = Field(default=None, max_length=10)
+    max_results: int = Field(default=30, ge=1, le=100)
+    include_external_leads: bool = True
+
+
 class RunPlanRequest(BaseModel):
     """What a run would do, before it runs (mockup AI_2)."""
-    module: Literal["case_synthesis", "hypothesis_test"] = "case_synthesis"
+    module: Literal["case_synthesis", "hypothesis_test"] | SuiteModuleName = "case_synthesis"
     question: str = Field(min_length=1, max_length=4000)
     working_theory: str | None = Field(default=None, max_length=2000)
+    handoff_from: str | None = Field(default=None, max_length=64)
     max_results: int = Field(default=30, ge=1, le=100)
     include_external_leads: bool = True
     severity_floor: SeverityFloor | None = None

@@ -2948,6 +2948,8 @@ class AiModuleStatusOut(ResponseModel):
     spec_file: str
     available: bool
     vendored_tas: bool
+    # The suite system the module belongs to (tas, ras, qas, las, das, egs, ehs); null for an app-local module.
+    system: str | None = None
 
 
 class AiControlFlagOut(ResponseModel):
@@ -3491,7 +3493,7 @@ class AiAnalysisCandidateSummaryOut(ResponseModel):
     for a human rejection, or null when not rejected."""
     id: str
     investigation_id: str
-    module: str  # case_synthesis | hypothesis_test | presentation_draft
+    module: str  # case_synthesis | hypothesis_test | presentation_draft | a suite module (app/ai/systems.py)
     request: dict[str, Any]
     review_status: str  # proposed | accepted | rejected
     confidence: float

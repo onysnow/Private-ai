@@ -40,8 +40,10 @@
 - **Rain Noir:** Glass panels; the calm "after the rain" still.
 
 ## Authority System Suite (beta) notes for Ony
-- The app runs TAS only (modules 08 and 06). LAS, QAS, RAS, DAS, EGS and EHS are vendored but never invoked, so the
-  plan and the run map show them as "not in the app yet".
+- The app runs TAS (modules 08 and 06) and one app run of each of the other six systems (`POST
+  .../assistant/suite-run`; `backend/app/ai/systems.py`). What runs, what crosses between runs, and ten problems in
+  the suite itself are in `docs/authority-suite/SUITE_SYSTEMS_IN_APP.md`. The screens to start a suite run need a
+  mockup first.
 - Two suite items describe chat sessions rather than an app run, so the app adapts them:
   - `research_depth: exhaustive` asks for "a disconfirming search per question"; in an app run the search is
     within the packet;

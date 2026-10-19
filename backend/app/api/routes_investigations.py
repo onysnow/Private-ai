@@ -22,6 +22,7 @@ from app.ai.reasoning import (
     ReasoningInputError,
     list_ai_analysis_candidates,
     packet_of_run,
+    resolve_handoff,
     validate_reasoning_request,
 )
 from app.api.dependencies import MAX_OFFSET, authorize_request_resource
@@ -40,7 +41,7 @@ from app.schemas.responses import (
 )
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
-    InvestigationQuestionContextRequest, PresentationDraftRequest, RunPlanRequest, RunProfileIn,
+    InvestigationQuestionContextRequest, PresentationDraftRequest, RunPlanRequest, RunProfileIn, SuiteRunRequest,
 )
 from app.services.assistant_context import build_question_context
 from app.services.run_plan import build_run_plan, get_profile as get_run_profile, save_profile as save_run_profile
@@ -180,7 +181,7 @@ def investigation_question_context(
         raise HTTPException(404, str(exc))
 
 
-async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None, run_options: dict | None = None, premises: list[str] | None = None, changes: list[dict] | None = None, packet_from: dict | None = None) -> dict[str, Any]:
+async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None, run_options: dict | None = None, premises: list[str] | None = None, changes: list[dict] | None = None, packet_from: dict | None = None, handoff_from: str | None = None, context: str | None = None) -> dict[str, Any]:
     """Validate, then run as a background job (Foundation Fixes fix 4).
 
     In the Docker stack the run is queued and this answers 202 with the job
@@ -194,7 +195,11 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
         resolved_flags = validate_reasoning_request(
             investigation_id=investigation_id, module=module, working_theory=working_theory,
             control_flags=control_flags, record_refs=record_refs, run_options=run_options, premises=premises,
+            handoff_from=handoff_from,
         )
+        # Refused before anything is queued: the answer handed over must be this case's, accepted, and of a module
+        # the receiving one takes from.
+        resolve_handoff(db, investigation_id=investigation_id, module=module, handoff_from=handoff_from)
         if packet_from:
             # Refused before anything is queued: the earlier run must be this case's and must have kept its packet.
             packet_of_run(db, investigation_id=investigation_id, run_id=str(packet_from["run_id"]))
@@ -211,6 +216,7 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
             "include_external_leads": include_external_leads, "record_refs": record_refs,
             "control_flags": control_flags if module in TAS_MODULES else None, "resolved_control_flags": resolved_flags,
             "run_options": run_options, "premises": premises, "changes": changes, "packet_from": packet_from,
+            "handoff_from": handoff_from, "context": context,
             "actor_id": scope.actor_id if scope is not None else "local-owner",
         },
         message="Waiting for the model",
@@ -248,6 +254,7 @@ def investigation_run_plan(investigation_id: str, body: RunPlanRequest, db: Sess
             max_results=body.max_results, include_external_leads=body.include_external_leads,
             flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
             options=body.options.model_dump(exclude_none=True) if body.options else None, premises=body.premises,
+            handoff_from=body.handoff_from,
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc))
@@ -309,6 +316,23 @@ async def investigation_hypothesis_test(
         working_theory=body.working_theory,
         control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
         **_run_extras(body),
+    )
+
+
+@router.post("/investigations/{investigation_id}/assistant/suite-run", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
+async def investigation_suite_run(
+    investigation_id: str, body: SuiteRunRequest, request: Request, response: Response, db: Session = Depends(get_db),
+) -> Any:
+    """A run of another system of the Authority System Suite -- RAS, QAS, LAS, DAS, EGS or EHS
+    (app/ai/systems.py) -- through the same citation-validated pipeline as the TAS endpoints, with the same
+    guarantee: the answer is a proposal and writes nothing else. A run may start from an answer you accepted
+    (`handoff_from`); what crosses is decided by the suite's INTEROP rules (app/ai/interop.py) and every value held
+    back is listed in the run record.
+    """
+    return await _run_reasoning_endpoint(
+        request, response, db, investigation_id=investigation_id, module=body.module, question=body.question,
+        max_results=body.max_results, include_external_leads=body.include_external_leads, premises=body.premises,
+        handoff_from=body.handoff_from, context=body.context,
     )
 
 

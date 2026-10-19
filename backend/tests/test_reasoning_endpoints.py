@@ -283,7 +283,8 @@ def test_settings_status_reports_ai_reasoning_state_without_secrets():
     assert ai["enabled"] is False
     assert ai["provider"] is None
     assert ai["endpoints_callable"] is False
-    assert set(ai["authority_suite"]["modules"]) == {"case_synthesis", "hypothesis_test", "presentation_draft"}
+    assert set(ai["authority_suite"]["modules"]) == {"case_synthesis", "hypothesis_test", "presentation_draft",
+                                                     *reasoning_module.SUITE_MODULES}
     assert "spec_file" in ai["authority_suite"]["modules"]["case_synthesis"]
 
     settings.enable_ai_features = True
