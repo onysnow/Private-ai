@@ -255,6 +255,7 @@ import {
   reviewRelationshipEvidenceEndpoint,
   revokeAppUserToken,
   rotateAppUserToken,
+  runRedFlags,
   runTableMapping,
   saveConnectorCredential,
   saveInvestigationRunProfile,
@@ -1016,6 +1017,9 @@ import type {
   RotateAppUserTokenData,
   RotateAppUserTokenError,
   RotateAppUserTokenResponse,
+  RunRedFlagsData,
+  RunRedFlagsError,
+  RunRedFlagsResponse,
   RunTableMappingData,
   RunTableMappingError,
   RunTableMappingResponse,
@@ -6883,7 +6887,8 @@ export const getRedFlagsQueryKey = (options: Options<GetRedFlagsData>) =>
 /**
  * Get Red Flags
  *
- * Runs every rule on the investigation's records now, then lists the flags.
+ * The flags as the rules last left them; reading never runs them. ``stale`` says the records
+ * have changed since they ran (POST .../red-flags/run runs them).
  */
 export const getRedFlagsOptions = (options: Options<GetRedFlagsData>) =>
   queryOptions<
@@ -6903,6 +6908,35 @@ export const getRedFlagsOptions = (options: Options<GetRedFlagsData>) =>
     },
     queryKey: getRedFlagsQueryKey(options),
   });
+
+/**
+ * Run Red Flags
+ *
+ * Runs every rule on the investigation's records now (and brings To check up to date), then lists the flags.
+ */
+export const runRedFlagsMutation = (
+  options?: Partial<Options<RunRedFlagsData>>,
+): UseMutationOptions<
+  RunRedFlagsResponse,
+  RunRedFlagsError,
+  Options<RunRedFlagsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RunRedFlagsResponse,
+    RunRedFlagsError,
+    Options<RunRedFlagsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await runRedFlags({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const listInvestigationRelationshipsQueryKey = (
   options: Options<ListInvestigationRelationshipsData>,

@@ -27,10 +27,22 @@ def _flag(db: Session, flag_id: str) -> PatternFlag:
 
 @router.get("/investigations/{investigation_id}/red-flags", response_model=RedFlagsOut)
 def get_red_flags(investigation_id: str, db: Session = Depends(get_db)) -> Any:
-    """Runs every rule on the investigation's records now, then lists the flags."""
+    """The flags as the rules last left them; reading never runs them. ``stale`` says the records
+    have changed since they ran (POST .../red-flags/run runs them)."""
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return engine.flags(db, investigation_id)
+
+
+@router.post("/investigations/{investigation_id}/red-flags/run", response_model=RedFlagsOut)
+def run_red_flags(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """Runs every rule on the investigation's records now (and brings To check up to date), then lists the flags."""
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    body = engine.run(db, investigation_id)
+    if body is None:
+        raise HTTPException(403, "Only someone who can edit this case can run the rules")
+    return body
 
 
 def _investigation(db: Session, investigation_id: str) -> Investigation:
@@ -65,7 +77,7 @@ def dismiss_red_flag(flag_id: str, body: FlagDismiss, db: Session = Depends(get_
         engine.dismiss(db, row, body.reason)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
-    return engine.flags(db, row.investigation_id, refresh=False)
+    return engine.flags(db, row.investigation_id)
 
 
 @router.post("/red-flags/{flag_id}/innocent", response_model=RedFlagsOut)
@@ -76,14 +88,14 @@ def mark_red_flag_innocent(flag_id: str, body: FlagInnocent, db: Session = Depen
         engine.mark_innocent(db, row, body.text, body.state, body.note)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
-    return engine.flags(db, row.investigation_id, refresh=False)
+    return engine.flags(db, row.investigation_id)
 
 
 @router.post("/red-flags/{flag_id}/reopen", response_model=RedFlagsOut)
 def reopen_red_flag(flag_id: str, db: Session = Depends(get_db)) -> Any:
     row = _flag(db, flag_id)
     engine.reopen(db, row)
-    return engine.flags(db, row.investigation_id, refresh=False)
+    return engine.flags(db, row.investigation_id)
 
 
 @router.post("/red-flags/{flag_id}/lead", response_model=LeadOut)

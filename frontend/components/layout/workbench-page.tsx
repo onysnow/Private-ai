@@ -8,7 +8,7 @@ import {useQuery} from '@tanstack/react-query';
 import type {ReactElement, ReactNode} from 'react';
 
 import {
-  getInvestigationGraphOptions, getInvestigationPlacesOptions, getRedFlagsOptions, getInvestigationTimelineOptions, leadQueueOptions, listClaimsOptions,
+  getInvestigationGraphOptions, getInvestigationPlacesOptions, getInvestigationTimelineOptions, leadQueueOptions, listClaimsOptions,
   listDocumentsOptions, listInvestigationEvidenceOptions, listSourcesOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {RelationshipOut} from '../../lib/generated/types.gen';
@@ -17,6 +17,7 @@ import type {Sure} from '../../lib/record-kinds';
 import {STAGES} from '../../lib/stages';
 import type {Stage, StageKey} from '../../lib/stages';
 import {SWATCH} from '../../lib/viz-tokens';
+import {useRedFlagsQuery} from '../../features/red-flags/use-red-flags-query';
 
 // How sure, for the tiles: the same mapping the search uses (backend
 // app/services/search_view.py SURE_OF_CLAIM / SURE_OF_EVENT / SURE_OF_LINK).
@@ -63,7 +64,7 @@ export function useStanding(investigationId: string): Standing {
   const timeline = useQuery({...getInvestigationTimelineOptions({path}), enabled}).data;
   const leads = useQuery({...leadQueueOptions({path, query: {unresolved_only: false}}), enabled}).data;
   const places = useQuery({...getInvestigationPlacesOptions({path}), enabled}).data;
-  const redFlags = useQuery({...getRedFlagsOptions({path}), enabled}).data;
+  const redFlags = useRedFlagsQuery(investigationId, enabled).query.data;
   const edges = graph?.edges ?? [];
   const events = timeline?.events ?? [];
   const years = events.map(e => (e.date_start ?? '').slice(0, 4)).filter(y => /^\d{4}$/.test(y)).sort();

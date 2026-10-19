@@ -8,20 +8,21 @@
 // party lights it in every chart.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {NeonTitle} from '../effects/board-effects';
-import type {UseQueryResult} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {
-  dismissRedFlagMutation, getChecksQueryKey, getRedFlagsOptions, getRedFlagsQueryKey, listAreasOptions, listLeadsQueryKey, makeLeadFromRedFlagMutation,
+  dismissRedFlagMutation, getChecksQueryKey, getRedFlagsQueryKey, listAreasOptions, listLeadsQueryKey, makeLeadFromRedFlagMutation,
   reopenRedFlagMutation, setInvestigationTypeMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import type {GetRedFlagsError, InvestigationTypeOut, RedFlagOut, RedFlagsOut} from '../../lib/generated/types.gen';
+import type {InvestigationTypeOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {GlossaryText} from '../glossary/glossary-text';
 import {DECISION} from '../to-check/to-check-panel';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {useRedFlagsQuery} from './use-red-flags-query';
+import type {RedFlagsRead} from './use-red-flags-query';
 
 export const LEVEL: Record<string, {name: string; meaning: string}> = {
   faint: {name: 'Faint', meaning: 'the pattern appears'},
@@ -227,15 +228,15 @@ export const LEVEL_ORDER = ['textbook', 'strong', 'faint'];
 /** Textbook flags first, then Strong, then Faint; by weight within a level (the server's order). */
 export const byLevel = (a: RedFlagOut, b: RedFlagOut): number => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level);
 
-export type RedFlagsState = {
-  query: UseQueryResult<RedFlagsOut, GetRedFlagsError>; problem: string; actionsFor: (f: RedFlagOut) => FlagActions; setAreas: (areas: string[] | null) => Promise<void>;
+export type RedFlagsState = RedFlagsRead & {
+  problem: string; actionsFor: (f: RedFlagOut) => FlagActions; setAreas: (areas: string[] | null) => Promise<void>;
 };
 
 /** The case's Red Flags and what a reporter can do with each: shared by the panel and the Act screen. */
 export function useRedFlags(investigationId: string): RedFlagsState {
   const queryClient = useQueryClient();
   const path = {investigation_id: investigationId};
-  const query = useQuery({...getRedFlagsOptions({path}), enabled: Boolean(investigationId)});
+  const read = useRedFlagsQuery(investigationId);
   const dismiss = useMutation({...dismissRedFlagMutation()});
   const reopen = useMutation({...reopenRedFlagMutation()});
   const lead = useMutation({...makeLeadFromRedFlagMutation()});
@@ -256,7 +257,7 @@ export function useRedFlags(investigationId: string): RedFlagsState {
   });
   const setAreas = (areas: string[] | null) => attempt(async () => {
     await setType.mutateAsync({path, body: {areas}}); await queryClient.invalidateQueries({queryKey: key}); }, 'Could not change the type');
-  return {query, problem, actionsFor, setAreas};
+  return {...read, problem, actionsFor, setAreas};
 }
 
 /** How many open flags fired in each catalogue area (for the type picker). */
@@ -264,7 +265,7 @@ export const flagsByArea = (flags: RedFlagOut[]): Record<string, number> => flag
   if (f.indicator) m[f.indicator.area] = (m[f.indicator.area] ?? 0) + 1; return m; }, {});
 
 export function RedFlagsPanel({investigationId}: {investigationId: string}): ReactElement {
-  const {query, problem, actionsFor, setAreas} = useRedFlags(investigationId);
+  const {query, waiting, problem, actionsFor, setAreas} = useRedFlags(investigationId);
   const [openId, setOpenId] = useState<string | null>(null);
   // An item in To check asks for its flag: open its details and bring the list into view.
   const askedFlag = useWorkbenchStore(state => state.flag);
@@ -299,7 +300,7 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
     {kind && <InvestigationType kind={kind} flagsByArea={flagsByArea(flags)} onSet={setAreas}/>}
     {query.isError && <p className="sv-error">{errorMessage(query.error, 'Could not run the rules')}</p>}
     {problem && <p className="sv-error" role="alert">{problem}</p>}
-    {query.data && !flags.length && <p className="sv-muted">No pattern fires on these records.</p>}
+    {query.data && !waiting && !flags.length && <p className="sv-muted">No pattern fires on these records.</p>}
     {areas.map(area => <div key={area} className="rf-group">
       {own.length > 0 && area === others[0] && <h3 className="rf-also">This may also point to</h3>}
       <h4 className="rf-area">{area}</h4>

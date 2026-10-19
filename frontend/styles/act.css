@@ -138,4 +138,47 @@
 .rb-quote footer { font-size: 11px; color: var(--text-muted); }
 .rb-quote a { color: var(--accent-2); }
 .rb-foot { margin: 0; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--line); padding-top: 8px; }
-@media (prefers-reduced-motion: reduce) { .rb-row { animation: none; } }
+
+/* Reading never writes: when the rules last ran, and running them on demand. */
+.rb-runline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.rb-run { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text-muted); }
+.rb-run button { all: unset; cursor: pointer; padding: 3px 10px; border-radius: 999px; font-size: 12px; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.rb-run button:disabled { cursor: default; color: var(--text-muted); }
+.rb-run button[aria-busy='true'] { box-shadow: inset 0 0 0 1px var(--accent-2); }
+.rb-run button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.rb-run small { font-size: inherit; }
+
+/* Hover-preview: the row pointed at, and its flag shown in the centre while the chosen one waits. */
+.rb-row.peek:not(.on) { background: var(--surface-2); border-color: var(--line); border-style: dashed; }
+.rb-open.preview { box-shadow: var(--shadow-panel, none), inset 0 0 0 1px var(--line); }
+.rb-open.preview > :not(.rb-peek-note) { opacity: .88; }
+.rb-peek-note { margin: 0; font: 600 10px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent-2); }
+
+/* What changed since the last visit: one change at a time; a new flag's row lights in the list. */
+.rb-changed { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 6px 10px; border-radius: 10px; font-size: 12px;
+  background: var(--surface-1); box-shadow: inset 0 0 0 1px var(--line); color: var(--text-muted); }
+.rb-changed.playing { box-shadow: inset 0 0 0 1px var(--accent-2); }
+.rb-changed-head { color: var(--text); }
+.rb-changed-now { display: inline-flex; align-items: center; gap: 6px; color: var(--text); animation: rb-in var(--dur-base, 200ms) both; }
+.rb-changed-all { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--text); }
+.rb-change-word { font: 700 10.5px var(--font-mono); letter-spacing: .04em; text-transform: uppercase; }
+.rb-change-word.ch-new { color: var(--accent-2); }
+.rb-change-word.ch-gone { color: var(--text-muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+.rb-changed-acts { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
+.rb-changed-acts button { all: unset; cursor: pointer; color: var(--accent-2); }
+.rb-changed-acts button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.rb-row.lit { box-shadow: inset 0 0 0 1.5px var(--accent-2); animation: rb-lit 1.6s ease-out both; }
+@keyframes rb-lit { 0% { background: color-mix(in srgb, var(--accent-2) 22%, transparent); } 100% { background: var(--surface-2); } }
+
+/* The payments: the one in focus ringed and named; scrolling over the picture steps through them. */
+.rb-payments:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.rb-payments figcaption small b { color: var(--text); }
+.rb-pay-ring { fill: none; stroke: var(--accent-2); stroke-width: 1.5; }
+.rb-pay.focus .rb-pay-label { font-weight: 700; }
+.rb-pay:not(.focus) { opacity: .7; }
+.rb-pay-focus { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+.rb-pay-focus b { color: var(--text); font-family: var(--font-mono); }
+.rb-pay-word { font: 600 10.5px var(--font-mono); text-transform: uppercase; }
+.rb-pay-word.c-shown { color: var(--status-supported); } .rb-pay-word.c-not_yet_shown { color: var(--status-unshown); } .rb-pay-word.c-disputed { color: var(--status-disputed); }
+@media (prefers-reduced-motion: reduce) { .rb-row, .rb-row.lit, .rb-changed-now { animation: none; } }
+html[data-motion='calm'] .rb-row, html[data-motion='calm'] .rb-row.lit, html[data-motion='calm'] .rb-changed-now { animation: none; }

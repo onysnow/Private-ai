@@ -747,6 +747,9 @@ import type {
   RotateAppUserTokenData,
   RotateAppUserTokenErrors,
   RotateAppUserTokenResponses,
+  RunRedFlagsData,
+  RunRedFlagsErrors,
+  RunRedFlagsResponses,
   RunTableMappingData,
   RunTableMappingErrors,
   RunTableMappingResponses,
@@ -1388,6 +1391,8 @@ import {
   zRevokeAppUserTokenResponse,
   zRotateAppUserTokenPath,
   zRotateAppUserTokenResponse,
+  zRunRedFlagsPath,
+  zRunRedFlagsResponse,
   zRunTableMappingBody,
   zRunTableMappingPath,
   zRunTableMappingResponse,
@@ -6895,7 +6900,8 @@ export const tagARecord = <ThrowOnError extends boolean = false>(
 /**
  * Get Red Flags
  *
- * Runs every rule on the investigation's records now, then lists the flags.
+ * The flags as the rules last left them; reading never runs them. ``stale`` says the records
+ * have changed since they ran (POST .../red-flags/run runs them).
  */
 export const getRedFlags = <ThrowOnError extends boolean = false>(
   options: Options<GetRedFlagsData, ThrowOnError>,
@@ -6916,6 +6922,33 @@ export const getRedFlags = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetRedFlagsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/red-flags',
+    ...options,
+  });
+
+/**
+ * Run Red Flags
+ *
+ * Runs every rule on the investigation's records now (and brings To check up to date), then lists the flags.
+ */
+export const runRedFlags = <ThrowOnError extends boolean = false>(
+  options: Options<RunRedFlagsData, ThrowOnError>,
+): RequestResult<RunRedFlagsResponses, RunRedFlagsErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RunRedFlagsResponses,
+    RunRedFlagsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRunRedFlagsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRunRedFlagsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/red-flags/run',
     ...options,
   });
 

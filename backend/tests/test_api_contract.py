@@ -287,7 +287,7 @@ def _red_flag(client: TestClient, inv: str) -> str:
     parties = {row["caption"]: row["id"] for row in client.get(f"/api/investigations/{inv}/entities").json()}
     client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": parties["Meridian Holdings Ltd"],
                                             "target_entity_id": parties["Bellcastle Trading Group"], "properties": {"amount": ["1000"], "currency": ["USD"]}})
-    flags = client.get(f"/api/investigations/{inv}/red-flags").json()["flags"]
+    flags = client.post(f"/api/investigations/{inv}/red-flags/run").json()["flags"]
     return next(f["id"] for f in flags if f["indicator_id"] == "BO-033")
 
 

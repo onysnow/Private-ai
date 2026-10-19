@@ -307,7 +307,7 @@ def test_one_rule_that_raises_does_not_take_the_other_flags_with_it(monkeypatch)
         cannot = engine.recompute(db, inv.id)
         reasons = {c["indicator_id"]: c["reason"] for c in cannot}
         assert "ZeroDivisionError" in reasons[broken]
-        assert engine.flags(db, inv.id, refresh=True)["investigation_id"] == inv.id
+        assert (engine.run(db, inv.id) or {})["investigation_id"] == inv.id
     finally:
         db.close()
 

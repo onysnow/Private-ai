@@ -120,7 +120,9 @@ def _load(case_id: str, tmp_path: Path) -> dict:
         assert db.query(RelationshipEdge).filter_by(investigation_id=inv.id).count() == len(case["relationships"])
         assert db.query(TimelineEvent).filter_by(investigation_id=inv.id).count() == len(case["events"])
         assert demo_cases.existing(db, case_id).id == inv.id
-        return engine.flags(db, inv.id)
+        flags = engine.run(db, inv.id)
+        assert flags is not None
+        return flags
 
 
 def _counts(flags: dict) -> Counter:

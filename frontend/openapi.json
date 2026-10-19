@@ -26243,7 +26243,7 @@
         "type": "object"
       },
       "RedFlagsOut": {
-        "description": "Every rule that ran, the flags that fire now (highest weight first),\nand those that no longer fire; with the investigation's type, whose areas\nare listed first.",
+        "description": "Every rule that ran, the flags that fire now (highest weight first),\nand those that no longer fire; with the investigation's type, whose areas\nare listed first. As the rules last ran (``ran_at``, null if never):\n``stale`` says the records they read have changed since, so a run\n(POST .../red-flags/run) would give a different answer.",
         "properties": {
           "cannot_run": {
             "items": {
@@ -26273,12 +26273,30 @@
           "investigation_type": {
             "$ref": "#/components/schemas/InvestigationTypeOut"
           },
+          "ran_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ran At"
+          },
           "rules": {
             "items": {
               "$ref": "#/components/schemas/RuleOut"
             },
             "title": "Rules",
             "type": "array"
+          },
+          "stale": {
+            "default": false,
+            "title": "Stale",
+            "type": "boolean"
           }
         },
         "required": [
@@ -52289,7 +52307,7 @@
     },
     "/api/investigations/{investigation_id}/red-flags": {
       "get": {
-        "description": "Runs every rule on the investigation's records now, then lists the flags.",
+        "description": "The flags as the rules last left them; reading never runs them. ``stale`` says the records\nhave changed since they ran (POST .../red-flags/run runs them).",
         "operationId": "get_red_flags",
         "parameters": [
           {
@@ -52335,6 +52353,56 @@
           }
         },
         "summary": "Get Red Flags"
+      }
+    },
+    "/api/investigations/{investigation_id}/red-flags/run": {
+      "post": {
+        "description": "Runs every rule on the investigation's records now (and brings To check up to date), then lists the flags.",
+        "operationId": "run_red_flags",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedFlagsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Run Red Flags"
       }
     },
     "/api/investigations/{investigation_id}/relationships": {

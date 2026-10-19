@@ -4266,10 +4266,14 @@ class InvestigationTypeOut(ResponseModel):
 class RedFlagsOut(ResponseModel):
     """Every rule that ran, the flags that fire now (highest weight first),
     and those that no longer fire; with the investigation's type, whose areas
-    are listed first."""
+    are listed first. As the rules last ran (``ran_at``, null if never):
+    ``stale`` says the records they read have changed since, so a run
+    (POST .../red-flags/run) would give a different answer."""
     investigation_id: str
     rules: list[RuleOut]
     cannot_run: list[CannotRunOut]
+    ran_at: Timestamp | None = None
+    stale: bool = False
     flags: list[RedFlagOut]
     gone: list[RedFlagOut]
     investigation_type: InvestigationTypeOut
