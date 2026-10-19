@@ -32,6 +32,22 @@ class CollectionIn(BaseModel):
     requests: list[dict[str, Any]] = Field(default_factory=list, max_length=200)
 
 
+
+def _own_base(request: Request) -> str:
+    """Where this server listens, taken from the connection and not from the
+    Host header: a caller sets that header, and the replay must only ever go to
+    this server. The listening address comes from the ASGI scope; a wildcard
+    address is reached as loopback."""
+    server = request.scope.get("server")
+    if isinstance(server, (tuple, list)) and len(server) == 2 and server[1]:
+        host = str(server[0])
+        if host in ("0.0.0.0", "::", ""):
+            host = "127.0.0.1"
+        if ":" in host and not host.startswith("["):
+            host = f"[{host}]"
+        return f"{request.url.scheme}://{host}:{server[1]}"
+    return "http://127.0.0.1:8000"
+
 def router(ctx: ConsoleContext) -> APIRouter:
     r = APIRouter()
     limits = ctx.config.limits
@@ -82,8 +98,8 @@ def router(ctx: ConsoleContext) -> APIRouter:
         # same write authority as the console's raw-SQL escape hatch, not
         # merely ctx.read(). It previously bypassed console_writes entirely.
         principal = ctx.write(request, need=WritePolicy.CHANGESETS_AND_SQL)
-        if not body.path.startswith("/"):
-            raise ConsoleError(400, "bad_path", "path must start with '/' (requests only go to this server)")
+        if not body.path.startswith("/") or body.path.startswith(("//", "/\\")) or "://" in body.path or "\\" in body.path:
+            raise ConsoleError(400, "bad_path", "path must start with a single '/' (requests only go to this server)")
         headers = {k: v for k, v in (body.headers or {}).items() if k.lower() not in ("host", "content-length")}
         if body.act_as:
             auth = ctx.config.auth
@@ -97,7 +113,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         # replayed request -- not just impersonated ones -- leaves a trail.
         note = f"{body.method} {body.path}" + (f" as {body.act_as}" if body.act_as else "")
         ctx.audit(principal, request, section="api", action="send", note=note)
-        base = str(request.base_url).rstrip("/")
+        base = _own_base(request)
         started = time.perf_counter()
         try:
             with httpx.Client(base_url=base, timeout=body.timeout_seconds, follow_redirects=False) as client:
@@ -135,7 +151,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
     @r.post("/api/probes/run", response_model=s.ConsoleRunStatusOut)
     def probes(request: Request) -> Any:
         principal = ctx.read(request)
-        base = str(request.base_url).rstrip("/")
+        base = _own_base(request)
         suite = [Probe("GET", "/openapi.json", (200,), "OpenAPI document"), Probe("GET", f"{ctx.config.route_prefix}/manifest", (200,), "Console manifest")] + list(ctx.config.api_probe_suite)
         return _run_probes(ctx, principal, base, suite)
 

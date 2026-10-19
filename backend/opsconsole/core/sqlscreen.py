@@ -14,13 +14,34 @@ from sqlalchemy.engine import Connection
 
 from opsconsole.core.introspect import json_safe
 
-_COMMENT = re.compile(r"--[^\n]*|/\*.*?\*/", re.S)
 _WRITE_WORDS = re.compile(r"\b(INSERT|UPDATE|DELETE|MERGE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE|ATTACH|DETACH|PRAGMA|COPY|VACUUM|REINDEX|REPLACE|CALL|DO|LOCK|SET|RESET|LISTEN|NOTIFY)\b", re.I)
 READ_HEADS = {"SELECT", "WITH", "EXPLAIN", "VALUES", "SHOW", "TABLE"}
 
 
+def _strip_comments(sql: str) -> str:
+    """Each -- line comment and /* block comment */ replaced by a space, in one
+    pass (a regular expression for the block form took quadratic time on text
+    with many unclosed '/*'). Quoted strings are not tracked: this feeds only the
+    screen below, and a quote that hides a keyword makes the screen stricter."""
+    out: list[str] = []
+    i, n = 0, len(sql)
+    while i < n:
+        if sql.startswith("--", i):
+            j = sql.find("\n", i)
+            i = n if j < 0 else j
+            out.append(" ")
+        elif sql.startswith("/*", i):
+            j = sql.find("*/", i + 2)
+            i = n if j < 0 else j + 2
+            out.append(" ")
+        else:
+            out.append(sql[i])
+            i += 1
+    return "".join(out)
+
+
 def clean(sql: str) -> str:
-    cleaned = _COMMENT.sub(" ", sql or "").strip().rstrip(";").strip()
+    cleaned = _strip_comments(sql or "").strip().rstrip(";").strip()
     if not cleaned:
         raise ValueError("empty statement")
     if ";" in cleaned:

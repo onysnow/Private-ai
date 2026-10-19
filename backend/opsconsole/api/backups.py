@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -13,6 +14,8 @@ from pydantic import BaseModel, Field
 from opsconsole import schemas as s
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.protocols import BackupProvider
+
+log = logging.getLogger(__name__)
 
 
 class CreateIn(BaseModel):
@@ -44,7 +47,9 @@ def router(ctx: ConsoleContext) -> APIRouter:
                 items = [asdict(b) for b in p.list()]
                 error = None
             except Exception as exc:
-                items, error = [], f"{exc.__class__.__name__}: {str(exc)[:200]}"
+                # The provider's own message can carry paths or hosts; the server log keeps it.
+                log.warning("backup provider %s could not list its backups", kind, exc_info=True)
+                items, error = [], f"{exc.__class__.__name__}: the provider could not list its backups (see the server log)"
             out.append({"kind": kind, "items": items, "error": error})
         return {"providers": out, "running": {k: ctx.supervisor.is_running(k) for k in ("backup", "restore")}}
 
