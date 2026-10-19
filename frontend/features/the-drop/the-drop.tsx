@@ -24,8 +24,10 @@ import {ApiHttpError, errorMessage} from '../../lib/api-client';
 import {caseHref} from '../../lib/case-href';
 import {getDropHistoryOptions, getDropHistoryQueryKey, getDropOptions, getDropQueryKey, settingsStatusOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {cancelJobEndpoint, createIngestionBatch, retryJobEndpoint} from '../../lib/generated/sdk.gen';
-import type {DropHistoryEntryOut, DropLaneOut, DropOut, DropStageOut} from '../../lib/generated/types.gen';
+import type {DropHistoryEntryOut, DropLaneOut, DropOut, DropProposerOut, DropStageOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {apiTime} from '../../lib/timestamps';
+import {proposerName} from '../reading-room/proposers';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {PagePicture} from '../case-home/decision-card';
 import {batchLabel, upload} from '../documents/documents-panel';
@@ -166,7 +168,7 @@ function DropHistory({investigationId, onShow}: {investigationId: string; onShow
   return <ol className="dp-history" aria-label="Every drop, newest first">{drops.map(d => {
     const found = Object.entries(d.proposals).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${c} ${kindWord(k, c)}`).join(', ');
     return <li key={d.id}>
-      <header><b>{d.label}</b><time dateTime={String(d.created_at)}>{new Date(d.created_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</time>
+      <header><b>{d.label}</b><time dateTime={String(d.created_at)}>{apiTime(d.created_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</time>
         {d.one_at_a_time && <span className="dp-chip">One at a time</span>}</header>
       <p className="dp-quiet">{[n(d.files, 'file saved', 'files saved'), d.files_inside ? `${d.files_inside} inside them` : '', d.duplicates ? `${d.duplicates} already in the case` : '',
         d.refused ? `${d.refused} not taken` : ''].filter(Boolean).join(' · ')}</p>
@@ -212,6 +214,7 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
   const r = lane.receipt;
   const found = Object.entries(r.proposals).map(([k, n]) => `${n} ${kindWord(k, n)}`).join(' · ');
   const waiting = Object.values(r.waiting).reduce((a, b) => a + b, 0);
+  const proposers = byProposer(r.by_proposer ?? []);
   const verdict = lane.problem ? ['Not read', 'bad'] : reading ? ['Reading', ''] : lane.issues.length ? ['Read, with notes', 'warn'] : ['Read cleanly', 'good'];
   const copy = () => { void navigator.clipboard?.writeText(r.fingerprint).then(() => setCopied(true)); };
   return <section className="dp-card dp-receipt" aria-label={`Read receipt: ${lane.filename}`}>
@@ -229,6 +232,9 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
       <div><dt>Passages</dt><dd>{r.passages}</dd></div>
       {r.files_inside > 0 && <div><dt>Files inside</dt><dd>{r.files_inside}</dd></div>}
       <div><dt>Proposals</dt><dd>{found || 'Nothing yet'}{waiting ? <> · <b>{waiting} wait</b></> : null}</dd></div>
+      {proposers.length > 0 && <div title="An accept you corrected first counts as accepted: corrections are not recorded apart.">
+        <dt>By proposer</dt><dd><ul className="dp-proposers" aria-label="What each proposer's proposals came to">{proposers.map(p => <li key={p.name}>
+          {p.name}: {p.accepted} of {p.accepted + p.rejected} accepted{p.waiting ? ` · ${p.waiting} wait${p.waiting === 1 ? 's' : ''}` : ''}</li>)}</ul></dd></div>}
       <div><dt>Watchlist</dt><dd>{r.watchlist_hits ? `${r.watchlist_hits} hit${r.watchlist_hits === 1 ? '' : 's'}` : 'No watched names'}</dd></div>
       {r.flags_fed.length > 0 && <div><dt>Feeds</dt><dd>{r.flags_fed.join(', ')}</dd></div>}
     </dl>
@@ -242,6 +248,20 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
     </div>
     {stopping && <p role="status" className="dp-quiet">{stopping}</p>}
   </section>;
+}
+
+/** What each proposer's answered proposals came to on a receipt (research §05 "revision rate": "Name-finder: 31 of 40
+ *  accepted"), proposers with the same name together, most answered first. One with nothing answered yet is left out. */
+export function byProposer(rows: DropProposerOut[]): {name: string; accepted: number; rejected: number; waiting: number}[] {
+  const by = new Map<string, {name: string; accepted: number; rejected: number; waiting: number}>();
+  for (const row of rows) {
+    const name = proposerName(row.rule);
+    const one = by.get(name) ?? {name, accepted: 0, rejected: 0, waiting: 0};
+    one.accepted += row.accepted; one.rejected += row.rejected; one.waiting += row.waiting;
+    by.set(name, one);
+  }
+  return [...by.values()].filter(p => p.accepted + p.rejected > 0)
+    .sort((a, b) => b.accepted + b.rejected - (a.accepted + a.rejected) || a.name.localeCompare(b.name));
 }
 
 function Totals({data, tab}: {data: DropOut; tab: TabStop}): ReactElement {
@@ -471,7 +491,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
       </section>}
       <section className="dp-card" aria-label="This drop">
         <p className="dp-eyebrow">This drop</p>
-        {t!.started_at && <p className="dp-quiet">Since {new Date(t!.started_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</p>}
+        {t!.started_at && <p className="dp-quiet">Since {apiTime(t!.started_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</p>}
         <dl>
           <div><dt>Files</dt><dd>{t!.files} dropped{t!.files_inside ? ` · ${t!.files_inside} inside` : ''}</dd></div>
           {ocr && <div><dt>OCR language</dt><dd>{ocr.pdf_ocr_enabled ? language : 'OCR off'}</dd></div>}

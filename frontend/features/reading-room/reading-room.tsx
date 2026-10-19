@@ -33,6 +33,7 @@ import {confidenceBand} from '../documents/confidence';
 import {DocumentTranslation} from '../documents/document-translation';
 import {needsSchemaAnswer} from '../documents/schema-question';
 import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/entity-identity';
+import {proposerName} from './proposers';
 
 type Tab = 'text' | 'original' | 'translation' | 'details';
 type Span = {start: number; end: number; id: string; kind: string; status: string; primary: boolean};
@@ -46,8 +47,6 @@ type BatchHeld = {ids: string[]; record: string; body: Record<string, unknown>; 
 const CLIP_CONTEXT = 32;
 const HOLD_MS = 6000;
 const KIND_WORD: Record<string, string> = {entity: 'Name', claim: 'Claim', evidence: 'Quote', relationship: 'Link', event: 'Date', identifier: 'Email address'};
-const PROPOSER: Record<string, string> = {capitalized_name_sequence: 'Name-finder (rules)', sentence_assertion: 'Claim-finder (rules)', whole_chunk: 'Passage (whole)',
-  openaleph_ingest_file: 'OpenAleph', openaleph_ftm_analyze: 'OpenAleph', column_mapping: 'Column mapping', reporter_staged: 'You'};
 const SCHEMA_WORD: Record<string, string> = {Person: 'Person', Company: 'Company', Organization: 'Organisation', LegalEntity: 'Not sure'};
 
 function typing(target: EventTarget | null): boolean {
@@ -69,7 +68,7 @@ export function proposalText(c: ExtractionCandidateOut): string {
 /** Who proposed it, in a reporter's words (research §1: "Name-finder (rules)", "OpenAleph", "You"). */
 export function proposerOf(c: ExtractionCandidateOut): string {
   const rule = String(((c.payload as {rationale?: {rule?: string}}).rationale ?? {}).rule ?? '');
-  return PROPOSER[rule] ?? (rule.startsWith('openaleph') ? 'OpenAleph' : 'The reader');
+  return proposerName(rule);
 }
 
 /** The schema choices a name's question offers, in the order the payload lists them. */

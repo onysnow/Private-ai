@@ -18,7 +18,10 @@
 // only receives -- and named with the total that passed through it.
 //
 // Used by app/page.tsx's money-flow panel (lazy-loaded), fed from
-// GET /api/investigations/{id}/financial-flows.
+// GET /api/investigations/{id}/financial-flows. The Money view passes `fold`:
+// a very large ledger then draws its largest flows and folds the rest into one
+// band, "others (n)", as its Columns layout does; each party's label keeps its
+// exact total.
 
 import * as React from 'react';
 import {useMemo, useState} from 'react';
@@ -28,6 +31,9 @@ import {Chart} from './chart';
 import {
   aggregateTransactionsByCurrency,
   findFlowCycle,
+  foldFlows,
+  OTHERS_IN,
+  OTHERS_OUT,
   type FinancialFlowTransaction,
 } from '@/lib/financial-flow-types';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -40,6 +46,9 @@ export type FinancialFlowSankeyProps = {
   currency?: string;
   height?: number | string;
   className?: string;
+  /** Draw only the `top` largest flows and fold the rest into "others (n)" unless `all`; `onAll` opens or folds them.
+   *  Unset draws every flow. */
+  fold?: {top: number; all: boolean; onAll: (all: boolean) => void};
 };
 
 // Fixed 2026-09-29: matches the real current Dark Academia tokens now used
@@ -64,6 +73,7 @@ export function FinancialFlowSankey({
   currency,
   height = 420,
   className,
+  fold,
 }: FinancialFlowSankeyProps): React.ReactElement {
   const byCurrency = useMemo(() => aggregateTransactionsByCurrency(transactions), [transactions]);
   const availableCurrencies = useMemo(() => Array.from(byCurrency.keys()).sort(), [byCurrency]);
@@ -76,23 +86,34 @@ export function FinancialFlowSankey({
         ? currency
         : pickDefaultCurrency(byCurrency);
 
-  const aggregation = activeCurrency ? byCurrency.get(activeCurrency) : undefined;
+  const everyFlow = activeCurrency ? byCurrency.get(activeCurrency) : undefined;
+  const top = fold && !fold.all ? fold.top : undefined;
+  const shown = useMemo(() => (everyFlow ? foldFlows(everyFlow, top) : undefined), [everyFlow, top]);
+  const aggregation = shown?.aggregation;
+  const folded = shown?.folded ?? null;
+  // Only a folded picture needs its labels told the exact totals; otherwise ECharts' own node values are the same.
+  const exact = fold ? shown?.totals : undefined;
+  const othersName = folded ? `others (${folded.flows})` : '';
 
   const option: EChartsOption = useMemo(() => {
     if (!aggregation) {
       return {series: []};
     }
+    const shownName = (name: string) => (name === OTHERS_IN || name === OTHERS_OUT ? othersName : name);
     return {
       tooltip: {
         // Party names come from documents and outside records: plain text only, never HTML (richText mode).
         trigger: 'item', renderMode: 'richText', backgroundColor: SWATCH.card, borderColor: '#4e4234', textStyle: {color: SWATCH.parchment, fontSize: 12},
         formatter: (rawParams: unknown) => {
-          const params = rawParams as {dataType?: string; name?: string; value?: number; data?: {flowType?: string}};
+          const params = rawParams as {dataType?: string; name?: string; value?: number; data?: {flowType?: string; source?: string}};
           if (params.dataType === 'edge') {
             const flowType = params.data?.flowType ?? 'direct';
+            if (folded && params.data?.source === OTHERS_IN) {
+              return `${othersName}\n${activeCurrency} ${(params.value ?? 0).toLocaleString()} in ${folded.transactions} payment${folded.transactions === 1 ? '' : 's'}`;
+            }
             return `${params.name}\n${activeCurrency} ${(params.value ?? 0).toLocaleString()} (${flowType})`;
           }
-          return String(params.name ?? '');
+          return shownName(String(params.name ?? ''));
         },
       },
       series: [
@@ -112,7 +133,7 @@ export function FinancialFlowSankey({
             color: SWATCH.parchment, fontSize: 12, fontWeight: 600, textBorderColor: '#1c262b', textBorderWidth: 3,
             formatter: (p: unknown) => {
               const {name, value} = p as {name: string; value?: number};
-              return `${name}\n{amount|${activeCurrency} ${Math.round(value ?? 0).toLocaleString('en-GB')}}`;
+              return `${shownName(name)}\n{amount|${activeCurrency} ${Math.round(exact?.get(name) ?? value ?? 0).toLocaleString('en-GB')}}`;
             },
             rich: {amount: {color: SWATCH.tan, fontSize: 11, fontWeight: 400, lineHeight: 15}},
           },
@@ -120,7 +141,7 @@ export function FinancialFlowSankey({
         },
       ],
     } as EChartsOption;
-  }, [aggregation, activeCurrency]);
+  }, [aggregation, activeCurrency, exact, folded, othersName]);
 
   if (transactions.length === 0) {
     return <p className="text-sm text-muted-foreground">No transactions to chart.</p>;
@@ -128,6 +149,8 @@ export function FinancialFlowSankey({
 
   const excludedCurrencies = aggregation?.excludedCurrencies ?? [];
   const cycle = aggregation ? findFlowCycle(aggregation.links) : null;
+  const parties = aggregation?.nodes.filter(n => n.name !== OTHERS_IN && n.name !== OTHERS_OUT).length ?? 0;
+  const money = (amount: number) => `${activeCurrency} ${Math.round(amount).toLocaleString('en-GB')}`;
 
   return (
     <div className={className}>
@@ -162,8 +185,21 @@ export function FinancialFlowSankey({
         <Chart
           option={option}
           height={height}
-          ariaLabel={`Sankey diagram of ${activeCurrency ?? ''} transaction flows between ${aggregation?.nodes.length ?? 0} parties`}
+          ariaLabel={`Sankey diagram of ${activeCurrency ?? ''} transaction flows between ${parties} parties${folded ? `, and ${othersName}` : ''}`}
         />
+      )}
+      {fold && folded && shown && (
+        <p className="mt-2 text-xs text-muted-foreground" data-testid="sankey-fold">
+          The {fold.top} largest of {shown.flows} flows are drawn; {othersName} holds the other {folded.transactions} payment{folded.transactions === 1 ? '' : 's'},{' '}
+          {money(folded.amount)}. Totals count every payment.{' '}
+          <button type="button" className="underline underline-offset-2 text-foreground" onClick={() => fold.onAll(true)}>Show all {shown.flows} flows</button>
+        </p>
+      )}
+      {fold && fold.all && shown && shown.flows > fold.top && (
+        <p className="mt-2 text-xs text-muted-foreground" data-testid="sankey-fold">
+          All {shown.flows} flows are drawn.{' '}
+          <button type="button" className="underline underline-offset-2 text-foreground" onClick={() => fold.onAll(false)}>Fold to the {fold.top} largest</button>
+        </p>
       )}
     </div>
   );

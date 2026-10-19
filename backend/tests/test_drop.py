@@ -73,6 +73,31 @@ def test_each_file_is_a_lane_of_seven_stages_with_its_receipt():
     assert body["ready_for_you"] == {"entity": 1}
 
 
+def test_the_receipt_counts_what_each_proposer_s_proposals_came_to():
+    """Research §05 "revision rate": per proposer (the rule that proposed it), accepted, rejected and still waiting."""
+    inv = ok(client.post("/api/investigations", json={"name": "Drop proposers"}))["id"]
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Files", source_type="document")
+        db.add(src)
+        db.flush()
+        memo = _doc(db, inv, src.id, "memo.pdf", "complete")
+        other = _doc(db, inv, src.id, "other.pdf", "complete")
+        names = {"rationale": {"rule": "capitalized_name_sequence"}}
+        claims = {"rationale": {"rule": "sentence_assertion"}}
+        for payload, status in [(names, "accepted"), (names, "accepted"), (names, "rejected"), (names, "proposed"),
+                                (claims, "rejected"), ({}, "accepted")]:
+            db.add(ExtractionCandidate(investigation_id=inv, document_id=memo.id, candidate_type="entity", payload=payload, review_status=status))
+        db.add(ExtractionCandidate(investigation_id=inv, document_id=other.id, candidate_type="entity", payload=names, review_status="rejected"))
+        db.commit()
+    lanes = {lane["filename"]: lane for lane in ok(client.get(f"/api/investigations/{inv}/drop"))["lanes"]}
+    assert lanes["memo.pdf"]["receipt"]["by_proposer"] == [
+        {"rule": "", "accepted": 1, "rejected": 0, "waiting": 0},
+        {"rule": "capitalized_name_sequence", "accepted": 2, "rejected": 1, "waiting": 1},
+        {"rule": "sentence_assertion", "accepted": 0, "rejected": 1, "waiting": 0},
+    ]
+    assert lanes["other.pdf"]["receipt"]["by_proposer"] == [{"rule": "capitalized_name_sequence", "accepted": 0, "rejected": 1, "waiting": 0}]
+
+
 def test_a_file_already_in_the_case_says_so():
     inv = ok(client.post("/api/investigations", json={"name": "Drop twice"}))["id"]
     with SessionLocal() as db:

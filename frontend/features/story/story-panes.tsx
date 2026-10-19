@@ -15,13 +15,14 @@ import {
   listStoryVersionsOptions, listStoryVersionsQueryKey, nameStoryVersionMutation, removeNoteMutation, restoreStoryVersionMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {NoteOut, StoryOut, WriteupVersionOut} from '../../lib/generated/types.gen';
+import {apiTime} from '../../lib/timestamps';
 import type {CitableClaim, DocInfo} from './editor-extensions';
 
 // TipTap loads only when a version is read (as the editor itself does).
 const VersionText = dynamic(() => import('./version-text').then(m => m.VersionText), {ssr: false, loading: () => <p className="sy-quiet">Reading…</p>});
 
 const STATE_CHIP = {shown: 'supported', disputed: 'disputed', unshown: 'unshown', ruled_out: 'ruled_out'} as const;
-const when = (iso: string) => new Date(iso).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+const when = (iso: string) => apiTime(iso).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
 
 function Pane({title, onClose, children, label}: {title: ReactNode; onClose: () => void; children: ReactNode; label: string}): ReactElement {
   const ref = useRef<HTMLElement>(null);

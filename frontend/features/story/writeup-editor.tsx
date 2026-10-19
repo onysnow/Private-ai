@@ -17,6 +17,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import type {FocusEvent, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
+import {apiTime} from '../../lib/timestamps';
 import {
   getStoryQueryKey, getWriteupEndpointOptions, getWriteupEndpointQueryKey, listStoryVersionsQueryKey, updateWriteupEndpointMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
@@ -197,7 +198,7 @@ export function WriteupEditor({investigationId, writeupId, claims, onDoc, onOpen
   return <div className="wu">
     <div className="wu-bar">
       <button type="button" className="wu-cite" onClick={() => setPicking(p => !p)} aria-expanded={picking}>Cite a claim <kbd>⌘⇧C</kbd></button>
-      <span className="wu-status" aria-live="polite">{words} words · {save.isPending ? 'Saving…' : save.isError ? errorMessage(save.error, 'Not saved') : saved ? `saved ${stamp(saved)}` : q.data ? `saved ${stamp(new Date(q.data.updated_at))}` : ''}</span>
+      <span className="wu-status" aria-live="polite">{words} words · {save.isPending ? 'Saving…' : save.isError ? errorMessage(save.error, 'Not saved') : saved ? `saved ${stamp(saved)}` : q.data ? `saved ${stamp(apiTime(q.data.updated_at))}` : ''}</span>
     </div>
     {picking && <ul className="wu-picker" aria-label="Cite a claim of the story">
       {claims.length ? claims.map(c => <li key={c.id}><button type="button" onClick={() => cite(c)}>

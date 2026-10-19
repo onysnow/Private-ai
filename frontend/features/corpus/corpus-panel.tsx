@@ -23,6 +23,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {decideInvestigationCrossReference, syncCorpusNow} from '../../lib/generated/sdk.gen';
 import type {CorpusSyncOut, CrossReferenceOut} from '../../lib/generated/types.gen';
+import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {CorpusInsights} from './corpus-insights';
 import {EntitySets} from './entity-sets';
@@ -37,7 +38,7 @@ const DECISIONS: {value: Decision; label: string}[] = [
 const DECISION_LABEL: Record<string, string> = {same: 'Same entity', different: 'Different', unsure: 'Not sure'};
 
 function when(value: string | null): string {
-  return value ? new Date(value.endsWith('Z') || /[+-]\d\d:\d\d$/.test(value) ? value : `${value}Z`).toLocaleString() : 'never';
+  return value ? apiTime(value).toLocaleString() : 'never';
 }
 
 /** The "Corpus sync" line in plain words. */

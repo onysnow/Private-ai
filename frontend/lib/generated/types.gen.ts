@@ -7033,9 +7033,35 @@ export type DropOut = {
 };
 
 /**
+ * DropProposerOut
+ */
+export type DropProposerOut = {
+  /**
+   * Accepted
+   */
+  accepted: number;
+  /**
+   * Rejected
+   */
+  rejected: number;
+  /**
+   * Rule
+   */
+  rule: string;
+  /**
+   * Waiting
+   */
+  waiting: number;
+};
+
+/**
  * DropReceiptOut
  */
 export type DropReceiptOut = {
+  /**
+   * By Proposer
+   */
+  by_proposer?: Array<DropProposerOut>;
   /**
    * Files Inside
    */

@@ -10,6 +10,7 @@ import type {ReactElement} from 'react';
 import {AiTag, LevelChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {apiTime} from '../../lib/timestamps';
 import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
@@ -21,7 +22,7 @@ const KIND_ICON: Record<DecisionKind, string> = {to_check: '?', missing: '∅', 
 const SHAPE: Record<DecisionChoiceOut['key'], string> = {yes: '✓', no: '✕', unsure: '○'};
 
 function age(iso: string): string {
-  const minutes = Math.max(0, Math.round((Date.now() - new Date(iso.endsWith('Z') ? iso : `${iso}Z`).getTime()) / 60000));
+  const minutes = Math.max(0, Math.round((Date.now() - apiTime(iso).getTime()) / 60000));
   if (minutes < 60) return `${minutes} min`;
   if (minutes < 60 * 24) return `${Math.round(minutes / 60)} h`;
   return `${Math.round(minutes / 1440)} d`;

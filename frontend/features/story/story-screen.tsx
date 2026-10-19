@@ -20,6 +20,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {exportWriteupDocx} from '../../lib/generated/sdk.gen';
 import type {StoryGateOut, StoryOut} from '../../lib/generated/types.gen';
+import {apiTime} from '../../lib/timestamps';
 import type {CitableClaim, DocInfo} from './editor-extensions';
 import {ExportSheet, NotesTab, PassagePane, VersionsPane} from './story-panes';
 
@@ -281,7 +282,7 @@ function Gates({story, onGate, onReady}: {story: StoryOut; onGate: (gate: 'right
           </span>)}
       </span>
     </li>)}</ul>
-    {story.ready ? <p className="sy-ok">Ready to run · decided by {story.ready.by} on {new Date(story.ready.at).toLocaleDateString('en-GB')}</p>
+    {story.ready ? <p className="sy-ok">Ready to run · decided by {story.ready.by} on {apiTime(story.ready.at).toLocaleDateString('en-GB')}</p>
       : <form className="gate-form" onSubmit={e => { e.preventDefault(); if (by.trim()) onReady(by.trim()); }}>
         <input aria-label="Decided by" placeholder="Decided by" value={by} onChange={e => setBy(e.target.value)} disabled={!story.can_ready}/>
         <button type="submit" disabled={!story.can_ready || !by.trim()}>Ready to run</button>

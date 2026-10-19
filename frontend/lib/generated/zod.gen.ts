@@ -2672,9 +2672,20 @@ export const zDropHistoryOut = z.object({
 });
 
 /**
+ * DropProposerOut
+ */
+export const zDropProposerOut = z.object({
+  accepted: z.number().int(),
+  rejected: z.number().int(),
+  rule: z.string(),
+  waiting: z.number().int(),
+});
+
+/**
  * DropReceiptOut
  */
 export const zDropReceiptOut = z.object({
+  by_proposer: z.array(zDropProposerOut).optional(),
   files_inside: z.number().int(),
   fingerprint: z.string(),
   flags_fed: z.array(z.string()),

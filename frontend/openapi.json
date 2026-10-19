@@ -16173,8 +16173,43 @@
         "title": "DropOut",
         "type": "object"
       },
+      "DropProposerOut": {
+        "properties": {
+          "accepted": {
+            "title": "Accepted",
+            "type": "integer"
+          },
+          "rejected": {
+            "title": "Rejected",
+            "type": "integer"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "waiting": {
+            "title": "Waiting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule",
+          "accepted",
+          "rejected",
+          "waiting"
+        ],
+        "title": "DropProposerOut",
+        "type": "object"
+      },
       "DropReceiptOut": {
         "properties": {
+          "by_proposer": {
+            "items": {
+              "$ref": "#/components/schemas/DropProposerOut"
+            },
+            "title": "By Proposer",
+            "type": "array"
+          },
           "files_inside": {
             "title": "Files Inside",
             "type": "integer"

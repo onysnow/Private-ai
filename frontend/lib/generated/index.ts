@@ -750,6 +750,7 @@ export type {
   DropHistoryOut,
   DropLaneOut,
   DropOut,
+  DropProposerOut,
   DropReceiptOut,
   DropStageNameOut,
   DropStageOut,
