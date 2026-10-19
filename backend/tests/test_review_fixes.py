@@ -455,6 +455,9 @@ def test_a_connector_credential_failure_does_not_answer_with_the_internal_reason
     assert r.status_code == 500 and "/home/ops" not in r.text
 
 
+
+
+
 # --- the query workbench's read mode is read-only in the database itself on SQLite ---
 
 def test_read_mode_is_enforced_by_sqlite_not_only_by_the_keyword_screen(tmp_path):
