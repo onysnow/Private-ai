@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-10-18 — DIR-0060: Module 01 types a cause-testing question THEORY TEST; Module 04 stresses the Module 05 hand-off (T-0378)
+
+`PROMPT_MODULES/01_QUESTION_AND_DATA_FRAMING.md` rule 2 now says a question asking whether a named cause or programme produced a difference between groups is a THEORY TEST, not COMPARATIVE. `PROMPT_MODULES/04_CHOOSING_AND_RUNNING_THE_ANALYSIS.md` rule 11 now says each QRES goes to Module 05 as its own step before any result is reported, and a self-issued audit under Module 07 does not stand in for it. Q24 failed both elements in 3 of 3 samples (RUN-0058). The maintainer's approval: DIR-0060; stays only if its pre-registered round passes.
+
+## 2026-10-18 — DIR-0056: principle 10's clause put back for a final test (T-0378)
+
+The clause removed under DIR-0055 is restored to `CORE/QAS_STANDARD.md` principle 10 for one last pre-registered round: it passed Q30 2 of 2 against 1 of 3 without it, with no guard failing, and the cases it did not help (Q18) are now fixed elsewhere. It stays only if Q30 passes at least 2 of 3 and no guard fails. The maintainer's approval: DIR-0056.
+
+## 2026-10-18 — DIR-0055: principle 10's to-do clause reverted; Module 02 rule 8 makes the split before any decision not to proceed (T-0378)
+
+The clause DIR-0054 added to `CORE/QAS_STANDARD.md` principle 10 is removed: the guard rerun passed Q18, Q24 and Q30 in 2 of 6 samples against the pre-registered threshold of 3. `PROMPT_MODULES/02_DATA_PROVENANCE_AND_CLEANING.md` rule 8 gains a sentence: make the split and write its QCLN record even when the file is judged unfit for the requested analysis, and before any decision not to proceed. Q18 had failed 0 of 4 samples on the same gap. The maintainer's approval: DIR-0053, applied by DIR-0055.
+
+## 2026-10-18 — DIR-0054: principle 10 says a required record is written, not listed as a to-do (T-0378)
+
+`CORE/QAS_STANDARD.md` principle 10 gains: a record or fix the modules call for is written in the answer in full; naming it as still to be made is not making it, except where its material is absent or a gate withholds it (a FAIL verdict releases no handoff). In the resample of the open full-suite cases (evidence/full-suite-resample-2026-10-18.txt) Q30, Q18 and Q24 kept failing for that one behaviour. The maintainer's approval: DIR-0053, applied by DIR-0054.
+
+## 2026-10-18 — DIR-0052: the Standard's principle 10 and template T03 rule 12 (T-0378)
+
+`CORE/QAS_STANDARD.md` gains principle 10, a short answer is not a short procedure, and `PROMPT_TEMPLATES/INTEGRATED_PROMPT_TEMPLATE_LIBRARY.md` T03 rule 12 now declines a request for the result and points to T01. Closes the doctrine-arm FAILs of Q15, Q18, Q24, Q30 and Q31 in the full-suite run (RUN-0049). The maintainer's approval: DIR-0052.
+
+## 2026-10-12 — DIR-0049: Q12's pass condition follows the headline rule (T-0376)
+
+`EVALUATION/ADVERSARIAL_TEST_SUITE.md` Q12's Pass no longer requires the headline itself to carry the estimate with its interval; it requires the estimate and interval to stay in the piece, as `CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md` lets a headline simplify a finding but not raise its confidence, widen its scope or state a cause. Every reader failed the doctrine arm on that clause alone (RUN-0019, T-0376). The maintainer's approval: DIR-0049.
+
+The same entry, later on 2026-10-12: Q12's Pass now says a removal of the untraced number that the audit lists and applies under Module 07 rule 13 counts as removed. Module 07 rule 13 defines PASS WITH CORRECTIONS as corrections listed and applied, including removing an untraceable number; two of three readers of the rerun read "once it is removed" as the submitted draft. Within the Q12 pass-condition approval of DIR-0049.
+
 ## 2026-10-10 — DIR-0047: the premise status of a handed-off result (T-0374)
 
 Version v0.3 (no change to the version: one pointer added to Standard §10).

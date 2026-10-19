@@ -2,6 +2,16 @@
 
 *Decision Authority System (DAS)*
 
+## 2026-10-18 — DIR-0051: the outcome's mechanism and a gap's materiality are separate questions (T-0377)
+
+`PROMPT_MODULES/10_FINAL_DECISION_AUDIT.md` rule 10 now keeps two questions apart: what caused the outcome (the mechanism), and whether a gap bore on how large the loss grew or whether it was contained (its materiality). A gap that bore only on size or containment is stated as such (material, not material or unknown) and is not the mechanism; where the cause lay outside the record, no gap is named as the mechanism; neither answer changes the verdict or sections A–C. The rule asked for a materiality note and D01's pass condition forbade naming a gap as the mechanism, and one of three readers of the two-run D01 rerun (RUN-0039) read the note as breaking the condition. D01's pass condition in `EVALUATION/ADVERSARIAL_TEST_SUITE.md` now uses the same two terms (suite revision recorded in its header). Dropping the note was rejected: it is honest information about why a loss grew, and removing it would make the second-run audit less truthful.
+
+## 2026-10-12 — DIR-0050: an option about to be lost is secured first (T-0376)
+
+`PROMPT_MODULES/01_DECISION_FRAMING.md` rule 10 now ends: whatever the domain, an option that will be lost before the analysis can finish is secured first, as a stabilising step recorded in short form with a review trigger. Only the Chaotic label allowed acting first, and the doctrine arm of gate case D14 classed a fast-moving crisis as Disorder and held everything for the pipeline on both fixtures (RUN-0017, T-0376). The maintainer's approval: DIR-0050.
+
+Later the same day: rule 6's Chaotic label gains its observable signal (a situation changing faster than analysis can finish, where waiting is itself causing harm), and rule 10's stabilising step is taken now with a named owner. The rerun on the first wording classed the same crisis Disorder/Complex and left the step undecided with no owner. Under the same approval (DIR-0050, the maintainer's "just fix them").
+
 ## 2026-10-10 — DIR-0044: the restating-a-finding section's last sentence
 
 Under DIR-0044, `CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md`'s "Restating a finding" section ends "in both studies the exaggeration was in the restatement, not in the result it restated", where it said "the restatement is where accuracy is lost", which claimed more than the two studies show (AUDIT_QAS_2026-10-10 UNSOURCED-4, AUDIT_EHS_2026-10-10 UNSOURCED-5). The same words in every system (audit check 65).

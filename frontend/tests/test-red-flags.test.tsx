@@ -108,7 +108,13 @@ describe('RedFlagsPanel', () => {
     });
     wrap(<RedFlagsPanel investigationId="inv-1"/>);
     const type = await screen.findByRole('group', {name: 'Type of investigation'});
-    expect(type).toHaveTextContent('TypeHidden ownership and shell companieschosen by the appChange');
+    expect(type).toHaveTextContent('TypeHidden ownership and shell companies— chosen by the appwhy?Change');
+    // "why?" shows the app's reasons without opening the picker.
+    const whyUser = userEvent.setup();
+    await whyUser.click(within(type).getByRole('button', {name: 'why?'}));
+    expect(within(type).getByRole('list', {name: 'Why the app chose this type'})).toHaveTextContent('Hidden ownership and shell companiesCircular ownership (BO-001)');
+    await whyUser.click(within(type).getByRole('button', {name: 'why?'}));
+    expect(within(type).queryByRole('list', {name: 'Why the app chose this type'})).toBeNull();
     const headings = () => screen.getAllByRole('heading').map(h => h.textContent);
     expect(headings()).toEqual(['Red Flags', 'Hidden ownership and shell companies', 'Circular ownership', 'This may also point to', 'Money laundering', 'Circular payments']);
     const user = userEvent.setup();
@@ -128,7 +134,7 @@ describe('RedFlagsPanel', () => {
     await user.click(within(type).getByRole('button', {name: /Money laundering/}));
     await user.click(within(type).getByRole('button', {name: 'Save'}));
     await waitFor(() => expect(api.lastBody('PUT /api/investigations/inv-1/type')).toEqual({areas: ['ML']}));
-    expect(await within(type).findByText('chosen by you')).toBeInTheDocument();
+    expect(await within(type).findByText('— chosen by you')).toBeInTheDocument();
     await waitFor(() => expect(headings()).toEqual(['Red Flags', 'Money laundering', 'Circular payments', 'This may also point to', 'Hidden ownership and shell companies', 'Circular ownership']));
   });
 });

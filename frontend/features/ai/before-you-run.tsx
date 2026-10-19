@@ -4,9 +4,10 @@
 // answer will need, any instruction found inside the evidence, where the model runs and what leaves the computer,
 // every change echoed as it is made, and what cannot be turned off. Run and watch, or run in the background.
 // The plan comes from the server (backend app/services/run_plan.py); nothing is sent to a model until Run.
-// "Edit plan" edits what that plan is made of, and only that: the question, what runs (synthesis or a theory test), the
-// packet's size and whether saved outside leads come along, and the two steps a setting adds (devil's advocate,
-// exhaustive research depth). The live view (step 3) opens the same instructions and plan as a drawer at its left edge,
+// "Edit plan" edits what that plan is made of, and only that: the question, what runs (synthesis, a theory test or a
+// draft), the packet's size and whether saved outside leads come along, and the two steps a setting adds (devil's
+// advocate, exhaustive research depth). A draft (the presentation draft, app/ai/presentation_modules) is written from the
+// records you pick, with its goal in place of a question, and runs under none of the settings: its checks are fixed. The live view (step 3) opens the same instructions and plan as a drawer at its left edge,
 // for a new run of the question; step 4 reviews the answer claim by claim (claim-review-view.tsx). Ask the case can be
 // opened from elsewhere (the command palette, the case home's AI strip) with a question already typed.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -21,14 +22,20 @@ import {apiTime} from '../../lib/timestamps';
 import {
   investigationRunPlanMutation, investigationRunProfileOptions, investigationRunProfileQueryKey, saveInvestigationRunProfileMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import {investigationCaseSynthesis, investigationHypothesisTest} from '../../lib/generated/sdk.gen';
+import {investigationCaseSynthesis, investigationHypothesisTest, investigationPresentationDraft} from '../../lib/generated/sdk.gen';
 import type {RunOptionsIn, RunPlanOut, RunSettingOut} from '../../lib/generated/types.gen';
 import {listAiRunsOptions, listAiRunsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {ReviewSheet} from './claim-review-view';
 import {WatchTheRun} from './watch-the-run';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {RecordPicker} from '../../components/presentation/record-picker';
+import type {SelectedRef} from '../../components/presentation/record-picker';
 
-type Module = 'case_synthesis' | 'hypothesis_test';
+type Module = 'case_synthesis' | 'hypothesis_test' | 'presentation_draft';
+const MODULES: ReadonlyArray<readonly [Module, string]> = [['case_synthesis', 'Case synthesis'], ['hypothesis_test', 'Test a theory'], ['presentation_draft', 'Draft a brief']];
+/** What a run needs before its plan can be worked out: a question (a draft's goal), a theory to test, picked records. */
+const ready = (module: Module, question: string, theory: string, refs: SelectedRef[]) =>
+  Boolean(question.trim()) && (module !== 'hypothesis_test' || Boolean(theory.trim())) && (module !== 'presentation_draft' || refs.length > 0);
 type Values = Record<string, string>;
 type Echo = {at: string; kind: 'SETTING' | 'FLAG'; text: string};
 type Step = 1 | 2 | 3 | 4;
@@ -44,10 +51,61 @@ const FLAGS = new Set(['severity_floor', 'source_tier_floor']);
 const GROUPS = ['How strict', 'Extra passes', 'What you see', 'Doing things on its own'];
 const SWITCHES = new Set(['devils_advocate', 'show_reasoning_chain']);
 const clock = () => new Date().toTimeString().slice(0, 8);
-const STATE_WORDS: Record<string, string> = {runs: 'runs', not_in_app: 'would apply · not in the app yet', not_expected: 'not expected'};
+const STATE_WORDS: Record<string, string> = {runs: 'runs', next_run: 'would apply · a next run from this answer, once you accept it', not_in_app: 'would apply · not in the app yet', not_expected: 'not expected'};
 // The plan's steps a setting adds (run_plan.py _steps): the setting's key, and its value with and without the step.
 const OPTIONAL_STEPS: Array<{key: string; on: string; off: string}> = [{key: 'devils_advocate', on: 'ON', off: 'OFF'}, {key: 'research_depth', on: 'EXHAUSTIVE', off: 'NORMAL'}];
 const PACKET_DEFAULT = 30;
+
+/** A run asked for from elsewhere with its module chosen (the AI drafts panel's "Run module"): it opens here, never
+ *  runs directly. Handed to a mounted Before you run, or kept until one mounts; from another page it travels in the
+ *  address (?ask=…&module=…&theory=…&refs=type:id,…#ai-runs) and is read once on mount. A draft's goal goes in
+ *  `question` and its picked records in `refs`. */
+export type BeforeRunRequest = {module: Module; question: string; theory: string; maxResults?: number; includeLeads?: boolean; refs?: SelectedRef[]};
+let pendingRequest: BeforeRunRequest | null = null;
+const requestListeners = new Set<(r: BeforeRunRequest) => void>();
+export function askBeforeYouRun(investigationId: string, request: BeforeRunRequest): void {
+  const tab = typeof document !== 'undefined' ? document.querySelector('a[href="#ai-runs"]') : null;
+  if (!tab) {
+    // Not on Act: go there with the request in the address.
+    const q = new URLSearchParams({inv: investigationId, ask: request.question, module: request.module});
+    if (request.theory) q.set('theory', request.theory);
+    if (request.maxResults !== undefined && request.maxResults !== PACKET_DEFAULT) q.set('max', String(request.maxResults));
+    if (request.includeLeads === false) q.set('leads', 'off');
+    if (request.refs?.length) q.set('refs', request.refs.map(r => `${r.record_type}:${r.record_id}`).join(','));
+    window.location.assign(`/act/?${q.toString()}#ai-runs`);
+    return;
+  }
+  if (requestListeners.size) requestListeners.forEach(l => l(request)); else pendingRequest = request;
+  // Act's section tabs follow the address's #; open the AI runs tab.
+  window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}#ai-runs`);
+  window.dispatchEvent(new HashChangeEvent('hashchange'));
+}
+function requestFromAddress(): BeforeRunRequest | null {
+  const params = new URLSearchParams(window.location.search);
+  const question = params.get('ask');
+  if (question === null) return null;
+  const named = params.get('module');
+  const asked: Module = named === 'hypothesis_test' || named === 'presentation_draft' ? named : 'case_synthesis';
+  const theory = params.get('theory') ?? '';
+  const max = Number(params.get('max'));
+  const includeLeads = params.get('leads') !== 'off';
+  // The address carries only each record's type and id; its title comes back with the plan's packet.
+  const refs = (params.get('refs') ?? '').split(',').map(r => r.split(':')).filter(([t, id]) => t && id)
+    .map(([record_type, record_id]) => ({record_type, record_id, label: `${record_type} ${record_id.slice(0, 8)}`}));
+  // Read once: a later visit to the tab does not open it again.
+  ['ask', 'module', 'theory', 'max', 'leads', 'refs'].forEach(k => params.delete(k));
+  const rest = params.toString();
+  window.history.replaceState(window.history.state, '', `${window.location.pathname}${rest ? `?${rest}` : ''}${window.location.hash}`);
+  return {module: asked, question, theory, maxResults: max >= 1 && max <= 100 ? Math.round(max) : PACKET_DEFAULT, includeLeads, refs};
+}
+/** How long past runs took on this machine, in words: "under a minute", "about 2 min", "about 1–4 min". */
+export function runTime(minutes: number[]): string {
+  if (!minutes.length) return 'not measured yet: no run has finished here';
+  const lo = Math.min(...minutes), hi = Math.max(...minutes);
+  if (hi < 1) return 'under a minute on this machine';
+  const a = Math.max(1, Math.round(lo)), b = Math.max(1, Math.round(hi));
+  return `about ${a === b ? a : `${a}–${b}`} min on this machine`;
+}
 
 /** A segmented control: a radio group, arrows move, the name says the default and whether it changed. */
 function Segments({row, value, onChange}: {row: RunSettingOut; value: string; onChange: (v: string) => void}): ReactElement {
@@ -85,6 +143,9 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   const [module, setModule] = useState<Module>('case_synthesis');
   const [question, setQuestion] = useState('');
   const [theory, setTheory] = useState('');
+  // A draft's picked records: only these can be cited by it.
+  const [refs, setRefs] = useState<SelectedRef[]>([]);
+  const draft = module === 'presentation_draft';
   const [values, setValues] = useState<Values | null>(null);
   const [premises, setPremises] = useState<string[]>([]);
   const [premise, setPremise] = useState('');
@@ -116,7 +177,33 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     window.setTimeout(() => questionRef.current?.focus({preventScroll: true}), 0);
   }, [askCase]); // eslint-disable-line react-hooks/exhaustive-deps
   // A link copied with "Copy cite" in the trace drawer (…?run=<id>&step=n#ai-runs) opens that run.
-  useEffect(() => { const linked = new URLSearchParams(window.location.search).get('run'); if (linked && linked !== 'sample') { setRunId(linked); setStep(3); } }, []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const linked = params.get('run');
+    if (linked && linked !== 'sample') { setRunId(linked); setStep(3); }
+    // A link from Decide's "Not sure? Review it claim by claim" opens that answer's review (step 4).
+    const review = params.get('review');
+    if (linked && review) { setReviewId(review); setStep(4); }
+  }, []);
+  // A run asked for with its module chosen (askBeforeYouRun): the plan for it, or step 1 while the question or the
+  // theory is still missing. Nothing runs until Run.
+  useEffect(() => {
+    const take = (r: BeforeRunRequest) => {
+      setDrawer(false); setEditing(false); setPacketFrom(null); setRunId(null); setSampleOnly(false);
+      setModule(r.module); setQuestion(r.question); setTheory(r.theory); setRefs(r.refs ?? []);
+      // The packet asked for, echoed to the run record as a change from the default would be here.
+      const size = r.maxResults ?? PACKET_DEFAULT, leads = r.includeLeads ?? true;
+      setMaxResults(size); setIncludeLeads(leads);
+      setEcho([...(size !== PACKET_DEFAULT ? [{at: clock(), kind: 'SETTING' as const, text: `packet up to ${PACKET_DEFAULT} → ${size} records`}] : []),
+        ...(!leads ? [{at: clock(), kind: 'SETTING' as const, text: 'outside leads in the packet on → off'}] : [])]);
+      setStep(ready(r.module, r.question, r.theory, r.refs ?? []) ? 2 : 1);
+    };
+    const waiting = pendingRequest ?? requestFromAddress();
+    pendingRequest = null;
+    if (waiting) take(waiting);
+    requestListeners.add(take);
+    return () => { requestListeners.delete(take); };
+  }, []);
   const earlier = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && step === 1});
   const [outcome, setOutcome] = useState<{ok: boolean; text: string} | null>(null);
   const flagged = useRef(new Set<string>());
@@ -129,20 +216,28 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   }, [profile.data, values]);
 
   const plan = useMutation({...investigationRunPlanMutation()});
-  const body = useMemo(() => values && {
-    module, question: question.trim(), working_theory: module === 'hypothesis_test' ? theory.trim() || null : null,
-    max_results: maxResults, include_external_leads: includeLeads,
+  const settingsBody = useMemo(() => values && {
     severity_floor: values.severity_floor as 'ALL', source_tier_floor: values.source_tier_floor as 'D',
-    options: Object.fromEntries(Object.entries(values).filter(([k]) => !FLAGS.has(k))) as RunOptionsIn, premises,
-  }, [values, module, question, theory, premises, maxResults, includeLeads]);
+    options: Object.fromEntries(Object.entries(values).filter(([k]) => !FLAGS.has(k))) as RunOptionsIn,
+  }, [values]);
+  const recordRefs = useMemo(() => refs.map(({record_type, record_id}) => ({record_type, record_id})), [refs]);
+  // A draft's plan is its goal and the records picked; it takes none of the settings, the premises or the packet size.
+  const body = useMemo(() => settingsBody && (draft ? {module, question: question.trim(), record_refs: recordRefs} : {
+    module, question: question.trim(), working_theory: module === 'hypothesis_test' ? theory.trim() || null : null,
+    max_results: maxResults, include_external_leads: includeLeads, ...settingsBody, premises,
+  }), [settingsBody, draft, recordRefs, module, question, theory, premises, maxResults, includeLeads]);
   const planKey = JSON.stringify(body);
   const planShows = step === 2 || (step === 3 && drawer);
   useEffect(() => {
-    if (!planShows || !body || !body.question) return;
+    if (!planShows || !body || !body.question || (draft && !recordRefs.length)) return;
     const t = window.setTimeout(() => plan.mutate({path: {investigation_id: investigationId}, body}), 250);
     return () => window.clearTimeout(t);
   }, [planShows, planKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  const p: RunPlanOut | undefined = plan.data;
+  // While a changed plan is worked out, the last one stays on screen: the rows never vanish under the pointer or the
+  // keyboard focus between one setting and the next.
+  const lastPlan = useRef<RunPlanOut | undefined>(undefined);
+  if (plan.data) lastPlan.current = plan.data;
+  const p: RunPlanOut | undefined = plan.data ?? (plan.isPending ? lastPlan.current : undefined);
 
   // An instruction found inside the evidence is echoed once, as the run record will keep it.
   useEffect(() => {
@@ -171,17 +266,19 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     queryClient.setQueryData(investigationRunProfileQueryKey({path: {investigation_id: investigationId}}), data);
     setSaving(false); setReason('');
   }});
-  const saveDefault = () => body && save.mutate({path: {investigation_id: investigationId}, body: {
-    severity_floor: body.severity_floor, source_tier_floor: body.source_tier_floor, options: body.options, premises, reason: reason.trim()}});
+  const saveDefault = () => settingsBody && save.mutate({path: {investigation_id: investigationId}, body: {...settingsBody, premises, reason: reason.trim()}});
 
   const [running, setRunning] = useState(false);
   const run = async (watch: boolean) => {
-    if (!body || !p?.where.callable || running) return;
+    if (!body || !settingsBody || !p?.where.callable || running) return;
     setRunning(true); setOutcome(null);
-    const runBody = {question: body.question, max_results: maxResults, include_external_leads: includeLeads, severity_floor: body.severity_floor,
-      source_tier_floor: body.source_tier_floor, options: body.options, premises, changes: echo, packet_from: packetFrom};
+    const runBody = {question: body.question, max_results: maxResults, include_external_leads: includeLeads, ...settingsBody,
+      premises, changes: echo, packet_from: packetFrom};
     try {
-      const reply = module === 'hypothesis_test'
+      // A draft runs through the endpoint the AI drafts panel used: its goal and the records picked, nothing else.
+      const reply = draft
+        ? (await investigationPresentationDraft({path: {investigation_id: investigationId}, body: {goal: body.question, record_refs: recordRefs}, throwOnError: true})).data
+        : module === 'hypothesis_test'
         ? (await investigationHypothesisTest({path: {investigation_id: investigationId}, body: {...runBody, working_theory: theory.trim()}, throwOnError: true})).data
         : (await investigationCaseSynthesis({path: {investigation_id: investigationId}, body: runBody, throwOnError: true})).data;
       setRunId(reply.job.id);
@@ -235,22 +332,24 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   useEffect(() => { setSizeDraft(String(maxResults)); }, [maxResults]);
 
   const leftCol = <div className="br-col br-left" aria-label="Operating instructions" role="region">
-    <p className="br-title">Operating instructions <small>Profile <b>{profile.data?.name ?? '…'}</b>{changed.length ? <> · <em>{changed.length} changed</em></> : null}</small></p>
-    {values && GROUPS.map(g => <fieldset key={g} className="br-group"><legend>{g}</legend>
+    <p className="br-title">Operating instructions <small>Profile <b>{profile.data?.name ?? '…'}</b>{changed.length && !draft ? <> · <em>{changed.length} changed</em></> : null}</small></p>
+    {draft && <p className="br-tray" role="note">A draft runs under none of these settings: they belong to the suite&apos;s systems, and a draft is
+      an app module. Its checks are fixed: every citation in the packet, every quote word for word, every chart drawn from the records, the writing read.</p>}
+    {values && !draft && GROUPS.map(g => <fieldset key={g} className="br-group"><legend>{g}</legend>
       {rows.filter(r => r.group === g).map(r => <div key={r.key} className={`br-row${values[r.key] !== caseDefaults?.[r.key] ? ' changed' : ''}`}
-        onMouseEnter={() => setHover(r.key)} onMouseLeave={() => setHover(null)} title={`${r.key} · ${r.source}`}>
+        onMouseEnter={() => setHover(r.key)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(r.key)} onBlur={() => setHover(null)} title={`${r.key} · ${r.source}`}>
         <span className="br-label">{r.label}<small>{r.help}</small></span>
         {SWITCHES.has(r.key) ? <Switch row={r} value={values[r.key]} onChange={v => change(r.key, v)}/> : <Segments row={r} value={values[r.key]} onChange={v => change(r.key, v)}/>}
       </div>)}
     </fieldset>)}
-    <fieldset className="br-group"><legend>Take as given</legend>
+    {!draft && <fieldset className="br-group"><legend>Take as given</legend>
       <ul className="br-premises">{premises.map(x => <li key={x}><q>{x}</q><span className="br-chip">You said</span>
         <button type="button" aria-label={`Stop taking as given: ${x}`} onClick={() => setPremises(premises.filter(y => y !== x))}>×</button></li>)}</ul>
       <form className="br-add" onSubmit={e => { e.preventDefault(); addPremise(); }}>
         <input aria-label="Something to take as given" value={premise} onChange={e => setPremise(e.target.value)} placeholder="Printed on the result as you said it. Not evidence."/>
         <button type="submit" disabled={!premise.trim()}>Add</button>
       </form>
-    </fieldset>
+    </fieldset>}
     <fieldset className="br-group br-planned"><legend>Overlays</legend><span>Legal · Journalism · Values (labour)</span><span className="br-chip">Planned</span></fieldset>
   </div>;
 
@@ -262,26 +361,32 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       <button type="button" className="br-quiet" aria-pressed={editing} onClick={() => setEditing(v => !v)}>{editing ? 'Done' : 'Edit plan'}</button></p>
     <div className="br-qcard">{editing ? <div className="br-edit">
       <span className="br-seg" role="radiogroup" aria-label="What runs">
-        {([['case_synthesis', 'Case synthesis'], ['hypothesis_test', 'Test a theory']] as const).map(([m, l]) =>
+        {MODULES.map(([m, l]) =>
           <button key={m} type="button" role="radio" aria-checked={module === m} className={module === m ? 'on' : ''} onClick={() => setModule(m)}>{l}</button>)}
       </span>
-      <label>The question<textarea rows={2} value={question} onChange={e => setQuestion(e.target.value)} className="br-question"/></label>
+      <label>{draft ? 'What the brief or deck should do' : 'The question'}<textarea rows={2} value={question} onChange={e => setQuestion(e.target.value)} className="br-question"/></label>
       {module === 'hypothesis_test' && <label>The theory to test<textarea rows={2} value={theory} onChange={e => setTheory(e.target.value)}/></label>}
-      {packetFrom ? <p className="br-tray">The packet is the one run {packetFrom.run_id.slice(0, 8)} sent; build a new packet to change its size.</p>
+      {draft ? <RecordPicker investigationId={investigationId} selected={refs} onChange={setRefs}/> : packetFrom ? <p className="br-tray">The packet is the one run {packetFrom.run_id.slice(0, 8)} sent; build a new packet to change its size.</p>
         : <div className="br-packet-edit">
           <label>Records in the packet, at most<input type="number" min={1} max={100} value={sizeDraft} onChange={e => setSizeDraft(e.target.value)}
             onBlur={() => setPacketSize(Number(sizeDraft))} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setPacketSize(Number(sizeDraft)); } }}/></label>
           <label className="br-check"><input type="checkbox" checked={includeLeads} onChange={e => setLeads(e.target.checked)}/> Bring outside leads saved in the case, as leads only</label>
         </div>}
     </div> : <>
-      <p className="br-eyebrow">Your question</p><p className="br-q">{question}</p>
+      <p className="br-eyebrow">{draft ? 'What the draft is for' : 'Your question'}</p><p className="br-q">{question}</p>
       {module === 'hypothesis_test' && theory && <p className="br-theory">Theory: {theory}</p>}</>}
       {packetFrom && <p className="br-tray br-reuse" role="status"><b>Same packet as run {packetFrom.run_id.slice(0, 8)}</b> (from its step {packetFrom.step}): the records it sent go in again, with the instructions set here.
         <button type="button" className="br-quiet" onClick={() => setPacketFrom(null)}>Build a new packet</button></p>}
-      {p && !packetFrom && <p className="br-tray"><b>{p.packet.records} records go in</b> · {p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
-        {maxResults !== PACKET_DEFAULT && <> · up to {maxResults}</>}
+      {p && !packetFrom && <div className="br-packet">{p.packet.first.length > 0 && <ul className="br-firsts" aria-label="The first records in the packet">
+        {p.packet.first.map(r => <li key={`${r.record_type}:${r.record_id}`} title={`${(TYPE_WORDS[r.record_type] ?? [r.record_type])[0]}: ${r.title || r.record_id.slice(0, 8)}`}>
+          <span aria-hidden="true">{(TYPE_WORDS[r.record_type]?.[0] ?? r.record_type).charAt(0).toUpperCase()}</span>
+          <span className="sr-only">{(TYPE_WORDS[r.record_type] ?? [r.record_type])[0]}: {r.title || r.record_id.slice(0, 8)}</span></li>)}</ul>}
+        <p className="br-tray"><b>{p.packet.records} records go in</b> · {p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
+        {draft ? <> · only the records you picked</> : maxResults !== PACKET_DEFAULT && <> · up to {maxResults}</>}
         {p.packet.leads_only > 0 && <><br/>{p.packet.leads_only} outside lead{p.packet.leads_only === 1 ? '' : 's'} count as leads only</>}
-        {!includeLeads && <><br/>Outside leads stay out of this packet</>}</p>}
+        {p.packet.below_tier_floor.map(t => <span key={t.tier} className="br-floor" title="They still go in the packet; the tier floor keeps them from counting toward a fact">
+          <br/>{t.count} Tier {t.tier} record{t.count === 1 ? '' : 's'} left out by the tier floor · leads only</span>)}
+        {!includeLeads && !draft && <><br/>Outside leads stay out of this packet</>}</p></div>}
     </div>
     {plan.isError && <p role="alert" className="br-bad">{errorMessage(plan.error, 'Could not work out the plan')}</p>}
     <ol className="br-plan">{p?.steps.map(s => {
@@ -295,8 +400,11 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       {optional.filter(o => values[o.key] !== o.on).map(o => <button key={o.key} type="button" className="br-quiet" onClick={() => change(o.key, o.on)}>
         + {o.row!.label}{o.key === 'research_depth' ? ` · ${o.row!.allowed.find(a => a.value === o.on)?.label ?? o.on}` : ''}</button>)}</p>}
     {p && <div className="br-systems"><p className="br-eyebrow">Likely to run · decided by what the answer will contain</p>
-      <p>{p.systems.map(s => <span key={s.system} className={`br-sysrow ${s.state}`} title={STATE_WORDS[s.state]}><b>{s.system}</b> · {s.state === 'not_expected' ? 'not expected' : s.why}{s.state === 'not_in_app' ? ' · not in the app yet' : ''}</span>)}</p>
-      <small>You cannot switch a system off: it runs when the answer would need it. Today only TAS runs inside the app.</small></div>}
+      <p>{p.systems.filter(s => s.state !== 'not_expected').map(s => <span key={s.system} className={`br-sysrow ${s.state}`} title={STATE_WORDS[s.state]}><b>{s.system}</b> · {s.why}{s.state === 'not_in_app' ? ' · not in the app yet' : ''}{s.state === 'next_run' ? ' · next run, from this answer' : ''}</span>)}
+        {p.systems.some(s => s.state === 'not_expected') && <span className="br-sysrow not_expected"
+          title={p.systems.filter(s => s.state === 'not_expected').map(s => `${s.system} runs for ${s.why}`).join(' · ')}>
+          <b>{p.systems.filter(s => s.state === 'not_expected').map(s => s.system).join(' · ')}</b> · not expected</span>}</p>
+      <small>You cannot switch a system off: it runs when the answer would need it. A next run starts from this answer once you accept it.</small></div>}
     {p?.injections.map(i => <p key={i.record_id} className="br-inject" role="note"><b>Ignored an instruction inside the evidence.</b> {i.title || i.record_type} reads “{i.quote}”.
       Material can never change a setting; it is quoted as evidence and logged.</p>)}
   </div>;
@@ -308,15 +416,16 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
 
   if (step === 1) return <section className="br" aria-label="AI runs">
     <header className="br-head"><h2>Ask the case</h2>{stepper}</header>
-    <form className="br-ask" onSubmit={e => { e.preventDefault(); if (question.trim() && (module === 'case_synthesis' || theory.trim())) setStep(2); }}>
+    <form className="br-ask" onSubmit={e => { e.preventDefault(); if (ready(module, question, theory, refs)) setStep(2); }}>
       <span className="br-seg" role="radiogroup" aria-label="What to run">
-        {([['case_synthesis', 'Case synthesis'], ['hypothesis_test', 'Test a theory']] as const).map(([m, l]) =>
+        {MODULES.map(([m, l]) =>
           <button key={m} type="button" role="radio" aria-checked={module === m} className={module === m ? 'on' : ''} onClick={() => setModule(m)}>{l}</button>)}
       </span>
-      <label>Your question<textarea ref={questionRef} rows={3} value={question} onChange={e => setQuestion(e.target.value)} className="br-question"
-        placeholder="Who controlled Fernhill Ltd between 2016 and 2023, and how was the harbour land moved?"/></label>
+      <label>{draft ? 'What the brief or deck should do' : 'Your question'}<textarea ref={questionRef} rows={3} value={question} onChange={e => setQuestion(e.target.value)} className="br-question"
+        placeholder={draft ? 'Brief my editor on what we can and can’t say about the harbour land sale.' : 'Who controlled Fernhill Ltd between 2016 and 2023, and how was the harbour land moved?'}/></label>
       {module === 'hypothesis_test' && <label>The theory to test<textarea rows={2} value={theory} onChange={e => setTheory(e.target.value)}/></label>}
-      <button type="submit" className="br-primary" disabled={!question.trim() || (module === 'hypothesis_test' && !theory.trim())}>Next: instructions and plan</button>
+      {draft && <RecordPicker investigationId={investigationId} selected={refs} onChange={setRefs}/>}
+      <button type="submit" className="br-primary" disabled={!ready(module, question, theory, refs)}>Next: instructions and plan</button>
     </form>
     {(earlier.data?.runs.length ?? 0) > 0 && <div className="br-earlier"><p className="br-eyebrow">Earlier runs</p><ul>
       {earlier.data!.runs.slice(0, 6).map(r => <li key={r.run_id}><span>{r.question}</span>
@@ -348,11 +457,23 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     {!runId && running && <p role="status">Sending the run…</p>}
     {(runId || sampleOnly) && <WatchTheRun investigationId={investigationId} runId={runId} sample={sampleOnly && !runId}
       onBack={() => { setSampleOnly(false); setDrawer(false); setStep(runId ? 2 : 1); }}
-      onRunAgain={r => { setSampleOnly(false); setDrawer(false); setPacketFrom(r.from ?? null); setQuestion(r.question); setModule(r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setTheory(r.theory ?? ''); setStep(2); }}
+      onRunAgain={r => {
+        // A draft comes back as a draft, with the records it was asked to draft from (labelled by type until the plan names them).
+        const draftAgain = r.module === 'presentation_draft' && Boolean(r.refs?.length);
+        setSampleOnly(false); setDrawer(false); setPacketFrom(draftAgain ? null : r.from ?? null); setQuestion(r.question);
+        setModule(draftAgain ? 'presentation_draft' : r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis');
+        if (draftAgain) setRefs(r.refs!.map(x => ({...x, label: `${x.record_type} ${x.record_id.slice(0, 8)}`})));
+        setTheory(r.theory ?? ''); setStep(2);
+      }}
       onReview={id => { setReviewId(id); setDrawer(false); setStep(4); }}
       onPlan={r => {
         if (drawer) { setDrawer(false); return; }
-        if (r.question) { setQuestion(r.question); setModule(r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setTheory(r.theory ?? ''); }
+        if (r.question) {
+          const draftAgain = r.module === 'presentation_draft' && Boolean(r.refs?.length);
+          setQuestion(r.question); setModule(draftAgain ? 'presentation_draft' : r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis');
+          if (draftAgain) setRefs(r.refs!.map(x => ({...x, label: `${x.record_type} ${x.record_id.slice(0, 8)}`})));
+          setTheory(r.theory ?? '');
+        }
         setPacketFrom(null); setDrawer(true);
       }}
       planDrawer={planDrawer}/>}
@@ -372,13 +493,14 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
             <div className="br-boxes" aria-hidden="true"><span>Your case<small>{p.packet.records} records</small></span><i>→</i>
               <span className={p.where.runs_on_this_computer ? '' : 'out'}>Model<small>{p.where.model ?? 'none chosen'}</small></span><i>→</i>
               <span className="never">Outside<small>never called</small></span></div>
+            <p className="br-lookups">Runs make no outside lookups yet: the model reads only the packet. The Outside lookups setting is kept with the run for when they do.</p>
             {!p.where.enabled && <p className="br-bad">AI is off. Turn it on in <a href="/settings">Settings</a>.</p>}
             {p.where.enabled && !p.where.provider && <p className="br-bad">No model chosen. Choose one in <a href="/settings">Settings</a>.</p>}
           </div>
           <dl className="br-facts">
             <dt>Model</dt><dd>{p.where.model ?? 'none chosen'}{p.where.runs_on_this_computer ? ' · on this computer' : p.where.provider ? ` · ${p.where.provider}` : ''}</dd>
             <dt>Size</dt><dd>≈ {p.where.words_in.toLocaleString()} words in · up to ≈ {p.where.words_out_max.toLocaleString()} out</dd>
-            <dt>Time</dt><dd>{p.where.minutes.length ? `about ${Math.min(...p.where.minutes)}–${Math.max(...p.where.minutes)} min on this machine` : 'not measured yet: no run has finished here'}</dd>
+            <dt>Time</dt><dd>{runTime(p.where.minutes)}</dd>
             <dt>Money</dt><dd>{p.where.money}</dd>
             <dt>Limit</dt><dd>{p.where.limits.concurrent} runs at once · {p.where.limits.per_minute} a minute</dd>
           </dl>
@@ -392,7 +514,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     <footer className="br-foot">
       <button type="button" className="br-primary" onClick={() => void run(true)} disabled={!p?.where.callable || running}>Run and watch <kbd>⌘↵</kbd></button>
       <button type="button" onClick={() => void run(false)} disabled={!p?.where.callable || running}>Run in the background</button>
-      {saving ? <form className="br-add br-why" onSubmit={e => { e.preventDefault(); saveDefault(); }}>
+      {draft ? null : saving ? <form className="br-add br-why" onSubmit={e => { e.preventDefault(); saveDefault(); }}>
         <input aria-label="Why this case runs with these settings" value={reason} onChange={e => setReason(e.target.value)} placeholder="Why, in one line (kept with the profile)" autoFocus/>
         <button type="submit" disabled={!reason.trim() || save.isPending}>Save</button>
       </form> : <button type="button" className="br-save" onClick={() => setSaving(true)}>Save as this case’s default</button>}

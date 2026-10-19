@@ -2611,3 +2611,126 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
 - Suite coverage (same day): app/ai/suite_map.json maps 78 app values to suite terms (an agent read the suite;
   every term string was then checked present in the vendored file). Adding a value to any of the vocabularies in
   suite_map.app_vocabularies() without mapping it fails tests/test_suite_map.py; so does a stale SUITE_GAPS.md.
+
+## 2026-10-19: the suite's other six systems run in the app
+
+Ony: build out the Authority System Suite's systems. Six spec passes read RAS, QAS, LAS, DAS, EGS and EHS (router
+rows, modules, INTEROP rules, value lists, what an app run may not do); every value list was then checked present in
+the vendored text by a new drift test, and the suite defects they reported were re-read at the cited lines.
+
+- `app/ai/systems.py`: eight modules (RAS 03+04, QAS 01+03, LAS 01+02, DAS 01 and 02, EGS 01, EHS 02 and 01), each
+  with its suite files, a trimmed output contract, its value lists, and the rules the app reads mechanically
+  (rejections) or shows the person (flags). `reasoning.py` takes them through the same pipeline as TAS.
+- `app/ai/interop.py`: a run may start from an accepted answer (`handoff_from`); it reads that run's packet, gets
+  what INTEROP lets cross, and every held-back value is a BLOCK · HELD event with its rule. Rejected claims never
+  cross; corrected ones cross in the person's words.
+- DAS `upstream_tier` is written by the Workbench from the source's person-set tier ([IN-010]).
+- "Before you run" covers suite modules, shows the hand-over step and marks the systems a next run would use.
+- `docs/authority-suite/SUITE_SYSTEMS_IN_APP.md`: what runs, what does not and why, and ten suite problems for Ony.
+
+Tests: `test_suite_systems.py` (12, new), drift tests (2 new), and the AI, plan, claim-review, guard and migration
+tests pass; mypy and ruff clean. Frontend: client regenerated, tsc clean, vitest 1307 passed. No screen for
+starting a suite run: mockup first.
+
+## 2026-10-19 (cont.): the suite at its newest version, behind one service
+
+Ony: use the most recent version of the suite, and have one service handle all of it and route everything.
+
+- Vendored copy b1c71e8 → d2b2186 (the suite's `main`, 51 commits; 21 files in `systems/`, root documents
+  unchanged). The old copy was first checked byte for byte against b1c71e8. Upstream changes the app sends as
+  prompts: TAS 08 rules 8, 9 and new 11; QAS 01; DAS 01; EHS 01. `SUITE_GAPS.md` regenerated (it names the commit).
+  New suite conflict for Ony: TAS 08 rule 8 now says one source is never corroboration, Standard §4.3 still lets
+  one Tier A source carry it (SUITE_SYSTEMS_IN_APP.md item 11).
+- `app/ai/suite.py`: the one front door. Every module's route (system, trigger-table row, files), each system's
+  version, and `next_runs` (an answer routed onward by what it contains). reasoning.py's MODULE_FILES, titles,
+  nodes and run-record ROUTE/LOAD steps, the plan, and the settings status all read from it; the two code paths
+  for routing a TAS run and a suite run are now one.
+- `POST .../assistant/run` runs any module; the per-module endpoints are that route with the module fixed.
+  Candidates carry `next_runs`; settings status carries `authority_suite.systems`.
+
+Tests: `test_suite_service.py` (5, new: routes against AGENTS.md's table, the pipeline reading from the service,
+status, the one endpoint and its refusals, next runs) plus the suite, AI, guard and migration tests pass; mypy and
+ruff clean; vitest 1307 passed, tsc clean.
+
+## 2026-10-19 (cont.): the run map draws every system's run; the stopped and rejected states read right
+
+Ony sent two screenshots of Watch the run (a stopped case synthesis; a candidate with a green check beside "Your
+review: rejected") and asked that every system be hooked up properly and that this screen work. Reproduced locally
+with a stand-in model (all eight suite modules plus TAS, both chains, a stopped run, a rejected run), screenshotted
+each, fixed, screenshotted again.
+
+Backend: a run the checks stopped saved its answer as rejected but its job has no result, so the run summary said
+"none saved"; it now finds the answer through the run record's "Saved as" step. The summary's review status is the
+answer's as it stands now (it was frozen at run time). Each run carries its route from the suite service (system,
+row, node, module count, final audit). A DAS evidence row citing no source now says why it has no upstream tier.
+
+Run map: columns and the Support pills light from the run's route ("not in this run" replaces "not triggered · not
+in the app yet"); EGS and EHS are real nodes; a system's module chip, gate and thoughts sit on its own node, with the
+wires to it; a hand-over lights the Boundaries band ("Hand-over · n held") instead of a Controls badge; the router
+reads "of 7"; "+ n modules" comes from the system's real count (TAS has 13); the final-audit ledger names the run's
+system's audit; lanes appear for the systems a run used. The candidate's mark follows its review (✕ once rejected),
+and Your review says "you rejected it" or, dimmed, "stopped by the checks". A stopped run shows its real reason, not
+"Stopped with an error".
+
+Tests: test_suite_service.py (6), watch-the-run (23, 2 new); vitest 1309 passed, tsc and eslint clean; backend
+touched tests, mypy, ruff and the OpenAPI check pass. Not changed: the map's small size and overlapping axis labels
+at phone width, which were there before.
+
+### 2026-10-19 — Screen audit: every page checked against its mockup (PR #87)
+
+Six screen audits (Home and Decide, Bring in, Check, See, Act, AI and Learn) compared each page with its mockup for
+layout, hover, focus, keyboard, entrance and persistent motion (Calm and reduced motion), and data. Fixed in this
+round:
+- Case home: AI questions name the suite system ("Accept the RAS answer…"); evidence questions name the document and
+  page; "Not sure?" opens the run claim by claim (/act?run=…&review=…). The No key opens the reasons first, as a
+  click does; the answer buttons hold one row; the undo hold is 10 s.
+- Chain of Custody: a proposal from an outside service is counted under "outside services", not as the app's.
+- Frame: the shortcuts sheet lists every key the screens use (G then H, 1–4, J/K, Enter, S/D/U, 1/2/3, Z); G then H
+  goes to Case home; the frame hints fade after 6 s; Settings sits in the breadcrumb.
+- Appearance: Full effects run as Light on battery until the computer charges (said under Full).
+- Stage pages: the header is one row ("step n of 5", name, line, tabs), so Money fits 1440×900.
+- Plus the per-screen fixes the audits made in the Drop, Reading room, Wire, Money, Red Flags, Story, Leads, Before
+  you run, Watch the run, claim review, Learn and glossary (drop.py, financial_flows.py, patterns engine,
+  investigation_type.py, stories.py and routes_ai_runs.py on the backend).
+
+Tests: vitest 1341 passed (200 files), tsc and eslint clean; backend touched tests, mypy and the OpenAPI check pass.
+
+### 2026-10-19 — Decided audit items built (PR #87)
+
+Case home: continuous year rail (empty years as dimmed ticks; the strip's year count is the span); mini network
+"n linked · m in the case". Claims list: mark + word on every status, edge by shape. Bring in: sample-case link
+only when the sample has documents; reading room counts only what it shows, "n whole-passage quotes wait in
+Decide"; "Emails & phones"; identifier cards say Email address or Phone number from the value. AI: the drafts panel
+hands runs to Before you run; the lookups line says runs make no outside lookups yet; run plan
+`packet.below_tier_floor` (records below the floor, per tier, "leads only"). Settings breadcrumb names the case.
+Not built (new design or no data): standing-number popovers, empty-case first actions, Format Editorial/Desk/Story,
+Wire arrangement switch, worked-out links, source scan, Practise, sort by unlocks / H snooze, Safety & data screen.
+Presentation draft still runs straight from the drafts panel (the plan endpoint does not cover it).
+Tests: vitest 1353 passed; tsc, eslint, mypy, ruff, OpenAPI check clean; touched backend tests pass.
+
+### 2026-10-19 — The rest of the unbuilt features (PR #87)
+
+Built, each from its mockup or, where none draws it, from the research text (agents quoted the lines):
+- AI: Presentation draft goes through Before you run ("Draft a brief" with the record picker; plan endpoint plans it);
+  Run again / Instructions & plan keep a draft a draft (`record_refs` on the run summary).
+- Case home: standing-number popovers (point previews, click pins, Esc closes); an empty case shows four first
+  actions; Formats Editorial / Desk / Story beside Board (`formats.tsx`, `formats.css`; theme suggests, never sets);
+  year rail shows "n flags"; "to decide" leaves out what is put off.
+- Decide: "by what it unlocks" (dry run, nothing written: `decision_unlocks.py`); H puts a card off until it changes
+  (`decision_snoozes` table, Z undoes, "n snoozed" restores).
+- The Wire: arrangement switch with "Chosen because…", dotted ƒ worked-out links (indirect ownership), lettered stubs,
+  link drawer with the source scan and "How is X linked to Y?"; "Add to To check" makes a To check item of kind link.
+- Learn: Practise (`learning_cards`, fixed ladder, decks, ＋ Flip card).
+- Safety & data at /keep/safety: stores, services with modes enforced at every outbound call, the outbound log word
+  for word, Backup / Who can reach it / Housekeeping / Delete cards, Your safety.
+- Backups protected with a passphrase by default (ADR-0015, `cryptography`, AES-256-GCM + scrypt); Housekeeping
+  Keep / Add back / Delete per stray file, every path re-checked on the server.
+Migrations, in order: b7e3d5a9c142 learning cards → d3a7c9e15b48 decision snoozes → c4f8a2d6e913 safety and
+outbound log → f3b9d2a7c615 backup protection and kept stray files.
+Decided (Ony delegated): Ask first as the default service mode; outbound log and modes in backups, safety answers
+not; flip cards not in case backups; snooze per case with "until tomorrow" / "for a week".
+Tests: vitest 1396 passed (204 files); tsc and eslint clean; backend tests for every changed area, test_migrations,
+test_models_split, mypy, ruff and the OpenAPI check pass. Checked live on the restarted API: Case home, Safety & data,
+The Wire, Decide, Practise, To check, Before you run (no HTTP or console errors).
+Not built: GET /export and the operator console still write unprotected backups (ADR-0015 says so); staged backup
+progress and "Test this backup"; Housekeeping thumbnails; popover links open screens unfiltered (they take no filter).

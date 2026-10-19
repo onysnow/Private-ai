@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.connectors.registry import registry
+from app.core.config import settings
 from app.core.time import utcnow_naive
 from app.jobs.corpus import request_corpus_sync
 from app.models.domain import (
@@ -13,6 +14,7 @@ from app.models.domain import (
     RelationshipEdge, Source, Statement, StatementPromotion,
 )
 from app.schemas.api import EntityCreate, EntityUpdate, PropertyConflictDecisionRequest
+from app.services import outbound
 from app.services.connectors import persist_connector_findings
 from app.services.consolidation import get_enrichment_session_detail
 from app.services.ftm import make_ftm_entity
@@ -172,6 +174,19 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
         db.commit()
         db.refresh(session_run)
         connector = registry.get(provider)
+        # The case's mode for this service, then the outbound log, before anything is sent (app/services/outbound.py).
+        try:
+            outbound.require_allowed(db, entity.investigation_id, provider, settings)
+        except outbound.ServiceRefused as exc:
+            failures += 1
+            session_run.status = "failed"; session_run.error = str(exc); session_run.finished_at = utcnow_naive()
+            db.commit()
+            continue
+        if outbound.connector_will_send(connector):
+            value, value_kind = outbound.enrichment_value(connector, {
+                "id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption, "properties": entity.properties or {}})
+            outbound.record(db, entity.investigation_id, provider, kind="lookup", value=value, value_kind=value_kind,
+                            reason=f"enrich {entity.caption}")
         run = ConnectorRun(
             investigation_id=entity.investigation_id, provider=provider, query=f"entity:{entity.ftm_id or entity.id}",
         )

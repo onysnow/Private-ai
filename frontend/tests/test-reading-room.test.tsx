@@ -5,7 +5,7 @@ import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {ReadingRoom, acceptImpact, clipOf, proposalText, sameReason} from '../features/reading-room/reading-room';
+import {ReadingRoom, acceptImpact, clipOf, kindWord, proposalText, sameReason} from '../features/reading-room/reading-room';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -57,6 +57,13 @@ describe('reading room helpers', () => {
     expect(proposalText(name as unknown as ExtractionCandidateOut)).toBe('Fernhill Ltd');
   });
 
+  it('names an identifier by its value: email or phone number', () => {
+    const id = (value: string) => ({...name, candidate_type: 'identifier', payload: {value}}) as unknown as ExtractionCandidateOut;
+    expect(kindWord(id('ana@harbour.example'))).toBe('Email address');
+    expect(kindWord(id('+44 20 7946 0000'))).toBe('Phone number');
+    expect(kindWord(name as unknown as ExtractionCandidateOut)).toBe('Name');
+  });
+
   it('says why a record may be the same, and what accepting adds', () => {
     expect(sameReason('Harbour Nominees Ltd', 'Harbour Nominees Limited', 'the same name')).toBe('Same name: “Ltd” and “Limited” read as one');
     expect(sameReason('Kestrel SA', 'Kestrel SA', 'the same name')).toBe('Same name, word for word');
@@ -95,6 +102,25 @@ describe('ReadingRoom', () => {
     expect(api.lastBody('POST /api/extraction-candidates/x1/review')).toEqual({decision: 'accept', entity_schema: 'Company'});
   });
 
+  it('counts only what the margin shows, and points whole-passage quotes to Decide', async () => {
+    const quote = (id: string, status: string) => ({...name, id, candidate_type: 'evidence', review_status: status,
+      payload: {quote: TEXT, rationale: {rule: 'sentence_assertion'}}});
+    routes({'GET /api/documents/d1/candidates': [name, quote('q1', 'proposed'), quote('q2', 'proposed'), quote('q3', 'accepted')]});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    await within(room).findByRole('article', {name: 'Name: Fernhill Ltd'});
+    expect(room.querySelector('.rr-foot')).toHaveTextContent('0 accepted · 0 rejected · 1 waiting');
+    expect(within(room).getByRole('link', {name: '2 whole-passage quotes wait in Decide'})).toHaveAttribute('href', '/decide?kind=proposal&inv=inv-1');
+  });
+
+  it('leaves out the pointer to Decide when no whole-passage quote waits', async () => {
+    routes();
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    await within(room).findByRole('article', {name: 'Name: Fernhill Ltd'});
+    expect(within(room).queryByRole('link', {name: /whole-passage/})).not.toBeInTheDocument();
+  });
+
   it('waits for the answer to its question before a name can be accepted', async () => {
     const unsure = {...name, confidence: 0.4, payload: {...name.payload, schema_choices: ['Person', 'Organization', 'Company']}};
     const api = routes({'GET /api/documents/d1/candidates': [unsure], 'POST /api/extraction-candidates/x1/review': {candidate: {...unsure, review_status: 'accepted'}, record: null}});
@@ -127,11 +153,40 @@ describe('ReadingRoom', () => {
     fireEvent.mouseUp(passage);
     expect(await screen.findByRole('toolbar', {name: 'Keep the selected words'})).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'e'});
-    const clip = await screen.findByRole('region', {name: 'Evidence clip'});
+    // Held 6 s with Undo, like a decision (mockup INTAKE_2: "saved just now · Undo"); U takes it back.
+    let clip = await screen.findByRole('region', {name: 'Evidence clip'});
+    expect(within(clip).getByText('saved in a moment')).toBeInTheDocument();
     expect(within(clip).getByText('bought on behalf', {selector: 'mark'})).toBeInTheDocument();
     expect(within(clip).getByText(/the words are in the stored text/)).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'u'});
+    expect(screen.queryByRole('region', {name: 'Evidence clip'})).toBeNull();
+    expect(api.calls('POST /api/evidence')).toHaveLength(0);
+    // Kept again, it is saved after its moment (here: on closing the room).
+    window.getSelection()!.removeAllRanges();
+    window.getSelection()!.addRange(range);
+    fireEvent.mouseUp(passage);
+    fireEvent.keyDown(window, {key: 'e'});
+    clip = await screen.findByRole('region', {name: 'Evidence clip'});
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(api.calls('POST /api/evidence')).toHaveLength(1));
     // document_id is for pictures only: the backend answers 400 to it on a text document.
     expect(api.lastBody('POST /api/evidence')).toEqual({source_id: 'src-1', quote: 'bought on behalf', locator: 'page 4'});
+  });
+
+  it('lights a card and its words together, says what a name would be, and reads its status in words', async () => {
+    routes();
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const card = await screen.findByRole('article', {name: 'Name: Fernhill Ltd'});
+    expect(card).toHaveTextContent('Fernhill Ltd · Company');
+    const words = await screen.findByText('Fernhill Ltd', {selector: '.rr-span'});
+    fireEvent.mouseEnter(card);
+    expect(words).toHaveClass('lit');
+    fireEvent.mouseLeave(card);
+    expect(words).not.toHaveClass('lit');
+    fireEvent.mouseEnter(words);
+    expect(card).toHaveClass('lit');
+    await userEvent.setup().click(screen.getByRole('tab', {name: 'Details'}));
+    expect(screen.getByText('Read', {selector: 'dd'})).toBeInTheDocument();
   });
 
   it('shows what accepting changes on the Accept button', async () => {
@@ -186,8 +241,12 @@ describe('ReadingRoom', () => {
     fireEvent.keyDown(window, {key: '1'});
     const offer = await within(card).findByRole('group', {name: 'Same answer for the others'});
     await userEvent.setup().click(within(offer).getByRole('button', {name: 'Apply to these 2'}));
+    // Said in the card where the offer was, so it is seen.
+    expect(within(card).getByRole('status')).toHaveTextContent('2 more mentions go to Fernhill Limited in a moment.');
     fireEvent.keyDown(window, {key: 'u'});
     expect(await screen.findByText('Undone: the 2 other mentions still wait.')).toBeInTheDocument();
+    // The offer comes back, to be made again.
+    expect(within(card).getByRole('group', {name: 'Same answer for the others'})).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'Escape'});
     expect(api.calls('POST /api/extraction-candidates/y1/review')).toHaveLength(0);
   });

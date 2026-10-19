@@ -16,10 +16,16 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.ai.run_events import RunRecorder, run_events, serialize_event
+from app.ai.suite import run_route
 from app.api.dependencies import authorize_request_resource
 from app.db.session import SessionLocal, get_db
 from app.jobs.handlers import AI_REASONING
-from app.models.domain import AIRunEvent, BackgroundJob, Investigation
+from app.models.domain import (
+    AIAnalysisCandidate,
+    AIRunEvent,
+    BackgroundJob,
+    Investigation,
+)
 from app.schemas.api import AiThoughtMarkRequest
 from app.schemas.responses import AiRunEventOut, AiRunEventsOut, AiRunsOut
 
@@ -33,18 +39,47 @@ def _run_row(db: Session, investigation_id: str, run_id: str) -> BackgroundJob:
     return job
 
 
+def _saved_candidate(db: Session, job: BackgroundJob) -> AIAnalysisCandidate | None:
+    """The answer this run saved. A run the app's checks rejected still saves its answer (as rejected) but ends as a
+    failed job with no result, so the run record's own "Saved as" step is read when the result names none."""
+    result = (job.payload or {}).get("result") or {}
+    candidate_id = result.get("candidate_id")
+    if not candidate_id:
+        for refs in db.scalars(select(AIRunEvent.refs).where(AIRunEvent.run_id == job.id, AIRunEvent.kind == "WRITE",
+                                                             AIRunEvent.node == "candidate")).all():
+            candidate_id = next((r.get("record_id") for r in refs or [] if r.get("record_type") == "ai_analysis_candidate"), None)
+            if candidate_id:
+                break
+    candidate = db.get(AIAnalysisCandidate, candidate_id) if candidate_id else None
+    return candidate if candidate is not None and candidate.investigation_id == job.investigation_id else None
+
+
 def serialize_run(db: Session, job: BackgroundJob) -> dict[str, Any]:
     payload = job.payload or {}
-    result = payload.get("result") or {}
-    counts: dict[str, int] = {str(status): int(n) for status, n in db.execute(
-        select(AIRunEvent.status, func.count()).where(AIRunEvent.run_id == job.id).group_by(AIRunEvent.status)).all()}
+    candidate = _saved_candidate(db, job)
+    counts: dict[str, int] = {}
+    # A problem is a stopped step, or an in-between one the app found; what the model says of itself ("model says",
+    # in between) is not one until a check confirms it. Watch the run counts the same way (isProblem).
+    problems = 0
+    for status, self_reported, n in db.execute(
+            select(AIRunEvent.status, AIRunEvent.self_reported, func.count()).where(AIRunEvent.run_id == job.id)
+            .group_by(AIRunEvent.status, AIRunEvent.self_reported)).all():
+        counts[str(status)] = counts.get(str(status), 0) + int(n)
+        if status == "bad" or (status == "partial" and not self_reported):
+            problems += int(n)
     return {
         "run_id": job.id, "status": job.status, "finished": job.status in ("succeeded", "failed", "cancelled"),
         "module": payload.get("module") or "", "question": payload.get("question") or "", "working_theory": payload.get("working_theory"),
         "created_at": job.created_at, "started_at": job.started_at, "finished_at": job.finished_at,
-        "candidate_id": result.get("candidate_id"), "review_status": result.get("review_status"),
-        "events": sum(counts.values()), "problems": int(counts.get("bad", 0)) + int(counts.get("partial", 0)),
+        # The answer as it stands now: its review status changes after the run, when you accept or reject it.
+        "candidate_id": candidate.id if candidate else None, "review_status": candidate.review_status if candidate else None,
+        "events": sum(counts.values()), "problems": problems,
         "message": job.message, "error": job.error,
+        # How the suite service routed it (app/ai/suite.py), and the accepted answer it started from, if any.
+        "route": run_route(payload.get("module") or ""), "handoff_from": payload.get("handoff_from"),
+        # The records a presentation draft was asked to draft from, so Run again can plan it with the same ones.
+        "record_refs": [{"record_type": str(r.get("record_type")), "record_id": str(r.get("record_id"))}
+                        for r in payload.get("record_refs") or [] if isinstance(r, dict)],
     }
 
 

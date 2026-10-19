@@ -18,6 +18,7 @@ export const PLAN = {
    }
   ],
   "leads_only": 1,
+  "below_tier_floor": [],
   "first": []
  },
  "steps": [
@@ -340,3 +341,24 @@ export const PLAN = {
   "suppress_flags"
  ]
 } as const;
+
+// A presentation draft's plan (run_plan.py _draft_steps): the records picked, the fixed checks, and no settings.
+export const DRAFT_PLAN = {
+  ...PLAN,
+  module: 'presentation_draft', module_label: 'Draft a brief', system: 'app', question: 'Brief my editor on the harbour land sale.',
+  packet: {records: 1, by_type: [{record_type: 'claim', count: 1}], leads_only: 0, below_tier_floor: [],
+    first: [{record_type: 'claim', record_id: 'claim-1', title: 'Meridian paid Bellcastle $2.4M'}]},
+  steps: [
+    {key: 'packet', n: 1, who: 'APP', title: 'Build the packet from the records you picked', changed: false, system: null,
+      detail: 'Only the 1 record you picked: no search, and no outside leads. The full text of 1 of them goes in to quote from, and the chart menu: 2 of 9 chart queries have data in this case.'},
+    {key: 'model', n: 2, who: 'MODEL', title: 'Draft a brief', changed: false, system: 'app',
+      detail: 'Workbench draft, an app module outside the suite. Writes the brief from the 1 record in the packet only.'},
+    {key: 'checks', n: 3, who: 'APP', title: 'Enforced checks', changed: false, system: null,
+      detail: 'Shape · every citation in the packet · every quote word for word · every chart drawn from the records · the writing read'},
+    {key: 'review', n: 4, who: 'YOU', title: 'You decide', changed: false, system: null,
+      detail: 'The draft lands as a proposal. Nothing joins the case until you accept it; accepted, it can become a write-up or a deck.'},
+  ],
+  systems: PLAN.systems.map(s => ({...s, state: 'not_expected'})),
+  injections: [],
+  settings: [], resolved: {}, premises: [], changed_from_case_default: [],
+};

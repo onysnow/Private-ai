@@ -11,7 +11,7 @@ Part of the STRUCT-0024 split; see app/models/base.py.
 
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.time import utcnow_naive
@@ -75,3 +75,22 @@ class CheckItem(Base):
     record_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     blocks: Mapped[str | None] = mapped_column(Text, nullable=True)
     lead_id: Mapped[str | None] = mapped_column(ForeignKey("leads.id"), nullable=True)
+
+
+class DecisionSnooze(Base):
+    """A decision put off with H on Decide (Workbench-redesign-2026.pdf, Check §3.1 keyboard: "H later (snooze,
+    wakes on new activity — Linear)"). It leaves the queue until ``until`` passes, or, with ``wake_on_activity``,
+    until the item changes: ``digest`` is the item as it read when it was put off (app/services/decision_snoozes.py).
+    One per item; putting it off again replaces it."""
+
+    __tablename__ = "decision_snoozes"
+    __table_args__ = (UniqueConstraint("investigation_id", "kind", "item_id", name="uq_decision_snooze_item"),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(16))  # to_check | missing | proposal | match | outside | ai | watchlist
+    item_id: Mapped[str] = mapped_column(String)
+    until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    wake_on_activity: Mapped[bool] = mapped_column(Boolean, default=True)
+    digest: Mapped[str] = mapped_column(String(64))
+    question: Mapped[str] = mapped_column(Text)  # what it asked, for the snoozed list
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

@@ -169,6 +169,10 @@ export type AiAnalysisCandidateOut = {
    */
   module: string;
   /**
+   * Next Runs
+   */
+  next_runs?: Array<AiNextRunOut>;
+  /**
    * Payload
    */
   payload: {
@@ -333,6 +337,10 @@ export type AiAuthoritySuiteOut = {
    */
   source: string | null;
   /**
+   * Systems
+   */
+  systems?: Array<AiSuiteSystemOut>;
+  /**
    * Tas Version
    */
   tas_version: string | null;
@@ -423,6 +431,20 @@ export type AiControlSurfaceOut = {
 };
 
 /**
+ * AiFinalAuditOut
+ */
+export type AiFinalAuditOut = {
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Node
+   */
+  node: string;
+};
+
+/**
  * AiLimitsOut
  */
 export type AiLimitsOut = {
@@ -467,9 +489,41 @@ export type AiModuleStatusOut = {
    */
   spec_file: string;
   /**
+   * System
+   */
+  system?: string | null;
+  /**
    * Vendored Tas
    */
   vendored_tas: boolean;
+};
+
+/**
+ * AiNextRunOut
+ *
+ * A next run the suite service routes an answer to, by what the answer contains.
+ */
+export type AiNextRunOut = {
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Row
+   */
+  row: number | null;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Why
+   */
+  why: string;
 };
 
 /**
@@ -701,6 +755,10 @@ export type AiRunOut = {
    */
   finished_at: string | null;
   /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
    * Message
    */
   message: string | null;
@@ -717,9 +775,14 @@ export type AiRunOut = {
    */
   question: string;
   /**
+   * Record Refs
+   */
+  record_refs?: Array<RecordRefOut>;
+  /**
    * Review Status
    */
   review_status: string | null;
+  route: AiRunRouteOut;
   /**
    * Run Id
    */
@@ -753,6 +816,36 @@ export type AiRunRefOut = {
 };
 
 /**
+ * AiRunRouteOut
+ *
+ * How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+ * not know (a run recorded under a name since removed); "app" for the app-local draft.
+ */
+export type AiRunRouteOut = {
+  final_audit: AiFinalAuditOut | null;
+  /**
+   * Modules In System
+   */
+  modules_in_system: number;
+  /**
+   * Node
+   */
+  node: string | null;
+  /**
+   * Row
+   */
+  row: number | null;
+  /**
+   * System
+   */
+  system: string | null;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * AiRunsOut
  */
 export type AiRunsOut = {
@@ -760,6 +853,74 @@ export type AiRunsOut = {
    * Runs
    */
   runs: Array<AiRunOut>;
+};
+
+/**
+ * AiSuiteModuleOut
+ */
+export type AiSuiteModuleOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Node
+   */
+  node: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * AiSuiteSystemOut
+ *
+ * One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+ * CHANGELOG numbers them, `latest_change` its newest entry.
+ */
+export type AiSuiteSystemOut = {
+  final_audit: AiFinalAuditOut | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Latest Change
+   */
+  latest_change: string | null;
+  /**
+   * Module Count
+   */
+  module_count: number;
+  /**
+   * Modules
+   */
+  modules: Array<AiSuiteModuleOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Present
+   */
+  present: boolean;
+  /**
+   * Row
+   */
+  row: number;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Version
+   */
+  version: string | null;
 };
 
 /**
@@ -1015,6 +1176,80 @@ export type AppUserUpdatedOut = {
 };
 
 /**
+ * AssistantRunRequest
+ *
+ * Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+ * test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+ * uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+ * (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+ * check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+ * then holds the goal).
+ */
+export type AssistantRunRequest = {
+  /**
+   * Changes
+   */
+  changes?: Array<RunChangeIn> | null;
+  /**
+   * Context
+   */
+  context?: string | null;
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module:
+    | 'case_synthesis'
+    | 'hypothesis_test'
+    | 'presentation_draft'
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
+  options?: RunOptionsIn | null;
+  packet_from?: PacketFromIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Record Refs
+   */
+  record_refs?: Array<RecordRef> | null;
+  /**
+   * Severity Floor
+   */
+  severity_floor?: 'ALL' | 'MATERIAL' | 'BLOCKING' | null;
+  /**
+   * Source Tier Floor
+   */
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
+};
+
+/**
  * BackgroundJobOut
  *
  * One piece of slow work and where it stands; the screen polls this.
@@ -1206,6 +1441,32 @@ export type BackupRestoreResultOut = {
 };
 
 /**
+ * BackupsStoreOut
+ */
+export type BackupsStoreOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Encrypted
+   */
+  encrypted: boolean;
+  /**
+   * Last At
+   */
+  last_at: string | null;
+  /**
+   * Last Sha256
+   */
+  last_sha256: string | null;
+  /**
+   * Last Size Bytes
+   */
+  last_size_bytes: number | null;
+};
+
+/**
  * BarItemOut
  */
 export type BarItemOut = {
@@ -1299,6 +1560,12 @@ export type BodyInspectBackup = {
    * File
    */
   file: Blob | File;
+  /**
+   * Passphrase
+   *
+   * The passphrase a protected backup was made with; leave out for an unprotected one
+   */
+  passphrase?: string | null;
 };
 
 /**
@@ -1309,6 +1576,12 @@ export type BodyPreviewBackupRestore = {
    * File
    */
   file: Blob | File;
+  /**
+   * Passphrase
+   *
+   * The passphrase a protected backup was made with; leave out for an unprotected one
+   */
+  passphrase?: string | null;
 };
 
 /**
@@ -1319,6 +1592,12 @@ export type BodyRestoreBackup = {
    * File
    */
   file: Blob | File;
+  /**
+   * Passphrase
+   *
+   * The passphrase a protected backup was made with; leave out for an unprotected one
+   */
+  passphrase?: string | null;
 };
 
 /**
@@ -1740,6 +2019,8 @@ export type CaseClaimCountsOut = {
  * CaseDecisionsOut
  *
  * One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind.
+ * ``snoozed`` counts the ones put off and still asleep, left out of ``items``, ``total`` and ``counts`` (asked with
+ * ``snoozed=true``, ``items`` holds only them).
  */
 export type CaseDecisionsOut = {
   /**
@@ -1760,6 +2041,10 @@ export type CaseDecisionsOut = {
    * Offset
    */
   offset: number;
+  /**
+   * Snoozed
+   */
+  snoozed?: number;
   /**
    * Total
    */
@@ -5437,6 +5722,32 @@ export type DecisionEvidenceOut = {
 };
 
 /**
+ * DecisionFlagChangeOut
+ */
+export type DecisionFlagChangeOut = {
+  /**
+   * From Level
+   */
+  from_level?: 'faint' | 'strong' | 'textbook' | null;
+  /**
+   * Indicator Id
+   */
+  indicator_id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * To Level
+   */
+  to_level: 'faint' | 'strong' | 'textbook';
+};
+
+/**
  * DecisionGroupOut
  */
 export type DecisionGroupOut = {
@@ -5538,6 +5849,8 @@ export type DecisionItemOut = {
    * Reason
    */
   reason: string;
+  snooze?: DecisionSnoozeStateOut | null;
+  unlocks?: DecisionUnlocksOut | null;
 };
 
 /**
@@ -5588,6 +5901,208 @@ export type DecisionRowOut = {
    * Number
    */
   number: number;
+};
+
+/**
+ * DecisionSnoozeCreate
+ *
+ * Puts one decision off: until a time, until the item changes (the default), or whichever comes first.
+ */
+export type DecisionSnoozeCreate = {
+  /**
+   * Item Id
+   */
+  item_id: string;
+  /**
+   * Kind
+   */
+  kind:
+    | 'to_check'
+    | 'missing'
+    | 'proposal'
+    | 'match'
+    | 'outside'
+    | 'ai'
+    | 'watchlist';
+  /**
+   * Until
+   *
+   * When it comes back; none: only when the item changes.
+   */
+  until?: string | null;
+  /**
+   * Wake On Activity
+   *
+   * Comes back as soon as the item changes (new activity on it).
+   */
+  wake_on_activity?: boolean;
+};
+
+/**
+ * DecisionSnoozeOut
+ */
+export type DecisionSnoozeOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Item Id
+   */
+  item_id: string;
+  /**
+   * Kind
+   */
+  kind:
+    | 'to_check'
+    | 'missing'
+    | 'proposal'
+    | 'match'
+    | 'outside'
+    | 'ai'
+    | 'watchlist';
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Snoozed At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  snoozed_at: string;
+  /**
+   * Until
+   */
+  until?: string | null;
+  /**
+   * Wake On Activity
+   */
+  wake_on_activity: boolean;
+};
+
+/**
+ * DecisionSnoozeStateOut
+ *
+ * A decision put off (H). ``asleep``: out of the queue; ``woke``: back, with why.
+ */
+export type DecisionSnoozeStateOut = {
+  /**
+   * Snoozed At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  snoozed_at: string;
+  /**
+   * State
+   */
+  state: 'asleep' | 'woke';
+  /**
+   * Until
+   */
+  until?: string | null;
+  /**
+   * Wake On Activity
+   */
+  wake_on_activity: boolean;
+  /**
+   * Why
+   */
+  why?: string | null;
+};
+
+/**
+ * DecisionUnlocksOut
+ *
+ * What answering Yes would change, dry-run on the records (app/services/decision_unlocks.py): claims that would
+ * meet every Done rule for Supported, Red Flags that would rise, links that would complete a chain. ``counted`` is
+ * false when the request ran out of dry runs before this one.
+ */
+export type DecisionUnlocksOut = {
+  /**
+   * Chains
+   */
+  chains: number;
+  /**
+   * Claims
+   */
+  claims: number;
+  /**
+   * Counted
+   */
+  counted: boolean;
+  /**
+   * Flag Changes
+   */
+  flag_changes: Array<DecisionFlagChangeOut>;
+  /**
+   * Flags
+   */
+  flags: number;
+  /**
+   * Lines
+   */
+  lines: Array<string>;
+  /**
+   * Score
+   */
+  score: number;
+  /**
+   * Words
+   */
+  words: string;
+};
+
+/**
+ * DecisionWake
+ *
+ * Brings a decision put off back into the queue now (the snoozed list's Restore, and Z).
+ */
+export type DecisionWake = {
+  /**
+   * Item Id
+   */
+  item_id: string;
+  /**
+   * Kind
+   */
+  kind:
+    | 'to_check'
+    | 'missing'
+    | 'proposal'
+    | 'match'
+    | 'outside'
+    | 'ai'
+    | 'watchlist';
+};
+
+/**
+ * DecisionWakeOut
+ */
+export type DecisionWakeOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Item Id
+   */
+  item_id: string;
+  /**
+   * Kind
+   */
+  kind:
+    | 'to_check'
+    | 'missing'
+    | 'proposal'
+    | 'match'
+    | 'outside'
+    | 'ai'
+    | 'watchlist';
+  /**
+   * Woke
+   */
+  woke: boolean;
 };
 
 /**
@@ -6527,6 +7042,24 @@ export type DocumentUploadOut = {
    * Title
    */
   title?: string | null;
+};
+
+/**
+ * DocumentsStoreOut
+ */
+export type DocumentsStoreOut = {
+  /**
+   * Files
+   */
+  files: number;
+  /**
+   * Missing
+   */
+  missing: number;
+  /**
+   * Size Bytes
+   */
+  size_bytes: number;
 };
 
 /**
@@ -10375,6 +10908,20 @@ export type InvestigationUpdate = {
 };
 
 /**
+ * KeysStoreOut
+ */
+export type KeysStoreOut = {
+  /**
+   * Set
+   */
+  set: number;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
  * LeadClaimConversionOut
  */
 export type LeadClaimConversionOut = {
@@ -10795,6 +11342,219 @@ export type LeadWorkflowEventOut = {
    * To Status
    */
   to_status: string;
+};
+
+/**
+ * LearningAnswer
+ *
+ * The reporter's answer to a flip card: Again / Good, or Hard / Easy when they are turned on.
+ */
+export type LearningAnswer = {
+  /**
+   * Answer
+   */
+  answer: 'again' | 'hard' | 'good' | 'easy';
+  /**
+   * Card Id
+   */
+  card_id: string;
+};
+
+/**
+ * LearningCardCreate
+ *
+ * ＋ Flip card: an indicator from the catalogue or a term from the glossary, kept for Practise.
+ */
+export type LearningCardCreate = {
+  /**
+   * Kind
+   */
+  kind: 'indicator' | 'term';
+  /**
+   * Ref
+   *
+   * The indicator's id (BO-007) or the term as the glossary spells it.
+   */
+  ref: string;
+};
+
+/**
+ * LearningCardListOut
+ *
+ * A deck's cards, due ones first; ``next_due_at`` is when the first card not yet due falls due.
+ */
+export type LearningCardListOut = {
+  /**
+   * Cards
+   */
+  cards: Array<LearningCardOut>;
+  /**
+   * Due
+   */
+  due: number;
+  /**
+   * Next Due At
+   */
+  next_due_at: string | null;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * LearningCardOut
+ *
+ * One flip card and where it stands on the ladder (app/services/learning.py).
+ */
+export type LearningCardOut = {
+  /**
+   * Added From
+   */
+  added_from: string;
+  /**
+   * Areas
+   */
+  areas: Array<string>;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Due
+   */
+  due: boolean;
+  /**
+   * Due At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  due_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Interval Days
+   */
+  interval_days: number;
+  /**
+   * Kind
+   */
+  kind: 'indicator' | 'term';
+  /**
+   * Lapses
+   */
+  lapses: number;
+  /**
+   * Last Answer
+   */
+  last_answer: 'again' | 'hard' | 'good' | 'easy' | null;
+  /**
+   * Last Reviewed At
+   */
+  last_reviewed_at: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  next_days: LearningNextDaysOut;
+  /**
+   * Ref
+   */
+  ref: string;
+  /**
+   * Reviews
+   */
+  reviews: number;
+  /**
+   * Step
+   */
+  step: number;
+};
+
+/**
+ * LearningDeckCountOut
+ */
+export type LearningDeckCountOut = {
+  /**
+   * Area
+   */
+  area: string | null;
+  /**
+   * Deck
+   */
+  deck: 'all' | 'case' | 'area' | 'terms' | 'safety';
+  /**
+   * Due
+   */
+  due: number;
+  /**
+   * Next Due At
+   */
+  next_due_at: string | null;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * LearningNextDaysOut
+ *
+ * In how many days the card comes back after each answer (0: in this sitting).
+ */
+export type LearningNextDaysOut = {
+  /**
+   * Again
+   */
+  again: number;
+  /**
+   * Easy
+   */
+  easy: number;
+  /**
+   * Good
+   */
+  good: number;
+  /**
+   * Hard
+   */
+  hard: number;
+};
+
+/**
+ * LearningSummaryOut
+ *
+ * What "Practise · n due" needs: due counts in all and per deck, and the ladder of days.
+ */
+export type LearningSummaryOut = {
+  /**
+   * Areas
+   */
+  areas: Array<LearningDeckCountOut>;
+  /**
+   * Decks
+   */
+  decks: Array<LearningDeckCountOut>;
+  /**
+   * Due
+   */
+  due: number;
+  /**
+   * Ladder Days
+   */
+  ladder_days: Array<number>;
+  /**
+   * Next Due At
+   */
+  next_due_at: string | null;
+  /**
+   * Total
+   */
+  total: number;
 };
 
 /**
@@ -12221,13 +12981,21 @@ export type OrphanFileOut = {
 /**
  * OrphanStoragePreviewOut
  *
- * Files under document storage no document refers to. Read-only: they are kept until a reporter decides.
+ * Files under document storage no document refers to. They are kept until the reporter decides, per file: Keep,
+ * Add back to a case, or Delete (POST /settings/storage/orphans/keep, …/delete,
+ * /investigations/{id}/storage/orphans/add-back).
  */
 export type OrphanStoragePreviewOut = {
   /**
    * Cleanup Available
    */
   cleanup_available: boolean;
+  /**
+   * Kept File Count
+   *
+   * Stray files the reporter chose to Keep; not listed again
+   */
+  kept_file_count: number;
   /**
    * Orphan Bytes
    */
@@ -12252,6 +13020,74 @@ export type OrphanStoragePreviewOut = {
    * Unsafe Document References
    */
   unsafe_document_references: Array<UnsafeDocumentReferenceOut>;
+};
+
+/**
+ * OutboundLogOut
+ */
+export type OutboundLogOut = {
+  /**
+   * Items
+   */
+  items: Array<OutboundRequestOut>;
+  /**
+   * Since
+   */
+  since: string | null;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * OutboundRequestOut
+ *
+ * One request that left this computer: when, to whom, the value word for word, and why.
+ */
+export type OutboundRequestOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Documents Sent
+   */
+  documents_sent: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Service
+   */
+  service: string;
+  /**
+   * Service Name
+   */
+  service_name: string;
+  /**
+   * Started By
+   */
+  started_by: string;
+  /**
+   * Value Kind
+   */
+  value_kind: string;
+  /**
+   * Value Sent
+   */
+  value_sent: string;
 };
 
 /**
@@ -12783,6 +13619,32 @@ export type PresentationStyleCatalogOut = {
 };
 
 /**
+ * PrivateAiStoreOut
+ */
+export type PrivateAiStoreOut = {
+  /**
+   * Enabled
+   */
+  enabled: boolean;
+  /**
+   * Model
+   */
+  model: string | null;
+  /**
+   * On This Computer
+   */
+  on_this_computer: boolean | null;
+  /**
+   * Outside Allowed
+   */
+  outside_allowed: boolean;
+  /**
+   * Provider
+   */
+  provider: string | null;
+};
+
+/**
  * PromoteToDeckRequest
  */
 export type PromoteToDeckRequest = {
@@ -13288,6 +14150,20 @@ export type RecordTagsOut = {
    * Rows
    */
   rows: Array<RecordTagRowOut>;
+};
+
+/**
+ * RecordsStoreOut
+ */
+export type RecordsStoreOut = {
+  /**
+   * Claims
+   */
+  claims: number;
+  /**
+   * Total
+   */
+  total: number;
 };
 
 /**
@@ -14412,6 +15288,10 @@ export type RunPlanOut = {
  */
 export type RunPlanPacketOut = {
   /**
+   * Below Tier Floor
+   */
+  below_tier_floor: Array<RunPlanTierCountOut>;
+  /**
    * By Type
    */
   by_type: Array<RunPlanTypeCountOut>;
@@ -14450,9 +15330,14 @@ export type RunPlanRecordOut = {
 /**
  * RunPlanRequest
  *
- * What a run would do, before it runs (mockup AI_2).
+ * What a run would do, before it runs (mockup AI_2). A presentation draft takes its goal in `question` and the
+ * records you picked in `record_refs`, and none of the TAS settings or premises.
  */
 export type RunPlanRequest = {
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
   /**
    * Include External Leads
    */
@@ -14464,7 +15349,18 @@ export type RunPlanRequest = {
   /**
    * Module
    */
-  module?: 'case_synthesis' | 'hypothesis_test';
+  module?:
+    | 'case_synthesis'
+    | 'hypothesis_test'
+    | 'presentation_draft'
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
   options?: RunOptionsIn | null;
   /**
    * Premises
@@ -14474,6 +15370,10 @@ export type RunPlanRequest = {
    * Question
    */
   question: string;
+  /**
+   * Record Refs
+   */
+  record_refs?: Array<RecordRef> | null;
   /**
    * Severity Floor
    */
@@ -14538,6 +15438,20 @@ export type RunPlanSystemOut = {
    * Why
    */
   why: string;
+};
+
+/**
+ * RunPlanTierCountOut
+ */
+export type RunPlanTierCountOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Tier
+   */
+  tier: string;
 };
 
 /**
@@ -14724,6 +15638,222 @@ export type RunSettingValueOut = {
    * Value
    */
   value: string;
+};
+
+/**
+ * SafetyAccessOut
+ */
+export type SafetyAccessOut = {
+  /**
+   * Mode
+   */
+  mode: string;
+  /**
+   * Needs Attention
+   */
+  needs_attention: boolean;
+  /**
+   * Refused 24H
+   */
+  refused_24h: number | null;
+  /**
+   * Remote Api Enabled
+   */
+  remote_api_enabled: boolean;
+  /**
+   * Restore Api Enabled
+   */
+  restore_api_enabled: boolean;
+};
+
+/**
+ * SafetyAnswerIn
+ *
+ * The reporter's answer to an "Only you can say" question; null takes it back.
+ */
+export type SafetyAnswerIn = {
+  /**
+   * Answer
+   */
+  answer?: 'YES' | 'NO' | 'NOT_SURE' | null;
+  /**
+   * Question
+   */
+  question: 'threats' | 'doxxing';
+};
+
+/**
+ * SafetyBackupIn
+ *
+ * Back up now. A passphrase protects the backup (ADR-0015); null saves it without one, which the reporter
+ * chooses on purpose. The passphrase is used to seal the file and dropped: never stored, logged or sent back.
+ */
+export type SafetyBackupIn = {
+  /**
+   * Passphrase
+   */
+  passphrase?: string | null;
+};
+
+/**
+ * SafetyDeleteOut
+ */
+export type SafetyDeleteOut = {
+  /**
+   * Can Delete
+   */
+  can_delete: boolean;
+  /**
+   * Files To Delete
+   */
+  files_to_delete: number;
+  /**
+   * Record Total
+   */
+  record_total: number;
+  /**
+   * Shared Files Kept
+   */
+  shared_files_kept: number;
+};
+
+/**
+ * SafetyQuestionOut
+ */
+export type SafetyQuestionOut = {
+  /**
+   * Answer
+   */
+  answer: 'YES' | 'NO' | 'NOT_SURE' | null;
+  /**
+   * Answered At
+   */
+  answered_at: string | null;
+  /**
+   * Id
+   */
+  id: 'threats' | 'doxxing';
+  /**
+   * Indicators
+   */
+  indicators: Array<string>;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * SafetyServiceOut
+ */
+export type SafetyServiceOut = {
+  /**
+   * Configured
+   */
+  configured: boolean | null;
+  /**
+   * Ever Used
+   */
+  ever_used: boolean;
+  /**
+   * Last
+   */
+  last: Array<OutboundRequestOut>;
+  /**
+   * Line
+   */
+  line: string;
+  /**
+   * Locked Reason
+   */
+  locked_reason: string | null;
+  /**
+   * Mode
+   */
+  mode: 'OFF' | 'ASK' | 'AUTOMATIC';
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Sent Count
+   */
+  sent_count: number;
+  /**
+   * Sent Kinds
+   */
+  sent_kinds: Array<SentKindOut>;
+  /**
+   * Service
+   */
+  service: string;
+};
+
+/**
+ * SafetyStoresOut
+ */
+export type SafetyStoresOut = {
+  backups: BackupsStoreOut;
+  documents: DocumentsStoreOut;
+  private_ai: PrivateAiStoreOut;
+  records: RecordsStoreOut;
+  security_log: SecurityLogStoreOut;
+  service_keys: KeysStoreOut;
+};
+
+/**
+ * SafetySummaryOut
+ *
+ * Keep › Safety & data in one reply: totals for the period, the six stores, the outside services with their
+ * modes, who can reach the case, what deleting it removes, and the reporter's private answers.
+ */
+export type SafetySummaryOut = {
+  access: SafetyAccessOut;
+  delete: SafetyDeleteOut;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Investigation Name
+   */
+  investigation_name: string;
+  /**
+   * Questions
+   */
+  questions: Array<SafetyQuestionOut>;
+  /**
+   * Services
+   */
+  services: Array<SafetyServiceOut>;
+  /**
+   * Since
+   */
+  since: string | null;
+  stores: SafetyStoresOut;
+  totals: SafetyTotalsOut;
+};
+
+/**
+ * SafetyTotalsOut
+ */
+export type SafetyTotalsOut = {
+  /**
+   * Ai Calls Outside
+   */
+  ai_calls_outside: number;
+  /**
+   * Documents Sent
+   */
+  documents_sent: number;
+  /**
+   * Requests
+   */
+  requests: number;
+  /**
+   * Services Reached
+   */
+  services_reached: number;
 };
 
 /**
@@ -15259,6 +16389,24 @@ export type SecurityAuditViewOut = {
 };
 
 /**
+ * SecurityLogStoreOut
+ */
+export type SecurityLogStoreOut = {
+  /**
+   * Events
+   */
+  events: number | null;
+  /**
+   * Keep Days
+   */
+  keep_days: number;
+  /**
+   * Size Bytes
+   */
+  size_bytes: number | null;
+};
+
+/**
  * SecurityRemoteHostOut
  */
 export type SecurityRemoteHostOut = {
@@ -15270,6 +16418,36 @@ export type SecurityRemoteHostOut = {
    * Count
    */
   count: number;
+};
+
+/**
+ * SentKindOut
+ */
+export type SentKindOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Value Kind
+   */
+  value_kind: string;
+};
+
+/**
+ * ServiceModeIn
+ *
+ * A case's mode for one outside service (research Keep §7: Off / Ask first / Automatic).
+ */
+export type ServiceModeIn = {
+  /**
+   * Mode
+   */
+  mode: 'OFF' | 'ASK' | 'AUTOMATIC';
+  /**
+   * Service
+   */
+  service: string;
 };
 
 /**
@@ -16125,6 +17303,102 @@ export type StoryUnplacedOut = {
 };
 
 /**
+ * StrayFileAddBackIn
+ *
+ * One stray file to add back to a case as a document (Housekeeping, research Keep §12).
+ */
+export type StrayFileAddBackIn = {
+  /**
+   * Path
+   */
+  path: string;
+};
+
+/**
+ * StrayFileAddedBackOut
+ *
+ * The stray file is now a document of the case; it is read like an upload (follow it on The Drop).
+ */
+export type StrayFileAddedBackOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Job Id
+   */
+  job_id: string | null;
+};
+
+/**
+ * StrayFileDeletedOut
+ */
+export type StrayFileDeletedOut = {
+  /**
+   * Relative Path
+   */
+  relative_path: string;
+  /**
+   * Size Bytes
+   */
+  size_bytes: number;
+};
+
+/**
+ * StrayFilesDeletedOut
+ */
+export type StrayFilesDeletedOut = {
+  /**
+   * Deleted
+   */
+  deleted: Array<StrayFileDeletedOut>;
+  /**
+   * Deleted Count
+   */
+  deleted_count: number;
+  /**
+   * Freed Bytes
+   */
+  freed_bytes: number;
+};
+
+/**
+ * StrayFilesIn
+ *
+ * Stray files to Keep or Delete (Housekeeping, research Keep §12): paths relative to the document storage
+ * folder, as GET /settings/storage/orphans lists them. Each is checked again on the server; one that is not a
+ * current stray file refuses the whole request and nothing changes.
+ */
+export type StrayFilesIn = {
+  /**
+   * Paths
+   */
+  paths: Array<string>;
+};
+
+/**
+ * StrayFilesKeptOut
+ */
+export type StrayFilesKeptOut = {
+  /**
+   * Kept
+   */
+  kept: Array<string>;
+  /**
+   * Kept Count
+   */
+  kept_count: number;
+};
+
+/**
  * StyleWarningOut
  *
  * A warning the style panel shows beside one option's control.
@@ -16271,6 +17545,54 @@ export type SuiteRequirementOut = {
    * Why
    */
   why: string;
+};
+
+/**
+ * SuiteRunRequest
+ *
+ * One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an
+ * answer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.
+ * `context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and
+ * access limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given
+ * by the logic check only.
+ */
+export type SuiteRunRequest = {
+  /**
+   * Context
+   */
+  context?: string | null;
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module:
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
 };
 
 /**
@@ -16973,9 +18295,11 @@ export type TimelineVisualOut = {
 /**
  * ToCheckItemOut
  *
- * Something a person checks: a passage to read, a checklist item, or a money
- * check a person kept (kind "money", indicator_id the check's kind). The app
- * never decides it; open until a person does.
+ * Something a person checks: a passage to read, a checklist item, a money
+ * check a person kept (kind "money", indicator_id the check's kind), or a link
+ * a person added from The Wire because no reviewed source shows it yet (kind
+ * "link", ``relationship_id`` the link). The app never decides it; open until
+ * a person does.
  */
 export type ToCheckItemOut = {
   /**
@@ -17016,7 +18340,7 @@ export type ToCheckItemOut = {
   /**
    * Kind
    */
-  kind: 'passage' | 'checklist' | 'money';
+  kind: 'passage' | 'checklist' | 'money' | 'link';
   /**
    * Locator
    */
@@ -17037,6 +18361,10 @@ export type ToCheckItemOut = {
    * Related Flags
    */
   related_flags: Array<string>;
+  /**
+   * Relationship Id
+   */
+  relationship_id?: string | null;
   /**
    * Status
    */
@@ -18139,6 +19467,42 @@ export type WireFlagsOut = {
 };
 
 /**
+ * WireLinkFlagOut
+ *
+ * An open Red Flag a link is part of: its level, name, sentence, path (a loop's) and first innocent explanation.
+ */
+export type WireLinkFlagOut = {
+  /**
+   * Flag Id
+   */
+  flag_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Innocent
+   */
+  innocent: string;
+  /**
+   * Level
+   */
+  level: 'faint' | 'strong' | 'textbook';
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Path
+   */
+  path: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * WireLinkOut
  */
 export type WireLinkOut = {
@@ -18162,6 +19526,10 @@ export type WireLinkOut = {
    * Fam
    */
   fam: 'owns' | 'runs' | 'money' | 'other';
+  /**
+   * Flags
+   */
+  flags?: Array<WireLinkFlagOut>;
   /**
    * Id
    */
@@ -18208,16 +19576,27 @@ export type WireOut = {
    * Links
    */
   links: Array<WireLinkOut>;
+  /**
+   * Worked Out
+   */
+  worked_out?: Array<WireWorkedOutOut>;
 };
 
 /**
  * WireQuoteOut
+ *
+ * A quote that shows a link; document_id and page when it comes from a document the case holds (page: the
+ * page its passage is on, none when not found), pdf when that document can be drawn as a page.
  */
 export type WireQuoteOut = {
   /**
    * Doc
    */
   doc: string;
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
   /**
    * Evidence Id
    */
@@ -18227,9 +19606,88 @@ export type WireQuoteOut = {
    */
   loc: string;
   /**
+   * Page
+   */
+  page?: number | null;
+  /**
+   * Pdf
+   */
+  pdf?: boolean;
+  /**
    * Q
    */
   q: string;
+};
+
+/**
+ * WireWorkedOutOut
+ *
+ * A link the app works out from stored links (app/services/wire.py worked_out): never stored, never a
+ * reviewed fact. pct is the worked-out share, empty with share_unknown_because when it cannot be worked out;
+ * inputs are the stored links it rests on (the shortest path's first, in order); via the parties between on
+ * the shortest path; flag_id the circular-ownership Red Flag its paths run through.
+ */
+export type WireWorkedOutOut = {
+  /**
+   * Fam
+   */
+  fam: 'owns';
+  /**
+   * Flag Id
+   */
+  flag_id: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Inputs
+   */
+  inputs: Array<string>;
+  /**
+   * Paths
+   */
+  paths: number;
+  /**
+   * Pct
+   */
+  pct: string;
+  /**
+   * Rule
+   */
+  rule: string;
+  /**
+   * Rule Name
+   */
+  rule_name: string;
+  /**
+   * Rule Text
+   */
+  rule_text: string;
+  /**
+   * S
+   */
+  s: string;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Share Unknown Because
+   */
+  share_unknown_because: string;
+  /**
+   * Steps
+   */
+  steps: number;
+  /**
+   * T
+   */
+  t: string;
+  /**
+   * Via
+   */
+  via: Array<string>;
 };
 
 /**
@@ -23570,6 +25028,102 @@ export type SaveInvestigationRunProfileResponses = {
 export type SaveInvestigationRunProfileResponse =
   SaveInvestigationRunProfileResponses[keyof SaveInvestigationRunProfileResponses];
 
+export type InvestigationAssistantRunData = {
+  body: AssistantRunRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/run';
+};
+
+export type InvestigationAssistantRunErrors = {
+  /**
+   * Response 422 Investigation Assistant Run
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
+   */
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Assistant Run
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationAssistantRunError =
+  InvestigationAssistantRunErrors[keyof InvestigationAssistantRunErrors];
+
+export type InvestigationAssistantRunResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
+};
+
+export type InvestigationAssistantRunResponse =
+  InvestigationAssistantRunResponses[keyof InvestigationAssistantRunResponses];
+
+export type InvestigationSuiteRunData = {
+  body: SuiteRunRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/suite-run';
+};
+
+export type InvestigationSuiteRunErrors = {
+  /**
+   * Response 422 Investigation Suite Run
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
+   */
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Suite Run
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationSuiteRunError =
+  InvestigationSuiteRunErrors[keyof InvestigationSuiteRunErrors];
+
+export type InvestigationSuiteRunResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
+};
+
+export type InvestigationSuiteRunResponse =
+  InvestigationSuiteRunResponses[keyof InvestigationSuiteRunResponses];
+
 export type ListCaseRecordsData = {
   body?: never;
   path: {
@@ -24393,6 +25947,77 @@ export type ListInvestigationCrossReferencesResponses = {
 export type ListInvestigationCrossReferencesResponse =
   ListInvestigationCrossReferencesResponses[keyof ListInvestigationCrossReferencesResponses];
 
+export type SnoozeDecisionData = {
+  body: DecisionSnoozeCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/decision-snoozes';
+};
+
+export type SnoozeDecisionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SnoozeDecisionError =
+  SnoozeDecisionErrors[keyof SnoozeDecisionErrors];
+
+export type SnoozeDecisionResponses = {
+  /**
+   * Successful Response
+   */
+  200: DecisionSnoozeOut;
+};
+
+export type SnoozeDecisionResponse =
+  SnoozeDecisionResponses[keyof SnoozeDecisionResponses];
+
+export type WakeDecisionData = {
+  body: DecisionWake;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/decision-snoozes/wake';
+};
+
+export type WakeDecisionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type WakeDecisionError = WakeDecisionErrors[keyof WakeDecisionErrors];
+
+export type WakeDecisionResponses = {
+  /**
+   * Successful Response
+   */
+  200: DecisionWakeOut;
+};
+
+export type WakeDecisionResponse =
+  WakeDecisionResponses[keyof WakeDecisionResponses];
+
 export type GetDecisionsData = {
   body?: never;
   path: {
@@ -24426,6 +26051,12 @@ export type GetDecisionsData = {
      * Limit
      */
     limit?: number;
+    /**
+     * Snoozed
+     *
+     * Only the decisions put off (H) and still asleep.
+     */
+    snoozed?: boolean;
   };
   url: '/api/investigations/{investigation_id}/decisions';
 };
@@ -25222,6 +26853,108 @@ export type AddNoteResponses = {
 
 export type AddNoteResponse = AddNoteResponses[keyof AddNoteResponses];
 
+export type GetOutboundLogData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Since
+     *
+     * Only what left at or after this time (UTC when no offset); leave out for all of it
+     */
+    since?: string | null;
+    /**
+     * Service
+     */
+    service?: string | null;
+    /**
+     * Limit
+     */
+    limit?: number;
+    /**
+     * Offset
+     */
+    offset?: number;
+  };
+  url: '/api/investigations/{investigation_id}/outbound-log';
+};
+
+export type GetOutboundLogErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetOutboundLogError =
+  GetOutboundLogErrors[keyof GetOutboundLogErrors];
+
+export type GetOutboundLogResponses = {
+  /**
+   * Successful Response
+   */
+  200: OutboundLogOut;
+};
+
+export type GetOutboundLogResponse =
+  GetOutboundLogResponses[keyof GetOutboundLogResponses];
+
+export type ExportOutboundLogData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Since
+     *
+     * Only what left at or after this time (UTC when no offset); leave out for all of it
+     */
+    since?: string | null;
+    /**
+     * Service
+     */
+    service?: string | null;
+  };
+  url: '/api/investigations/{investigation_id}/outbound-log/export';
+};
+
+export type ExportOutboundLogErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExportOutboundLogError =
+  ExportOutboundLogErrors[keyof ExportOutboundLogErrors];
+
+export type ExportOutboundLogResponses = {
+  /**
+   * The outbound log as CSV, oldest first
+   */
+  200: Blob | File;
+};
+
+export type ExportOutboundLogResponse =
+  ExportOutboundLogResponses[keyof ExportOutboundLogResponses];
+
 export type HowAreTheyConnectedData = {
   body?: never;
   path: {
@@ -25659,6 +27392,158 @@ export type ListReportingTasksResponses = {
 export type ListReportingTasksResponse =
   ListReportingTasksResponses[keyof ListReportingTasksResponses];
 
+export type GetSafetyData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Since
+     *
+     * Only what left at or after this time (UTC when no offset); leave out for all of it
+     */
+    since?: string | null;
+  };
+  url: '/api/investigations/{investigation_id}/safety';
+};
+
+export type GetSafetyErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSafetyError = GetSafetyErrors[keyof GetSafetyErrors];
+
+export type GetSafetyResponses = {
+  /**
+   * Successful Response
+   */
+  200: SafetySummaryOut;
+};
+
+export type GetSafetyResponse = GetSafetyResponses[keyof GetSafetyResponses];
+
+export type PutSafetyAnswerData = {
+  body: SafetyAnswerIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/safety/answers';
+};
+
+export type PutSafetyAnswerErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutSafetyAnswerError =
+  PutSafetyAnswerErrors[keyof PutSafetyAnswerErrors];
+
+export type PutSafetyAnswerResponses = {
+  /**
+   * Successful Response
+   */
+  200: SafetySummaryOut;
+};
+
+export type PutSafetyAnswerResponse =
+  PutSafetyAnswerResponses[keyof PutSafetyAnswerResponses];
+
+export type MakeSafetyBackupData = {
+  /**
+   * Body
+   */
+  body?: SafetyBackupIn | null;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/safety/backup';
+};
+
+export type MakeSafetyBackupErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeSafetyBackupError =
+  MakeSafetyBackupErrors[keyof MakeSafetyBackupErrors];
+
+export type MakeSafetyBackupResponses = {
+  /**
+   * A portable backup of the case (.jwbackup.zip), kept on record
+   */
+  200: Blob | File;
+};
+
+export type MakeSafetyBackupResponse =
+  MakeSafetyBackupResponses[keyof MakeSafetyBackupResponses];
+
+export type PutServiceModeData = {
+  body: ServiceModeIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/service-modes';
+};
+
+export type PutServiceModeErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutServiceModeError =
+  PutServiceModeErrors[keyof PutServiceModeErrors];
+
+export type PutServiceModeResponses = {
+  /**
+   * Successful Response
+   */
+  200: SafetySummaryOut;
+};
+
+export type PutServiceModeResponse =
+  PutServiceModeResponses[keyof PutServiceModeResponses];
+
 export type GetSinceData = {
   body?: never;
   path: {
@@ -25778,6 +27663,50 @@ export type GetStandingResponses = {
 
 export type GetStandingResponse =
   GetStandingResponses[keyof GetStandingResponses];
+
+export type AddBackStrayFileData = {
+  body: StrayFileAddBackIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/storage/orphans/add-back';
+};
+
+export type AddBackStrayFileErrors = {
+  /**
+   * The same bytes are already a document of this case
+   */
+  409: unknown;
+  /**
+   * The reader this deployment uses cannot read this kind of file
+   */
+  415: unknown;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddBackStrayFileError =
+  AddBackStrayFileErrors[keyof AddBackStrayFileErrors];
+
+export type AddBackStrayFileResponses = {
+  /**
+   * Successful Response
+   */
+  200: StrayFileAddedBackOut;
+};
+
+export type AddBackStrayFileResponse =
+  AddBackStrayFileResponses[keyof AddBackStrayFileResponses];
 
 export type GetStoryData = {
   body?: never;
@@ -27177,6 +29106,164 @@ export type LinkLeadResponses = {
 
 export type LinkLeadResponse = LinkLeadResponses[keyof LinkLeadResponses];
 
+export type AnswerLearningCardData = {
+  body: LearningAnswer;
+  path?: never;
+  query?: never;
+  url: '/api/learning/answers';
+};
+
+export type AnswerLearningCardErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AnswerLearningCardError =
+  AnswerLearningCardErrors[keyof AnswerLearningCardErrors];
+
+export type AnswerLearningCardResponses = {
+  /**
+   * Successful Response
+   */
+  200: LearningCardOut;
+};
+
+export type AnswerLearningCardResponse =
+  AnswerLearningCardResponses[keyof AnswerLearningCardResponses];
+
+export type ListLearningCardsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Deck
+     */
+    deck?: 'all' | 'case' | 'area' | 'terms' | 'safety';
+    /**
+     * Areas
+     *
+     * The open case's areas, comma-separated (BO,ML): the "My case's areas" deck.
+     */
+    areas?: string;
+    /**
+     * Area
+     */
+    area?: string | null;
+    /**
+     * Due Only
+     */
+    due_only?: boolean;
+    /**
+     * Ref
+     */
+    ref?: string | null;
+    /**
+     * Limit
+     */
+    limit?: number;
+  };
+  url: '/api/learning/cards';
+};
+
+export type ListLearningCardsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListLearningCardsError =
+  ListLearningCardsErrors[keyof ListLearningCardsErrors];
+
+export type ListLearningCardsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LearningCardListOut;
+};
+
+export type ListLearningCardsResponse =
+  ListLearningCardsResponses[keyof ListLearningCardsResponses];
+
+export type AddLearningCardData = {
+  body: LearningCardCreate;
+  path?: never;
+  query?: never;
+  url: '/api/learning/cards';
+};
+
+export type AddLearningCardErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddLearningCardError =
+  AddLearningCardErrors[keyof AddLearningCardErrors];
+
+export type AddLearningCardResponses = {
+  /**
+   * Successful Response
+   */
+  200: LearningCardOut;
+};
+
+export type AddLearningCardResponse =
+  AddLearningCardResponses[keyof AddLearningCardResponses];
+
+export type LearningSummaryData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Areas
+     *
+     * The open case's areas, comma-separated (BO,ML): the "My case's areas" deck.
+     */
+    areas?: string;
+  };
+  url: '/api/learning/summary';
+};
+
+export type LearningSummaryErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type LearningSummaryError =
+  LearningSummaryErrors[keyof LearningSummaryErrors];
+
+export type LearningSummaryResponses = {
+  /**
+   * Successful Response
+   */
+  200: LearningSummaryOut;
+};
+
+export type LearningSummaryResponse =
+  LearningSummaryResponses[keyof LearningSummaryResponses];
+
 export type RemoveNoteData = {
   body?: never;
   path: {
@@ -27779,6 +29866,41 @@ export type PatchRelationshipSuiteResponses = {
    */
   200: unknown;
 };
+
+export type KeepLinkCheckData = {
+  body?: never;
+  path: {
+    /**
+     * Relationship Id
+     */
+    relationship_id: string;
+  };
+  query?: never;
+  url: '/api/relationships/{relationship_id}/to-check';
+};
+
+export type KeepLinkCheckErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type KeepLinkCheckError = KeepLinkCheckErrors[keyof KeepLinkCheckErrors];
+
+export type KeepLinkCheckResponses = {
+  /**
+   * Successful Response
+   */
+  200: ChecksOut;
+};
+
+export type KeepLinkCheckResponse =
+  KeepLinkCheckResponses[keyof KeepLinkCheckResponses];
 
 export type CreateReportingTaskEndpointData = {
   body: ReportingTaskCreate;
@@ -28516,6 +30638,68 @@ export type GetOrphanStoragePreviewResponses = {
 
 export type GetOrphanStoragePreviewResponse =
   GetOrphanStoragePreviewResponses[keyof GetOrphanStoragePreviewResponses];
+
+export type DeleteStrayFilesData = {
+  body: StrayFilesIn;
+  path?: never;
+  query?: never;
+  url: '/api/settings/storage/orphans/delete';
+};
+
+export type DeleteStrayFilesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteStrayFilesError =
+  DeleteStrayFilesErrors[keyof DeleteStrayFilesErrors];
+
+export type DeleteStrayFilesResponses = {
+  /**
+   * Successful Response
+   */
+  200: StrayFilesDeletedOut;
+};
+
+export type DeleteStrayFilesResponse =
+  DeleteStrayFilesResponses[keyof DeleteStrayFilesResponses];
+
+export type KeepStrayFilesData = {
+  body: StrayFilesIn;
+  path?: never;
+  query?: never;
+  url: '/api/settings/storage/orphans/keep';
+};
+
+export type KeepStrayFilesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type KeepStrayFilesError =
+  KeepStrayFilesErrors[keyof KeepStrayFilesErrors];
+
+export type KeepStrayFilesResponses = {
+  /**
+   * Successful Response
+   */
+  200: StrayFilesKeptOut;
+};
+
+export type KeepStrayFilesResponse =
+  KeepStrayFilesResponses[keyof KeepStrayFilesResponses];
 
 export type CreateSourceEndpointData = {
   body: SourceCreate;

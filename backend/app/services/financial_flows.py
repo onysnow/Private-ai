@@ -19,7 +19,8 @@ Rules this module keeps (read-only; nothing is created or changed):
   input). Amounts are never converted or summed across currencies here.
 * ``certainty`` is the status grammar the views draw (research §2.8): ``shown``
   when reviewed evidence supports the payment, ``disputed`` when a claim it
-  rests on is challenged, otherwise ``not_yet_shown``.
+  rests on is challenged or reviewed evidence contradicts it (the rule the
+  network uses for a contested link), otherwise ``not_yet_shown``.
 * ``flow_type`` is ``direct`` only when at least one attached evidence record's
   latest reporter review is ``supports``; otherwise ``inferred``. The rule is
   returned with the ledger (``flow_type_rule``) so the UI can state it.
@@ -102,6 +103,7 @@ def investigation_financial_ledger(db: Session, investigation_id: str) -> dict[s
 
         attachments = (row.get("provenance") or {}).get("evidence_attachments") or []
         supporting = [a for a in attachments if (a.get("latest_review") or {}).get("stance") == "supports"]
+        contradicted = any((a.get("latest_review") or {}).get("stance") == "contradicts" for a in attachments)
         evidence_bits = []
         for att in attachments:
             ev = att.get("evidence") or {}
@@ -128,7 +130,8 @@ def investigation_financial_ledger(db: Session, investigation_id: str) -> dict[s
             "supporting_evidence_count": len(supporting),
             "status": advisory.get("support_state"),
             "flowType": "direct" if supporting else "inferred",
-            "certainty": "disputed" if advisory.get("support_state") == "challenged_support" else "shown" if supporting else "not_yet_shown",
+            "certainty": ("disputed" if advisory.get("support_state") == "challenged_support" or contradicted
+                          else "shown" if supporting else "not_yet_shown"),
             "locator": next(((a.get("evidence") or {}).get("locator") for a in supporting + attachments if (a.get("evidence") or {}).get("locator")), None),
         }
         if problems:

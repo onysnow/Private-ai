@@ -27,7 +27,10 @@
 .kc-switch button { all: unset; cursor: pointer; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); }
 .kc-switch button.on { background: var(--surface-3); color: var(--text); }
 .kc-switch button:focus-visible { outline: 2px solid var(--accent-2); }
-.kc-practise { all: unset; box-sizing: border-box; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); font-size: 12.5px; font-weight: 600; color: var(--text-muted); cursor: not-allowed; opacity: .7; }
+.kc-practise { all: unset; box-sizing: border-box; cursor: pointer; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); font-size: 12.5px; font-weight: 600; color: var(--text);
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+.kc-practise:hover { background: var(--surface-2); border-color: var(--text-muted); }
+.kc-practise:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 
 .kc-board { min-height: 0; display: grid; grid-template-columns: minmax(0, 37fr) minmax(0, 21fr) minmax(0, 40fr); grid-template-rows: minmax(0, 1fr); gap: 14px; }
 .kc-board.view-table { grid-template-columns: minmax(0, 58fr) minmax(0, 40fr); }
@@ -186,7 +189,8 @@
 .kc-fam-col thead th { font: 600 10px var(--font-mono); color: var(--text-muted); }
 .kc-fam-col tr.on th[scope='row'] .kc-link { color: var(--accent-1); }
 .kc-fam-col th[scope='row'] .kc-link { color: var(--text); font-size: 12px; }
-.kc-cells { list-style: none; margin: 4px 0 8px; padding: 0; display: grid; gap: 3px; text-align: left; }
+.kc-cells { list-style: none; margin: 4px 0 8px; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px; text-align: left; }
+.kc-cells li { min-width: 0; }
 .kc-cell { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 4px 8px; border-radius: 6px; background: var(--surface-2); font-size: 11.5px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kc-cell.on { box-shadow: inset 3px 0 var(--accent-1); }
@@ -259,3 +263,45 @@ html[data-motion='calm'] .kc-flip.flipped .kc-face.front { opacity: 0; }
 .kc-dashed-box { margin: 0; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; font-size: 13px; color: var(--text-muted); }
 .kg-ul { margin: 0; padding-left: 16px; font-size: 12.5px; color: var(--text-muted); display: grid; gap: 3px; }
 .kg-chips { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Practise (features/knowledge/practise-screen.tsx; research Knowledge §6): the deck chooser, one flip card at a time,
+   Again / Good (or Again / Hard / Good / Easy), each saying when the card comes back. The turn is the catalogue's
+   .kc-flip (450 ms 3D; reduced motion a 120 ms crossfade; Calm a cut, rules above). */
+.kc-tabs a { cursor: pointer; }
+.kp-decks { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 3px; padding: 3px; border-radius: 10px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
+.kp-decks button { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); }
+.kp-decks button:hover:not(:disabled) { color: var(--text); }
+.kp-decks button.on { background: var(--surface-3); color: var(--text); }
+.kp-decks button:disabled { cursor: not-allowed; opacity: .5; }
+.kp-decks button:focus-visible, .kp-decks select:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.kp-decks select { box-sizing: border-box; max-width: 220px; padding: 5px 8px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--text-muted);
+  font: 600 12.5px var(--font-ui); cursor: pointer; }
+.kp-decks select.on { background: var(--surface-3); color: var(--text); }
+.kp-decks select option { background: var(--surface-2); color: var(--text); }
+.kp-count { margin-left: 4px; font: 11px var(--font-mono); color: var(--text-muted); }
+.kp-four { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-muted); cursor: pointer; }
+.kp-four input { accent-color: var(--accent-1); }
+.kc-top kbd, .kp kbd { padding: 0 5px; border: 1px solid var(--line); border-radius: 5px; background: transparent; font: 10.5px var(--font-mono); color: var(--text-muted); }
+.kc-btn.primary kbd { border-color: currentColor; color: inherit; opacity: .8; }
+.kp { flex: 1 1 auto; display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: auto; }
+.kp-stage { align-content: center; }
+.kc-flip.kp-card { width: min(620px, 80vw); height: min(420px, 58vh); }
+.kp-card .kc-face { overflow: auto; }
+.kp-back { gap: 9px; }
+.kp-levels { display: grid; gap: 4px; font-size: 12.5px; color: var(--text); }
+.kp-level.unset { color: var(--text-muted); }
+.kp-level.unset .rb-level { border-style: dashed; }
+.kp-innocent { color: var(--status-supported); }
+.kp-source { color: var(--text-muted); }
+.kp-answers { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.kp-answer { display: inline-flex; align-items: center; gap: 8px; min-width: 110px; justify-content: center; }
+.kp-answer.good { background: var(--accent-1); color: var(--ground); }
+.kp-answer.good kbd { border-color: currentColor; color: inherit; }
+.kp-when { font: 11px var(--font-mono); opacity: .8; }
+.kp-keys { margin: 0; text-align: center; color: var(--text-muted); }
+.kp-state { align-self: center; justify-self: center; max-width: 460px; text-align: center; display: grid; gap: 6px; }
+.kp-state-line { margin: 0; font: 17px/1.5 var(--font-read); }
+.kp-state-actions { margin: 6px 0 0; display: flex; gap: 8px; justify-content: center; }
+.kp-link { all: unset; cursor: pointer; color: var(--accent-1); text-decoration: underline; text-underline-offset: 3px; }
+.kp-link:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; border-radius: 3px; }
+.kc-flip-kept { display: inline-flex; align-items: center; padding: 8px 12px; border: 1px solid var(--status-supported); border-radius: 9px; font-size: 12.5px; color: var(--status-supported); }

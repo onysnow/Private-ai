@@ -6,7 +6,7 @@ import json
 import time
 from collections.abc import AsyncIterator
 from datetime import datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.concurrency import run_in_threadpool
@@ -17,8 +17,9 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import SessionLocal, get_db
 from app.models.domain import Entity, Investigation
 from app.schemas.api import InvestigationUpdate
-from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
-from app.services import case_home, case_years, drop, wire
+from app.schemas.decide import DecisionSnoozeCreate, DecisionWake
+from app.schemas.responses import CaseDecisionsOut, DecisionSnoozeOut, DecisionWakeOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
+from app.services import case_home, case_years, decision_snoozes, drop, wire
 from app.services.investigations import update_investigation
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -49,11 +50,32 @@ def get_decisions(
     kind: Literal["to_check", "missing", "proposal", "match", "outside", "ai", "watchlist"] | None = None,
     order: Literal["consequence", "source", "oldest"] = "consequence",
     offset: int = Query(0, ge=0), limit: int = Query(200, ge=1, le=500),
+    snoozed: Annotated[bool, Query(description="Only the decisions put off (H) and still asleep.")] = False,
 ) -> Any:
     # The Red Flags and To check items as last brought up to date: reading never writes (GET .../red-flags says
-    # when they are behind, POST .../red-flags/run brings them up to date).
+    # when they are behind, POST .../red-flags/run brings them up to date). The consequence order puts first what
+    # answering Yes would unlock, dry-run on the records (app/services/decision_unlocks.py).
     _case(db, investigation_id)
-    return case_home.decisions(db, investigation_id, kind=kind, order=order, offset=offset, limit=limit)
+    return case_home.decisions(db, investigation_id, kind=kind, order=order, offset=offset, limit=limit, snoozed=snoozed)
+
+
+@router.post("/investigations/{investigation_id}/decision-snoozes", response_model=DecisionSnoozeOut)
+def snooze_decision(investigation_id: str, body: DecisionSnoozeCreate, db: Session = Depends(get_db)) -> Any:
+    """Puts a waiting decision off (H on Decide): until a time, until the item changes, or whichever comes first."""
+    _case(db, investigation_id)
+    try:
+        return decision_snoozes.snooze(db, investigation_id, body.kind, body.item_id, until=body.until, wake_on_activity=body.wake_on_activity)
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+
+@router.post("/investigations/{investigation_id}/decision-snoozes/wake", response_model=DecisionWakeOut)
+def wake_decision(investigation_id: str, body: DecisionWake, db: Session = Depends(get_db)) -> Any:
+    """Brings a decision put off back into the queue now (Restore, or Z right after H)."""
+    _case(db, investigation_id)
+    return decision_snoozes.wake(db, investigation_id, body.kind, body.item_id)
 
 
 @router.get("/investigations/{investigation_id}/since", response_model=CaseSinceOut)

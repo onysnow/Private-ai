@@ -41,8 +41,9 @@ def test_orphan_preview_is_read_only_and_excludes_referenced_and_staging_files(t
     assert result['orphan_file_count'] == 1
     assert result['orphan_bytes'] == 5
     assert result['orphan_files'][0]['relative_path'] == 'orphan.bin'
-    assert result['cleanup_available'] is False
-    assert result['policy'] == 'preview_only_retain_by_default'
+    # Looking removes nothing; the reporter decides per file (test_housekeeping.py).
+    assert result['cleanup_available'] is True and result['kept_file_count'] == 0
+    assert result['policy'] == 'retain_until_reporter_decides'
     assert known.exists() and orphan.exists() and staging.exists()
 
     db.close(); engine.dispose()

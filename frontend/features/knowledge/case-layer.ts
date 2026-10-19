@@ -18,6 +18,8 @@ export type CaseLayer = {
   firesByArea: Map<string, number>;
   /** Indicators whose rule ran on this case (fired or not). */
   ran: Set<string>;
+  /** The case's areas: its type's areas, then any other area where a flag fires (Practise's "My case's areas"). */
+  areas: string[];
   loading: boolean;
   error: unknown;
   refetch: () => Promise<unknown>;
@@ -29,7 +31,7 @@ export function strongest(flags: RedFlagOut[] | undefined): RedFlagOut | undefin
 }
 
 /** The layer from a Red Flags reply: pure, so it is tested without a server. */
-export function buildLayer(reply: RedFlagsOut | undefined): Pick<CaseLayer, 'flags' | 'firesByArea' | 'ran'> {
+export function buildLayer(reply: RedFlagsOut | undefined): Pick<CaseLayer, 'flags' | 'firesByArea' | 'ran' | 'areas'> {
   const flags = new Map<string, RedFlagOut[]>();
   for (const f of reply?.flags ?? []) {
     if (f.status === 'dismissed') continue;
@@ -43,7 +45,8 @@ export function buildLayer(reply: RedFlagsOut | undefined): Pick<CaseLayer, 'fla
   }
   const cannot = new Set((reply?.cannot_run ?? []).map(c => c.indicator_id));
   const ran = new Set((reply?.rules ?? []).map(r => r.indicator_id).filter(id => !cannot.has(id)));
-  return {flags, firesByArea, ran};
+  const areas = [...new Set([...(reply?.investigation_type?.areas ?? []).map(a => a.key), ...firesByArea.keys()])];
+  return {flags, firesByArea, ran, areas};
 }
 
 export function useCaseLayer(investigationId: string): CaseLayer {

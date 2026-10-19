@@ -4,7 +4,8 @@
 
 /* ---- The case screens' frame: one screen; a stage page scrolls inside its own column. ---- */
 .cv { position: relative; }
-.cv-home-wrap { height: calc(100vh - 52px); overflow: hidden; }
+/* Positioned, so what a panel draws past its own edges (Rain Noir's glass bleed) is clipped here and never scrolls the page. */
+.cv-home-wrap { position: relative; height: calc(100vh - 52px); overflow: hidden; }
 .cv-stage { height: calc(100vh - 52px); overflow-y: auto; overscroll-behavior: contain; padding: 4px clamp(16px, 3vw, 40px) 48px; scroll-padding-top: 12px;
   animation: cv-in var(--dur-base) var(--ease-out); }
 .cv-stage-head { position: sticky; top: 0; z-index: 5; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap;
@@ -25,7 +26,18 @@
 .ch-top { display: grid; grid-template-columns: minmax(220px, .9fr) minmax(0, 3fr); grid-template-areas: 'name tools' 'q strip'; column-gap: 20px; row-gap: 10px; align-items: end; }
 .ch-top > .ch-search { grid-area: tools; justify-self: center; align-self: center; }
 .ch-top > .ch-tools { grid-area: tools; justify-self: end; align-self: center; }
-.ch-name { grid-area: name; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
+/* The name block may run on under the free start of the tools row, up to the search bar, so a long case name is not cut. */
+.ch-name { grid-column: 1 / -1; grid-row: 1; justify-self: start; display: flex; flex-direction: column; gap: 6px; min-width: 0; max-width: min(640px, calc(50vw - 200px)); }
+/* The name and Switch case on one line (HOME_1); the AI line and its question field on one line under them. */
+.ch-name-line { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ch-name-line .ch-switch { flex: none; white-space: nowrap; }
+.ch-ai-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ch-ai-line:empty { display: none; }
+.ch-ai-line > .ai-strip { flex: 0 1 auto; min-width: 0; }
+.ch-ai-line > .ai-strip > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ch-ai-line > .ai-strip > .ai-tallies { flex: none; }
+.ch-ai-line > .ai-ask { flex: 1 1 96px; min-width: 96px; }
+.ch-ai-line > .ai-ask input { width: 100%; box-sizing: border-box; }
 .ch-name h1 { margin: 0; font: 700 clamp(22px, 2.1vw, 30px)/1.1 var(--font-ui); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .ch-switch { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 11px; border-radius: 999px; font-size: 12px; color: var(--text); border: 1px solid color-mix(in srgb, var(--text-muted) 45%, transparent); }
 .ch-switch kbd, .ch-search kbd, .ch-hide kbd { padding: 1px 6px; border-radius: 6px; background: var(--surface-2); font: 600 10.5px var(--font-mono); color: var(--text); }
@@ -53,7 +65,8 @@
 .ch-q-edit label { font: 600 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
 .ch-q-edit input { flex: 1; min-width: 220px; background: var(--surface-1); color: var(--text); border: 1px solid var(--accent-1); border-radius: 9px; padding: 7px 10px; font: 500 17px var(--font-read); }
 .ch-q-edit button, .ch-first-form button, .ch-sample, .ch-strip-error button { all: unset; cursor: pointer; padding: 7px 13px; border-radius: 9px; background: var(--accent-1); color: var(--ground); font-weight: 650; font-size: 13px; }
-.ch-strip { grid-area: strip; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-radius: 14px; background: var(--surface-1);
+/* Columns sized as HOME_1 draws them: the money, years and To-decide cells carry the longest values. */
+.ch-strip { grid-area: strip; display: grid; grid-template-columns: repeat(3, minmax(0, .9fr)) minmax(0, 1.15fr) minmax(0, 1.3fr) minmax(0, 1.05fr) minmax(0, 1fr); margin: 0; padding: 0; list-style: none; border-radius: 14px; background: var(--surface-1);
   box-shadow: var(--shadow-panel); overflow: hidden; }
 .ch-strip li + li { border-left: 1px solid color-mix(in srgb, var(--line) 35%, transparent); }
 .ch-num { display: flex; flex-direction: column; gap: 3px; padding: 10px 14px; color: var(--text); text-decoration: none; height: 100%; box-sizing: border-box;
@@ -75,6 +88,8 @@
 
 .ch-mod { position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 0; flex: 1 1 0; padding: 14px 16px; border-radius: 16px; background: var(--surface-1);
   box-shadow: var(--shadow-panel); overflow: hidden; }
+/* 1–4 focus a module (and J / K step in it): the focus ring says which. */
+.ch-mod:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
 .ch-mod-head { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
 .ch-mod-head h2 { margin: 0; display: flex; align-items: baseline; gap: 9px; font: 650 15px/1.2 var(--font-ui); white-space: nowrap; min-width: 0; }
 .ch-mod-head { min-width: 0; }
@@ -171,7 +186,7 @@
   mask-image: linear-gradient(#000 calc(100% - 18px), transparent); padding-bottom: 10px; }
 .ch-card .ch-choices, .ch-card .ch-reasons, .ch-card .ch-elsewhere { flex: 0 0 auto; }
 .ch-question { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 0 0 auto; }
-@keyframes ch-card-in { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+@keyframes ch-card-in { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
 .ch-why { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0; font-size: 12.5px; color: var(--text-muted); }
 .ch-actor { font: 600 10.5px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent-2); }
 .ch-question { margin: 0; font: 550 clamp(18px, 1.55vw, 23px)/1.25 var(--font-read); color: var(--text); }
@@ -179,6 +194,9 @@
   max-height: 9.5em; overflow-y: auto; border-left: 3px solid var(--accent-1); }
 .ch-excerpt mark, .dc-read mark, .dc-legend mark { background: color-mix(in srgb, var(--accent-1) 28%, transparent); color: inherit; border-bottom: 1.5px solid var(--accent-1); padding: 0 1px; border-radius: 2px; }
 .ch-proposal { margin: 0; font: 500 15px var(--font-read); color: var(--text-muted); }
+.ch-source-link { align-self: flex-start; font-size: 12.5px; color: var(--accent-2); text-decoration: none; }
+.ch-source-link:hover { text-decoration: underline; }
+.ch-source-link:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
 .ch-locator { margin: 0; font: 500 11.5px var(--font-mono); color: var(--text-muted); }
 .ch-parties { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
 .ch-party { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 99px; border: 1px solid var(--line); font-size: 12.5px; color: var(--text);
@@ -196,7 +214,8 @@
 .ch-known { margin: 0; padding: 8px 12px 8px 28px; border-radius: 10px; font-size: 13px; line-height: 1.45; background: color-mix(in srgb, var(--accent-1) 8%, transparent); border: 1px dashed color-mix(in srgb, var(--accent-1) 50%, transparent); }
 .ch-happens { padding: 10px 12px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--accent-2) 45%, transparent); background: color-mix(in srgb, var(--accent-2) 7%, transparent); }
 .ch-happens ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }
-.ch-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ch-choices { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
+.ch-choices .ch-choice { min-width: 0; text-wrap: balance; line-height: 1.15; }
 .ch-choice { all: unset; cursor: pointer; box-sizing: border-box; min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px;
   font: 650 14.5px var(--font-ui); border: 1.5px solid currentColor; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast), box-shadow var(--dur-fast); }
 .ch-choice:hover, .ch-choice:focus-visible { transform: translateY(-2px); box-shadow: var(--shadow-panel); }
@@ -264,18 +283,21 @@
 
 /* Bottom: years and what is pointed at */
 .ch-bottom { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(260px, 1fr); gap: 14px; }
-.ch-years { display: flex; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel); overflow: hidden; min-height: 52px; align-items: stretch; }
+.ch-years { display: flex; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel); overflow: hidden; overflow-x: auto; scrollbar-width: thin; min-height: 52px; align-items: stretch; }
 .ch-years.ch-quiet { align-items: center; padding: 0 16px; }
-.ch-years button { all: unset; cursor: pointer; flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 7px 4px 10px;
+.ch-years button { all: unset; cursor: pointer; flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 7px 4px 10px; min-width: 64px;
   transition: background var(--dur-fast); }
 .ch-years button + button { border-left: 1px solid color-mix(in srgb, var(--line) 30%, transparent); }
 .ch-years button:hover { background: var(--surface-2); }
+.ch-years button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; }
 .ch-years button.on { background: color-mix(in srgb, var(--accent-1) 20%, transparent); box-shadow: inset 0 3px 0 var(--accent-1); }
 .ch-years b { font: 600 14px var(--font-ui); font-variant-numeric: tabular-nums; }
 .ch-years small { font-size: 10.5px; color: var(--text-muted); }
 .ch-years button.flagged { box-shadow: inset 0 -3px 0 var(--status-disputed); }
 .ch-years button.lit { background: color-mix(in srgb, var(--accent-2) 18%, transparent); }
 .ch-years button.lit b { color: var(--accent-2); }
+.ch-years button.empty b { font-weight: 500; color: var(--text-muted); }
+.ch-years button.empty small { opacity: .6; }
 .ch-year-flags { color: var(--status-disputed); font-weight: 600; }
 .ch-years i { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); height: 3px; max-width: 70%; border-radius: 2px; background: var(--accent-2); }
 .ch-pointing { display: flex; align-items: center; gap: 10px; padding: 0 16px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel); font-size: 12.5px; flex-wrap: wrap; }
@@ -371,6 +393,7 @@
 .ch-happens dd { margin: 0; }
 .ch-happens-yes dt { color: var(--status-supported); } .ch-happens-no dt { color: var(--status-disputed); } .ch-happens-unsure dt { color: var(--status-unshown); }
 @media (prefers-reduced-motion: reduce) { .dc-last button, .dc-bulk-confirm { animation: cv-fade 120ms both; } }
+html[data-motion='calm'] .dc-last button, html[data-motion='calm'] .dc-bulk-confirm { animation: cv-fade 120ms both; }
 .dc-keys { display: flex; gap: 4px; align-items: center; color: var(--text-muted); }
 .dc-toast { margin-left: auto; display: flex; gap: 8px; align-items: center; }
 .dc-toast button { all: unset; cursor: pointer; color: var(--accent-1); font-weight: 650; }
@@ -462,11 +485,11 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .cv-screen { height: calc(100vh - 52px); overflow: hidden; }
 .ss { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; padding: 6px clamp(14px, 2vw, 28px) 12px; color: var(--text); font-family: var(--font-ui);
   animation: cv-in var(--dur-base) var(--ease-out); }
-.ss-head { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'title tabs' 'line line'; align-items: end; column-gap: 28px; row-gap: 2px;
+.ss-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'title line tabs'; align-items: end; column-gap: 20px; row-gap: 2px;
   padding-bottom: 8px; border-bottom: 2px solid var(--stage); }
 .ss-title { grid-area: title; }
-.ss-title h1 { margin: 2px 0 0; font: 650 clamp(22px, 2.1vw, 30px)/1.1 var(--font-display); }
-.ss-line { grid-area: line; margin: 2px 0 0; font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-title h1 { margin: 2px 0 0; font: 650 clamp(20px, 1.7vw, 24px)/1.1 var(--font-display); }
+.ss-line { grid-area: line; margin: 0 0 3px; font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ss-tabs { grid-area: tabs; display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
 .ss-tabs a { position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 10px; color: var(--text-muted);
   text-decoration: none; font-size: 14px; font-weight: 550; transition: color var(--dur-fast), background var(--dur-fast), transform var(--dur-fast) var(--ease-out); }
@@ -480,6 +503,7 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .ss-sec { height: 100%; overflow-y: auto; overscroll-behavior: contain; animation: cv-in var(--dur-base) var(--ease-out); }
 .ss-sec.fill { overflow: hidden; }
 .ss-sec .card { margin: 0 0 12px; }
+@media (max-width: 1180px) { .ss-head { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'title tabs' 'line line'; } }
 @media (max-width: 760px) { .ss-head { grid-template-columns: 1fr; grid-template-areas: 'title' 'tabs' 'line'; } .ss-tabs { justify-content: flex-start; } }
 
 @media (prefers-reduced-motion: reduce) { .ss, .ss-sec, .ss-tabs a[aria-current='page']::after { animation: none; } }
@@ -519,3 +543,62 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .ch-show-all:focus-visible { outline: 2px solid var(--accent-1); border-radius: 4px; }
 .ch-change .ai-tag { align-self: flex-start; margin-top: 4px; }
 .ch-next-foot > span[aria-live] { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ==== Case home: standing-number lists and an empty case's first actions (build: standing popovers + first actions) ====
+   Redesign "Standing numbers" (hover or focus previews the list, a click pins it) and "The case home", States
+   ("Empty case: four large first actions … each one line"). Kept in this block; Decide's rules are elsewhere. */
+.ch-num { cursor: pointer; }
+.ch-num[aria-expanded='true'] { background: var(--surface-2); box-shadow: inset 0 -2px 0 var(--accent-2); }
+.ch-num.need[aria-expanded='true'] { box-shadow: inset 0 -3px 0 var(--accent-1); }
+.ch-num:focus-visible { outline: 2px solid var(--accent-1); outline-offset: -3px; }
+.ch-pop { position: fixed; z-index: 60; box-sizing: border-box; width: min(380px, calc(100vw - 16px)); max-height: min(440px, calc(100vh - 120px)); overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: 8px; padding: 13px 14px 10px; border-radius: 14px; background: var(--surface-1); color: var(--text); font-family: var(--font-ui);
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent); box-shadow: var(--shadow-lifted); animation: cv-fade var(--dur-fast) var(--ease-out) both; }
+.ch-pop.pinned { border-color: var(--accent-2); }
+.ch-pop:focus { outline: none; } .ch-pop:focus-visible { outline: 2px solid var(--accent-1); }
+.ch-pop h3 { margin: 0; font: 600 14px/1.3 var(--font-ui); }
+.ch-pop-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.ch-pop-list button, .ch-pop-list a { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: flex; align-items: baseline; gap: 8px; padding: 5px 6px; border-radius: 8px; font-size: 13px; line-height: 1.35; }
+.ch-pop-list button:hover, .ch-pop-list a:hover { background: var(--surface-2); }
+.ch-pop-list button:focus-visible, .ch-pop-list a:focus-visible { outline: 2px solid var(--accent-1); }
+.ch-pop-list button > span:last-child, .ch-pop-list a > span:last-child { min-width: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ch-pop-list .st { flex: none; font-size: 9.5px; padding: 3px 7px; }
+.ch-pop-row { display: flex; align-items: baseline; gap: 8px; padding: 5px 6px; font-size: 13px; line-height: 1.35; }
+.ch-pop-row > span:not(.st) { flex: 1; min-width: 0; }
+.ch-pop-row b { font: 600 13px var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ch-pop-date { flex: none; min-width: 84px; font: 500 12px var(--font-mono); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.ch-pop-kind { flex: none; font: 600 10px/1.6 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+.ch-pop-kinds { margin: 0; font-size: 12px; color: var(--text-muted); }
+.ch-pop-kinds a { color: var(--accent-2); text-decoration: none; } .ch-pop-kinds a:hover { text-decoration: underline; }
+.ch-pop-doc { flex: none; display: inline-flex; gap: 5px; font: 600 10px/1.6 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+.ch-pop-doc-failed { color: var(--status-disputed); } .ch-pop-doc-read { color: var(--status-supported); }
+.ch-pop-quiet, .ch-pop-more { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+.ch-pop-quiet button { all: unset; cursor: pointer; color: var(--accent-2); text-decoration: underline; }
+.ch-pop-open { align-self: flex-start; font-size: 13px; font-weight: 600; color: var(--accent-2); text-decoration: none; }
+.ch-pop-open:hover { text-decoration: underline; } .ch-pop-open:focus-visible { outline: 2px solid var(--accent-1); border-radius: 4px; }
+.ch-pop-hint { margin: 2px 0 0; padding-top: 6px; border-top: 1px solid color-mix(in srgb, var(--line) 35%, transparent); font: 500 10.5px var(--font-mono); color: var(--text-muted); }
+
+.ch-firsts { min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.ch-firsts-head { text-align: center; }
+.ch-firsts ol { list-style: none; margin: 0 auto; padding: 0; width: min(1100px, 100%); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.ch-first-act { animation: ch-rise var(--dur-base) var(--ease-out) both; }
+.ch-first-act:nth-child(2) { animation-delay: 50ms; } .ch-first-act:nth-child(3) { animation-delay: 100ms; } .ch-first-act:nth-child(4) { animation-delay: 150ms; }
+.ch-first-act > a, .ch-first-act > button { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; height: 100%; min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px;
+  padding: 20px 20px 18px; border-radius: 18px; background: var(--surface-1); box-shadow: var(--shadow-panel); color: var(--text);
+  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast); }
+.ch-first-act > a:hover, .ch-first-act > button:hover:not(:disabled) { background: var(--surface-2); transform: translateY(-3px); }
+.ch-first-act > a:focus-visible, .ch-first-act > button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+.ch-first-act > button:disabled { cursor: progress; opacity: .75; }
+.ch-first-act b { font: 600 clamp(16px, 1.45vw, 22px)/1.15 var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-first-act span:last-child { font-size: 13px; line-height: 1.4; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-first-n { margin-bottom: auto; font: 600 12px var(--font-mono); color: var(--text-muted); }
+.ch-first-drop > a { border: 1.5px dashed color-mix(in srgb, var(--accent-1) 70%, transparent); }
+.ch-first-drop.over > a { background: color-mix(in srgb, var(--accent-1) 16%, var(--surface-1)); border-style: solid; }
+@media (max-width: 980px) { .ch-firsts ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ch-first-act > a, .ch-first-act > button { min-height: 140px; } }
+html[data-motion='calm'] .ch-pop, html[data-motion='calm'] .ch-first-act { animation-duration: 120ms; animation-name: cv-fade; animation-delay: 0ms; }
+html[data-motion='calm'] .ch-first-act > a, html[data-motion='calm'] .ch-first-act > button { transition: none; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ch-pop, .ch-first-act { animation: cv-fade 120ms both; }
+  .ch-first-act > a, .ch-first-act > button { transition: none; transform: none !important; }
+}
+/* ==== end: standing popovers + first actions ==== */

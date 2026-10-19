@@ -73,6 +73,7 @@ from app.models.watchlists import (
 )
 from app.models.patterns import (
     CheckItem,
+    DecisionSnooze,
     PatternFlag,
 )
 from app.models.annotations import (
@@ -104,6 +105,12 @@ from app.models.identity import (
 )
 from app.models.jobs import (
     BackgroundJob,
+)
+from app.models.learning import (
+    LearningCard,
+)
+from app.models.safety import (
+    BackupEvent, KeptStrayFile, OutboundRequest, SafetyAnswer, ServiceMode,
 )
 from app.models.corpus import (
     OpenAlephEntityLink,
@@ -167,6 +174,7 @@ __all__ = [
     "CollectionItem",
     "PatternFlag",
     "CheckItem",
+    "DecisionSnooze",
     "AIAnalysisCandidate",
     "AIRunEvent",
     "Writeup",
@@ -178,6 +186,12 @@ __all__ = [
     "AppUser",
     "InvestigationMembership",
     "BackgroundJob",
+    "LearningCard",
+    "OutboundRequest",
+    "ServiceMode",
+    "SafetyAnswer",
+    "BackupEvent",
+    "KeptStrayFile",
     "OpenAlephEntityLink",
     "OpenAlephEntitySetLink",
     "CorpusSyncState",

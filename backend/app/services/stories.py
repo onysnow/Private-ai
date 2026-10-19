@@ -37,7 +37,9 @@ def story_of(db: Session, investigation_id: str, create: bool = False) -> Story 
     return story
 
 
-_END = re.compile(r"(?<=[.!?])\s+")
+# A sentence ends at . ! or ? and a space, but not after an initial ("M. Ross") or a short title or abbreviation
+# ("Dr.", "e.g."): those stay inside their sentence. frontend/features/story/sentences.ts reads sentences the same way.
+_END = re.compile(r"(?<=[.!?])(?<!\b[A-Z]\.)(?<!\bMr\.)(?<!\bMrs\.)(?<!\bMs\.)(?<!\bDr\.)(?<!\bSt\.)(?<!\bNo\.)(?<!\be\.g\.)(?<!\bi\.e\.)\s+")
 _WORDS = re.compile(r"\w")
 
 

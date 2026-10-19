@@ -23,6 +23,7 @@ from typing import Any, Callable
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.ai.systems import SUITE_MODULES
 from app.models.domain import (
     AIAnalysisCandidate, CheckItem, Claim, ClaimReviewEvent, ConnectorFinding, CrossReferenceProposal, Document,
     DocumentChunk, Entity, Evidence, ExtractionCandidate, Investigation, Lead, PatternFlag, RelationshipEdge, Source,
@@ -72,6 +73,16 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
             by_currency.setdefault(t["currency"], []).append(float(t["amount"]))
     currency = max(by_currency, key=lambda c: len(by_currency[c])) if by_currency else None
     waiting = decision_counts(db, inv)
+    # A decision put off with H (decision_snoozes) leaves "to decide" while it sleeps, as it leaves the Decide queue.
+    from app.services import decision_snoozes
+    put_off = decision_snoozes.rows(db, inv)
+    if put_off:
+        from app.core.time import utcnow_naive
+        now = utcnow_naive()
+        for item in pending_items(db, inv):
+            row = put_off.get((item["kind"], item["id"]))
+            if row is not None and decision_snoozes.state(row, item, now).get("state") == "asleep" and waiting.get(item["kind"]):
+                waiting[item["kind"]] -= 1
     return {
         "investigation_id": inv,
         "claims": {"total": sum(claims.values()), "supported": claims["supported"], "disputed": claims["disputed"],
@@ -166,6 +177,9 @@ def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
     docs = {d.id: d.filename for d in db.scalars(select(Document).where(Document.id.in_({r.document_id for r in rows if r.document_id})))}
     out = []
     for r in rows:
+        if r.kind == "link":  # a link a person added from The Wire's chain strip
+            out.append(_link_item(r, names))
+            continue
         flag = flags.get(r.flag_id) if r.flag_id else None
         level = flag.level if flag else None
         money = r.kind == "money"  # a money check a person kept from See › Money
@@ -194,6 +208,24 @@ def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
             "open": {"href": "/check#to-check", "label": "Open To check"},
         })
     return out
+
+
+def _link_item(r: CheckItem, names: dict[str, tuple[str, str]]) -> dict[str, Any]:
+    """A link kept in To check from The Wire: it asks for a reviewed source and opens the link in The Wire."""
+    from app.patterns.checks import LINK_NAME
+
+    path = f"/api/checks/{r.id}/decide"
+    return {
+        "kind": "to_check", "id": r.id, "question": r.question, "actor": "The Wire", "actor_kind": "app",
+        "created_at": r.first_seen_at, "rank": 15, "reason": "Added from The Wire: a chain breaks at this link", "level": None,
+        "group": {"key": "link", "label": LINK_NAME}, "evidence": None, "parties": _parties(list(r.parties), names),
+        "proposal": f"{LINK_NAME}: no reviewed source shows it yet",
+        "consequences": ["Your answer is kept with this item; the link's own status comes from its reviewed sources and does not change."],
+        "choices": [_choice("yes", "Shows it", path, {"status": "shows"}, "Recorded as shown, with your note; it leaves the list."),
+                    _choice("no", "Does not", path, {"status": "does_not"}, "Recorded as not shown, with your reason; it leaves the list."),
+                    _choice("unsure", "Unclear", path, {"status": "unclear"}, "Recorded as unclear; it leaves the list and can be opened again in To check.")],
+        "open": {"href": f"/see?link={r.record_id}#the-wire", "label": "Open the link in The Wire"},
+    }
 
 
 MISSING_OPEN = {"entity": "/bring-in#connectors", "relationship": "/see#relationship-graph", "evidence": "/bring-in#source-capture",
@@ -431,6 +463,7 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
                          "terms": [caption] if caption and caption in quote else []},
             "parties": [], "proposal": f"{r.candidate_type.capitalize()}: {caption}" if caption else r.candidate_type.capitalize(),
             "open": {"href": f"/review?document={r.document_id}", "label": "Open in Review"},
+            "_row": r,  # for the dry run of its Yes (decision_unlocks)
         }
         numbers = [n for n in p.get("rows") or [] if isinstance(n, int)]
         if numbers:
@@ -453,7 +486,9 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
                                        "Creates the claim as Not yet shown, with this passage linked as supporting evidence."),
                                _choice("no", "Not a claim", path, {"decision": "reject"}, REJECTED.format("no claim is made"))]
         elif r.candidate_type == "evidence":
-            item["question"] = "Keep this passage as evidence?"
+            # Named by its document and place, so several in one list can be told apart.
+            where = item["evidence"].get("locator")
+            item["question"] = f"Keep this passage from {docs.get(r.document_id, 'the document')}{f' ({where})' if where else ''} as evidence?"
             item["consequences"] = []
             item["choices"] = [_choice("yes", "Keep it", path, {"decision": "accept"},
                                        "Saves the exact words and where they are as evidence of this document's source."),
@@ -524,14 +559,17 @@ def _outside(db: Session, inv: str) -> list[dict[str, Any]]:
 def _ai(db: Session, inv: str) -> list[dict[str, Any]]:
     rows = list(db.scalars(select(AIAnalysisCandidate).where(AIAnalysisCandidate.investigation_id == inv,
                                                              AIAnalysisCandidate.review_status == "proposed")))
-    label = {"case_synthesis": "Case synthesis", "hypothesis_test": "Hypothesis test", "presentation_draft": "Presentation draft"}
+    label = {"case_synthesis": "Case synthesis", "hypothesis_test": "Hypothesis test", "presentation_draft": "Presentation draft",
+             **{key: m.title for key, m in SUITE_MODULES.items()}}
     out = []
     for r in rows:
         q = str((r.request or {}).get("question") or "")
         path = f"/api/ai-analysis-candidates/{r.id}/review"
         claims = len((r.payload or {}).get("claims") or [])
         out.append({
-            "kind": "ai", "id": r.id, "question": f"Accept this {label.get(r.module, r.module).lower()} as checked analysis?",
+            "kind": "ai", "id": r.id, "question": (f"Accept this {label.get(r.module, r.module).lower()} as checked analysis?" if r.module not in SUITE_MODULES
+                         # The suite's titles are not all singular ("Rival explanations", "Options and evidence").
+                         else f"Accept the {SUITE_MODULES[r.module].system.upper()} answer, {label[r.module].lower()}, as checked analysis?"),
             "actor": "AI", "actor_kind": "ai", "created_at": r.created_at, "rank": 80, "level": None,
             "reason": f"AI draft · {r.created_at:%d %b %H:%M}" + (f" · asked: {q[:80]}" if q else ""),
             "group": {"key": "ai", "label": "AI drafts"}, "evidence": None, "parties": [],
@@ -539,7 +577,9 @@ def _ai(db: Session, inv: str) -> list[dict[str, Any]]:
             "consequences": ["Either way it never creates or changes a record; your answer is written into the run record."],
             "choices": [_choice("yes", "Accept", path, {"decision": "accept"}, "Marks the draft as analysis a person checked."),
                         _choice("no", "Reject", path, {"decision": "reject"}, "Marks the draft rejected, with your reason.")],
-            "open": {"href": "/act#ai-reasoning-panel", "label": "Read the whole draft"},
+            # Not sure about the whole answer: decide it claim by claim instead (AI runs › Review).
+            "open": {"href": f"/act?run={(r.trace or {}).get('run_id') or ''}&review={r.id}#ai-runs" if (r.trace or {}).get("run_id")
+                     else "/act#ai-reasoning-panel", "label": "Not sure? Review it claim by claim"},
         })
     return out
 
@@ -614,19 +654,46 @@ def _pages_read(db: Session, page: list[dict[str, Any]]) -> None:
             item["group"] = {**item["group"], "pages": len(seen[doc]), "pages_read": len(seen[doc] - pending.get(doc, set()))}
 
 
-def decisions(db: Session, investigation_id: str, *, kind: str | None = None, order: str = "consequence",
-              offset: int = 0, limit: int = 200) -> dict[str, Any]:
+def pending_items(db: Session, investigation_id: str, kind: str | None = None) -> list[dict[str, Any]]:
+    """Every decision that waits, of one kind or all, as its reader builds it (before a page is chosen)."""
     readers: dict[str, Callable[[Session, str], list[dict[str, Any]]]] = {"to_check": _check_items, "missing": _missing, "proposal": _proposals, "match": _matches, "outside": _outside, "ai": _ai, "watchlist": _watchlist}
     items: list[dict[str, Any]] = []
     for k, read in readers.items():
         if kind in (None, k):
             items.extend(read(db, investigation_id))
+    return items
+
+
+def decisions(db: Session, investigation_id: str, *, kind: str | None = None, order: str = "consequence",
+              offset: int = 0, limit: int = 200, snoozed: bool = False) -> dict[str, Any]:
+    from app.core.time import utcnow_naive
+    from app.services import decision_snoozes, decision_unlocks
+
+    items = pending_items(db, investigation_id, kind)
+    # Put off with H (decision_snoozes): one still asleep leaves the queue and its kind's count; one that woke is back,
+    # saying why. With ``snoozed``, the list is the ones asleep.
+    put_off = decision_snoozes.rows(db, investigation_id)
+    asleep: list[dict[str, Any]] = []
+    if put_off:
+        now = utcnow_naive()
+        awake: list[dict[str, Any]] = []
+        for item in items:
+            row = put_off.get((item["kind"], item["id"]))
+            if row is not None:
+                item["snooze"] = decision_snoozes.state(row, item, now)
+            (asleep if item.get("snooze", {}).get("state") == "asleep" else awake).append(item)
+        items = asleep if snoozed else awake
+    elif snoozed:
+        items = []
+    # What answering Yes would unlock, dry-run on the records (decision_unlocks): the consequence order puts the
+    # decisions that unlock most first, then the kinds that weigh most.
+    decision_unlocks.score(db, investigation_id, items)
     if order == "oldest":
         items.sort(key=lambda i: i["created_at"])
     elif order == "source":
         items.sort(key=lambda i: (i["group"]["key"], -i["rank"], i["created_at"]))
     else:
-        items.sort(key=lambda i: (-i["rank"], i["created_at"]))
+        items.sort(key=lambda i: (-i["unlocks"]["score"], -i["rank"], i["created_at"]))
     total = len(items)
     page = items[offset:offset + limit]
     if any("_entity_row" in i for i in page):
@@ -639,13 +706,21 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
                 except ValueError:
                     strong = None
                 _entity_question(item, strong)
+                if strong:
+                    # Its Yes is "the same record": no new record, so nothing for the rules to find.
+                    decision_unlocks.none(item)
     _known_payments(db, investigation_id, page)
     _pages_read(db, page)
     for item in page:
         item.pop("_entity_row", None)
         item.pop("_payment_ends", None)
-    return {"investigation_id": investigation_id, "counts": decision_counts(db, investigation_id), "total": total,
-            "offset": offset, "items": page}
+        item.pop("_row", None)
+    counts = decision_counts(db, investigation_id)
+    for item in asleep:
+        if counts.get(item["kind"]):
+            counts[item["kind"]] -= 1
+    return {"investigation_id": investigation_id, "counts": {k: v for k, v in counts.items() if v}, "total": total,
+            "offset": offset, "items": page, "snoozed": len(asleep)}
 
 
 # --- Since -------------------------------------------------------------------------------------------------------

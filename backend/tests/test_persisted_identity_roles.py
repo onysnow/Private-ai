@@ -242,7 +242,9 @@ def test_every_model_resolves_to_its_investigation_for_the_write_guard():
         "IngestionBatchItem", "LeadLink", "LeadProfile", "LeadWorkflowEvent", "RelationshipEvidenceAttachment",
         "RelationshipEvidenceReviewEvent", "Statement", "StoryClaim", "StorySection",
     }
-    not_case_owned = {"AppUser", "Investigation"}
+    # A reporter's own flip cards (keyed by who asked) and the server's kept stray files (a local-only route) belong
+    # to no investigation, so no investigation's viewer role applies to them.
+    not_case_owned = {"AppUser", "Investigation", "KeptStrayFile", "LearningCard"}
     missing = sorted(m.class_.__name__ for m in Inv.registry.mappers
                      if "investigation_id" not in {c.key for c in m.columns}
                      and m.class_.__name__ not in resolved_through_parent | not_case_owned)

@@ -81,12 +81,14 @@ export function passageOf(claim: CitableClaim | undefined): CitablePassage | und
 
 type Hover = {id: string; x: number; y: number};
 
-export function WriteupEditor({investigationId, writeupId, claims, onDoc, onOpenPassage, reloadKey = 0}: {
+export function WriteupEditor({investigationId, writeupId, claims, onDoc, onOpenPassage, onPointClaim, reloadKey = 0}: {
   investigationId: string; writeupId: string; claims: CitableClaim[];
   /** Tells the screen what the text holds (the Cited tab, the AI-use note, the Export sheet's checks). */
   onDoc?: (info: DocInfo) => void;
   /** A citation was clicked: open its claim's passage beside the text. */
   onOpenPassage?: (claimId: string) => void;
+  /** A citation is pointed at (its claim's id), or no longer (null): the story tree lights that claim. */
+  onPointClaim?: (claimId: string | null) => void;
   /** Bumped after a version is restored: the stored text is loaded again. */
   reloadKey?: number;
 }): ReactElement {
@@ -158,10 +160,10 @@ export function WriteupEditor({investigationId, writeupId, claims, onDoc, onOpen
   useEffect(() => () => { window.clearTimeout(timer.current); window.clearTimeout(hideTimer.current); }, []);
   useEffect(() => {
     if (!hover) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setHover(null); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setHover(null); onPointClaim?.(null); } };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [hover]);
+  }, [hover, onPointClaim]);
 
   const cite = (c: CitableClaim) => {
     if (!editor) return;
@@ -180,12 +182,13 @@ export function WriteupEditor({investigationId, writeupId, claims, onDoc, onOpen
     const r = chip.getBoundingClientRect();
     const width = Math.min(340, host.width * 0.92); // the card's width (.wu-hover): kept inside the write-up
     setHover({id, x: Math.max(0, Math.min(r.left - host.left - 12, host.width - width)), y: r.bottom - host.top + 6});
+    onPointClaim?.(id);
   };
-  const hideSoon = () => { window.clearTimeout(hideTimer.current); hideTimer.current = window.setTimeout(() => setHover(null), 250); };
+  const hideSoon = () => { window.clearTimeout(hideTimer.current); hideTimer.current = window.setTimeout(() => { setHover(null); onPointClaim?.(null); }, 250); };
   const onOver = (e: ReactMouseEvent) => { const chip = chipOf(e.target); if (chip) showFor(chip); };
   const onOut = (e: ReactMouseEvent) => { if (chipOf(e.target) && !chipOf(e.relatedTarget)) hideSoon(); };
   const onFocusIn = (e: FocusEvent) => { const chip = chipOf(e.target); if (chip) showFor(chip); };
-  const open = (id: string) => { setHover(null); onOpenPassage?.(id); };
+  const open = (id: string) => { setHover(null); onPointClaim?.(null); onOpenPassage?.(id); };
   const onClick = (e: ReactMouseEvent) => { const chip = chipOf(e.target); const id = chip?.getAttribute('data-record-id'); if (id) open(id); };
   const onKey = (e: ReactKeyboardEvent) => {
     const chip = chipOf(e.target);

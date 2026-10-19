@@ -9,16 +9,19 @@ import {
 
 import { client } from '../client.gen';
 import {
+  addBackStrayFile,
   addChartToDeckEndpoint,
   addChartToWriteupEndpoint,
   addCollection,
   addCollectionItem,
+  addLearningCard,
   addNote,
   addStorySection,
   addTag,
   addWatchlistEntry,
   amendCaseRecord,
   analyzeOpenalephDocument,
+  answerLearningCard,
   assessStatement,
   attachRelationshipEvidenceEndpoint,
   cancelJobEndpoint,
@@ -53,6 +56,7 @@ import {
   deleteDeckEndpoint,
   deleteInvestigationMembership,
   deleteStorySection,
+  deleteStrayFiles,
   deleteWriteupEndpoint,
   dismissHit,
   dismissRedFlag,
@@ -72,6 +76,7 @@ import {
   expandEntityInCorpus,
   exportDeckPptx,
   exportInvestigation,
+  exportOutboundLog,
   exportWriteupDocx,
   externalRelationshipCandidates,
   findExtractionLineageEndpoint,
@@ -130,11 +135,13 @@ import {
   getOpenalephDocumentReviewStatus,
   getOpenalephDocumentSync,
   getOrphanStoragePreview,
+  getOutboundLog,
   getOwnershipChain,
   getPartyYears,
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
+  getSafety,
   getSameAnswerCandidates,
   getSecurityAlerts,
   getSecurityAudit,
@@ -157,6 +164,7 @@ import {
   importOpenalephDocumentEntities,
   importOpenalephDocumentEvidence,
   inspectBackup,
+  investigationAssistantRun,
   investigationCaseSynthesis,
   investigationDeletionPreview,
   investigationHypothesisTest,
@@ -164,11 +172,15 @@ import {
   investigationQuestionContext,
   investigationRunPlan,
   investigationRunProfile,
+  investigationSuiteRun,
   investigationVisualCatalog,
   investigationVisualPreview,
   investigationVisualRestyle,
+  keepLinkCheck,
   keepMoneyCheck,
+  keepStrayFiles,
   leadQueue,
+  learningSummary,
   linkClaimEvidenceEndpoint,
   linkLead,
   listAiRunEvents,
@@ -206,6 +218,7 @@ import {
   listJobsEndpoint,
   listLeadLinksEndpoint,
   listLeads,
+  listLearningCards,
   listOpenalephCorpusFailures,
   listPropertyConflictDecisions,
   listRelationshipEvidenceReviews,
@@ -220,6 +233,7 @@ import {
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
+  makeSafetyBackup,
   markAiRunThought,
   markRedFlagInnocent,
   markStoryReady,
@@ -242,6 +256,8 @@ import {
   promoteStatementAssessment,
   pruneSecurityAudit,
   putInvestigationMembership,
+  putSafetyAnswer,
+  putServiceMode,
   recheckHash,
   recordStoryGate,
   refreshOpenalephDocumentReview,
@@ -278,6 +294,7 @@ import {
   setInvestigationType,
   setStoryThesis,
   settingsStatus,
+  snoozeDecision,
   startStoryWriteup,
   syncCorpusNow,
   syncOpenalephDocument,
@@ -292,8 +309,12 @@ import {
   updateStorySection,
   updateWriteupEndpoint,
   uploadDocument,
+  wakeDecision,
 } from '../sdk.gen';
 import type {
+  AddBackStrayFileData,
+  AddBackStrayFileError,
+  AddBackStrayFileResponse,
   AddChartToDeckEndpointData,
   AddChartToDeckEndpointError,
   AddChartToDeckEndpointResponse,
@@ -306,6 +327,9 @@ import type {
   AddCollectionItemError,
   AddCollectionItemResponse,
   AddCollectionResponse,
+  AddLearningCardData,
+  AddLearningCardError,
+  AddLearningCardResponse,
   AddNoteData,
   AddNoteError,
   AddNoteResponse,
@@ -324,6 +348,9 @@ import type {
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentError,
   AnalyzeOpenalephDocumentResponse,
+  AnswerLearningCardData,
+  AnswerLearningCardError,
+  AnswerLearningCardResponse,
   AssessStatementData,
   AssessStatementError,
   AssessStatementResponse,
@@ -426,6 +453,9 @@ import type {
   DeleteStorySectionData,
   DeleteStorySectionError,
   DeleteStorySectionResponse,
+  DeleteStrayFilesData,
+  DeleteStrayFilesError,
+  DeleteStrayFilesResponse,
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointError,
   DeleteWriteupEndpointResponse,
@@ -483,6 +513,9 @@ import type {
   ExportInvestigationData,
   ExportInvestigationError,
   ExportInvestigationResponse,
+  ExportOutboundLogData,
+  ExportOutboundLogError,
+  ExportOutboundLogResponse,
   ExportWriteupDocxData,
   ExportWriteupDocxError,
   ExportWriteupDocxResponse,
@@ -657,6 +690,9 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewError,
   GetOrphanStoragePreviewResponse,
+  GetOutboundLogData,
+  GetOutboundLogError,
+  GetOutboundLogResponse,
   GetOwnershipChainData,
   GetOwnershipChainError,
   GetOwnershipChainResponse,
@@ -672,6 +708,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsError,
   GetRedFlagsResponse,
+  GetSafetyData,
+  GetSafetyError,
+  GetSafetyResponse,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesError,
   GetSameAnswerCandidatesResponse,
@@ -738,6 +777,9 @@ import type {
   InspectBackupData,
   InspectBackupError,
   InspectBackupResponse,
+  InvestigationAssistantRunData,
+  InvestigationAssistantRunError,
+  InvestigationAssistantRunResponse,
   InvestigationCaseSynthesisData,
   InvestigationCaseSynthesisError,
   InvestigationCaseSynthesisResponse,
@@ -759,6 +801,9 @@ import type {
   InvestigationRunProfileData,
   InvestigationRunProfileError,
   InvestigationRunProfileResponse,
+  InvestigationSuiteRunData,
+  InvestigationSuiteRunError,
+  InvestigationSuiteRunResponse,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogError,
   InvestigationVisualCatalogResponse,
@@ -768,12 +813,21 @@ import type {
   InvestigationVisualRestyleData,
   InvestigationVisualRestyleError,
   InvestigationVisualRestyleResponse,
+  KeepLinkCheckData,
+  KeepLinkCheckError,
+  KeepLinkCheckResponse,
   KeepMoneyCheckData,
   KeepMoneyCheckError,
   KeepMoneyCheckResponse,
+  KeepStrayFilesData,
+  KeepStrayFilesError,
+  KeepStrayFilesResponse,
   LeadQueueData,
   LeadQueueError,
   LeadQueueResponse,
+  LearningSummaryData,
+  LearningSummaryError,
+  LearningSummaryResponse,
   LinkClaimEvidenceEndpointData,
   LinkClaimEvidenceEndpointError,
   LinkClaimEvidenceEndpointResponse,
@@ -885,6 +939,9 @@ import type {
   ListLeadsData,
   ListLeadsError,
   ListLeadsResponse,
+  ListLearningCardsData,
+  ListLearningCardsError,
+  ListLearningCardsResponse,
   ListOpenalephCorpusFailuresData,
   ListOpenalephCorpusFailuresError,
   ListOpenalephCorpusFailuresResponse,
@@ -927,6 +984,9 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagError,
   MakeLeadFromRedFlagResponse,
+  MakeSafetyBackupData,
+  MakeSafetyBackupError,
+  MakeSafetyBackupResponse,
   MarkAiRunThoughtData,
   MarkAiRunThoughtError,
   MarkAiRunThoughtResponse,
@@ -989,6 +1049,12 @@ import type {
   PutInvestigationMembershipData,
   PutInvestigationMembershipError,
   PutInvestigationMembershipResponse,
+  PutSafetyAnswerData,
+  PutSafetyAnswerError,
+  PutSafetyAnswerResponse,
+  PutServiceModeData,
+  PutServiceModeError,
+  PutServiceModeResponse,
   RecheckHashData,
   RecheckHashError,
   RecheckHashResponse,
@@ -1097,6 +1163,9 @@ import type {
   SettingsStatusData,
   SettingsStatusError,
   SettingsStatusResponse,
+  SnoozeDecisionData,
+  SnoozeDecisionError,
+  SnoozeDecisionResponse,
   StartStoryWriteupData,
   StartStoryWriteupError,
   StartStoryWriteupResponse,
@@ -1139,6 +1208,9 @@ import type {
   UploadDocumentData,
   UploadDocumentError,
   UploadDocumentResponse,
+  WakeDecisionData,
+  WakeDecisionError,
+  WakeDecisionResponse,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -5375,6 +5447,70 @@ export const saveInvestigationRunProfileMutation = (
   return mutationOptions;
 };
 
+/**
+ * Investigation Assistant Run
+ *
+ * Any AI run, through the one route the suite service gives its module (app/ai/suite.py): TAS, the other six
+ * systems, or the app-local draft. The per-module endpoints below are this same route with the module fixed.
+ * Every answer is a proposal and writes nothing else.
+ */
+export const investigationAssistantRunMutation = (
+  options?: Partial<Options<InvestigationAssistantRunData>>,
+): UseMutationOptions<
+  InvestigationAssistantRunResponse,
+  InvestigationAssistantRunError,
+  Options<InvestigationAssistantRunData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    InvestigationAssistantRunResponse,
+    InvestigationAssistantRunError,
+    Options<InvestigationAssistantRunData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await investigationAssistantRun({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Investigation Suite Run
+ *
+ * A run of another system of the Authority System Suite -- RAS, QAS, LAS, DAS, EGS or EHS
+ * (app/ai/systems.py) -- through the same citation-validated pipeline as the TAS endpoints, with the same
+ * guarantee: the answer is a proposal and writes nothing else. A run may start from an answer you accepted
+ * (`handoff_from`); what crosses is decided by the suite's INTEROP rules (app/ai/interop.py) and every value held
+ * back is listed in the run record.
+ */
+export const investigationSuiteRunMutation = (
+  options?: Partial<Options<InvestigationSuiteRunData>>,
+): UseMutationOptions<
+  InvestigationSuiteRunResponse,
+  InvestigationSuiteRunError,
+  Options<InvestigationSuiteRunData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    InvestigationSuiteRunResponse,
+    InvestigationSuiteRunError,
+    Options<InvestigationSuiteRunData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await investigationSuiteRun({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const listCaseRecordsQueryKey = (
   options: Options<ListCaseRecordsData>,
 ) => createQueryKey('listCaseRecords', options);
@@ -6185,6 +6321,64 @@ export const listInvestigationCrossReferencesOptions = (
     },
     queryKey: listInvestigationCrossReferencesQueryKey(options),
   });
+
+/**
+ * Snooze Decision
+ *
+ * Puts a waiting decision off (H on Decide): until a time, until the item changes, or whichever comes first.
+ */
+export const snoozeDecisionMutation = (
+  options?: Partial<Options<SnoozeDecisionData>>,
+): UseMutationOptions<
+  SnoozeDecisionResponse,
+  SnoozeDecisionError,
+  Options<SnoozeDecisionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SnoozeDecisionResponse,
+    SnoozeDecisionError,
+    Options<SnoozeDecisionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await snoozeDecision({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Wake Decision
+ *
+ * Brings a decision put off back into the queue now (Restore, or Z right after H).
+ */
+export const wakeDecisionMutation = (
+  options?: Partial<Options<WakeDecisionData>>,
+): UseMutationOptions<
+  WakeDecisionResponse,
+  WakeDecisionError,
+  Options<WakeDecisionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    WakeDecisionResponse,
+    WakeDecisionError,
+    Options<WakeDecisionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await wakeDecision({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getDecisionsQueryKey = (options: Options<GetDecisionsData>) =>
   createQueryKey('getDecisions', options);
@@ -7011,6 +7205,117 @@ export const addNoteMutation = (
   return mutationOptions;
 };
 
+export const getOutboundLogQueryKey = (options: Options<GetOutboundLogData>) =>
+  createQueryKey('getOutboundLog', options);
+
+/**
+ * Get Outbound Log
+ *
+ * Every request that left this computer for an outside service, newest first: the value word for word.
+ * Append-only: nothing here changes or removes a row.
+ */
+export const getOutboundLogOptions = (options: Options<GetOutboundLogData>) =>
+  queryOptions<
+    GetOutboundLogResponse,
+    GetOutboundLogError,
+    GetOutboundLogResponse,
+    ReturnType<typeof getOutboundLogQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOutboundLog({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getOutboundLogQueryKey(options),
+  });
+
+export const getOutboundLogInfiniteQueryKey = (
+  options: Options<GetOutboundLogData>,
+): QueryKey<Options<GetOutboundLogData>> =>
+  createQueryKey('getOutboundLog', options, true);
+
+/**
+ * Get Outbound Log
+ *
+ * Every request that left this computer for an outside service, newest first: the value word for word.
+ * Append-only: nothing here changes or removes a row.
+ */
+export const getOutboundLogInfiniteOptions = (
+  options: Options<GetOutboundLogData>,
+) => {
+  const opts = infiniteQueryOptions<
+    GetOutboundLogResponse,
+    GetOutboundLogError,
+    InfiniteData<GetOutboundLogResponse>,
+    QueryKey<Options<GetOutboundLogData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetOutboundLogData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetOutboundLogData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getOutboundLog({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getOutboundLogInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const exportOutboundLogQueryKey = (
+  options: Options<ExportOutboundLogData>,
+) => createQueryKey('exportOutboundLog', options);
+
+/**
+ * Export Outbound Log
+ */
+export const exportOutboundLogOptions = (
+  options: Options<ExportOutboundLogData>,
+) =>
+  queryOptions<
+    ExportOutboundLogResponse,
+    ExportOutboundLogError,
+    ExportOutboundLogResponse,
+    ReturnType<typeof exportOutboundLogQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await exportOutboundLog({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: exportOutboundLogQueryKey(options),
+  });
+
 export const howAreTheyConnectedQueryKey = (
   options: Options<HowAreTheyConnectedData>,
 ) => createQueryKey('howAreTheyConnected', options);
@@ -7401,6 +7706,122 @@ export const listReportingTasksInfiniteOptions = (
   return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const getSafetyQueryKey = (options: Options<GetSafetyData>) =>
+  createQueryKey('getSafety', options);
+
+/**
+ * Get Safety
+ *
+ * Totals for the period with zeroes stated, the six stores on this computer, the outside services with their
+ * modes and what each was sent, who can reach the case, and what deleting it removes.
+ */
+export const getSafetyOptions = (options: Options<GetSafetyData>) =>
+  queryOptions<
+    GetSafetyResponse,
+    GetSafetyError,
+    GetSafetyResponse,
+    ReturnType<typeof getSafetyQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSafety({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSafetyQueryKey(options),
+  });
+
+/**
+ * Put Safety Answer
+ *
+ * The reporter's answer to an "Only you can say" question. Kept on this computer only, never in a backup.
+ */
+export const putSafetyAnswerMutation = (
+  options?: Partial<Options<PutSafetyAnswerData>>,
+): UseMutationOptions<
+  PutSafetyAnswerResponse,
+  PutSafetyAnswerError,
+  Options<PutSafetyAnswerData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutSafetyAnswerResponse,
+    PutSafetyAnswerError,
+    Options<PutSafetyAnswerData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putSafetyAnswer({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Make Safety Backup
+ *
+ * Back up now: the case's portable backup with its documents, and a record of it (when, size, checksum, whether
+ * protected). With a passphrase in the body the file is sealed with it (ADR-0015); without one it is not.
+ */
+export const makeSafetyBackupMutation = (
+  options?: Partial<Options<MakeSafetyBackupData>>,
+): UseMutationOptions<
+  MakeSafetyBackupResponse,
+  MakeSafetyBackupError,
+  Options<MakeSafetyBackupData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeSafetyBackupResponse,
+    MakeSafetyBackupError,
+    Options<MakeSafetyBackupData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeSafetyBackup({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Put Service Mode
+ *
+ * Off / Ask first / Automatic for one outside service in this case. Enforced where the calls are made.
+ */
+export const putServiceModeMutation = (
+  options?: Partial<Options<PutServiceModeData>>,
+): UseMutationOptions<
+  PutServiceModeResponse,
+  PutServiceModeError,
+  Options<PutServiceModeData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutServiceModeResponse,
+    PutServiceModeError,
+    Options<PutServiceModeData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putServiceMode({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getSinceQueryKey = (options: Options<GetSinceData>) =>
   createQueryKey('getSince', options);
 
@@ -7578,6 +7999,37 @@ export const getStandingOptions = (options: Options<GetStandingData>) =>
     },
     queryKey: getStandingQueryKey(options),
   });
+
+/**
+ * Add Back Stray File
+ *
+ * Add back to the case (Housekeeping, research Keep §12 "opens The Drop with it"): the stray file becomes a
+ * document of this case and is read like an upload. When its bytes are saved as a new copy the stray original is
+ * removed. Local-only; the path is checked again here like Delete.
+ */
+export const addBackStrayFileMutation = (
+  options?: Partial<Options<AddBackStrayFileData>>,
+): UseMutationOptions<
+  AddBackStrayFileResponse,
+  AddBackStrayFileError,
+  Options<AddBackStrayFileData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddBackStrayFileResponse,
+    AddBackStrayFileError,
+    Options<AddBackStrayFileData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addBackStrayFile({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getStoryQueryKey = (options: Options<GetStoryData>) =>
   createQueryKey('getStory', options);
@@ -8668,6 +9120,124 @@ export const linkLeadMutation = (
 };
 
 /**
+ * Answer Learning Card
+ *
+ * Again / Good (or Hard / Easy): moves the card along the ladder and says when it comes back.
+ */
+export const answerLearningCardMutation = (
+  options?: Partial<Options<AnswerLearningCardData>>,
+): UseMutationOptions<
+  AnswerLearningCardResponse,
+  AnswerLearningCardError,
+  Options<AnswerLearningCardData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AnswerLearningCardResponse,
+    AnswerLearningCardError,
+    Options<AnswerLearningCardData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await answerLearningCard({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listLearningCardsQueryKey = (
+  options?: Options<ListLearningCardsData>,
+) => createQueryKey('listLearningCards', options);
+
+/**
+ * List Learning Cards
+ *
+ * A deck's cards, due first; with due_only, only those due now. ``ref`` finds one indicator's or term's card.
+ */
+export const listLearningCardsOptions = (
+  options?: Options<ListLearningCardsData>,
+) =>
+  queryOptions<
+    ListLearningCardsResponse,
+    ListLearningCardsError,
+    ListLearningCardsResponse,
+    ReturnType<typeof listLearningCardsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listLearningCards({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listLearningCardsQueryKey(options),
+  });
+
+/**
+ * Add Learning Card
+ *
+ * ＋ Flip card: keeps the indicator or term as a card, due now. Adding it again changes nothing.
+ */
+export const addLearningCardMutation = (
+  options?: Partial<Options<AddLearningCardData>>,
+): UseMutationOptions<
+  AddLearningCardResponse,
+  AddLearningCardError,
+  Options<AddLearningCardData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddLearningCardResponse,
+    AddLearningCardError,
+    Options<AddLearningCardData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addLearningCard({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const learningSummaryQueryKey = (
+  options?: Options<LearningSummaryData>,
+) => createQueryKey('learningSummary', options);
+
+/**
+ * Learning Summary
+ *
+ * How many flip cards are due, in all and per deck, and when the next falls due.
+ */
+export const learningSummaryOptions = (
+  options?: Options<LearningSummaryData>,
+) =>
+  queryOptions<
+    LearningSummaryResponse,
+    LearningSummaryError,
+    LearningSummaryResponse,
+    ReturnType<typeof learningSummaryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await learningSummary({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: learningSummaryQueryKey(options),
+  });
+
+/**
  * Remove Note
  *
  * Delete the note. A lead made from it stays.
@@ -9134,6 +9704,36 @@ export const patchRelationshipSuiteMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await patchRelationshipSuite({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Keep Link Check
+ *
+ * Keeps a link in To check (The Wire's chain strip, "Add to To check →"): an item asking for a reviewed source
+ * for it, on its two parties. Once; adding it again changes nothing.
+ */
+export const keepLinkCheckMutation = (
+  options?: Partial<Options<KeepLinkCheckData>>,
+): UseMutationOptions<
+  KeepLinkCheckResponse,
+  KeepLinkCheckError,
+  Options<KeepLinkCheckData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    KeepLinkCheckResponse,
+    KeepLinkCheckError,
+    Options<KeepLinkCheckData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await keepLinkCheck({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -9723,6 +10323,67 @@ export const getOrphanStoragePreviewOptions = (
     },
     queryKey: getOrphanStoragePreviewQueryKey(options),
   });
+
+/**
+ * Delete Stray Files
+ *
+ * Delete stray files the reporter confirmed (Housekeeping, research Keep §12). Local-only. Each path is checked
+ * again here: under the document storage folder, not a link, not a staging folder, and no document points to it;
+ * one that is not refuses the whole request (400) and nothing is deleted. Written to the security audit log.
+ */
+export const deleteStrayFilesMutation = (
+  options?: Partial<Options<DeleteStrayFilesData>>,
+): UseMutationOptions<
+  DeleteStrayFilesResponse,
+  DeleteStrayFilesError,
+  Options<DeleteStrayFilesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteStrayFilesResponse,
+    DeleteStrayFilesError,
+    Options<DeleteStrayFilesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteStrayFiles({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Keep Stray Files
+ *
+ * Keep (Housekeeping, research Keep §12): the files stay on disk and are not offered again. Local-only, like
+ * the list. A path that is not a current stray file under document storage refuses the request (400).
+ */
+export const keepStrayFilesMutation = (
+  options?: Partial<Options<KeepStrayFilesData>>,
+): UseMutationOptions<
+  KeepStrayFilesResponse,
+  KeepStrayFilesError,
+  Options<KeepStrayFilesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    KeepStrayFilesResponse,
+    KeepStrayFilesError,
+    Options<KeepStrayFilesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await keepStrayFiles({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Create Source Endpoint

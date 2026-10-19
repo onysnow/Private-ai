@@ -6,11 +6,13 @@
 // Left: Bring in above Check. Centre, the only lifted panel: Next up, then what
 // changed since your last visit. Right: Act · Red Flags above See · who is linked.
 // Bottom: the year rail and what is pointed at. Scrolling over a module steps
-// inside it; every step also has a click and a key.
+// inside it; every step also has a click and a key. That grid is the Board format; Editorial, Desk and Story lay
+// the same parts out their own way (formats.tsx), the top band and the bottom staying where they are.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
-import {useCallback, useEffect, useMemo, useState} from 'react';
-import type {DragEvent, ReactElement, ReactNode} from 'react';
+import {useRouter} from 'next/navigation';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 
 import {LevelChip, StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
@@ -21,11 +23,11 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
 import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../lib/generated/types.gen';
+import {singleKeysOn} from '../../lib/shortcuts';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {HIDE_SCREEN_EVENT, OPEN_INBOX_EVENT, OPEN_PALETTE_EVENT, SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
 import {useNeedsYouCount} from '../inbox/inbox';
 import {caseHref} from '../../lib/case-href';
-import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
 import {NewCaseSetup} from '../new-case/new-case-setup';
 import {DecisionCard} from './decision-card';
@@ -37,6 +39,13 @@ import {HOLD_MS, useDecisions} from './use-decisions';
 import {useWheelStep} from './wheel-step';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AiStrip} from '../ai/ai-strip';
+import {StandingPopover, money, useStandingPopover} from './standing-popover';
+import type {StandingKey} from './standing-popover';
+import {FirstActions, caseIsEmpty, useDropFiles} from './first-actions';
+import {DeskHome, EditorialHome, StoryHome, useFormat} from './formats';
+import type {Part} from './formats';
+
+export {money};
 
 const CLAIM_STATUS: Record<string, ClaimStatus> = {
   supported: 'supported', confirmed: 'supported', disputed: 'disputed', rejected: 'ruled_out', lead: 'unshown', unverified: 'unshown',
@@ -44,17 +53,11 @@ const CLAIM_STATUS: Record<string, ClaimStatus> = {
 const CLAIM_ORDER: Record<ClaimStatus, number> = {disputed: 0, unshown: 1, supported: 2, ruled_out: 3};
 const LEVEL_ORDER: Record<string, number> = {textbook: 0, strong: 1, faint: 2};
 const UNREAD = new Set(['queued', 'pending', 'extracting']);
+const typing = (target: EventTarget | null): boolean => {
+  const el = target as HTMLElement | null;
+  return Boolean(el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)));
+};
 const VISIT_KEY = (id: string) => `pai:last-visit:${id}`;
-
-export function money(amount: number, currency: string | null): string {
-  if (!currency) return '—';
-  // Large sums are shortened ($5.82bn); the exact figure is in the ledger.
-  const compact = Math.abs(amount) >= 1_000_000;
-  try {
-    return new Intl.NumberFormat('en-US', {style: 'currency', currency, currencyDisplay: 'narrowSymbol', notation: compact ? 'compact' : 'standard',
-      maximumFractionDigits: compact ? 2 : 0}).format(amount);
-  } catch { return `${currency} ${Math.round(amount).toLocaleString('en-GB')}`; }
-}
 
 /** Years in a line: [2015, 2017, 2018] → "2015, 2017–18". */
 export function yearSpan(years: number[]): string {
@@ -90,11 +93,14 @@ function writeVisit(id: string): void {
   try { window.localStorage.setItem(VISIT_KEY(id), new Date().toISOString()); } catch { /* private window */ }
 }
 
+/** Where Enter takes a focused module: its feature, whole-screen (redesign §04.1 "Keyboard"). */
+const MODULE_HREF: Record<string, string> = {'01': '/bring-in', '02': '/check#claim-verification', '03': '/see#the-wire', '04': '/act#red-flags'};
+
 function Module({n, name, href, extra, children, className = '', label, openLabel = 'Open'}: {
   n: string; name: string; href?: string; extra?: ReactNode; children: ReactNode; className?: string; label?: string; openLabel?: string;
 }): ReactElement {
   const inv = useWorkbenchStore(state => state.investigationId);
-  return <FrostPanel className={`ch-mod ${className}`} label={label ?? name}>
+  return <FrostPanel className={`ch-mod ${className}`} label={label ?? name} attrs={{'data-module': n, tabIndex: -1}}>
     <header className="ch-mod-head">
       <h2><span className="ch-n">{n}</span>{name}</h2>
       {extra}
@@ -116,12 +122,13 @@ function Stepper({index, count, total, onStep, label}: {index: number; count: nu
 }
 
 /** The case's own question, written in place. */
-function CaseQuestion({investigation}: {investigation: InvestigationOut}): ReactElement {
+function CaseQuestion({investigation, editSignal = 0}: {investigation: InvestigationOut; /** Changes when another control asks to write the question. */ editSignal?: number}): ReactElement {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(investigation.question ?? '');
   const [problem, setProblem] = useState('');
   useEffect(() => { setDraft(investigation.question ?? ''); }, [investigation.question]);
+  useEffect(() => { if (editSignal) setEditing(true); }, [editSignal]);
   const save = async () => {
     try {
       await patchInvestigation({path: {investigation_id: investigation.id}, body: {question: draft}, throwOnError: true});
@@ -147,21 +154,25 @@ function CaseQuestion({investigation}: {investigation: InvestigationOut}): React
 function StandingStrip({investigationId}: {investigationId: string}): ReactElement {
   const standing = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const s = standing.data;
-  const cell = (key: string, big: ReactNode, small: string, href: string, mark?: string, tone = '') =>
-    <li key={key}><Link className={`ch-num ${tone}`} href={caseHref(href, investigationId)}>
+  // Pointing at a number or focusing it previews its list; a click pins it; Escape closes (redesign "Standing numbers").
+  const pop = useStandingPopover();
+  const cell = (key: StandingKey, big: ReactNode, small: string, href: string, mark?: string, tone = '') =>
+    <li key={key}><a className={`ch-num ${tone}`} href={caseHref(href, investigationId)} aria-haspopup="dialog" {...(s ? pop.triggerProps(key) : {})}>
       <b>{mark && <span aria-hidden="true" className="ch-num-mark">{mark}</span>}{big}</b><small>{small}</small>
-    </Link></li>;
+    </a></li>;
   if (standing.isError) return <p className="ch-strip-error" role="alert">{errorMessage(standing.error, 'Could not count the case')} <button type="button" onClick={() => void standing.refetch()}>Retry</button></p>;
-  return <ul className="ch-strip" aria-label="Where the case stands" aria-busy={!s}>
+  return <><ul className="ch-strip" aria-label="Where the case stands" aria-busy={!s}>
     {cell('sup', s?.claims.supported ?? '·', 'claims supported', '/check#claim-verification', '✓', 'ok')}
     {cell('dis', s?.claims.disputed ?? '·', 'claims disputed', '/check#claim-verification', '✕', 'bad')}
     {cell('uns', s?.claims.unshown ?? '·', 'not yet shown', '/check#claim-verification', '○')}
     {cell('dec', s?.to_decide ?? '·', 'to decide · need a person', '/decide', undefined, 'need')}
     {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? `money traced from ${s.money.from_sources ?? 0} source${s.money.from_sources === 1 ? '' : 's'} · ${s.money.payments} payment${s.money.payments === 1 ? '' : 's'}` : 'money traced', '/see#money-flows')}
     {cell('yrs', s?.timeline.from ? (s.timeline.from === s.timeline.to ? s.timeline.from : `${s.timeline.from}–${s.timeline.to?.slice(2)}`) : '—',
-      s ? `${s.timeline.events} events · ${s.timeline.years.length} years` : 'events', '/see#timeline')}
-    {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread` : 'documents', '/bring-in#document-ingestion')}
-  </ul>;
+      s ? `${s.timeline.events} events · ${continuousYears(s.timeline.years).length} years` : 'events', '/see#timeline')}
+    {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread${s.documents.failed ? ` · ${s.documents.failed} failed` : ''}` : 'documents', '/bring-in#document-ingestion')}
+  </ul>
+  {s && pop.open && <StandingPopover open={pop.open} anchor={pop.anchors.current.get(pop.open.key)} popover={pop.popover} popoverProps={pop.popoverProps}
+    standing={s} investigationId={investigationId} onClose={() => pop.close()}/>}</>;
 }
 
 /** "4 names and 2 dates proposed so far", from a document's proposal counts. */
@@ -175,11 +186,9 @@ export function proposedLine(doc: {candidate_counts?: Record<string, number> | n
 }
 
 function BringIn({investigationId}: {investigationId: string}): ReactElement {
-  const queryClient = useQueryClient();
   const docs = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data ?? [];
   const standing = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
-  const [over, setOver] = useState(false);
-  const [dropped, setDropped] = useState('');
+  const {over, status: dropped, dropProps} = useDropFiles(investigationId);
   const reading = docs.find(d => d.extraction_status === 'extracting') ?? docs.find(d => UNREAD.has(d.extraction_status));
   const openDocument = useWorkbenchStore(state => state.openDocument);
   // The card shows the file being read, else the last one brought in (mockup HOME_1).
@@ -191,18 +200,6 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
     enabled: Boolean(investigationId && reading), refetchInterval: reading?.extraction_status === 'extracting' ? 1500 : false}).data?.[0];
   const busy = reading?.extraction_status === 'extracting';
   const progress = busy && job?.status === 'running' && typeof job.progress === 'number' ? job.progress : null;
-  const onDrop = async (event: DragEvent) => {
-    event.preventDefault(); setOver(false);
-    const files = Array.from(event.dataTransfer.files);
-    if (!files.length || !investigationId) return;
-    let done = 0;
-    for (const file of files) {
-      setDropped(`Saving ${file.name} (${done + 1} of ${files.length})…`);
-      try { await upload(investigationId, file.name.replace(/\.[^./]+$/, ''), file); done += 1; } catch (error) { setDropped(`${file.name}: ${errorMessage(error, 'not saved')}`); return; }
-    }
-    setDropped(`${done} document${done === 1 ? '' : 's'} saved. Reading starts now.`);
-    await queryClient.invalidateQueries();
-  };
   const row = (count: number, label: string, href: string, verb: string) =>
     <li><b>{count}</b><span>{label}</span><Link href={caseHref(href, investigationId)}>{verb} →</Link></li>;
   return <Module n="01" name="Bring in" href="/bring-in">
@@ -223,7 +220,7 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
       {row(kinds.outside ?? 0, 'outside findings to review', '/decide?kind=outside', 'Review')}
       {row(kinds.watchlist ?? 0, `watchlist hit${(kinds.watchlist ?? 0) === 1 ? '' : 's'}`, '/decide?kind=watchlist', 'See')}
     </ul>
-    <div className={`ch-drop${over ? ' over' : ''}`} onDragOver={e => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={e => void onDrop(e)}>
+    <div className={`ch-drop${over ? ' over' : ''}`} {...dropProps}>
       {dropped ? <span role="status">{dropped}</span> : <Link href={caseHref('/bring-in#the-drop', investigationId)}>+ Drop documents anywhere</Link>}
     </div>
   </Module>;
@@ -361,14 +358,14 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
   }, [active, held, undo]);
-  return <section className="ch-mod ch-next" aria-label="Next up" {...wheel}>
+  return <section className="ch-mod ch-next" aria-label="Next up" data-module="next" tabIndex={-1} {...wheel}>
     <header className="ch-mod-head">
       <h2><span className="ch-eyebrow">Next up</span>{item?.kind === 'to_check' ? 'One thing only you can check' : 'One thing only you can decide'}</h2>
       <Stepper index={index} count={items.length} total={query.data?.total} onStep={setIndex} label="Decisions"/>
     </header>
     {query.isError ? <p role="alert">{errorMessage(query.error, 'Could not load what waits for you')} <button type="button" onClick={() => void query.refetch()}>Retry</button></p>
       : query.isPending && investigationId ? <div className="ch-skeleton" aria-busy="true"/>
-      : item ? <DecisionCard item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}/>
+      : item ? <DecisionCard key={item.id} item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}/>
       : <div className="ch-clear"><p>Nothing waits for you.</p><Link href={caseHref('/bring-in#document-ingestion', inv)}>Drop documents</Link></div>}
     <footer className="ch-next-foot">
       <span className="ch-dots" aria-hidden="true">{items.slice(0, 9).map((d, i) => <i key={d.id} className={i === index ? 'on' : ''}/>)}</span>
@@ -381,26 +378,42 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
   </section>;
 }
 
+type RailYear = {year: string; events: number; flags?: number};
+
+/** Every year from the first dated item to the last, in order: a year with nothing
+ *  in it stays on the rail as an empty tick, so the rail reads as continuous time. */
+export function continuousYears(years: RailYear[]): RailYear[] {
+  const known = new Map(years.filter(y => /^\d{4}$/.test(y.year)).map(y => [Number(y.year), y]));
+  if (!known.size) return [];
+  const first = Math.min(...known.keys());
+  const last = Math.max(...known.keys());
+  return Array.from({length: last - first + 1}, (_, i) => known.get(first + i) ?? {year: String(first + i), events: 0, flags: 0});
+}
+
 function YearRail({investigationId}: {investigationId: string}): ReactElement {
   const standingQuery = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const standing = standingQuery.data;
   const asOf = useWorkbenchStore(state => state.asOf);
   const setAsOf = useWorkbenchStore(state => state.setAsOf);
-  const years = standing?.timeline.years ?? [];
+  const years = useMemo(() => continuousYears(standing?.timeline.years ?? []), [standing]);
   const most = Math.max(1, ...years.map(y => y.events));
   const pointed = usePointedYears();
   const lit = new Set(pointed.years);
+  // A long case scrolls the rail; it opens on the latest years.
+  const rail = useRef<HTMLElement>(null);
+  useEffect(() => { if (rail.current) rail.current.scrollLeft = rail.current.scrollWidth; }, [years.length]);
   if (standingQuery.isPending && investigationId) return <div className="ch-years" aria-busy="true"/>;
   if (!years.length) return <div className="ch-years ch-quiet">Dated events place the case in time here.</div>;
-  return <nav className="ch-years" aria-label="Years in the case">
-    {years.slice(-10).map(y => {
+  return <nav ref={rail} className="ch-years" aria-label="Years in the case">
+    {years.map(y => {
       const on = asOf === Number(y.year);
       const flags = y.flags ?? 0;
-      const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit'].filter(Boolean).join(' ');
+      const empty = !y.events && !flags;
+      const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit', empty && 'empty'].filter(Boolean).join(' ');
       return <button key={y.year} type="button" className={cls} aria-pressed={on} onClick={() => setAsOf(on ? null : Number(y.year))}
         title={on ? 'Show all years again' : `Show the case as of ${y.year}`}>
         <b>{y.year}</b><small aria-label={`${y.events} event${y.events === 1 ? '' : 's'}${flags ? `, ${flags} Red Flag${flags === 1 ? '' : 's'}` : ''}`}>
-          {y.events}{flags ? <> · <span className="ch-year-flags">flag</span></> : null}</small>
+          {y.events}{flags ? <> · <span className="ch-year-flags">{flags} flag{flags === 1 ? '' : 's'}</span></> : null}</small>
         <i style={{width: `${(100 * y.events) / most}%`}}/>
       </button>;
     })}
@@ -464,31 +477,91 @@ function FirstCase({onSwitch}: {onSwitch: (id: string) => void}): ReactElement {
   </div>;
 }
 
+function SeeModule({investigationId}: {investigationId: string}): ReactElement {
+  return <Module n="03" name="See · who is linked" href="/see#the-wire" openLabel="Open network"><MiniNetwork investigationId={investigationId}/></Module>;
+}
+
+/** The Case home's parts for the formats other than Board (formats.tsx): the same components, in the order the
+ *  Case home is read — the one thing that needs you, then the four steps. */
+function parts(id: string, active: boolean, preview: boolean): Part[] {
+  return [
+    {key: 'next', module: 'next', word: 'Next up', href: '/decide', render: shown => <div className="ch-centre fm-pair">
+      <NextUp investigationId={id} active={active && shown}/><SinceStrip investigationId={id} markVisit={!preview}/></div>},
+    {key: 'bring', module: '01', word: 'Bring in', href: MODULE_HREF['01'], render: () => <BringIn investigationId={id}/>},
+    {key: 'check', module: '02', word: 'Check', href: MODULE_HREF['02'], render: () => <CheckModule investigationId={id}/>},
+    {key: 'see', module: '03', word: 'See', href: MODULE_HREF['03'], render: () => <SeeModule investigationId={id}/>},
+    {key: 'act', module: '04', word: 'Act', href: MODULE_HREF['04'], render: () => <ActModule investigationId={id}/>},
+  ];
+}
+
 export function CaseHome({investigation, investigations: _cases, onSwitch, loading, active = true, preview = false}: {
   investigation: InvestigationOut | null; investigations: InvestigationOut[]; onSwitch: (id: string) => void; loading: boolean; active?: boolean;
   /** A picture of the page (Appearance's before/after): it never marks the case as visited. */
   preview?: boolean;
 }): ReactElement {
   const id = investigation?.id ?? '';
+  const router = useRouter();
+  const standing = useQuery({...getStandingOptions({path: {investigation_id: id}}), enabled: Boolean(id)});
+  // An empty case shows its four first actions in place of the modules (redesign "The case home", States).
+  const empty = !preview && caseIsEmpty(standing.data);
+  const [askQuestion, setAskQuestion] = useState(0);
+  const format = useFormat();
+  const reveal = useRef<((module: string) => void) | null>(null);
+  // 1–4 focus a module, J / K step inside the focused one, Enter opens it whole-screen (redesign §04.1 "Keyboard").
+  useEffect(() => {
+    if (!active || preview || !investigation) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.defaultPrevented || typing(event.target) || !singleKeysOn()) return;
+      if (document.querySelector('[role="dialog"]')) return;
+      const home = document.querySelector<HTMLElement>('[data-testid="case-home"]');
+      if (!home || home.closest('[hidden]')) return;
+      const key = event.key.toLowerCase();
+      if (/^[1-4]$/.test(key)) {
+        // A module on screen is focused; one a format keeps out of sight (Editorial's other words, Desk's cut-outs)
+        // is brought forward first.
+        const panel = Array.from(home.querySelectorAll<HTMLElement>(`[data-module="0${key}"]`)).find(el => !el.closest('[inert]'));
+        if (panel) { event.preventDefault(); panel.focus(); } else if (reveal.current) { event.preventDefault(); reveal.current(`0${key}`); }
+        return;
+      }
+      const panel = (document.activeElement as HTMLElement | null)?.closest<HTMLElement>('[data-module]');
+      if (!panel || !home.contains(panel)) return;
+      if (key === 'j' || key === 'k') {
+        const step = panel.querySelector<HTMLButtonElement>(`.ch-step button[aria-label="${key === 'j' ? 'Next' : 'Previous'}"]`);
+        if (step) { event.preventDefault(); if (!step.disabled) step.click(); }
+      } else if (event.key === 'Enter' && document.activeElement === panel) {
+        const href = MODULE_HREF[panel.dataset.module ?? ''] ?? (panel.dataset.module === 'next' ? '/decide' : null);
+        if (href) { event.preventDefault(); router.push(caseHref(href, investigation.id)); }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [active, preview, investigation, router]);
   if (!investigation) return loading ? <div className="ch-home ch-loading" aria-busy="true"><div className="ch-skeleton"/></div> : <div className="ch-home"><FirstCase onSwitch={onSwitch}/></div>;
-  return <FrostStill.Provider value={preview}><div className="ch-home" data-testid="case-home">
+  return <FrostStill.Provider value={preview}><div className={`ch-home ch-format-${format}`} data-testid="case-home">
     <RainPane as="header" className="ch-top" still={preview}>
       <div className="ch-name">
-        <h1>{investigation.name}</h1>
-        <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
-          Switch case <kbd>⌘O</kbd></button>
-        {!preview && <AiStrip investigationId={id}/>}
+        <div className="ch-name-line">
+          <h1 title={investigation.name}>{investigation.name}</h1>
+          <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
+            Switch case <kbd>⌘O</kbd></button>
+        </div>
+        {/* The AI line and its question field share one line, so the band stays as low as HOME_1's. */}
+        {!preview && <div className="ch-ai-line"><AiStrip investigationId={id}/></div>}
       </div>
       {!preview && <HomeTools/>}
-      <CaseQuestion investigation={investigation}/>
+      <CaseQuestion investigation={investigation} editSignal={askQuestion}/>
       <StandingStrip investigationId={id}/>
     </RainPane>
-    <div className="ch-grid">
+    {empty ? <FirstActions investigationId={id} question={investigation.question} onWriteQuestion={() => setAskQuestion(n => n + 1)} onSwitch={onSwitch}/>
+      : standing.isPending && id && !preview ? <div className="ch-grid" aria-busy="true"/>
+      : format === 'board' ? <div className="ch-grid">
       <div className="ch-col"><BringIn investigationId={id}/><CheckModule investigationId={id}/></div>
       <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id} markVisit={!preview}/></div>
-      <div className="ch-col"><ActModule investigationId={id}/>
-        <Module n="03" name="See · who is linked" href="/see#the-wire" openLabel="Open network"><MiniNetwork investigationId={id}/></Module></div>
+      <div className="ch-col"><ActModule investigationId={id}/><SeeModule investigationId={id}/></div>
     </div>
+      : format === 'editorial' ? <EditorialHome parts={parts(id, active, preview)} investigationId={id} reveal={reveal}/>
+      : format === 'desk' ? <DeskHome parts={parts(id, active, preview)} investigationId={id} reveal={reveal}/>
+      : <StoryHome parts={parts(id, active, preview)} reveal={reveal}/>}
     <footer className="ch-bottom"><YearRail investigationId={id}/><PointingAt investigationId={id}/></footer>
   </div></FrostStill.Provider>;
 }

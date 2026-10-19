@@ -8,7 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const push = vi.fn();
 vi.mock('next/navigation', () => ({useRouter: () => ({push})}));
 
-import {ChainOfCustody, logTable, sealLine} from '../features/custody/chain-of-custody';
+import {ChainOfCustody, logTable, sealLine, whoWord} from '../features/custody/chain-of-custody';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -162,6 +162,50 @@ describe('Chain of Custody', () => {
       await screen.findByRole('region', {name: 'Custody log'});
       expect(calm.container.querySelector('svg.cc-lines')).not.toHaveClass('draw');
     } finally { if (had) Object.defineProperty(window, 'matchMedia', had); else delete (window as {matchMedia?: unknown}).matchMedia; }
+  });
+
+  it('names an AI step by its module, never its code name, in the log, the list and the export', async () => {
+    expect(whoWord('AI · case_synthesis')).toBe('AI · Case synthesis');
+    expect(whoWord('AI · some_new_module')).toBe('AI · some new module');
+    expect(whoWord('a person')).toBe('a person');
+    const raw = {...CHAIN, log: [{...CHAIN.log[2], who: 'AI · case_synthesis'}]};
+    expect(logTable(raw as never).split('\n')[4]).toBe('2026-10-10T14:02:00Z\tAI · Case synthesis\tai\tQuoted the claim in a draft (not accepted yet)');
+    mockApi({...routes, 'GET /api/claims/c1/custody-chain': raw});
+    render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+    const log = await screen.findByRole('region', {name: 'Custody log'});
+    expect(within(log).getByText('AI · Case synthesis')).toBeInTheDocument();
+    expect(within(log).queryByText(/case_synthesis/)).toBeNull();
+  });
+
+  it('says when a re-check of the file could not be made, instead of keeping the old tick', async () => {
+    mockApi({...routes, 'POST /api/documents/d1/recheck-hash': () => new Response(JSON.stringify({detail: 'Document not found'}), {status: 404, headers: {'content-type': 'application/json'}})});
+    render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+    const detail = await screen.findByRole('complementary', {name: 'Step 3 of 4: Passage'});
+    await userEvent.setup().click(within(detail).getByRole('button', {name: 'Re-check hash'}));
+    expect(await within(detail).findByRole('alert')).toHaveTextContent(/✕ could not re-check: Document not found/);
+    expect(within(detail).queryByText(/re-checked when opened/)).toBeNull();
+  });
+
+  it('folds more AI steps than fit under the claim into one card that opens them all', async () => {
+    const ai = Array.from({length: 5}, (_, i) => ({id: `ai${i}`, module: 'evidence_plan', status: 'pending', when: '2026-10-10T14:02:00Z', run_id: null}));
+    mockApi({...routes, 'GET /api/claims/c1/custody-chain': {...CHAIN, ai}});
+    render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+    const more = await screen.findByRole('button', {name: 'Show 3 more AI steps that quoted this claim'});
+    expect(screen.getAllByRole('article', {name: 'AI step'})).toHaveLength(2);
+    expect(more).toHaveTextContent('+3 more AI drafts quoted this claim');
+    await userEvent.setup().click(more);
+    expect(screen.getAllByRole('article', {name: 'AI step'})).toHaveLength(5);
+    expect(screen.queryByRole('button', {name: /more AI steps/})).toBeNull();
+  });
+
+  it('says every checkable rule is met when some rules cannot be checked here', async () => {
+    const done = {...CHAIN.done, met: true, left: 0, unknown: 1, rules: [
+      {key: 'supporting', label: 'At least one supporting item is linked', state: 'met', detail: '1 supporting item'},
+      {key: 'file', label: 'The file behind each item still matches its fingerprint', state: 'unknown', detail: 'No supporting item has a stored file.'}]};
+    mockApi({...routes, 'GET /api/claims/c1/custody-chain': {...CHAIN, done}});
+    render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+    const list = await screen.findByLabelText('Done for Supported');
+    expect(list).toHaveTextContent('Done for Supported · ✓ every checkable rule met · ○ 1 not checkable here');
   });
 
   it('opens the claim another panel asked for, and says when there is nothing to trace', async () => {

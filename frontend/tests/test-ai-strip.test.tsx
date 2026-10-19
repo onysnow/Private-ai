@@ -17,7 +17,7 @@ vi.mock('next/navigation', () => ({useRouter: () => ({push, replace: vi.fn(), pr
 
 const RUN = {run_id: 'run-1', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who?', working_theory: null,
   created_at: '2026-10-10T14:02:00Z', started_at: '2026-10-10T14:02:00Z', finished_at: '2026-10-10T14:03:12Z', candidate_id: 'cand-1',
-  review_status: 'proposed', events: 3, problems: 1, message: null, error: null};
+  review_status: 'proposed', events: 3, problems: 1, message: null, error: null, route: {system: 'tas', row: 2, node: 'tas/08', title: 'Case synthesis', modules_in_system: 13, final_audit: {node: 'tas/10', file: '10_FINAL_ACCURACY_AUDIT.md'}}};
 const ev = (n: number, o: Record<string, unknown>) => ({n, at: '2026-10-10T14:02:05Z', system: 'app', rule: null, status: 'good', verdict: null, refs: [],
   parent: null, self_reported: false, detail: null, kind: 'CHECK', node: 'run', text: 'x', ...o});
 const caps = (on: boolean) => ({product: 'Journalism Workbench', mode: 'core_preview', ai_features_enabled: on,

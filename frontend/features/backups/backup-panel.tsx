@@ -1,6 +1,8 @@
 'use client';
 // Portable investigation backup & restore: one checksum-verified archive out,
 // and a preview-first restore in that never merges into an existing case.
+// The archive is protected with a passphrase unless the reporter chooses not to
+// (ADR-0015, features/backups/passphrase.tsx); a protected file asks for it to restore.
 // Moved out of app/page.tsx (Foundation Fixes fix 3); the reply checks are
 // generated from the API schema (fix 2). The archive goes up as a file and
 // comes down as one, so these three calls use the app's own client with the
@@ -18,6 +20,7 @@ import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
 import type {BackupPreviewOut, BackupRestoreResultOut} from '../../lib/generated/types.gen';
 import {zBackupPreviewOut, zBackupRestoreResultOut} from '../../lib/generated/zod.gen';
+import {isProtectedBackup, PassphraseFields, RestorePassphrase, usePassphraseChoice} from './passphrase';
 
 type Props = {
   investigationId: string;
@@ -27,9 +30,11 @@ type Props = {
   children?: ReactNode;
 };
 
-function archiveForm(file: File): FormData {
+function archiveForm(file: File, passphrase: string | null): FormData {
   const body = new FormData();
   body.append('file', file);
+  // A form field beside the file, never in the address (ADR-0015); only a protected backup needs one.
+  if (passphrase) body.append('passphrase', passphrase);
   return body;
 }
 
@@ -38,23 +43,28 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
   const [preview, setPreview] = useState<BackupPreviewOut | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState('');
+  const [choice, controls] = usePassphraseChoice();
+  const [locked, setLocked] = useState(false);
+  const [unlock, setUnlock] = useState('');
 
+  // Back up through Safety & data's route: documents included, kept on record (when, size, whether protected).
   const download = useMutation({
-    mutationFn: (id: string) => api.blob(`/api/investigations/${id}/export?include_documents=true`),
+    mutationFn: ({id, passphrase}: {id: string; passphrase: string | null}) =>
+      api.blob(`/api/investigations/${encodeURIComponent(id)}/safety/backup`, {method: 'POST', body: {passphrase}}),
   });
   const inspect = useMutation({
-    mutationFn: (archive: File) => api.parsed('/api/backups/preview', checkedReply(zBackupPreviewOut), {method: 'POST', rawBody: archiveForm(archive)}),
+    mutationFn: (archive: File) => api.parsed('/api/backups/preview', checkedReply(zBackupPreviewOut), {method: 'POST', rawBody: archiveForm(archive, locked ? unlock : null)}),
   });
   const restore = useMutation({
     mutationFn: (archive: File): Promise<BackupRestoreResultOut> =>
-      api.parsed('/api/backups/restore', checkedReply(zBackupRestoreResultOut), {method: 'POST', rawBody: archiveForm(archive)}),
+      api.parsed('/api/backups/restore', checkedReply(zBackupRestoreResultOut), {method: 'POST', rawBody: archiveForm(archive, locked ? unlock : null)}),
   });
 
   const downloadBackup = async () => {
-    if (!investigationId) return;
+    if (!investigationId || !choice.ready) return;
     setStatus('Preparing backup…');
     try {
-      const blob = await download.mutateAsync(investigationId);
+      const blob = await download.mutateAsync({id: investigationId, passphrase: choice.value});
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -63,7 +73,8 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
-      setStatus('Backup downloaded.');
+      setStatus(choice.protect ? 'Backup downloaded, protected with your passphrase.' : 'Backup downloaded, without a passphrase.');
+      controls.reset();
     } catch (error) {
       setStatus(errorMessage(error, 'Backup download failed'));
     }
@@ -97,10 +108,14 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
   };
 
   const chooseFile = (e: ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files?.[0] || null);
+    const chosen = e.target.files?.[0] || null;
+    setFile(chosen);
     setPreview(null);
     setConfirmed(false);
     setStatus('');
+    setUnlock('');
+    setLocked(false);
+    if (chosen) void isProtectedBackup(chosen).then(setLocked, () => setLocked(false));
   };
 
   return <Card className="card" id="backup-restore">
@@ -109,12 +124,14 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       <CardDescription>Export FollowTheMoney JSONL, evidence and claim provenance, leads/tasks, timeline, extracted document text, review decisions, and stored source files in one checksum-verified archive.</CardDescription>
     </CardHeader>
     <CardContent>
-      <Button onClick={downloadBackup} disabled={!investigationId}>Download backup</Button>
+      <PassphraseFields choice={choice} controls={controls}/>
+      <Button onClick={downloadBackup} disabled={!investigationId || !choice.ready || download.isPending}>{choice.protect ? 'Download backup' : 'Download without a passphrase'}</Button>
       <hr/>
       <h4>Restore safely</h4>
       <p className="muted">Restore is preview-first and never merges into an existing investigation. The preview checks archive integrity, every restored record ID, provenance lineage, and destination document paths before mutation.</p>
       <Input type="file" accept=".zip,.jwbackup.zip,application/zip" onChange={chooseFile}/>
-      <Button onClick={previewBackup} disabled={!file}>Preview restore</Button>
+      {locked && <RestorePassphrase value={unlock} onChange={v => { setUnlock(v); setPreview(null); setConfirmed(false); }}/>}
+      <Button onClick={previewBackup} disabled={!file || (locked && !unlock)}>Preview restore</Button>
       {preview && <div className="candidate">
         <b>{preview.investigation.name}</b>
         <div>{Object.values(preview.record_counts).reduce((a, b) => a + b, 0)} records · {preview.document_file_count} stored document file(s) · {preview.missing_document_count} missing raw file(s)</div>

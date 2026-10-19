@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {CaseHome, sourceLine, yearSpan} from '../features/case-home/case-home';
+import {CaseHome, continuousYears, sourceLine, yearSpan} from '../features/case-home/case-home';
 import {DecideScreen} from '../features/case-home/decide-screen';
 import {pageOf} from '../features/case-home/decision-card';
 import {HOLD_MS, markTerms} from '../features/case-home/use-decisions';
@@ -121,6 +121,38 @@ describe('Case home', () => {
     expect(await screen.findByText('1 source for · 2 against · Harbour Gazette, land register')).toBeInTheDocument();
   });
 
+  it('focuses a module with 1–4 and steps inside it with J / K', async () => {
+    routes({
+      'GET /api/investigations/inv-1/claims': [
+        {id: 'c1', investigation_id: 'inv-1', text: 'Kestrel SA bought the harbour land in 2020 with its own funds.', status: 'disputed', confidence: 0.3, created_at: '2026-10-01T00:00:00'},
+        {id: 'c2', investigation_id: 'inv-1', text: 'M. Ross signed for Harbour Nominees.', status: 'lead', confidence: 0.3, created_at: '2026-10-01T00:00:00'},
+        {id: 'c3', investigation_id: 'inv-1', text: 'Fernhill Ltd paid €29,400.', status: 'supported', confidence: 0.9, created_at: '2026-10-01T00:00:00'},
+      ],
+    });
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const check = await screen.findByRole('region', {name: 'Check'});
+    expect(await within(check).findByLabelText('Claims: 1 of 3')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: '2'});
+    expect(check).toHaveFocus();
+    fireEvent.keyDown(window, {key: 'j'});
+    expect(within(check).getByLabelText('Claims: 2 of 3')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'k'});
+    expect(within(check).getByLabelText('Claims: 1 of 3')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: '1'});
+    expect(screen.getByRole('region', {name: 'Bring in'})).toHaveFocus();
+  });
+
+  it('puts the source one click away when a decision has no passage to show', async () => {
+    const aiItem = {...missingItem, kind: 'ai', id: 'ai-1', question: 'Accept this logic check as checked analysis?', proposal: 'Logic check', actor: 'AI', actor_kind: 'ai',
+      reason: 'AI draft · asked: Do the conclusions follow?', evidence: null, group: {key: 'ai', label: 'AI drafts'}, consequences: [],
+      choices: [{key: 'yes', label: 'Accept', method: 'POST', path: '/api/ai-analysis-candidates/ai-1/review', body: {decision: 'accept'}}],
+      open: {href: '/act#ai-reasoning-panel', label: 'Read the whole draft'}};
+    routes({'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {ai: 1}, total: 1, offset: 0, items: [aiItem]}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const card = await screen.findByTestId('decision-card');
+    expect(within(card).getByRole('link', {name: /Read the whole draft/})).toHaveAttribute('href', '/act?inv=inv-1#ai-reasoning-panel');
+  });
+
   it('marks flagged years and lights the years of the party pointed at', async () => {
     routes({
       'GET /api/investigations/inv-1/standing': {...standing, timeline: {...standing.timeline, years: [{year: '2016', events: 4, flags: 0}, {year: '2017', events: 9, flags: 1}, {year: '2018', events: 2, flags: 0}]}},
@@ -135,6 +167,15 @@ describe('Case home', () => {
     expect(await screen.findByText('lights 2017–18 everywhere')).toBeInTheDocument();
     await waitFor(() => expect(within(rail).getByRole('button', {name: /2018/})).toHaveClass('lit'));
     expect(within(rail).getByRole('button', {name: /2016/})).not.toHaveClass('lit');
+  });
+
+  it('shows every year on the rail, a year without events as an empty tick', async () => {
+    routes({'GET /api/investigations/inv-1/standing': {...standing, timeline: {...standing.timeline, years: [{year: '2016', events: 4, flags: 0}, {year: '2019', events: 2, flags: 0}]}}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const rail = await screen.findByRole('navigation', {name: 'Years in the case'});
+    expect(within(rail).getAllByRole('button').map(b => b.querySelector('b')?.textContent)).toEqual(['2016', '2017', '2018', '2019']);
+    expect(within(rail).getByRole('button', {name: /2017/})).toHaveClass('empty');
+    expect(within(rail).getByRole('button', {name: /2016/})).not.toHaveClass('empty');
   });
 
   it('says where the document being read is, page by page', async () => {
@@ -174,6 +215,10 @@ describe('Case home', () => {
     expect(await screen.findByText('Does page 4 show that the harbour parcel was bought on behalf of Fernhill Ltd?')).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     expect(api.calls('POST /api/checks/chk-1/decide')).toHaveLength(0);
+    // The key for No opens the reasons, as a click does; pressing it again answers without one.
+    fireEvent.keyDown(window, {key: 'd'});
+    expect(await screen.findByRole('group', {name: 'Why not'})).toBeInTheDocument();
+    expect(api.calls('POST /api/checks/chk-1/decide')).toHaveLength(0);
     fireEvent.keyDown(window, {key: 'd'});
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     await waitFor(() => expect(api.lastBody('POST /api/checks/chk-1/decide')).toEqual({status: 'does_not'}));
@@ -191,6 +236,90 @@ describe('Case home', () => {
     expect(api.lastBody('POST /api/investigations')).toEqual({name: 'Kestrel SA', question: 'Who really owns the harbour land?'});
     expect(screen.getByRole('button', {name: 'Or open the sample case to look around'})).toBeInTheDocument();
   });
+
+  it('previews a standing number\'s list on hover or focus, pins it on a click, and closes it with Escape', async () => {
+    routes({'GET /api/investigations/inv-1/claims': [
+      {id: 'c1', investigation_id: 'inv-1', text: 'Kestrel SA bought the harbour land in 2020 with its own funds.', status: 'disputed', confidence: 0.3, created_at: '2026-10-01T00:00:00'},
+      {id: 'c2', investigation_id: 'inv-1', text: 'Fernhill Ltd paid €29,400.', status: 'supported', confidence: 0.9, created_at: '2026-10-01T00:00:00'},
+    ]});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const strip = screen.getByRole('list', {name: 'Where the case stands'});
+    await within(strip).findByText('11');
+    const disputed = within(strip).getByRole('link', {name: /3\s*claims disputed/});
+    // Focus previews: the claims of that status, from the claims list, and a link to the full list.
+    act(() => { disputed.focus(); });
+    const pop = await screen.findByRole('dialog', {name: '1 claim disputed'});
+    expect(disputed).toHaveAttribute('aria-expanded', 'true');
+    expect(within(pop).getByText('Kestrel SA bought the harbour land in 2020 with its own funds.')).toBeInTheDocument();
+    expect(within(pop).queryByText('Fernhill Ltd paid €29,400.')).not.toBeInTheDocument();
+    expect(within(pop).getByRole('link', {name: /Open the claims in Check/})).toHaveAttribute('href', '/check?inv=inv-1#claim-verification');
+    // A click pins it (it stays when the pointer leaves); Escape closes it.
+    fireEvent.click(disputed);
+    expect(screen.getByRole('dialog')).toHaveClass('pinned');
+    fireEvent.mouseLeave(disputed);
+    await new Promise(r => setTimeout(r, 300));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    // Hover previews after a moment, and leaving closes an unpinned list.
+    fireEvent.mouseEnter(within(strip).getByRole('link', {name: /2\s*to decide/}));
+    const decide = await screen.findByRole('dialog', {name: /2 things to decide/});
+    expect(await within(decide).findByText('Does page 4 show that the harbour parcel was bought on behalf of Fernhill Ltd?')).toBeInTheDocument();
+    expect(within(decide).getByRole('link', {name: '1 Missing'})).toHaveAttribute('href', '/decide?kind=missing&inv=inv-1');
+    fireEvent.mouseLeave(within(strip).getByRole('link', {name: /2\s*to decide/}));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('lists the documents behind the number, failed ones first, each with a shape and a word', async () => {
+    const doc = (id: string, filename: string, status: string) => ({id, investigation_id: 'inv-1', filename, source_id: `src-${id}`, mime_type: null, sha256: id,
+      extraction_status: status, extraction_error: null, extraction_issues: [], created_at: '2026-10-12T00:00:00', chunk_count: 2, candidate_counts: {}, parent_document_id: null});
+    routes({
+      'GET /api/investigations/inv-1/standing': {...standing, documents: {total: 2, unread: 0, failed: 1}},
+      'GET /api/investigations/inv-1/documents': [doc('d1', 'minutes.pdf', 'extracted'), doc('d2', 'scan.tif', 'failed')],
+    });
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const strip = screen.getByRole('list', {name: 'Where the case stands'});
+    const docs = await within(strip).findByRole('link', {name: /documents · 0 unread · 1 failed/});
+    fireEvent.click(docs);
+    const pop = await screen.findByRole('dialog', {name: '2 documents · 0 unread · 1 could not be read'});
+    const rows = within(pop).getAllByRole('listitem');
+    expect(rows[0]).toHaveTextContent('✕Could not be readscan.tif');
+    expect(rows[1]).toHaveTextContent('✓Readminutes.pdf');
+    fireEvent.click(within(rows[0]).getByRole('button'));
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd2'});
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('shows an empty case its four first actions instead of the modules, each wired to its flow', async () => {
+    const empty = {...standing, claims: {total: 0, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, to_check: 0, missing: 0, to_decide: 0, to_decide_by_kind: {},
+      money: {currency: null, amount: 0, payments: 0, from_sources: 0, other_currencies: []}, timeline: {events: 0, from: null, to: null, years: []},
+      documents: {total: 0, unread: 0, failed: 0}, sources: 0, evidence: 0, network: {parties: 0, links: 0}, flags: {open: 0, textbook: 0, strong: 0, faint: 0},
+      leads: {open: 0}, watchlist: {names: 0, new_hits: 0}};
+    const api = routes({
+      'GET /api/investigations/inv-1/standing': empty,
+      'POST /api/demo/seed': {investigation_id: 'demo-1', created: true},
+      'GET /api/investigations': [INV],
+    });
+    const onSwitch = vi.fn();
+    wrap(<CaseHome investigation={{...INV, question: null}} investigations={[INV]} onSwitch={onSwitch} loading={false}/>);
+    const firsts = await screen.findByRole('region', {name: 'Start this case'});
+    expect(screen.queryByRole('region', {name: 'Check'})).not.toBeInTheDocument();
+    expect(within(firsts).getByRole('link', {name: /Drop documents/})).toHaveAttribute('href', '/bring-in?inv=inv-1#the-drop');
+    expect(within(firsts).getByRole('link', {name: /Add a name to look up/})).toHaveAttribute('href', '/bring-in?inv=inv-1#investigation-search');
+    const user = userEvent.setup();
+    await user.click(within(firsts).getByRole('button', {name: /Write the question/}));
+    expect(screen.getByRole('textbox', {name: 'The question'})).toHaveFocus();
+    await user.click(within(firsts).getByRole('button', {name: /Open the sample case/}));
+    await waitFor(() => expect(onSwitch).toHaveBeenCalledWith('demo-1'));
+    expect(api.calls('POST /api/demo/seed')).toHaveLength(1);
+  });
+
+  it('keeps the modules for a case with something in it', async () => {
+    routes({'GET /api/investigations/inv-1/standing': {...standing, claims: {total: 0, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, documents: {total: 0, unread: 0, failed: 0}}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    expect(await screen.findByRole('region', {name: 'Check'})).toBeInTheDocument();
+    expect(screen.queryByRole('region', {name: 'Start this case'})).not.toBeInTheDocument();
+  });
 });
 
 describe('Decide', () => {
@@ -207,6 +336,24 @@ describe('Decide', () => {
     fireEvent.click(screen.getByRole('button', {name: 'Not public'}));
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     await waitFor(() => expect(api.lastBody('POST /api/checks/mv-1/decide')).toEqual({status: 'unknowable', note: 'Not public'}));
+  });
+
+  it('takes a held answer off its chip count at once, and opens the source in its reader with O', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    routes();
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    const queue = await screen.findByRole('complementary', {name: 'To decide'});
+    expect(await within(queue).findByRole('button', {name: 'All 2'})).toBeInTheDocument();
+    await screen.findByRole('heading', {name: checkItem.question});
+    fireEvent.keyDown(window, {key: 'o'});
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1', pageNumber: 4});
+    fireEvent.keyDown(window, {key: '1'});
+    // Held, not yet sent: it leaves the list and its count straight away; Z puts both back.
+    expect(within(queue).getByRole('button', {name: 'All 1'})).toBeInTheDocument();
+    expect(within(queue).queryByRole('button', {name: /^To check/})).toBeNull();
+    fireEvent.keyDown(window, {key: 'z'});
+    expect(within(queue).getByRole('button', {name: 'All 2'})).toBeInTheDocument();
+    expect(within(queue).getByRole('button', {name: 'To check 1'})).toBeInTheDocument();
   });
 
   it('groups by source with the pages read, and says what each answer does', async () => {
@@ -340,6 +487,14 @@ describe('sourceLine', () => {
     expect(sourceLine(undefined)).toBe('No passage yet');
     expect(sourceLine({count: 0, leads_open: 1})).toBe('No passage yet · 1 lead open');
     expect(sourceLine({count: 2, sources_for: 2, names: ['Filing']})).toBe('2 sources for · Filing');
+  });
+});
+
+describe('continuousYears', () => {
+  it('keeps every year from the first to the last, a year with nothing as an empty tick', () => {
+    expect(continuousYears([{year: '2019', events: 1, flags: 0}, {year: '2016', events: 0, flags: 2}]).map(y => [y.year, y.events, y.flags]))
+      .toEqual([['2016', 0, 2], ['2017', 0, 0], ['2018', 0, 0], ['2019', 1, 0]]);
+    expect(continuousYears([])).toEqual([]);
   });
 });
 

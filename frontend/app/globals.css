@@ -543,9 +543,9 @@
 }
 
 /* The investigation's type on Red Flags (features/red-flags/red-flags-panel.tsx). */
-.rf-type { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 16px; padding: 8px 12px; border: 1px solid #3a3229; border-radius: 10px; background: #151d22; font-size: 13px; }
+.rf-type { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 16px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); font-size: 13px; }
 .rf-type-label { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--text-muted); }
-.rf-type-names { color: #f0d9a8; font-weight: 600; }
+.rf-type-names { color: var(--text); font-weight: 600; }
 .rf-type.editing { display: block; padding: 16px 18px; }
 .tp-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
 .tp-sub { margin: 14px 0 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-1); }

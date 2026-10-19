@@ -11,10 +11,12 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
 import {getDecisionsOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {snoozeDecision, wakeDecision} from '../../lib/generated/sdk.gen';
 import type {CaseDecisionsOut, DecisionChoiceOut, DecisionItemOut, GetDecisionsError} from '../../lib/generated/types.gen';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
+import {apiTime} from '../../lib/timestamps';
 
-export const HOLD_MS = 8000;
+export const HOLD_MS = 10_000;
 export type DecisionKind = DecisionItemOut['kind'];
 export type DecisionOrder = 'consequence' | 'source' | 'oldest';
 
@@ -61,12 +63,33 @@ export function acceptsInBulk(item: DecisionItemOut): boolean {
   return item.kind === 'proposal' && item.confidence_band === 'high' && yes !== undefined && !('entity_identity_decision' in yes.body);
 }
 
+/** A decision put off with H (research Check §3.1: "H later (snooze, wakes on new activity — Linear)"): it leaves
+ *  the queue at once and comes back when the item changes, or at ``until`` when one is set. */
+export type Snoozed = {item: DecisionItemOut; at: number; until: string | null; state: 'saving' | 'saved' | 'waking'; savedAt?: number};
+
+/** When a decision put off comes back, in words. */
+export function wakesWhen(until: string | null | undefined, wakeOnActivity = true): string {
+  const when = until ? apiTime(until)
+    .toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) : '';
+  if (when && wakeOnActivity) return `comes back ${when}, or sooner if it changes`;
+  if (when) return `comes back ${when}`;
+  return 'comes back when it changes';
+}
+
 export type DecisionQueue = {
   query: UseQueryResult<CaseDecisionsOut, GetDecisionsError>; items: DecisionItemOut[]; counts: Record<string, number>; decided: Decided[];
   decide: (item: DecisionItemOut, choice: DecisionChoiceOut, note?: string) => void; undo: (itemId?: string) => boolean;
   /** Holds Yes for each item; they are sent together after the wait, and undone as one. */
   acceptAll: (items: DecisionItemOut[]) => void; undoBatch: (batch: string) => void;
   retry: (itemId: string) => void; held: Decided | null; undoError: string | null;
+  /** H: puts the item off (until it changes, or at ``until`` or sooner if it changes). */
+  snooze: (item: DecisionItemOut, until?: string | null) => void; snoozed: Snoozed[];
+  /** Brings an item put off back at once (Restore in the snoozed list; Z right after H). */
+  wake: (kind: DecisionKind, itemId: string) => void;
+  /** The last thing Z takes back: a held answer, or the latest put-off. */
+  last: 'answer' | 'snooze' | null;
+  /** How many are put off and asleep: the server's count, with the ones put off since it was read. */
+  snoozedCount: number;
 };
 
 export function useDecisions(investigationId: string, {kind, order = 'consequence', enabled = true}: {kind?: DecisionKind; order?: DecisionOrder; enabled?: boolean} = {}): DecisionQueue {
@@ -80,6 +103,9 @@ export function useDecisions(investigationId: string, {kind, order = 'consequenc
   useRedFlagsQuery(investigationId, enabled);
   const [decided, setDecided] = useState<Decided[]>([]);
   const [undoError, setUndoError] = useState<string | null>(null);
+  const [snoozed, setSnoozed] = useState<Snoozed[]>([]);
+  const snoozedRef = useRef(snoozed);
+  snoozedRef.current = snoozed;
   const timers = useRef(new Map<string, number>());
   const decidedRef = useRef(decided);
   decidedRef.current = decided;
@@ -134,9 +160,38 @@ export function useDecisions(investigationId: string, {kind, order = 'consequenc
     setDecided(list => list.filter(d => d.batch !== batch || (d.state !== 'held' && d.state !== 'failed')));
   }, []);
 
-  // Without an id, the newest held answer goes (or its whole batch).
+  const wake = useCallback((kind: DecisionKind, itemId: string) => {
+    setUndoError(null);
+    setSnoozed(list => list.map(s => (s.item.id === itemId ? {...s, state: 'waking'} : s)));
+    wakeDecision({path: {investigation_id: investigationId}, body: {kind, item_id: itemId}, throwOnError: true}).then(async () => {
+      setSnoozed(list => list.filter(s => s.item.id !== itemId));
+      await refresh();
+    }, (error: unknown) => {
+      setSnoozed(list => list.map(s => (s.item.id === itemId ? {...s, state: 'saved'} : s)));
+      setUndoError(`Could not bring it back: ${errorMessage(error, 'the server did not answer')}.`);
+    });
+  }, [investigationId, refresh]);
+
+  const snooze = useCallback((item: DecisionItemOut, until: string | null = null) => {
+    setUndoError(null);
+    setSnoozed(list => [{item, at: Date.now(), until, state: 'saving' as const}, ...list.filter(s => s.item.id !== item.id)].slice(0, 30));
+    snoozeDecision({path: {investigation_id: investigationId}, body: {kind: item.kind, item_id: item.id, until, wake_on_activity: true}, throwOnError: true}).then(async () => {
+      setSnoozed(list => list.map(s => (s.item.id === item.id ? {...s, state: 'saved', savedAt: Date.now()} : s)));
+      await refresh();
+    }, (error: unknown) => {
+      // Not put off: it stays in the queue, and the bar says why.
+      setSnoozed(list => list.filter(s => s.item.id !== item.id));
+      setUndoError(`Could not put it off: ${errorMessage(error, 'the server did not answer')}.`);
+    });
+  }, [investigationId, refresh]);
+
+  // Without an id, the newest held answer goes (or its whole batch), or the latest put-off when that came after it.
   const undo = useCallback((itemId?: string) => {
     const newest = decidedRef.current.find(d => d.state === 'held');
+    // Z takes back the put-off only when it is the last thing done (no answer since).
+    const put = snoozedRef.current.find(s => s.state === 'saved');
+    const answered = decidedRef.current[0];
+    if (!itemId && put && (!answered || put.at > answered.at)) { wake(put.item.kind, put.item.id); return true; }
     if (!itemId && newest?.batch) { undoBatch(newest.batch); return true; }
     const target = itemId ?? newest?.item.id;
     if (!target) return false;
@@ -160,7 +215,7 @@ export function useDecisions(investigationId: string, {kind, order = 'consequenc
     }
     setDecided(list => list.filter(d => d.item.id !== target));
     return true;
-  }, [refresh, undoBatch]);
+  }, [refresh, undoBatch, wake]);
 
   const retry = useCallback((itemId: string) => {
     setDecided(list => list.map(d => (d.item.id === itemId ? {...d, state: 'held', error: undefined, batch: undefined} : d)));
@@ -174,10 +229,19 @@ export function useDecisions(investigationId: string, {kind, order = 'consequenc
     return () => { window.removeEventListener('pagehide', flush); flush(); };
   }, [send, sendBatch]);
 
-  const hidden = useMemo(() => new Set(decided.filter(d => d.state !== 'failed').map(d => d.item.id)), [decided]);
+  // A put-off is hidden until the list has been read again after it was saved; from then the server says (an item that
+  // changed comes back, marked as woken).
+  const loadedAt = query.dataUpdatedAt;
+  const hidden = useMemo(() => new Set([...decided.filter(d => d.state !== 'failed').map(d => d.item.id),
+    ...snoozed.filter(s => s.state === 'saving' || (s.state === 'saved' && loadedAt <= (s.savedAt ?? 0))).map(s => s.item.id)]), [decided, snoozed, loadedAt]);
   const items = useMemo(() => (query.data?.items ?? []).filter(i => !hidden.has(i.id)), [query.data, hidden]);
   const counts = query.data?.counts ?? {};
-  return {query, items, counts, decided, decide, undo, acceptAll, undoBatch, retry, held: decided.find(d => d.state === 'held') ?? null, undoError};
+  const held = decided.find(d => d.state === 'held') ?? null;
+  const put = snoozed.find(s => s.state === 'saved') ?? null;
+  const last = put && (!decided[0] || put.at > decided[0].at) ? 'snooze' : held ? 'answer' : null;
+  const pending = snoozed.filter(s => s.state === 'saving' || (s.state === 'saved' && loadedAt <= (s.savedAt ?? 0))).length;
+  const snoozedCount = (query.data?.snoozed ?? 0) + pending;
+  return {query, items, counts, decided, decide, undo, acceptAll, undoBatch, retry, held, undoError, snooze, snoozed, wake, last, snoozedCount};
 }
 
 /** The words of an excerpt with the matched terms marked. */

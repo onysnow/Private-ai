@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {parseSse} from '../features/ai/run-stream';
+import {ReviewSheet} from '../features/ai/claim-review-view';
 import {WatchTheRun} from '../features/ai/watch-the-run';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -15,7 +16,7 @@ import {mockApi} from '../test-support/mock-api';
 const EV = '/api/investigations/inv-1/ai-runs/run-1/events';
 const RUN = {run_id: 'run-1', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who controlled Fernhill Ltd between 2016 and 2023?',
   working_theory: null, created_at: '2026-10-10T14:02:00Z', started_at: '2026-10-10T14:02:00Z', finished_at: '2026-10-10T14:03:12Z', candidate_id: 'cand-1',
-  review_status: 'proposed', events: 0, problems: 1, message: null, error: null};
+  review_status: 'proposed', events: 0, problems: 1, message: null, error: null, route: {system: 'tas', row: 2, node: 'tas/08', title: 'Case synthesis', modules_in_system: 13, final_audit: {node: 'tas/10', file: '10_FINAL_ACCURACY_AUDIT.md'}}};
 
 let n = 0;
 const ev = (o: Partial<Record<string, unknown>> & {kind: string; node: string; text: string}) => ({
@@ -69,17 +70,77 @@ function open(claims = 2, extra: Record<string, unknown> = {}) {
 }
 
 describe('WatchTheRun', () => {
-  it('draws the header in one line, the key, the systems not triggered and the three ledgers', async () => {
+  it('draws the header in one line, the key, the systems not in this run and the three ledgers', async () => {
     open();
     const map = await screen.findByRole('group', {name: /The run as a map/});
-    await waitFor(() => expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(/Act · AI runs · Case synthesis · 10 Oct 1[0-9]:\d\d/));
+    await waitFor(() => expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(/Act · AI runs · Case synthesis · TAS · 10 Oct 1[0-9]:\d\d/));
     expect(screen.getByRole('button', {name: /Events: summary/})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /^2 problems/})).toBeInTheDocument();
-    expect(within(map as unknown as HTMLElement).getAllByText('not triggered').length).toBe(4);
+    expect(within(map as unknown as HTMLElement).getAllByText('not in this run').length).toBe(4);
+    expect(within(map as unknown as HTMLElement).getByText('1 of 7 routed')).toBeInTheDocument();
+    expect(within(map as unknown as HTMLElement).getByText('+ 12 modules')).toBeInTheDocument();
     expect(within(screen.getByRole('list', {name: 'Key'})).getAllByRole('listitem')).toHaveLength(6);
     await waitFor(() => expect(screen.getByText('Run record').parentElement?.textContent).toMatch(/\d+/));
     expect(screen.getByText('Judgement ledger')).toBeInTheDocument();
-    expect(screen.getByText(/tas\/10 not run here/)).toBeInTheDocument();
+    expect(screen.getByText(/tas\/10 runs apart, never inside the run/)).toBeInTheDocument();
+  });
+
+  it('draws a run of another system on its own route: its pill or column, the hand-over it started from, its final audit', async () => {
+    n = 0;
+    const events = [
+      ev({kind: 'TURN', node: 'run', text: 'Evidence plan asked'}),
+      ev({kind: 'ROUTE', node: 'router', system: 'egs', status: 'good', rule: 'AGENTS.md trigger table row 6', text: 'EGS: the answer plans how to obtain evidence', parent: 1}),
+      ev({kind: 'LOAD', node: 'egs/01', system: 'egs', status: 'good', text: 'Loaded 01_EVIDENCE_PLAN.md', parent: 2}),
+      ev({kind: 'CHECK', node: 'interop', system: 'umbrella', status: 'good', rule: 'INTEROP.md', text: 'Started from your accepted Case synthesis: 2 record(s) handed over', parent: 2}),
+      ev({kind: 'BLOCK', node: 'interop', system: 'umbrella', status: 'partial', verdict: 'HELD', text: 'TAS record_existence held back from EGS', parent: 4}),
+      ev({kind: 'BLOCK', node: 'interop', system: 'umbrella', status: 'partial', verdict: 'HELD', text: 'TAS classification held back from EGS', parent: 4}),
+      ev({kind: 'CHECK', node: 'retrieval', text: 'Packet of the handed-over run: 8 records', status: 'good', parent: 2}),
+      ev({kind: 'CHECK', node: 'gate:schema', text: 'Shape matches', status: 'good', verdict: 'PASS', parent: 7}),
+      ev({kind: 'CHECK', node: 'gate:egs', system: 'egs', text: 'The suite\u2019s rules hold', status: 'good', verdict: 'PASS', parent: 8}),
+      ev({kind: 'RULE', node: 'egs/01', system: 'egs', status: 'neutral', verdict: 'RECORDS_REQUEST', self_reported: true, text: 'who received the last transfer',
+        parent: 9, detail: {thought: 'GPLN-0001'}}),
+      ev({kind: 'WRITE', node: 'candidate', status: 'good', verdict: 'PROPOSED', text: 'Saved as cand-2', parent: 9}),
+    ];
+    const run = {...RUN, run_id: 'run-2', module: 'evidence_plan', candidate_id: 'cand-2', events: events.length, handoff_from: 'cand-1',
+      route: {system: 'egs', row: 6, node: 'egs/01', title: 'Evidence plan', modules_in_system: 5, final_audit: {node: 'egs/05', file: '05_GATHERING_LOG_AND_FINAL_GATHERING_CHECK.md'}}};
+    mockApi({
+      'GET /api/investigations/inv-1/ai-runs/run-2/events': {run, events},
+      'GET /api/ai-analysis-candidates/cand-2': {...CAND, id: 'cand-2', module: 'evidence_plan', payload: {plan_items: [], order_of_work: []}},
+    });
+    render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-2"/></QueryProvider>);
+    const map = await screen.findByRole('group', {name: /The run as a map/}) as unknown as HTMLElement;
+    await waitFor(() => expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(/Evidence plan · EGS/));
+    expect(within(map).getByRole('button', {name: /^EGS 01 \(Evidence plan/})).toBeInTheDocument();
+    expect(within(map).getByRole('button', {name: /^EHS ethics \(not in this run/})).toBeInTheDocument();
+    expect(within(map).getAllByText('not in this run').length).toBe(5);
+    expect(within(map).getByText('1 of 7 routed')).toBeInTheDocument();
+    expect(within(map).getByRole('button', {name: /^Hand-over · 2 held \(INTEROP boundaries\)/})).toBeInTheDocument();
+    expect(within(map).getByRole('button', {name: /^Controls, 0 overrides/}).textContent).not.toMatch(/\d$/);
+    expect(screen.getByText(/egs\/05 runs apart, never inside the run/)).toBeInTheDocument();
+    expect(within(screen.getByLabelText('The run, one lane per part')).getByText('EGS')).toBeInTheDocument();
+    // Counts are words ("1 finding"), and a run shorter than ten seconds counts seconds on its axis, never one clock time twice.
+    expect(within(map).getByText('1 finding')).toBeInTheDocument();
+    const ticks = [...document.querySelectorAll('.wr-axis i')].map(i => i.textContent);
+    expect(ticks.slice(1)).toEqual(['+0.25 s', '+0.50 s', '+0.75 s', '+1.0 s']);
+  });
+
+  it('says whether the answer was stopped by the checks or rejected by you', async () => {
+    open(2, {'GET /api/ai-analysis-candidates/cand-1': {...CAND, review_status: 'rejected', rejection_reason: 'reviewer'}});
+    expect(await screen.findByText('you rejected it')).toBeInTheDocument();
+    cleanup();
+    open(2, {'GET /api/ai-analysis-candidates/cand-1': {...CAND, review_status: 'rejected', rejection_reason: 'citation'}});
+    expect(await screen.findByText('stopped by the checks')).toBeInTheDocument();
+  });
+
+  it('a replay shows the answer and your review only once it reaches them', async () => {
+    open(2, {'GET /api/ai-analysis-candidates/cand-1': {...CAND, review_status: 'rejected', rejection_reason: 'reviewer'}});
+    expect(await screen.findByText('you rejected it')).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: 'Replay'}));
+    expect(await screen.findByText('not reached yet')).toBeInTheDocument();
+    expect(screen.queryByText('you rejected it')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Live'}));
+    expect(await screen.findByText('you rejected it')).toBeInTheDocument();
   });
 
   it('puts the lanes on a clock axis and says how many events are shown', async () => {
@@ -239,12 +300,16 @@ describe('WatchTheRun, your marks and other runs', () => {
     mockApi({
       [`GET ${EV}`]: {run: {...RUN, events: now.length}, events: now},
       'GET /api/investigations/inv-1/ai-runs/run-0/events': {run: {...RUN, run_id: 'run-0', created_at: '2026-10-09T09:00:00Z', events: before.length}, events: before},
-      'GET /api/investigations/inv-1/ai-runs': {runs: [RUN, {...RUN, run_id: 'run-0', created_at: '2026-10-09T09:00:00Z'}]},
+      'GET /api/investigations/inv-1/ai-runs': {runs: [RUN, {...RUN, run_id: 'run-0', created_at: '2026-10-09T09:00:00Z', problems: 1},
+        {...RUN, run_id: 'run-9', module: 'research_vetting', created_at: '2026-10-09T08:00:00Z'}]},
       'GET /api/ai-analysis-candidates/cand-1': CAND,
     });
     render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-1"/></QueryProvider>);
     const user = userEvent.setup();
-    await user.selectOptions(await screen.findByRole('combobox', {name: 'Compare with another run of this question'}), 'run-0');
+    const compare = await screen.findByRole('combobox', {name: 'Compare with another run of this question'});
+    // Only a run of the same module compares: another system draws another route.
+    expect(within(compare).getAllByRole('option').map(o => o.textContent)).toEqual(['Compare…', expect.stringMatching(/^with 9 Oct \d\d:\d\d · 1 problem$/)]);
+    await user.selectOptions(compare, 'run-0');
     expect(await screen.findByText(/Compared with the run of 9 Oct .* 1 part changed/)).toBeInTheDocument();
     expect(screen.getByText(/corroboration: verified → in between/)).toBeInTheDocument();
     expect(document.querySelectorAll('.wr-node.changed')).toHaveLength(1);
@@ -328,6 +393,18 @@ describe('WatchTheRun, deciding one claim', () => {
     expect(screen.getByRole('region', {name: 'Instructions and plan'})).toHaveTextContent('The plan panel');
     await user.click(screen.getByRole('button', {name: 'Instructions & plan'}));
     expect(plan).toHaveBeenCalledWith({question: RUN.question, module: 'case_synthesis', theory: null});
+  });
+});
+
+describe('ReviewSheet, a suite answer', () => {
+  it('names a logic check’s parts as arguments and asks no likelihood of them', async () => {
+    mockApi({'GET /api/ai-analysis-candidates/cand-3': {...CAND, id: 'cand-3', module: 'las_argument_check',
+      payload: {arguments: [{arg_id: 'ARG-0001', conclusion: 'The payments were routed to hide their source.'}]}}});
+    render(<QueryProvider><ReviewSheet candidateId="cand-3" header={<h2>Review</h2>} onBack={() => {}}/></QueryProvider>);
+    expect(await screen.findByText('1 argument')).toBeInTheDocument();
+    const detail = screen.getByRole('region', {name: 'ARG-0001 in full'});
+    expect(within(detail).queryByText('Likelihood')).toBeNull();
+    expect(within(detail).queryByText(/unclassified/)).toBeNull();
   });
 });
 

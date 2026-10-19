@@ -5,12 +5,12 @@ import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
-import {BeforeYouRun} from '../features/ai/before-you-run';
+import {BeforeYouRun, runTime} from '../features/ai/before-you-run';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {mockApi} from '../test-support/mock-api';
-import {PLAN} from '../test-support/run-plan-fixture';
+import {DRAFT_PLAN, PLAN} from '../test-support/run-plan-fixture';
 
 const BASE = '/api/investigations/inv-1/assistant';
 const job = {id: 'job-1', kind: 'ai_reasoning', investigation_id: 'inv-1', subject_type: 'ai_run', subject_id: null, status: 'succeeded', finished: true,
@@ -19,7 +19,7 @@ const job = {id: 'job-1', kind: 'ai_reasoning', investigation_id: 'inv-1', subje
 
 const RUN = {run_id: 'job-1', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who controlled Fernhill Ltd?', working_theory: null,
   created_at: '2026-10-12T10:00:00Z', started_at: '2026-10-12T10:00:00Z', finished_at: '2026-10-12T10:01:00Z', candidate_id: 'cand-1', review_status: 'proposed',
-  events: 0, problems: 0, message: null, error: null};
+  events: 0, problems: 0, message: null, error: null, route: {system: 'tas', row: 2, node: 'tas/08', title: 'Case synthesis', modules_in_system: 13, final_audit: {node: 'tas/10', file: '10_FINAL_ACCURACY_AUDIT.md'}}};
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => cleanup());
@@ -67,6 +67,81 @@ describe('BeforeYouRun', () => {
     expect(sent.changes.map(c => c.text)).toEqual(['evidence:ev-58 · material · ignored', 'devils_advocate off → on', 'research_depth normal → exhaustive', 'premise + USER_STIPULATED']);
     expect(await screen.findByRole('region', {name: 'Watch the run'})).toBeInTheDocument();
     expect(await screen.findByText('Run record')).toBeInTheDocument();
+  });
+
+  it('shows the packet’s first records, the systems not expected as one chip, and past run time in words', async () => {
+    const plan = {...PLAN, packet: {...PLAN.packet, first: [{record_type: 'document', record_id: 'doc-41', title: 'Register extract, 2017'},
+      {record_type: 'evidence', record_id: 'ev-58', title: 'Email, M. Ross'}]}, where: {...PLAN.where, minutes: [0.2, 0.4]}};
+    mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: plan});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    const first = await screen.findByRole('list', {name: 'The first records in the packet'});
+    expect(within(first).getByText('document: Register extract, 2017')).toBeInTheDocument();
+    const region = screen.getByRole('region', {name: 'The plan'});
+    expect(within(region).getByText('QAS · RAS · DAS')).toBeInTheDocument();
+    expect(within(region).getAllByText(/not expected/)).toHaveLength(1);
+    expect(screen.getByText('under a minute on this machine')).toBeInTheDocument();
+    expect(runTime([])).toBe('not measured yet: no run has finished here');
+    expect(runTime([1.2, 3.6])).toBe('about 1–4 min on this machine');
+    expect(runTime([2.1, 1.9])).toBe('about 2 min on this machine');
+  });
+
+  it('counts the records the tier floor leaves out, and says runs make no outside lookups', async () => {
+    const plan = {...PLAN, packet: {...PLAN.packet, below_tier_floor: [{tier: 'E', count: 3}, {tier: 'F', count: 1}]}};
+    mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: plan});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    const region = await screen.findByRole('region', {name: 'The plan'});
+    expect(await within(region).findByText('3 Tier E records left out by the tier floor · leads only')).toBeInTheDocument();
+    expect(within(region).getByText('1 Tier F record left out by the tier floor · leads only')).toBeInTheDocument();
+    const where = screen.getByRole('region', {name: 'Where it runs, what it costs'});
+    expect(within(where).getByText(/Runs make no outside lookups yet/)).toBeInTheDocument();
+    expect(within(where).queryByText(/stop and ask/)).not.toBeInTheDocument();
+  });
+
+  it('plans a presentation draft from its goal and the records picked, with none of the settings, and runs it through the draft endpoint', async () => {
+    const queued = {...job, status: 'queued', finished: false, progress: null, message: 'Waiting for the model', finished_at: null};
+    const api = mockApi({
+      [`GET ${BASE}/profile`]: PLAN.profile,
+      'GET /api/investigations/inv-1/ai-runs': {runs: []},
+      'GET /api/search': {results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}, kind: 'claim_event'}],
+        query: 'Bellcastle', investigation_id: 'inv-1', total: 1, returned: 1, counts: {claim: 1}, group_counts: {reporting: 1}},
+      [`POST ${BASE}/plan`]: DRAFT_PLAN,
+      [`POST ${BASE}/presentation-draft`]: {status: 202, body: {candidate_id: null, job: queued}},
+      'GET /api/jobs/job-1': {...job, result: {candidate_id: 'cand-9', review_status: 'proposed', payload: {}}},
+    });
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(within(await screen.findByRole('radiogroup', {name: 'What to run'})).getByRole('radio', {name: 'Draft a brief'}));
+    await user.type(screen.getByLabelText('What the brief or deck should do'), 'Brief my editor on the harbour land sale.');
+    const next = screen.getByRole('button', {name: 'Next: instructions and plan'});
+    expect(next).toBeDisabled(); // a goal alone is not enough: the draft can cite only records picked
+    await user.type(screen.getByLabelText('Search records to add'), 'Bellcastle');
+    await user.click(within(screen.getByTestId('presentation-record-picker')).getByRole('button', {name: 'Search'}));
+    await user.click(await screen.findByRole('button', {name: 'Add Claim: Meridian paid Bellcastle $2.4M'}));
+    await user.click(next);
+
+    const plan = await screen.findByRole('region', {name: 'The plan'});
+    expect(await within(plan).findByText('Build the packet from the records you picked')).toBeInTheDocument();
+    expect(within(plan).getByText('What the draft is for')).toBeInTheDocument();
+    expect(within(plan).getByText(/only the records you picked/)).toBeInTheDocument();
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toEqual({module: 'presentation_draft', question: 'Brief my editor on the harbour land sale.',
+      record_refs: [{record_type: 'claim', record_id: 'claim-1'}]}));
+    const instructions = screen.getByRole('region', {name: 'Operating instructions'});
+    expect(within(instructions).getByRole('note')).toHaveTextContent('A draft runs under none of these settings');
+    expect(within(instructions).queryByRole('radiogroup')).not.toBeInTheDocument();
+    expect(within(instructions).queryByLabelText('Something to take as given')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Save as this case’s default'})).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'Run in the background'}));
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/presentation-draft`)).toEqual({goal: 'Brief my editor on the harbour land sale.',
+      record_refs: [{record_type: 'claim', record_id: 'claim-1'}]}));
+    expect(await screen.findByText('The answer is waiting for you as a proposal. Nothing has joined the case.')).toBeInTheDocument();
+    expect(api.calls(`POST ${BASE}/case-synthesis`)).toHaveLength(0);
   });
 
   it('saves this case’s default only with a reason', async () => {
@@ -117,6 +192,25 @@ describe('BeforeYouRun', () => {
     await waitFor(() => expect(go).toBeEnabled());
     await user.click(go);
     await waitFor(() => expect(api.lastBody(`POST ${BASE}/case-synthesis`)).toMatchObject({question: RUN.question, packet_from: {run_id: 'job-1', step: 2}}));
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('runs a draft again as a draft, with the records it drafted from', async () => {
+    const draftRun = {...RUN, module: 'presentation_draft', question: 'Brief my editor', record_refs: [{record_type: 'evidence', record_id: 'ev-58'}]};
+    const events = [{n: 1, at: '2026-10-12T10:00:05Z', system: 'app', rule: null, status: 'neutral', verdict: null, refs: [], parent: null,
+      self_reported: false, detail: null, kind: 'TURN', node: 'run', text: 'Draft asked'}];
+    window.history.replaceState(null, '', '/act?inv=inv-1&run=job-1&step=1');
+    const api = mockApi({
+      [`GET ${BASE}/profile`]: PLAN.profile,
+      [`POST ${BASE}/plan`]: DRAFT_PLAN,
+      'GET /api/investigations/inv-1/ai-runs/job-1/events': {run: {...draftRun, events: 1}, events},
+      'GET /api/investigations/inv-1/ai-runs': {runs: [draftRun]},
+    });
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: 'Run again from this step…'}));
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toMatchObject({module: 'presentation_draft', question: 'Brief my editor',
+      record_refs: [{record_type: 'evidence', record_id: 'ev-58'}]}));
     window.history.replaceState(null, '', '/');
   });
 

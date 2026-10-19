@@ -126,7 +126,7 @@ describe('SecurityPanel', () => {
     const orphans = 'GET /api/settings/storage/orphans';
     const api = await renderOpen({[orphans]: {
       storage_root: '/tmp/docs', orphan_files: [{relative_path: 'stray.bin', size_bytes: 6, modified_at: 1759300000, action: 'retain_until_explicit_cleanup'}],
-      orphan_file_count: 1, orphan_bytes: 6, unsafe_document_references: [{document_id: 'doc-9', storage_path: '../outside', error: 'escapes the storage root'}], cleanup_available: false, policy: 'preview_only_retain_by_default',
+      orphan_file_count: 1, orphan_bytes: 6, kept_file_count: 0, unsafe_document_references: [{document_id: 'doc-9', storage_path: '../outside', error: 'escapes the storage root'}], cleanup_available: false, policy: 'preview_only_retain_by_default',
     }});
     await userEvent.setup().click(screen.getByRole('button', {name: 'Preview retained orphan files'}));
     await screen.findByText('Found 1 unreferenced file(s). They are retained; cleanup is not automatic.');

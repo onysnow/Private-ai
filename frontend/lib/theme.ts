@@ -30,12 +30,18 @@ export const THEMES: ThemeInfo[] = [
     swatches: ['#121233', '#1B1B45', '#272757', '#33336A', '#FBF6EA', '#FFD166', '#A6D4FF'], fonts: 'Inclusive Sans · Lexend · Plex Mono', lowestContrast: '6.39:1', effects: 'None', calm: 'No effects, so nothing to keep away from text.', cost: 'None.'},
 ];
 
-export const FORMATS: {id: Format; name: string; line: string; ready: boolean}[] = [
-  {id: 'board', name: 'Board', line: 'Panels float over a board; navigation waits at the edges.', ready: true},
-  {id: 'editorial', name: 'Editorial', line: 'The case home as a list of huge words; point at one to preview it.', ready: false},
-  {id: 'desk', name: 'Desk', line: 'The case as a corkboard of evidence; the selected item opens as one calm card.', ready: false},
-  {id: 'story', name: 'Story', line: 'Chapter by chapter, each in its own tint, with how far through you are.', ready: false},
+/** The formats: one layout recipe each for the same Case home parts (research §03 D1, §04.11 "Format"). `short` is the
+ *  line under each thumbnail in mockup HOME_2. */
+export const FORMATS: {id: Format; name: string; short: string; line: string; ready: boolean}[] = [
+  {id: 'board', name: 'Board', short: 'panels over a board', line: 'Panels float over a board; navigation waits at the edges.', ready: true},
+  {id: 'editorial', name: 'Editorial', short: 'big words as menu', line: 'The case home as a list of huge words; point at one to preview it.', ready: true},
+  {id: 'desk', name: 'Desk', short: 'corkboard of evidence', line: 'The case as a corkboard of evidence; the selected item opens as one calm card.', ready: true},
+  {id: 'story', name: 'Story', short: 'chapter by chapter', line: 'Chapter by chapter, each in its own tint, with how far through you are.', ready: true},
 ];
+
+/** The format a theme suggests (research §03 D1: "A theme suggests a format (Rain Noir → Board with the rain hero;
+ *  Archive → Desk), but the two are chosen separately"). Only a suggestion: choosing a theme never changes the format. */
+export const SUGGESTED_FORMAT: Partial<Record<ThemeId, Format>> = {'rain-noir': 'board', archive: 'desk'};
 
 /** The named board effects that can be switched off one by one (mockup HOME_2). */
 export type NamedEffect = 'bokeh' | 'rain' | 'grain' | 'iris' | 'shutter' | 'neon' | 'bloom';
@@ -109,10 +115,29 @@ export function currentAppearance(): Appearance {
 /** The variables a theme of your own sets on <html> (here or in the first-paint script), taken off at every change. */
 const OWN_VARS = Object.keys(paletteVars(BASE_PALETTES['case-night']));
 
+// On battery, kept Full effects run as Light (research §04.11: "Light is chosen automatically on battery"); the kept
+// choice is unchanged and Full comes back when the computer is charging. Browsers without the Battery API keep Full.
+let onBattery = false;
+let watchingBattery = false;
+type BatteryLike = {charging: boolean; addEventListener: (name: string, fn: () => void) => void};
+function watchBattery(): void {
+  if (watchingBattery || typeof navigator === 'undefined') return;
+  watchingBattery = true;
+  const get = (navigator as {getBattery?: () => Promise<BatteryLike>}).getBattery;
+  if (!get) return;
+  get.call(navigator).then(battery => {
+    const read = () => { const was = onBattery; onBattery = !battery.charging; if (was !== onBattery) applyAppearance(); };
+    read();
+    battery.addEventListener('chargingchange', read);
+  }).catch(() => undefined);
+}
+
 export function applyAppearance(a: Appearance = currentAppearance()): void {
   const html = document.documentElement;
+  watchBattery();
   html.dataset.theme = a.theme;
-  html.dataset.effects = a.effects;
+  html.dataset.effects = a.effects === 'full' && onBattery ? 'light' : a.effects;
+  if (a.effects === 'full' && onBattery) html.dataset.effectsAuto = 'battery'; else delete html.dataset.effectsAuto;
   html.dataset.motion = a.motion;
   html.dataset.format = a.format;
   html.dataset.fxOff = a.off.join(' ');
@@ -158,4 +183,4 @@ export function onAppearanceChange(fn: () => void): () => void {
 /** Runs before the first paint (in <head>), so a kept theme never flashes the default. Must stay self-contained. */
 // A theme of your own: its base theme, and the variables stored with it (lib/custom-theme), only values that look like
 // colours. The page's own code checks the theme's contrast again as soon as it runs (applyAppearance).
-export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var a=JSON.parse(localStorage.getItem('${KEY}')||'{}');var t=sessionStorage.getItem('${TRY_KEY}');var h=document.documentElement;var own=t&&t.indexOf('own:')===0?t.slice(4):(t?null:a.custom);h.dataset.theme=(t&&!own?t:a.theme)||'case-night';h.dataset.effects=a.effects||'full';h.dataset.motion=a.motion||'normal';h.dataset.format='board';h.dataset.fxOff=(a.off||['neon']).join(' ');if(own){var l=JSON.parse(localStorage.getItem('${CUSTOM_KEY}')||'[]');for(var i=0;i<l.length;i++){if(l[i]&&l[i].id===own&&l[i].vars){h.dataset.theme=l[i].base;for(var k in l[i].vars){var v=String(l[i].vars[k]);if(/^--[a-z0-9-]+$/.test(k)&&/^[#0-9a-fA-F% .]+$/.test(v))h.style.setProperty(k,v);}}}}}catch(e){}})();`;
+export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var a=JSON.parse(localStorage.getItem('${KEY}')||'{}');var t=sessionStorage.getItem('${TRY_KEY}');var h=document.documentElement;var own=t&&t.indexOf('own:')===0?t.slice(4):(t?null:a.custom);h.dataset.theme=(t&&!own?t:a.theme)||'case-night';h.dataset.effects=a.effects||'full';h.dataset.motion=a.motion||'normal';h.dataset.format=['board','editorial','desk','story'].indexOf(a.format)>=0?a.format:'board';h.dataset.fxOff=(a.off||['neon']).join(' ');if(own){var l=JSON.parse(localStorage.getItem('${CUSTOM_KEY}')||'[]');for(var i=0;i<l.length;i++){if(l[i]&&l[i].id===own&&l[i].vars){h.dataset.theme=l[i].base;for(var k in l[i].vars){var v=String(l[i].vars[k]);if(/^--[a-z0-9-]+$/.test(k)&&/^[#0-9a-fA-F% .]+$/.test(v))h.style.setProperty(k,v);}}}}}catch(e){}})();`;

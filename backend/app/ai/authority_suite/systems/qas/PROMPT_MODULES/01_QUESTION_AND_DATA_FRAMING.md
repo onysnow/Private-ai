@@ -24,7 +24,10 @@ RULES
    date and time it was written in the QFRM record. (logic)
 2. Classify the question: DESCRIPTIVE (how many, how much, how often),
    COMPARATIVE (is A different from B) or THEORY TEST (does this explanation
-   fit the data better than its rivals). (logic)
+   fit the data better than its rivals). A question that asks whether a named cause or programme (a scheme, a drug,
+   a policy) produced a difference between groups is a THEORY TEST, not
+   COMPARATIVE: COMPARATIVE asks only whether A differs from B, with no
+   explanation under test. (logic)
 3. Name the unit of analysis: what one row of the analysis file will be (a
    person, a contract, a precinct in one year). What counts as an observation
    depends on the question, so it is fixed from the question. (QS-05)

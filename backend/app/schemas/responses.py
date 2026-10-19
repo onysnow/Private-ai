@@ -2948,6 +2948,8 @@ class AiModuleStatusOut(ResponseModel):
     spec_file: str
     available: bool
     vendored_tas: bool
+    # The suite system the module belongs to (tas, ras, qas, las, das, egs, ehs); null for an app-local module.
+    system: str | None = None
 
 
 class AiControlFlagOut(ResponseModel):
@@ -2961,12 +2963,49 @@ class AiControlSurfaceOut(ResponseModel):
     flags: dict[str, AiControlFlagOut]
 
 
+class AiFinalAuditOut(ResponseModel):
+    node: str  # e.g. tas/10
+    file: str
+
+
+class AiSuiteModuleOut(ResponseModel):
+    module: str
+    title: str
+    node: str
+    available: bool
+
+
+class AiSuiteSystemOut(ResponseModel):
+    """One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+    CHANGELOG numbers them, `latest_change` its newest entry."""
+    system: str
+    name: str
+    kind: str  # authority | support
+    row: int
+    version: str | None
+    latest_change: str | None
+    present: bool
+    module_count: int
+    final_audit: AiFinalAuditOut | None
+    modules: list[AiSuiteModuleOut]
+
+
+class AiNextRunOut(ResponseModel):
+    """A next run the suite service routes an answer to, by what the answer contains."""
+    module: str
+    system: str
+    row: int | None
+    title: str
+    why: str
+
+
 class AiAuthoritySuiteOut(ResponseModel):
     """The vendored Authority System Suite: where it came from and the TAS version the prompts use."""
     present: bool
     source: str | None
     tas_version: str | None
     modules: dict[str, AiModuleStatusOut]
+    systems: list[AiSuiteSystemOut] = []
     control_surface: AiControlSurfaceOut
 
 
@@ -3033,14 +3072,41 @@ class UnsafeDocumentReferenceOut(ResponseModel):
 
 
 class OrphanStoragePreviewOut(ResponseModel):
-    """Files under document storage no document refers to. Read-only: they are kept until a reporter decides."""
+    """Files under document storage no document refers to. They are kept until the reporter decides, per file: Keep,
+    Add back to a case, or Delete (POST /settings/storage/orphans/keep, …/delete,
+    /investigations/{id}/storage/orphans/add-back)."""
     storage_root: str
     orphan_files: list[OrphanFileOut]
     orphan_file_count: int
     orphan_bytes: int
+    kept_file_count: int = Field(description="Stray files the reporter chose to Keep; not listed again")
     unsafe_document_references: list[UnsafeDocumentReferenceOut]
     cleanup_available: bool
     policy: str
+
+
+class StrayFilesKeptOut(ResponseModel):
+    kept: list[str]
+    kept_count: int
+
+
+class StrayFileDeletedOut(ResponseModel):
+    relative_path: str
+    size_bytes: int
+
+
+class StrayFilesDeletedOut(ResponseModel):
+    deleted: list[StrayFileDeletedOut]
+    deleted_count: int
+    freed_bytes: int
+
+
+class StrayFileAddedBackOut(ResponseModel):
+    """The stray file is now a document of the case; it is read like an upload (follow it on The Drop)."""
+    investigation_id: str
+    document_id: str
+    filename: str
+    job_id: str | None
 
 
 class SecurityAuditViewOut(ResponseModel):
@@ -3491,7 +3557,7 @@ class AiAnalysisCandidateSummaryOut(ResponseModel):
     for a human rejection, or null when not rejected."""
     id: str
     investigation_id: str
-    module: str  # case_synthesis | hypothesis_test | presentation_draft
+    module: str  # case_synthesis | hypothesis_test | presentation_draft | a suite module (app/ai/systems.py)
     request: dict[str, Any]
     review_status: str  # proposed | accepted | rejected
     confidence: float
@@ -3545,6 +3611,8 @@ class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
     trace: dict[str, Any] | None
     # Your decisions claim by claim, by claim or hypothesis id (app/ai/reasoning.py review_ai_claim); {} when none.
     claim_reviews: dict[str, AiClaimReviewOut]
+    # Where this answer goes next by what it contains (app/ai/suite.py next_runs); [] for a rejected answer.
+    next_runs: list[AiNextRunOut] = []
     citation_details: list[CitationDetailOut] | None = Field(default=None, exclude_if=_absent_when_none)
     deck_preview: list[DeckSlideOut] | None = Field(default=None, exclude_if=_absent_when_none)
     # A presentation draft's "how we know" line (app/services/presentation.py how_we_know).
@@ -4349,13 +4417,15 @@ class CheckDocumentOut(ResponseModel):
 
 
 class ToCheckItemOut(ResponseModel):
-    """Something a person checks: a passage to read, a checklist item, or a money
-    check a person kept (kind "money", indicator_id the check's kind). The app
-    never decides it; open until a person does."""
+    """Something a person checks: a passage to read, a checklist item, a money
+    check a person kept (kind "money", indicator_id the check's kind), or a link
+    a person added from The Wire because no reviewed source shows it yet (kind
+    "link", ``relationship_id`` the link). The app never decides it; open until
+    a person does."""
     id: str
     indicator_id: str
     indicator_name: str
-    kind: Literal["passage", "checklist", "money"]
+    kind: Literal["passage", "checklist", "money", "link"]
     question: str
     status: Literal["open", "shows", "does_not", "unclear"]
     note: str | None
@@ -4369,6 +4439,7 @@ class ToCheckItemOut(ResponseModel):
     terms: list[str]
     first_seen_at: Timestamp
     gone_at: Timestamp | None
+    relationship_id: str | None = None  # a link item: the link it asks a source for
 
 
 class MissingValueOut(ResponseModel):
@@ -4679,6 +4750,37 @@ class DecisionLinkOut(ResponseModel):
     label: str
 
 
+class DecisionFlagChangeOut(ResponseModel):
+    indicator_id: str
+    name: str
+    from_level: Literal["faint", "strong", "textbook"] | None = None  # None: no such flag yet
+    to_level: Literal["faint", "strong", "textbook"]
+    text: str  # the level meter moving, with the words ("▮▯▯ → ▮▮▯ Layered ownership (…)")
+
+
+class DecisionUnlocksOut(ResponseModel):
+    """What answering Yes would change, dry-run on the records (app/services/decision_unlocks.py): claims that would
+    meet every Done rule for Supported, Red Flags that would rise, links that would complete a chain. ``counted`` is
+    false when the request ran out of dry runs before this one."""
+    score: int
+    claims: int
+    flags: int
+    chains: int
+    counted: bool
+    words: str  # "unlocks: 1 claim supported, 1 Red Flag rises"; empty when it unlocks none of these
+    lines: list[str]
+    flag_changes: list[DecisionFlagChangeOut]
+
+
+class DecisionSnoozeStateOut(ResponseModel):
+    """A decision put off (H). ``asleep``: out of the queue; ``woke``: back, with why."""
+    state: Literal["asleep", "woke"]
+    until: Timestamp | None = None
+    wake_on_activity: bool
+    snoozed_at: Timestamp
+    why: str | None = None
+
+
 class DecisionItemOut(ResponseModel):
     """Every decision is the same five-part card: question, proposal (and who
     proposed it), evidence, choices, what happens. An item with no choices is
@@ -4701,15 +4803,37 @@ class DecisionItemOut(ResponseModel):
     open: DecisionLinkOut
     known: list[str] = []
     confidence_band: Literal["high", "medium", "low"] | None = None  # a document proposal's confidence, as a word
+    unlocks: DecisionUnlocksOut | None = None
+    snooze: DecisionSnoozeStateOut | None = None
 
 
 class CaseDecisionsOut(ResponseModel):
-    """One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind."""
+    """One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind.
+    ``snoozed`` counts the ones put off and still asleep, left out of ``items``, ``total`` and ``counts`` (asked with
+    ``snoozed=true``, ``items`` holds only them)."""
     investigation_id: str
     counts: dict[str, int]
     total: int
     offset: int
     items: list[DecisionItemOut]
+    snoozed: int = 0
+
+
+class DecisionSnoozeOut(ResponseModel):
+    investigation_id: str
+    kind: Literal["to_check", "missing", "proposal", "match", "outside", "ai", "watchlist"]
+    item_id: str
+    until: Timestamp | None = None
+    wake_on_activity: bool
+    snoozed_at: Timestamp
+    question: str
+
+
+class DecisionWakeOut(ResponseModel):
+    investigation_id: str
+    kind: Literal["to_check", "missing", "proposal", "match", "outside", "ai", "watchlist"]
+    item_id: str
+    woke: bool  # false when it was not put off
 
 
 class CaseChangeOut(ResponseModel):
@@ -4842,10 +4966,26 @@ class WireEntityOut(ResponseModel):
 
 
 class WireQuoteOut(ResponseModel):
+    """A quote that shows a link; document_id and page when it comes from a document the case holds (page: the
+    page its passage is on, none when not found), pdf when that document can be drawn as a page."""
     doc: str
     loc: str
     q: str
     evidence_id: str | None = None
+    document_id: str | None = None
+    page: int | None = None
+    pdf: bool = False
+
+
+class WireLinkFlagOut(ResponseModel):
+    """An open Red Flag a link is part of: its level, name, sentence, path (a loop's) and first innocent explanation."""
+    flag_id: str
+    id: str
+    level: Literal["faint", "strong", "textbook"]
+    name: str
+    text: str
+    path: str
+    innocent: str
 
 
 class WireLinkOut(ResponseModel):
@@ -4860,6 +5000,30 @@ class WireLinkOut(ResponseModel):
     role: str
     pct: str
     ev: list[WireQuoteOut]
+    flags: list[WireLinkFlagOut] = []
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class WireWorkedOutOut(ResponseModel):
+    """A link the app works out from stored links (app/services/wire.py worked_out): never stored, never a
+    reviewed fact. pct is the worked-out share, empty with share_unknown_because when it cannot be worked out;
+    inputs are the stored links it rests on (the shortest path's first, in order); via the parties between on
+    the shortest path; flag_id the circular-ownership Red Flag its paths run through."""
+    id: str
+    s: str
+    t: str
+    schema_: str = Field(alias="schema")
+    fam: Literal["owns"]
+    pct: str
+    share_unknown_because: str
+    rule: str
+    rule_name: str
+    rule_text: str
+    inputs: list[str]
+    paths: int
+    steps: int
+    via: list[str]
+    flag_id: str | None
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
 
 
@@ -4874,6 +5038,7 @@ class WireOut(ResponseModel):
     entities: list[WireEntityOut]
     links: list[WireLinkOut]
     events: list[WireEventOut]
+    worked_out: list[WireWorkedOutOut] = []
 
 
 # --- The Authority System Suite's records (app/services/case_records.py) --------------
@@ -5052,10 +5217,17 @@ class RunPlanTypeCountOut(ResponseModel):
     count: int
 
 
+class RunPlanTierCountOut(ResponseModel):
+    tier: str
+    count: int
+
+
 class RunPlanPacketOut(ResponseModel):
     records: int
     by_type: list[RunPlanTypeCountOut]
     leads_only: int
+    # Records whose source sits below the tier floor, by tier: in the packet, but never counting toward a fact.
+    below_tier_floor: list[RunPlanTierCountOut]
     first: list[RunPlanRecordOut]
 
 
@@ -5142,6 +5314,17 @@ class AiRunEventOut(ResponseModel):
     detail: dict[str, Any] | None
 
 
+class AiRunRouteOut(ResponseModel):
+    """How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+    not know (a run recorded under a name since removed); "app" for the app-local draft."""
+    system: str | None
+    row: int | None
+    node: str | None
+    title: str
+    modules_in_system: int
+    final_audit: AiFinalAuditOut | None
+
+
 class AiRunOut(ResponseModel):
     run_id: str
     status: str
@@ -5158,6 +5341,9 @@ class AiRunOut(ResponseModel):
     problems: int
     message: str | None
     error: str | None
+    route: AiRunRouteOut
+    handoff_from: str | None = None
+    record_refs: list[RecordRefOut] = []
 
 
 class AiRunsOut(ResponseModel):
@@ -5167,3 +5353,57 @@ class AiRunsOut(ResponseModel):
 class AiRunEventsOut(ResponseModel):
     run: AiRunOut
     events: list[AiRunEventOut]
+
+
+class LearningNextDaysOut(ResponseModel):
+    """In how many days the card comes back after each answer (0: in this sitting)."""
+    again: int
+    hard: int
+    good: int
+    easy: int
+
+
+class LearningCardOut(ResponseModel):
+    """One flip card and where it stands on the ladder (app/services/learning.py)."""
+    id: str
+    kind: Literal["indicator", "term"]
+    ref: str
+    name: str
+    areas: list[str]
+    added_from: str
+    step: int
+    interval_days: int
+    due_at: Timestamp
+    due: bool
+    last_answer: Literal["again", "hard", "good", "easy"] | None
+    last_reviewed_at: Timestamp | None
+    reviews: int
+    lapses: int
+    created_at: Timestamp
+    next_days: LearningNextDaysOut
+
+
+class LearningCardListOut(ResponseModel):
+    """A deck's cards, due ones first; ``next_due_at`` is when the first card not yet due falls due."""
+    total: int
+    due: int
+    next_due_at: Timestamp | None
+    cards: list[LearningCardOut]
+
+
+class LearningDeckCountOut(ResponseModel):
+    deck: Literal["all", "case", "area", "terms", "safety"]
+    area: str | None
+    total: int
+    due: int
+    next_due_at: Timestamp | None
+
+
+class LearningSummaryOut(ResponseModel):
+    """What "Practise · n due" needs: due counts in all and per deck, and the ladder of days."""
+    total: int
+    due: int
+    next_due_at: Timestamp | None
+    ladder_days: list[int]
+    decks: list[LearningDeckCountOut]
+    areas: list[LearningDeckCountOut]

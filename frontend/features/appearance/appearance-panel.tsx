@@ -3,7 +3,8 @@
 // specimen cards (each drawn in its own theme) and the effects; on the right the open
 // case's real Case home, split between the theme you use and the one you point at, its
 // four facts, and the formats. Pointing at a card previews it there; choosing a card tries
-// it on the whole app for this session, and the bar at the top keeps it or goes back. "+ Make your own" opens the
+// it on the whole app for this session, and the bar at the top keeps it or goes back. The format (Board, Editorial,
+// Desk, Story) is kept at once, with the same crossfade; the theme on screen may suggest one, never choose it. "+ Make your own" opens the
 // theme maker (theme-maker.tsx); your own themes then sit among the cards and are tried and kept the same way.
 import type {CSSProperties, ReactElement} from 'react';
 import {useEffect, useState} from 'react';
@@ -14,9 +15,10 @@ import {webglAvailable} from '../effects/webgl';
 import {ThemeCompare, type Look} from './theme-compare';
 import {draftFrom, draftOf, ThemeMaker, type ThemeDraft} from './theme-maker';
 import {checkPalette, ratioText} from '../../lib/contrast';
+import '../../styles/formats.css';
 import {customTheme, customThemes, deleteCustomTheme, MAX_CUSTOM_THEMES, onCustomThemesChange, paletteVars, type CustomTheme} from '../../lib/custom-theme';
 import {
-  currentAppearance, DEFAULT_APPEARANCE, FORMATS, keepAppearance, keptAppearance, onAppearanceChange, THEMES, tryingCustom, tryingTheme, tryTheme,
+  currentAppearance, DEFAULT_APPEARANCE, FORMATS, keepAppearance, SUGGESTED_FORMAT, keptAppearance, onAppearanceChange, THEMES, tryingCustom, tryingTheme, tryTheme,
   type Appearance, type Effects, type Format, type NamedEffect, type ThemeId,
 } from '../../lib/theme';
 
@@ -51,6 +53,20 @@ const themeName = (id: ThemeId): string => THEMES.find(t => t.id === id)?.name ?
 /** A theme's name, or the name of your own theme when there is one. */
 export const lookName = (theme: ThemeId, own: string | null): string => customTheme(own)?.name ?? themeName(theme);
 
+/** A theme change as a crossfade of the whole screen (research §04.11 "Motion": 450 ms, Rain Noir 700 ms, a 120 ms
+ *  crossfade under Calm motion or the computer's reduced-motion setting); straight away where the browser has no
+ *  view transitions. `to` is the theme the screen ends in. */
+export function fadeTheme(change: () => void, to: ThemeId): void {
+  const doc = document as Document & {startViewTransition?: (update: () => void) => {finished?: Promise<void>}};
+  if (typeof doc.startViewTransition !== 'function') { change(); return; }
+  let reduced = false;
+  try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* no media queries */ }
+  const root = document.documentElement;
+  root.dataset.themeFade = reduced || currentAppearance().motion === 'calm' ? 'calm' : to === 'rain-noir' ? 'slow' : 'base';
+  const done = () => { delete root.dataset.themeFade; };
+  try { void doc.startViewTransition(change).finished?.then(done, done); } catch { done(); change(); }
+}
+
 /** The bar at the top of every screen while a theme is on trial: Keep it, or go back (Esc). */
 export function TryingBar(): ReactElement | null {
   const {trying, tryingOwn, kept} = useAppearance();
@@ -58,18 +74,18 @@ export function TryingBar(): ReactElement | null {
     if (!trying) return undefined;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || e.defaultPrevented || document.querySelector('[role="dialog"]')) return;
-      tryTheme(null);
+      fadeTheme(() => tryTheme(null), kept.theme);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [trying]);
+  }, [trying, kept.theme]);
   if (!trying) return null;
   const name = lookName(trying, tryingOwn);
   return <div className="ap-trying" role="status">
     <i className="ap-trying-dot" aria-hidden="true"/>
     <span>Trying <b>{name}</b> · nothing is saved until you keep it</span>
     <button type="button" className="ap-btn p" onClick={() => keepAppearance({theme: trying, custom: tryingOwn})}>Keep {name}</button>
-    <button type="button" className="ap-btn" onClick={() => tryTheme(null)}>Go back to {lookName(kept.theme, kept.custom)} <kbd>Esc</kbd></button>
+    <button type="button" className="ap-btn" onClick={() => fadeTheme(() => tryTheme(null), kept.theme)}>Go back to {lookName(kept.theme, kept.custom)} <kbd>Esc</kbd></button>
   </div>;
 }
 
@@ -86,14 +102,17 @@ const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeI
   {id: 'bloom', name: 'Bloom on the AI run’s lights', line: 'WebGL · Watch the run only · stops if calm', themes: ['rain-noir']},
 ];
 
-/** A format drawn small: where its panels sit. */
+/** Whether a theme has any of the named effects (research §04.11: each card's name says "has effects" when it does). */
+const hasEffects = (theme: ThemeId): boolean => NAMED.some(n => n.themes.includes(theme));
+
+/** A format drawn small, as mockup HOME_2 draws it: where its panels sit, the one that matters in the accent. */
 function FormatThumb({id}: {id: Format}): ReactElement {
-  const box = (x: number, y: number, w: number, h: number, k = 0) => <rect key={`${x}${y}${k}`} x={x} y={y} width={w} height={h} rx={2}/>;
+  const box = (x: number, y: number, w: number, h: number, cls?: string) => <rect key={`${x}-${y}`} x={x} y={y} width={w} height={h} rx={2} className={cls}/>;
   const parts: Record<Format, ReactElement[]> = {
-    board: [box(4, 6, 16, 26), box(23, 6, 26, 26, 1), box(52, 6, 16, 26, 2), box(4, 36, 64, 6, 3)],
-    editorial: [box(6, 7, 44, 6), box(6, 17, 54, 6, 1), box(6, 27, 38, 6, 2), box(6, 37, 48, 4, 3)],
-    desk: [box(5, 8, 14, 12), box(23, 5, 16, 14, 1), box(44, 10, 13, 12, 2), box(9, 26, 15, 13, 3), box(30, 24, 22, 17, 4)],
-    story: [box(4, 6, 64, 4), box(4, 14, 20, 28, 1), box(27, 14, 20, 28, 2), box(50, 14, 18, 28, 3)],
+    board: [box(5, 7, 18, 31), box(26, 7, 24, 31, 'fm-hot'), box(53, 7, 14, 31)],
+    editorial: [box(8, 9, 46, 5), box(8, 19, 56, 5), box(8, 29, 42, 5)],
+    desk: [box(6, 7, 15, 14), box(26, 14, 15, 11), box(47, 6, 16, 17)],
+    story: [box(44, 4, 24, 38, 'fm-deep'), box(24, 4, 18, 38), box(28, 31, 10, 3, 'fm-hot')],
   };
   return <svg className="ap-format" viewBox="0 0 72 46" aria-hidden="true">{parts[id]}</svg>;
 }
@@ -195,16 +214,20 @@ export function AppearancePanel(): ReactElement {
             if (at < 0) return;
             const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
             if (step) { e.preventDefault(); cards[(at + step + cards.length) % cards.length].focus(); return; }
-            if ((e.key === 'k' || e.key === 'K') && !e.metaKey && !e.ctrlKey) { e.preventDefault(); keepAppearance({theme: options[at].theme, custom: options[at].own?.id ?? null}); }
+            if ((e.key === 'k' || e.key === 'K') && !e.metaKey && !e.ctrlKey) {
+              e.preventDefault();
+              const pick = options[at];
+              fadeTheme(() => keepAppearance({theme: pick.theme, custom: pick.own?.id ?? null}), pick.theme);
+            }
           }}>
           {options.map(t => {
             const current = keptKey === t.key;
             const card = <button key={t.key} type="button" data-theme={t.theme} role="radio" aria-checked={nowKey === t.key} style={ownStyle(t.own)}
               tabIndex={nowKey === t.key ? 0 : -1}
               className={`ap-card${nowKey === t.key ? ' on' : ''}${tryingKey === t.key ? ' trying' : ''}`}
-              aria-label={`${t.name} theme${t.own ? ' (your own)' : ''}${current ? ', in use' : ''}${tryingKey === t.key ? ', trying' : ''}`}
+              aria-label={`${t.name} theme${t.own ? ' (your own)' : ''}${current ? ', in use' : ''}${tryingKey === t.key ? ', trying' : ''}, lowest contrast ${t.lowest}${hasEffects(t.theme) ? ', has effects' : ''}`}
               onMouseEnter={() => setPointed(t.key)} onFocus={() => setPointed(t.key)} onBlur={() => setPointed(null)}
-              onClick={() => tryTheme(current ? null : t.theme, current ? null : t.own?.id ?? null)}>
+              onClick={() => fadeTheme(() => tryTheme(current ? null : t.theme, current ? null : t.own?.id ?? null), current ? kept.theme : t.theme)}>
               <span className="ap-card-head"><b>{t.name}</b>{current && <span className="ap-tag">Current</span>}{tryingKey === t.key && <span className="ap-tag try">Trying</span>}</span>
               <span className="ap-mood">{t.mood}</span>
               <span className="ap-sw" aria-hidden="true">{t.swatches.map((c, i) => <i key={`${c}${i}`} style={{background: c}}/>)}</span>
@@ -246,7 +269,7 @@ export function AppearancePanel(): ReactElement {
         <div className="ap-seg" role="radiogroup" aria-label="Effects">
           {EFFECTS.map(e => <button key={e.id} type="button" role="radio" aria-checked={now.effects === e.id} className={now.effects === e.id ? 'on' : ''}
             onClick={() => keepAppearance({effects: e.id})}>{e.name}</button>)}
-          <span>{now.effects === 'light' ? 'Light: the same effects, standing still.' : now.effects === 'off' ? 'Off: a plain board.' : 'Full: the theme’s board effects, moving.'}</span>
+          <span>{now.effects === 'light' ? 'Light: the same effects, standing still.' : now.effects === 'off' ? 'Off: a plain board.' : 'Full: the theme’s board effects, moving. On battery they run as Light until the computer is charging.'}</span>
         </div>
         <div className="ap-switches">
           {NAMED.map(n => {
@@ -274,11 +297,26 @@ export function AppearancePanel(): ReactElement {
           <div><dt>Cost on this laptop</dt><dd>{info.cost}</dd></div>
         </dl>
         <header className="ap-pane-head"><h2>Format</h2><span>how home is laid out · chosen apart from theme</span></header>
-        <div className="ap-formats" role="radiogroup" aria-label="Format">
-          {FORMATS.map(f => <button key={f.id} type="button" role="radio" aria-checked={now.format === f.id} disabled={!f.ready} title={f.line}
-            className={`ap-fmt${now.format === f.id ? ' on' : ''}`} onClick={() => keepAppearance({format: f.id})}>
-            <FormatThumb id={f.id}/><b>{f.name}</b><small>{f.ready ? f.line.split(';')[0] : 'Planned'}</small>
-          </button>)}
+        <div className="ap-formats" role="radiogroup" aria-label="Format: arrows move, Enter or Space chooses"
+          onKeyDown={e => {
+            const tiles = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('[role=radio]:not(:disabled)'));
+            const at = tiles.indexOf(document.activeElement as HTMLButtonElement);
+            const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+            if (at < 0 || !step) return;
+            e.preventDefault();
+            tiles[(at + step + tiles.length) % tiles.length].focus();
+          }}>
+          {FORMATS.map(f => {
+            // A theme suggests a format; it never chooses it (research §03 D1).
+            const suggested = SUGGESTED_FORMAT[now.theme] === f.id;
+            return <button key={f.id} type="button" role="radio" aria-checked={now.format === f.id} disabled={!f.ready} title={f.line}
+              tabIndex={now.format === f.id ? 0 : -1}
+              aria-label={`${f.name}: ${f.line}${suggested ? ` Suggested for ${themeName(now.theme)}.` : ''}`}
+              className={`ap-fmt${now.format === f.id ? ' on' : ''}`} onClick={() => { if (now.format !== f.id) fadeTheme(() => keepAppearance({format: f.id}), now.theme); }}>
+              <FormatThumb id={f.id}/><b>{f.name}</b><small>{f.ready ? f.short : 'Planned'}</small>
+              {suggested && <span className="ap-fmt-tag">Suggested for {themeName(now.theme)}</span>}
+            </button>;
+          })}
         </div>
       </div>
     </div>

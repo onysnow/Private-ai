@@ -116,11 +116,11 @@ Also from the backlog: watchlist highlights redesign; Sources & evidence as a br
 SEE_1 "Who controls Kestrel SA": The Wire is now See's map; SEE_1's parts go into it.
 **Ony, 12 Oct: the two screenshots of The Wire he sent with the mockups are work in progress and need much more design work than the other screens; they are not targets. The Wire is redesigned from SEE_1, SEE_2 and research chapter 07, as a mockup for Ony to approve first.**
 - [ ] Every link labelled with its sentence and certainty glyph ("✓ owns 60%", "? signs for · not yet shown", "ƒ owns 40% · worked out")
-- [ ] Certainty line styles: solid shown / dashed not yet shown / double disputed / dotted worked out / faint ended, with the key always on
-- [ ] Flag rings with level and count; lettered stubs for long links
-- [ ] Right detail panel for a link: sentence, status, the source scan with the words lit, Open the source / Chain of Custody, its Red Flag, "How is X linked to Y?"
+- [x] Certainty line styles: solid shown / dashed not yet shown / double disputed / dotted worked out / faint ended, with the key always on (dotted ƒ worked-out links built 19 Oct: `worked_out` in `wire()`, indirect ownership)
+- [x] Flag rings with level and count; lettered stubs for long links (lettered stubs built 19 Oct)
+- [x] Right detail panel for a link: sentence, status, the source scan with the words lit, Open the source / Chain of Custody, its Red Flag, "How is X linked to Y?" (built 19 Oct: `features/the-wire/link-drawer.tsx`; "Add to To check" makes a To check item of kind link)
 - [ ] Active chips (As of end of 2019 ✕ · Lit Kestrel SA ✕ · Clear all) and the as-of time rail with histogram, "11 of 14 links held by then · 1 ended · 2 undated"
-- [ ] Arrangement switch (Who controls whom · Around a party · By kind · Linked groups · Grid) with "Chosen because…"
+- [x] Arrangement switch (Who controls whom · Around a party · By kind · Linked groups · Grid) with "Chosen because…" (built 19 Oct)
 SEE_2 "Where did the money go" (12 Oct: See › Money, `features/money`, loads with the view; the dead Money link now opens it):
 - [x] Currency tabs with counts, Columns / Flow / Ledger switch, "Traced so far" running total (click a band; Esc clears)
 - [x] Comes from → passes through → goes to columns in SVG, labelled bands with the status grammar; missing money drawn as a hatched "No recorded source" ghost with its arithmetic; a round trip's latest payment drawn as a return arc (never "cannot draw")
@@ -139,7 +139,7 @@ Timeline and Places: **no mockup in the 16 screens** — the canvas frames 4–1
 CHECK_1 Decide: **partial** (queue, evidence pane, card, keys, undo built).
 - [x] Queue filters work past the first 200 (backlog P1); grouped by source with "pages read" (19 Oct: each document group shows "pages read: n of m", the pages carrying a proposal or a passage to check and how many have nothing left, counted on the server from the items themselves; a spreadsheet's rows get no count)
 - [x] "What happens" preview per kind; reason chips under No; Last 10 strip; bulk "Accept all 38 high" (19 Oct: each answer says what it does, worded from the endpoint it posts to; chips only where the endpoint stores the note, so a watchlist dismiss answers at once; Last 10 entries undo while held, a saved To check item or missing value goes back to open, the rest say why not; "Accept all n high" per source for high proposals whose Yes asks no question, confirmed by count with the list, one Undo all; the Decide error state stands alone with Retry)
-- [ ] Sort by what it unlocks (19 Oct: not built; no stored data says which answer completes a claim's Done rules or raises a Red Flag: To check answers leave flag levels unchanged, an accepted claim starts Not yet shown, and whether a new link would raise a flag needs a dry run of the pattern engine); "Open the document" opens the reader, not Search (done, see CHECK_2 below)
+- [x] Sort by what it unlocks (19 Oct: not built; no stored data says which answer completes a claim's Done rules or raises a Red Flag: To check answers leave flag levels unchanged, an accepted claim starts Not yet shown, and whether a new link would raise a flag needs a dry run of the pattern engine); "Open the document" opens the reader, not Search (done, see CHECK_2 below) — sort built 19 Oct: `decision_unlocks.py` dry-runs Done rules, Red Flag rules and chains without writing; H snooze built (`decision_snoozes`)
 CHECK_2 Chain of Custody (12 Oct: Check › Chain of Custody, `features/custody`; backend `GET /claims/{id}/custody-chain`, `POST /documents/{id}/recheck-hash`):
 - [x] Whole-screen chain: Files → Reading → Passage → Decision → The claim as wired cards with check glyphs (✓ hash re-checked on load, ✓ says it, OCR / text layer), one row per piece of evidence, against rows in red; AI drafts that quote the claim as plum cards
 - [x] Wire styles (confirmed / proposed / worked out / against / AI) with the action word on each line
@@ -183,10 +183,10 @@ AI_2 built 12 Oct (Act › AI runs, `features/ai/before-you-run.tsx`; backend `a
 ## 9. Knowledge and safety — mockups KNOWLEDGE_KEEP_1 (catalogue) and _2 (Safety & data) (§10)
 
 Both **missing**.
-- [x] Catalogue map of 42 areas in six families, area card, indicator list with how-checked glyphs and counts, indicator page (ladder, could be innocent / signs side by side, checked by, sources, case), Map / Table / Cards (built 19 Oct at /learn: `features/knowledge/`, `GET /api/catalogue/map`, `/indicators`; the six families are the mockup's grouping, still waiting on Ony, research Part 6 Q2). Still to do: Practise (scheduled flip cards: needs a review store, an open question for Ony); Cards is browse-only
+- [x] Catalogue map of 42 areas in six families, area card, indicator list with how-checked glyphs and counts, indicator page (ladder, could be innocent / signs side by side, checked by, sources, case), Map / Table / Cards (built 19 Oct at /learn: `features/knowledge/`, `GET /api/catalogue/map`, `/indicators`; the six families are the mockup's grouping, still waiting on Ony, research Part 6 Q2). Practise built 19 Oct (`learning_cards`, fixed ladder 1/3/7/14/30/60/120 days, decks, ＋ Flip card)
 - [x] Glossary: every term (not the first 200), every area's definition, hover cards that are reachable, dwell, Esc (built 19 Oct: Learn › Glossary, `features/glossary/`; every area's own wording in a tab, "No definition yet" where an area has none; the wording itself stays Ony's)
-- [ ] Safety & data: what lives where (stores and services with modes and what is sent), totals with zeroes, period switch; Backup / Who can reach it / Housekeeping / Delete this case cards; Your safety panel (built last); outbound log, word for word
-- [ ] Encrypted backups (ADR); delete by typing the case name
+- [x] Safety & data: what lives where (stores and services with modes and what is sent), totals with zeroes, period switch; Backup / Who can reach it / Housekeeping / Delete this case cards; Your safety panel (built last); outbound log, word for word (built 19 Oct at /keep/safety; per-service modes enforced; `outbound_log`)
+- [x] Encrypted backups (ADR); delete by typing the case name (built 19 Oct: ADR-0015, AES-256-GCM + scrypt, on by default; Housekeeping Keep / Add back / Delete)
 
 ## 10. Website — mockups SITE_1 (home) and SITE_2 (About Ony) (§11)
 

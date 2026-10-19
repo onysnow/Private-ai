@@ -132,6 +132,14 @@ export const zAiControlSurfaceOut = z.object({
 });
 
 /**
+ * AiFinalAuditOut
+ */
+export const zAiFinalAuditOut = z.object({
+  file: z.string(),
+  node: z.string(),
+});
+
+/**
  * AiLimitsOut
  */
 export const zAiLimitsOut = z.object({
@@ -147,20 +155,21 @@ export const zAiLimitsOut = z.object({
 export const zAiModuleStatusOut = z.object({
   available: z.boolean(),
   spec_file: z.string(),
+  system: z.string().nullish(),
   vendored_tas: z.boolean(),
 });
 
 /**
- * AiAuthoritySuiteOut
+ * AiNextRunOut
  *
- * The vendored Authority System Suite: where it came from and the TAS version the prompts use.
+ * A next run the suite service routes an answer to, by what the answer contains.
  */
-export const zAiAuthoritySuiteOut = z.object({
-  control_surface: zAiControlSurfaceOut,
-  modules: z.record(zAiModuleStatusOut),
-  present: z.boolean(),
-  source: z.string().nullable(),
-  tas_version: z.string().nullable(),
+export const zAiNextRunOut = z.object({
+  module: z.string(),
+  row: z.number().int().nullable(),
+  system: z.string(),
+  title: z.string(),
+  why: z.string(),
 });
 
 /**
@@ -207,61 +216,6 @@ export const zAiModelFailedOut = z.object({
 });
 
 /**
- * AiReasoningStatusOut
- *
- * Whether the AI reasoning endpoints can be called, and what they would
- * run on. Never carries key material. Every key is always sent (null when
- * unknown), so the nullable ones have no default: the generated type then
- * matches the AI panel's own status type (lib/api-types.ts).
- */
-export const zAiReasoningStatusOut = z.object({
-  authority_suite: zAiAuthoritySuiteOut,
-  enabled: z.boolean(),
-  endpoints_callable: z.boolean(),
-  limits: zAiLimitsOut,
-  model: z.string().nullable(),
-  provider: z.string().nullable(),
-  provider_key_configured: z.boolean(),
-  remote_endpoint_allowed: z.boolean(),
-  runs_on_this_computer: z.boolean().nullable(),
-});
-
-/**
- * AiRunOut
- */
-export const zAiRunOut = z.object({
-  candidate_id: z.string().nullable(),
-  created_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  error: z.string().nullable(),
-  events: z.number().int(),
-  finished: z.boolean(),
-  finished_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullable(),
-  message: z.string().nullable(),
-  module: z.string(),
-  problems: z.number().int(),
-  question: z.string(),
-  review_status: z.string().nullable(),
-  run_id: z.string(),
-  started_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullable(),
-  status: z.string(),
-  working_theory: z.string().nullable(),
-});
-
-/**
  * AiRunRefOut
  */
 export const zAiRunRefOut = z.object({
@@ -296,18 +250,81 @@ export const zAiRunEventOut = z.object({
 });
 
 /**
- * AiRunEventsOut
+ * AiRunRouteOut
+ *
+ * How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+ * not know (a run recorded under a name since removed); "app" for the app-local draft.
  */
-export const zAiRunEventsOut = z.object({
-  events: z.array(zAiRunEventOut),
-  run: zAiRunOut,
+export const zAiRunRouteOut = z.object({
+  final_audit: zAiFinalAuditOut.nullable(),
+  modules_in_system: z.number().int(),
+  node: z.string().nullable(),
+  row: z.number().int().nullable(),
+  system: z.string().nullable(),
+  title: z.string(),
 });
 
 /**
- * AiRunsOut
+ * AiSuiteModuleOut
  */
-export const zAiRunsOut = z.object({
-  runs: z.array(zAiRunOut),
+export const zAiSuiteModuleOut = z.object({
+  available: z.boolean(),
+  module: z.string(),
+  node: z.string(),
+  title: z.string(),
+});
+
+/**
+ * AiSuiteSystemOut
+ *
+ * One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+ * CHANGELOG numbers them, `latest_change` its newest entry.
+ */
+export const zAiSuiteSystemOut = z.object({
+  final_audit: zAiFinalAuditOut.nullable(),
+  kind: z.string(),
+  latest_change: z.string().nullable(),
+  module_count: z.number().int(),
+  modules: z.array(zAiSuiteModuleOut),
+  name: z.string(),
+  present: z.boolean(),
+  row: z.number().int(),
+  system: z.string(),
+  version: z.string().nullable(),
+});
+
+/**
+ * AiAuthoritySuiteOut
+ *
+ * The vendored Authority System Suite: where it came from and the TAS version the prompts use.
+ */
+export const zAiAuthoritySuiteOut = z.object({
+  control_surface: zAiControlSurfaceOut,
+  modules: z.record(zAiModuleStatusOut),
+  present: z.boolean(),
+  source: z.string().nullable(),
+  systems: z.array(zAiSuiteSystemOut).optional().default([]),
+  tas_version: z.string().nullable(),
+});
+
+/**
+ * AiReasoningStatusOut
+ *
+ * Whether the AI reasoning endpoints can be called, and what they would
+ * run on. Never carries key material. Every key is always sent (null when
+ * unknown), so the nullable ones have no default: the generated type then
+ * matches the AI panel's own status type (lib/api-types.ts).
+ */
+export const zAiReasoningStatusOut = z.object({
+  authority_suite: zAiAuthoritySuiteOut,
+  enabled: z.boolean(),
+  endpoints_callable: z.boolean(),
+  limits: zAiLimitsOut,
+  model: z.string().nullable(),
+  provider: z.string().nullable(),
+  provider_key_configured: z.boolean(),
+  remote_endpoint_allowed: z.boolean(),
+  runs_on_this_computer: z.boolean().nullable(),
 });
 
 /**
@@ -555,6 +572,22 @@ export const zBackupRestoreResultOut = z.object({
 });
 
 /**
+ * BackupsStoreOut
+ */
+export const zBackupsStoreOut = z.object({
+  count: z.number().int(),
+  encrypted: z.boolean(),
+  last_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  last_sha256: z.string().nullable(),
+  last_size_bytes: z.number().int().nullable(),
+});
+
+/**
  * BasemapStatusOut
  *
  * Whether the self-hosted base map is installed (app/services/basemap.py),
@@ -577,6 +610,7 @@ export const zBasemapStatusOut = z.object({
  */
 export const zBodyInspectBackup = z.object({
   file: z.string(),
+  passphrase: z.string().nullish(),
 });
 
 /**
@@ -584,6 +618,7 @@ export const zBodyInspectBackup = z.object({
  */
 export const zBodyPreviewBackupRestore = z.object({
   file: z.string(),
+  passphrase: z.string().nullish(),
 });
 
 /**
@@ -591,6 +626,7 @@ export const zBodyPreviewBackupRestore = z.object({
  */
 export const zBodyRestoreBackup = z.object({
   file: z.string(),
+  passphrase: z.string().nullish(),
 });
 
 /**
@@ -2181,6 +2217,17 @@ export const zDecisionChoiceOut = z.object({
 });
 
 /**
+ * DecisionFlagChangeOut
+ */
+export const zDecisionFlagChangeOut = z.object({
+  from_level: z.enum(['faint', 'strong', 'textbook']).nullish(),
+  indicator_id: z.string(),
+  name: z.string(),
+  text: z.string(),
+  to_level: z.enum(['faint', 'strong', 'textbook']),
+});
+
+/**
  * DecisionGroupOut
  */
 export const zDecisionGroupOut = z.object({
@@ -2230,6 +2277,96 @@ export const zDecisionEvidenceOut = z.object({
 });
 
 /**
+ * DecisionSnoozeCreate
+ *
+ * Puts one decision off: until a time, until the item changes (the default), or whichever comes first.
+ */
+export const zDecisionSnoozeCreate = z.object({
+  item_id: z.string().min(1).max(64),
+  kind: z.enum([
+    'to_check',
+    'missing',
+    'proposal',
+    'match',
+    'outside',
+    'ai',
+    'watchlist',
+  ]),
+  until: z.string().datetime({ offset: true, local: true }).nullish(),
+  wake_on_activity: z.boolean().optional().default(true),
+});
+
+/**
+ * DecisionSnoozeOut
+ */
+export const zDecisionSnoozeOut = z.object({
+  investigation_id: z.string(),
+  item_id: z.string(),
+  kind: z.enum([
+    'to_check',
+    'missing',
+    'proposal',
+    'match',
+    'outside',
+    'ai',
+    'watchlist',
+  ]),
+  question: z.string(),
+  snoozed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  until: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  wake_on_activity: z.boolean(),
+});
+
+/**
+ * DecisionSnoozeStateOut
+ *
+ * A decision put off (H). ``asleep``: out of the queue; ``woke``: back, with why.
+ */
+export const zDecisionSnoozeStateOut = z.object({
+  snoozed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  state: z.enum(['asleep', 'woke']),
+  until: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  wake_on_activity: z.boolean(),
+  why: z.string().nullish(),
+});
+
+/**
+ * DecisionUnlocksOut
+ *
+ * What answering Yes would change, dry-run on the records (app/services/decision_unlocks.py): claims that would
+ * meet every Done rule for Supported, Red Flags that would rise, links that would complete a chain. ``counted`` is
+ * false when the request ran out of dry runs before this one.
+ */
+export const zDecisionUnlocksOut = z.object({
+  chains: z.number().int(),
+  claims: z.number().int(),
+  counted: z.boolean(),
+  flag_changes: z.array(zDecisionFlagChangeOut),
+  flags: z.number().int(),
+  lines: z.array(z.string()),
+  score: z.number().int(),
+  words: z.string(),
+});
+
+/**
  * DecisionItemOut
  *
  * Every decision is the same five-part card: question, proposal (and who
@@ -2267,19 +2404,60 @@ export const zDecisionItemOut = z.object({
   question: z.string(),
   rank: z.number().int(),
   reason: z.string(),
+  snooze: zDecisionSnoozeStateOut.nullish(),
+  unlocks: zDecisionUnlocksOut.nullish(),
 });
 
 /**
  * CaseDecisionsOut
  *
  * One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind.
+ * ``snoozed`` counts the ones put off and still asleep, left out of ``items``, ``total`` and ``counts`` (asked with
+ * ``snoozed=true``, ``items`` holds only them).
  */
 export const zCaseDecisionsOut = z.object({
   counts: z.record(z.number().int()),
   investigation_id: z.string(),
   items: z.array(zDecisionItemOut),
   offset: z.number().int(),
+  snoozed: z.number().int().optional().default(0),
   total: z.number().int(),
+});
+
+/**
+ * DecisionWake
+ *
+ * Brings a decision put off back into the queue now (the snoozed list's Restore, and Z).
+ */
+export const zDecisionWake = z.object({
+  item_id: z.string().min(1).max(64),
+  kind: z.enum([
+    'to_check',
+    'missing',
+    'proposal',
+    'match',
+    'outside',
+    'ai',
+    'watchlist',
+  ]),
+});
+
+/**
+ * DecisionWakeOut
+ */
+export const zDecisionWakeOut = z.object({
+  investigation_id: z.string(),
+  item_id: z.string(),
+  kind: z.enum([
+    'to_check',
+    'missing',
+    'proposal',
+    'match',
+    'outside',
+    'ai',
+    'watchlist',
+  ]),
+  woke: z.boolean(),
 });
 
 /**
@@ -2575,6 +2753,15 @@ export const zDocumentReadFailureOut = z.object({
  */
 export const zDocumentReadFailedOut = z.object({
   detail: zDocumentReadFailureOut,
+});
+
+/**
+ * DocumentsStoreOut
+ */
+export const zDocumentsStoreOut = z.object({
+  files: z.number().int(),
+  missing: z.number().int(),
+  size_bytes: z.number().int(),
 });
 
 /**
@@ -4211,6 +4398,14 @@ export const zInvestigationUpdate = z.object({
 });
 
 /**
+ * KeysStoreOut
+ */
+export const zKeysStoreOut = z.object({
+  set: z.number().int(),
+  total: z.number().int(),
+});
+
+/**
  * LeadConvertRequest
  */
 export const zLeadConvertRequest = z.object({
@@ -4328,6 +4523,127 @@ export const zLeadWorkflowEventOut = z.object({
   lead_id: z.string(),
   note: z.string().nullish(),
   to_status: z.string(),
+});
+
+/**
+ * LearningAnswer
+ *
+ * The reporter's answer to a flip card: Again / Good, or Hard / Easy when they are turned on.
+ */
+export const zLearningAnswer = z.object({
+  answer: z.enum(['again', 'hard', 'good', 'easy']),
+  card_id: z.string().min(1).max(64),
+});
+
+/**
+ * LearningCardCreate
+ *
+ * ＋ Flip card: an indicator from the catalogue or a term from the glossary, kept for Practise.
+ */
+export const zLearningCardCreate = z.object({
+  kind: z.enum(['indicator', 'term']),
+  ref: z.string().min(1).max(255),
+});
+
+/**
+ * LearningDeckCountOut
+ */
+export const zLearningDeckCountOut = z.object({
+  area: z.string().nullable(),
+  deck: z.enum(['all', 'case', 'area', 'terms', 'safety']),
+  due: z.number().int(),
+  next_due_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  total: z.number().int(),
+});
+
+/**
+ * LearningNextDaysOut
+ *
+ * In how many days the card comes back after each answer (0: in this sitting).
+ */
+export const zLearningNextDaysOut = z.object({
+  again: z.number().int(),
+  easy: z.number().int(),
+  good: z.number().int(),
+  hard: z.number().int(),
+});
+
+/**
+ * LearningCardOut
+ *
+ * One flip card and where it stands on the ladder (app/services/learning.py).
+ */
+export const zLearningCardOut = z.object({
+  added_from: z.string(),
+  areas: z.array(z.string()),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  due: z.boolean(),
+  due_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  interval_days: z.number().int(),
+  kind: z.enum(['indicator', 'term']),
+  lapses: z.number().int(),
+  last_answer: z.enum(['again', 'hard', 'good', 'easy']).nullable(),
+  last_reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  name: z.string(),
+  next_days: zLearningNextDaysOut,
+  ref: z.string(),
+  reviews: z.number().int(),
+  step: z.number().int(),
+});
+
+/**
+ * LearningCardListOut
+ *
+ * A deck's cards, due ones first; ``next_due_at`` is when the first card not yet due falls due.
+ */
+export const zLearningCardListOut = z.object({
+  cards: z.array(zLearningCardOut),
+  due: z.number().int(),
+  next_due_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  total: z.number().int(),
+});
+
+/**
+ * LearningSummaryOut
+ *
+ * What "Practise · n due" needs: due counts in all and per deck, and the ladder of days.
+ */
+export const zLearningSummaryOut = z.object({
+  areas: z.array(zLearningDeckCountOut),
+  decks: z.array(zLearningDeckCountOut),
+  due: z.number().int(),
+  ladder_days: z.array(z.number().int()),
+  next_due_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  total: z.number().int(),
 });
 
 /**
@@ -5165,6 +5481,42 @@ export const zOrphanFileOut = z.object({
 });
 
 /**
+ * OutboundRequestOut
+ *
+ * One request that left this computer: when, to whom, the value word for word, and why.
+ */
+export const zOutboundRequestOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  documents_sent: z.number().int(),
+  id: z.string(),
+  kind: z.string(),
+  reason: z.string(),
+  service: z.string(),
+  service_name: z.string(),
+  started_by: z.string(),
+  value_kind: z.string(),
+  value_sent: z.string(),
+});
+
+/**
+ * OutboundLogOut
+ */
+export const zOutboundLogOut = z.object({
+  items: z.array(zOutboundRequestOut),
+  since: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  total: z.number().int(),
+});
+
+/**
  * OwnershipChainLinkOut
  *
  * An Ownership or Directorship link as the records state it.
@@ -5391,6 +5743,17 @@ export const zPostMergeReconciliationRequest = z.object({
 });
 
 /**
+ * PrivateAiStoreOut
+ */
+export const zPrivateAiStoreOut = z.object({
+  enabled: z.boolean(),
+  model: z.string().nullable(),
+  on_this_computer: z.boolean().nullable(),
+  outside_allowed: z.boolean(),
+  provider: z.string().nullable(),
+});
+
+/**
  * PromoteToWriteupRequest
  */
 export const zPromoteToWriteupRequest = z.object({
@@ -5581,6 +5944,59 @@ export const zRecordRefOut = z.object({
 });
 
 /**
+ * AiRunOut
+ */
+export const zAiRunOut = z.object({
+  candidate_id: z.string().nullable(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  error: z.string().nullable(),
+  events: z.number().int(),
+  finished: z.boolean(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  handoff_from: z.string().nullish(),
+  message: z.string().nullable(),
+  module: z.string(),
+  problems: z.number().int(),
+  question: z.string(),
+  record_refs: z.array(zRecordRefOut).optional().default([]),
+  review_status: z.string().nullable(),
+  route: zAiRunRouteOut,
+  run_id: z.string(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  status: z.string(),
+  working_theory: z.string().nullable(),
+});
+
+/**
+ * AiRunEventsOut
+ */
+export const zAiRunEventsOut = z.object({
+  events: z.array(zAiRunEventOut),
+  run: zAiRunOut,
+});
+
+/**
+ * AiRunsOut
+ */
+export const zAiRunsOut = z.object({
+  runs: z.array(zAiRunOut),
+});
+
+/**
  * BarItemOut
  */
 export const zBarItemOut = z.object({
@@ -5681,6 +6097,14 @@ export const zRecordTagRowOut = z.object({
 export const zRecordTagsOut = z.object({
   investigation_id: z.string(),
   rows: z.array(zRecordTagRowOut),
+});
+
+/**
+ * RecordsStoreOut
+ */
+export const zRecordsStoreOut = z.object({
+  claims: z.number().int(),
+  total: z.number().int(),
 });
 
 /**
@@ -6058,6 +6482,45 @@ export const zRunOptionsIn = z.object({
 });
 
 /**
+ * AssistantRunRequest
+ *
+ * Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+ * test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+ * uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+ * (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+ * check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+ * then holds the goal).
+ */
+export const zAssistantRunRequest = z.object({
+  changes: z.array(zRunChangeIn).max(50).nullish(),
+  context: z.string().max(4000).nullish(),
+  handoff_from: z.string().max(64).nullish(),
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.number().int().gte(1).lte(100).optional().default(30),
+  module: z.union([
+    z.enum(['case_synthesis', 'hypothesis_test', 'presentation_draft']),
+    z.enum([
+      'research_vetting',
+      'quant_framing',
+      'las_argument_check',
+      'das_framing',
+      'das_options',
+      'evidence_plan',
+      'ehs_harm_minimisation',
+      'ehs_public_interest',
+    ]),
+  ]),
+  options: zRunOptionsIn.nullish(),
+  packet_from: zPacketFromIn.nullish(),
+  premises: z.array(z.string()).max(10).nullish(),
+  question: z.string().min(1).max(4000),
+  record_refs: z.array(zRecordRef).max(200).nullish(),
+  severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
+  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
+  working_theory: z.string().max(2000).nullish(),
+});
+
+/**
  * CaseSynthesisRequest
  */
 export const zCaseSynthesisRequest = z.object({
@@ -6126,18 +6589,33 @@ export const zRunPlanRecordOut = z.object({
 /**
  * RunPlanRequest
  *
- * What a run would do, before it runs (mockup AI_2).
+ * What a run would do, before it runs (mockup AI_2). A presentation draft takes its goal in `question` and the
+ * records you picked in `record_refs`, and none of the TAS settings or premises.
  */
 export const zRunPlanRequest = z.object({
+  handoff_from: z.string().max(64).nullish(),
   include_external_leads: z.boolean().optional().default(true),
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   module: z
-    .enum(['case_synthesis', 'hypothesis_test'])
+    .union([
+      z.enum(['case_synthesis', 'hypothesis_test', 'presentation_draft']),
+      z.enum([
+        'research_vetting',
+        'quant_framing',
+        'las_argument_check',
+        'das_framing',
+        'das_options',
+        'evidence_plan',
+        'ehs_harm_minimisation',
+        'ehs_public_interest',
+      ]),
+    ])
     .optional()
     .default('case_synthesis'),
   options: zRunOptionsIn.nullish(),
   premises: z.array(z.string()).max(10).nullish(),
   question: z.string().min(1).max(4000),
+  record_refs: z.array(zRecordRef).max(200).nullish(),
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
   source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
   working_theory: z.string().max(2000).nullish(),
@@ -6166,6 +6644,14 @@ export const zRunPlanSystemOut = z.object({
 });
 
 /**
+ * RunPlanTierCountOut
+ */
+export const zRunPlanTierCountOut = z.object({
+  count: z.number().int(),
+  tier: z.string(),
+});
+
+/**
  * RunPlanTypeCountOut
  */
 export const zRunPlanTypeCountOut = z.object({
@@ -6177,6 +6663,7 @@ export const zRunPlanTypeCountOut = z.object({
  * RunPlanPacketOut
  */
 export const zRunPlanPacketOut = z.object({
+  below_tier_floor: z.array(zRunPlanTierCountOut),
   by_type: z.array(zRunPlanTypeCountOut),
   first: z.array(zRunPlanRecordOut),
   leads_only: z.number().int(),
@@ -6276,6 +6763,73 @@ export const zRunPlanOut = z.object({
   systems: z.array(zRunPlanSystemOut),
   where: zRunPlanWhereOut,
   working_theory: z.string().nullable(),
+});
+
+/**
+ * SafetyAccessOut
+ */
+export const zSafetyAccessOut = z.object({
+  mode: z.string(),
+  needs_attention: z.boolean(),
+  refused_24h: z.number().int().nullable(),
+  remote_api_enabled: z.boolean(),
+  restore_api_enabled: z.boolean(),
+});
+
+/**
+ * SafetyAnswerIn
+ *
+ * The reporter's answer to an "Only you can say" question; null takes it back.
+ */
+export const zSafetyAnswerIn = z.object({
+  answer: z.enum(['YES', 'NO', 'NOT_SURE']).nullish(),
+  question: z.enum(['threats', 'doxxing']),
+});
+
+/**
+ * SafetyBackupIn
+ *
+ * Back up now. A passphrase protects the backup (ADR-0015); null saves it without one, which the reporter
+ * chooses on purpose. The passphrase is used to seal the file and dropped: never stored, logged or sent back.
+ */
+export const zSafetyBackupIn = z.object({
+  passphrase: z.string().min(1).max(1024).nullish(),
+});
+
+/**
+ * SafetyDeleteOut
+ */
+export const zSafetyDeleteOut = z.object({
+  can_delete: z.boolean(),
+  files_to_delete: z.number().int(),
+  record_total: z.number().int(),
+  shared_files_kept: z.number().int(),
+});
+
+/**
+ * SafetyQuestionOut
+ */
+export const zSafetyQuestionOut = z.object({
+  answer: z.enum(['YES', 'NO', 'NOT_SURE']).nullable(),
+  answered_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  id: z.enum(['threats', 'doxxing']),
+  indicators: z.array(z.string()),
+  text: z.string(),
+});
+
+/**
+ * SafetyTotalsOut
+ */
+export const zSafetyTotalsOut = z.object({
+  ai_calls_outside: z.number().int(),
+  documents_sent: z.number().int(),
+  requests: z.number().int(),
+  services_reached: z.number().int(),
 });
 
 /**
@@ -6427,6 +6981,27 @@ export const zSecurityAuditViewOut = z.object({
 });
 
 /**
+ * SecurityLogStoreOut
+ */
+export const zSecurityLogStoreOut = z.object({
+  events: z.number().int().nullable(),
+  keep_days: z.number().int(),
+  size_bytes: z.number().int().nullable(),
+});
+
+/**
+ * SafetyStoresOut
+ */
+export const zSafetyStoresOut = z.object({
+  backups: zBackupsStoreOut,
+  documents: zDocumentsStoreOut,
+  private_ai: zPrivateAiStoreOut,
+  records: zRecordsStoreOut,
+  security_log: zSecurityLogStoreOut,
+  service_keys: zKeysStoreOut,
+});
+
+/**
  * SecurityRemoteHostOut
  */
 export const zSecurityRemoteHostOut = z.object({
@@ -6451,6 +7026,63 @@ export const zSecurityAlertsOut = z.object({
   since: z.string(),
   total_denials: z.number().int(),
   window_hours: z.number(),
+});
+
+/**
+ * SentKindOut
+ */
+export const zSentKindOut = z.object({
+  count: z.number().int(),
+  value_kind: z.string(),
+});
+
+/**
+ * SafetyServiceOut
+ */
+export const zSafetyServiceOut = z.object({
+  configured: z.boolean().nullable(),
+  ever_used: z.boolean(),
+  last: z.array(zOutboundRequestOut),
+  line: z.string(),
+  locked_reason: z.string().nullable(),
+  mode: z.enum(['OFF', 'ASK', 'AUTOMATIC']),
+  name: z.string(),
+  sent_count: z.number().int(),
+  sent_kinds: z.array(zSentKindOut),
+  service: z.string(),
+});
+
+/**
+ * SafetySummaryOut
+ *
+ * Keep › Safety & data in one reply: totals for the period, the six stores, the outside services with their
+ * modes, who can reach the case, what deleting it removes, and the reporter's private answers.
+ */
+export const zSafetySummaryOut = z.object({
+  access: zSafetyAccessOut,
+  delete: zSafetyDeleteOut,
+  investigation_id: z.string(),
+  investigation_name: z.string(),
+  questions: z.array(zSafetyQuestionOut),
+  services: z.array(zSafetyServiceOut),
+  since: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  stores: zSafetyStoresOut,
+  totals: zSafetyTotalsOut,
+});
+
+/**
+ * ServiceModeIn
+ *
+ * A case's mode for one outside service (research Keep §7: Off / Ask first / Automatic).
+ */
+export const zServiceModeIn = z.object({
+  mode: z.enum(['OFF', 'ASK', 'AUTOMATIC']),
+  service: z.string().min(1).max(64),
 });
 
 /**
@@ -7051,6 +7683,63 @@ export const zStoryUnplacedOut = z.object({
 });
 
 /**
+ * StrayFileAddBackIn
+ *
+ * One stray file to add back to a case as a document (Housekeeping, research Keep §12).
+ */
+export const zStrayFileAddBackIn = z.object({
+  path: z.string().min(1).max(1024),
+});
+
+/**
+ * StrayFileAddedBackOut
+ *
+ * The stray file is now a document of the case; it is read like an upload (follow it on The Drop).
+ */
+export const zStrayFileAddedBackOut = z.object({
+  document_id: z.string(),
+  filename: z.string(),
+  investigation_id: z.string(),
+  job_id: z.string().nullable(),
+});
+
+/**
+ * StrayFileDeletedOut
+ */
+export const zStrayFileDeletedOut = z.object({
+  relative_path: z.string(),
+  size_bytes: z.number().int(),
+});
+
+/**
+ * StrayFilesDeletedOut
+ */
+export const zStrayFilesDeletedOut = z.object({
+  deleted: z.array(zStrayFileDeletedOut),
+  deleted_count: z.number().int(),
+  freed_bytes: z.number().int(),
+});
+
+/**
+ * StrayFilesIn
+ *
+ * Stray files to Keep or Delete (Housekeeping, research Keep §12): paths relative to the document storage
+ * folder, as GET /settings/storage/orphans lists them. Each is checked again on the server; one that is not a
+ * current stray file refuses the whole request and nothing changes.
+ */
+export const zStrayFilesIn = z.object({
+  paths: z.array(z.string()).min(1).max(500),
+});
+
+/**
+ * StrayFilesKeptOut
+ */
+export const zStrayFilesKeptOut = z.object({
+  kept: z.array(z.string()),
+  kept_count: z.number().int(),
+});
+
+/**
  * StyleWarningOut
  *
  * A warning the style panel shows beside one option's control.
@@ -7097,6 +7786,34 @@ export const zSuiteRequirementOut = z.object({
   suite_term: z.string(),
   what: z.string(),
   why: z.string(),
+});
+
+/**
+ * SuiteRunRequest
+ *
+ * One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an
+ * answer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.
+ * `context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and
+ * access limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given
+ * by the logic check only.
+ */
+export const zSuiteRunRequest = z.object({
+  context: z.string().max(4000).nullish(),
+  handoff_from: z.string().max(64).nullish(),
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.number().int().gte(1).lte(100).optional().default(30),
+  module: z.enum([
+    'research_vetting',
+    'quant_framing',
+    'las_argument_check',
+    'das_framing',
+    'das_options',
+    'evidence_plan',
+    'ehs_harm_minimisation',
+    'ehs_public_interest',
+  ]),
+  premises: z.array(z.string()).max(10).nullish(),
+  question: z.string().min(1).max(4000),
 });
 
 /**
@@ -7608,9 +8325,11 @@ export const zTimelineOut = z.object({
 /**
  * ToCheckItemOut
  *
- * Something a person checks: a passage to read, a checklist item, or a money
- * check a person kept (kind "money", indicator_id the check's kind). The app
- * never decides it; open until a person does.
+ * Something a person checks: a passage to read, a checklist item, a money
+ * check a person kept (kind "money", indicator_id the check's kind), or a link
+ * a person added from The Wire because no reviewed source shows it yet (kind
+ * "link", ``relationship_id`` the link). The app never decides it; open until
+ * a person does.
  */
 export const zToCheckItemOut = z.object({
   decided_at: z
@@ -7636,12 +8355,13 @@ export const zToCheckItemOut = z.object({
   id: z.string(),
   indicator_id: z.string(),
   indicator_name: z.string(),
-  kind: z.enum(['passage', 'checklist', 'money']),
+  kind: z.enum(['passage', 'checklist', 'money', 'link']),
   locator: z.string().nullable(),
   note: z.string().nullable(),
   parties: z.array(zFlagPartyOut),
   question: z.string(),
   related_flags: z.array(z.string()),
+  relationship_id: z.string().nullish(),
   status: z.enum(['open', 'shows', 'does_not', 'unclear']),
   terms: z.array(z.string()),
 });
@@ -7808,10 +8528,13 @@ export const zUnsafeDocumentReferenceOut = z.object({
 /**
  * OrphanStoragePreviewOut
  *
- * Files under document storage no document refers to. Read-only: they are kept until a reporter decides.
+ * Files under document storage no document refers to. They are kept until the reporter decides, per file: Keep,
+ * Add back to a case, or Delete (POST /settings/storage/orphans/keep, …/delete,
+ * /investigations/{id}/storage/orphans/add-back).
  */
 export const zOrphanStoragePreviewOut = z.object({
   cleanup_available: z.boolean(),
+  kept_file_count: z.number().int(),
   orphan_bytes: z.number().int(),
   orphan_file_count: z.number().int(),
   orphan_files: z.array(zOrphanFileOut),
@@ -8263,6 +8986,7 @@ export const zAiAnalysisCandidateOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   module: z.string(),
+  next_runs: z.array(zAiNextRunOut).optional().default([]),
   payload: z.record(z.unknown()),
   rejection_reason: z.string().nullable(),
   request: z.record(z.unknown()),
@@ -8519,12 +9243,33 @@ export const zWireEntityOut = z.object({
 });
 
 /**
+ * WireLinkFlagOut
+ *
+ * An open Red Flag a link is part of: its level, name, sentence, path (a loop's) and first innocent explanation.
+ */
+export const zWireLinkFlagOut = z.object({
+  flag_id: z.string(),
+  id: z.string(),
+  innocent: z.string(),
+  level: z.enum(['faint', 'strong', 'textbook']),
+  name: z.string(),
+  path: z.string(),
+  text: z.string(),
+});
+
+/**
  * WireQuoteOut
+ *
+ * A quote that shows a link; document_id and page when it comes from a document the case holds (page: the
+ * page its passage is on, none when not found), pdf when that document can be drawn as a page.
  */
 export const zWireQuoteOut = z.object({
   doc: z.string(),
+  document_id: z.string().nullish(),
   evidence_id: z.string().nullish(),
   loc: z.string(),
+  page: z.number().int().nullish(),
+  pdf: z.boolean().optional().default(false),
   q: z.string(),
 });
 
@@ -8537,12 +9282,39 @@ export const zWireLinkOut = z.object({
   date: z.string(),
   ev: z.array(zWireQuoteOut),
   fam: z.enum(['owns', 'runs', 'money', 'other']),
+  flags: z.array(zWireLinkFlagOut).optional().default([]),
   id: z.string(),
   pct: z.string(),
   role: z.string(),
   s: z.string(),
   schema: z.string(),
   t: z.string(),
+});
+
+/**
+ * WireWorkedOutOut
+ *
+ * A link the app works out from stored links (app/services/wire.py worked_out): never stored, never a
+ * reviewed fact. pct is the worked-out share, empty with share_unknown_because when it cannot be worked out;
+ * inputs are the stored links it rests on (the shortest path's first, in order); via the parties between on
+ * the shortest path; flag_id the circular-ownership Red Flag its paths run through.
+ */
+export const zWireWorkedOutOut = z.object({
+  fam: z.literal('owns'),
+  flag_id: z.string().nullable(),
+  id: z.string(),
+  inputs: z.array(z.string()),
+  paths: z.number().int(),
+  pct: z.string(),
+  rule: z.string(),
+  rule_name: z.string(),
+  rule_text: z.string(),
+  s: z.string(),
+  schema: z.string(),
+  share_unknown_because: z.string(),
+  steps: z.number().int(),
+  t: z.string(),
+  via: z.array(z.string()),
 });
 
 /**
@@ -8553,6 +9325,7 @@ export const zWireOut = z.object({
   events: z.array(zWireEventOut),
   investigation_id: z.string(),
   links: z.array(zWireLinkOut),
+  worked_out: z.array(zWireWorkedOutOut).optional().default([]),
 });
 
 /**
@@ -10119,6 +10892,28 @@ export const zSaveInvestigationRunProfilePath = z.object({
  */
 export const zSaveInvestigationRunProfileResponse = zRunProfileOut;
 
+export const zInvestigationAssistantRunBody = zAssistantRunRequest;
+
+export const zInvestigationAssistantRunPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationAssistantRunResponse = zAiReasoningRunOut;
+
+export const zInvestigationSuiteRunBody = zSuiteRunRequest;
+
+export const zInvestigationSuiteRunPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationSuiteRunResponse = zAiReasoningRunOut;
+
 export const zListCaseRecordsPath = z.object({
   investigation_id: z.string(),
 });
@@ -10364,6 +11159,28 @@ export const zListInvestigationCrossReferencesQuery = z.object({
 export const zListInvestigationCrossReferencesResponse =
   z.array(zCrossReferenceOut);
 
+export const zSnoozeDecisionBody = zDecisionSnoozeCreate;
+
+export const zSnoozeDecisionPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSnoozeDecisionResponse = zDecisionSnoozeOut;
+
+export const zWakeDecisionBody = zDecisionWake;
+
+export const zWakeDecisionPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zWakeDecisionResponse = zDecisionWakeOut;
+
 export const zGetDecisionsPath = z.object({
   investigation_id: z.string(),
 });
@@ -10386,6 +11203,7 @@ export const zGetDecisionsQuery = z.object({
     .default('consequence'),
   offset: z.number().int().gte(0).optional().default(0),
   limit: z.number().int().gte(1).lte(500).optional().default(200),
+  snoozed: z.boolean().optional().default(false),
 });
 
 /**
@@ -10647,6 +11465,36 @@ export const zAddNotePath = z.object({
  */
 export const zAddNoteResponse = zNoteOut;
 
+export const zGetOutboundLogPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetOutboundLogQuery = z.object({
+  since: z.string().datetime({ offset: true, local: true }).nullish(),
+  service: z.string().max(64).nullish(),
+  limit: z.number().int().gte(1).lte(500).optional().default(50),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetOutboundLogResponse = zOutboundLogOut;
+
+export const zExportOutboundLogPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zExportOutboundLogQuery = z.object({
+  since: z.string().datetime({ offset: true, local: true }).nullish(),
+  service: z.string().max(64).nullish(),
+});
+
+/**
+ * The outbound log as CSV, oldest first
+ */
+export const zExportOutboundLogResponse = z.string();
+
 export const zHowAreTheyConnectedPath = z.object({
   investigation_id: z.string(),
 });
@@ -10796,6 +11644,55 @@ export const zListReportingTasksQuery = z.object({
  */
 export const zListReportingTasksResponse = z.array(zReportingTaskOut);
 
+export const zGetSafetyPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetSafetyQuery = z.object({
+  since: z.string().datetime({ offset: true, local: true }).nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSafetyResponse = zSafetySummaryOut;
+
+export const zPutSafetyAnswerBody = zSafetyAnswerIn;
+
+export const zPutSafetyAnswerPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPutSafetyAnswerResponse = zSafetySummaryOut;
+
+/**
+ * Body
+ */
+export const zMakeSafetyBackupBody = zSafetyBackupIn.nullable();
+
+export const zMakeSafetyBackupPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * A portable backup of the case (.jwbackup.zip), kept on record
+ */
+export const zMakeSafetyBackupResponse = z.string();
+
+export const zPutServiceModeBody = zServiceModeIn;
+
+export const zPutServiceModePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPutServiceModeResponse = zSafetySummaryOut;
+
 export const zGetSincePath = z.object({
   investigation_id: z.string(),
 });
@@ -10833,6 +11730,17 @@ export const zGetStandingPath = z.object({
  * Successful Response
  */
 export const zGetStandingResponse = zCaseStandingOut;
+
+export const zAddBackStrayFileBody = zStrayFileAddBackIn;
+
+export const zAddBackStrayFilePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddBackStrayFileResponse = zStrayFileAddedBackOut;
 
 export const zGetStoryPath = z.object({
   investigation_id: z.string(),
@@ -11226,6 +12134,59 @@ export const zLinkLeadPath = z.object({
  */
 export const zLinkLeadResponse = zLeadLinkOut;
 
+export const zAnswerLearningCardBody = zLearningAnswer;
+
+/**
+ * Successful Response
+ */
+export const zAnswerLearningCardResponse = zLearningCardOut;
+
+export const zListLearningCardsQuery = z.object({
+  deck: z
+    .enum(['all', 'case', 'area', 'terms', 'safety'])
+    .optional()
+    .default('all'),
+  areas: z
+    .string()
+    .max(400)
+    .regex(/^([A-Z]{2,3}(,[A-Z]{2,3})*)?$/)
+    .optional()
+    .default(''),
+  area: z
+    .string()
+    .regex(/^[A-Z]{2,3}$/)
+    .nullish(),
+  due_only: z.boolean().optional().default(false),
+  ref: z.string().min(1).max(255).nullish(),
+  limit: z.number().int().gte(1).lte(1000).optional().default(200),
+});
+
+/**
+ * Successful Response
+ */
+export const zListLearningCardsResponse = zLearningCardListOut;
+
+export const zAddLearningCardBody = zLearningCardCreate;
+
+/**
+ * Successful Response
+ */
+export const zAddLearningCardResponse = zLearningCardOut;
+
+export const zLearningSummaryQuery = z.object({
+  areas: z
+    .string()
+    .max(400)
+    .regex(/^([A-Z]{2,3}(,[A-Z]{2,3})*)?$/)
+    .optional()
+    .default(''),
+});
+
+/**
+ * Successful Response
+ */
+export const zLearningSummaryResponse = zLearningSummaryOut;
+
 export const zRemoveNotePath = z.object({
   note_id: z.string(),
 });
@@ -11382,6 +12343,15 @@ export const zPatchRelationshipSuiteBody = zRelationshipSuiteFields;
 export const zPatchRelationshipSuitePath = z.object({
   relationship_id: z.string(),
 });
+
+export const zKeepLinkCheckPath = z.object({
+  relationship_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zKeepLinkCheckResponse = zChecksOut;
 
 export const zCreateReportingTaskEndpointBody = zReportingTaskCreate;
 
@@ -11578,6 +12548,20 @@ export const zSettingsStatusResponse = zSettingsStatusOut;
  * Successful Response
  */
 export const zGetOrphanStoragePreviewResponse = zOrphanStoragePreviewOut;
+
+export const zDeleteStrayFilesBody = zStrayFilesIn;
+
+/**
+ * Successful Response
+ */
+export const zDeleteStrayFilesResponse = zStrayFilesDeletedOut;
+
+export const zKeepStrayFilesBody = zStrayFilesIn;
+
+/**
+ * Successful Response
+ */
+export const zKeepStrayFilesResponse = zStrayFilesKeptOut;
 
 export const zCreateSourceEndpointBody = zSourceCreate;
 

@@ -99,6 +99,7 @@ const PAGES: {label: string; href: string; hint: string}[] = [
   {label: 'Case home', href: '/', hint: 'Where the case stands and what needs you'},
   {label: 'Decide', href: '/decide', hint: 'Everything only you can decide, one at a time'},
   {label: 'Learn', href: '/learn', hint: 'The Red Flags catalogue and the glossary'},
+  {label: 'Safety & data', href: '/keep/safety', hint: 'What lives on this computer, and what leaves it'},
   {label: 'Settings', href: '/settings', hint: 'Appearance, access, demo case'},
   {label: 'About', href: '/about', hint: 'What this app is'},
 ];
@@ -154,7 +155,11 @@ function useTrail(): {label: string; href?: string}[] {
     trail.push({label: 'Check', href: '/check'}, {label: 'Decide'});
   } else if (pathname === '/') {
     trail.push({label: 'Home'});
-  } else if (tail.length && (pathname === '/learn' || pathname === '/glossary')) {
+  } else if (pathname === '/keep/safety') {
+    // Mockup KEEP: case › Keep › Safety & data.
+    if (caseName) trail.push({label: caseName, href: '/'});
+    trail.push({label: 'Keep'}, {label: 'Safety & data'});
+  } else if (tail.length && (pathname === '/learn' || pathname === '/glossary' || pathname === '/settings')) {
     if (caseName) trail.push({label: caseName, href: '/'});
     trail.push(...tail);
   } else {
@@ -257,7 +262,10 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
 
 function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open: boolean) => void}): ReactElement {
   const rows: [string, string][] = [['⌘K / Ctrl K', 'Search the case, or go anywhere'], ['⌘O / Ctrl O', 'Switch case'], ['⌘⇧H / Ctrl Shift H', 'Hide the screen'], ['[', 'Open or close the steps (left edge)'], [']', 'Open or close the tools (top edge)'],
-    ['Alt →  /  Alt ←', 'Open or close the steps'], ['Alt ↓  /  Alt ↑', 'Open or close the tools'],
+    ['Alt →  /  Alt ←', 'Open or close the steps'], ['Alt ↓  /  Alt ↑', 'Open or close the tools'], ['G then H', 'Go to the case home'],
+    ['1 – 4', 'Case home: go to a module'], ['J / K', 'Case home and Decide: step through the list'], ['Enter', 'Case home: open the focused module whole-screen'],
+    ['S / D / U', 'Case home: answer Next up (shows it, does not, unclear)'], ['1 / 2 / 3', 'Decide: answer the card'],
+    ['H', 'Decide: later — put the card off until it changes'], ['Z', 'Undo the last answer, or the last put-off'],
     ['?', 'This list'], ['Esc', 'Close what is open']];
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="fr-help">
@@ -339,6 +347,9 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   const [topOpen, setTop] = useEdge(']', topAt, 'ArrowDown', 'ArrowUp');
   const [pins, setPins] = useState<Pins>({left: false, top: false});
   const [fresh, setFresh] = useState(false);
+  // The first-use hints name the edges for a few seconds on each page, then fade, so they never sit over the work.
+  const [hintShown, setHintShown] = useState(true);
+  useEffect(() => { setHintShown(true); const t = window.setTimeout(() => setHintShown(false), 6000); return () => window.clearTimeout(t); }, [pathname]);
   const [places, setPlaces] = useState<Place[]>([]);
   useEffect(() => { setPins(readPins()); setFresh(!learned()); setPlaces(readPlaces()); }, []);
   const left = leftOpen || pins.left;
@@ -361,6 +372,10 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   const [inbox, setInbox] = useState(false);
   const [newCase, setNewCase] = useState(false);
   const closeInbox = useCallback(() => setInbox(false), []);
+  const router = useRouter();
+  const goPending = useRef(0);
+  const goHome = useRef(() => {});
+  goHome.current = () => router.push(caseHref('/'));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -368,6 +383,12 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
       else if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'o') { e.preventDefault(); setCases(c => !c); }
       else if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'h') { e.preventDefault(); setHidden(true); }
       else if (e.key === '?' && !typing(e.target) && singleKeysOn()) { e.preventDefault(); setHelp(true); }
+      // G then H, within a second: the case home (research §04.2's go-to keys).
+      else if (!e.metaKey && !e.ctrlKey && !e.altKey && !typing(e.target) && singleKeysOn()) {
+        const k = e.key.toLowerCase();
+        if (k === 'g') goPending.current = Date.now();
+        else if (k === 'h' && Date.now() - goPending.current < 1000) { goPending.current = 0; e.preventDefault(); goHome.current(); }
+      }
     };
     const openCases = () => setCases(true);
     const openPalette = () => setPalette(true);
@@ -396,8 +417,8 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     {/* Left edge: where to go. */}
     <button type="button" className={`fr-handle fr-handle-left${left ? ' on' : ''}`} aria-label="Open steps and pages" aria-expanded={left} aria-controls="fr-left" onClick={() => setLeft(o => !o)}/>
     {!left && <span className="fr-edge-label" aria-hidden="true">▸ Case · Steps</span>}
-    {fresh && !left && <span className="fr-hint fr-hint-left" aria-hidden="true">Steps and pages <kbd>[</kbd></span>}
-    {fresh && !top && <span className="fr-hint fr-hint-top" aria-hidden="true">Tools <kbd>]</kbd></span>}
+    {fresh && !left && <span className={`fr-hint fr-hint-left${hintShown ? '' : ' gone'}`} aria-hidden="true">Steps and pages <kbd>[</kbd></span>}
+    {fresh && !top && <span className={`fr-hint fr-hint-top${hintShown ? '' : ' gone'}`} aria-hidden="true">Tools <kbd>]</kbd></span>}
     <aside id="fr-left" className={`fr-left${left ? ' open' : ''}`} aria-label="Steps and pages" aria-hidden={!left} onMouseLeave={() => setLeft(false)} inert={!left ? true : undefined}>
       <div className="fr-left-head"><b>Journalism Workbench</b>
         <span><button type="button" className={`fr-pin${pins.left ? ' on' : ''}`} aria-pressed={pins.left} onClick={() => pin('left')}
