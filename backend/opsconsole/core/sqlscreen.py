@@ -19,24 +19,75 @@ READ_HEADS = {"SELECT", "WITH", "EXPLAIN", "VALUES", "SHOW", "TABLE"}
 
 
 def _strip_comments(sql: str) -> str:
-    """Each -- line comment and /* block comment */ replaced by a space, in one
-    pass (a regular expression for the block form took quadratic time on text
-    with many unclosed '/*'). Quoted strings are not tracked: this feeds only the
-    screen below, and a quote that hides a keyword makes the screen stricter."""
     out: list[str] = []
-    i, n = 0, len(sql)
-    while i < n:
+    i = 0
+    quote: str | None = None
+    dollar_quote: str | None = None
+    while i < len(sql):
+        if dollar_quote:
+            if sql.startswith(dollar_quote, i):
+                out.append(dollar_quote)
+                i += len(dollar_quote)
+                dollar_quote = None
+            else:
+                out.append(sql[i])
+                i += 1
+            continue
+        if quote:
+            char = sql[i]
+            out.append(char)
+            i += 1
+            if char == "\\" and quote == "'" and i < len(sql):
+                out.append(sql[i])
+                i += 1
+            elif char == quote:
+                if i < len(sql) and sql[i] == quote:
+                    out.append(sql[i])
+                    i += 1
+                else:
+                    quote = None
+            continue
         if sql.startswith("--", i):
-            j = sql.find("\n", i)
-            i = n if j < 0 else j
+            end = sql.find("\n", i + 2)
+            if end == -1:
+                break
+            out.append("\n")
+            i = end + 1
+            continue
+        if sql.startswith("/*", i):
             out.append(" ")
-        elif sql.startswith("/*", i):
-            j = sql.find("*/", i + 2)
-            i = n if j < 0 else j + 2
-            out.append(" ")
-        else:
+            i += 2
+            depth = 1
+            while i < len(sql) and depth:
+                if sql.startswith("/*", i):
+                    depth += 1
+                    i += 2
+                elif sql.startswith("*/", i):
+                    depth -= 1
+                    i += 2
+                else:
+                    if sql[i] == "\n":
+                        out.append("\n")
+                    i += 1
+            if depth:
+                raise ValueError("unterminated comment")
+            continue
+        if sql[i] in ("'", '"', "`"):
+            quote = sql[i]
             out.append(sql[i])
             i += 1
+            continue
+        if sql[i] == "$":
+            end = sql.find("$", i + 1)
+            if end != -1 and (end == i + 1 or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", sql[i + 1:end])):
+                dollar_quote = sql[i:end + 1]
+                out.append(dollar_quote)
+                i = end + 1
+                continue
+        out.append(sql[i])
+        i += 1
+    if quote or dollar_quote:
+        raise ValueError("unterminated quoted value")
     return "".join(out)
 
 
