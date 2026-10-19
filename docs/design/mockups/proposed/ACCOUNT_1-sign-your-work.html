@@ -1,0 +1,68 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="account.css"><style>
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 40px}
+.crumb{font-size:13px;color:var(--muted)} .crumb b{color:var(--text);font-weight:500}
+.wrap{display:grid;grid-template-columns:1.15fr 1fr;gap:28px;padding:6px 40px 0}
+h1{font:300 46px/1.05 'Source Serif 4 Variable';letter-spacing:-.01em;margin:10px 0 10px}
+.lede{color:var(--muted);font-size:15.5px;max-width:610px}
+.namebox{margin-top:26px;padding:22px 24px}
+.field{display:flex;align-items:flex-end;gap:16px;border-bottom:2px solid var(--amber);padding-bottom:8px;margin-top:10px}
+.field .val{font:400 44px/1 'Source Serif 4 Variable'}
+.caret{width:2px;height:40px;background:var(--amber);margin-left:-12px}
+.initials{margin-left:auto;width:52px;height:52px;border-radius:50%;border:1.5px solid var(--amber);display:grid;place-items:center;font:500 16px 'IBM Plex Mono';color:var(--amber)}
+.role{display:flex;gap:10px;margin-top:14px;align-items:center}
+.reads{margin-top:18px;display:grid;gap:10px}
+.read{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center;padding:11px 14px;background:var(--p2);border:1px solid var(--line);border-radius:10px}
+.read .where{font:500 11px 'IBM Plex Mono';color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.name{color:var(--amber);font-weight:600;background:linear-gradient(transparent 60%,rgba(232,163,61,.18) 0)}
+.logrow{font:12.5px 'IBM Plex Mono';color:var(--muted)} .logrow b{color:var(--text);font-weight:500}
+.right{display:grid;gap:16px;align-content:start;margin-top:64px}
+.unlock{padding:18px 20px}
+.opt{display:grid;grid-template-columns:22px 1fr;gap:12px;padding:12px 12px;border:1px solid var(--line);border-radius:10px;margin-top:10px;background:var(--p2)}
+.opt.on{border-color:var(--amber);background:#2a2014}
+.radio{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--muted);margin-top:2px}
+.opt.on .radio{border-color:var(--amber);box-shadow:inset 0 0 0 3.5px #2a2014;background:var(--amber)}
+.opt b{font-weight:600} .opt small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.opt.off{opacity:.55}
+.past{padding:18px 20px;border-color:#5b4422}
+.count{font:300 40px/1 'Source Serif 4 Variable';color:var(--text)}
+.bar{display:flex;gap:2px;margin:12px 0 6px;height:22px}
+.bar i{flex:1;border-radius:2px;background:#3b2f22}
+.bar i.d{background:#6b5536}
+.foot{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:16px 40px;border-top:1px solid var(--line);background:rgba(18,15,12,.85)}
+</style></head><body>
+<div class="top"><div class="crumb">Journalism Workbench · <b>This computer</b> · first open after the update</div><span class="chip"><span>⌂</span> Nothing leaves this computer</span></div>
+<div class="wrap">
+ <div>
+  <p class="eyebrow">Step 1 of 1 · who is working here</p>
+  <h1>Sign your work</h1>
+  <p class="lede">From now on the app writes your name on every decision you make: what you accept, link, reject or set as Supported. Editors and lawyers read it in the Chain of Custody and the custody log.</p>
+  <div class="panel namebox">
+   <p class="eyebrow">Your name, as it goes on your work</p>
+   <div class="field"><span class="val">Ony</span><span class="caret"></span><span class="initials">ON</span></div>
+   <div class="role"><span class="note">On this computer you are</span><span class="chip amber">◆ Owner</span><span class="note">— every case, every setting. Change it later in Settings › People and access.</span></div>
+   <div class="reads">
+    <p class="eyebrow" style="margin-top:6px">How it will read · live as you type</p>
+    <div class="read"><span class="where">Custody log</span><span class="logrow">3 Oct 11:02 · <span class="name">Ony</span> · <b>Accepted the proposal</b> · linked as supports the claim</span></div>
+    <div class="read"><span class="where">Decision card</span><span><span style="color:var(--ok)">✓</span> Accepted by <span class="name">Ony</span> · 3 Oct 11:02 — “matches J30 wording”</span></div>
+    <div class="read"><span class="where">Export for a lawyer</span><span class="logrow">decided_by: <span class="name">Ony</span> (owner) · human · 2026-10-03 11:02 UTC</span></div>
+   </div>
+  </div>
+ </div>
+ <div class="right">
+  <div class="panel unlock">
+   <p class="eyebrow">How the app knows it's you</p>
+   <div class="opt on"><span class="radio"></span><div><b>Nothing to unlock — this computer is mine</b><small>Whoever opens the app here acts as Ony. Fine for one person on one laptop.</small></div></div>
+   <div class="opt"><span class="radio"></span><div><b>A PIN when the app opens</b><small>6 digits, kept on this computer as a hash. Also asked after <span class="mono">Hide screen</span>.</small></div></div>
+   <div class="opt off"><span class="radio"></span><div><b>Windows Hello</b><small>Not available: the app is served over plain http on this computer. It needs the https setup first.</small></div></div>
+  </div>
+  <div class="panel past">
+   <p class="eyebrow">Decisions made before today</p>
+   <div style="display:flex;align-items:baseline;gap:12px;margin-top:10px"><span class="count">214</span><span class="note">decisions on this computer say “a person”, from 12 Sep to 19 Oct</span></div>
+   <div class="bar"><i class="d"></i><i class="d"></i><i></i><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i></i></div>
+   <p class="note">The app cannot tell who made them. If they were all yours, sign them: each one keeps its original time and gets a note: <span class="mono" style="color:var(--text)">signed later by Ony, 19 Oct</span>.</p>
+   <div style="display:flex;gap:10px;margin-top:14px"><button class="btn">Sign all 214 as Ony</button><button class="btn">Leave them as “a person”</button></div>
+  </div>
+ </div>
+</div>
+<div class="foot"><span class="note">Your name is stored in this computer's database and travels in backups. You can change it; past decisions keep the name they were signed with.</span><span style="display:flex;gap:12px;align-items:center"><span class="note">Later</span><button class="btn primary">Start signing as Ony <span class="key" style="border-color:#7a5520;color:#1b1208">⏎</span></button></span></div>
+</body></html>
