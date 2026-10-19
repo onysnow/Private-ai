@@ -56,7 +56,7 @@ export function SectionScreen({stage, investigationName, sections, active = true
   return <div className="ss" style={{['--stage' as string]: s.colour}} data-stage={stage}>
     <header className="ss-head">
       <div className="ss-title">
-        <p className="cv-eyebrow">{investigationName || 'No case open'} · step {s.n} of 5</p>
+        <p className="cv-eyebrow">{investigationName ? '' : 'No case open · '}step {s.n} of 5</p>
         <h1>{s.name}</h1>
       </div>
       <nav className="ss-tabs" aria-label={`Sections of ${s.name}`}

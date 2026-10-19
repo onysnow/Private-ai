@@ -5,7 +5,7 @@ import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-libr
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {RedFlagsBoard, changesSince, ladder} from '../features/act/red-flags-board';
+import {RedFlagsBoard, changesSince, ladder, monthTicks, placeLabels} from '../features/act/red-flags-board';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -111,6 +111,73 @@ describe('RedFlagsBoard', () => {
     fireEvent.keyDown(board, {key: 'j'});
     expect(await within(screen.getByRole('region', {name: 'The open Red Flag'})).findByRole('link', {name: 'Show in money flows'})).toHaveAttribute('href', expect.stringContaining('/see'));
     expect(within(screen.getByRole('region', {name: 'The open Red Flag'})).getByRole('button', {name: 'Share'})).toBeDisabled();
+  });
+});
+
+describe('the audit fixes (19 Oct)', () => {
+  it('L cycles the level filter; Enter opens a row and moves into the flag; Esc goes back to the list', async () => {
+    mockApi(routes);
+    renderBoard();
+    const list = await screen.findByRole('listbox', {name: 'Red Flags, ranked'});
+    await within(list).findAllByRole('option');
+    const rows = () => within(screen.getByRole('listbox')).queryAllByRole('option');
+    const board = document.querySelector('.rb')!;
+    fireEvent.keyDown(board, {key: 'l'});
+    expect(rows().map(r => r.getAttribute('aria-label'))).toEqual(['Rank 1, Textbook, Circular ownership, Kestrel SA']);
+    fireEvent.keyDown(board, {key: 'l'});
+    expect(rows()).toHaveLength(0);
+    fireEvent.keyDown(board, {key: 'l'});
+    expect(rows()).toHaveLength(1);
+    expect(rows()[0]).toHaveAccessibleName(/Faint, Structuring/);
+    fireEvent.keyDown(board, {key: 'l'});
+    expect(rows()).toHaveLength(2);
+    fireEvent.keyDown(rows()[1], {key: 'Enter'});
+    const open = screen.getByRole('region', {name: 'The open Red Flag'});
+    await waitFor(() => expect(open).toHaveFocus());
+    expect(open).toHaveTextContent('Structuring below reporting thresholds');
+    fireEvent.keyDown(open, {key: 'Escape'});
+    expect(rows()[1]).toHaveFocus();
+  });
+
+  it('says "Not looked at" on an innocent explanation nobody has looked at (a word, not only ○)', async () => {
+    mockApi(routes);
+    renderBoard();
+    const before = await screen.findByRole('complementary', {name: 'Before you call it'});
+    await waitFor(() => expect(within(before).getAllByText('Not looked at')).toHaveLength(2));
+  });
+
+  it('draws two parties sharing an address with the address, and no arrow between them', async () => {
+    const shared = flag('f3', indicator('BO-032', 'Apparently unrelated parties share an address', {}), 'textbook', 2, {
+      parties: [{id: 'fh', name: 'Fernhill Ltd', schema: 'Company'}, {id: 'qh', name: 'Quayside Holdings Ltd', schema: 'Company'}],
+      facts: {family: 'shared_property', kind: 'address', value: '1 Harbour Road', spellings: ['1 Harbour Road', '1 Harbour Rd']}});
+    mockApi({...routes, 'GET /api/investigations/inv-1/red-flags': body([shared])});
+    renderBoard();
+    const fig = await screen.findByRole('figure', {name: 'Fernhill Ltd and Quayside Holdings Ltd share the address 1 Harbour Road'});
+    expect(fig).toHaveTextContent('address “1 Harbour Road” also written “1 Harbour Rd”');
+    expect(fig.textContent).not.toContain('→');
+  });
+
+  it('keeps this visit as the last one when the tab closes, not only when the screen does', async () => {
+    mockApi(routes);
+    renderBoard();
+    await screen.findByRole('listbox', {name: 'Red Flags, ranked'});
+    expect(window.localStorage.getItem('pai:flags-visit:inv-1')).toBeNull();
+    window.dispatchEvent(new Event('pagehide'));
+    expect(window.localStorage.getItem('pai:flags-visit:inv-1')).not.toBeNull();
+  });
+
+  it('places the payment labels so none crosses another, a payment or the reporting line', () => {
+    const at = placeLabels([{x: 100, y: 90, w: 96}, {x: 170, y: 52, w: 96}, {x: 270, y: 74, w: 96}], {line: 39, left: 50, right: 546});
+    expect(at[0]).toEqual({x: 113, y: 81, anchor: 'start'});
+    expect(at[1]).toEqual({x: 183, y: 56, anchor: 'start'}); // above would cross the line, so beside
+    const boxes = at.map((l, i) => ({x0: l.anchor === 'start' ? l.x : l.x - 96, y0: l.y - 10, i}));
+    for (const a of boxes) for (const b of boxes) if (a.i < b.i) expect(Math.abs(a.x0 - b.x0) >= 96 || Math.abs(a.y0 - b.y0) >= 12).toBe(true);
+  });
+
+  it('marks the months under the payments', () => {
+    const t = (iso: string) => Date.parse(`${iso}T00:00:00Z`);
+    expect(monthTicks(t('2019-03-02'), t('2019-07-08')).map(m => `${m.label} ${m.year}`)).toEqual(['Apr 2019', 'May 2019', 'Jun 2019', 'Jul 2019']);
+    expect(monthTicks(t('2017-01-15'), t('2019-12-01')).length).toBeLessThanOrEqual(8);
   });
 });
 

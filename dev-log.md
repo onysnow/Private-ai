@@ -2675,3 +2675,22 @@ and Your review says "you rejected it" or, dimmed, "stopped by the checks". A st
 Tests: test_suite_service.py (6), watch-the-run (23, 2 new); vitest 1309 passed, tsc and eslint clean; backend
 touched tests, mypy, ruff and the OpenAPI check pass. Not changed: the map's small size and overlapping axis labels
 at phone width, which were there before.
+
+### 2026-10-19 — Screen audit: every page checked against its mockup (PR #87)
+
+Six screen audits (Home and Decide, Bring in, Check, See, Act, AI and Learn) compared each page with its mockup for
+layout, hover, focus, keyboard, entrance and persistent motion (Calm and reduced motion), and data. Fixed in this
+round:
+- Case home: AI questions name the suite system ("Accept the RAS answer…"); evidence questions name the document and
+  page; "Not sure?" opens the run claim by claim (/act?run=…&review=…). The No key opens the reasons first, as a
+  click does; the answer buttons hold one row; the undo hold is 10 s.
+- Chain of Custody: a proposal from an outside service is counted under "outside services", not as the app's.
+- Frame: the shortcuts sheet lists every key the screens use (G then H, 1–4, J/K, Enter, S/D/U, 1/2/3, Z); G then H
+  goes to Case home; the frame hints fade after 6 s; Settings sits in the breadcrumb.
+- Appearance: Full effects run as Light on battery until the computer charges (said under Full).
+- Stage pages: the header is one row ("step n of 5", name, line, tabs), so Money fits 1440×900.
+- Plus the per-screen fixes the audits made in the Drop, Reading room, Wire, Money, Red Flags, Story, Leads, Before
+  you run, Watch the run, claim review, Learn and glossary (drop.py, financial_flows.py, patterns engine,
+  investigation_type.py, stories.py and routes_ai_runs.py on the backend).
+
+Tests: vitest 1341 passed (200 files), tsc and eslint clean; backend touched tests, mypy and the OpenAPI check pass.

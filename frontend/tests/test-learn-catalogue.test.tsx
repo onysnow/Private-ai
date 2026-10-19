@@ -174,8 +174,11 @@ describe('Learn › Red Flags catalogue', () => {
     expect(within(list).getByRole('option', {selected: true})).toHaveTextContent('BO-007');
     fireEvent.pointerLeave(list);
     expect(await screen.findByRole('region', {name: 'Indicator BO-007'})).toBeInTheDocument();
+    within(list).getByRole('option', {selected: true}).focus();
     fireEvent.keyDown(list, {key: 'j'});
     await waitFor(() => expect(within(list).getByRole('option', {selected: true})).toHaveTextContent('BO-008'));
+    // Focus follows the choice while the list has the keyboard.
+    expect(document.activeElement).toBe(within(list).getByRole('option', {selected: true}));
     const pending = await screen.findByRole('region', {name: 'Indicator BO-008'});
     await waitFor(() => expect(pending).toHaveTextContent('Pending checks: not used for Red Flags yet.'));
   });
@@ -216,5 +219,20 @@ describe('Learn › Red Flags catalogue', () => {
     await user.click(await screen.findByRole('button', {name: /SA-001 Threats to the reporter/}));
     expect(await screen.findByRole('region', {name: 'Indicator SA-001'})).toBeInTheDocument();
     await waitFor(() => expect(window.location.search).toContain('area=SA'));
+  });
+
+  it('moves from the search box through the results with the arrow keys', async () => {
+    mockApi(routes);
+    render(<LearnPage/>);
+    const user = userEvent.setup();
+    await screen.findByRole('listbox', {name: 'Areas, in families'});
+    await user.type(screen.getByLabelText('Search indicators and terms'), 'threats');
+    const result = await screen.findByRole('button', {name: /SA-001 Threats to the reporter/});
+    await user.keyboard('{ArrowDown}');
+    expect(document.activeElement).toBe(result);
+    await user.keyboard('{ArrowUp}');
+    expect(document.activeElement).toBe(screen.getByLabelText('Search indicators and terms'));
+    await user.keyboard('{ArrowDown}{Enter}');
+    expect(await screen.findByRole('region', {name: 'Indicator SA-001'})).toBeInTheDocument();
   });
 });

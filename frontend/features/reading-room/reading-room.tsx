@@ -10,7 +10,9 @@
 // tag, from a bar at the selection. J and K move between proposals, A accepts, R rejects,
 // 1–4 answer the card's question, U undoes the last decision (each waits 6 s before it is
 // sent). Evidence kept here shows its clip: the quote with 32 characters either side, the
-// file's fingerprint and where it is, checked against the stored text.
+// file's fingerprint and where it is, checked against the stored text. Words kept are held 6 s with Undo
+// like a decision, then saved. Pointing at a card lights its words, and pointing at marked words lights
+// their card (research §6).
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
@@ -42,7 +44,10 @@ export type Clip = {quote: string; before: string; after: string; fingerprint: s
 type Answer = {schema?: string; identity?: IdentityChoice; owner?: string};
 type Held = {c: ExtractionCandidateOut; decision: 'accept' | 'reject'; body: Record<string, unknown>; until: number};
 /** The same answer applied to other mentions of a name, held 6 s like one decision. */
-type BatchHeld = {ids: string[]; record: string; body: Record<string, unknown>; until: number};
+type BatchHeld = {ids: string[]; record: string; body: Record<string, unknown>; until: number; from: string};
+/** Selected words kept (evidence, a claim, a name, something to check), held 6 s like a decision before they are saved. */
+type KeepHeld = {what: 'evidence' | 'claim' | 'name' | 'check'; picked: Picked; until: number; clip: Clip | null};
+const KEPT_WORD: Record<KeepHeld['what'], string> = {evidence: 'as evidence', claim: 'as a claim, with these words as its evidence', name: 'as a name', check: 'as something to check (a lead)'};
 
 const CLIP_CONTEXT = 32;
 const HOLD_MS = 6000;
@@ -129,7 +134,8 @@ export function clipOf(chunk: {text: string; locator: string; page_number?: numb
 }
 
 /** A chunk's text with its proposals and find matches marked. */
-function Marked({text, spans, find, focus, onFocus}: {text: string; spans: Span[]; find: string; focus: string | null; onFocus: (id: string) => void}): ReactElement {
+function Marked({text, spans, find, focus, lit, onFocus, onLight}: {text: string; spans: Span[]; find: string; focus: string | null; lit: string | null;
+  onFocus: (id: string) => void; onLight: (id: string | null) => void}): ReactElement {
   const cuts = new Set([0, text.length]);
   for (const s of spans) { cuts.add(Math.max(0, s.start)); cuts.add(Math.min(text.length, s.end)); }
   const lower = text.toLowerCase();
@@ -145,7 +151,8 @@ function Marked({text, spans, find, focus, onFocus}: {text: string; spans: Span[
     // The innermost proposal marks the words (a name inside a claim is the name); every
     // proposal that starts here still gets its anchor, for its margin card.
     const s = spans.filter(x => x.start <= a && x.end >= b).sort((x, y) => (x.end - x.start) - (y.end - y.start))[0];
-    if (s) piece = <span className={`rr-span rr-${s.kind} rr-${s.status}${focus === s.id ? ' on' : ''}`} onClick={() => onFocus(s.id)}>{piece}</span>;
+    if (s) piece = <span className={`rr-span rr-${s.kind} rr-${s.status}${focus === s.id ? ' on' : ''}${lit === s.id ? ' lit' : ''}`} data-span={s.id}
+      onClick={() => onFocus(s.id)} onMouseEnter={() => onLight(s.id)} onMouseLeave={() => onLight(null)}>{piece}</span>;
     out.push(<span key={a}>{spans.filter(x => x.start === a && x.primary).map(x => <span key={x.id} id={`rr-anchor-${x.id}`} className="rr-anchor"/>)}{piece}</span>);
   }
   return <>{out}</>;
@@ -258,31 +265,34 @@ function Question({c, answer, setAnswer, active, onAcceptFirst}: {c: ExtractionC
 /** Answer once, apply to the batch (research §8): once this name is said to be a record already in the case, the
  * other waiting mentions of the same name in its drop are offered the same answer, listed; nothing is applied
  * until you say so, and then it waits 6 s with Undo like any decision. */
-function SameAnswer({c, record, recordId, schema, onApply}: {c: ExtractionCandidateOut; record: string; recordId: string; schema: string;
-  onApply: (b: BatchHeld) => void}): ReactElement | null {
+function SameAnswer({c, record, recordId, schema, onApply, applied}: {c: ExtractionCandidateOut; record: string; recordId: string; schema: string;
+  onApply: (b: BatchHeld) => void; applied: boolean}): ReactElement | null {
   const same = useQuery({...getSameAnswerCandidatesOptions({path: {candidate_id: c.id}})});
   const [dismissed, setDismissed] = useState(false);
   const list = same.data?.candidates ?? [];
-  if (dismissed || !list.length) return null;
+  // While the same answer waits its 6 s, or once it is sent, the offer is not made again; Undo brings it back.
+  if (dismissed || applied || !list.length) return null;
   const where = same.data?.scope === 'drop' ? 'in this drop' : 'in this case';
   return <div className="rr-batch" role="group" aria-label="Same answer for the others">
     <p>Same answer for {list.length} more mention{list.length === 1 ? '' : 's'} {where}? <b>{proposalText(c)}</b> = <b>{record}</b></p>
     <ul>{list.slice(0, 6).map(x => <li key={x.candidate_id}>“{x.caption}” · {x.filename}{x.locator ? `, ${x.locator}` : ''}</li>)}
       {list.length > 6 && <li>and {list.length - 6} more</li>}</ul>
     <div className="rr-batch-acts">
-      <button type="button" onClick={e => { e.stopPropagation(); setDismissed(true);
-        onApply({ids: list.map(x => x.candidate_id), record, body: {decision: 'accept', entity_schema: schema, entity_identity_decision: 'same', matched_entity_id: recordId}, until: Date.now() + HOLD_MS}); }}>
+      <button type="button" onClick={e => { e.stopPropagation();
+        onApply({ids: list.map(x => x.candidate_id), record, from: c.id,
+          body: {decision: 'accept', entity_schema: schema, entity_identity_decision: 'same', matched_entity_id: recordId}, until: Date.now() + HOLD_MS}); }}>
         Apply to these {list.length}</button>
       <button type="button" onClick={e => { e.stopPropagation(); setDismissed(true); }}>No, one at a time</button>
     </div>
   </div>;
 }
 
-function Card({c, focus, locator, held, answer, setAnswer, onFocus, onDecide, onUndo, onAcceptFirst, onApplyBatch}: {
-  c: ExtractionCandidateOut; focus: boolean; locator: string; held: Held | null; answer: Answer; setAnswer: (a: Answer) => void; onFocus: () => void;
+function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight, onDecide, onUndo, onAcceptFirst, onApplyBatch, batchHeld, batchSent, onUndoBatch}: {
+  c: ExtractionCandidateOut; focus: boolean; lit: boolean; locator: string; held: Held | null; answer: Answer; setAnswer: (a: Answer) => void; onFocus: () => void;
+  onLight: (on: boolean) => void;
   onDecide: (decision: 'accept' | 'reject', caption?: string) => void; onUndo: () => void;
   onAcceptFirst: (candidateId: string, caption: string, schema: string) => Promise<string>;
-  onApplyBatch: (b: BatchHeld) => void;
+  onApplyBatch: (b: BatchHeld) => void; batchHeld: BatchHeld | null; batchSent: boolean; onUndoBatch: () => void;
 }): ReactElement {
   const [why, setWhy] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -300,8 +310,11 @@ function Card({c, focus, locator, held, answer, setAnswer, onFocus, onDecide, on
     strong: answer.identity?.kind === 'new' ? matches.data?.strong_match?.caption ?? null : null,
     owner: owners.find(o => o.entity_id === answer.owner)?.caption ?? null});
   const impactId = `rr-impact-${c.id}`;
-  return <article id={`rr-card-${c.id}`} className={`rr-card rr-${c.candidate_type}${focus ? ' on' : ''}${open ? '' : ' done'}`}
-    aria-label={`${kind}: ${proposalText(c)}`} onClick={onFocus}>
+  // A name says what kind of record it would be (mockup INTAKE_2: "Harbour Nominees Ltd · Company"), unless that is the question.
+  const schema = c.candidate_type === 'entity' && (answer.schema || !needsSchemaAnswer(c))
+    ? answer.schema ?? String((c.payload as {suggested_schema?: unknown}).suggested_schema ?? '') : '';
+  return <article id={`rr-card-${c.id}`} className={`rr-card rr-${c.candidate_type}${focus ? ' on' : ''}${lit ? ' lit' : ''}${open ? '' : ' done'}`}
+    aria-label={`${kind}: ${proposalText(c)}`} onClick={onFocus} onMouseEnter={() => onLight(true)} onMouseLeave={() => onLight(false)}>
     <header>
       <b>{kind}</b>
       {c.review_status === 'proposed' ? <span className="rr-chip">Proposed</span> : <span className={`rr-chip ${c.review_status}`}>{c.review_status === 'accepted' ? '✓ Accepted' : '✕ Rejected'}</span>}
@@ -309,7 +322,7 @@ function Card({c, focus, locator, held, answer, setAnswer, onFocus, onDecide, on
       <small>{proposerOf(c)} · {locator}</small>
     </header>
     {editing ? <input className="rr-edit" aria-label="Edit the name" value={caption} onChange={e => setCaption(e.target.value)} onClick={e => e.stopPropagation()}/>
-      : <p className="rr-card-text">{caption}</p>}
+      : <p className="rr-card-text">{caption}{schema && schema !== 'LegalEntity' ? <small className="rr-card-kind"> · {SCHEMA_WORD[schema] ?? schema}</small> : null}</p>}
     {held ? <p className="rr-held" role="status">{held.decision === 'accept' ? '✓ Accepted' : '✕ Rejected'}: saved in a moment.
       <button type="button" onClick={e => { e.stopPropagation(); onUndo(); }}>Undo <kbd>U</kbd></button></p>
       : open ? <>
@@ -326,9 +339,11 @@ function Card({c, focus, locator, held, answer, setAnswer, onFocus, onDecide, on
           {blocked && ask && <small className="rr-why-not">{ask === 'owner' ? 'Say whose it is first' : 'Answer the question first'}</small>}
           <button type="button" className="rr-why-btn" onClick={e => { e.stopPropagation(); setWhy(w => !w); }} aria-expanded={why}>Why? ›</button>
         </div>
-        {sameId && record && <SameAnswer c={c} record={record} recordId={sameId} onApply={onApplyBatch}
+        {sameId && record && <SameAnswer c={c} record={record} recordId={sameId} onApply={onApplyBatch} applied={Boolean(batchHeld) || batchSent}
           schema={answer.schema ?? String((c.payload as {suggested_schema?: unknown}).suggested_schema ?? 'LegalEntity')}/>}
       </> : null}
+    {batchHeld && <p className="rr-held rr-batch-held" role="status">✓ {batchHeld.ids.length} more mention{batchHeld.ids.length === 1 ? ' goes' : 's go'} to {batchHeld.record} in a moment.
+      <button type="button" onClick={e => { e.stopPropagation(); onUndoBatch(); }}>Undo <kbd>U</kbd></button></p>}
     {why && <Why candidateId={c.id}/>}
   </article>;
 }
@@ -345,6 +360,8 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   const [tab, setTab] = useState<Tab>('text');
   const [find, setFind] = useState('');
   const [focus, setFocus] = useState<string | null>(null);
+  // The proposal pointed at, in the text or in the margin: its words and its card light together.
+  const [lit, setLit] = useState<string | null>(null);
   const [picked, setPicked] = useState<Picked | null>(null);
   const [clips, setClips] = useState<Clip[]>([]);
   const [status, setStatus] = useState('');
@@ -355,7 +372,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   const heldRef = useRef<Held | null>(null);
   const findRef = useRef<HTMLInputElement>(null);
   const roomRef = useRef<HTMLDivElement>(null);
-  const [line, setLine] = useState<{x1: number; y1: number; x2: number; y2: number} | null>(null);
+  const [line, setLine] = useState<{x1: number; y1: number; xe: number; x2: number; y2: number} | null>(null);
   const doc: DocumentDetailOut | undefined = detail.data;
   const chunks = useMemo(() => doc?.chunks ?? [], [doc]);
   const all = useMemo(() => candidates.data ?? [], [candidates.data]);
@@ -432,7 +449,14 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
       const paper = anchor.closest('.rr-paper')?.getBoundingClientRect();
       const b = card.getBoundingClientRect();
       if (!paper || a.top < paper.top || a.top > paper.bottom || b.bottom < room.top) { setLine(null); return; }
-      setLine({x1: paper.right - room.left - 12, y1: a.top - room.top + a.height / 2, x2: b.left - room.left, y2: b.top - room.top + 22});
+      // From the end of the words' first line (mockup INTAKE_2), along under the line to the paper's edge, then to the
+      // card, so it never runs across the text being read; else from the paper's edge beside them.
+      const xe = paper.right - room.left - 12;
+      const words = anchor.parentElement?.querySelector<HTMLElement>('.rr-span');
+      const first = words && typeof words.getClientRects === 'function' ? words.getClientRects()[0] : undefined;
+      const x1 = first && first.width ? Math.min(xe, first.right - room.left + 3) : xe;
+      const y1 = first && first.height ? first.bottom - room.top - 2 : a.top - room.top + a.height / 2;
+      setLine({x1, y1, xe, x2: b.left - room.left, y2: b.top - room.top + 22});
     };
     draw();
     const scrollers = roomRef.current.querySelectorAll('.rr-paper-scroll, .rr-side-list');
@@ -467,7 +491,9 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   // The same answer for other mentions of a name: held like one decision, then sent one by one.
   const [heldBatch, setHeldBatch] = useState<BatchHeld | null>(null);
   const heldBatchRef = useRef<BatchHeld | null>(null);
+  const [batchSent, setBatchSent] = useState<string[]>([]);
   const sendBatch = useCallback(async (b: BatchHeld) => {
+    setBatchSent(xs => [...xs, b.from]);
     let done = 0;
     const failed: string[] = [];
     for (const id of b.ids) {
@@ -486,7 +512,11 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     return () => window.clearTimeout(timer);
   }, [heldBatch, sendBatch]);
   useEffect(() => () => { if (heldBatchRef.current) void sendBatchRef.current(heldBatchRef.current); }, []);
-  const undoBatch = () => { if (heldBatchRef.current) setStatus(`Undone: the ${heldBatchRef.current.ids.length} other mentions still wait.`); setHeldBatch(null); heldBatchRef.current = null; };
+  const undoBatch = () => {
+    const n = heldBatchRef.current?.ids.length;
+    if (n) setStatus(n === 1 ? 'Undone: the other mention still waits.' : `Undone: the ${n} other mentions still wait.`);
+    setHeldBatch(null); heldBatchRef.current = null;
+  };
 
   const decide = useCallback((c: ExtractionCandidateOut, decision: 'accept' | 'reject', caption?: string) => {
     if (heldRef.current && heldRef.current.c.id !== c.id) void send(heldRef.current);
@@ -537,14 +567,31 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     setPicked({chunk, start, end: start + quote.length, quote, x: box && room ? box.left - room.left : 0, y: box && room ? box.top - room.top : 0});
   };
 
-  const keep = async (what: 'evidence' | 'claim' | 'name' | 'check') => {
+  // Kept words wait HOLD_MS before they are saved, so U can take them back (the clip says so meanwhile); closing saves them.
+  const [heldKeep, setHeldKeep] = useState<KeepHeld | null>(null);
+  const heldKeepRef = useRef<KeepHeld | null>(null);
+  const keep = (what: KeepHeld['what']) => {
     if (!picked || !doc) return;
+    if (heldKeepRef.current) void saveKept(heldKeepRef.current);
     const {chunk, start, end, quote} = picked;
+    const clip = what === 'evidence' || what === 'claim' ? clipOf(chunk, start, end, quote, doc.sha256) : null;
+    if (clip) window.dispatchEvent(new Event(SHUTTER_EVENT));
+    const next: KeepHeld = {what, picked, clip, until: Date.now() + HOLD_MS};
+    heldKeepRef.current = next;
+    setHeldKeep(next);
+    setStatus(`Keeping it ${KEPT_WORD[what]} in a moment.`);
+    window.getSelection()?.removeAllRanges();
+    setPicked(null);
+  };
+  const undoKeep = () => { if (heldKeepRef.current) setStatus('Undone: nothing was kept.'); heldKeepRef.current = null; setHeldKeep(null); };
+  const saveKept = async (h: KeepHeld) => {
+    if (!doc) return;
+    const {what} = h;
+    const {chunk, quote} = h.picked;
     try {
       if (what === 'evidence' || what === 'claim') {
         const ev = (await createEvidenceEndpoint({body: {source_id: doc.source_id, quote, locator: chunk.locator, ...(isPicture(doc) ? {document_id: doc.id} : {})}, throwOnError: true})).data;
-        setClips(cs => [clipOf(chunk, start, end, quote, doc.sha256, ev.id), ...cs]);
-        window.dispatchEvent(new Event(SHUTTER_EVENT));
+        setClips(cs => [{...h.clip!, evidenceId: ev.id}, ...cs]);
         if (what === 'claim') {
           const claim = (await createClaimEndpoint({body: {investigation_id: investigationId, text: quote, status: 'unverified', confidence: 0.5}, throwOnError: true})).data;
           await linkClaimEvidenceEndpoint({path: {claim_id: claim.id}, body: {evidence_id: ev.id, stance: 'supports'}, throwOnError: true});
@@ -558,11 +605,17 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
           detail: `${doc.filename}, ${chunk.locator}: “${quote.trim()}”`}, throwOnError: true});
         setStatus('Kept as something to check (a lead).');
       }
-      window.getSelection()?.removeAllRanges();
-      setPicked(null);
       await queryClient.invalidateQueries();
     } catch (error) { setStatus(errorMessage(error, 'Could not keep it')); }
   };
+  const saveKeptRef = useRef(saveKept);
+  saveKeptRef.current = saveKept;
+  useEffect(() => {
+    if (!heldKeep) return undefined;
+    const timer = window.setTimeout(() => { heldKeepRef.current = null; setHeldKeep(null); void saveKeptRef.current(heldKeep); }, Math.max(0, heldKeep.until - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [heldKeep]);
+  useEffect(() => () => { if (heldKeepRef.current) void saveKeptRef.current(heldKeepRef.current); }, []);
   const tag = async (tagId: string) => {
     setTagMenu(false);
     try {
@@ -589,11 +642,12 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
       if (picked && ['e', 'c', 'n', 'x', 't'].includes(k)) {
         e.preventDefault();
         if (k === 't') setTagMenu(true);
-        else void keep(k === 'e' ? 'evidence' : k === 'c' ? 'claim' : k === 'n' ? 'name' : 'check');
+        else keep(k === 'e' ? 'evidence' : k === 'c' ? 'claim' : k === 'n' ? 'name' : 'check');
         return;
       }
       if (k === 'j') { e.preventDefault(); move(1); return; }
       if (k === 'k') { e.preventDefault(); move(-1); return; }
+      if (k === 'u' && heldKeepRef.current) { e.preventDefault(); undoKeep(); return; }
       if (k === 'u' && heldBatchRef.current) { e.preventDefault(); undoBatch(); return; }
       if (k === 'u' && heldRef.current) { e.preventDefault(); undo(); return; }
       const card = cards.find(c => c.id === focus);
@@ -615,6 +669,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     return chunks.reduce((sum, ch) => sum + (ch.text.toLowerCase().split(n).length - 1), 0);
   }, [chunks, find]);
 
+  const heldClip = heldKeep?.clip && (heldKeep.clip.page ?? 0) === current ? heldKeep.clip : null;
   const title = (doc?.filename ?? '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
   return <div ref={roomRef} className="rr" role="dialog" aria-modal="true" aria-label={`Reading room: ${doc?.filename ?? 'document'}`}>
     <header className="rr-top">
@@ -657,7 +712,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
             {pageChunks.map((ch, i) => <div key={ch.id} className="rr-para">
               <span className="rr-pilcrow" aria-hidden="true">¶{i + 1}</span>
               <p className="rr-passage" data-chunk={ch.id} title={ch.locator}>
-                <Marked text={ch.text} spans={byChunk.get(ch.id) ?? []} find={find} focus={focus} onFocus={setFocus}/></p>
+                <Marked text={ch.text} spans={byChunk.get(ch.id) ?? []} find={find} focus={focus} lit={lit} onFocus={setFocus} onLight={setLit}/></p>
             </div>)}
             {!chunks.length && <p className="rr-quiet">{doc ? 'No text was read from this document.' : 'Opening…'}</p>}
             {(doc?.extraction_issues ?? []).map(issue => <p key={issue} className="rr-issue"><span className="st st-unshown"><span aria-hidden="true">○</span>Note</span> {issue}</p>)}
@@ -669,7 +724,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         : <dl className="rr-details">
           <div><dt>File</dt><dd>{doc?.filename}</dd></div>
           <div><dt>Fingerprint</dt><dd><code>{doc?.sha256}</code></dd></div>
-          <div><dt>Read</dt><dd>{doc?.extraction_status}{doc?.extraction_error ? ` · ${doc.extraction_error}` : ''}</dd></div>
+          <div><dt>Read</dt><dd>{readWord(doc?.extraction_status)}{doc?.extraction_error ? ` · ${doc.extraction_error}` : ''}</dd></div>
           <div><dt>Passages</dt><dd>{chunks.length}</dd></div>
           {(doc?.extraction_issues ?? []).map(i => <div key={i}><dt>Note</dt><dd>{i}</dd></div>)}
         </dl>}
@@ -684,8 +739,14 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         </span>
       </header>
       <div className="rr-side-list">
-        {heldBatch && <p className="rr-held rr-batch-held" role="status">✓ {heldBatch.ids.length} more mention{heldBatch.ids.length === 1 ? '' : 's'} go to {heldBatch.record} in a moment.
+        {heldBatch && !shownCards.some(c => c.id === heldBatch.from) && <p className="rr-held rr-batch-held" role="status">✓ {heldBatch.ids.length} more mention{heldBatch.ids.length === 1 ? ' goes' : 's go'} to {heldBatch.record} in a moment.
           <button type="button" onClick={undoBatch}>Undo <kbd>U</kbd></button></p>}
+        {heldClip && <section className="rr-clip rr-clip-held" aria-label="Evidence clip">
+          <p className="rr-eyebrow">Evidence clip <span className="rr-quiet">saved in a moment</span>
+            <button type="button" className="rr-undo" onClick={undoKeep}>Undo <kbd>U</kbd></button></p>
+          <div className="rr-clip-body"><blockquote><span className="rr-ctx">…{heldClip.before}</span><mark>{heldClip.quote}</mark><span className="rr-ctx">{heldClip.after}…</span></blockquote></div>
+          <p className="rr-clip-meta">{heldClip.anchor} · {heldClip.checked ? <span className="rr-ok">✓ the words are in the stored text</span> : <span className="rr-bad">✕ the words differ from the stored text</span>}</p>
+        </section>}
         {pageClips.map(cl => <section key={cl.evidenceId || cl.anchor} className="rr-clip" aria-label="Evidence clip">
           <p className="rr-eyebrow">Evidence clip <span className="rr-quiet">saved just now</span>
             <span className="st st-unshown"><span aria-hidden="true">○</span>Not yet shown</span></p>
@@ -696,23 +757,25 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
           <p className="rr-clip-meta">{cl.anchor} · <code title={cl.fingerprint}>SHA-256 {cl.fingerprint.slice(0, 6)}…{cl.fingerprint.slice(-4)}</code>{' '}
             {cl.checked ? <span className="rr-ok">✓ the words are in the stored text</span> : <span className="rr-bad">✕ the words differ from the stored text</span>}</p>
         </section>)}
-        {shownCards.map(c => <Card key={c.id} c={c} focus={focus === c.id} locator={locatorOf(c)} held={held?.c.id === c.id ? held : null}
+        {shownCards.map(c => <Card key={c.id} c={c} focus={focus === c.id} lit={lit === c.id} locator={locatorOf(c)} held={held?.c.id === c.id ? held : null}
           answer={answers[c.id] ?? {}} setAnswer={a => setAnswers(prev => ({...prev, [c.id]: a}))} onFocus={() => setFocus(c.id)}
-          onDecide={(d, caption) => decide(c, d, caption)} onUndo={undo} onAcceptFirst={acceptFirst} onApplyBatch={b => { setHeldBatch(b); heldBatchRef.current = b; }}/>)}
-        {!shownCards.length && !pageClips.length && <p className="rr-quiet">{filter === 'questions' ? 'No question waits on this page.'
+          onLight={on => setLit(on ? c.id : null)}
+          onDecide={(d, caption) => decide(c, d, caption)} onUndo={undo} onAcceptFirst={acceptFirst} onApplyBatch={b => { setHeldBatch(b); heldBatchRef.current = b; }}
+          batchHeld={heldBatch?.from === c.id ? heldBatch : null} batchSent={batchSent.includes(c.id)} onUndoBatch={undoBatch}/>)}
+        {!shownCards.length && !pageClips.length && !heldClip && <p className="rr-quiet">{filter === 'questions' ? 'No question waits on this page.'
           : pageCards.length ? '' : `Nothing waits on this ${paged ? 'page' : 'text'}.`}{counts.waiting && !pageCards.some(c => c.review_status === 'proposed') ? ' Others wait elsewhere: J moves to the next.' : ''}</p>}
       </div>
     </aside>
 
     {line && <svg className="rr-leader" aria-hidden="true"><circle cx={line.x1} cy={line.y1} r={3}/>
-      <path d={`M${line.x1},${line.y1} C${(line.x1 + line.x2) / 2},${line.y1} ${(line.x1 + line.x2) / 2},${line.y2} ${line.x2},${line.y2}`}/></svg>}
+      <path d={`M${line.x1},${line.y1} H${line.xe} C${(line.xe + line.x2) / 2},${line.y1} ${(line.xe + line.x2) / 2},${line.y2} ${line.x2},${line.y2}`}/></svg>}
 
     {picked && <div className="rr-selbar" role="toolbar" aria-label="Keep the selected words"
       style={picked.x || picked.y ? {left: Math.max(8, picked.x), top: Math.max(8, picked.y - 48)} : undefined}>
-      <button type="button" className="p" onClick={() => void keep('evidence')}>Evidence <kbd>E</kbd></button>
-      <button type="button" onClick={() => void keep('claim')}>Claim <kbd>C</kbd></button>
-      <button type="button" onClick={() => void keep('name')}>Name <kbd>N</kbd></button>
-      <button type="button" onClick={() => void keep('check')}>To check <kbd>X</kbd></button>
+      <button type="button" className="p" onClick={() => keep('evidence')}>Evidence <kbd>E</kbd></button>
+      <button type="button" onClick={() => keep('claim')}>Claim <kbd>C</kbd></button>
+      <button type="button" onClick={() => keep('name')}>Name <kbd>N</kbd></button>
+      <button type="button" onClick={() => keep('check')}>To check <kbd>X</kbd></button>
       <button type="button" onClick={() => setTagMenu(m => !m)} aria-expanded={tagMenu}>Tag <kbd>T</kbd></button>
       {tagMenu && <span className="rr-tags">{(tags?.tags ?? []).length ? (tags?.tags ?? []).map(t => <button key={t.id} type="button" onClick={() => void tag(t.id)}>{t.name}</button>)
         : <small>No tags yet; make them in Keep.</small>}</span>}
@@ -732,6 +795,15 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
 // stores the picture's date). For text the source and the locator already say where
 // the words are, so sending the id made "Keep as evidence" fail with a 400.
 const isPicture = (doc: {mime_type?: string | null}) => (doc.mime_type ?? '').toLowerCase().startsWith('image/');
+
+/** How far reading a document got, in words (not the stored status code). */
+export function readWord(status: string | null | undefined): string {
+  if (status === 'complete') return 'Read';
+  if (status === 'failed') return 'Could not be read';
+  if (status === 'extracting') return 'Being read';
+  if (status === 'pending' || status === 'queued') return 'Waiting to be read';
+  return status ?? '';
+}
 
 export function ReadingRoom({investigationId}: {investigationId: string}): ReactElement | null {
   const request = useWorkbenchStore(state => state.document);

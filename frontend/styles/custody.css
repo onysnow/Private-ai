@@ -161,3 +161,20 @@
 .cc-lines.draw { animation: cc-draw 900ms cubic-bezier(.25, .7, .25, 1) backwards; }
 @keyframes cc-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @media (prefers-reduced-motion: reduce) { .cc-lines.draw { animation: none; } }
+
+/* 19 Oct audit. The detail panel's three actions wrap their words inside the panel (as CHECK_2 draws "Re-check
+   hash" and "What if this breaks?" on two lines) instead of running past its edge. */
+.cc-acts button { white-space: normal; min-width: 0; line-height: 1.25; }
+/* A card's words stay inside it: a long address or quote breaks rather than pushing past the card's edge. */
+.cc-card { grid-template-columns: minmax(0, 1fr); }
+.cc-card small, .cc-card .cc-text { overflow-wrap: anywhere; }
+/* More AI steps than fit under the claim fold into one card that opens them all. */
+.cc-ai-more { cursor: pointer; text-align: left; }
+.cc-ai-more small { color: var(--ai-mark); text-decoration: underline; text-underline-offset: 2px; }
+.cc-ai-more:focus-visible { outline: 2px solid var(--ai-mark); outline-offset: 2px; }
+/* Opening a chain: the cards fade in column by column (60 ms a column, file to claim) with the wires; text never
+   moves. Calm and reduced motion draw everything at once (the component leaves out "draw" when Calm is on). */
+.cc-wires.draw .cc-card { animation: cc-card-in 320ms var(--ease-out, ease-out) backwards; animation-delay: calc(var(--col, 4) * 60ms); }
+@keyframes cc-card-in { from { opacity: 0; } to { opacity: 1; } }
+html[data-motion='calm'] .cc-wires.draw .cc-card, html[data-motion='calm'] .cc-lines.draw { animation: none; }
+@media (prefers-reduced-motion: reduce) { .cc-wires.draw .cc-card { animation: none; } }

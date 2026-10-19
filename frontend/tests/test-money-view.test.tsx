@@ -292,6 +292,25 @@ describe('MoneyView', () => {
     expect(container.querySelectorAll('.mn-band')).toHaveLength(21);
   });
 
+  it('keeps every band chip inside the picture and off the others, leaving out one with no room near its band', async () => {
+    // SEE_2's own euro payments: the €60,000 band runs between two names with no room for its chip (the mockup draws none).
+    const NOM: [string, string] = ['nom', 'Harbour Nominees Ltd'];
+    const ledger = {...LEDGER, transactions: [...LEDGER.transactions,
+      tx('p6', FERN, KES, 42000, {dateTime: '2019-05-14', statedPurpose: 'deposit'}), tx('p7', NOM, LOOP, 60000, {dateTime: '2019-06-12'})]};
+    mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': ledger});
+    wrap(<MoneyView investigationId="inv-1"/>);
+    const fig = await screen.findByRole('img', {name: /Money in EUR/});
+    const height = Number(fig.getAttribute('viewBox')!.split(' ')[3]);
+    const boxes = [...fig.querySelectorAll('.mn-chip-band')].map(g => {
+      const [x, y] = g.getAttribute('transform')!.match(/-?[\d.]+/g)!.map(Number);
+      const r = g.querySelector('rect')!;
+      return {x, top: y - 13, w: Number(r.getAttribute('width')), h: Number(r.getAttribute('height'))};
+    });
+    expect(boxes.length).toBeGreaterThan(2);
+    for (const b of boxes) { expect(b.top).toBeGreaterThanOrEqual(20); expect(b.top + b.h).toBeLessThanOrEqual(height); }
+    boxes.forEach((a, i) => boxes.slice(i + 1).forEach(b => expect(a.x < b.x + b.w && a.x + a.w > b.x && a.top < b.top + b.h && a.top + a.h > b.top).toBe(false)));
+  });
+
   it('shows a payment made over a span with its end date', async () => {
     const spanned = {...LEDGER, transactions: LEDGER.transactions.map(t => t.id === 'p5' ? {...t, dateEnd: '2021-06'} : t)};
     mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': spanned});

@@ -4,7 +4,8 @@
 
 /* ---- The case screens' frame: one screen; a stage page scrolls inside its own column. ---- */
 .cv { position: relative; }
-.cv-home-wrap { height: calc(100vh - 52px); overflow: hidden; }
+/* Positioned, so what a panel draws past its own edges (Rain Noir's glass bleed) is clipped here and never scrolls the page. */
+.cv-home-wrap { position: relative; height: calc(100vh - 52px); overflow: hidden; }
 .cv-stage { height: calc(100vh - 52px); overflow-y: auto; overscroll-behavior: contain; padding: 4px clamp(16px, 3vw, 40px) 48px; scroll-padding-top: 12px;
   animation: cv-in var(--dur-base) var(--ease-out); }
 .cv-stage-head { position: sticky; top: 0; z-index: 5; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap;
@@ -25,7 +26,18 @@
 .ch-top { display: grid; grid-template-columns: minmax(220px, .9fr) minmax(0, 3fr); grid-template-areas: 'name tools' 'q strip'; column-gap: 20px; row-gap: 10px; align-items: end; }
 .ch-top > .ch-search { grid-area: tools; justify-self: center; align-self: center; }
 .ch-top > .ch-tools { grid-area: tools; justify-self: end; align-self: center; }
-.ch-name { grid-area: name; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
+/* The name block may run on under the free start of the tools row, up to the search bar, so a long case name is not cut. */
+.ch-name { grid-column: 1 / -1; grid-row: 1; justify-self: start; display: flex; flex-direction: column; gap: 6px; min-width: 0; max-width: min(640px, calc(50vw - 200px)); }
+/* The name and Switch case on one line (HOME_1); the AI line and its question field on one line under them. */
+.ch-name-line { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ch-name-line .ch-switch { flex: none; white-space: nowrap; }
+.ch-ai-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ch-ai-line:empty { display: none; }
+.ch-ai-line > .ai-strip { flex: 0 1 auto; min-width: 0; }
+.ch-ai-line > .ai-strip > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ch-ai-line > .ai-strip > .ai-tallies { flex: none; }
+.ch-ai-line > .ai-ask { flex: 1 1 96px; min-width: 96px; }
+.ch-ai-line > .ai-ask input { width: 100%; box-sizing: border-box; }
 .ch-name h1 { margin: 0; font: 700 clamp(22px, 2.1vw, 30px)/1.1 var(--font-ui); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .ch-switch { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 11px; border-radius: 999px; font-size: 12px; color: var(--text); border: 1px solid color-mix(in srgb, var(--text-muted) 45%, transparent); }
 .ch-switch kbd, .ch-search kbd, .ch-hide kbd { padding: 1px 6px; border-radius: 6px; background: var(--surface-2); font: 600 10.5px var(--font-mono); color: var(--text); }
@@ -53,7 +65,8 @@
 .ch-q-edit label { font: 600 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
 .ch-q-edit input { flex: 1; min-width: 220px; background: var(--surface-1); color: var(--text); border: 1px solid var(--accent-1); border-radius: 9px; padding: 7px 10px; font: 500 17px var(--font-read); }
 .ch-q-edit button, .ch-first-form button, .ch-sample, .ch-strip-error button { all: unset; cursor: pointer; padding: 7px 13px; border-radius: 9px; background: var(--accent-1); color: var(--ground); font-weight: 650; font-size: 13px; }
-.ch-strip { grid-area: strip; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-radius: 14px; background: var(--surface-1);
+/* Columns sized as HOME_1 draws them: the money, years and To-decide cells carry the longest values. */
+.ch-strip { grid-area: strip; display: grid; grid-template-columns: repeat(3, minmax(0, .9fr)) minmax(0, 1.15fr) minmax(0, 1.3fr) minmax(0, 1.05fr) minmax(0, 1fr); margin: 0; padding: 0; list-style: none; border-radius: 14px; background: var(--surface-1);
   box-shadow: var(--shadow-panel); overflow: hidden; }
 .ch-strip li + li { border-left: 1px solid color-mix(in srgb, var(--line) 35%, transparent); }
 .ch-num { display: flex; flex-direction: column; gap: 3px; padding: 10px 14px; color: var(--text); text-decoration: none; height: 100%; box-sizing: border-box;
@@ -75,6 +88,8 @@
 
 .ch-mod { position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 0; flex: 1 1 0; padding: 14px 16px; border-radius: 16px; background: var(--surface-1);
   box-shadow: var(--shadow-panel); overflow: hidden; }
+/* 1–4 focus a module (and J / K step in it): the focus ring says which. */
+.ch-mod:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
 .ch-mod-head { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
 .ch-mod-head h2 { margin: 0; display: flex; align-items: baseline; gap: 9px; font: 650 15px/1.2 var(--font-ui); white-space: nowrap; min-width: 0; }
 .ch-mod-head { min-width: 0; }
@@ -171,7 +186,7 @@
   mask-image: linear-gradient(#000 calc(100% - 18px), transparent); padding-bottom: 10px; }
 .ch-card .ch-choices, .ch-card .ch-reasons, .ch-card .ch-elsewhere { flex: 0 0 auto; }
 .ch-question { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 0 0 auto; }
-@keyframes ch-card-in { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+@keyframes ch-card-in { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
 .ch-why { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0; font-size: 12.5px; color: var(--text-muted); }
 .ch-actor { font: 600 10.5px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent-2); }
 .ch-question { margin: 0; font: 550 clamp(18px, 1.55vw, 23px)/1.25 var(--font-read); color: var(--text); }
@@ -179,6 +194,9 @@
   max-height: 9.5em; overflow-y: auto; border-left: 3px solid var(--accent-1); }
 .ch-excerpt mark, .dc-read mark, .dc-legend mark { background: color-mix(in srgb, var(--accent-1) 28%, transparent); color: inherit; border-bottom: 1.5px solid var(--accent-1); padding: 0 1px; border-radius: 2px; }
 .ch-proposal { margin: 0; font: 500 15px var(--font-read); color: var(--text-muted); }
+.ch-source-link { align-self: flex-start; font-size: 12.5px; color: var(--accent-2); text-decoration: none; }
+.ch-source-link:hover { text-decoration: underline; }
+.ch-source-link:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
 .ch-locator { margin: 0; font: 500 11.5px var(--font-mono); color: var(--text-muted); }
 .ch-parties { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
 .ch-party { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 99px; border: 1px solid var(--line); font-size: 12.5px; color: var(--text);
@@ -196,7 +214,8 @@
 .ch-known { margin: 0; padding: 8px 12px 8px 28px; border-radius: 10px; font-size: 13px; line-height: 1.45; background: color-mix(in srgb, var(--accent-1) 8%, transparent); border: 1px dashed color-mix(in srgb, var(--accent-1) 50%, transparent); }
 .ch-happens { padding: 10px 12px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--accent-2) 45%, transparent); background: color-mix(in srgb, var(--accent-2) 7%, transparent); }
 .ch-happens ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }
-.ch-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ch-choices { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
+.ch-choices .ch-choice { white-space: nowrap; }
 .ch-choice { all: unset; cursor: pointer; box-sizing: border-box; min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px;
   font: 650 14.5px var(--font-ui); border: 1.5px solid currentColor; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast), box-shadow var(--dur-fast); }
 .ch-choice:hover, .ch-choice:focus-visible { transform: translateY(-2px); box-shadow: var(--shadow-panel); }
@@ -371,6 +390,7 @@
 .ch-happens dd { margin: 0; }
 .ch-happens-yes dt { color: var(--status-supported); } .ch-happens-no dt { color: var(--status-disputed); } .ch-happens-unsure dt { color: var(--status-unshown); }
 @media (prefers-reduced-motion: reduce) { .dc-last button, .dc-bulk-confirm { animation: cv-fade 120ms both; } }
+html[data-motion='calm'] .dc-last button, html[data-motion='calm'] .dc-bulk-confirm { animation: cv-fade 120ms both; }
 .dc-keys { display: flex; gap: 4px; align-items: center; color: var(--text-muted); }
 .dc-toast { margin-left: auto; display: flex; gap: 8px; align-items: center; }
 .dc-toast button { all: unset; cursor: pointer; color: var(--accent-1); font-weight: 650; }
@@ -462,11 +482,11 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .cv-screen { height: calc(100vh - 52px); overflow: hidden; }
 .ss { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; padding: 6px clamp(14px, 2vw, 28px) 12px; color: var(--text); font-family: var(--font-ui);
   animation: cv-in var(--dur-base) var(--ease-out); }
-.ss-head { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'title tabs' 'line line'; align-items: end; column-gap: 28px; row-gap: 2px;
+.ss-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'title line tabs'; align-items: end; column-gap: 20px; row-gap: 2px;
   padding-bottom: 8px; border-bottom: 2px solid var(--stage); }
 .ss-title { grid-area: title; }
-.ss-title h1 { margin: 2px 0 0; font: 650 clamp(22px, 2.1vw, 30px)/1.1 var(--font-display); }
-.ss-line { grid-area: line; margin: 2px 0 0; font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-title h1 { margin: 2px 0 0; font: 650 clamp(20px, 1.7vw, 24px)/1.1 var(--font-display); }
+.ss-line { grid-area: line; margin: 0 0 3px; font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ss-tabs { grid-area: tabs; display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
 .ss-tabs a { position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 10px; color: var(--text-muted);
   text-decoration: none; font-size: 14px; font-weight: 550; transition: color var(--dur-fast), background var(--dur-fast), transform var(--dur-fast) var(--ease-out); }
@@ -480,6 +500,7 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .ss-sec { height: 100%; overflow-y: auto; overscroll-behavior: contain; animation: cv-in var(--dur-base) var(--ease-out); }
 .ss-sec.fill { overflow: hidden; }
 .ss-sec .card { margin: 0 0 12px; }
+@media (max-width: 1180px) { .ss-head { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'title tabs' 'line line'; } }
 @media (max-width: 760px) { .ss-head { grid-template-columns: 1fr; grid-template-areas: 'title' 'tabs' 'line'; } .ss-tabs { justify-content: flex-start; } }
 
 @media (prefers-reduced-motion: reduce) { .ss, .ss-sec, .ss-tabs a[aria-current='page']::after { animation: none; } }

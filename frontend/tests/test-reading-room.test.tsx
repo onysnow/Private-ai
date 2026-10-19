@@ -127,11 +127,40 @@ describe('ReadingRoom', () => {
     fireEvent.mouseUp(passage);
     expect(await screen.findByRole('toolbar', {name: 'Keep the selected words'})).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'e'});
-    const clip = await screen.findByRole('region', {name: 'Evidence clip'});
+    // Held 6 s with Undo, like a decision (mockup INTAKE_2: "saved just now · Undo"); U takes it back.
+    let clip = await screen.findByRole('region', {name: 'Evidence clip'});
+    expect(within(clip).getByText('saved in a moment')).toBeInTheDocument();
     expect(within(clip).getByText('bought on behalf', {selector: 'mark'})).toBeInTheDocument();
     expect(within(clip).getByText(/the words are in the stored text/)).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'u'});
+    expect(screen.queryByRole('region', {name: 'Evidence clip'})).toBeNull();
+    expect(api.calls('POST /api/evidence')).toHaveLength(0);
+    // Kept again, it is saved after its moment (here: on closing the room).
+    window.getSelection()!.removeAllRanges();
+    window.getSelection()!.addRange(range);
+    fireEvent.mouseUp(passage);
+    fireEvent.keyDown(window, {key: 'e'});
+    clip = await screen.findByRole('region', {name: 'Evidence clip'});
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(api.calls('POST /api/evidence')).toHaveLength(1));
     // document_id is for pictures only: the backend answers 400 to it on a text document.
     expect(api.lastBody('POST /api/evidence')).toEqual({source_id: 'src-1', quote: 'bought on behalf', locator: 'page 4'});
+  });
+
+  it('lights a card and its words together, says what a name would be, and reads its status in words', async () => {
+    routes();
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const card = await screen.findByRole('article', {name: 'Name: Fernhill Ltd'});
+    expect(card).toHaveTextContent('Fernhill Ltd · Company');
+    const words = await screen.findByText('Fernhill Ltd', {selector: '.rr-span'});
+    fireEvent.mouseEnter(card);
+    expect(words).toHaveClass('lit');
+    fireEvent.mouseLeave(card);
+    expect(words).not.toHaveClass('lit');
+    fireEvent.mouseEnter(words);
+    expect(card).toHaveClass('lit');
+    await userEvent.setup().click(screen.getByRole('tab', {name: 'Details'}));
+    expect(screen.getByText('Read', {selector: 'dd'})).toBeInTheDocument();
   });
 
   it('shows what accepting changes on the Accept button', async () => {
@@ -186,8 +215,12 @@ describe('ReadingRoom', () => {
     fireEvent.keyDown(window, {key: '1'});
     const offer = await within(card).findByRole('group', {name: 'Same answer for the others'});
     await userEvent.setup().click(within(offer).getByRole('button', {name: 'Apply to these 2'}));
+    // Said in the card where the offer was, so it is seen.
+    expect(within(card).getByRole('status')).toHaveTextContent('2 more mentions go to Fernhill Limited in a moment.');
     fireEvent.keyDown(window, {key: 'u'});
     expect(await screen.findByText('Undone: the 2 other mentions still wait.')).toBeInTheDocument();
+    // The offer comes back, to be made again.
+    expect(within(card).getByRole('group', {name: 'Same answer for the others'})).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'Escape'});
     expect(api.calls('POST /api/extraction-candidates/y1/review')).toHaveLength(0);
   });

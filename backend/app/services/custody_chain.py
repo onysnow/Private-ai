@@ -63,6 +63,12 @@ def _passage(db: Session, doc: Document, quote: str, chunk_id: str | None) -> Do
     return None
 
 
+def _proposer_actor(payload: Any) -> str:
+    """Who proposed it, by kind: an outside service (a provider such as OpenAleph or OpenSanctions) or the app."""
+    prov = payload.get("provenance") if isinstance(payload, dict) else None
+    return "outside" if isinstance(prov, dict) and prov.get("provider") else "app"
+
+
 def _proposer(payload: Any) -> str:
     prov = payload.get("provenance") if isinstance(payload, dict) else None
     if not isinstance(prov, dict):
@@ -171,12 +177,12 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             cards.append({"id": f"decision:{ev.id}", "kind": "decision", "title": "Proposed",
                           "lines": [f"{proposer} · {candidate.get('candidate_type')}{f' · {conf:.2f}' if isinstance(conf, (int, float)) else ''}",
                                     "accepted by a person" if accepted else "not yet decided"],
-                          "who": "a person" if accepted else proposer, "actor": "person" if accepted else "app",
+                          "who": "a person" if accepted else proposer, "actor": "person" if accepted else _proposer_actor(candidate.get("payload")),
                           "when": candidate.get("reviewed_at") or candidate.get("created_at"),
                           "checks": [{"label": "accepted", "ok": accepted}],
                           "wire": {"style": "against" if against else ("confirmed" if accepted else "proposed"),
                                    "words": "against" if against else "supports"}})
-            log.append({"when": candidate.get("created_at"), "who": proposer, "actor": "app",
+            log.append({"when": candidate.get("created_at"), "who": proposer, "actor": _proposer_actor(candidate.get("payload")),
                         "what": f"Proposed this {candidate.get('candidate_type')}{f' ({conf:.2f})' if isinstance(conf, (int, float)) else ''}", "card": f"decision:{ev.id}"})
             if accepted and candidate.get("reviewed_at"):
                 log.append({"when": candidate["reviewed_at"], "who": "a person", "actor": "person", "what": "Accepted the proposal", "card": f"decision:{ev.id}"})
@@ -223,7 +229,8 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             "steps": sum(len(r["cards"]) for r in rows) + 1,
             "people": people,
             "app_services": app_services,
-            "outside_services": 0,
+            "outside_services": len({e["who"] for e in log if e["actor"] == "outside"}
+                                    | {c["who"] for c in cards_all if c["actor"] == "outside" and c.get("who")}),
             "hashes_intact": None if not hashes else all(h is True for h in hashes),
             "hashes_checked": len(hashes),
             "ai_uses": len(ai),

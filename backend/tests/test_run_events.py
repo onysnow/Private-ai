@@ -70,6 +70,8 @@ def test_a_run_records_each_step_in_order_and_the_review_is_appended(monkeypatch
 
     runs = ok(client.get(f"/api/investigations/{inv}/ai-runs"))["runs"]
     assert runs[0]["run_id"] == run_id and runs[0]["events"] == len(events) + 1 and runs[0]["question"] == "What did Ada North sign?"
+    # A problem is what Watch the run calls one: a stopped step, or an in-between step that is not the model's own word.
+    assert runs[0]["problems"] == sum(1 for e in events if e["status"] == "bad" or (e["status"] == "partial" and not e["self_reported"]))
 
     with client.stream("GET", f"/api/investigations/{inv}/ai-runs/{run_id}/events/stream", headers={"Last-Event-ID": str(len(events))}) as stream:
         text = "".join(stream.iter_text())

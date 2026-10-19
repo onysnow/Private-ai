@@ -48,6 +48,14 @@ const STATE_WORDS: Record<string, string> = {runs: 'runs', next_run: 'would appl
 // The plan's steps a setting adds (run_plan.py _steps): the setting's key, and its value with and without the step.
 const OPTIONAL_STEPS: Array<{key: string; on: string; off: string}> = [{key: 'devils_advocate', on: 'ON', off: 'OFF'}, {key: 'research_depth', on: 'EXHAUSTIVE', off: 'NORMAL'}];
 const PACKET_DEFAULT = 30;
+/** How long past runs took on this machine, in words: "under a minute", "about 2 min", "about 1–4 min". */
+export function runTime(minutes: number[]): string {
+  if (!minutes.length) return 'not measured yet: no run has finished here';
+  const lo = Math.min(...minutes), hi = Math.max(...minutes);
+  if (hi < 1) return 'under a minute on this machine';
+  const a = Math.max(1, Math.round(lo)), b = Math.max(1, Math.round(hi));
+  return `about ${a === b ? a : `${a}–${b}`} min on this machine`;
+}
 
 /** A segmented control: a radio group, arrows move, the name says the default and whether it changed. */
 function Segments({row, value, onChange}: {row: RunSettingOut; value: string; onChange: (v: string) => void}): ReactElement {
@@ -116,7 +124,14 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     window.setTimeout(() => questionRef.current?.focus({preventScroll: true}), 0);
   }, [askCase]); // eslint-disable-line react-hooks/exhaustive-deps
   // A link copied with "Copy cite" in the trace drawer (…?run=<id>&step=n#ai-runs) opens that run.
-  useEffect(() => { const linked = new URLSearchParams(window.location.search).get('run'); if (linked && linked !== 'sample') { setRunId(linked); setStep(3); } }, []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const linked = params.get('run');
+    if (linked && linked !== 'sample') { setRunId(linked); setStep(3); }
+    // A link from Decide's "Not sure? Review it claim by claim" opens that answer's review (step 4).
+    const review = params.get('review');
+    if (linked && review) { setReviewId(review); setStep(4); }
+  }, []);
   const earlier = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && step === 1});
   const [outcome, setOutcome] = useState<{ok: boolean; text: string} | null>(null);
   const flagged = useRef(new Set<string>());
@@ -142,7 +157,11 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     const t = window.setTimeout(() => plan.mutate({path: {investigation_id: investigationId}, body}), 250);
     return () => window.clearTimeout(t);
   }, [planShows, planKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  const p: RunPlanOut | undefined = plan.data;
+  // While a changed plan is worked out, the last one stays on screen: the rows never vanish under the pointer or the
+  // keyboard focus between one setting and the next.
+  const lastPlan = useRef<RunPlanOut | undefined>(undefined);
+  if (plan.data) lastPlan.current = plan.data;
+  const p: RunPlanOut | undefined = plan.data ?? (plan.isPending ? lastPlan.current : undefined);
 
   // An instruction found inside the evidence is echoed once, as the run record will keep it.
   useEffect(() => {
@@ -238,7 +257,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     <p className="br-title">Operating instructions <small>Profile <b>{profile.data?.name ?? '…'}</b>{changed.length ? <> · <em>{changed.length} changed</em></> : null}</small></p>
     {values && GROUPS.map(g => <fieldset key={g} className="br-group"><legend>{g}</legend>
       {rows.filter(r => r.group === g).map(r => <div key={r.key} className={`br-row${values[r.key] !== caseDefaults?.[r.key] ? ' changed' : ''}`}
-        onMouseEnter={() => setHover(r.key)} onMouseLeave={() => setHover(null)} title={`${r.key} · ${r.source}`}>
+        onMouseEnter={() => setHover(r.key)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(r.key)} onBlur={() => setHover(null)} title={`${r.key} · ${r.source}`}>
         <span className="br-label">{r.label}<small>{r.help}</small></span>
         {SWITCHES.has(r.key) ? <Switch row={r} value={values[r.key]} onChange={v => change(r.key, v)}/> : <Segments row={r} value={values[r.key]} onChange={v => change(r.key, v)}/>}
       </div>)}
@@ -278,10 +297,14 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       {module === 'hypothesis_test' && theory && <p className="br-theory">Theory: {theory}</p>}</>}
       {packetFrom && <p className="br-tray br-reuse" role="status"><b>Same packet as run {packetFrom.run_id.slice(0, 8)}</b> (from its step {packetFrom.step}): the records it sent go in again, with the instructions set here.
         <button type="button" className="br-quiet" onClick={() => setPacketFrom(null)}>Build a new packet</button></p>}
-      {p && !packetFrom && <p className="br-tray"><b>{p.packet.records} records go in</b> · {p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
+      {p && !packetFrom && <div className="br-packet">{p.packet.first.length > 0 && <ul className="br-firsts" aria-label="The first records in the packet">
+        {p.packet.first.map(r => <li key={`${r.record_type}:${r.record_id}`} title={`${(TYPE_WORDS[r.record_type] ?? [r.record_type])[0]}: ${r.title || r.record_id.slice(0, 8)}`}>
+          <span aria-hidden="true">{(TYPE_WORDS[r.record_type]?.[0] ?? r.record_type).charAt(0).toUpperCase()}</span>
+          <span className="sr-only">{(TYPE_WORDS[r.record_type] ?? [r.record_type])[0]}: {r.title || r.record_id.slice(0, 8)}</span></li>)}</ul>}
+        <p className="br-tray"><b>{p.packet.records} records go in</b> · {p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
         {maxResults !== PACKET_DEFAULT && <> · up to {maxResults}</>}
         {p.packet.leads_only > 0 && <><br/>{p.packet.leads_only} outside lead{p.packet.leads_only === 1 ? '' : 's'} count as leads only</>}
-        {!includeLeads && <><br/>Outside leads stay out of this packet</>}</p>}
+        {!includeLeads && <><br/>Outside leads stay out of this packet</>}</p></div>}
     </div>
     {plan.isError && <p role="alert" className="br-bad">{errorMessage(plan.error, 'Could not work out the plan')}</p>}
     <ol className="br-plan">{p?.steps.map(s => {
@@ -295,7 +318,10 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       {optional.filter(o => values[o.key] !== o.on).map(o => <button key={o.key} type="button" className="br-quiet" onClick={() => change(o.key, o.on)}>
         + {o.row!.label}{o.key === 'research_depth' ? ` · ${o.row!.allowed.find(a => a.value === o.on)?.label ?? o.on}` : ''}</button>)}</p>}
     {p && <div className="br-systems"><p className="br-eyebrow">Likely to run · decided by what the answer will contain</p>
-      <p>{p.systems.map(s => <span key={s.system} className={`br-sysrow ${s.state}`} title={STATE_WORDS[s.state]}><b>{s.system}</b> · {s.state === 'not_expected' ? 'not expected' : s.why}{s.state === 'not_in_app' ? ' · not in the app yet' : ''}{s.state === 'next_run' ? ' · next run, from this answer' : ''}</span>)}</p>
+      <p>{p.systems.filter(s => s.state !== 'not_expected').map(s => <span key={s.system} className={`br-sysrow ${s.state}`} title={STATE_WORDS[s.state]}><b>{s.system}</b> · {s.why}{s.state === 'not_in_app' ? ' · not in the app yet' : ''}{s.state === 'next_run' ? ' · next run, from this answer' : ''}</span>)}
+        {p.systems.some(s => s.state === 'not_expected') && <span className="br-sysrow not_expected"
+          title={p.systems.filter(s => s.state === 'not_expected').map(s => `${s.system} runs for ${s.why}`).join(' · ')}>
+          <b>{p.systems.filter(s => s.state === 'not_expected').map(s => s.system).join(' · ')}</b> · not expected</span>}</p>
       <small>You cannot switch a system off: it runs when the answer would need it. A next run starts from this answer once you accept it.</small></div>}
     {p?.injections.map(i => <p key={i.record_id} className="br-inject" role="note"><b>Ignored an instruction inside the evidence.</b> {i.title || i.record_type} reads “{i.quote}”.
       Material can never change a setting; it is quoted as evidence and logged.</p>)}
@@ -378,7 +404,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
           <dl className="br-facts">
             <dt>Model</dt><dd>{p.where.model ?? 'none chosen'}{p.where.runs_on_this_computer ? ' · on this computer' : p.where.provider ? ` · ${p.where.provider}` : ''}</dd>
             <dt>Size</dt><dd>≈ {p.where.words_in.toLocaleString()} words in · up to ≈ {p.where.words_out_max.toLocaleString()} out</dd>
-            <dt>Time</dt><dd>{p.where.minutes.length ? `about ${Math.min(...p.where.minutes)}–${Math.max(...p.where.minutes)} min on this machine` : 'not measured yet: no run has finished here'}</dd>
+            <dt>Time</dt><dd>{runTime(p.where.minutes)}</dd>
             <dt>Money</dt><dd>{p.where.money}</dd>
             <dt>Limit</dt><dd>{p.where.limits.concurrent} runs at once · {p.where.limits.per_minute} a minute</dd>
           </dl>

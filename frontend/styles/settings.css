@@ -39,7 +39,7 @@
 .ap-pane-head em { margin-left: auto; font-style: normal; font-size: 12px; color: var(--accent-2); }
 .ap-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 @media (max-width: 700px) { .ap-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.ap-card { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 7px; padding: 11px; border-radius: 12px;
+.ap-card { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 7px; padding: 11px 10px; border-radius: 12px;
   background: var(--surface-2); color: var(--text); border: 1.5px solid var(--line); font-family: var(--font-ui); transition: transform var(--dur-fast), box-shadow var(--dur-fast); }
 .ap-card:hover, .ap-card:focus-visible { transform: translateY(-2px); box-shadow: var(--shadow-lifted); }
 .ap-card:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
@@ -52,10 +52,12 @@
 .ap-tag + .ap-tag { margin-left: 0; }
 .ap-mood { font-size: 11.5px; line-height: 1.35; color: var(--text-muted); }
 .ap-sw { display: flex; gap: 3px; } .ap-sw i { flex: 1; height: 16px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .25); }
-.ap-type { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; overflow: hidden; }
-.ap-type-h { font: 650 12px var(--font-display); } .ap-type-b { font: 400 11.5px var(--font-read); } .ap-type-m { font: 500 10px var(--font-mono); color: var(--text-muted); }
-.ap-marks { display: flex; gap: 3px; flex-wrap: wrap; }
-.ap-marks i { font-style: normal; font: 600 9px/1 var(--font-ui); padding: 3px 4px; border-radius: 4px; border: 1px solid currentColor; }
+/* "Header Body copy €29,400" on one line, whole (HOME_2); on a narrow screen the figure goes under, never cut. */
+.ap-type { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 4px; white-space: nowrap; }
+.ap-type-h { font: 650 11.5px var(--font-display); } .ap-type-b { font: 400 11px var(--font-read); } .ap-type-m { font: 500 9.5px var(--font-mono); color: var(--text-muted); }
+/* The seven marks on one row, as each card in HOME_2 draws them (they wrap only on a narrow screen). */
+.ap-marks { display: flex; gap: 2px; flex-wrap: wrap; }
+.ap-marks i { flex: none; font-style: normal; font: 600 8.5px/1 var(--font-ui); padding: 3px 3px; border-radius: 4px; border: 1px solid currentColor; }
 .ap-marks .lv-strong { border-color: var(--flag-strong); } .ap-marks .lv-textbook { border-color: var(--flag-textbook-edge); }
 .ap-meta { font: 500 10.5px var(--font-mono); color: var(--text-muted); }
 .ap-own { border-style: dashed; background: transparent; align-items: center; justify-content: center; text-align: center; }
@@ -144,10 +146,14 @@
 .st-kept span { display: inline-flex; gap: 4px; }
 /* The photograph behind Rain Noir's glass (Appearance, under the Rain switch). */
 .ap-photo { display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 9px 12px; border-radius: 10px; background: var(--surface-2); font-size: 13px; }
-.ap-photo > img, .ap-photo-none { flex: 0 0 72px; height: 44px; border-radius: 6px; object-fit: cover; }
+.ap-photo > img, .ap-photo > .ap-photo-none { flex: 0 0 72px; height: 44px; border-radius: 6px; object-fit: cover; }
 .ap-photo-none { display: grid; place-items: center; font-size: 10px; color: var(--text-muted); box-shadow: inset 0 0 0 1px var(--line); }
-.ap-photo > span { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.ap-photo > span:not(.ap-photo-none) { display: flex; flex-direction: column; gap: 2px; flex: 1; }
 .ap-photo small { font-size: 11px; color: var(--text-muted); }
 .ap-photo-pick, .ap-photo > button { all: unset; cursor: pointer; padding: 5px 11px; border-radius: 999px; font-size: 12px; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
 .ap-photo-pick:focus-within, .ap-photo > button:focus-visible { outline: 2px solid var(--focus, var(--accent-2)); outline-offset: 2px; }
 .ap-photo-pick input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+/* A theme change crossfades the whole screen (appearance-panel.tsx fadeTheme; research §04.11 "Motion"). */
+html[data-theme-fade]::view-transition-old(root), html[data-theme-fade]::view-transition-new(root) { animation-duration: 450ms; animation-timing-function: ease-out; }
+html[data-theme-fade='slow']::view-transition-old(root), html[data-theme-fade='slow']::view-transition-new(root) { animation-duration: 700ms; }
+html[data-theme-fade='calm']::view-transition-old(root), html[data-theme-fade='calm']::view-transition-new(root) { animation-duration: 120ms; }

@@ -14,7 +14,7 @@ import {getDecisionsOptions} from '../../lib/generated/@tanstack/react-query.gen
 import type {CaseDecisionsOut, DecisionChoiceOut, DecisionItemOut, GetDecisionsError} from '../../lib/generated/types.gen';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 
-export const HOLD_MS = 8000;
+export const HOLD_MS = 10_000;
 export type DecisionKind = DecisionItemOut['kind'];
 export type DecisionOrder = 'consequence' | 'source' | 'oldest';
 

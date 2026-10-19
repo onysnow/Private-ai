@@ -121,6 +121,38 @@ describe('Case home', () => {
     expect(await screen.findByText('1 source for · 2 against · Harbour Gazette, land register')).toBeInTheDocument();
   });
 
+  it('focuses a module with 1–4 and steps inside it with J / K', async () => {
+    routes({
+      'GET /api/investigations/inv-1/claims': [
+        {id: 'c1', investigation_id: 'inv-1', text: 'Kestrel SA bought the harbour land in 2020 with its own funds.', status: 'disputed', confidence: 0.3, created_at: '2026-10-01T00:00:00'},
+        {id: 'c2', investigation_id: 'inv-1', text: 'M. Ross signed for Harbour Nominees.', status: 'lead', confidence: 0.3, created_at: '2026-10-01T00:00:00'},
+        {id: 'c3', investigation_id: 'inv-1', text: 'Fernhill Ltd paid €29,400.', status: 'supported', confidence: 0.9, created_at: '2026-10-01T00:00:00'},
+      ],
+    });
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const check = screen.getByRole('region', {name: 'Check'});
+    expect(await within(check).findByLabelText('Claims: 1 of 3')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: '2'});
+    expect(check).toHaveFocus();
+    fireEvent.keyDown(window, {key: 'j'});
+    expect(within(check).getByLabelText('Claims: 2 of 3')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'k'});
+    expect(within(check).getByLabelText('Claims: 1 of 3')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: '1'});
+    expect(screen.getByRole('region', {name: 'Bring in'})).toHaveFocus();
+  });
+
+  it('puts the source one click away when a decision has no passage to show', async () => {
+    const aiItem = {...missingItem, kind: 'ai', id: 'ai-1', question: 'Accept this logic check as checked analysis?', proposal: 'Logic check', actor: 'AI', actor_kind: 'ai',
+      reason: 'AI draft · asked: Do the conclusions follow?', evidence: null, group: {key: 'ai', label: 'AI drafts'}, consequences: [],
+      choices: [{key: 'yes', label: 'Accept', method: 'POST', path: '/api/ai-analysis-candidates/ai-1/review', body: {decision: 'accept'}}],
+      open: {href: '/act#ai-reasoning-panel', label: 'Read the whole draft'}};
+    routes({'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {ai: 1}, total: 1, offset: 0, items: [aiItem]}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const card = await screen.findByTestId('decision-card');
+    expect(within(card).getByRole('link', {name: /Read the whole draft/})).toHaveAttribute('href', '/act?inv=inv-1#ai-reasoning-panel');
+  });
+
   it('marks flagged years and lights the years of the party pointed at', async () => {
     routes({
       'GET /api/investigations/inv-1/standing': {...standing, timeline: {...standing.timeline, years: [{year: '2016', events: 4, flags: 0}, {year: '2017', events: 9, flags: 1}, {year: '2018', events: 2, flags: 0}]}},
@@ -174,6 +206,10 @@ describe('Case home', () => {
     expect(await screen.findByText('Does page 4 show that the harbour parcel was bought on behalf of Fernhill Ltd?')).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     expect(api.calls('POST /api/checks/chk-1/decide')).toHaveLength(0);
+    // The key for No opens the reasons, as a click does; pressing it again answers without one.
+    fireEvent.keyDown(window, {key: 'd'});
+    expect(await screen.findByRole('group', {name: 'Why not'})).toBeInTheDocument();
+    expect(api.calls('POST /api/checks/chk-1/decide')).toHaveLength(0);
     fireEvent.keyDown(window, {key: 'd'});
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     await waitFor(() => expect(api.lastBody('POST /api/checks/chk-1/decide')).toEqual({status: 'does_not'}));
@@ -207,6 +243,24 @@ describe('Decide', () => {
     fireEvent.click(screen.getByRole('button', {name: 'Not public'}));
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     await waitFor(() => expect(api.lastBody('POST /api/checks/mv-1/decide')).toEqual({status: 'unknowable', note: 'Not public'}));
+  });
+
+  it('takes a held answer off its chip count at once, and opens the source in its reader with O', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    routes();
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    const queue = await screen.findByRole('complementary', {name: 'To decide'});
+    expect(await within(queue).findByRole('button', {name: 'All 2'})).toBeInTheDocument();
+    await screen.findByRole('heading', {name: checkItem.question});
+    fireEvent.keyDown(window, {key: 'o'});
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1', pageNumber: 4});
+    fireEvent.keyDown(window, {key: '1'});
+    // Held, not yet sent: it leaves the list and its count straight away; Z puts both back.
+    expect(within(queue).getByRole('button', {name: 'All 1'})).toBeInTheDocument();
+    expect(within(queue).queryByRole('button', {name: /^To check/})).toBeNull();
+    fireEvent.keyDown(window, {key: 'z'});
+    expect(within(queue).getByRole('button', {name: 'All 2'})).toBeInTheDocument();
+    expect(within(queue).getByRole('button', {name: 'To check 1'})).toBeInTheDocument();
   });
 
   it('groups by source with the pages read, and says what each answer does', async () => {

@@ -155,6 +155,17 @@ def indicator(indicator_id: str) -> tuple[Indicator, str] | None:
     return _catalogue().get(indicator_id)
 
 
+@lru_cache(maxsize=1)
+def _home_areas() -> dict[str, str]:
+    return {i.id: a.key for a in catalogue().areas for i in a.indicators}
+
+
+def home_area(indicator_id: str) -> str | None:
+    """The area an indicator's catalogue entry sits in (ML-021 sits in Money laundering), whose name the flag shows.
+    Its `areas` list can name another area first (ML-021: CY, ML), which put the flag under Cybercrime."""
+    return _home_areas().get(indicator_id)
+
+
 def _name(indicator_id: str) -> str:
     found = indicator(indicator_id)
     return found[0].name if found else indicator_id
@@ -269,7 +280,7 @@ def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]],
         "innocent": [{"text": text, "state": (row.innocent or {}).get(text, {}).get("state", "not_looked_at"),
                       "note": (row.innocent or {}).get(text, {}).get("note")} for text in (ind.innocent_explanations if ind else [])],
         "indicator": None if ind is None else {
-            "id": ind.id, "name": ind.name, "definition": ind.definition, "area": ind.areas[0], "area_name": area,
+            "id": ind.id, "name": ind.name, "definition": ind.definition, "area": home_area(ind.id) or ind.areas[0], "area_name": area,
             "levels": {"faint": ind.levels.faint, "strong": ind.levels.strong, "textbook": ind.levels.textbook,
                        "threshold_source": ind.levels.threshold_source, "threshold_note": ind.levels.threshold_note},
             "sources": [{"title": s.title, "publisher": s.publisher, "url": s.url, "locator": s.locator, "quote": s.quote}

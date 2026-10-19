@@ -15,6 +15,10 @@
 // that has not moved for six minutes says so ("No progress for 6 min") with Check. A file
 // already in the case is not saved again: it is named with "Open that one" and "Keep a second
 // copy". History lists every drop with what it produced; a drop can be shown alone on the line.
+// Motion (research §2): a file that arrives slides into its lane, each box's mark steps when its stage
+// changes (a ✓ presses, a stop notches, never a shake); pointing at a file lifts it and shows its receipt.
+// Calm motion and reduced motion make these instant (styles/themes.css), and a log under the line says
+// what was read or could not be, which a screen reader also hears.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -58,6 +62,8 @@ function typing(target: EventTarget | null): boolean {
 export function boxDetail(stage: DropStageOut): string {
   if (stage.key === 'received' || (stage.key === 'checked' && stage.detail !== '= same')) return '';
   if (stage.key === 'inside' && stage.state === 'skipped') return 'none';
+  // A stopped box shows only its ✕ (mockup INTAKE_1); the reason is in its title, its name and the line under the file.
+  if (stage.state === 'stopped' && stage.key !== 'inside') return '';
   const n = /^(\d+)( of \d+)?/.exec(stage.detail);
   if (n && ['passages', 'names', 'ready', 'inside'].includes(stage.key)) return n[2] ? `${n[1]}${n[2].replace(' of ', '/')}` : n[1];
   return stage.detail;
@@ -85,7 +91,14 @@ function Thumb({lane, width}: {lane: DropLaneOut; width: number}): ReactElement 
     : <span className="dp-thumb-kind" aria-hidden="true">{ext(lane.filename)}</span>;
 }
 
-type Actions = {retry: (lane: DropLaneOut) => void; pick: (id: string) => void};
+type Actions = {retry: (lane: DropLaneOut) => void; pick: (id: string) => void; hover: (id: string | null) => void};
+
+/** A box's mark. Keyed by its stage's state, so a change of state makes a new mark, which steps in when step was true
+ *  as it was made (research §2: a ✓ presses, a stop notches); the first marks of a file do not. */
+function Mark({step, children}: {step: boolean; children: string}): ReactElement {
+  const [moved] = useState(step);
+  return <i aria-hidden="true" className={moved ? 'dp-step' : undefined}>{children}</i>;
+}
 /** Which cell of the grid Tab lands on: 0 for that one cell, -1 for every other (a roving tab stop). */
 type TabStop = (row: string, col: number) => 0 | -1;
 
@@ -106,16 +119,21 @@ export function boxName(lane: DropLaneOut, s: DropStageOut): string {
   return `${lane.filename}, ${s.label}: ${word}${s.detail ? `, ${s.detail}` : ''}`;
 }
 
-function Lane({lane, on, onPick, actions, tab, depth = 0}: {lane: DropLaneOut; on: string; onPick: (id: string) => void; actions: Actions; tab: TabStop; depth?: number}): ReactElement {
+function Lane({lane, on, onPick, actions, tab, fresh, depth = 0}: {lane: DropLaneOut; on: string; onPick: (id: string) => void; actions: Actions; tab: TabStop;
+  fresh: (id: string) => boolean; depth?: number}): ReactElement {
   const [all, setAll] = useState(false);
+  // A file that arrives after the line was first drawn slides into place, once.
+  const [arrived] = useState(() => fresh(lane.document_id));
+  const drawn = useRef(false);
+  useEffect(() => { drawn.current = true; }, []);
   const kids = lane.children ?? [];
   const folded = kids.length > FOLD_OVER && !all;
   const read = kids.filter(k => k.stages.find(s => s.key === 'read')?.state === 'done').length;
   const reading = kids.filter(k => k.stages.find(s => s.key === 'read')?.state === 'active').length;
   const id = lane.document_id;
   return <>
-    <div role="row" data-row={id} aria-selected={on === id} onClick={() => onPick(id)}
-      className={`dp-lane${on === id ? ' on' : ''}${lane.problem ? ' problem' : ''}${depth ? ' inside' : ''}`}>
+    <div role="row" data-row={id} aria-selected={on === id} onClick={() => onPick(id)} onMouseEnter={() => actions.hover(id)}
+      className={`dp-lane${on === id ? ' on' : ''}${lane.problem ? ' problem' : ''}${depth ? ' inside' : ''}${arrived ? ' dp-arrive' : ''}`}>
       <span role="rowheader" tabIndex={tab(id, 0)} className="dp-file" title={lane.filename}><b>{depth ? <span aria-hidden="true">↳ </span> : null}{lane.filename}</b>
         <small className={lane.problem ? 'bad' : lane.issues.length || lane.stalled_minutes ? 'warn' : ''}>
           {lane.problem ? '✕ ' : lane.stalled_minutes ? `${STALLED_MARK} ` : lane.issues.length ? '⚠ ' : ''}{lane.note}</small></span>
@@ -123,7 +141,7 @@ function Lane({lane, on, onPick, actions, tab, depth = 0}: {lane: DropLaneOut; o
         const stalled = isStalled(lane, s);
         return <span key={s.key} role="gridcell" tabIndex={tab(id, i + 1)} aria-label={boxName(lane, s)} title={`${s.label}: ${stalled ? STALLED_WORD : WORD[s.state]}${s.detail ? ` · ${s.detail}` : ''}`}
           className={`dp-stage dp-${s.state}${stalled ? ' dp-stalled' : ''}`}>
-          <i aria-hidden="true">{stalled ? STALLED_MARK : MARK[s.state]}</i><small aria-hidden="true">{stalled ? `${lane.stalled_minutes} min` : boxDetail(s)}</small></span>;
+          <Mark key={stalled ? 'stalled' : s.state} step={drawn.current}>{stalled ? STALLED_MARK : MARK[s.state]}</Mark><small aria-hidden="true">{stalled ? `${lane.stalled_minutes} min` : boxDetail(s)}</small></span>;
       })}
       <span role="gridcell" tabIndex={tab(id, 8)} className="dp-waiting-cell"><WaitingCell lane={lane} actions={actions}/></span>
     </div>
@@ -133,7 +151,7 @@ function Lane({lane, on, onPick, actions, tab, depth = 0}: {lane: DropLaneOut; o
         <i className="dp-fold-bar" aria-hidden="true"><i style={{width: `${(100 * read) / kids.length}%`}}/></i>
         <button type="button" tabIndex={-1} onClick={() => setAll(true)}>Show all {kids.length}</button>
       </span>
-    </div> : kids.map(k => <Lane key={k.document_id} lane={k} on={on} onPick={onPick} actions={actions} tab={tab} depth={depth + 1}/>)}
+    </div> : kids.map(k => <Lane key={k.document_id} lane={k} on={on} onPick={onPick} actions={actions} tab={tab} fresh={fresh} depth={depth + 1}/>)}
     {kids.length > FOLD_OVER && all && <div role="row" data-row={`unfold:${id}`} className="dp-fold">
       <span role="gridcell" aria-colspan={9} tabIndex={tab(`unfold:${id}`, 0)}>
         <button type="button" tabIndex={-1} onClick={() => setAll(false)}>Fold the {kids.length} files inside {lane.filename}</button></span></div>}
@@ -173,7 +191,7 @@ function DropHistory({investigationId, onShow}: {investigationId: string; onShow
       <p className="dp-quiet">{[n(d.files, 'file saved', 'files saved'), d.files_inside ? `${d.files_inside} inside them` : '', d.duplicates ? `${d.duplicates} already in the case` : '',
         d.refused ? `${d.refused} not taken` : ''].filter(Boolean).join(' · ')}</p>
       <ul className="dp-produced" aria-label="What it produced">
-        <li><i className="dp-stage dp-done" aria-hidden="true">✓</i>{n(d.read, 'read')}</li>
+        <li><i className="dp-stage dp-done" aria-hidden="true">✓</i>{d.read} read</li>
         {d.problems > 0 && <li><i className="dp-stage dp-stopped" aria-hidden="true">✕</i>{d.problems} could not be read</li>}
         {d.in_progress > 0 && <li><i className="dp-stage dp-waiting" aria-hidden="true">·</i>{d.in_progress} still to read</li>}
         <li>{n(d.passages, 'passage')}</li>
@@ -193,6 +211,25 @@ function duplicateOf(error: unknown): {id: string; filename: string} | null {
   if (!(error instanceof ApiHttpError) || error.status !== 409) return null;
   const doc = error.body?.document as {id?: unknown; filename?: unknown} | undefined;
   return doc && typeof doc.id === 'string' ? {id: doc.id, filename: typeof doc.filename === 'string' ? doc.filename : ''} : null;
+}
+
+/** An upload whose file was saved but could not be read (422 with the document): it is on the line, stopped at Read. */
+function savedUnread(error: unknown): {filename: string; reason: string} | null {
+  if (!(error instanceof ApiHttpError) || error.status !== 422) return null;
+  const doc = error.body?.document as {filename?: unknown} | undefined;
+  if (!doc) return null;
+  const reason = typeof error.body?.error === 'string' && error.body.error ? error.body.error : 'it could not be read';
+  return {filename: typeof doc.filename === 'string' ? doc.filename : '', reason};
+}
+
+/** An upload's failure in words, without the address it was sent to. */
+const notSaved = (error: unknown) => (error instanceof ApiHttpError ? error.detail : errorMessage(error, 'not saved'));
+
+/** What the log under the line says when a file finishes or stops (research §2: summaries and failures, never every stage). */
+export function laneNews(lane: DropLaneOut): string {
+  if (lane.problem) return `${lane.filename} could not be read: ${lane.note}`;
+  const found = Object.values(lane.receipt.proposals).reduce((a, b) => a + b, 0);
+  return `${lane.filename} read: ${lane.receipt.passages} passage${lane.receipt.passages === 1 ? '' : 's'}, ${found} proposal${found === 1 ? '' : 's'}`;
 }
 
 function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: string}): ReactElement {
@@ -308,7 +345,30 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   const startedMany = useRef(false);
   useEffect(() => { if (many && !startedMany.current) { startedMany.current = true; setOnly(true); } }, [many]);
   const [picked, setPicked] = useState<string | null>(null);
+  // Pointing at a file shows its receipt while the pointer stays on the line (research §2); a click keeps it.
+  const [hovered, setHovered] = useState<string | null>(null);
   const files = useRef<HTMLInputElement>(null);
+  // Files on the line when it was first drawn, and every one since: a file not among them has just arrived.
+  const seen = useRef<Set<string> | null>(null);
+  const fresh = useCallback((id: string) => seen.current !== null && !seen.current.has(id), []);
+  useEffect(() => {
+    if (!data) return;
+    const ids = flatLanes(data.lanes).map(l => l.document_id);
+    if (seen.current === null) seen.current = new Set(ids); else ids.forEach(id => seen.current!.add(id));
+  }, [data]);
+  // What finished or stopped since the line was drawn, newest first: announced politely, and shown under Calm motion.
+  const [news, setNews] = useState<{key: string; text: string}[]>([]);
+  const lastState = useRef<Map<string, string> | null>(null);
+  useEffect(() => {
+    if (!data) return;
+    const now = new Map(flatLanes(data.lanes).map(l => [l.document_id, l.problem ? 'problem' : l.in_progress ? 'reading' : 'read'] as const));
+    const before = lastState.current;
+    lastState.current = now;
+    if (!before) return;
+    const told = flatLanes(data.lanes).filter(l => now.get(l.document_id) !== 'reading' && before.get(l.document_id) !== now.get(l.document_id)
+      && (before.get(l.document_id) === 'reading' || !before.has(l.document_id)));
+    if (told.length) setNews(n => [...told.map(l => ({key: `${l.document_id}:${now.get(l.document_id)}:${Date.now()}`, text: laneNews(l)})), ...n].slice(0, 8));
+  }, [data]);
   const folder = useRef<HTMLInputElement>(null);
 
   const lanes = useMemo(() => (data?.lanes ?? []).filter(l => !shown || shown.ids.includes(l.document_id))
@@ -316,8 +376,10 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
     .sort((a, b) => Number(b.problem) - Number(a.problem)), [data, only, shown]);
   const every = useMemo(() => flatLanes(data?.lanes ?? []), [data]);
   const lane = every.find(l => l.document_id === picked) ?? lanes[0];
+  const shownLane = every.find(l => l.document_id === hovered) ?? lane;
   const problems = useMemo(() => problemsFirst(data?.lanes ?? []), [data]);
-  const strip = data?.lanes ?? [];
+  // The strip runs in the line's order (problems first), so "n / N" counts along the line.
+  const strip = useMemo(() => [...(data?.lanes ?? [])].sort((a, b) => Number(b.problem) - Number(a.problem)), [data]);
   const at = Math.max(0, strip.findIndex(l => l.document_id === lane?.document_id || flatLanes(l.children ?? []).some(k => k.document_id === lane?.document_id)));
   const firstToRead = problems.find(l => !l.problem && !stalledLane(l)) ?? every.find(l => l.waiting) ?? lane;
 
@@ -393,6 +455,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
     batchRef.current = batchId;
     let done = 0;
     const already: Duplicate[] = [];
+    const unread: string[] = [];
     const failed: string[] = [];
     for (const [i, file] of list.entries()) {
       setStatus(`Saving ${file.name} (${i + 1} of ${list.length})…`);
@@ -402,13 +465,15 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
         void queryClient.invalidateQueries({queryKey: dropKey});
       } catch (error) {
         const same = duplicateOf(error);
+        const saved = same ? null : savedUnread(error);
         if (same) already.push({file, existingId: same.id, existingName: same.filename});
-        else failed.push(`${file.name}: ${errorMessage(error, 'not saved')}`);
+        else if (saved) { done += 1; unread.push(`${saved.filename || file.name} was saved but could not be read: ${saved.reason}.`); }
+        else failed.push(`${file.name} was not saved: ${notSaved(error)}.`);
       }
     }
     setDuplicates(d => [...already, ...d]);
-    setStatus([`${done} file${done === 1 ? '' : 's'} saved.${done ? ' Reading starts now; nothing leaves this computer.' : ''}`,
-      already.length ? `${already.length} already in the case.` : '', ...failed].filter(Boolean).join(' '));
+    setStatus([`${done} file${done === 1 ? '' : 's'} saved.${done > unread.length ? ' Reading starts now; nothing leaves this computer.' : ''}`,
+      already.length ? `${already.length} already in the case.` : '', ...unread, ...failed].filter(Boolean).join(' '));
     setBusyNow(false);
     await queryClient.invalidateQueries();
   };
@@ -429,7 +494,8 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   };
   const choose = (e: ChangeEvent<HTMLInputElement>) => { void send(Array.from(e.target.files ?? [])); e.target.value = ''; };
   const actions: Actions = {
-    pick: setPicked,
+    pick: id => { setPicked(id); setHovered(null); },
+    hover: setHovered,
     retry: l => {
       if (!l.retry_job_id) return;
       setStatus(`Reading ${l.filename} again…`);
@@ -449,7 +515,8 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
 
   const field = <div className={`dp-field${over ? ' over' : ''}`} onDragOver={e => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={onDrop}
     onPaste={e => { const text = e.clipboardData.getData('text'); if (text && !e.clipboardData.files.length) { e.preventDefault(); onPaste(text); } }} tabIndex={0}
-    aria-label="Drop files here, or paste text">
+    onKeyDown={e => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.stopPropagation(); files.current?.click(); } }}
+    aria-label="Drop files here, or paste text. Enter chooses files">
     <span className="dp-arrow" aria-hidden="true">↓</span>
     <p><b>Drop files, a folder, or paste text</b></p>
     <p className="dp-quiet">or press <kbd>O</kbd> to <button type="button" className="dp-link" onClick={() => files.current?.click()}>choose files</button>
@@ -459,6 +526,11 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
     <input ref={folder} type="file" multiple hidden webkitdirectory="" onChange={choose}/>
     {status && <p role="status" className="dp-status">{status}</p>}
   </div>;
+
+  if (!data && query.isPending) return <section className="dp dp-empty" aria-label="The Drop" aria-busy="true">
+    <div className="dp-skeleton" aria-hidden="true">{[0, 1, 2, 3].map(i => <i key={i}/>)}</div>
+    <p className="dp-quiet">Looking at what was brought in…</p>
+  </section>;
 
   if (!data || empty) return <section className="dp dp-empty" aria-label="The Drop">
     {field}
@@ -498,7 +570,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
         </dl>
         <p className="dp-local">Nothing leaves this computer{byOpenAleph ? ': OpenAleph runs here.' : ': every file is read here.'}</p>
       </section>
-      {lane && <Receipt lane={lane} investigationId={investigationId}/>}
+      {shownLane && <Receipt key={shownLane.document_id} lane={shownLane} investigationId={investigationId}/>}
       <section className="dp-card" aria-label="What happens next">
         <p className="dp-eyebrow">What happens next</p>
         <p className="dp-quiet">Accepted names and claims join the case. Nothing is added until you accept it.</p>
@@ -515,11 +587,12 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
           : <span className="dp-all">All {t!.files}</span>}
         <button type="button" className={`dp-filter${only ? ' on' : ''}`} aria-pressed={only} onClick={() => setOnly(o => !o)}>Problems & in progress <kbd>F</kbd></button>
       </header>
-      <div ref={gridRef} role="grid" aria-label="Files, stage by stage" aria-colcount={9} className="dp-grid" onKeyDown={onGridKey} onFocus={onGridFocus}>
+      <div ref={gridRef} role="grid" aria-label="Files, stage by stage" aria-colcount={9} className="dp-grid" onKeyDown={onGridKey} onFocus={onGridFocus}
+        onMouseLeave={() => setHovered(null)}>
         <div role="row" data-row="head" className="dp-head">
           {['File', ...data.stages.map(s => s.label), 'Waiting'].map((label, i) => <span key={label} role="columnheader" tabIndex={tabStop('head', i)}>{label}</span>)}
         </div>
-        {visible.map(l => <Lane key={l.document_id} lane={l} on={lane?.document_id ?? ''} onPick={setPicked} actions={actions} tab={tabStop}/>)}
+        {visible.map(l => <Lane key={l.document_id} lane={l} on={lane?.document_id ?? ''} onPick={id => { setPicked(id); setHovered(null); }} actions={actions} tab={tabStop} fresh={fresh}/>)}
         {many && !only && <div role="row" data-row="fold:clean" className="dp-fold"><span role="gridcell" aria-colspan={9} tabIndex={tabStop('fold:clean', 0)}>
           <span><b>{lanes.filter(l => !(l.problem || l.in_progress || l.issues.length || l.waiting)).length} read cleanly</b>, nothing waits</span>
           <button type="button" tabIndex={-1} onClick={() => setShowClean(c => !c)}>{showClean ? 'Fold them' : 'Show them'}</button></span></div>}
@@ -531,6 +604,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
         <span><i className="dp-stage dp-stalled" aria-hidden="true">{STALLED_MARK}</i>{STALLED_WORD}</span>
         <span className="dp-by">Proposed by: {byOpenAleph ? 'OpenAleph' : 'the Workbench’s name-finder (rules)'} · <span className="ai-tag">AI</span> none in a drop</span>
       </footer>
+      <ol className="dp-log" aria-live="polite" aria-label="What changed on the line">{news.map(n => <li key={n.key}>{n.text}</li>)}</ol>
     </div>}
 
     <div className="dp-right">

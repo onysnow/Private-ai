@@ -7,7 +7,7 @@
 import {useQuery} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import type {ReactElement} from 'react';
+import type {KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
 
 // Connects the generated client to the shared ApiClient, as every page that calls the API does.
 import '../../lib/api-instance';
@@ -165,13 +165,30 @@ function CatalogueSearch({total, onIndicator}: {total: number; onIndicator: (id:
   const inds = useQuery({...listIndicatorsOptions({query: {q, limit: 8}}), enabled: q.length > 1});
   const glossaryTotal = useQuery({...searchGlossaryOptions({query: {limit: 1}}), staleTime: Infinity}).data?.total;
   const pick = (id: string) => { onIndicator(id); setOpen(false); setText(''); };
+  // ↓ / ↑ move from the box through the results (indicators, then terms) and back; Esc returns to the box.
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const step = (by: number) => {
+    const items = [...(resultsRef.current?.querySelectorAll<HTMLElement>('button, a') ?? [])];
+    if (!items.length) return;
+    const at = items.indexOf(document.activeElement as HTMLElement);
+    const next = at + by;
+    if (next < 0) ref.current?.focus(); else items[Math.min(items.length - 1, next)].focus();
+  };
+  const resultKeys = (e: ReactKeyboardEvent) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); step(e.key === 'ArrowDown' ? 1 : -1); }
+    else if (e.key === 'Escape') { e.preventDefault(); ref.current?.focus(); }
+  };
   return <div className="kc-search" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false); }}>
     <input ref={ref} value={text} onChange={e => { setText(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)}
-      onKeyDown={e => { if (e.key === 'Escape') { setOpen(false); (e.target as HTMLInputElement).blur(); } if (e.key === 'Enter' && inds.data?.indicators[0]) pick(inds.data.indicators[0].id); }}
+      onKeyDown={e => {
+        if (e.key === 'Escape') { setOpen(false); (e.target as HTMLInputElement).blur(); }
+        if (e.key === 'Enter' && inds.data?.indicators[0]) pick(inds.data.indicators[0].id);
+        if (e.key === 'ArrowDown' && open && q.length > 1) { e.preventDefault(); step(1); }
+      }}
       placeholder={`Search ${total ? total.toLocaleString('en-GB') : ''} indicators${glossaryTotal ? ` and ${glossaryTotal.toLocaleString('en-GB')} terms` : ' and terms'}`}
       role="combobox" aria-autocomplete="list" aria-label="Search indicators and terms" aria-expanded={open && q.length > 1} aria-controls="kc-search-results"/>
     <kbd aria-hidden="true">/</kbd>
-    {open && q.length > 1 && <div className="kc-results" id="kc-search-results">
+    {open && q.length > 1 && <div className="kc-results" id="kc-search-results" ref={resultsRef} onKeyDown={resultKeys}>
       <p className="kc-eyebrow">Indicators</p>
       {inds.data?.indicators.length ? <ul>{inds.data.indicators.map(r => <li key={r.id}><button type="button" onClick={() => pick(r.id)}>
         <span className="kc-mono">{r.id}</span> {r.name}</button></li>)}</ul> : <p className="kc-quiet">{inds.isFetching ? 'Searching…' : 'No indicator matches.'}</p>}

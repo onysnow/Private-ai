@@ -20,6 +20,7 @@ import {BackupPanel} from '../../features/backups/backup-panel';
 import {LevelChip, LEVEL_WORDS} from '../../components/status';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {setSingleKeys, singleKeysOn} from '../../lib/shortcuts';
+import {setTrailTail} from '../../lib/trail';
 import {SuiteCoverage} from '../../features/suite-coverage/suite-coverage';
 import {DemoCasesLoader} from '../../features/demo/demo-cases-loader';
 import {OneMdbLoader} from '../../features/demo/one-mdb-loader';
@@ -224,6 +225,9 @@ function Settings(): ReactElement {
   ];
   const [section, go] = useSection(settingRows.filter(r => !r.href).map(r => r.id), 'appearance');
   const row = settingRows.find(r => r.id === section)!;
+  // The breadcrumb names the section you are in (mockup HOME_2: case › Settings › Appearance).
+  useEffect(() => { setTrailTail([{label: 'Settings', href: '/settings'}, {label: row.label}]); }, [row.label]);
+  useEffect(() => () => setTrailTail([]), []);
   const providersQuery = useQuery({...connectorsOptions(), enabled: Boolean(status) && ['lookups', 'keys', 'log'].includes(section)});
   const providers = providersQuery.data?.providers ?? Object.keys(status?.connectors ?? {});
   const card = 'rounded-xl border border-border bg-card p-5';
