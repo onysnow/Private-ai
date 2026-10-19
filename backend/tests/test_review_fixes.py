@@ -340,3 +340,55 @@ def test_the_failure_limiter_forgets_old_keys():
     for n in range(300):
         limiter.hit(f"late{n}", now=5000.0)  # every earlier window has expired
     assert len(limiter._windows) <= 100
+
+
+# --- A-02: figures typed into a request do not survive a save ---------------
+
+def _forged_chart_visual():
+    from tests.test_saved_charts import ORDER
+    return {
+        "type": "chart", "spec": ORDER,
+        "data": {"rows": [{"label": "Shell Co Ltd", "value": 9999999999.0,
+                           "record_refs": [{"record_type": "payment", "record_id": "not-a-real-payment"}]}]},
+        "option": {"series": [{"data": [9999999999.0]}]},
+    }
+
+
+def test_a_forged_chart_in_a_deck_is_cooked_again_from_the_records():
+    from tests.test_saved_charts import _deck_and_writeup
+    from fastapi.testclient import TestClient as _TC
+    c = _TC(app)
+    _inv, deck_id, _w = _deck_and_writeup()
+    saved = c.patch(f"/api/decks/{deck_id}", json={"slides_json": [
+        {"kind": "content", "heading": "Money", "bullets": [], "evidence": [], "visual": _forged_chart_visual()}]})
+    assert saved.status_code == 200, saved.text
+    visual = saved.json()["slides"][0]["visual"]
+    labels = [r["label"] for r in visual["data"]["rows"]]
+    assert "Shell Co Ltd" not in labels and "Meridian Holdings Ltd" in labels
+    assert "not-a-real-payment" not in str(visual)
+
+
+def test_a_forged_chart_in_a_writeup_is_cooked_again_from_the_records():
+    from tests.test_saved_charts import _deck_and_writeup
+    from fastapi.testclient import TestClient as _TC
+    c = _TC(app)
+    _inv, _d, writeup_id = _deck_and_writeup()
+    doc = {"type": "doc", "content": [{"type": "evidenceVisual", "attrs": {"visual": _forged_chart_visual()}}]}
+    saved = c.patch(f"/api/writeups/{writeup_id}", json={"content_json": doc})
+    assert saved.status_code == 200, saved.text
+    body = saved.json()
+    assert "Shell Co Ltd" not in str(body["content_json"]) and "not-a-real-payment" not in str(body)
+    assert "Meridian Holdings Ltd" in str(body["content_json"])
+
+
+def test_a_chart_whose_query_cannot_run_is_dropped_not_kept():
+    from tests.test_saved_charts import _deck_and_writeup
+    from fastapi.testclient import TestClient as _TC
+    c = _TC(app)
+    _inv, deck_id, _w = _deck_and_writeup()
+    visual = _forged_chart_visual()
+    visual["spec"] = {"kind": "bar", "title": "x", "query": {"name": "no_such_query"}}
+    saved = c.patch(f"/api/decks/{deck_id}", json={"slides_json": [
+        {"kind": "content", "heading": "Money", "bullets": [], "evidence": [], "visual": visual}]})
+    assert saved.status_code == 200
+    assert saved.json()["slides"][0]["visual"] is None

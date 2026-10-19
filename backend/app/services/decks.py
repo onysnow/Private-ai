@@ -107,6 +107,42 @@ def normalize_chart_visual(visual: Any) -> dict | None:
     return kept
 
 
+def rebuild_chart_data(db: Session, investigation_id: str, visual: dict) -> dict | None:
+    """A chart whose rows are cooked again by the data service from its own
+    order slip. Whatever rows, record refs, drawing, words or report the
+    client sent are discarded: the figures and the records they cite are the
+    ones the investigation's data holds, never ones typed into a request
+    (an export carries them under the investigation's name). A chart whose
+    query cannot be run -- or runs to nothing -- is dropped (None)."""
+    from app.visuals.data_service import QueryError, run_query
+
+    try:
+        spec = VisualSpec.model_validate(visual["spec"])
+        data = run_query(db, investigation_id, spec.query)
+    except (QueryError, ValueError, KeyError, TypeError):
+        return None
+    if not data.rows:
+        return None
+    rebuilt = {k: v for k, v in visual.items() if k not in {"data", "option", "text", "report", "slide_drawing"}}
+    rebuilt["data"] = data.as_dict()
+    rebuilt["report"] = {"ok": True, "errors": [], "warnings": []}
+    rebuilt["text"] = {}
+    return rebuilt
+
+
+def rebuild_deck_charts(db: Session, investigation_id: str, slides: list[dict]) -> list[dict]:
+    """Every chart on the given (already normalized) slides rebuilt from the
+    investigation's data; a chart that cannot be rebuilt leaves its slide
+    without a visual."""
+    out: list[dict] = []
+    for slide in slides:
+        visual = slide.get("visual")
+        if isinstance(visual, dict) and visual.get("type") == CHART_VISUAL:
+            slide = {**slide, "visual": rebuild_chart_data(db, investigation_id, visual)}
+        out.append(slide)
+    return out
+
+
 def recheck_charts(slides: list[dict], theme: Theme) -> list[dict]:
     """Every chart in a deck drawn again in the deck's theme and its own
     style, and checked again, whenever the deck's slides or look change
@@ -630,7 +666,8 @@ def create_deck(db: Session, *, investigation_id: str, title: str, slides: list[
     deck_style = normalize_deck_style(style)
     row = Deck(
         investigation_id=investigation_id, title=title.strip() or "Untitled deck",
-        slides_json=recheck_charts(_normalize_slides(slides), resolved_theme(deck_style)), style_json=deck_style,
+        slides_json=recheck_charts(rebuild_deck_charts(db, investigation_id, _normalize_slides(slides)), resolved_theme(deck_style)),
+        style_json=deck_style,
         source_ai_candidate_id=source_ai_candidate_id,
         created_by=created_by, created_at=utcnow_naive(),
     )
@@ -649,7 +686,8 @@ def update_deck(db: Session, row: Deck, data: dict) -> Deck:
         row.style_json = normalize_deck_style(data["style_json"])
     if slides_changed or style_changed:
         # A new look or new slides: every chart is drawn and checked again.
-        slides = _normalize_slides(data["slides_json"]) if slides_changed else list(row.slides_json or [])
+        slides = (rebuild_deck_charts(db, row.investigation_id, _normalize_slides(data["slides_json"]))
+                  if slides_changed else list(row.slides_json or []))
         row.slides_json = recheck_charts(slides, resolved_theme(row.style_json))
     db.commit()
     db.refresh(row)
