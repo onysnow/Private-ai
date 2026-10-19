@@ -15,7 +15,7 @@ from opsconsole import schemas as s
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.protocols import BackupProvider
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class CreateIn(BaseModel):
@@ -46,10 +46,9 @@ def router(ctx: ConsoleContext) -> APIRouter:
             try:
                 items = [asdict(b) for b in p.list()]
                 error = None
-            except Exception as exc:
-                # The provider's own message can carry paths or hosts; the server log keeps it.
-                log.warning("backup provider %s could not list its backups", kind, exc_info=True)
-                items, error = [], f"{exc.__class__.__name__}: the provider could not list its backups (see the server log)"
+            except Exception:
+                logger.exception("Backup provider %s failed to list backups", kind)
+                items, error = [], "Backup provider failed; details are in the server log."
             out.append({"kind": kind, "items": items, "error": error})
         return {"providers": out, "running": {k: ctx.supervisor.is_running(k) for k in ("backup", "restore")}}
 

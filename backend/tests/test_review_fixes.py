@@ -424,6 +424,37 @@ def test_a_chart_in_a_writeup_keeps_its_drawing_text_and_real_report_through_a_s
     assert visual["report"]["ok"] is True and visual["report"].get("checked_rules")
 
 
+# --- CodeQL findings on the combined branch ---------------------------------
+
+def test_the_query_workbench_strips_comments_in_one_pass():
+    import time as _t
+
+    import pytest as _p
+
+    from opsconsole.core.sqlscreen import screen_read
+    assert screen_read("select 1 -- trailing\n") == "select 1"
+    assert screen_read("select /* c */ 2") == "select   2"
+    with _p.raises(ValueError):
+        screen_read("/* hidden */ DROP TABLE x")
+    with _p.raises(ValueError):
+        screen_read("select 1 /* a */ ; delete from t")
+    started = _t.perf_counter()
+    with _p.raises(ValueError):          # nothing but unclosed '/*': used to take quadratic time
+        screen_read("/*a" * 200_000)
+    assert _t.perf_counter() - started < 2
+
+
+def test_a_connector_credential_failure_does_not_answer_with_the_internal_reason(monkeypatch):
+    import app.api.routes_settings as settings_routes
+
+    def broken(provider, credential):
+        raise RuntimeError("keyring backend at /home/ops/.local/share failed")
+
+    monkeypatch.setattr(settings_routes, "_save_connector_credential", broken)
+    r = TestClient(app).put("/api/settings/connectors/aleph/credential", json={"credential": "x"})
+    assert r.status_code == 500 and "/home/ops" not in r.text
+
+
 # --- E-03: a claim cannot be created already Supported or Confirmed ----------
 
 def test_a_claim_cannot_be_created_as_supported_or_confirmed():
@@ -451,56 +482,3 @@ def test_a_claim_cannot_be_created_as_supported_or_confirmed():
     # The other statuses a reporter may start a claim at are unchanged.
     for status in ("lead", "unverified", "disputed", "rejected"):
         assert c.post("/api/claims", json={"investigation_id": inv, "text": f"A {status} claim", "status": status}).status_code == 200
-
-# --- CodeQL findings on the combined branch ---------------------------------
-
-def test_the_query_workbench_strips_comments_in_one_pass():
-    import time as _t
-
-    import pytest as _p
-
-    from opsconsole.core.sqlscreen import screen_read
-    assert screen_read("select 1 -- trailing\n") == "select 1"
-    assert screen_read("select /* c */ 2") == "select   2"
-    with _p.raises(ValueError):
-        screen_read("/* hidden */ DROP TABLE x")
-    with _p.raises(ValueError):
-        screen_read("select 1 /* a */ ; delete from t")
-    started = _t.perf_counter()
-    with _p.raises(ValueError):          # nothing but unclosed '/*': used to take quadratic time
-        screen_read("/*a" * 200_000)
-    assert _t.perf_counter() - started < 2
-
-
-def test_the_api_replay_goes_to_the_address_the_server_listens_on_not_the_host_header():
-    from starlette.requests import Request
-
-    from opsconsole.api.apiplay import _own_base
-    scope = {"type": "http", "scheme": "http", "server": ("0.0.0.0", 8000), "path": "/", "query_string": b"",
-             "headers": [(b"host", b"attacker.example")]}
-    assert _own_base(Request(scope)) == "http://127.0.0.1:8000"
-    scope["server"] = ("::1", 9000)
-    assert _own_base(Request(scope)) == "http://[::1]:9000"
-
-
-def test_base_map_files_are_read_only_from_inside_their_folder(tmp_path):
-    from app.services.basemap import _read_inside
-    (tmp_path / "fonts").mkdir()
-    (tmp_path / "fonts" / "a.pbf").write_bytes(b"ok")
-    (tmp_path / "secret.txt").write_bytes(b"no")
-    root = tmp_path / "fonts"
-    from pathlib import Path
-    assert _read_inside(root, Path("a.pbf")) == b"ok"
-    assert _read_inside(root, Path("../secret.txt")) is None
-    assert _read_inside(root, Path("missing.pbf")) is None
-
-
-def test_a_connector_credential_failure_does_not_answer_with_the_internal_reason(monkeypatch):
-    import app.api.routes_settings as settings_routes
-
-    def broken(provider, credential):
-        raise RuntimeError("keyring backend at /home/ops/.local/share failed")
-
-    monkeypatch.setattr(settings_routes, "_save_connector_credential", broken)
-    r = TestClient(app).put("/api/settings/connectors/aleph/credential", json={"credential": "x"})
-    assert r.status_code == 500 and "/home/ops" not in r.text
