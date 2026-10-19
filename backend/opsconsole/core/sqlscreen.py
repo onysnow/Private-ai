@@ -1,5 +1,5 @@
 """The query workbench: read mode (screened, rolled back, READ ONLY on
-Postgres, row/byte/time capped), EXPLAIN, and the write mode the host must
+Postgres and query_only on SQLite, row/byte/time capped), EXPLAIN, and the write mode the host must
 opt into."""
 
 from __future__ import annotations
@@ -7,6 +7,8 @@ from __future__ import annotations
 import json
 import re
 import time
+from collections.abc import Iterator
+from contextlib import contextmanager
 from typing import Any, Mapping
 
 from sqlalchemy import text
@@ -115,8 +117,28 @@ def _set_timeout(conn: Connection, seconds: int) -> None:
         conn.execute(text(f"SET LOCAL statement_timeout = {int(seconds * 1000)}"))
 
 
+@contextmanager
+def _sqlite_query_only(conn: Connection) -> Iterator[None]:
+    """On SQLite the database itself refuses writes while a read-mode statement
+    runs (PRAGMA query_only), so read mode does not depend on the keyword screen
+    alone. It is switched back afterwards: the connection may be pooled."""
+    if conn.dialect.name != "sqlite":
+        yield
+        return
+    conn.execute(text("PRAGMA query_only = ON"))
+    try:
+        yield
+    finally:
+        conn.execute(text("PRAGMA query_only = OFF"))
+
+
 def run_read(conn: Connection, sql: str, *, params: Mapping[str, Any] | None, max_rows: int, max_bytes: int, timeout_seconds: int) -> dict[str, Any]:
     cleaned = screen_read(sql)
+    with _sqlite_query_only(conn):
+        return _run_read(conn, cleaned, params=params, max_rows=max_rows, max_bytes=max_bytes, timeout_seconds=timeout_seconds)
+
+
+def _run_read(conn: Connection, cleaned: str, *, params: Mapping[str, Any] | None, max_rows: int, max_bytes: int, timeout_seconds: int) -> dict[str, Any]:
     started = time.perf_counter()
     if conn.dialect.name == "postgresql":
         conn.execute(text("SET TRANSACTION READ ONLY"))
@@ -168,8 +190,9 @@ def explain(conn: Connection, sql: str, *, params: Mapping[str, Any] | None, ana
         plan = result.scalar()
         return {"dialect": dialect, "plan": plan, "text": None}
     if dialect == "sqlite":
-        result = conn.execute(text(f"EXPLAIN QUERY PLAN {cleaned}"), dict(params or {}))
-        lines = [" ".join(str(v) for v in r) for r in result]
+        with _sqlite_query_only(conn):
+            result = conn.execute(text(f"EXPLAIN QUERY PLAN {cleaned}"), dict(params or {}))
+            lines = [" ".join(str(v) for v in r) for r in result]
         return {"dialect": dialect, "plan": None, "text": "\n".join(lines)}
     result = conn.execute(text(f"EXPLAIN {cleaned}"), dict(params or {}))
     return {"dialect": dialect, "plan": None, "text": "\n".join(" ".join(str(v) for v in r) for r in result)}
