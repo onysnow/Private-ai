@@ -154,11 +154,11 @@ function calmNow(): boolean {
 export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onReview, onPlan, planDrawer, sample: startSample = false}: {
   investigationId: string; runId: string | null; onBack?: () => void; sample?: boolean;
   /** Run again with new instructions: back to the plan with this run's question (research AI §5 "Run again"). */
-  onRunAgain?: (r: {question: string; module: string; theory: string | null; from?: {run_id: string; step: number}}) => void;
+  onRunAgain?: (r: {question: string; module: string; theory: string | null; refs?: {record_type: string; record_id: string}[]; from?: {run_id: string; step: number}}) => void;
   /** Step 4 of Ask the case: review this run's answer claim by claim. */
   onReview?: (candidateId: string) => void;
   /** Open (or close) the instructions and plan as a drawer inside this view (research AI §6), for this run's question. */
-  onPlan?: (r: {question: string; module: string; theory: string | null}) => void;
+  onPlan?: (r: {question: string; module: string; theory: string | null; refs?: {record_type: string; record_id: string}[]}) => void;
   /** The instructions and plan drawer, drawn at the left edge while open. */
   planDrawer?: ReactNode;
 }): ReactElement {
@@ -685,7 +685,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
       <button type="button" className="wr-pill" aria-pressed={calm} onClick={() => setCalm(c => !c)}>Calm</button>
       <button type="button" className="wr-pill" aria-pressed={log} onClick={() => setLog(l => !l)}>Log <kbd>L</kbd></button>
       {onPlan && run && !sample && <button type="button" className="wr-pill" aria-pressed={Boolean(planDrawer)}
-        onClick={() => onPlan({question: run.question, module: run.module, theory: run.working_theory ?? null})}>Instructions &amp; plan</button>}
+        onClick={() => onPlan({question: run.question, module: run.module, theory: run.working_theory ?? null, refs: run.record_refs})}>Instructions &amp; plan</button>}
       {onReview && candidateId && items.length > 0 && <button type="button" className={`wr-pill${waitingClaims && !reviewed ? ' ai' : ''}`} onClick={() => onReview(candidateId)}>
         Review{reviewed ? ` · ${words(candidate.data?.review_status)}` : waitingClaims ? ` · ${waitingClaims} wait` : ' · all decided'}</button>}
       {onBack &&<button type="button" className="wr-pill" onClick={onBack}>{sample && !realId ? 'Ask the case' : 'Back to the plan'}</button>}
@@ -868,7 +868,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
             {marked === 'to_check' ? '◉ To check' : '○ To check'}</button>}
           <button type="button" onClick={() => { void navigator.clipboard?.writeText(citation()); setCopied(true); }}>{copied ? 'Copied' : 'Copy cite'}</button>
           {onRunAgain && run && !sample && run.finished && <button type="button" title="Back to the plan with this question and the same packet, to change the instructions; the new run is a new record and this one is kept"
-            onClick={() => onRunAgain({question: run.question, module: run.module, theory: run.working_theory ?? null, from: focused ? {run_id: run.run_id, step: focused.n} : undefined})}>Run again from this step…</button>}
+            onClick={() => onRunAgain({question: run.question, module: run.module, theory: run.working_theory ?? null, refs: run.record_refs, from: focused ? {run_id: run.run_id, step: focused.n} : undefined})}>Run again from this step…</button>}
           {review.isError && <span role="alert" className="br-bad">{errorMessage(review.error, 'Not saved')}</span>}
           {mark.isError && <span role="alert" className="br-bad">{errorMessage(mark.error, 'Not saved')}</span>}
           <small>Accept and reject apply to the whole answer; {item ? 'Keep, Correct and Reject above decide this claim; ' : ''}To check marks this thought only.</small>

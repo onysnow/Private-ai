@@ -3,16 +3,17 @@
 //
 // Everything an LLM produces here lands as an AIAnalysisCandidate in a review
 // queue; nothing on this panel writes to canonical records. The panel only
-// (1) runs Case Synthesis / Hypothesis Test through the citation- and
-// schema-gated backend endpoints, (2) lists the resulting queue, (3) shows one
+// (1) hands a run (case synthesis, a theory test or a presentation draft) to
+// Before you run (Act › AI runs), where it is planned and started, (2) lists
+// the resulting queue, (3) shows one
 // candidate's claims with the exact citation ids it was checked against, and
 // (4) records the human accept/reject decision. Kept out of app/page.tsx so
 // the flow can be rendered and tested on its own (STRUCT-0015 remainder).
 import {useCallback,useEffect,useRef,useState} from 'react';
 import type {ChangeEvent,ReactElement} from 'react';
 
-import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,BackgroundJob,DeckStyle,JsonObject,JsonValue,PresentationStyleCatalog,VisualStyle} from '../lib/api-types';
-import {ApiPayloadError,isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isBackgroundJob,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
+import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,DeckStyle,JsonObject,JsonValue,PresentationStyleCatalog,VisualStyle} from '../lib/api-types';
+import {isAiAnalysisCandidate,isAiAnalysisCandidateReview,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
 import {ApiClient,ApiHttpError,errorMessage} from '../lib/api-client';
 import type {ChartRestyleOut} from '../lib/generated/types.gen';
 import {shortStamp} from '../lib/timestamps';
@@ -20,7 +21,6 @@ import {getAiAnalysisCandidateEndpoint,investigationVisualRestyle,listInvestigat
   promoteAiAnalysisCandidateToDeckEndpoint,promoteAiAnalysisCandidateToWriteupEndpoint,reviewAiAnalysisCandidateEndpoint} from '../lib/generated/sdk.gen';
 import type {ChartRestyleRequest} from '../lib/generated/types.gen';
 import {narrowed} from '../lib/narrow';
-import {describeJob,waitForJob} from '../lib/jobs';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
@@ -52,10 +52,6 @@ export function moduleCallable(status:AiReasoningStatus|null|undefined,module:Ai
   if(module==='presentation_draft')return status.authority_suite.modules.presentation_draft?.available!==false;
   return Boolean(status.endpoints_callable);
 }
-
-// Endpoint 422s carry a structured detail ({message, invalid_citations|schema_errors});
-// ApiHttpError flattens non-string details to JSON, which is what a reviewer needs to see.
-const runFailureMessage=(error:unknown):string=>errorMessage(error,'Reasoning run failed');
 
 const asObj=(v:JsonValue|undefined):JsonObject|null=>(typeof v==='object'&&v!==null&&!Array.isArray(v))?v:null;
 
@@ -114,7 +110,6 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   const [theory,setTheory]=useState('');
   const [maxResults,setMaxResults]=useState(30);
   const [includeLeads,setIncludeLeads]=useState(true);
-  const [running,setRunning]=useState(false);
   const [runStatus,setRunStatus]=useState('');
   const [filter,setFilter]=useState<'all'|'proposed'|'accepted'|'rejected'>('all');
   const [queue,setQueue]=useState<AiAnalysisCandidateSummary[]>([]);
@@ -211,42 +206,18 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
     catch(error){setSelected(null);setReviewStatus(errorMessage(error,'Could not load the candidate'))}
   };
 
-  // A run is a background job (Foundation Fixes fix 4). In developer mode the
-  // answer already holds the result; in the Docker stack it is 202 with the
-  // job, and the result (or the error the endpoint would have given) arrives
-  // on the finished job.
-  const startRun=async(endpoint:string,body:unknown)=>{
-    const raw=await api.unknown(endpoint,{method:'POST',body});
-    if(isAiReasoningRunResult(raw))return raw;
-    const job=typeof raw==='object'&&raw!==null&&'job' in raw&&isBackgroundJob((raw as {job:unknown}).job)?(raw as {job:BackgroundJob}).job:null;
-    if(!job)throw new ApiPayloadError(endpoint,'reasoning result has an unexpected shape');
-    setRunStatus('Queued. The model runs in the background; you can keep working.');
-    const done=await waitForJob(api,job.id,j=>setRunStatus(`Running in the background: ${describeJob(j)}`),{intervalMs:2000});
-    if(done.status==='succeeded'&&isAiReasoningRunResult(done.result))return done.result;
-    const failure=(typeof done.result==='object'&&done.result!==null?done.result:{}) as {status_code?:number,detail?:unknown};
-    const detail=typeof failure.detail==='string'?failure.detail:failure.detail!==undefined?JSON.stringify(failure.detail):describeJob(done);
-    throw new ApiHttpError(endpoint,failure.status_code??500,detail);
-  };
-
-  const run=async()=>{
+  const run=()=>{
     if(!investigationId)return;
+    // Every run goes through Before you run (Act › AI runs): the plan, the settings and what leaves the computer are
+    // seen before anything is sent. Nothing runs from here. A draft takes its goal and the records picked here.
     if(module==='presentation_draft'){
       if(!goal.trim()||selectedRefs.length===0)return;
-      setRunning(true);setRunStatus('Running… the model output is validated against the picked evidence before it can be reviewed.');
-      try{
-        const body={goal:goal.trim(),record_refs:selectedRefs.map(({record_type,record_id})=>({record_type,record_id}))};
-        const result=await startRun(`/api/investigations/${investigationId}/assistant/presentation-draft`,body);
-        setRunStatus(`Proposed for review (candidate ${result.candidate_id}). Nothing has been written to the investigation.`);
-        await loadQueue();
-        await open(result.candidate_id);
-      }catch(error){setRunStatus(runFailureMessage(error));await loadQueue()}
-      finally{setRunning(false)}
+      setRunStatus('');
+      askBeforeYouRun(investigationId,{module,question:goal.trim(),theory:'',refs:selectedRefs});
       return;
     }
     if(!question.trim())return;
     if(module==='hypothesis_test'&&!theory.trim()){setRunStatus('A working theory is required for a hypothesis test.');return}
-    // Case synthesis and theory tests go through Before you run (Act › AI runs): the plan, the settings and what
-    // leaves the computer are seen before anything is sent. Nothing runs from here.
     if(module!=='case_synthesis'&&module!=='hypothesis_test')return;
     setRunStatus('');
     askBeforeYouRun(investigationId,{module,question:question.trim(),theory:module==='hypothesis_test'?theory.trim():'',maxResults,includeLeads});
@@ -297,18 +268,18 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
     <p className="muted text-sm" data-testid="ai-status">{describeAiStatus(status)}</p></CardHeader><CardContent>
     {!investigationId?<p className="muted">Select an investigation to run or review AI analysis.</p>:<>
       <div className="searchrow">
-        <Select value={module} onValueChange={(v:string)=>setModule(v as AiModuleName)} disabled={!anyCallable||running}><SelectTrigger aria-label="Reasoning module" className="w-auto"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="case_synthesis">Case synthesis</SelectItem><SelectItem value="hypothesis_test">Hypothesis test</SelectItem><SelectItem value="presentation_draft">Presentation draft</SelectItem></SelectContent></Select>
+        <Select value={module} onValueChange={(v:string)=>setModule(v as AiModuleName)} disabled={!anyCallable}><SelectTrigger aria-label="Reasoning module" className="w-auto"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="case_synthesis">Case synthesis</SelectItem><SelectItem value="hypothesis_test">Hypothesis test</SelectItem><SelectItem value="presentation_draft">Presentation draft</SelectItem></SelectContent></Select>
         {module!=='presentation_draft'&&<>
-          <Input aria-label="Question" value={question} onChange={(e:ChangeEvent<HTMLInputElement>)=>setQuestion(e.target.value)} placeholder="What does the evidence establish about …?" disabled={!callable||running} className="min-w-[12rem] flex-1"/>
-          <Input aria-label="Max retrieval results" type="number" min={1} max={100} value={maxResults} onChange={(e:ChangeEvent<HTMLInputElement>)=>setMaxResults(Math.min(100,Math.max(1,Number(e.target.value)||30)))} className="w-20" style={{flex:'0 0 5rem',width:'5rem',minWidth:0}} disabled={!callable||running}/>
-          <label className="muted flex items-center gap-1.5 text-sm" style={{whiteSpace:'nowrap'}}><input type="checkbox" className="accent-[hsl(var(--primary))]" style={{flex:'none'}} checked={includeLeads} onChange={(e:ChangeEvent<HTMLInputElement>)=>setIncludeLeads(e.target.checked)} disabled={!callable||running}/> include external leads</label>
+          <Input aria-label="Question" value={question} onChange={(e:ChangeEvent<HTMLInputElement>)=>setQuestion(e.target.value)} placeholder="What does the evidence establish about …?" disabled={!callable} className="min-w-[12rem] flex-1"/>
+          <Input aria-label="Max retrieval results" type="number" min={1} max={100} value={maxResults} onChange={(e:ChangeEvent<HTMLInputElement>)=>setMaxResults(Math.min(100,Math.max(1,Number(e.target.value)||30)))} className="w-20" style={{flex:'0 0 5rem',width:'5rem',minWidth:0}} disabled={!callable}/>
+          <label className="muted flex items-center gap-1.5 text-sm" style={{whiteSpace:'nowrap'}}><input type="checkbox" className="accent-[hsl(var(--primary))]" style={{flex:'none'}} checked={includeLeads} onChange={(e:ChangeEvent<HTMLInputElement>)=>setIncludeLeads(e.target.checked)} disabled={!callable}/> include external leads</label>
         </>}
-        <Button onClick={run} disabled={!callable||running||(module==='presentation_draft'?(!goal.trim()||selectedRefs.length===0):!question.trim())}>{running?'Running…':'Run module'}</Button>
+        <Button onClick={run} disabled={!callable||(module==='presentation_draft'?(!goal.trim()||selectedRefs.length===0):!question.trim())}>Run module</Button>
       </div>
-      {module==='hypothesis_test'&&<Textarea className="mt-3" aria-label="Working theory" value={theory} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setTheory(e.target.value)} placeholder="The working theory to test against the evidence (required for a hypothesis test)." disabled={!callable||running}/>}
+      {module==='hypothesis_test'&&<Textarea className="mt-3" aria-label="Working theory" value={theory} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setTheory(e.target.value)} placeholder="The working theory to test against the evidence (required for a hypothesis test)." disabled={!callable}/>}
       {module==='presentation_draft'&&<div className="mt-3 space-y-3">
-        <Textarea aria-label="Goal" value={goal} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setGoal(e.target.value)} rows={2} placeholder="What should this brief or deck accomplish? e.g. “Brief my editor on what we can and can’t say about the Bellcastle payment.”" disabled={!callable||running}/>
-        <RecordPicker investigationId={investigationId} selected={selectedRefs} onChange={setSelectedRefs} disabled={!callable||running}/>
+        <Textarea aria-label="Goal" value={goal} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setGoal(e.target.value)} rows={2} placeholder="What should this brief or deck accomplish? e.g. “Brief my editor on what we can and can’t say about the Bellcastle payment.”" disabled={!callable}/>
+        <RecordPicker investigationId={investigationId} selected={selectedRefs} onChange={setSelectedRefs} disabled={!callable}/>
       </div>}
       {runStatus&&<p className="muted" data-testid="ai-run-status">{runStatus}</p>}
       <div className="twocol" style={isPresentationDraft?{gridTemplateColumns:'minmax(220px,0.55fr) minmax(0,2fr)'}:undefined}>

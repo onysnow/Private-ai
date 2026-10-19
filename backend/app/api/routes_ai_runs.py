@@ -77,6 +77,9 @@ def serialize_run(db: Session, job: BackgroundJob) -> dict[str, Any]:
         "message": job.message, "error": job.error,
         # How the suite service routed it (app/ai/suite.py), and the accepted answer it started from, if any.
         "route": run_route(payload.get("module") or ""), "handoff_from": payload.get("handoff_from"),
+        # The records a presentation draft was asked to draft from, so Run again can plan it with the same ones.
+        "record_refs": [{"record_type": str(r.get("record_type")), "record_id": str(r.get("record_id"))}
+                        for r in payload.get("record_refs") or [] if isinstance(r, dict)],
     }
 
 

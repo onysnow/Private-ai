@@ -44,6 +44,8 @@ from app.api.routes_case_home import router as case_home_router
 from app.api.routes_suite import router as suite_router
 from app.api.routes_demo import router as demo_router
 from app.api.routes_catalogue import router as catalogue_router
+from app.api.routes_learning import router as learning_router
+from app.api.routes_safety import router as safety_router
 from app.api.routes_table_mappings import router as table_mappings_router
 from app.api.routes_basemap import router as basemap_router
 from app.api.routes_places import router as places_router
@@ -108,6 +110,8 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(suite_router)
     app.include_router(demo_router)
     app.include_router(catalogue_router)
+    app.include_router(learning_router)
+    app.include_router(safety_router)
     app.include_router(table_mappings_router)
     app.include_router(basemap_router)
     app.include_router(places_router)

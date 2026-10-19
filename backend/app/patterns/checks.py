@@ -20,6 +20,11 @@ A third kind is added by a person, not called for by the records:
   black hole, round trip) a person chose to keep in To check from See › Money.
   It holds the check's numbers as they were when added; a recompute never marks
   it gone, because no rule asked for it.
+- **link**: a link in a chain that has no reviewed source yet (or whose sources
+  disagree), added by a person from The Wire's "How is X linked to Y?" strip
+  ("Add to To check →", research §2.6). It asks for a reviewed source for the
+  link, names the link's two parties and keeps the link's id (``record_id``) so
+  the item opens it in The Wire. Like a money check, a recompute leaves it alone.
 
 Check specs live in catalogue/detection/checks/*.yaml. The words are matched
 in Python, whole words and phrases, ignoring case, so the same search runs on
@@ -39,7 +44,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.time import utcnow_naive
-from app.models.domain import CheckItem, Document, DocumentChunk, Entity, PatternFlag
+from app.models.domain import CheckItem, Document, DocumentChunk, Entity, PatternFlag, RelationshipEdge
 
 ROOT = Path(__file__).resolve().parents[3] / "catalogue" / "detection" / "checks"
 STATUSES = ("open", "shows", "does_not", "unclear")
@@ -48,6 +53,10 @@ MISSING_STATUSES = ("open", "chasing", "unknowable", "not_needed")
 # The money checks a person can keep in To check, with the line each card reads (mockup SEE_2).
 MONEY_KINDS = {"grey_hole": ("Grey hole", "more out than in"), "miracle": ("Miracle", "out with nothing in"),
                "black_hole": ("Black hole", "in with nothing out"), "round_trip": ("Round trip", "money back to where it started")}
+# Items a person adds, not called for by the records: a recompute never marks them gone.
+PERSON_KEPT = ("money", "link")
+LINK_INDICATOR = "link"
+LINK_NAME = "Weak link"
 EXCERPT = 160  # characters either side of the first word found
 
 
@@ -195,9 +204,9 @@ def recompute(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] |
     for are marked gone (decisions kept), ones that come back lose the mark."""
     wanted = _wanted(db, investigation_id, load() if specs is None else specs)
     now = utcnow_naive()
-    # A money check is kept by a person, not called for by the records: a recompute leaves it as it is.
+    # A money check or a link is kept by a person, not called for by the records: a recompute leaves it as it is.
     existing = {c.fingerprint: c for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id,
-                                                                              CheckItem.kind != "money"))}
+                                                                              CheckItem.kind.notin_(PERSON_KEPT)))}
     for fp, fields in wanted.items():
         row = existing.get(fp)
         if row is None:
@@ -217,7 +226,7 @@ def up_to_date(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] 
     screen that finds them behind runs the rules (POST .../red-flags/run), which recomputes them."""
     wanted = _wanted(db, investigation_id, load() if specs is None else specs)
     existing = {c.fingerprint: c for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id,
-                                                                              CheckItem.kind != "money"))}
+                                                                              CheckItem.kind.notin_(PERSON_KEPT)))}
     for fp, fields in wanted.items():
         row = existing.get(fp)
         if row is None or row.gone_at is not None or any(getattr(row, key) != value for key, value in fields.items()):
@@ -276,6 +285,55 @@ def add_money_check(db: Session, investigation_id: str, currency: str, kind: str
     return row
 
 
+# A link's verb when it has no role of its own, as The Wire's chain strip words it (link-drawer.tsx stepVerb).
+LINK_VERBS = {"Directorship": "director of", "Payment": "paid", "Employment": "works for", "Membership": "member of",
+              "Family": "family", "Associate": "associate"}
+
+
+def link_fingerprint(relationship_id: str) -> str:
+    return _fp("link", relationship_id)
+
+
+def link_verb(schema: str, props: dict[str, Any]) -> str:
+    """The verb on a link: its role (or purpose, or summary) first, else its kind."""
+    def first(*names: str) -> str:
+        for name in names:
+            for value in props.get(name) or []:
+                if str(value).strip():
+                    return str(value).strip()
+        return ""
+    role = first("role", "purpose", "summary")
+    if role:
+        return role[:28]
+    if schema == "Ownership":
+        pct = first("percentage").rstrip("%")
+        return f"owns {pct}%" if pct else "owns"
+    return LINK_VERBS.get(schema, "linked to")
+
+
+def add_link_check(db: Session, edge: RelationshipEdge) -> CheckItem:
+    """Keeps a link that has no reviewed source yet in To check, once: "Find a reviewed source for: M. Ross signs
+    for Harbour Nominees", on the link's two parties. A second add returns the same item, whatever its answer."""
+    fp = link_fingerprint(edge.id)
+    row = db.scalar(select(CheckItem).where(CheckItem.investigation_id == edge.investigation_id, CheckItem.fingerprint == fp))
+    if row is not None:
+        return row
+    ends = {e.id: e for e in db.scalars(select(Entity).where(Entity.id.in_({edge.source_entity_id, edge.target_entity_id,
+                                                                            edge.relationship_entity_id})))}
+    link = ends.get(edge.relationship_entity_id)
+
+    def name(eid: str) -> str:
+        return (ends[eid].caption or eid) if eid in ends else eid
+    verb = link_verb(edge.schema, (link.properties if link else None) or {})
+    row = CheckItem(investigation_id=edge.investigation_id, fingerprint=fp, kind="link", indicator_id=LINK_INDICATOR, status="open",
+                    question=f"Find a reviewed source for: {name(edge.source_entity_id)} {verb} {name(edge.target_entity_id)}",
+                    parties=[edge.source_entity_id, edge.target_entity_id], terms=[], locator=edge.schema,
+                    record_type="relationship", record_id=edge.id, first_seen_at=utcnow_naive())
+    db.add(row)
+    db.commit()
+    return row
+
+
 def decide(db: Session, row: CheckItem, status: str, note: str | None) -> None:
     allowed = MISSING_STATUSES if row.kind == "missing" else STATUSES
     if status not in allowed:
@@ -329,6 +387,7 @@ def serialize(row: CheckItem, names: dict[str, tuple[str, str]], indicator_names
         "document": None if row.document_id is None else {"id": row.document_id, "filename": documents.get(row.document_id, row.document_id)},
         "locator": row.locator, "excerpt": row.excerpt, "terms": list(row.terms or []),
         "first_seen_at": row.first_seen_at, "gone_at": row.gone_at,
+        "relationship_id": row.record_id if row.kind == "link" else None,
     }
 
 
@@ -345,7 +404,7 @@ def items(db: Session, investigation_id: str) -> dict[str, Any]:
         for p in f.parties:
             flags_on_parties.setdefault(p, []).append(f.id)
     indicator_names = {r.indicator_id: MONEY_KINDS[r.indicator_id][0] if r.kind == "money" and r.indicator_id in MONEY_KINDS
-                       else _name(r.indicator_id) for r in rows if r.kind != "missing"}
+                       else LINK_NAME if r.kind == "link" else _name(r.indicator_id) for r in rows if r.kind != "missing"}
     order = {"open": 0, "unclear": 1, "chasing": 1, "shows": 2, "does_not": 3}
     missing = sorted((r for r in rows if r.kind == "missing" and r.gone_at is None), key=lambda r: (order.get(r.status, 9), r.indicator_id, r.first_seen_at))
     rows = [r for r in rows if r.kind != "missing"]

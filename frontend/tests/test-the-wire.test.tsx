@@ -137,14 +137,15 @@ describe('The Wire', () => {
     // The flag badge gives the level in words with the count.
     expect(map.textContent).toContain('TEXTBOOK · 2');
     expect(screen.getByLabelText('Key').textContent).toMatch(/How sure.*always on.*shown.*not yet shown.*disputed.*worked out by the app.*ended, drawn faint/);
-    expect(document.querySelector('.tw-counts')?.textContent).toBe('Showing all 4 links · 1 ended, drawn faint · 1 undated, always shown');
+    expect(document.querySelector('.tw-counts')?.textContent).toMatch(/^Showing all 4 links · 1 ended, drawn faint · 1 undated, always shown/);
   });
 
   it('shows the active filters as chips that clear', async () => {
     mockApi({'GET /api/investigations/inv-1/wire': SEE1, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH});
     document.documentElement.dataset.motion = 'calm';
     render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
-    // Calm: the Wire goes straight down to the most-flagged party, with no flight.
+    // Around a party, from the switch: Calm goes straight there, with no flight.
+    fireEvent.click(await screen.findByRole('radio', {name: 'Around a party'}));
     const chip = await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
     const end = document.querySelectorAll<SVGGElement>('.tw-tsvg .handle')[1];
     fireEvent.keyDown(end, {key: 'ArrowLeft'});
@@ -160,13 +161,177 @@ describe('The Wire', () => {
     mockApi({'GET /api/investigations/inv-1/wire': SEE1, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH});
     document.documentElement.dataset.motion = 'calm';
     render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    fireEvent.click(await screen.findByRole('radio', {name: 'Around a party'}));
     await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
     await waitFor(() => expect([...document.querySelectorAll<SVGGElement>('.elab')].some(g => g.style.display !== 'none')).toBe(true));
     fireEvent.keyDown(window, {key: 'j'});
     const lit = document.querySelector('.elab.lit');
     expect(lit).not.toBeNull();
     expect(document.querySelector('.tw-tip')?.textContent).toMatch(/Enter opens every record on this link/);
+    // J / K open the link in the detail panel too ("Link · 1 of n").
+    expect((await screen.findByRole('complementary', {name: 'The link'})).textContent).toMatch(/Link · 1 of \d/);
     fireEvent.keyDown(window, {key: 'Enter'});
     await waitFor(() => expect(document.querySelector('.tw-alttitle')?.textContent).toBe('one link, opened'));
+    expect(screen.queryByRole('complementary', {name: 'The link'})).toBeNull();
+  });
+
+  it('offers five arrangements, says why one was chosen, previews one while pointed at and keeps one when clicked', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    mockApi({'GET /api/investigations/inv-1/wire': SEE1, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH});
+    document.documentElement.dataset.motion = 'calm';
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const group = await screen.findByRole('radiogroup', {name: 'Arrangement'});
+    expect([...group.querySelectorAll('[role=radio]')].map(b => b.textContent)).toEqual(['Who controls whom', 'Around a party', 'By kind', 'Linked groups', 'Grid']);
+    // Two of the four links say who owns or directs whom: the shared rule picks control and says so.
+    await waitFor(() => expect(screen.getByRole('radio', {name: 'Who controls whom'})).toHaveAttribute('aria-checked', 'true'));
+    expect(document.querySelector('.tw-chosen')?.textContent).toBe('Chosen because 2 of the 4 links here say who owns or directs whom.');
+    // Its guides are labelled like SEE_1's levels.
+    expect(document.querySelector('.tw-sec')?.textContent).toMatch(/Top of the chain/);
+    // Pointing at By kind previews it, faded; leaving brings control back.
+    const root = document.querySelector('.tw')!;
+    fireEvent.mouseEnter(screen.getByRole('radio', {name: 'By kind'}));
+    await vi.advanceTimersByTimeAsync(200);
+    expect(root.classList.contains('tw-peeking')).toBe(true);
+    expect(document.querySelector('.tw-chosen')?.textContent).toMatch(/^Preview: By kind/);
+    expect(screen.getByRole('radio', {name: 'Who controls whom'})).toHaveAttribute('aria-checked', 'true');
+    fireEvent.mouseLeave(group);
+    expect(root.classList.contains('tw-peeking')).toBe(false);
+    expect(document.querySelector('.tw-sec')?.textContent).toMatch(/Top of the chain/);
+    // Scrolling over the switch steps the preview.
+    fireEvent.wheel(group, {deltaY: 100});
+    expect(screen.getByRole('radio', {name: 'Around a party'}).classList.contains('peek')).toBe(true);
+    fireEvent.mouseLeave(group);
+    // Clicked, it stays, and the line gives that arrangement's rule.
+    fireEvent.click(screen.getByRole('radio', {name: 'By kind'}));
+    expect(screen.getByRole('radio', {name: 'By kind'})).toHaveAttribute('aria-checked', 'true');
+    expect(document.querySelector('.tw-chosen')?.textContent).toMatch(/^Arranged by kind:/);
+    expect(document.querySelector('.tw-sec')?.textContent).toMatch(/People.*Companies|Companies.*People/);
+    // Arrow keys move along the radio group; Grid draws the same links as a matrix.
+    fireEvent.keyDown(screen.getByRole('radio', {name: 'By kind'}), {key: 'End'});
+    expect(await screen.findByLabelText('Grid: one row and one column per party')).toBeInTheDocument();
+    expect(screen.getByRole('radio', {name: 'Grid'})).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(screen.getByRole('radio', {name: 'Linked groups'}));
+    await waitFor(() => expect(screen.queryByLabelText('Grid: one row and one column per party')).toBeNull());
+    vi.useRealTimers();
+  });
+
+  it('draws a link the app worked out dotted with ƒ, and its panel says which rule and links it came from', async () => {
+    const worked = {...SEE1, worked_out: [{id: 'worked:l:f', s: 'l', t: 'f', schema: 'Ownership', fam: 'owns', pct: '', share_unknown_because: 'the ownership runs in a circle, so the shares cannot be added up',
+      rule: 'indirect_ownership', rule_name: 'Indirect ownership', rule_text: 'The percentages multiplied along each path.', inputs: ['o1'], paths: 1, steps: 2, via: ['k'], flag_id: null}]};
+    mockApi({'GET /api/investigations/inv-1/wire': worked, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH,
+      'GET /api/investigations/inv-1/paths': {from_id: 'l', to_id: 'k', max_len: 4, total: 0, truncated: false, chains: []}});
+    document.documentElement.dataset.motion = 'calm';
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    await waitFor(() => expect(map.querySelector('.strand.s-worked')).not.toBeNull());
+    expect(map.querySelector('.strand.s-worked')?.getAttribute('stroke-dasharray')).toBe('1.5 4');
+    const label = [...map.querySelectorAll<SVGGElement>('.elab.s-worked')][0];
+    expect(label.querySelector('text')?.textContent).toBe('ƒ owns a share not known · worked out');
+    expect(document.querySelector('.tw-counts')?.textContent).toMatch(/1 worked out by the app \(ƒ\), never stored/);
+    fireEvent.click(label);
+    const panel = await screen.findByRole('complementary', {name: 'The link'});
+    expect(panel.textContent).toMatch(/Worked out by the app/);
+    expect(panel.textContent).toMatch(/ƒ Worked out by the app never stored as a reviewed fact/);
+    expect(panel.textContent).toMatch(/from the rule Indirect ownership/);
+    expect(panel.textContent).toMatch(/The share is not known: the ownership runs in a circle/);
+    expect(screen.getByRole('button', {name: 'Loop Two BV owns 100% Kestrel SA'})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Open the source'})).toBeNull();
+    // How is Loop Two linked to the case's subject: no chain of up to 4, try 6.
+    expect(await screen.findByText(/No chain of up to 4 links joins them/)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Try 6'})).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(screen.queryByRole('complementary', {name: 'The link'})).toBeNull());
+  });
+
+  it('opens a link in the panel with the page and the words lit, its sources, its Red Flag and how two parties are linked', async () => {
+    vi.stubGlobal('URL', Object.assign(URL, {createObjectURL: vi.fn(() => 'blob:page'), revokeObjectURL: vi.fn()}));
+    const quote = {doc: 'Luxembourg business register', loc: 'RCS B204417 p.1', q: 'Harbour Nominees Ltd appointed director', evidence_id: 'ev-1', document_id: 'doc-1', page: 2, pdf: true};
+    const flag = {flag_id: 'f9', id: 'BO-001', level: 'textbook', name: 'Circular ownership', text: '', path: 'Kestrel SA → Loop Two BV → Kestrel SA', innocent: 'Group cross-holdings'};
+    const data = {...SEE1, links: SEE1.links.map(l => (l.id === 'o1' ? {...l, ev: [quote], flags: [flag]} : l))};
+    const api = mockApi({'GET /api/investigations/inv-1/wire': data, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH,
+      'GET /api/documents/doc-1/page-image': 'png',
+      'GET /api/investigations/inv-1/paths': {from_id: 'l', to_id: 'k', max_len: 4, total: 2, truncated: false, chains: [
+        {parties: [{id: 'l', name: 'Loop Two BV'}, {id: 'r', name: 'M. Ross'}, {id: 'k', name: 'Kestrel SA'}],
+          links: [{id: 'x9', schema: 'UnknownLink', from: 'r', to: 'l', certainty: 'supported'}, {id: 'u1', schema: 'UnknownLink', from: 'r', to: 'k', certainty: 'unsupported'}], weakest: 'unsupported'},
+        {parties: [{id: 'l', name: 'Loop Two BV'}, {id: 'k', name: 'Kestrel SA'}], links: [{id: 'o1', schema: 'Ownership', from: 'l', to: 'k', certainty: 'supported'}], weakest: 'supported'},
+      ]},
+      'GET /api/investigations/inv-1/checks': {investigation_id: 'inv-1', items: [], gone: [], missing: []},
+      'POST /api/relationships/u1/to-check': {investigation_id: 'inv-1', gone: [], missing: [], items: [{id: 'c-9', indicator_id: 'link', indicator_name: 'Weak link', kind: 'link', question: 'Find a reviewed source for: M. Ross signs for Kestrel SA',
+        status: 'open', note: null, decided_at: null, parties: [{id: 'r', name: 'M. Ross', schema: 'Person'}, {id: 'k', name: 'Kestrel SA', schema: 'Company'}],
+        flag_id: null, related_flags: [], document: null, locator: 'UnknownLink', excerpt: null, terms: [], first_seen_at: '2026-10-10T00:00:00', gone_at: null,
+        relationship_id: 'u1'}]}});
+    const openDocument = vi.fn();
+    const openFlag = vi.fn();
+    useWorkbenchStore.setState({openDocument, openFlag});
+    document.documentElement.dataset.motion = 'calm';
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    const owns = () => [...map.querySelectorAll('.elab')].find(g => g.querySelector('text')?.textContent === '✓ owns 100% since 2016');
+    await waitFor(() => expect(owns()).toBeDefined());
+    fireEvent.click(owns()!);
+    const panel = await screen.findByRole('complementary', {name: 'The link'});
+    expect(panel.querySelector('h2')?.textContent).toBe('Loop Two BV owns 100% of Kestrel SA, since 1 Feb 2016');
+    expect(panel.textContent).toMatch(/✓ Shown/);
+    expect(panel.textContent).toMatch(/1 source agrees/);
+    // The page, drawn by the API with the quoted words lit.
+    expect(await screen.findByRole('img', {name: 'Luxembourg business register, page 2, the quoted words lit'})).toBeInTheDocument();
+    expect(api.lastUrl('GET /api/documents/doc-1/page-image').searchParams.get('highlight')).toBe('Harbour Nominees Ltd appointed director');
+    expect(panel.querySelector('.tw-sources')?.textContent).toBe('Luxembourg business register · RCS B204417 p.1 · p.2');
+    fireEvent.click(screen.getByRole('button', {name: 'Open the source'}));
+    expect(openDocument).toHaveBeenCalledWith('doc-1', 2);
+    // Its Red Flag, with the innocent explanation visible.
+    expect(panel.textContent).toMatch(/Part of a Red Flag.*Circular ownership.*Could be innocent: Group cross-holdings/);
+    // How is Loop Two linked to Kestrel SA: strongest chain first, "1 more chain".
+    expect(await screen.findByText('Every link shown')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: '1 more chain'}));
+    expect(screen.getByText(/The chain breaks at “signs for”: no reviewed source yet\./)).toBeInTheDocument();
+    expect(screen.getByText(/Rests on 1 unshown link/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: 'Add to To check →'}));
+    expect(await screen.findByText('Added to To check ✓')).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: 'Open To check →'})).toHaveAttribute('href', '/check?inv=inv-1#to-check');
+    expect(api.calls('POST /api/relationships/u1/to-check')).toHaveLength(1);
+    expect(api.calls('POST /api/relationships/u1/lead-from-context')).toHaveLength(0);
+    // Pointing at a chain lights its links on the map.
+    fireEvent.mouseEnter(screen.getByRole('listitem', {name: /Chain 2: Rests on 1 unshown link/}));
+    expect(document.querySelector('.tw')?.classList.contains('chain-on')).toBe(true);
+    expect(map.querySelector('g.chain-lit .strand.s-unshown')).not.toBeNull();
+  });
+
+  it('opens the link the address asks for (?link=, from To check or Decide) and then drops it from the address', async () => {
+    mockApi({'GET /api/investigations/inv-1/wire': SEE1, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH});
+    document.documentElement.dataset.motion = 'calm';
+    window.history.replaceState(null, '', '/see?link=o1&inv=inv-1#the-wire');
+    try {
+      render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+      const panel = await screen.findByRole('complementary', {name: 'The link'});
+      expect(panel.querySelector('h2')?.textContent).toMatch(/^Loop Two BV owns 100% of Kestrel SA/);
+      expect(window.location.search).toBe('?inv=inv-1');
+      expect(window.location.hash).toBe('#the-wire');
+    } finally { window.history.replaceState(null, '', '/'); }
+  });
+
+  it('draws a link that would cross the whole map as two lettered stubs; pointing at one lights both and the whole line', async () => {
+    const far = {investigation_id: 'inv-1', entities: [ent('a', 'Far West Ltd', {x: 120, y: 120}), ent('b', 'Far East Ltd', {x: 2280, y: 1380}),
+      ent('c', 'Middle Ltd', {x: 1200, y: 760}), ent('d', 'Near Middle Ltd', {x: 1260, y: 800})],
+    links: [{id: 'p1', s: 'a', t: 'b', schema: 'Payment', fam: 'money', amount: 5000, cur: 'EUR', date: '2019-01-01', role: '', pct: '', ev: []},
+      {id: 'p2', s: 'c', t: 'd', schema: 'Payment', fam: 'money', amount: 100, cur: 'EUR', date: '2019-01-02', role: '', pct: '', ev: []}], events: []};
+    mockApi({'GET /api/investigations/inv-1/wire': far});
+    document.documentElement.dataset.motion = 'calm';
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    // No link says who controls whom and every party is a company: Linked groups, the whole map.
+    fireEvent.click(await screen.findByRole('radio', {name: 'Linked groups'}));
+    await waitFor(() => expect([...map.querySelectorAll<SVGGElement>('.stub')].filter(g => g.style.display !== 'none')).toHaveLength(1));
+    const stub = [...map.querySelectorAll<SVGGElement>('.stub')].find(g => g.style.display !== 'none')!;
+    expect([...stub.querySelectorAll('text')].map(t => t.textContent)).toEqual(['A', 'A']);
+    expect(stub.getAttribute('aria-label')).toMatch(/^A: Far West Ltd to Far East Ltd/);
+    const line = map.querySelector('g.stubbed')!;
+    expect(line.querySelector('.strand')?.getAttribute('d')?.match(/M/g)).toHaveLength(2);
+    fireEvent.mouseEnter(stub);
+    expect(line.classList.contains('stub-lit')).toBe(true);
+    expect(stub.classList.contains('lit')).toBe(true);
+    expect(line.querySelector('.ghost')?.getAttribute('d')).toMatch(/Q/);
+    fireEvent.mouseLeave(stub);
+    expect(line.classList.contains('stub-lit')).toBe(false);
   });
 });

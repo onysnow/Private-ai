@@ -25,11 +25,13 @@ from typing import Sequence
 
 from app.connectors.base import ExternalFinding
 from app.connectors.registry import registry
+from app.core.config import settings
 from app.core.time import utcnow_naive
 from app.models.domain import (
     ConnectorFinding, ConnectorRun, Entity, Investigation, Lead, LeadProfile, LeadWorkflowEvent,
 )
 from app.schemas.api import ConnectorSearchRequest
+from app.services import outbound
 
 
 def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id: str, provider: str, findings: Sequence[ExternalFinding]) -> list[ConnectorFinding]:
@@ -88,6 +90,14 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
     connector = registry.get(provider)
     if connector is None:
         raise HTTPException(404, "Connector not found")
+    # The case's mode for this service, then the outbound log, before anything is sent (app/services/outbound.py).
+    try:
+        outbound.require_allowed(db, body.investigation_id, provider, settings)
+    except outbound.ServiceRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    if outbound.connector_will_send(connector):
+        outbound.record(db, body.investigation_id, provider, kind="lookup", value=body.query, value_kind="search text",
+                        reason="lookup")
     run = ConnectorRun(investigation_id=body.investigation_id, provider=provider, query=body.query)
     db.add(run); db.commit(); db.refresh(run)
     run_id = run.id
@@ -107,6 +117,15 @@ async def enrich_entity(provider: str, entity: Entity, db: Session) -> Any:
     connector = registry.get(provider)
     if connector is None:
         raise HTTPException(404, "Connector not found")
+    try:
+        outbound.require_allowed(db, entity.investigation_id, provider, settings)
+    except outbound.ServiceRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    sent_entity = {"id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption, "properties": entity.properties or {}}
+    if outbound.connector_will_send(connector):
+        value, value_kind = outbound.enrichment_value(connector, sent_entity)
+        outbound.record(db, entity.investigation_id, provider, kind="lookup", value=value, value_kind=value_kind,
+                        reason=f"enrich {entity.caption}")
     query_label = f"entity:{entity.ftm_id or entity.id}"
     run = ConnectorRun(
         investigation_id=entity.investigation_id, provider=provider, query=query_label,

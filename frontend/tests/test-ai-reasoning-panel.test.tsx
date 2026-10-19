@@ -20,7 +20,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.mocked(askBeforeYouRun).mockClear();
 });
-// "Run module" for case synthesis and theory tests hands over to Before you run (features/ai/before-you-run.tsx).
+// "Run module" hands every run over to Before you run (features/ai/before-you-run.tsx): case synthesis, theory tests and
+// presentation drafts.
 vi.mock('../features/ai/before-you-run', () => ({askBeforeYouRun: vi.fn()}));
 
 const readyStatus: AiReasoningStatus = {
@@ -196,73 +197,35 @@ describe('AiReasoningPanel', () => {
     expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
-  // A presentation draft still runs from here (Before you run plans case synthesis and theory tests only).
+  // A presentation draft goes to Before you run too, with its goal and the records picked here.
   const searchHit = {results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}, kind: 'claim_event'}],
     query: 'Bellcastle', investigation_id: 'inv-1', total: 1, returned: 1, counts: {claim: 1}, group_counts: {reporting: 1}};
-  const runDraft = async (user: ReturnType<typeof userEvent.setup>) => {
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+  const pickDraft = async (user: ReturnType<typeof userEvent.setup>) => {
     screen.getByLabelText('Reasoning module').focus();
     await user.keyboard('{ArrowDown}{ArrowDown}');
     await user.click(await screen.findByRole('option', {name: 'Presentation draft'}));
     await user.type(screen.getByLabelText('Goal'), 'Summarize the Bellcastle payment.');
     await user.type(screen.getByLabelText('Search records to add'), 'Bellcastle');
     await user.click(within(screen.getByTestId('presentation-record-picker')).getByRole('button', {name: 'Search'}));
+    // A claim hit is labelled by its own text, not search's generic "Claim" title.
     await user.click(await screen.findByRole('button', {name: 'Add Claim: Meridian paid Bellcastle $2.4M'}));
-    await user.click(screen.getByRole('button', {name: 'Run module'}));
+    expect(screen.getByTestId('selected-count')).toHaveTextContent('Selected evidence · 1');
   };
 
-  it('follows a queued run in the background and opens its candidate when the job finishes', async () => {
+  it('sends a presentation draft to Before you run with its goal and the picked records, and runs nothing', async () => {
     const user = userEvent.setup();
-    const job = {id: 'job-7', kind: 'ai_reasoning', investigation_id: 'inv-1', subject_type: 'ai_run', subject_id: null,
-      status: 'queued', finished: false, progress: null, message: 'Waiting for the model', error: null, attempts: 0, runner: 'procrastinate', result: null};
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(jsonResponse({candidates: []})) // initial queue
-      .mockResolvedValueOnce(jsonResponse(searchHit)) // GET /api/search
-      .mockResolvedValueOnce(jsonResponse({candidate_id: null, job}, 202)) // POST presentation-draft: queued
-      .mockResolvedValueOnce(jsonResponse({...job, status: 'succeeded', finished: true, progress: 100, message: 'Proposed for review',
-        result: {candidate_id: 'cand-1', review_status: 'proposed', payload: {}}})) // GET job
-      .mockResolvedValueOnce(jsonResponse({candidates: [summary()]})) // queue reload
-      .mockResolvedValueOnce(jsonResponse(fullCandidate())); // GET candidate
+      .mockResolvedValueOnce(jsonResponse(searchHit)); // GET /api/search
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
-    await runDraft(user);
-
-    await screen.findByTestId('ai-candidate-detail');
-    expect(screen.getByTestId('ai-run-status')).toHaveTextContent('Proposed for review (candidate cand-1).');
-    expect(requestUrl(fetchMock.mock.calls[3])).toBe('http://api.test/api/jobs/job-7');
-  });
-
-  it('shows the error a queued run finished with', async () => {
-    const user = userEvent.setup();
-    const job = {id: 'job-8', kind: 'ai_reasoning', investigation_id: 'inv-1', subject_type: 'ai_run', subject_id: null,
-      status: 'failed', finished: true, progress: 0, message: 'Stopped with an error', error: 'Model output rejected', attempts: 1, runner: 'procrastinate',
-      result: {status_code: 422, detail: {message: 'Model output rejected: none of its quotes could be found in the records it cites.', removed: []}}};
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(jsonResponse({candidates: []}))
-      .mockResolvedValueOnce(jsonResponse(searchHit))
-      .mockResolvedValueOnce(jsonResponse({candidate_id: null, job: {...job, status: 'queued', finished: false, result: null}}, 202))
-      .mockResolvedValueOnce(jsonResponse(job))
-      .mockResolvedValueOnce(jsonResponse({candidates: []}));
-    vi.stubGlobal('fetch', fetchMock);
-    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
-    await runDraft(user);
-    await waitFor(() => expect(screen.getByTestId('ai-run-status')).toHaveTextContent(/none of its quotes could be found.*422/));
-  });
-
-  it('surfaces a citation rejection from the backend instead of a proposed candidate', async () => {
-    const user = userEvent.setup();
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(jsonResponse({candidates: []}))
-      .mockResolvedValueOnce(jsonResponse(searchHit))
-      .mockResolvedValueOnce(jsonResponse({detail: {message: 'Model output rejected: referenced evidence not present in the retrieval packet.', invalid_citations: [{record_type: 'evidence', record_id: 'INVENTED'}]}}, 422))
-      .mockResolvedValueOnce(jsonResponse({candidates: [summary({review_status: 'rejected', reviewer_note: 'Auto-rejected: model referenced 1 citation(s) absent from the retrieval packet'})]}));
-    vi.stubGlobal('fetch', fetchMock);
-    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
-    await runDraft(user);
-
-    await waitFor(() => expect(screen.getByTestId('ai-run-status')).toHaveTextContent(/422/));
-    await screen.findByText(/Auto-rejected: model referenced 1 citation/);
-    expect(screen.queryByTestId('ai-candidate-detail')).not.toBeInTheDocument();
+    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await pickDraft(user);
+    await user.click(screen.getByRole('button', {name: 'Run module'}));
+    expect(askBeforeYouRun).toHaveBeenCalledWith('inv-1', {module: 'presentation_draft', question: 'Summarize the Bellcastle payment.', theory: '',
+      refs: [{record_type: 'claim', record_id: 'claim-1', label: 'Meridian paid Bellcastle $2.4M'}]});
+    expect(fetchMock).toHaveBeenCalledTimes(2); // the queue and the search; nothing was sent to a model
+    expect(fetchMock.mock.calls.some(c => requestUrl(c).includes('/assistant/'))).toBe(false);
   });
 
   it('requires a working theory for a hypothesis test, sends it to Before you run, and reads a tested theory', async () => {
@@ -347,7 +310,7 @@ describe('AiReasoningPanel', () => {
     chart_families: {}, chart_presets: {}, chart_options: {},
   };
 
-  it('runs a presentation draft from picked evidence, previews it as slides and a brief, accepts it, and promotes it to a write-up and a deck', async () => {
+  it('hands a presentation draft to Before you run, then previews a queued draft as slides and a brief, accepts it, and promotes it to a write-up and a deck', async () => {
     const user = userEvent.setup();
     const traced: string[] = [];
     const draftPayload = {
@@ -377,13 +340,8 @@ describe('AiReasoningPanel', () => {
     });
     const draftDetail = (overrides: Record<string, unknown> = {}) => ({...fullCandidate(), ...draftSummary(overrides), payload: draftPayload, deck_preview: deckPreview, citation_details: citationDetails});
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(jsonResponse({candidates: []})) // initial queue
-      .mockResolvedValueOnce(jsonResponse({ // GET /api/search
-        results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}, kind: 'claim_event'}],
-        query: 'Bellcastle', investigation_id: 'inv-1', total: 1, returned: 1, counts: {claim: 1}, group_counts: {reporting: 1},
-      }))
-      .mockResolvedValueOnce(jsonResponse({candidate_id: 'cand-9', review_status: 'proposed', payload: {}})) // POST presentation-draft
-      .mockResolvedValueOnce(jsonResponse({candidates: [draftSummary()]})) // queue reload
+      .mockResolvedValueOnce(jsonResponse({candidates: [draftSummary()]})) // initial queue: the draft Before you run ran
+      .mockResolvedValueOnce(jsonResponse(searchHit)) // GET /api/search
       .mockResolvedValueOnce(jsonResponse(draftDetail())) // GET candidate
       .mockResolvedValueOnce(jsonResponse(styleCatalog)) // GET /api/presentation-styles (once, on the first open draft)
       .mockResolvedValueOnce(jsonResponse({id: 'cand-9', module: 'presentation_draft', review_status: 'accepted', reviewer_note: null, reviewed_at: '2026-09-30T12:00:00'})) // POST review
@@ -395,28 +353,18 @@ describe('AiReasoningPanel', () => {
         style: {theme: 'newsprint', fonts: 'theme'}, source_ai_candidate_id: 'cand-9', created_by: null})); // POST promote-to-deck
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} onTraceRecord={d => traced.push(`${d.trace_record_type}:${d.record_id}`)} />);
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
-
-    const moduleTrigger = screen.getByLabelText('Reasoning module');
-    moduleTrigger.focus();
-    await user.keyboard('{ArrowDown}{ArrowDown}');
-    await user.click(await screen.findByRole('option', {name: 'Presentation draft'}));
-    await user.type(screen.getByLabelText('Goal'), 'Summarize the Bellcastle payment.');
-
-    await user.type(screen.getByLabelText('Search records to add'), 'Bellcastle');
-    await user.click(within(screen.getByTestId('presentation-record-picker')).getByRole('button', {name: 'Search'}));
-    // A claim hit is labelled by its own text, not search's generic "Claim" title.
-    await user.click(await screen.findByRole('button', {name: 'Add Claim: Meridian paid Bellcastle $2.4M'}));
-    expect(screen.getByTestId('selected-count')).toHaveTextContent('Selected evidence · 1');
-
+    await screen.findByText('Summarize the Bellcastle payment.');
+    await pickDraft(user);
     const runButton = screen.getByRole('button', {name: 'Run module'});
     expect(runButton).not.toBeDisabled();
     await user.click(runButton);
+    // Planned and started in Before you run, never from here.
+    expect(askBeforeYouRun).toHaveBeenCalledWith('inv-1', {module: 'presentation_draft', question: 'Summarize the Bellcastle payment.', theory: '',
+      refs: [{record_type: 'claim', record_id: 'claim-1', label: 'Meridian paid Bellcastle $2.4M'}]});
+    expect(fetchMock).toHaveBeenCalledTimes(2);
 
+    await user.click(screen.getByRole('button', {name: 'Open'}));
     await screen.findByTestId('draft-preview');
-    const runCall = fetchMock.mock.calls[2];
-    expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/presentation-draft');
-    expect(await sentBody(runCall)).toEqual({goal: 'Summarize the Bellcastle payment.', record_refs: [{record_type: 'claim', record_id: 'claim-1'}]});
 
     // Slides: title + takeaway + 1 content + questions + sources = 5 frames.
     expect(screen.getByTestId('slide-position')).toHaveTextContent('1 / 5');
@@ -450,7 +398,7 @@ describe('AiReasoningPanel', () => {
     await user.click(within(promotePanel).getByRole('button', {name: 'Promote to write-up'}));
     await waitFor(() => expect(within(promotePanel).getByTestId('promote-status')).toHaveTextContent('Promoted to write-up "The Bellcastle consulting fee" (42 word(s), status draft).'));
     expect(within(promotePanel).getByRole('link', {name: 'Download .docx'})).toHaveAttribute('href', 'http://api.test/api/writeups/wu-1/export.docx');
-    const writeupCall = fetchMock.mock.calls[9];
+    const writeupCall = fetchMock.mock.calls[7];
     expect(requestUrl(writeupCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-9/promote-to-writeup');
     expect(await sentBody(writeupCall)).toEqual({});
 
@@ -458,7 +406,7 @@ describe('AiReasoningPanel', () => {
     await waitFor(() => expect(within(promotePanel).getByTestId('promote-status')).toHaveTextContent('Promoted to deck "The Bellcastle consulting fee" (4 slide(s)).'));
     expect(within(promotePanel).getByRole('link', {name: 'Download .pptx'})).toHaveAttribute('href', 'http://api.test/api/decks/dk-1/export.pptx');
     // The deck goes out in the look picked in the style panel.
-    const deckCall = fetchMock.mock.calls[10];
+    const deckCall = fetchMock.mock.calls[8];
     expect(requestUrl(deckCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-9/promote-to-deck');
     expect(await sentBody(deckCall)).toEqual({style: {theme: 'newsprint', fonts: 'theme'}, visual_styles: {'0': {preset: 'row', options: {}}}, deck_kind: 'presenting'});
   });

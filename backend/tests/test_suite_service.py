@@ -162,3 +162,22 @@ def test_a_run_names_the_answer_it_saved_its_current_review_and_its_route(monkey
     assert route["modules_in_system"] == suite.module_count("tas") and route["final_audit"]["node"] == "tas/10"
     for system, name in suite.FINAL_AUDIT.items():
         assert (suite.SYSTEMS_ROOT / system / "PROMPT_MODULES" / name).is_file(), system
+
+
+def test_a_draft_run_names_the_records_it_drafted_from():
+    """Run again plans a presentation draft with the same records, so the run summary carries them."""
+    from app.api.routes_ai_runs import AI_REASONING
+    from app.db.session import SessionLocal
+    from app.models.jobs import BackgroundJob
+
+    client = TestClient(app)
+    case = _case(client)
+    with SessionLocal() as db:
+        job = BackgroundJob(kind=AI_REASONING, investigation_id=case["inv"], status="succeeded", payload={
+            "module": "presentation_draft", "question": "Brief the editor",
+            "record_refs": [{"record_type": "evidence", "record_id": "ev-1"}, "not a ref"]})
+        db.add(job)
+        db.commit()
+    runs = client.get(f"/api/investigations/{case['inv']}/ai-runs").json()["runs"]
+    draft = next(r for r in runs if r["module"] == "presentation_draft")
+    assert draft["record_refs"] == [{"record_type": "evidence", "record_id": "ev-1"}]

@@ -13,7 +13,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
-import {PLAN} from '../test-support/run-plan-fixture';
+import {DRAFT_PLAN, PLAN} from '../test-support/run-plan-fixture';
 
 const BASE = '/api/investigations/inv-1/assistant';
 const RUN = {run_id: 'run-1', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who controlled Fernhill Ltd?', working_theory: null,
@@ -87,6 +87,36 @@ describe('Run module from the AI drafts panel', () => {
     expect(api.calls(`POST ${BASE}/case-synthesis`)).toHaveLength(0);
     expect(api.calls(`POST ${BASE}/hypothesis-test`)).toHaveLength(0);
     tab.remove();
+  });
+
+  it('opens a presentation draft with its goal and the records picked there, plans it without settings, and runs nothing', async () => {
+    const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, 'GET /api/investigations/inv-1/ai-runs': {runs: [RUN]}, [`POST ${BASE}/plan`]: DRAFT_PLAN});
+    const tab = document.body.appendChild(Object.assign(document.createElement('a'), {href: '#ai-runs'}));
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    await screen.findByText('Earlier runs');
+    act(() => askBeforeYouRun('inv-1', {module: 'presentation_draft', question: 'Brief my editor on the harbour land sale.', theory: '',
+      refs: [{record_type: 'claim', record_id: 'claim-1', label: 'Meridian paid Bellcastle $2.4M'}]}));
+    expect(await screen.findByRole('heading', {name: /Before you run/})).toBeInTheDocument();
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toEqual({module: 'presentation_draft', question: 'Brief my editor on the harbour land sale.',
+      record_refs: [{record_type: 'claim', record_id: 'claim-1'}]}));
+    expect(await screen.findByText('Build the packet from the records you picked')).toBeInTheDocument();
+    // Edit plan: the goal and the picked records are what a draft is made of; there is no packet size or outside leads.
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Edit plan'}));
+    expect(screen.getByLabelText('What the brief or deck should do')).toHaveValue('Brief my editor on the harbour land sale.');
+    expect(screen.getByTestId('selected-count')).toHaveTextContent('Selected evidence · 1');
+    expect(screen.queryByLabelText('Records in the packet, at most')).not.toBeInTheDocument();
+    expect(api.calls(`POST ${BASE}/presentation-draft`)).toHaveLength(0);
+    tab.remove();
+  });
+
+  it('reads a draft’s picked records from the address', async () => {
+    const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, 'GET /api/investigations/inv-1/ai-runs': {runs: [RUN]}, [`POST ${BASE}/plan`]: DRAFT_PLAN});
+    window.history.replaceState(null, '', '/act/?inv=inv-1&ask=Brief%20my%20editor&module=presentation_draft&refs=claim%3Aclaim-1%2Cevidence%3Aev-2#ai-runs');
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByRole('heading', {name: /Before you run/})).toBeInTheDocument();
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toEqual({module: 'presentation_draft', question: 'Brief my editor',
+      record_refs: [{record_type: 'claim', record_id: 'claim-1'}, {record_type: 'evidence', record_id: 'ev-2'}]}));
+    expect(window.location.search).toBe('?inv=inv-1');
   });
 
   it('reads a request from the address once, when it opens on another page', async () => {

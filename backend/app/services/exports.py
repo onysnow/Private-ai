@@ -18,6 +18,7 @@ from app.core.time import utcnow_iso
 from app.core.config import settings
 from app.db.locking import investigation_export_snapshot, lock_investigation_transaction
 from app.jobs.corpus import request_corpus_sync
+from app.services.backup_crypto import seal, unseal
 from app.services.security import contained_path, resolve_storage_root
 from app.models.domain import (
     Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, ClaimReviewEvent, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment,
@@ -27,8 +28,9 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
+    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, DecisionSnooze, CaseRecord,
     Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
+    OutboundRequest, ServiceMode,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -44,8 +46,9 @@ MODEL_BY_TABLE = {
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
-        WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
+        WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, DecisionSnooze, CaseRecord,
         Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
+        OutboundRequest, ServiceMode,
     ]
 }
 
@@ -78,6 +81,8 @@ RESTORE_ORDER = [
     "pattern_flags",
     # What a person checks, with their decisions; an item may point at its flag and its document.
     "check_items",
+    # Decisions a person put off on Decide (H), with when or on what they wake.
+    "decision_snoozes",
     # The Authority System Suite's own records for the case (gaps, replies, hypotheses, ...).
     "case_records",
     # The TAS reasoning review queue travels with the investigation: a restored
@@ -93,6 +98,9 @@ RESTORE_ORDER = [
     "stories", "story_sections", "story_claims",
     # Each AI run's steps as they happened (ADR-0012): the run record travels with the case.
     "ai_run_events",
+    # What left this computer, word for word, and each outside service's mode for the case (Keep › Safety & data):
+    # the log is part of the chain of custody (research Keep §14, the proposal; Ony's open question).
+    "outbound_log", "service_modes",
 ]
 
 
@@ -159,8 +167,8 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
-        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion,
+        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, DecisionSnooze, CaseRecord,
+        Story, AIRunEvent, WriteupVersion, OutboundRequest, ServiceMode,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -207,9 +215,11 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "collections": direct["collections"], "collection_items": direct["collection_items"],
         "pattern_flags": direct["pattern_flags"],
         "check_items": direct["check_items"],
+        "decision_snoozes": direct["decision_snoozes"],
         "case_records": direct["case_records"],
         "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
         "ai_run_events": direct["ai_run_events"],
+        "outbound_log": direct["outbound_log"], "service_modes": direct["service_modes"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -341,7 +351,13 @@ def _safe_name(name: str) -> str:
     return cleaned or "document"
 
 
-def build_investigation_export(db: Session, investigation_id: str, include_documents: bool = True) -> tuple[bytes, dict[str, Any]]:
+def build_investigation_export(db: Session, investigation_id: str, include_documents: bool = True,
+                               passphrase: str | None = None) -> tuple[bytes, dict[str, Any]]:
+    """The portable backup. With a passphrase, the whole archive (its checksum manifest inside) is sealed with
+    AES-256-GCM under a key made from it (app/services/backup_crypto.py, ADR-0015)."""
+    if passphrase is not None:
+        payload, manifest = build_investigation_export(db, investigation_id, include_documents)
+        return seal(payload, passphrase), manifest
     # PostgreSQL exports run from one REPEATABLE READ snapshot and hold a shared
     # investigation lock until database rows and referenced document bytes have all
     # been captured. SQLite intentionally reuses the caller's local session.
@@ -407,7 +423,9 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
     return buf.getvalue(), manifest
 
 
-def inspect_export(data: bytes) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
+def inspect_export(data: bytes, passphrase: str | None = None) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
+    # A protected backup is opened first; a wrong passphrase raises BackupPassphraseError (a ValueError).
+    data = unseal(data, passphrase)
     if len(data) > settings.max_backup_bytes:
         raise ValueError("Backup exceeds configured compressed-size limit")
     try:
@@ -469,10 +487,10 @@ def _normalize_legacy_relationship_evidence(records: dict[str, list[dict[str, An
 
 
 def preview_investigation_restore(
-    db: Session, data: bytes, document_storage_dir: Path
+    db: Session, data: bytes, document_storage_dir: Path, passphrase: str | None = None
 ) -> dict[str, Any]:
     """Inspect a portable backup against the current database/storage without mutating either."""
-    manifest, records = inspect_export(data)
+    manifest, records = inspect_export(data, passphrase)
     inv_rows = records.get("investigations") or []
     if len(inv_rows) != 1:
         raise ValueError("Backup must contain exactly one investigation")
@@ -577,7 +595,9 @@ def _coerce_datetimes(model: type[Any], row: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def restore_investigation_export(db: Session, data: bytes, document_storage_dir: Path) -> dict[str, Any]:
+def restore_investigation_export(db: Session, data: bytes, document_storage_dir: Path, passphrase: str | None = None) -> dict[str, Any]:
+    # A protected backup is opened once, before anything else; the rest reads the archive inside it.
+    data = unseal(data, passphrase)
     # Read the manifest first so PostgreSQL can serialize destructive work for this
     # investigation *before* the mutable-state preview. This closes the window where
     # two restores (or restore vs delete) could both approve the same target.

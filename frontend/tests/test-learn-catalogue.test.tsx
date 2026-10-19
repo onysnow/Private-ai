@@ -63,6 +63,8 @@ const routes = {
   'GET /api/catalogue/glossary': {total: 2116, terms: []},
   'GET /api/catalogue/terms': [],
   'GET /api/investigations/inv-1/red-flags': redFlags,
+  'GET /api/learning/summary': {total: 0, due: 0, next_due_at: null, ladder_days: [1, 3, 7, 14, 30, 60, 120], decks: [], areas: []},
+  'GET /api/learning/cards': {total: 0, due: 0, next_due_at: null, cards: []},
   'GET /api/investigations': [{id: 'inv-1', name: 'Harbour land', description: null, created_at: '2026-10-01T00:00:00Z', is_demo: false}],
   ...Object.fromEntries(Object.entries(details).map(([id, d]) => [`GET /api/catalogue/indicators/${id}`, d])),
 };

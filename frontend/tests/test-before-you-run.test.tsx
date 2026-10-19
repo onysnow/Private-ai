@@ -10,7 +10,7 @@ import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {mockApi} from '../test-support/mock-api';
-import {PLAN} from '../test-support/run-plan-fixture';
+import {DRAFT_PLAN, PLAN} from '../test-support/run-plan-fixture';
 
 const BASE = '/api/investigations/inv-1/assistant';
 const job = {id: 'job-1', kind: 'ai_reasoning', investigation_id: 'inv-1', subject_type: 'ai_run', subject_id: null, status: 'succeeded', finished: true,
@@ -103,6 +103,47 @@ describe('BeforeYouRun', () => {
     expect(within(where).queryByText(/stop and ask/)).not.toBeInTheDocument();
   });
 
+  it('plans a presentation draft from its goal and the records picked, with none of the settings, and runs it through the draft endpoint', async () => {
+    const queued = {...job, status: 'queued', finished: false, progress: null, message: 'Waiting for the model', finished_at: null};
+    const api = mockApi({
+      [`GET ${BASE}/profile`]: PLAN.profile,
+      'GET /api/investigations/inv-1/ai-runs': {runs: []},
+      'GET /api/search': {results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}, kind: 'claim_event'}],
+        query: 'Bellcastle', investigation_id: 'inv-1', total: 1, returned: 1, counts: {claim: 1}, group_counts: {reporting: 1}},
+      [`POST ${BASE}/plan`]: DRAFT_PLAN,
+      [`POST ${BASE}/presentation-draft`]: {status: 202, body: {candidate_id: null, job: queued}},
+      'GET /api/jobs/job-1': {...job, result: {candidate_id: 'cand-9', review_status: 'proposed', payload: {}}},
+    });
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(within(await screen.findByRole('radiogroup', {name: 'What to run'})).getByRole('radio', {name: 'Draft a brief'}));
+    await user.type(screen.getByLabelText('What the brief or deck should do'), 'Brief my editor on the harbour land sale.');
+    const next = screen.getByRole('button', {name: 'Next: instructions and plan'});
+    expect(next).toBeDisabled(); // a goal alone is not enough: the draft can cite only records picked
+    await user.type(screen.getByLabelText('Search records to add'), 'Bellcastle');
+    await user.click(within(screen.getByTestId('presentation-record-picker')).getByRole('button', {name: 'Search'}));
+    await user.click(await screen.findByRole('button', {name: 'Add Claim: Meridian paid Bellcastle $2.4M'}));
+    await user.click(next);
+
+    const plan = await screen.findByRole('region', {name: 'The plan'});
+    expect(await within(plan).findByText('Build the packet from the records you picked')).toBeInTheDocument();
+    expect(within(plan).getByText('What the draft is for')).toBeInTheDocument();
+    expect(within(plan).getByText(/only the records you picked/)).toBeInTheDocument();
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toEqual({module: 'presentation_draft', question: 'Brief my editor on the harbour land sale.',
+      record_refs: [{record_type: 'claim', record_id: 'claim-1'}]}));
+    const instructions = screen.getByRole('region', {name: 'Operating instructions'});
+    expect(within(instructions).getByRole('note')).toHaveTextContent('A draft runs under none of these settings');
+    expect(within(instructions).queryByRole('radiogroup')).not.toBeInTheDocument();
+    expect(within(instructions).queryByLabelText('Something to take as given')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Save as this case’s default'})).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'Run in the background'}));
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/presentation-draft`)).toEqual({goal: 'Brief my editor on the harbour land sale.',
+      record_refs: [{record_type: 'claim', record_id: 'claim-1'}]}));
+    expect(await screen.findByText('The answer is waiting for you as a proposal. Nothing has joined the case.')).toBeInTheDocument();
+    expect(api.calls(`POST ${BASE}/case-synthesis`)).toHaveLength(0);
+  });
+
   it('saves this case’s default only with a reason', async () => {
     const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: PLAN,
       [`PUT ${BASE}/profile`]: {...PLAN.profile, saved: true, reason: 'Named people', saved_at: '2026-10-12T10:00:00Z'}});
@@ -151,6 +192,25 @@ describe('BeforeYouRun', () => {
     await waitFor(() => expect(go).toBeEnabled());
     await user.click(go);
     await waitFor(() => expect(api.lastBody(`POST ${BASE}/case-synthesis`)).toMatchObject({question: RUN.question, packet_from: {run_id: 'job-1', step: 2}}));
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('runs a draft again as a draft, with the records it drafted from', async () => {
+    const draftRun = {...RUN, module: 'presentation_draft', question: 'Brief my editor', record_refs: [{record_type: 'evidence', record_id: 'ev-58'}]};
+    const events = [{n: 1, at: '2026-10-12T10:00:05Z', system: 'app', rule: null, status: 'neutral', verdict: null, refs: [], parent: null,
+      self_reported: false, detail: null, kind: 'TURN', node: 'run', text: 'Draft asked'}];
+    window.history.replaceState(null, '', '/act?inv=inv-1&run=job-1&step=1');
+    const api = mockApi({
+      [`GET ${BASE}/profile`]: PLAN.profile,
+      [`POST ${BASE}/plan`]: DRAFT_PLAN,
+      'GET /api/investigations/inv-1/ai-runs/job-1/events': {run: {...draftRun, events: 1}, events},
+      'GET /api/investigations/inv-1/ai-runs': {runs: [draftRun]},
+    });
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: 'Run again from this step…'}));
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toMatchObject({module: 'presentation_draft', question: 'Brief my editor',
+      record_refs: [{record_type: 'evidence', record_id: 'ev-58'}]}));
     window.history.replaceState(null, '', '/');
   });
 

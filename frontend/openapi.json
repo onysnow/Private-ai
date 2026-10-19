@@ -1277,6 +1277,14 @@
             "title": "Question",
             "type": "string"
           },
+          "record_refs": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Record Refs",
+            "type": "array"
+          },
           "review_status": {
             "anyOf": [
               {
@@ -2480,6 +2488,62 @@
         "title": "BackupRestoreResultOut",
         "type": "object"
       },
+      "BackupsStoreOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "encrypted": {
+            "title": "Encrypted",
+            "type": "boolean"
+          },
+          "last_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last At"
+          },
+          "last_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sha256"
+          },
+          "last_size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Size Bytes"
+          }
+        },
+        "required": [
+          "count",
+          "last_at",
+          "last_size_bytes",
+          "last_sha256",
+          "encrypted"
+        ],
+        "title": "BackupsStoreOut",
+        "type": "object"
+      },
       "BarItemOut": {
         "properties": {
           "evidence": {
@@ -2663,6 +2727,18 @@
             "contentMediaType": "application/octet-stream",
             "title": "File",
             "type": "string"
+          },
+          "passphrase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The passphrase a protected backup was made with; leave out for an unprotected one",
+            "title": "Passphrase"
           }
         },
         "required": [
@@ -2677,6 +2753,18 @@
             "contentMediaType": "application/octet-stream",
             "title": "File",
             "type": "string"
+          },
+          "passphrase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The passphrase a protected backup was made with; leave out for an unprotected one",
+            "title": "Passphrase"
           }
         },
         "required": [
@@ -2691,6 +2779,18 @@
             "contentMediaType": "application/octet-stream",
             "title": "File",
             "type": "string"
+          },
+          "passphrase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The passphrase a protected backup was made with; leave out for an unprotected one",
+            "title": "Passphrase"
           }
         },
         "required": [
@@ -3425,7 +3525,7 @@
         "type": "object"
       },
       "CaseDecisionsOut": {
-        "description": "One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind.",
+        "description": "One page of the decisions, in the order asked; ``total`` is how many there are in that order and kind.\n``snoozed`` counts the ones put off and still asleep, left out of ``items``, ``total`` and ``counts`` (asked with\n``snoozed=true``, ``items`` holds only them).",
         "properties": {
           "counts": {
             "additionalProperties": {
@@ -3447,6 +3547,11 @@
           },
           "offset": {
             "title": "Offset",
+            "type": "integer"
+          },
+          "snoozed": {
+            "default": 0,
+            "title": "Snoozed",
             "type": "integer"
           },
           "total": {
@@ -13977,6 +14082,55 @@
         "title": "DecisionEvidenceOut",
         "type": "object"
       },
+      "DecisionFlagChangeOut": {
+        "properties": {
+          "from_level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "faint",
+                  "strong",
+                  "textbook"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Level"
+          },
+          "indicator_id": {
+            "title": "Indicator Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "to_level": {
+            "enum": [
+              "faint",
+              "strong",
+              "textbook"
+            ],
+            "title": "To Level",
+            "type": "string"
+          }
+        },
+        "required": [
+          "indicator_id",
+          "name",
+          "to_level",
+          "text"
+        ],
+        "title": "DecisionFlagChangeOut",
+        "type": "object"
+      },
       "DecisionGroupOut": {
         "properties": {
           "key": {
@@ -14149,6 +14303,26 @@
           "reason": {
             "title": "Reason",
             "type": "string"
+          },
+          "snooze": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionSnoozeStateOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unlocks": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionUnlocksOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -14231,6 +14405,293 @@
           "cells"
         ],
         "title": "DecisionRowOut",
+        "type": "object"
+      },
+      "DecisionSnoozeCreate": {
+        "description": "Puts one decision off: until a time, until the item changes (the default), or whichever comes first.",
+        "properties": {
+          "item_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Item Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "to_check",
+              "missing",
+              "proposal",
+              "match",
+              "outside",
+              "ai",
+              "watchlist"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When it comes back; none: only when the item changes.",
+            "title": "Until"
+          },
+          "wake_on_activity": {
+            "default": true,
+            "description": "Comes back as soon as the item changes (new activity on it).",
+            "title": "Wake On Activity",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind",
+          "item_id"
+        ],
+        "title": "DecisionSnoozeCreate",
+        "type": "object"
+      },
+      "DecisionSnoozeOut": {
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "to_check",
+              "missing",
+              "proposal",
+              "match",
+              "outside",
+              "ai",
+              "watchlist"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "snoozed_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Snoozed At",
+            "type": "string"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until"
+          },
+          "wake_on_activity": {
+            "title": "Wake On Activity",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "kind",
+          "item_id",
+          "wake_on_activity",
+          "snoozed_at",
+          "question"
+        ],
+        "title": "DecisionSnoozeOut",
+        "type": "object"
+      },
+      "DecisionSnoozeStateOut": {
+        "description": "A decision put off (H). ``asleep``: out of the queue; ``woke``: back, with why.",
+        "properties": {
+          "snoozed_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Snoozed At",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "asleep",
+              "woke"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until"
+          },
+          "wake_on_activity": {
+            "title": "Wake On Activity",
+            "type": "boolean"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "state",
+          "wake_on_activity",
+          "snoozed_at"
+        ],
+        "title": "DecisionSnoozeStateOut",
+        "type": "object"
+      },
+      "DecisionUnlocksOut": {
+        "description": "What answering Yes would change, dry-run on the records (app/services/decision_unlocks.py): claims that would\nmeet every Done rule for Supported, Red Flags that would rise, links that would complete a chain. ``counted`` is\nfalse when the request ran out of dry runs before this one.",
+        "properties": {
+          "chains": {
+            "title": "Chains",
+            "type": "integer"
+          },
+          "claims": {
+            "title": "Claims",
+            "type": "integer"
+          },
+          "counted": {
+            "title": "Counted",
+            "type": "boolean"
+          },
+          "flag_changes": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionFlagChangeOut"
+            },
+            "title": "Flag Changes",
+            "type": "array"
+          },
+          "flags": {
+            "title": "Flags",
+            "type": "integer"
+          },
+          "lines": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "score": {
+            "title": "Score",
+            "type": "integer"
+          },
+          "words": {
+            "title": "Words",
+            "type": "string"
+          }
+        },
+        "required": [
+          "score",
+          "claims",
+          "flags",
+          "chains",
+          "counted",
+          "words",
+          "lines",
+          "flag_changes"
+        ],
+        "title": "DecisionUnlocksOut",
+        "type": "object"
+      },
+      "DecisionWake": {
+        "description": "Brings a decision put off back into the queue now (the snoozed list's Restore, and Z).",
+        "properties": {
+          "item_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Item Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "to_check",
+              "missing",
+              "proposal",
+              "match",
+              "outside",
+              "ai",
+              "watchlist"
+            ],
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "item_id"
+        ],
+        "title": "DecisionWake",
+        "type": "object"
+      },
+      "DecisionWakeOut": {
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "to_check",
+              "missing",
+              "proposal",
+              "match",
+              "outside",
+              "ai",
+              "watchlist"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "woke": {
+            "title": "Woke",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "kind",
+          "item_id",
+          "woke"
+        ],
+        "title": "DecisionWakeOut",
         "type": "object"
       },
       "DeckOut": {
@@ -15830,6 +16291,29 @@
           "candidate_counts"
         ],
         "title": "DocumentUploadOut",
+        "type": "object"
+      },
+      "DocumentsStoreOut": {
+        "properties": {
+          "files": {
+            "title": "Files",
+            "type": "integer"
+          },
+          "missing": {
+            "title": "Missing",
+            "type": "integer"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "files",
+          "size_bytes",
+          "missing"
+        ],
+        "title": "DocumentsStoreOut",
         "type": "object"
       },
       "DossierClaimLinkOut": {
@@ -22523,6 +23007,24 @@
         "title": "IssueIn",
         "type": "object"
       },
+      "KeysStoreOut": {
+        "properties": {
+          "set": {
+            "title": "Set",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "set",
+          "total"
+        ],
+        "title": "KeysStoreOut",
+        "type": "object"
+      },
       "LeadClaimConversionOut": {
         "properties": {
           "kind": {
@@ -23361,6 +23863,363 @@
           "created_at"
         ],
         "title": "LeadWorkflowEventOut",
+        "type": "object"
+      },
+      "LearningAnswer": {
+        "description": "The reporter's answer to a flip card: Again / Good, or Hard / Easy when they are turned on.",
+        "properties": {
+          "answer": {
+            "enum": [
+              "again",
+              "hard",
+              "good",
+              "easy"
+            ],
+            "title": "Answer",
+            "type": "string"
+          },
+          "card_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Card Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id",
+          "answer"
+        ],
+        "title": "LearningAnswer",
+        "type": "object"
+      },
+      "LearningCardCreate": {
+        "description": "＋ Flip card: an indicator from the catalogue or a term from the glossary, kept for Practise.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "indicator",
+              "term"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ref": {
+            "description": "The indicator's id (BO-007) or the term as the glossary spells it.",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "title": "LearningCardCreate",
+        "type": "object"
+      },
+      "LearningCardListOut": {
+        "description": "A deck's cards, due ones first; ``next_due_at`` is when the first card not yet due falls due.",
+        "properties": {
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/LearningCardOut"
+            },
+            "title": "Cards",
+            "type": "array"
+          },
+          "due": {
+            "title": "Due",
+            "type": "integer"
+          },
+          "next_due_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due At"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "due",
+          "next_due_at",
+          "cards"
+        ],
+        "title": "LearningCardListOut",
+        "type": "object"
+      },
+      "LearningCardOut": {
+        "description": "One flip card and where it stands on the ladder (app/services/learning.py).",
+        "properties": {
+          "added_from": {
+            "title": "Added From",
+            "type": "string"
+          },
+          "areas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "due": {
+            "title": "Due",
+            "type": "boolean"
+          },
+          "due_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Due At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "interval_days": {
+            "title": "Interval Days",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "indicator",
+              "term"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "lapses": {
+            "title": "Lapses",
+            "type": "integer"
+          },
+          "last_answer": {
+            "anyOf": [
+              {
+                "enum": [
+                  "again",
+                  "hard",
+                  "good",
+                  "easy"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Answer"
+          },
+          "last_reviewed_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Reviewed At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "next_days": {
+            "$ref": "#/components/schemas/LearningNextDaysOut"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "reviews": {
+            "title": "Reviews",
+            "type": "integer"
+          },
+          "step": {
+            "title": "Step",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "ref",
+          "name",
+          "areas",
+          "added_from",
+          "step",
+          "interval_days",
+          "due_at",
+          "due",
+          "last_answer",
+          "last_reviewed_at",
+          "reviews",
+          "lapses",
+          "created_at",
+          "next_days"
+        ],
+        "title": "LearningCardOut",
+        "type": "object"
+      },
+      "LearningDeckCountOut": {
+        "properties": {
+          "area": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          },
+          "deck": {
+            "enum": [
+              "all",
+              "case",
+              "area",
+              "terms",
+              "safety"
+            ],
+            "title": "Deck",
+            "type": "string"
+          },
+          "due": {
+            "title": "Due",
+            "type": "integer"
+          },
+          "next_due_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due At"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "deck",
+          "area",
+          "total",
+          "due",
+          "next_due_at"
+        ],
+        "title": "LearningDeckCountOut",
+        "type": "object"
+      },
+      "LearningNextDaysOut": {
+        "description": "In how many days the card comes back after each answer (0: in this sitting).",
+        "properties": {
+          "again": {
+            "title": "Again",
+            "type": "integer"
+          },
+          "easy": {
+            "title": "Easy",
+            "type": "integer"
+          },
+          "good": {
+            "title": "Good",
+            "type": "integer"
+          },
+          "hard": {
+            "title": "Hard",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "again",
+          "hard",
+          "good",
+          "easy"
+        ],
+        "title": "LearningNextDaysOut",
+        "type": "object"
+      },
+      "LearningSummaryOut": {
+        "description": "What \"Practise · n due\" needs: due counts in all and per deck, and the ladder of days.",
+        "properties": {
+          "areas": {
+            "items": {
+              "$ref": "#/components/schemas/LearningDeckCountOut"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "decks": {
+            "items": {
+              "$ref": "#/components/schemas/LearningDeckCountOut"
+            },
+            "title": "Decks",
+            "type": "array"
+          },
+          "due": {
+            "title": "Due",
+            "type": "integer"
+          },
+          "ladder_days": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Ladder Days",
+            "type": "array"
+          },
+          "next_due_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due At"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "due",
+          "next_due_at",
+          "ladder_days",
+          "decks",
+          "areas"
+        ],
+        "title": "LearningSummaryOut",
         "type": "object"
       },
       "LineageCandidateOut": {
@@ -25611,11 +26470,16 @@
         "type": "object"
       },
       "OrphanStoragePreviewOut": {
-        "description": "Files under document storage no document refers to. Read-only: they are kept until a reporter decides.",
+        "description": "Files under document storage no document refers to. They are kept until the reporter decides, per file: Keep,\nAdd back to a case, or Delete (POST /settings/storage/orphans/keep, …/delete,\n/investigations/{id}/storage/orphans/add-back).",
         "properties": {
           "cleanup_available": {
             "title": "Cleanup Available",
             "type": "boolean"
+          },
+          "kept_file_count": {
+            "description": "Stray files the reporter chose to Keep; not listed again",
+            "title": "Kept File Count",
+            "type": "integer"
           },
           "orphan_bytes": {
             "title": "Orphan Bytes",
@@ -25653,11 +26517,108 @@
           "orphan_files",
           "orphan_file_count",
           "orphan_bytes",
+          "kept_file_count",
           "unsafe_document_references",
           "cleanup_available",
           "policy"
         ],
         "title": "OrphanStoragePreviewOut",
+        "type": "object"
+      },
+      "OutboundLogOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OutboundRequestOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "since"
+        ],
+        "title": "OutboundLogOut",
+        "type": "object"
+      },
+      "OutboundRequestOut": {
+        "description": "One request that left this computer: when, to whom, the value word for word, and why.",
+        "properties": {
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "documents_sent": {
+            "title": "Documents Sent",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "service_name": {
+            "title": "Service Name",
+            "type": "string"
+          },
+          "started_by": {
+            "title": "Started By",
+            "type": "string"
+          },
+          "value_kind": {
+            "title": "Value Kind",
+            "type": "string"
+          },
+          "value_sent": {
+            "title": "Value Sent",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "service",
+          "service_name",
+          "kind",
+          "value_sent",
+          "value_kind",
+          "reason",
+          "started_by",
+          "documents_sent",
+          "created_at"
+        ],
+        "title": "OutboundRequestOut",
         "type": "object"
       },
       "OwnershipChainLinkOut": {
@@ -26486,6 +27447,60 @@
         "title": "PresentationStyleCatalogOut",
         "type": "object"
       },
+      "PrivateAiStoreOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "on_this_computer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "On This Computer"
+          },
+          "outside_allowed": {
+            "title": "Outside Allowed",
+            "type": "boolean"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          }
+        },
+        "required": [
+          "enabled",
+          "provider",
+          "model",
+          "on_this_computer",
+          "outside_allowed"
+        ],
+        "title": "PrivateAiStoreOut",
+        "type": "object"
+      },
       "PromoteToDeckRequest": {
         "properties": {
           "deck_kind": {
@@ -27296,6 +28311,24 @@
           "rows"
         ],
         "title": "RecordTagsOut",
+        "type": "object"
+      },
+      "RecordsStoreOut": {
+        "properties": {
+          "claims": {
+            "title": "Claims",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "claims"
+        ],
+        "title": "RecordsStoreOut",
         "type": "object"
       },
       "RedFlagOut": {
@@ -29311,7 +30344,7 @@
         "type": "object"
       },
       "RunPlanRequest": {
-        "description": "What a run would do, before it runs (mockup AI_2).",
+        "description": "What a run would do, before it runs (mockup AI_2). A presentation draft takes its goal in `question` and the\nrecords you picked in `record_refs`, and none of the TAS settings or premises.",
         "properties": {
           "handoff_from": {
             "anyOf": [
@@ -29342,7 +30375,8 @@
               {
                 "enum": [
                   "case_synthesis",
-                  "hypothesis_test"
+                  "hypothesis_test",
+                  "presentation_draft"
                 ],
                 "type": "string"
               },
@@ -29393,6 +30427,21 @@
             "minLength": 1,
             "title": "Question",
             "type": "string"
+          },
+          "record_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RecordRef"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Record Refs"
           },
           "severity_floor": {
             "anyOf": [
@@ -29858,6 +30907,399 @@
           "label"
         ],
         "title": "RunSettingValueOut",
+        "type": "object"
+      },
+      "SafetyAccessOut": {
+        "properties": {
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "needs_attention": {
+            "title": "Needs Attention",
+            "type": "boolean"
+          },
+          "refused_24h": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refused 24H"
+          },
+          "remote_api_enabled": {
+            "title": "Remote Api Enabled",
+            "type": "boolean"
+          },
+          "restore_api_enabled": {
+            "title": "Restore Api Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "mode",
+          "remote_api_enabled",
+          "refused_24h",
+          "needs_attention",
+          "restore_api_enabled"
+        ],
+        "title": "SafetyAccessOut",
+        "type": "object"
+      },
+      "SafetyAnswerIn": {
+        "additionalProperties": false,
+        "description": "The reporter's answer to an \"Only you can say\" question; null takes it back.",
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "enum": [
+                  "YES",
+                  "NO",
+                  "NOT_SURE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "question": {
+            "enum": [
+              "threats",
+              "doxxing"
+            ],
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "SafetyAnswerIn",
+        "type": "object"
+      },
+      "SafetyBackupIn": {
+        "additionalProperties": false,
+        "description": "Back up now. A passphrase protects the backup (ADR-0015); null saves it without one, which the reporter\nchooses on purpose. The passphrase is used to seal the file and dropped: never stored, logged or sent back.",
+        "properties": {
+          "passphrase": {
+            "anyOf": [
+              {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passphrase"
+          }
+        },
+        "title": "SafetyBackupIn",
+        "type": "object"
+      },
+      "SafetyDeleteOut": {
+        "properties": {
+          "can_delete": {
+            "title": "Can Delete",
+            "type": "boolean"
+          },
+          "files_to_delete": {
+            "title": "Files To Delete",
+            "type": "integer"
+          },
+          "record_total": {
+            "title": "Record Total",
+            "type": "integer"
+          },
+          "shared_files_kept": {
+            "title": "Shared Files Kept",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "record_total",
+          "files_to_delete",
+          "shared_files_kept",
+          "can_delete"
+        ],
+        "title": "SafetyDeleteOut",
+        "type": "object"
+      },
+      "SafetyQuestionOut": {
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "enum": [
+                  "YES",
+                  "NO",
+                  "NOT_SURE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "answered_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answered At"
+          },
+          "id": {
+            "enum": [
+              "threats",
+              "doxxing"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "indicators": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Indicators",
+            "type": "array"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "indicators",
+          "answer",
+          "answered_at"
+        ],
+        "title": "SafetyQuestionOut",
+        "type": "object"
+      },
+      "SafetyServiceOut": {
+        "properties": {
+          "configured": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configured"
+          },
+          "ever_used": {
+            "title": "Ever Used",
+            "type": "boolean"
+          },
+          "last": {
+            "items": {
+              "$ref": "#/components/schemas/OutboundRequestOut"
+            },
+            "title": "Last",
+            "type": "array"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          },
+          "locked_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locked Reason"
+          },
+          "mode": {
+            "enum": [
+              "OFF",
+              "ASK",
+              "AUTOMATIC"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sent_count": {
+            "title": "Sent Count",
+            "type": "integer"
+          },
+          "sent_kinds": {
+            "items": {
+              "$ref": "#/components/schemas/SentKindOut"
+            },
+            "title": "Sent Kinds",
+            "type": "array"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "name",
+          "line",
+          "mode",
+          "locked_reason",
+          "configured",
+          "sent_count",
+          "sent_kinds",
+          "ever_used",
+          "last"
+        ],
+        "title": "SafetyServiceOut",
+        "type": "object"
+      },
+      "SafetyStoresOut": {
+        "properties": {
+          "backups": {
+            "$ref": "#/components/schemas/BackupsStoreOut"
+          },
+          "documents": {
+            "$ref": "#/components/schemas/DocumentsStoreOut"
+          },
+          "private_ai": {
+            "$ref": "#/components/schemas/PrivateAiStoreOut"
+          },
+          "records": {
+            "$ref": "#/components/schemas/RecordsStoreOut"
+          },
+          "security_log": {
+            "$ref": "#/components/schemas/SecurityLogStoreOut"
+          },
+          "service_keys": {
+            "$ref": "#/components/schemas/KeysStoreOut"
+          }
+        },
+        "required": [
+          "records",
+          "documents",
+          "backups",
+          "service_keys",
+          "security_log",
+          "private_ai"
+        ],
+        "title": "SafetyStoresOut",
+        "type": "object"
+      },
+      "SafetySummaryOut": {
+        "description": "Keep › Safety & data in one reply: totals for the period, the six stores, the outside services with their\nmodes, who can reach the case, what deleting it removes, and the reporter's private answers.",
+        "properties": {
+          "access": {
+            "$ref": "#/components/schemas/SafetyAccessOut"
+          },
+          "delete": {
+            "$ref": "#/components/schemas/SafetyDeleteOut"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "investigation_name": {
+            "title": "Investigation Name",
+            "type": "string"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyQuestionOut"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyServiceOut"
+            },
+            "title": "Services",
+            "type": "array"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "stores": {
+            "$ref": "#/components/schemas/SafetyStoresOut"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/SafetyTotalsOut"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "investigation_name",
+          "since",
+          "totals",
+          "stores",
+          "services",
+          "access",
+          "delete",
+          "questions"
+        ],
+        "title": "SafetySummaryOut",
+        "type": "object"
+      },
+      "SafetyTotalsOut": {
+        "properties": {
+          "ai_calls_outside": {
+            "title": "Ai Calls Outside",
+            "type": "integer"
+          },
+          "documents_sent": {
+            "title": "Documents Sent",
+            "type": "integer"
+          },
+          "requests": {
+            "title": "Requests",
+            "type": "integer"
+          },
+          "services_reached": {
+            "title": "Services Reached",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "requests",
+          "services_reached",
+          "documents_sent",
+          "ai_calls_outside"
+        ],
+        "title": "SafetyTotalsOut",
         "type": "object"
       },
       "SameAnswerCandidateOut": {
@@ -30649,6 +32091,43 @@
         "title": "SecurityAuditViewOut",
         "type": "object"
       },
+      "SecurityLogStoreOut": {
+        "properties": {
+          "events": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Events"
+          },
+          "keep_days": {
+            "title": "Keep Days",
+            "type": "integer"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          }
+        },
+        "required": [
+          "events",
+          "size_bytes",
+          "keep_days"
+        ],
+        "title": "SecurityLogStoreOut",
+        "type": "object"
+      },
       "SecurityRemoteHostOut": {
         "properties": {
           "client_host": {
@@ -30736,6 +32215,51 @@
           "path"
         ],
         "title": "SendIn",
+        "type": "object"
+      },
+      "SentKindOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "value_kind": {
+            "title": "Value Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value_kind",
+          "count"
+        ],
+        "title": "SentKindOut",
+        "type": "object"
+      },
+      "ServiceModeIn": {
+        "additionalProperties": false,
+        "description": "A case's mode for one outside service (research Keep §7: Off / Ask first / Automatic).",
+        "properties": {
+          "mode": {
+            "enum": [
+              "OFF",
+              "ASK",
+              "AUTOMATIC"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "service": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Service",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "mode"
+        ],
+        "title": "ServiceModeIn",
         "type": "object"
       },
       "SettingsLimitsOut": {
@@ -32134,6 +33658,144 @@
           "state"
         ],
         "title": "StoryUnplacedOut",
+        "type": "object"
+      },
+      "StrayFileAddBackIn": {
+        "additionalProperties": false,
+        "description": "One stray file to add back to a case as a document (Housekeeping, research Keep §12).",
+        "properties": {
+          "path": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "StrayFileAddBackIn",
+        "type": "object"
+      },
+      "StrayFileAddedBackOut": {
+        "description": "The stray file is now a document of the case; it is read like an upload (follow it on The Drop).",
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "document_id",
+          "filename",
+          "job_id"
+        ],
+        "title": "StrayFileAddedBackOut",
+        "type": "object"
+      },
+      "StrayFileDeletedOut": {
+        "properties": {
+          "relative_path": {
+            "title": "Relative Path",
+            "type": "string"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "relative_path",
+          "size_bytes"
+        ],
+        "title": "StrayFileDeletedOut",
+        "type": "object"
+      },
+      "StrayFilesDeletedOut": {
+        "properties": {
+          "deleted": {
+            "items": {
+              "$ref": "#/components/schemas/StrayFileDeletedOut"
+            },
+            "title": "Deleted",
+            "type": "array"
+          },
+          "deleted_count": {
+            "title": "Deleted Count",
+            "type": "integer"
+          },
+          "freed_bytes": {
+            "title": "Freed Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "deleted",
+          "deleted_count",
+          "freed_bytes"
+        ],
+        "title": "StrayFilesDeletedOut",
+        "type": "object"
+      },
+      "StrayFilesIn": {
+        "additionalProperties": false,
+        "description": "Stray files to Keep or Delete (Housekeeping, research Keep §12): paths relative to the document storage\nfolder, as GET /settings/storage/orphans lists them. Each is checked again on the server; one that is not a\ncurrent stray file refuses the whole request and nothing changes.",
+        "properties": {
+          "paths": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Paths",
+            "type": "array"
+          }
+        },
+        "required": [
+          "paths"
+        ],
+        "title": "StrayFilesIn",
+        "type": "object"
+      },
+      "StrayFilesKeptOut": {
+        "properties": {
+          "kept": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Kept",
+            "type": "array"
+          },
+          "kept_count": {
+            "title": "Kept Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kept",
+          "kept_count"
+        ],
+        "title": "StrayFilesKeptOut",
         "type": "object"
       },
       "StyleWarningOut": {
@@ -33651,7 +35313,7 @@
         "type": "object"
       },
       "ToCheckItemOut": {
-        "description": "Something a person checks: a passage to read, a checklist item, or a money\ncheck a person kept (kind \"money\", indicator_id the check's kind). The app\nnever decides it; open until a person does.",
+        "description": "Something a person checks: a passage to read, a checklist item, a money\ncheck a person kept (kind \"money\", indicator_id the check's kind), or a link\na person added from The Wire because no reviewed source shows it yet (kind\n\"link\", ``relationship_id`` the link). The app never decides it; open until\na person does.",
         "properties": {
           "decided_at": {
             "anyOf": [
@@ -33733,7 +35395,8 @@
             "enum": [
               "passage",
               "checklist",
-              "money"
+              "money",
+              "link"
             ],
             "title": "Kind",
             "type": "string"
@@ -33777,6 +35440,17 @@
             },
             "title": "Related Flags",
             "type": "array"
+          },
+          "relationship_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relationship Id"
           },
           "status": {
             "enum": [
@@ -35731,6 +37405,55 @@
         "title": "WireFlagsOut",
         "type": "object"
       },
+      "WireLinkFlagOut": {
+        "description": "An open Red Flag a link is part of: its level, name, sentence, path (a loop's) and first innocent explanation.",
+        "properties": {
+          "flag_id": {
+            "title": "Flag Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "innocent": {
+            "title": "Innocent",
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "faint",
+              "strong",
+              "textbook"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "flag_id",
+          "id",
+          "level",
+          "name",
+          "text",
+          "path",
+          "innocent"
+        ],
+        "title": "WireLinkFlagOut",
+        "type": "object"
+      },
       "WireLinkOut": {
         "properties": {
           "amount": {
@@ -35768,6 +37491,14 @@
             ],
             "title": "Fam",
             "type": "string"
+          },
+          "flags": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/WireLinkFlagOut"
+            },
+            "title": "Flags",
+            "type": "array"
           },
           "id": {
             "title": "Id",
@@ -35836,6 +37567,14 @@
             },
             "title": "Links",
             "type": "array"
+          },
+          "worked_out": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/WireWorkedOutOut"
+            },
+            "title": "Worked Out",
+            "type": "array"
           }
         },
         "required": [
@@ -35848,10 +37587,22 @@
         "type": "object"
       },
       "WireQuoteOut": {
+        "description": "A quote that shows a link; document_id and page when it comes from a document the case holds (page: the\npage its passage is on, none when not found), pdf when that document can be drawn as a page.",
         "properties": {
           "doc": {
             "title": "Doc",
             "type": "string"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
           },
           "evidence_id": {
             "anyOf": [
@@ -35868,6 +37619,22 @@
             "title": "Loc",
             "type": "string"
           },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "pdf": {
+            "default": false,
+            "title": "Pdf",
+            "type": "boolean"
+          },
           "q": {
             "title": "Q",
             "type": "string"
@@ -35879,6 +37646,104 @@
           "q"
         ],
         "title": "WireQuoteOut",
+        "type": "object"
+      },
+      "WireWorkedOutOut": {
+        "description": "A link the app works out from stored links (app/services/wire.py worked_out): never stored, never a\nreviewed fact. pct is the worked-out share, empty with share_unknown_because when it cannot be worked out;\ninputs are the stored links it rests on (the shortest path's first, in order); via the parties between on\nthe shortest path; flag_id the circular-ownership Red Flag its paths run through.",
+        "properties": {
+          "fam": {
+            "const": "owns",
+            "title": "Fam",
+            "type": "string"
+          },
+          "flag_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Inputs",
+            "type": "array"
+          },
+          "paths": {
+            "title": "Paths",
+            "type": "integer"
+          },
+          "pct": {
+            "title": "Pct",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "rule_name": {
+            "title": "Rule Name",
+            "type": "string"
+          },
+          "rule_text": {
+            "title": "Rule Text",
+            "type": "string"
+          },
+          "s": {
+            "title": "S",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "share_unknown_because": {
+            "title": "Share Unknown Because",
+            "type": "string"
+          },
+          "steps": {
+            "title": "Steps",
+            "type": "integer"
+          },
+          "t": {
+            "title": "T",
+            "type": "string"
+          },
+          "via": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Via",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "s",
+          "t",
+          "schema",
+          "fam",
+          "pct",
+          "share_unknown_because",
+          "rule",
+          "rule_name",
+          "rule_text",
+          "inputs",
+          "paths",
+          "steps",
+          "via",
+          "flag_id"
+        ],
+        "title": "WireWorkedOutOut",
         "type": "object"
       },
       "WriteupCreate": {
@@ -52749,6 +54614,126 @@
         "summary": "List Investigation Cross References"
       }
     },
+    "/api/investigations/{investigation_id}/decision-snoozes": {
+      "post": {
+        "description": "Puts a waiting decision off (H on Decide): until a time, until the item changes, or whichever comes first.",
+        "operationId": "snooze_decision",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionSnoozeCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionSnoozeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Snooze Decision"
+      }
+    },
+    "/api/investigations/{investigation_id}/decision-snoozes/wake": {
+      "post": {
+        "description": "Brings a decision put off back into the queue now (Restore, or Z right after H).",
+        "operationId": "wake_decision",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionWake"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionWakeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Wake Decision"
+      }
+    },
     "/api/investigations/{investigation_id}/decisions": {
       "get": {
         "operationId": "get_decisions",
@@ -52823,6 +54808,18 @@
               "minimum": 1,
               "title": "Limit",
               "type": "integer"
+            }
+          },
+          {
+            "description": "Only the decisions put off (H) and still asleep.",
+            "in": "query",
+            "name": "snoozed",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only the decisions put off (H) and still asleep.",
+              "title": "Snoozed",
+              "type": "boolean"
             }
           }
         ],
@@ -54142,6 +56139,202 @@
         "summary": "Add Note"
       }
     },
+    "/api/investigations/{investigation_id}/outbound-log": {
+      "get": {
+        "description": "Every request that left this computer for an outside service, newest first: the value word for word.\nAppend-only: nothing here changes or removes a row.",
+        "operationId": "get_outbound_log",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only what left at or after this time (UTC when no offset); leave out for all of it",
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only what left at or after this time (UTC when no offset); leave out for all of it",
+              "title": "Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "service",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 2147483647,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutboundLogOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Outbound Log"
+      }
+    },
+    "/api/investigations/{investigation_id}/outbound-log/export": {
+      "get": {
+        "operationId": "export_outbound_log",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only what left at or after this time (UTC when no offset); leave out for all of it",
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only what left at or after this time (UTC when no offset); leave out for all of it",
+              "title": "Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "service",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The outbound log as CSV, oldest first"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Export Outbound Log"
+      }
+    },
     "/api/investigations/{investigation_id}/paths": {
       "get": {
         "description": "Every chain of links between two parties, up to max_len links, each with how sure its weakest link is.",
@@ -54824,6 +57017,263 @@
         "summary": "List Reporting Tasks"
       }
     },
+    "/api/investigations/{investigation_id}/safety": {
+      "get": {
+        "description": "Totals for the period with zeroes stated, the six stores on this computer, the outside services with their\nmodes and what each was sent, who can reach the case, and what deleting it removes.",
+        "operationId": "get_safety",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only what left at or after this time (UTC when no offset); leave out for all of it",
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only what left at or after this time (UTC when no offset); leave out for all of it",
+              "title": "Since"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafetySummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Safety"
+      }
+    },
+    "/api/investigations/{investigation_id}/safety/answers": {
+      "put": {
+        "description": "The reporter's answer to an \"Only you can say\" question. Kept on this computer only, never in a backup.",
+        "operationId": "put_safety_answer",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SafetyAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafetySummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Put Safety Answer"
+      }
+    },
+    "/api/investigations/{investigation_id}/safety/backup": {
+      "post": {
+        "description": "Back up now: the case's portable backup with its documents, and a record of it (when, size, checksum, whether\nprotected). With a passphrase in the body the file is sealed with it (ADR-0015); without one it is not.",
+        "operationId": "make_safety_backup",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/SafetyBackupIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "A portable backup of the case (.jwbackup.zip), kept on record"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Make Safety Backup"
+      }
+    },
+    "/api/investigations/{investigation_id}/service-modes": {
+      "put": {
+        "description": "Off / Ask first / Automatic for one outside service in this case. Enforced where the calls are made.",
+        "operationId": "put_service_mode",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceModeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafetySummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Put Service Mode"
+      }
+    },
     "/api/investigations/{investigation_id}/since": {
       "get": {
         "operationId": "get_since",
@@ -55014,6 +57464,72 @@
           }
         },
         "summary": "Get Standing"
+      }
+    },
+    "/api/investigations/{investigation_id}/storage/orphans/add-back": {
+      "post": {
+        "description": "Add back to the case (Housekeeping, research Keep §12 \"opens The Drop with it\"): the stray file becomes a\ndocument of this case and is read like an upload. When its bytes are saved as a new copy the stray original is\nremoved. Local-only; the path is checked again here like Delete.",
+        "operationId": "add_back_stray_file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StrayFileAddBackIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StrayFileAddedBackOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "The same bytes are already a document of this case"
+          },
+          "415": {
+            "description": "The reader this deployment uses cannot read this kind of file"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Add Back Stray File"
       }
     },
     "/api/investigations/{investigation_id}/story": {
@@ -57233,6 +59749,286 @@
         "summary": "Link Lead"
       }
     },
+    "/api/learning/answers": {
+      "post": {
+        "description": "Again / Good (or Hard / Easy): moves the card along the ladder and says when it comes back.",
+        "operationId": "answer_learning_card",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningAnswer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearningCardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Answer Learning Card"
+      }
+    },
+    "/api/learning/cards": {
+      "get": {
+        "description": "A deck's cards, due first; with due_only, only those due now. ``ref`` finds one indicator's or term's card.",
+        "operationId": "list_learning_cards",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "deck",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "case",
+                "area",
+                "terms",
+                "safety"
+              ],
+              "title": "Deck",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The open case's areas, comma-separated (BO,ML): the \"My case's areas\" deck.",
+            "in": "query",
+            "name": "areas",
+            "required": false,
+            "schema": {
+              "default": "",
+              "description": "The open case's areas, comma-separated (BO,ML): the \"My case's areas\" deck.",
+              "maxLength": 400,
+              "pattern": "^([A-Z]{2,3}(,[A-Z]{2,3})*)?$",
+              "title": "Areas",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "area",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Z]{2,3}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Area"
+            }
+          },
+          {
+            "in": "query",
+            "name": "due_only",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Due Only",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ref"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearningCardListOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Learning Cards"
+      },
+      "post": {
+        "description": "＋ Flip card: keeps the indicator or term as a card, due now. Adding it again changes nothing.",
+        "operationId": "add_learning_card",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningCardCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearningCardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Add Learning Card"
+      }
+    },
+    "/api/learning/summary": {
+      "get": {
+        "description": "How many flip cards are due, in all and per deck, and when the next falls due.",
+        "operationId": "learning_summary",
+        "parameters": [
+          {
+            "description": "The open case's areas, comma-separated (BO,ML): the \"My case's areas\" deck.",
+            "in": "query",
+            "name": "areas",
+            "required": false,
+            "schema": {
+              "default": "",
+              "description": "The open case's areas, comma-separated (BO,ML): the \"My case's areas\" deck.",
+              "maxLength": 400,
+              "pattern": "^([A-Z]{2,3}(,[A-Z]{2,3})*)?$",
+              "title": "Areas",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearningSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Learning Summary"
+      }
+    },
     "/api/notes/{note_id}": {
       "delete": {
         "description": "Delete the note. A lead made from it stays.",
@@ -58132,6 +60928,56 @@
           }
         },
         "summary": "Patch Relationship Suite"
+      }
+    },
+    "/api/relationships/{relationship_id}/to-check": {
+      "post": {
+        "description": "Keeps a link in To check (The Wire's chain strip, \"Add to To check →\"): an item asking for a reviewed source\nfor it, on its two parties. Once; adding it again changes nothing.",
+        "operationId": "keep_link_check",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relationship_id",
+            "required": true,
+            "schema": {
+              "title": "Relationship Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecksOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Keep Link Check"
       }
     },
     "/api/reporting-tasks": {
@@ -59329,6 +62175,104 @@
           }
         },
         "summary": "Get Orphan Storage Preview"
+      }
+    },
+    "/api/settings/storage/orphans/delete": {
+      "post": {
+        "description": "Delete stray files the reporter confirmed (Housekeeping, research Keep §12). Local-only. Each path is checked\nagain here: under the document storage folder, not a link, not a staging folder, and no document points to it;\none that is not refuses the whole request (400) and nothing is deleted. Written to the security audit log.",
+        "operationId": "delete_stray_files",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StrayFilesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StrayFilesDeletedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Delete Stray Files"
+      }
+    },
+    "/api/settings/storage/orphans/keep": {
+      "post": {
+        "description": "Keep (Housekeeping, research Keep §12): the files stay on disk and are not offered again. Local-only, like\nthe list. A path that is not a current stray file under document storage refuses the request (400).",
+        "operationId": "keep_stray_files",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StrayFilesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StrayFilesKeptOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Keep Stray Files"
       }
     },
     "/api/sources": {

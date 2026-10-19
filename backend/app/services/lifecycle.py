@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.db.session import Base
 from app.db.locking import lock_investigation_transaction
-from app.models.domain import Document, Investigation
+from app.models.domain import Document, Investigation, KeptStrayFile
 from app.services.security import resolve_storage_root
 
 logger = logging.getLogger("journalism.lifecycle")
@@ -264,15 +264,17 @@ def delete_investigation(db: Session, investigation_id: str, storage_root: str |
     }
 
 
-def preview_orphan_document_files(db: Session, storage_root: str | Path) -> dict[str, Any]:
-    """Report regular files under document storage that no Document row references.
+# Internal transient trees under document storage: never reported as stray and never touched by Housekeeping.
+STAGING_TOP_LEVEL = {".delete-staging", ".restore-staging", ".upload-staging"}
+STAGING_PREFIXES = (".restore-stage-",)  # restore's per-run temporary folder (exports.restore_investigation_export)
 
-    This is deliberately read-only. Cleanup must remain an explicit later action so a reporter
-    can inspect unexpected files before anything is removed. Internal transient staging trees
-    are excluded from the report.
-    """
-    root = resolve_storage_root(storage_root)
-    root.mkdir(parents=True, exist_ok=True)
+
+def is_staging_part(part: str) -> bool:
+    return part in STAGING_TOP_LEVEL or part.startswith(STAGING_PREFIXES)
+
+
+def referenced_document_paths(db: Session, root: Path) -> tuple[set[str], list[dict[str, str]]]:
+    """Resolved paths of every file a Document row points to, and the rows whose path is outside storage."""
     referenced: set[str] = set()
     unsafe_references: list[dict[str, str]] = []
     for document_id, raw in db.execute(select(Document.id, Document.storage_path)).all():
@@ -283,21 +285,38 @@ def preview_orphan_document_files(db: Session, storage_root: str | Path) -> dict
         except ValueError as exc:
             logger.warning("Unsafe stored path for document %s: %s", document_id, exc)
             unsafe_references.append({"document_id": str(document_id), "storage_path": str(raw), "error": UNSAFE_PATH})
+    return referenced, unsafe_references
 
-    ignored_top_level = {".delete-staging", ".restore-staging", ".upload-staging"}
+
+def preview_orphan_document_files(db: Session, storage_root: str | Path) -> dict[str, Any]:
+    """Report regular files under document storage that no Document row references.
+
+    Read-only. Cleanup is an explicit later action (app/services/housekeeping.py: Keep, Add back, Delete) so a
+    reporter can inspect unexpected files before anything is removed. Internal transient staging trees are
+    excluded, and so are files the reporter chose to Keep (kept_stray_files; counted in kept_file_count).
+    """
+    root = resolve_storage_root(storage_root)
+    root.mkdir(parents=True, exist_ok=True)
+    referenced, unsafe_references = referenced_document_paths(db, root)
+    kept = set(db.scalars(select(KeptStrayFile.relative_path)))
+
     files: list[dict[str, Any]] = []
+    kept_count = 0
     for path in sorted(root.rglob("*")):
-        if not path.is_file():
+        if path.is_symlink() or not path.is_file():
             continue
         rel = path.relative_to(root)
-        if rel.parts and rel.parts[0] in ignored_top_level:
+        if rel.parts and is_staging_part(rel.parts[0]):
             continue
         resolved = str(path.resolve())
         if resolved in referenced:
             continue
+        if rel.as_posix() in kept:
+            kept_count += 1
+            continue
         stat = path.stat()
         files.append({
-            "relative_path": str(rel),
+            "relative_path": rel.as_posix(),
             "size_bytes": int(stat.st_size),
             "modified_at": float(stat.st_mtime),
             "action": "retain_until_explicit_cleanup",
@@ -308,7 +327,8 @@ def preview_orphan_document_files(db: Session, storage_root: str | Path) -> dict
         "orphan_files": files,
         "orphan_file_count": len(files),
         "orphan_bytes": sum(item["size_bytes"] for item in files),
+        "kept_file_count": kept_count,
         "unsafe_document_references": unsafe_references,
-        "cleanup_available": False,
-        "policy": "preview_only_retain_by_default",
+        "cleanup_available": True,
+        "policy": "retain_until_reporter_decides",
     }

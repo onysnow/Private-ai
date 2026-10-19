@@ -10,6 +10,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 
 from app.api.dependencies import authorize_request_resource
 from app.core.access import request_is_local_request
@@ -22,17 +23,27 @@ from app.core.audit_log import (
 )
 from app.core.config import settings
 from app.db.session import get_db
-from app.models.domain import AppUser
+from app.api.routes_documents import _submit_or_record_failure
+from app.jobs.handlers import EXTRACT_DOCUMENT
+from app.jobs.records import create_job
+from app.jobs.runner import job_runner
+from app.models.domain import AppUser, Investigation
 from app.schemas.api import (
     AppUserCreate, AppUserUpdate, ConnectorCredentialPut, InvestigationMembershipPut, SecurityAuditRetentionRequest,
+    StrayFileAddBackIn, StrayFilesIn,
 )
 from app.schemas.responses import (
     AppUserCreatedOut, AppUserOut, AppUserTokenRevokedOut, AppUserTokenRotatedOut, AppUserUpdatedOut,
     ConnectorCredentialRemovedOut, ConnectorCredentialSavedOut, InvestigationMembershipOut, OrphanStoragePreviewOut,
     SecurityAlertsOut, SecurityAuditRetentionPreviewOut, SecurityAuditRetentionResultOut, SecurityAuditSummaryOut,
-    SecurityAuditViewOut, SettingsStatusOut,
+    SecurityAuditViewOut, SettingsStatusOut, StrayFileAddedBackOut, StrayFilesDeletedOut, StrayFilesKeptOut,
 )
 from app.services.lifecycle import preview_orphan_document_files as _preview_orphan_document_files
+from app.services import housekeeping
+from app.services.document_formats import UnsupportedFormat, check_upload
+from app.services.documents import sha256_bytes, store_document
+from app.services.ingestion_batches import find_duplicate
+from app.services.security import resolve_storage_root
 from app.services.settings import (
     create_app_user as _create_app_user,
     delete_connector_credential as _delete_connector_credential,
@@ -253,3 +264,71 @@ def get_orphan_storage_preview(request: Request, db: Session = Depends(get_db)) 
     except Exception:
         logger.exception("Orphan storage preview failed")
         raise HTTPException(500, "Orphan storage preview failed; details are in the server log.") from None
+
+
+@router.post("/settings/storage/orphans/keep", response_model=StrayFilesKeptOut)
+def keep_stray_files(body: StrayFilesIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Keep (Housekeeping, research Keep §12): the files stay on disk and are not offered again. Local-only, like
+    the list. A path that is not a current stray file under document storage refuses the request (400)."""
+    _require_local_request(request)
+    try:
+        return housekeeping.keep_stray_files(db, settings.document_storage_dir, body.paths)
+    except housekeeping.StrayFileRefused as exc:
+        raise HTTPException(400, str(exc)) from None
+
+
+@router.post("/settings/storage/orphans/delete", response_model=StrayFilesDeletedOut)
+def delete_stray_files(body: StrayFilesIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Delete stray files the reporter confirmed (Housekeeping, research Keep §12). Local-only. Each path is checked
+    again here: under the document storage folder, not a link, not a staging folder, and no document points to it;
+    one that is not refuses the whole request (400) and nothing is deleted. Written to the security audit log."""
+    _require_local_request(request)
+    try:
+        result = housekeeping.delete_stray_files(db, settings.document_storage_dir, body.paths)
+    except housekeeping.StrayFileRefused as exc:
+        raise HTTPException(400, str(exc)) from None
+    request.app.state.audit_logger.write(
+        request_id=getattr(request.state, "request_id", ""), method=request.method, path=request.url.path,
+        status_code=200, client_host=request.client.host if request.client else None, local_request=True,
+        event="stray_files_deleted",
+    )
+    return result
+
+
+@router.post("/investigations/{investigation_id}/storage/orphans/add-back", response_model=StrayFileAddedBackOut,
+             responses={409: {"description": "The same bytes are already a document of this case"},
+                        415: {"description": "The reader this deployment uses cannot read this kind of file"}})
+async def add_back_stray_file(investigation_id: str, body: StrayFileAddBackIn, request: Request,
+                              db: Session = Depends(get_db)) -> Any:
+    """Add back to the case (Housekeeping, research Keep §12 "opens The Drop with it"): the stray file becomes a
+    document of this case and is read like an upload. When its bytes are saved as a new copy the stray original is
+    removed. Local-only; the path is checked again here like Delete."""
+    _require_local_request(request)
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    try:
+        stray, filename, mime = housekeeping.stray_file_for_add_back(db, settings.document_storage_dir, body.path)
+    except housekeeping.StrayFileRefused as exc:
+        raise HTTPException(400, str(exc)) from None
+    try:
+        check_upload(filename, mime)
+    except UnsupportedFormat as exc:
+        raise HTTPException(415, str(exc)) from None
+    if stray.stat().st_size > settings.max_document_bytes:
+        raise HTTPException(413, "The file is larger than a document may be")
+    data = stray.read_bytes()
+    if not data:
+        raise HTTPException(400, "The file is empty")
+    existing = find_duplicate(db, investigation_id, sha256_bytes(data))
+    if existing is not None:
+        raise HTTPException(409, f"Already in this case as “{existing.filename}”")
+    doc = await run_in_threadpool(
+        store_document, db, investigation_id=investigation_id, title=filename.rsplit(".", 1)[0] or filename,
+        filename=filename, mime_type=mime, data=data, storage_dir=resolve_storage_root(settings.document_storage_dir),
+        source_metadata={"added_back_from_storage": True},
+    )
+    housekeeping.finish_add_back(db, settings.document_storage_dir, stray, doc)
+    job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=investigation_id, subject_type="document",
+                     subject_id=doc.id, runner=job_runner(request).mode)
+    await _submit_or_record_failure(request, job, db)
+    return {"investigation_id": investigation_id, "document_id": doc.id, "filename": filename, "job_id": job.id}

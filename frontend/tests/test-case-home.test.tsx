@@ -130,7 +130,7 @@ describe('Case home', () => {
       ],
     });
     wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
-    const check = screen.getByRole('region', {name: 'Check'});
+    const check = await screen.findByRole('region', {name: 'Check'});
     expect(await within(check).findByLabelText('Claims: 1 of 3')).toBeInTheDocument();
     fireEvent.keyDown(window, {key: '2'});
     expect(check).toHaveFocus();
@@ -235,6 +235,90 @@ describe('Case home', () => {
     await waitFor(() => expect(onSwitch).toHaveBeenCalledWith('inv-1'));
     expect(api.lastBody('POST /api/investigations')).toEqual({name: 'Kestrel SA', question: 'Who really owns the harbour land?'});
     expect(screen.getByRole('button', {name: 'Or open the sample case to look around'})).toBeInTheDocument();
+  });
+
+  it('previews a standing number\'s list on hover or focus, pins it on a click, and closes it with Escape', async () => {
+    routes({'GET /api/investigations/inv-1/claims': [
+      {id: 'c1', investigation_id: 'inv-1', text: 'Kestrel SA bought the harbour land in 2020 with its own funds.', status: 'disputed', confidence: 0.3, created_at: '2026-10-01T00:00:00'},
+      {id: 'c2', investigation_id: 'inv-1', text: 'Fernhill Ltd paid €29,400.', status: 'supported', confidence: 0.9, created_at: '2026-10-01T00:00:00'},
+    ]});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const strip = screen.getByRole('list', {name: 'Where the case stands'});
+    await within(strip).findByText('11');
+    const disputed = within(strip).getByRole('link', {name: /3\s*claims disputed/});
+    // Focus previews: the claims of that status, from the claims list, and a link to the full list.
+    act(() => { disputed.focus(); });
+    const pop = await screen.findByRole('dialog', {name: '1 claim disputed'});
+    expect(disputed).toHaveAttribute('aria-expanded', 'true');
+    expect(within(pop).getByText('Kestrel SA bought the harbour land in 2020 with its own funds.')).toBeInTheDocument();
+    expect(within(pop).queryByText('Fernhill Ltd paid €29,400.')).not.toBeInTheDocument();
+    expect(within(pop).getByRole('link', {name: /Open the claims in Check/})).toHaveAttribute('href', '/check?inv=inv-1#claim-verification');
+    // A click pins it (it stays when the pointer leaves); Escape closes it.
+    fireEvent.click(disputed);
+    expect(screen.getByRole('dialog')).toHaveClass('pinned');
+    fireEvent.mouseLeave(disputed);
+    await new Promise(r => setTimeout(r, 300));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    // Hover previews after a moment, and leaving closes an unpinned list.
+    fireEvent.mouseEnter(within(strip).getByRole('link', {name: /2\s*to decide/}));
+    const decide = await screen.findByRole('dialog', {name: /2 things to decide/});
+    expect(await within(decide).findByText('Does page 4 show that the harbour parcel was bought on behalf of Fernhill Ltd?')).toBeInTheDocument();
+    expect(within(decide).getByRole('link', {name: '1 Missing'})).toHaveAttribute('href', '/decide?kind=missing&inv=inv-1');
+    fireEvent.mouseLeave(within(strip).getByRole('link', {name: /2\s*to decide/}));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('lists the documents behind the number, failed ones first, each with a shape and a word', async () => {
+    const doc = (id: string, filename: string, status: string) => ({id, investigation_id: 'inv-1', filename, source_id: `src-${id}`, mime_type: null, sha256: id,
+      extraction_status: status, extraction_error: null, extraction_issues: [], created_at: '2026-10-12T00:00:00', chunk_count: 2, candidate_counts: {}, parent_document_id: null});
+    routes({
+      'GET /api/investigations/inv-1/standing': {...standing, documents: {total: 2, unread: 0, failed: 1}},
+      'GET /api/investigations/inv-1/documents': [doc('d1', 'minutes.pdf', 'extracted'), doc('d2', 'scan.tif', 'failed')],
+    });
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const strip = screen.getByRole('list', {name: 'Where the case stands'});
+    const docs = await within(strip).findByRole('link', {name: /documents · 0 unread · 1 failed/});
+    fireEvent.click(docs);
+    const pop = await screen.findByRole('dialog', {name: '2 documents · 0 unread · 1 could not be read'});
+    const rows = within(pop).getAllByRole('listitem');
+    expect(rows[0]).toHaveTextContent('✕Could not be readscan.tif');
+    expect(rows[1]).toHaveTextContent('✓Readminutes.pdf');
+    fireEvent.click(within(rows[0]).getByRole('button'));
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd2'});
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('shows an empty case its four first actions instead of the modules, each wired to its flow', async () => {
+    const empty = {...standing, claims: {total: 0, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, to_check: 0, missing: 0, to_decide: 0, to_decide_by_kind: {},
+      money: {currency: null, amount: 0, payments: 0, from_sources: 0, other_currencies: []}, timeline: {events: 0, from: null, to: null, years: []},
+      documents: {total: 0, unread: 0, failed: 0}, sources: 0, evidence: 0, network: {parties: 0, links: 0}, flags: {open: 0, textbook: 0, strong: 0, faint: 0},
+      leads: {open: 0}, watchlist: {names: 0, new_hits: 0}};
+    const api = routes({
+      'GET /api/investigations/inv-1/standing': empty,
+      'POST /api/demo/seed': {investigation_id: 'demo-1', created: true},
+      'GET /api/investigations': [INV],
+    });
+    const onSwitch = vi.fn();
+    wrap(<CaseHome investigation={{...INV, question: null}} investigations={[INV]} onSwitch={onSwitch} loading={false}/>);
+    const firsts = await screen.findByRole('region', {name: 'Start this case'});
+    expect(screen.queryByRole('region', {name: 'Check'})).not.toBeInTheDocument();
+    expect(within(firsts).getByRole('link', {name: /Drop documents/})).toHaveAttribute('href', '/bring-in?inv=inv-1#the-drop');
+    expect(within(firsts).getByRole('link', {name: /Add a name to look up/})).toHaveAttribute('href', '/bring-in?inv=inv-1#investigation-search');
+    const user = userEvent.setup();
+    await user.click(within(firsts).getByRole('button', {name: /Write the question/}));
+    expect(screen.getByRole('textbox', {name: 'The question'})).toHaveFocus();
+    await user.click(within(firsts).getByRole('button', {name: /Open the sample case/}));
+    await waitFor(() => expect(onSwitch).toHaveBeenCalledWith('demo-1'));
+    expect(api.calls('POST /api/demo/seed')).toHaveLength(1);
+  });
+
+  it('keeps the modules for a case with something in it', async () => {
+    routes({'GET /api/investigations/inv-1/standing': {...standing, claims: {total: 0, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, documents: {total: 0, unread: 0, failed: 0}}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    expect(await screen.findByRole('region', {name: 'Check'})).toBeInTheDocument();
+    expect(screen.queryByRole('region', {name: 'Start this case'})).not.toBeInTheDocument();
   });
 });
 

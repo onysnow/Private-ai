@@ -42,6 +42,7 @@ from app.core.authorization import current_authorization_scope, ensure_scope_can
 from app.core.config import Settings, settings as default_settings
 from app.core.time import utcnow_naive
 from app.models.domain import AIAnalysisCandidate, BackgroundJob, Evidence, Source
+from app.services import outbound
 from app.services.assistant_context import build_question_context, build_selected_record_context
 from app.visuals.spec import DRAWN_KINDS, QUESTIONS, spec_errors
 
@@ -1015,6 +1016,10 @@ def _run_reasoning_module(
             client = get_llm_client(settings)
         except LLMConfigurationError as exc:
             raise ReasoningInputError(str(exc)) from exc
+        try:  # a model elsewhere: the case's Outside AI mode decides before a packet is built (app/services/outbound.py)
+            outbound.guard_ai(db, investigation_id, settings)
+        except outbound.ServiceRefused as exc:
+            raise ReasoningInputError(str(exc)) from exc
 
         if packet_from:
             # Run again from a step (research AI §5): the earlier run's packet exactly as the model saw it.
@@ -1071,6 +1076,7 @@ def _run_reasoning_module(
         model_start = rec.emit("CHECK", "model", status="neutral", parent=retrieved, verdict="STARTED",
                                text=f"Model call: {(settings.ai_provider or '').strip()} {getattr(client, 'model', '') or ''}".strip())
         started_at = utcnow_naive()
+        outbound.record_ai_call(db, investigation_id, settings, user_prompt=user_prompt, system_prompt=system_prompt, packet=packet, module=module)
         response = coerce_response(client.generate(system_prompt, user_prompt, **generate_kwargs))
         seconds = round((utcnow_naive() - started_at).total_seconds(), 1)
         model_end = rec.emit("CHECK", "model", status="bad" if response.truncated else "good", parent=model_start,
@@ -1094,6 +1100,8 @@ def _run_reasoning_module(
                 chart_retries.append({"attempt": attempt, "removed": (retry_report or {}).get("removed", []), "feedback": feedback})
                 model_end = rec.emit("CHECK", "gate:chart", status="partial", parent=model_end, verdict="RETRY",
                                      text=f"A chart failed the chart check; sent back to the model (attempt {attempt})")
+                outbound.record_ai_call(db, investigation_id, settings, user_prompt=f"{user_prompt}\n\n{feedback}", system_prompt=system_prompt,
+                                        packet=packet, module=module)
                 response = coerce_response(client.generate(system_prompt, f"{user_prompt}\n\n{feedback}", **generate_kwargs))
 
     request = {

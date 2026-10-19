@@ -14,6 +14,8 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.ai.chart_check import MAX_CHART_RETRIES, visual_catalog_for_prompt
+from app.ai.quote_check import prompt_record_texts
 from app.ai.reasoning import (
     CONTROL_SURFACE_FLAGS,
     MODULE_FILES,
@@ -35,7 +37,7 @@ from app.ai.systems import SUITE_MODULES
 from app.core.config import Settings
 from app.core.config import settings as default_settings
 from app.models.domain import BackgroundJob, Evidence, Investigation, Source
-from app.services.assistant_context import build_question_context
+from app.services.assistant_context import RecordNotFoundError, build_question_context, build_selected_record_context
 
 # What each setting is called on screen, its values in plain words, and what it does (the suite name stays in
 # the tooltip, research AI §6). Kept here so the API and the screen say the same thing.
@@ -189,6 +191,34 @@ def _steps(module: str, options: dict[str, str], include_external_leads: bool, r
     return steps
 
 
+def _draft_steps(record_count: int, texts: int, catalog: dict) -> list[dict]:
+    """The presentation draft's plan (app-local, presentation_modules/PRESENTATION_DRAFT.md): the packet is the
+    records you picked and nothing else, with their text to quote from and the chart menu; no setting adds a step."""
+    title, system = MODULE_TEXT["presentation_draft"]
+    queries = catalog.get("queries") or []
+    with_data = sum(1 for q in queries if q.get("has_data"))
+    records = f"{record_count} record{'s' if record_count != 1 else ''}"
+    steps = [{
+        "key": "packet", "who": "APP", "title": "Build the packet from the records you picked", "changed": False,
+        "detail": f"Only the {records} you picked: no search, and no outside leads. The full text of {texts} of them goes in "
+                  f"to quote from, and the chart menu: {with_data} of {len(queries)} chart queries have data in this case.",
+    }, {
+        "key": "model", "who": "MODEL", "title": title, "system": system, "changed": False,
+        "detail": f"Workbench draft, an app module outside the suite. Writes the brief from the {records} in the packet only. "
+                  "A chart it orders is drawn by the app from the case's records, never from a number it writes; "
+                  f"a chart that fails the check goes back to the model, up to {MAX_CHART_RETRIES} more time{'s' if MAX_CHART_RETRIES != 1 else ''}.",
+    }, {
+        "key": "checks", "who": "APP", "title": "Enforced checks", "changed": False,
+        "detail": "Shape · every citation in the packet · every quote word for word · every chart drawn from the records · the writing read",
+    }, {
+        "key": "review", "who": "YOU", "title": "You decide", "changed": False,
+        "detail": "The draft lands as a proposal. Nothing joins the case until you accept it; accepted, it can become a write-up or a deck.",
+    }]
+    for n, step in enumerate(steps, 1):
+        step["n"] = n
+    return steps
+
+
 SYSTEM_WHY = {
     "ras": "published research", "tas": "facts about real people, firms and documents",
     "qas": "a theory tested against data", "las": "conclusions beyond what a source says",
@@ -246,11 +276,19 @@ def _past_run_minutes(db: Session) -> list[float]:
 def build_run_plan(db: Session, investigation_id: str, *, module: str, question: str, working_theory: str | None = None,
                    max_results: int = 30, include_external_leads: bool = True, flags: dict | None = None,
                    options: dict | None = None, premises: list[str] | None = None, handoff_from: str | None = None,
-                   settings: Settings = default_settings) -> dict:
-    if module not in MODULE_FILES or module == "presentation_draft":
-        raise ReasoningInputError("the plan covers case synthesis, theory tests and the suite's other systems")
+                   record_refs: list[dict] | None = None, settings: Settings = default_settings) -> dict:
+    if module not in MODULE_FILES:
+        raise ReasoningInputError("the plan covers case synthesis, theory tests, presentation drafts and the suite's other systems")
     if db.get(Investigation, investigation_id) is None:
         raise LookupError("Investigation not found")
+    draft = module == "presentation_draft"
+    # Refused here as the run refuses them (validate_reasoning_request), so the plan never shows a run that cannot start.
+    if draft and not record_refs:
+        raise ReasoningInputError("a presentation draft is written from records you pick: pick at least one")
+    if not draft and record_refs:
+        raise ReasoningInputError("only a presentation draft is written from picked records")
+    if draft and (any((flags or {}).values()) or options or premises or working_theory):
+        raise ReasoningInputError("a presentation draft takes no TAS settings, premises or theory: its checks are fixed")
     suite = SUITE_MODULES.get(module)
     if suite is not None and suite.needs_handoff and not handoff_from:
         raise ReasoningInputError(f"{suite.title} starts from an accepted answer of {' or '.join(suite.takes_from)}")
@@ -260,8 +298,18 @@ def build_run_plan(db: Session, investigation_id: str, *, module: str, question:
     stated = normalize_premises(premises)
     profile = get_profile(db, investigation_id)
 
+    catalog: dict = {}
     if source is not None:
         packet = packet_of_run(db, investigation_id=investigation_id, run_id=str((source.trace or {}).get("run_id")))
+    elif draft:
+        # The packet the run builds (app/ai/reasoning.py run_reasoning_module): the picked records, their quotable
+        # text and the chart menu, so the size below is the size the model will read.
+        try:
+            packet = build_selected_record_context(db, investigation_id=investigation_id, record_refs=record_refs or [], goal=question)
+        except RecordNotFoundError as exc:
+            raise LookupError(str(exc)) from exc
+        packet["record_texts"] = prompt_record_texts(db, packet["citations"])
+        catalog = packet["visual_catalog"] = visual_catalog_for_prompt(db, investigation_id)
     else:
         packet = build_question_context(db, investigation_id=investigation_id, question=question, max_results=max_results,
                                         include_external_leads=include_external_leads)
@@ -293,7 +341,7 @@ def build_run_plan(db: Session, investigation_id: str, *, module: str, question:
         leaves = "Not known: the model's address could not be checked."
     minutes = _past_run_minutes(db)
 
-    changed = {k: v for k, v in {**resolved_flags, **resolved_options}.items() if v != {**profile["flags"], **profile["options"]}[k]}
+    changed = {} if draft else {k: v for k, v in {**resolved_flags, **resolved_options}.items() if v != {**profile["flags"], **profile["options"]}[k]}
     return {
         "module": module, "module_label": MODULE_TEXT[module][0], "system": MODULE_TEXT[module][1],
         "question": question.strip(), "working_theory": working_theory,
@@ -303,6 +351,7 @@ def build_run_plan(db: Session, investigation_id: str, *, module: str, question:
             "below_tier_floor": _below_tier_floor(db, citations, resolved_flags["source_tier_floor"]), "first": [{"record_type": c["record_type"], "record_id": c["record_id"], "title": c.get("title") or ""} for c in citations[:6]],
         },
         "steps": _suite_steps(module, handoff, len(citations)) if suite is not None
+        else _draft_steps(len(citations), len(packet.get("record_texts") or []), catalog) if draft
         else _steps(module, resolved_options, include_external_leads, len(citations)),
         "systems": _systems(module),
         "injections": instructions_in_packet(packet),
@@ -314,8 +363,10 @@ def build_run_plan(db: Session, investigation_id: str, *, module: str, question:
             "money": "None: it runs on this computer" if local else (f"Charged by {provider}; not estimated here" if provider else "None"),
             "limits": {"concurrent": settings.ai_max_concurrent_runs, "per_minute": settings.ai_runs_per_minute},
         },
-        "settings": settings_table(profile),
-        "resolved": {**resolved_flags, **resolved_options}, "premises": stated,
+        # A draft runs under none of the settings (they are TAS CONTROL_SURFACE flags and TAS run options), so none
+        # are offered for it.
+        "settings": [] if draft else settings_table(profile),
+        "resolved": {} if draft else {**resolved_flags, **resolved_options}, "premises": stated,
         "changed_from_case_default": sorted(changed),
         "suite_defaults": _defaults(),
         "profile": profile,

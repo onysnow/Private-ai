@@ -1,4 +1,4 @@
-"""To check: passages to read, checklist items and the money checks a person
+"""To check: passages to read, checklist items, and the money checks and links a person
 keeps, each decided by a person (app/patterns/checks.py). They sit in the Verify stage; Red Flags stays what
 the records show."""
 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
-from app.models.domain import CheckItem, Investigation
+from app.models.domain import CheckItem, Investigation, RelationshipEdge
 from app.patterns import checks
 from app.schemas.api import CheckDecide, MoneyCheckKeep
 from app.schemas.responses import ChecksOut
@@ -37,6 +37,17 @@ def keep_money_check(investigation_id: str, body: MoneyCheckKeep, db: Session = 
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
     return checks.items(db, investigation_id)
+
+
+@router.post("/relationships/{relationship_id}/to-check", response_model=ChecksOut)
+def keep_link_check(relationship_id: str, db: Session = Depends(get_db)) -> Any:
+    """Keeps a link in To check (The Wire's chain strip, "Add to To check →"): an item asking for a reviewed source
+    for it, on its two parties. Once; adding it again changes nothing."""
+    edge = db.get(RelationshipEdge, relationship_id)
+    if edge is None:
+        raise HTTPException(404, "Relationship not found")
+    checks.add_link_check(db, edge)
+    return checks.items(db, edge.investigation_id)
 
 
 @router.post("/checks/{check_id}/decide", response_model=ChecksOut)

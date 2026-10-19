@@ -26,7 +26,9 @@ afterEach(() => {
 
 const PREVIEW = 'POST /api/backups/preview';
 const RESTORE = 'POST /api/backups/restore';
-const EXPORT = 'GET /api/investigations/inv-1/export';
+const EXPORT = 'POST /api/investigations/inv-1/safety/backup';
+const PASSPHRASE = 'harbour-lamp-violet-41';
+const LOST = 'If you lose this passphrase, nobody can open this backup — not even you.';
 const CONFIRMATION = 'I understand this creates a separate investigation and will not merge with existing records.';
 
 const backupFile = () => new File(['fake-zip-bytes'], 'investigation-inv-1.jwbackup.zip', {type: 'application/zip'});
@@ -69,16 +71,31 @@ describe('BackupPanel download', () => {
     expect(api.calls(EXPORT)).toHaveLength(0);
   });
 
-  it('downloads the archive with its documents and saves it through an object URL', async () => {
+  it('protects the backup with a passphrase by default: asked twice, with the warning, sent in the body', async () => {
     // A Response body can be read once, so the route makes a fresh one per request.
     const api = mockApi({[EXPORT]: () => new Response('zip-bytes', {status: 200, headers: {'content-type': 'application/zip'}})});
     const {createObjectURL, revokeObjectURL, clicked} = captureDownload();
     wrap(<BackupPanel investigationId="inv-1" onRestored={vi.fn()}/>);
+    const user = userEvent.setup();
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Download backup'}));
-    await screen.findByText('Backup downloaded.');
+    expect(screen.getByRole('checkbox', {name: 'Protect with a passphrase'})).toBeChecked();
+    expect(screen.getByText(LOST)).toBeInTheDocument();
+    const download = screen.getByRole('button', {name: 'Download backup'});
+    expect(download).toBeDisabled();
+    await user.type(screen.getByLabelText('Passphrase'), PASSPHRASE);
+    await user.type(screen.getByLabelText('Repeat the passphrase'), 'something else');
+    expect(screen.getByText('The two passphrases are not the same.')).toBeInTheDocument();
+    expect(download).toBeDisabled();
+    await user.clear(screen.getByLabelText('Repeat the passphrase'));
+    await user.type(screen.getByLabelText('Repeat the passphrase'), PASSPHRASE);
+    await user.click(download);
+    await screen.findByText('Backup downloaded, protected with your passphrase.');
 
-    expect(api.lastUrl(EXPORT).searchParams.get('include_documents')).toBe('true');
+    expect(api.calls(EXPORT)).toHaveLength(1);
+    expect(api.lastBody(EXPORT)).toEqual({passphrase: PASSPHRASE});
+    expect(api.lastUrl(EXPORT).search).toBe('');
+    // The passphrase is not kept on screen once the backup is saved.
+    expect(screen.getByLabelText('Passphrase')).toHaveValue('');
     expect(createObjectURL).toHaveBeenCalledTimes(1);
     expect((createObjectURL.mock.calls[0][0] as Blob).size).toBe('zip-bytes'.length);
     expect(clicked).toEqual([{href: 'blob:mock-url', download: 'investigation-inv-1.jwbackup.zip'}]);
@@ -86,11 +103,26 @@ describe('BackupPanel download', () => {
     expect(document.querySelectorAll('a[download]').length).toBe(0);
   });
 
+  it('saves without a passphrase only when the reporter chooses to', async () => {
+    const api = mockApi({[EXPORT]: () => new Response('zip-bytes', {status: 200, headers: {'content-type': 'application/zip'}})});
+    captureDownload();
+    wrap(<BackupPanel investigationId="inv-1" onRestored={vi.fn()}/>);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('checkbox', {name: 'Protect with a passphrase'}));
+    expect(screen.queryByLabelText('Passphrase')).not.toBeInTheDocument();
+    expect(screen.getByText('Saving without a passphrase: anyone who has the file can open the case.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Download without a passphrase'}));
+    await screen.findByText('Backup downloaded, without a passphrase.');
+    expect(api.lastBody(EXPORT)).toEqual({passphrase: null});
+  });
+
   it('shows the failure when the export cannot be fetched', async () => {
     mockApi({[EXPORT]: () => { throw new Error('export endpoint unreachable'); }});
     const {createObjectURL} = captureDownload();
     wrap(<BackupPanel investigationId="inv-1" onRestored={vi.fn()}/>);
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Download backup'}));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('checkbox', {name: 'Protect with a passphrase'}));
+    await user.click(screen.getByRole('button', {name: 'Download without a passphrase'}));
     await screen.findByText('export endpoint unreachable');
     expect(createObjectURL).not.toHaveBeenCalled();
   });
@@ -161,6 +193,37 @@ describe('BackupPanel preview and restore', () => {
     // The confirmation does not carry over to a second restore.
     expect(screen.getByRole('button', {name: 'Restore investigation'})).toBeDisabled();
     expect(api.unmatched()).toEqual([]);
+  });
+
+  it('asks for the passphrase when the chosen file is protected and sends it beside the file', async () => {
+    const api = mockApi({
+      [PREVIEW]: ({body}: {body: unknown}) => ((body as FormData).get('passphrase') === PASSPHRASE ? restorablePreview()
+        : {status: 400, body: {detail: 'The passphrase is wrong, or the backup file was changed after it was made. Nothing was opened.'}}),
+    });
+    wrap(<BackupPanel investigationId="" onRestored={vi.fn()}/>);
+    const user = userEvent.setup();
+    await user.upload(fileInput(), new File(['JWBACKUP-SEALED\n\x01sealed-bytes'], 'investigation-inv-1.jwbackup.zip', {type: 'application/zip'}));
+    const unlock = await screen.findByLabelText('This backup is protected. Passphrase');
+    expect(screen.getByRole('button', {name: 'Preview restore'})).toBeDisabled();
+    await user.type(unlock, 'not it');
+    await user.click(screen.getByRole('button', {name: 'Preview restore'}));
+    await screen.findByText(/The passphrase is wrong/);
+    await user.clear(unlock);
+    await user.type(unlock, PASSPHRASE);
+    await user.click(screen.getByRole('button', {name: 'Preview restore'}));
+    await screen.findByText('Kestrelwood filings');
+    expect((api.lastBody(PREVIEW) as FormData).get('passphrase')).toBe(PASSPHRASE);
+  });
+
+  it('does not ask for a passphrase for an unprotected file', async () => {
+    const api = mockApi({[PREVIEW]: restorablePreview()});
+    wrap(<BackupPanel investigationId="" onRestored={vi.fn()}/>);
+    const user = userEvent.setup();
+    await user.upload(fileInput(), backupFile());
+    await user.click(screen.getByRole('button', {name: 'Preview restore'}));
+    await screen.findByText('Kestrelwood filings');
+    expect(screen.queryByLabelText('This backup is protected. Passphrase')).not.toBeInTheDocument();
+    expect((api.lastBody(PREVIEW) as FormData).get('passphrase')).toBeNull();
   });
 
   it('shows the server\'s reason when an archive is refused, and forgets a preview when the file changes', async () => {

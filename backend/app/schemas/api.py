@@ -374,9 +374,15 @@ class SuiteRunRequest(BaseModel):
     include_external_leads: bool = True
 
 
+class RecordRef(BaseModel):
+    record_type: str
+    record_id: str
+
+
 class RunPlanRequest(BaseModel):
-    """What a run would do, before it runs (mockup AI_2)."""
-    module: Literal["case_synthesis", "hypothesis_test"] | SuiteModuleName = "case_synthesis"
+    """What a run would do, before it runs (mockup AI_2). A presentation draft takes its goal in `question` and the
+    records you picked in `record_refs`, and none of the TAS settings or premises."""
+    module: Literal["case_synthesis", "hypothesis_test", "presentation_draft"] | SuiteModuleName = "case_synthesis"
     question: str = Field(min_length=1, max_length=4000)
     working_theory: str | None = Field(default=None, max_length=2000)
     handoff_from: str | None = Field(default=None, max_length=64)
@@ -386,6 +392,7 @@ class RunPlanRequest(BaseModel):
     source_tier_floor: SourceTierFloor | None = None
     options: RunOptionsIn | None = None
     premises: list[str] | None = Field(default=None, max_length=10)
+    record_refs: list[RecordRef] | None = Field(default=None, max_length=200)
 
 
 class RunProfileIn(BaseModel):
@@ -427,6 +434,20 @@ class AppUserUpdate(BaseModel):
 
 class InvestigationMembershipPut(BaseModel):
     role: str = "viewer"
+
+
+class StrayFilesIn(BaseModel):
+    """Stray files to Keep or Delete (Housekeeping, research Keep §12): paths relative to the document storage
+    folder, as GET /settings/storage/orphans lists them. Each is checked again on the server; one that is not a
+    current stray file refuses the whole request and nothing changes."""
+    model_config = ConfigDict(extra="forbid")
+    paths: list[str] = Field(min_length=1, max_length=500)
+
+
+class StrayFileAddBackIn(BaseModel):
+    """One stray file to add back to a case as a document (Housekeeping, research Keep §12)."""
+    model_config = ConfigDict(extra="forbid")
+    path: str = Field(min_length=1, max_length=1024)
 
 
 class SecurityAuditRetentionRequest(BaseModel):
@@ -472,11 +493,6 @@ class WriteupUpdate(BaseModel):
     title: str | None = None
     content_json: dict | None = None
     status: str | None = None
-
-
-class RecordRef(BaseModel):
-    record_type: str
-    record_id: str
 
 
 class PresentationDraftRequest(BaseModel):
@@ -781,3 +797,15 @@ class StoryReady(BaseModel):
 
 class WriteupVersionCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200, description='A name for the write-up as it stands ("Before legal read").')
+
+
+class LearningCardCreate(BaseModel):
+    """＋ Flip card: an indicator from the catalogue or a term from the glossary, kept for Practise."""
+    kind: Literal["indicator", "term"]
+    ref: str = Field(min_length=1, max_length=255, description="The indicator's id (BO-007) or the term as the glossary spells it.")
+
+
+class LearningAnswer(BaseModel):
+    """The reporter's answer to a flip card: Again / Good, or Hard / Easy when they are turned on."""
+    card_id: str = Field(min_length=1, max_length=64)
+    answer: Literal["again", "hard", "good", "easy"]

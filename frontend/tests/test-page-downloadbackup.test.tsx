@@ -72,7 +72,14 @@ async function importHome(): Promise<() => ReactElement> {
 }
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
-const EXPORT = 'GET /api/investigations/inv-1/export';
+// Backups go through Safety & data's route and are protected with a passphrase by default (ADR-0015).
+const EXPORT = 'POST /api/investigations/inv-1/safety/backup';
+const PASSPHRASE = 'harbour-lamp-violet-41';
+
+async function typePassphrase(user: ReturnType<typeof userEvent.setup>): Promise<void> {
+  await user.type(screen.getByLabelText('Passphrase'), PASSPHRASE);
+  await user.type(screen.getByLabelText('Repeat the passphrase'), PASSPHRASE);
+}
 
 async function bootstrapWithSelectedInvestigation(): Promise<MockApi> {
   const api = mockApi(pageRoutes({investigations: [investigation]}));
@@ -80,7 +87,9 @@ async function bootstrapWithSelectedInvestigation(): Promise<MockApi> {
   const Home = await importHome();
   render(<Home />);
   await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
-  await waitFor(() => expect(screen.getByRole('button', {name: 'Download backup'})).not.toBeDisabled());
+  await waitFor(() => expect(screen.getByRole('checkbox', {name: 'Protect with a passphrase'})).toBeChecked());
+  // Disabled until a passphrase is typed twice.
+  expect(screen.getByRole('button', {name: 'Download backup'})).toBeDisabled();
   return api;
 }
 
@@ -117,12 +126,14 @@ describe('Home portable backup download', () => {
       capturedDownload = this.download;
     });
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Download backup'}));
+    const user = userEvent.setup();
+    await typePassphrase(user);
+    await user.click(screen.getByRole('button', {name: 'Download backup'}));
 
-    await screen.findByText('Backup downloaded.');
+    await screen.findByText('Backup downloaded, protected with your passphrase.');
 
     expect(api.calls(EXPORT)).toHaveLength(1);
-    expect(api.lastUrl(EXPORT).searchParams.get('include_documents')).toBe('true');
+    expect(api.lastBody(EXPORT)).toEqual({passphrase: PASSPHRASE});
 
     expect(createObjectURL).toHaveBeenCalledTimes(1);
     // The Blob passed to createObjectURL comes back from undici's
@@ -150,7 +161,9 @@ describe('Home portable backup download', () => {
     (URL as unknown as {createObjectURL: typeof createObjectURL}).createObjectURL = createObjectURL;
     (URL as unknown as {revokeObjectURL: (url: string) => void}).revokeObjectURL = vi.fn();
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Download backup'}));
+    const user = userEvent.setup();
+    await typePassphrase(user);
+    await user.click(screen.getByRole('button', {name: 'Download backup'}));
 
     await screen.findByText('export endpoint unreachable');
     expect(api.calls(EXPORT)).toHaveLength(1);

@@ -6,12 +6,15 @@
 // never decides an item. A slim card shows the question, who it is about and,
 // for a passage, the words in place; the decision and an optional note are on
 // the card. Each item names its indicator and links to its Red Flag. A money
-// check a person kept from See › Money carries the check's numbers as they were.
+// check a person kept from See › Money carries the check's numbers as they were. A link a person added from The
+// Wire's chain strip asks for a reviewed source for it, names its two parties and opens it in The Wire.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import Link from 'next/link';
 import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement, ReactNode} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
+import {caseHref} from '../../lib/case-href';
 import {decideCheckMutation, getChecksOptions, getChecksQueryKey, getRedFlagsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import type {ToCheckItemOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
@@ -57,7 +60,9 @@ function Parties({parties}: {parties: ToCheckItemOut['parties']}): ReactElement 
     {shown.length < parties.length && <span className="sv-muted">+{parties.length - shown.length} more</span>}</div>;
 }
 
-function CheckCard({item, highlighted, onDecide}: {item: ToCheckItemOut; highlighted: boolean;
+const KIND: Record<ToCheckItemOut['kind'], string> = {passage: 'Passage', checklist: 'Checklist', money: 'Money check', link: 'Link'};
+
+function CheckCard({item, investigationId, highlighted, onDecide}: {item: ToCheckItemOut; investigationId: string; highlighted: boolean;
   onDecide: (status: Status, note: string | null) => Promise<void>}): ReactElement {
   const openFlag = useWorkbenchStore(state => state.openFlag);
   const openDocument = useWorkbenchStore(state => state.openDocument);
@@ -68,10 +73,13 @@ function CheckCard({item, highlighted, onDecide}: {item: ToCheckItemOut; highlig
   return <article id={`check-${item.id}`} className={`tc-card status-${item.status}${highlighted ? ' open' : ''}`}
     aria-label={`To check: ${sentence(item.question)}`}>
     <header className="tc-head">
-      <span className="tc-kind">{item.kind === 'passage' ? 'Passage' : item.kind === 'money' ? 'Money check' : 'Checklist'}</span>
+      <span className="tc-kind">{KIND[item.kind]}</span>
       <h4>{sentence(item.question)}</h4>
     </header>
-    <p className="tc-from">{item.kind === 'money' ? <>Kept from See › Money · {item.locator}</> : <>{item.indicator_name} · {item.indicator_id}</>}
+    <p className="tc-from">{item.kind === 'money' ? <>Kept from See › Money · {item.locator}</>
+      : item.kind === 'link' ? <>Added from The Wire · a chain breaks at this link{item.relationship_id && <> · <Link className="tc-link"
+        href={caseHref(`/see?link=${encodeURIComponent(item.relationship_id)}#the-wire`, investigationId)}>Open the link in The Wire</Link></>}</>
+      : <>{item.indicator_name} · {item.indicator_id}</>}
       {item.flag_id && <> · <button type="button" className="tc-link" onClick={() => goToFlag(item.flag_id!)}>Its Red Flag</button></>}
       {item.related_flags.length > 0 && <> · {item.related_flags.length} other flag{item.related_flags.length > 1 ? 's' : ''} on these parties</>}
     </p>
@@ -132,7 +140,7 @@ export function ToCheckPanel({investigationId}: {investigationId: string}): Reac
   const open = items.filter(i => i.status === 'open');
   const decided = items.filter(i => i.status !== 'open');
   const gone = query.data?.gone ?? [];
-  const card = (i: ToCheckItemOut) => <CheckCard key={i.id} item={i} highlighted={highlight === i.id} onDecide={onDecide(i)}/>;
+  const card = (i: ToCheckItemOut) => <CheckCard key={i.id} item={i} investigationId={investigationId} highlighted={highlight === i.id} onDecide={onDecide(i)}/>;
 
   return <section className="card tc" id="to-check" aria-labelledby="to-check-title">
     <h3 id="to-check-title">To check</h3>

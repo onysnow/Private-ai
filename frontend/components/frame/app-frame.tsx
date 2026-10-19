@@ -99,6 +99,7 @@ const PAGES: {label: string; href: string; hint: string}[] = [
   {label: 'Case home', href: '/', hint: 'Where the case stands and what needs you'},
   {label: 'Decide', href: '/decide', hint: 'Everything only you can decide, one at a time'},
   {label: 'Learn', href: '/learn', hint: 'The Red Flags catalogue and the glossary'},
+  {label: 'Safety & data', href: '/keep/safety', hint: 'What lives on this computer, and what leaves it'},
   {label: 'Settings', href: '/settings', hint: 'Appearance, access, demo case'},
   {label: 'About', href: '/about', hint: 'What this app is'},
 ];
@@ -154,6 +155,10 @@ function useTrail(): {label: string; href?: string}[] {
     trail.push({label: 'Check', href: '/check'}, {label: 'Decide'});
   } else if (pathname === '/') {
     trail.push({label: 'Home'});
+  } else if (pathname === '/keep/safety') {
+    // Mockup KEEP: case › Keep › Safety & data.
+    if (caseName) trail.push({label: caseName, href: '/'});
+    trail.push({label: 'Keep'}, {label: 'Safety & data'});
   } else if (tail.length && (pathname === '/learn' || pathname === '/glossary' || pathname === '/settings')) {
     if (caseName) trail.push({label: caseName, href: '/'});
     trail.push(...tail);
@@ -259,7 +264,8 @@ function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open
   const rows: [string, string][] = [['⌘K / Ctrl K', 'Search the case, or go anywhere'], ['⌘O / Ctrl O', 'Switch case'], ['⌘⇧H / Ctrl Shift H', 'Hide the screen'], ['[', 'Open or close the steps (left edge)'], [']', 'Open or close the tools (top edge)'],
     ['Alt →  /  Alt ←', 'Open or close the steps'], ['Alt ↓  /  Alt ↑', 'Open or close the tools'], ['G then H', 'Go to the case home'],
     ['1 – 4', 'Case home: go to a module'], ['J / K', 'Case home and Decide: step through the list'], ['Enter', 'Case home: open the focused module whole-screen'],
-    ['S / D / U', 'Case home: answer Next up (shows it, does not, unclear)'], ['1 / 2 / 3', 'Decide: answer the card'], ['Z', 'Undo the last answer'],
+    ['S / D / U', 'Case home: answer Next up (shows it, does not, unclear)'], ['1 / 2 / 3', 'Decide: answer the card'],
+    ['H', 'Decide: later — put the card off until it changes'], ['Z', 'Undo the last answer, or the last put-off'],
     ['?', 'This list'], ['Esc', 'Close what is open']];
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="fr-help">

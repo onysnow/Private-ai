@@ -12,6 +12,9 @@ import {
 } from './client';
 import { client } from './client.gen';
 import type {
+  AddBackStrayFileData,
+  AddBackStrayFileErrors,
+  AddBackStrayFileResponses,
   AddChartToDeckEndpointData,
   AddChartToDeckEndpointErrors,
   AddChartToDeckEndpointResponses,
@@ -24,6 +27,9 @@ import type {
   AddCollectionItemErrors,
   AddCollectionItemResponses,
   AddCollectionResponses,
+  AddLearningCardData,
+  AddLearningCardErrors,
+  AddLearningCardResponses,
   AddNoteData,
   AddNoteErrors,
   AddNoteResponses,
@@ -42,6 +48,9 @@ import type {
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentErrors,
   AnalyzeOpenalephDocumentResponses,
+  AnswerLearningCardData,
+  AnswerLearningCardErrors,
+  AnswerLearningCardResponses,
   AssessStatementData,
   AssessStatementErrors,
   AssessStatementResponses,
@@ -144,6 +153,9 @@ import type {
   DeleteStorySectionData,
   DeleteStorySectionErrors,
   DeleteStorySectionResponses,
+  DeleteStrayFilesData,
+  DeleteStrayFilesErrors,
+  DeleteStrayFilesResponses,
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointErrors,
   DeleteWriteupEndpointResponses,
@@ -201,6 +213,9 @@ import type {
   ExportInvestigationData,
   ExportInvestigationErrors,
   ExportInvestigationResponses,
+  ExportOutboundLogData,
+  ExportOutboundLogErrors,
+  ExportOutboundLogResponses,
   ExportWriteupDocxData,
   ExportWriteupDocxErrors,
   ExportWriteupDocxResponses,
@@ -375,6 +390,9 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewErrors,
   GetOrphanStoragePreviewResponses,
+  GetOutboundLogData,
+  GetOutboundLogErrors,
+  GetOutboundLogResponses,
   GetOwnershipChainData,
   GetOwnershipChainErrors,
   GetOwnershipChainResponses,
@@ -390,6 +408,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsErrors,
   GetRedFlagsResponses,
+  GetSafetyData,
+  GetSafetyErrors,
+  GetSafetyResponses,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesErrors,
   GetSameAnswerCandidatesResponses,
@@ -492,12 +513,21 @@ import type {
   InvestigationVisualRestyleData,
   InvestigationVisualRestyleErrors,
   InvestigationVisualRestyleResponses,
+  KeepLinkCheckData,
+  KeepLinkCheckErrors,
+  KeepLinkCheckResponses,
   KeepMoneyCheckData,
   KeepMoneyCheckErrors,
   KeepMoneyCheckResponses,
+  KeepStrayFilesData,
+  KeepStrayFilesErrors,
+  KeepStrayFilesResponses,
   LeadQueueData,
   LeadQueueErrors,
   LeadQueueResponses,
+  LearningSummaryData,
+  LearningSummaryErrors,
+  LearningSummaryResponses,
   LinkClaimEvidenceEndpointData,
   LinkClaimEvidenceEndpointErrors,
   LinkClaimEvidenceEndpointResponses,
@@ -609,6 +639,9 @@ import type {
   ListLeadsData,
   ListLeadsErrors,
   ListLeadsResponses,
+  ListLearningCardsData,
+  ListLearningCardsErrors,
+  ListLearningCardsResponses,
   ListOpenalephCorpusFailuresData,
   ListOpenalephCorpusFailuresErrors,
   ListOpenalephCorpusFailuresResponses,
@@ -651,6 +684,9 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagErrors,
   MakeLeadFromRedFlagResponses,
+  MakeSafetyBackupData,
+  MakeSafetyBackupErrors,
+  MakeSafetyBackupResponses,
   MarkAiRunThoughtData,
   MarkAiRunThoughtErrors,
   MarkAiRunThoughtResponses,
@@ -714,6 +750,12 @@ import type {
   PutInvestigationMembershipData,
   PutInvestigationMembershipErrors,
   PutInvestigationMembershipResponses,
+  PutSafetyAnswerData,
+  PutSafetyAnswerErrors,
+  PutSafetyAnswerResponses,
+  PutServiceModeData,
+  PutServiceModeErrors,
+  PutServiceModeResponses,
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
@@ -822,6 +864,9 @@ import type {
   SettingsStatusData,
   SettingsStatusErrors,
   SettingsStatusResponses,
+  SnoozeDecisionData,
+  SnoozeDecisionErrors,
+  SnoozeDecisionResponses,
   StartStoryWriteupData,
   StartStoryWriteupErrors,
   StartStoryWriteupResponses,
@@ -864,8 +909,14 @@ import type {
   UploadDocumentData,
   UploadDocumentErrors,
   UploadDocumentResponses,
+  WakeDecisionData,
+  WakeDecisionErrors,
+  WakeDecisionResponses,
 } from './types.gen';
 import {
+  zAddBackStrayFileBody,
+  zAddBackStrayFilePath,
+  zAddBackStrayFileResponse,
   zAddChartToDeckEndpointBody,
   zAddChartToDeckEndpointPath,
   zAddChartToDeckEndpointResponse,
@@ -878,6 +929,8 @@ import {
   zAddCollectionItemResponse,
   zAddCollectionPath,
   zAddCollectionResponse,
+  zAddLearningCardBody,
+  zAddLearningCardResponse,
   zAddNoteBody,
   zAddNotePath,
   zAddNoteResponse,
@@ -895,6 +948,8 @@ import {
   zAmendCaseRecordResponse,
   zAnalyzeOpenalephDocumentPath,
   zAnalyzeOpenalephDocumentResponse,
+  zAnswerLearningCardBody,
+  zAnswerLearningCardResponse,
   zAssessStatementBody,
   zAssessStatementPath,
   zAssessStatementResponse,
@@ -975,6 +1030,8 @@ import {
   zDeleteInvestigationMembershipResponse,
   zDeleteStorySectionPath,
   zDeleteStorySectionResponse,
+  zDeleteStrayFilesBody,
+  zDeleteStrayFilesResponse,
   zDeleteWriteupEndpointPath,
   zDeleteWriteupEndpointResponse,
   zDismissHitPath,
@@ -1021,6 +1078,9 @@ import {
   zExportInvestigationPath,
   zExportInvestigationQuery,
   zExportInvestigationResponse,
+  zExportOutboundLogPath,
+  zExportOutboundLogQuery,
+  zExportOutboundLogResponse,
   zExportWriteupDocxPath,
   zExportWriteupDocxResponse,
   zExternalRelationshipCandidatesPath,
@@ -1138,6 +1198,9 @@ import {
   zGetOpenalephDocumentSyncPath,
   zGetOpenalephDocumentSyncResponse,
   zGetOrphanStoragePreviewResponse,
+  zGetOutboundLogPath,
+  zGetOutboundLogQuery,
+  zGetOutboundLogResponse,
   zGetOwnershipChainPath,
   zGetOwnershipChainResponse,
   zGetPartyYearsPath,
@@ -1149,6 +1212,9 @@ import {
   zGetRecordProvenanceTraceResponse,
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
+  zGetSafetyPath,
+  zGetSafetyQuery,
+  zGetSafetyResponse,
   zGetSameAnswerCandidatesPath,
   zGetSameAnswerCandidatesResponse,
   zGetSecurityAlertsQuery,
@@ -1227,12 +1293,18 @@ import {
   zInvestigationVisualRestyleBody,
   zInvestigationVisualRestylePath,
   zInvestigationVisualRestyleResponse,
+  zKeepLinkCheckPath,
+  zKeepLinkCheckResponse,
   zKeepMoneyCheckBody,
   zKeepMoneyCheckPath,
   zKeepMoneyCheckResponse,
+  zKeepStrayFilesBody,
+  zKeepStrayFilesResponse,
   zLeadQueuePath,
   zLeadQueueQuery,
   zLeadQueueResponse,
+  zLearningSummaryQuery,
+  zLearningSummaryResponse,
   zLinkClaimEvidenceEndpointBody,
   zLinkClaimEvidenceEndpointPath,
   zLinkClaimEvidenceEndpointResponse,
@@ -1319,6 +1391,8 @@ import {
   zListLeadsPath,
   zListLeadsQuery,
   zListLeadsResponse,
+  zListLearningCardsQuery,
+  zListLearningCardsResponse,
   zListOpenalephCorpusFailuresPath,
   zListOpenalephCorpusFailuresResponse,
   zListPropertyConflictDecisionsPath,
@@ -1348,6 +1422,9 @@ import {
   zMakeLeadFromNoteResponse,
   zMakeLeadFromRedFlagPath,
   zMakeLeadFromRedFlagResponse,
+  zMakeSafetyBackupBody,
+  zMakeSafetyBackupPath,
+  zMakeSafetyBackupResponse,
   zMarkAiRunThoughtBody,
   zMarkAiRunThoughtPath,
   zMarkAiRunThoughtResponse,
@@ -1403,6 +1480,12 @@ import {
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
   zPutInvestigationMembershipResponse,
+  zPutSafetyAnswerBody,
+  zPutSafetyAnswerPath,
+  zPutSafetyAnswerResponse,
+  zPutServiceModeBody,
+  zPutServiceModePath,
+  zPutServiceModeResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
   zRecordStoryGateBody,
@@ -1489,6 +1572,9 @@ import {
   zSetStoryThesisPath,
   zSetStoryThesisResponse,
   zSettingsStatusResponse,
+  zSnoozeDecisionBody,
+  zSnoozeDecisionPath,
+  zSnoozeDecisionResponse,
   zStartStoryWriteupPath,
   zStartStoryWriteupResponse,
   zSyncCorpusNowPath,
@@ -1527,6 +1613,9 @@ import {
   zUpdateWriteupEndpointResponse,
   zUploadDocumentBody,
   zUploadDocumentResponse,
+  zWakeDecisionBody,
+  zWakeDecisionPath,
+  zWakeDecisionResponse,
 } from './zod.gen';
 
 export type Options<
@@ -6544,6 +6633,68 @@ export const listInvestigationCrossReferences = <
   });
 
 /**
+ * Snooze Decision
+ *
+ * Puts a waiting decision off (H on Decide): until a time, until the item changes, or whichever comes first.
+ */
+export const snoozeDecision = <ThrowOnError extends boolean = false>(
+  options: Options<SnoozeDecisionData, ThrowOnError>,
+): RequestResult<SnoozeDecisionResponses, SnoozeDecisionErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    SnoozeDecisionResponses,
+    SnoozeDecisionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSnoozeDecisionBody,
+          path: zSnoozeDecisionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSnoozeDecisionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/decision-snoozes',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Wake Decision
+ *
+ * Brings a decision put off back into the queue now (Restore, or Z right after H).
+ */
+export const wakeDecision = <ThrowOnError extends boolean = false>(
+  options: Options<WakeDecisionData, ThrowOnError>,
+): RequestResult<WakeDecisionResponses, WakeDecisionErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    WakeDecisionResponses,
+    WakeDecisionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zWakeDecisionBody,
+          path: zWakeDecisionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zWakeDecisionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/decision-snoozes/wake',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Decisions
  */
 export const getDecisions = <ThrowOnError extends boolean = false>(
@@ -7083,6 +7234,63 @@ export const addNote = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Outbound Log
+ *
+ * Every request that left this computer for an outside service, newest first: the value word for word.
+ * Append-only: nothing here changes or removes a row.
+ */
+export const getOutboundLog = <ThrowOnError extends boolean = false>(
+  options: Options<GetOutboundLogData, ThrowOnError>,
+): RequestResult<GetOutboundLogResponses, GetOutboundLogErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetOutboundLogResponses,
+    GetOutboundLogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetOutboundLogPath,
+          query: zGetOutboundLogQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetOutboundLogResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/outbound-log',
+    ...options,
+  });
+
+/**
+ * Export Outbound Log
+ */
+export const exportOutboundLog = <ThrowOnError extends boolean = false>(
+  options: Options<ExportOutboundLogData, ThrowOnError>,
+): RequestResult<
+  ExportOutboundLogResponses,
+  ExportOutboundLogErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ExportOutboundLogResponses,
+    ExportOutboundLogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportOutboundLogPath,
+          query: zExportOutboundLogQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportOutboundLogResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/outbound-log/export',
+    ...options,
+  });
+
+/**
  * How Are They Connected
  *
  * Every chain of links between two parties, up to max_len links, each with how sure its weakest link is.
@@ -7374,6 +7582,136 @@ export const listReportingTasks = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Safety
+ *
+ * Totals for the period with zeroes stated, the six stores on this computer, the outside services with their
+ * modes and what each was sent, who can reach the case, and what deleting it removes.
+ */
+export const getSafety = <ThrowOnError extends boolean = false>(
+  options: Options<GetSafetyData, ThrowOnError>,
+): RequestResult<GetSafetyResponses, GetSafetyErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetSafetyResponses,
+    GetSafetyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSafetyPath,
+          query: zGetSafetyQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSafetyResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/safety',
+    ...options,
+  });
+
+/**
+ * Put Safety Answer
+ *
+ * The reporter's answer to an "Only you can say" question. Kept on this computer only, never in a backup.
+ */
+export const putSafetyAnswer = <ThrowOnError extends boolean = false>(
+  options: Options<PutSafetyAnswerData, ThrowOnError>,
+): RequestResult<
+  PutSafetyAnswerResponses,
+  PutSafetyAnswerErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutSafetyAnswerResponses,
+    PutSafetyAnswerErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutSafetyAnswerBody,
+          path: zPutSafetyAnswerPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutSafetyAnswerResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/safety/answers',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Make Safety Backup
+ *
+ * Back up now: the case's portable backup with its documents, and a record of it (when, size, checksum, whether
+ * protected). With a passphrase in the body the file is sealed with it (ADR-0015); without one it is not.
+ */
+export const makeSafetyBackup = <ThrowOnError extends boolean = false>(
+  options: Options<MakeSafetyBackupData, ThrowOnError>,
+): RequestResult<
+  MakeSafetyBackupResponses,
+  MakeSafetyBackupErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MakeSafetyBackupResponses,
+    MakeSafetyBackupErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMakeSafetyBackupBody.optional(),
+          path: zMakeSafetyBackupPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakeSafetyBackupResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/safety/backup',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Put Service Mode
+ *
+ * Off / Ask first / Automatic for one outside service in this case. Enforced where the calls are made.
+ */
+export const putServiceMode = <ThrowOnError extends boolean = false>(
+  options: Options<PutServiceModeData, ThrowOnError>,
+): RequestResult<PutServiceModeResponses, PutServiceModeErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    PutServiceModeResponses,
+    PutServiceModeErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutServiceModeBody,
+          path: zPutServiceModePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutServiceModeResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/service-modes',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Since
  */
 export const getSince = <ThrowOnError extends boolean = false>(
@@ -7447,6 +7785,43 @@ export const getStanding = <ThrowOnError extends boolean = false>(
       await zGetStandingResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/standing',
     ...options,
+  });
+
+/**
+ * Add Back Stray File
+ *
+ * Add back to the case (Housekeeping, research Keep §12 "opens The Drop with it"): the stray file becomes a
+ * document of this case and is read like an upload. When its bytes are saved as a new copy the stray original is
+ * removed. Local-only; the path is checked again here like Delete.
+ */
+export const addBackStrayFile = <ThrowOnError extends boolean = false>(
+  options: Options<AddBackStrayFileData, ThrowOnError>,
+): RequestResult<
+  AddBackStrayFileResponses,
+  AddBackStrayFileErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AddBackStrayFileResponses,
+    AddBackStrayFileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddBackStrayFileBody,
+          path: zAddBackStrayFilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddBackStrayFileResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/storage/orphans/add-back',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -8587,6 +8962,138 @@ export const linkLead = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Answer Learning Card
+ *
+ * Again / Good (or Hard / Easy): moves the card along the ladder and says when it comes back.
+ */
+export const answerLearningCard = <ThrowOnError extends boolean = false>(
+  options: Options<AnswerLearningCardData, ThrowOnError>,
+): RequestResult<
+  AnswerLearningCardResponses,
+  AnswerLearningCardErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AnswerLearningCardResponses,
+    AnswerLearningCardErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAnswerLearningCardBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAnswerLearningCardResponse.parseAsync(data),
+    url: '/api/learning/answers',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * List Learning Cards
+ *
+ * A deck's cards, due first; with due_only, only those due now. ``ref`` finds one indicator's or term's card.
+ */
+export const listLearningCards = <ThrowOnError extends boolean = false>(
+  options?: Options<ListLearningCardsData, ThrowOnError>,
+): RequestResult<
+  ListLearningCardsResponses,
+  ListLearningCardsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ListLearningCardsResponses,
+    ListLearningCardsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zListLearningCardsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListLearningCardsResponse.parseAsync(data),
+    url: '/api/learning/cards',
+    ...options,
+  });
+
+/**
+ * Add Learning Card
+ *
+ * ＋ Flip card: keeps the indicator or term as a card, due now. Adding it again changes nothing.
+ */
+export const addLearningCard = <ThrowOnError extends boolean = false>(
+  options: Options<AddLearningCardData, ThrowOnError>,
+): RequestResult<
+  AddLearningCardResponses,
+  AddLearningCardErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AddLearningCardResponses,
+    AddLearningCardErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddLearningCardBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddLearningCardResponse.parseAsync(data),
+    url: '/api/learning/cards',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Learning Summary
+ *
+ * How many flip cards are due, in all and per deck, and when the next falls due.
+ */
+export const learningSummary = <ThrowOnError extends boolean = false>(
+  options?: Options<LearningSummaryData, ThrowOnError>,
+): RequestResult<
+  LearningSummaryResponses,
+  LearningSummaryErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    LearningSummaryResponses,
+    LearningSummaryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zLearningSummaryQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zLearningSummaryResponse.parseAsync(data),
+    url: '/api/learning/summary',
+    ...options,
+  });
+
+/**
  * Remove Note
  *
  * Delete the note. A lead made from it stays.
@@ -9111,6 +9618,34 @@ export const patchRelationshipSuite = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Keep Link Check
+ *
+ * Keeps a link in To check (The Wire's chain strip, "Add to To check →"): an item asking for a reviewed source
+ * for it, on its two parties. Once; adding it again changes nothing.
+ */
+export const keepLinkCheck = <ThrowOnError extends boolean = false>(
+  options: Options<KeepLinkCheckData, ThrowOnError>,
+): RequestResult<KeepLinkCheckResponses, KeepLinkCheckErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    KeepLinkCheckResponses,
+    KeepLinkCheckErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zKeepLinkCheckPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zKeepLinkCheckResponse.parseAsync(data),
+    url: '/api/relationships/{relationship_id}/to-check',
+    ...options,
   });
 
 /**
@@ -9699,6 +10234,75 @@ export const getOrphanStoragePreview = <ThrowOnError extends boolean = false>(
       await zGetOrphanStoragePreviewResponse.parseAsync(data),
     url: '/api/settings/storage/orphans',
     ...options,
+  });
+
+/**
+ * Delete Stray Files
+ *
+ * Delete stray files the reporter confirmed (Housekeeping, research Keep §12). Local-only. Each path is checked
+ * again here: under the document storage folder, not a link, not a staging folder, and no document points to it;
+ * one that is not refuses the whole request (400) and nothing is deleted. Written to the security audit log.
+ */
+export const deleteStrayFiles = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteStrayFilesData, ThrowOnError>,
+): RequestResult<
+  DeleteStrayFilesResponses,
+  DeleteStrayFilesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    DeleteStrayFilesResponses,
+    DeleteStrayFilesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDeleteStrayFilesBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteStrayFilesResponse.parseAsync(data),
+    url: '/api/settings/storage/orphans/delete',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Keep Stray Files
+ *
+ * Keep (Housekeeping, research Keep §12): the files stay on disk and are not offered again. Local-only, like
+ * the list. A path that is not a current stray file under document storage refuses the request (400).
+ */
+export const keepStrayFiles = <ThrowOnError extends boolean = false>(
+  options: Options<KeepStrayFilesData, ThrowOnError>,
+): RequestResult<KeepStrayFilesResponses, KeepStrayFilesErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    KeepStrayFilesResponses,
+    KeepStrayFilesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zKeepStrayFilesBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zKeepStrayFilesResponse.parseAsync(data),
+    url: '/api/settings/storage/orphans/keep',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

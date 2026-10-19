@@ -1,9 +1,10 @@
 'use client';
-// Learn (mockup KNOWLEDGE_KEEP_1, research Knowledge §1–4): one whole-screen feature with two tabs, the Red Flags
-// catalogue and the Glossary. The catalogue is three panels on the board: the map of the areas in their families,
+// Learn (mockup KNOWLEDGE_KEEP_1, research Knowledge §1–4, §6): one whole-screen feature with three tabs, the Red
+// Flags catalogue, the Glossary and Practise (flip cards, features/knowledge/practise-screen.tsx). The catalogue is three panels on the board: the map of the areas in their families,
 // the chosen area's indicators, and the indicator page; Map / Table / Cards switch the first two. The open case
 // (?inv=, or the case the workbench has open) is a layer over all of it: what fires, at which level.
-// The address keeps the place: ?area=BO&indicator=BO-007&view=map, so a reload or a shared link opens it again.
+// The address keeps the place: ?area=BO&indicator=BO-007&view=map, so a reload or a shared link opens it again;
+// ?tab=practise&deck=case (or all, terms, safety, an area key) opens Practise.
 import {useQuery} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useEffect, useMemo, useRef, useState} from 'react';
@@ -26,6 +27,9 @@ import type {ListFilter} from './indicator-list';
 import {IndicatorPage} from './indicator-page';
 import {LearnTabs} from './learn-tabs';
 import type {LearnTab as Tab} from './learn-tabs';
+import {PractiseScreen} from './practise-screen';
+import {usePractiseSummary} from './practise-data';
+import type {Deck} from './practise-data';
 
 type View = 'map' | 'table' | 'cards';
 
@@ -56,12 +60,53 @@ export function LearnScreen({tab}: {tab: Tab}): ReactElement {
     if (store.investigationId !== inv) store.setInvestigationId(inv);
     store.setInvestigationName(layer.caseName);
   }, [inv, layer.caseName]);
+  // The catalogue's page also holds Practise; which one shows follows the address (?tab=practise).
+  const [practise, setPractise] = useState<Deck | null>(null);
+  useEffect(() => {
+    if (tab !== 'catalogue') return;
+    const p = readParams();
+    if (p.get('tab') === 'practise') setPractise(deckFromParam(p.get('deck')));
+  }, [tab]);
+  const openPractise = (deck: Deck) => { writeParams({tab: 'practise', deck: deckParam(deck)}); setPractise(deck); };
+  const leavePractise = () => { writeParams({tab: null, deck: null}); setPractise(null); };
+  const summary = usePractiseSummary(layer.areas, tab === 'catalogue');
+  // Practise opens on the case's areas when cards there are due, else on every card.
+  const startDeck = (): Deck => ((summary.data?.decks.find(d => d.deck === 'case')?.due ?? 0) > 0 ? {deck: 'case'} : {deck: 'all'});
+  const onTab = (t: 'catalogue' | 'practise') => (t === 'practise' ? (practise ? undefined : openPractise(startDeck())) : leavePractise());
+  if (tab === 'glossary') return <div className="kc" data-tab={tab}><GlossaryScreen tabs={<LearnTabs tab="glossary" inv={inv}/>}/></div>;
+  if (practise) {
+    return <div className="kc" data-tab="practise">
+      <PractiseTrail/>
+      <PractiseScreen tabs={<LearnTabs tab="practise" inv={inv} onTab={onTab}/>} caseAreas={layer.areas} hasCase={Boolean(inv)} initial={practise}
+        onDeck={deck => writeParams({deck: deckParam(deck)})} onLeave={leavePractise}/>
+    </div>;
+  }
   return <div className="kc" data-tab={tab}>
-    {tab === 'catalogue' ? <Catalogue layer={layer}/> : <GlossaryScreen tabs={<LearnTabs tab="glossary" inv={inv}/>}/>}
+    <Catalogue layer={layer} tabs={<LearnTabs tab="catalogue" inv={inv} onTab={onTab}/>} due={summary.data?.due}
+      onPractise={() => openPractise(startDeck())}/>
   </div>;
 }
 
-function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElement {
+function deckParam(deck: Deck): string {
+  return deck.deck === 'area' ? deck.area ?? 'all' : deck.deck;
+}
+function deckFromParam(value: string | null): Deck {
+  const v = (value ?? '').trim();
+  if (v === 'case' || v === 'terms' || v === 'safety' || v === 'all') return {deck: v};
+  return /^[A-Z]{2,3}$/.test(v) ? {deck: 'area', area: v} : {deck: 'all'};
+}
+
+function PractiseTrail(): null {
+  useEffect(() => {
+    setTrailTail([{label: 'Learn', href: '/learn'}, {label: 'Practise'}]);
+    return () => setTrailTail([]);
+  }, []);
+  return null;
+}
+
+function Catalogue({layer, tabs, due, onPractise}: {
+  layer: ReturnType<typeof useCaseLayer>; tabs: ReactElement; due: number | undefined; onPractise: () => void;
+}): ReactElement {
   const areasQuery = useQuery({...listAreasOptions(), staleTime: Infinity});
   const mapQuery = useQuery({...getCatalogueMapOptions(), staleTime: Infinity});
   const areas = useMemo(() => (areasQuery.data ?? []).filter(a => a.indicators > 0), [areasQuery.data]);
@@ -122,14 +167,13 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
 
   return <>
     <header className="kc-top">
-      <LearnTabs tab="catalogue" inv={layer.investigationId}/>
+      {tabs}
       <CatalogueSearch total={totalIndicators} onIndicator={openIndicator}/>
       <div className="kc-switch" role="group" aria-label="Show the catalogue as">
         {(['map', 'table', 'cards'] as const).map(v => <button type="button" key={v} aria-pressed={view === v} className={view === v ? 'on' : ''}
           onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>)}
       </div>
-      <button type="button" className="kc-practise" disabled aria-describedby="kc-practise-why">⟲ Practise</button>
-      <span id="kc-practise-why" className="sr-only">Practise (spaced review of flip cards) is not built yet.</span>
+      <button type="button" className="kc-practise" onClick={onPractise}><span aria-hidden="true">⟲</span> Practise{due === undefined ? '' : ` · ${due} due`}</button>
     </header>
     {problem && <p className="kc-error" role="alert">{problem}</p>}
     <div className={`kc-board view-${view}`}>

@@ -2,13 +2,14 @@
 // The catalogue as cards (mockup KNOWLEDGE_KEEP_1's "Cards"; research Knowledge §6): the chosen area's indicators one
 // card at a time. The front is the sign in the catalogue's words; Space (or a click) turns it to the name, the
 // innocent explanations first, and the first source. ← / → move through the area. This is browsing, not Practise:
-// nothing is scheduled or kept (spaced review needs a store that is not built yet).
+// nothing is scheduled here; ＋ Flip card keeps the card for Practise (practise-screen.tsx), where it is.
 import {useQuery} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 
 import {getIndicatorOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {CatalogueAreaOut, CatalogueIndicatorRowOut} from '../../lib/generated/types.gen';
+import {FlipCardButton} from './indicator-page';
 
 export function CatalogueCards({area, rows, indicator, onOpenIndicator}: {
   area: CatalogueAreaOut | undefined; rows: CatalogueIndicatorRowOut[]; indicator: string; onOpenIndicator: (id: string) => void;
@@ -47,6 +48,7 @@ export function CatalogueCards({area, rows, indicator, onOpenIndicator}: {
         <button type="button" className="kc-btn ghost" onClick={() => go(-1)}>← Previous</button>
         <button type="button" className="kc-btn ghost" onClick={() => setFlipped(v => !v)}>{flipped ? 'Turn back' : 'Turn the card'}</button>
         <button type="button" className="kc-btn ghost" onClick={() => go(1)}>Next →</button>
+        <FlipCardButton id={row.id}/>
       </div>
     </div>}
     {!row && <p className="kc-quiet">Choose an area to go through its indicators as cards.</p>}

@@ -88,6 +88,26 @@ describe('ToCheckPanel', () => {
     expect(within(card).getByRole('button', {name: 'Shows it'})).toBeEnabled();
   });
 
+  it('shows a link added from The Wire with its question and parties, opens it in The Wire, and is decided like any item', async () => {
+    const link = {...checklist, id: 'c-4', kind: 'link', indicator_id: 'link', indicator_name: 'Weak link', flag_id: null, locator: 'Directorship',
+      question: 'Find a reviewed source for: M. Ross signs for Harbour Nominees', relationship_id: 'rel-9',
+      parties: [{id: 'r', name: 'M. Ross', schema: 'Person'}, {id: 'h', name: 'Harbour Nominees', schema: 'Company'}]};
+    const api = mockApi({'GET /api/investigations/inv-1/checks': body([link]),
+      'POST /api/checks/c-4/decide': body([{...link, status: 'unclear', decided_at: '2026-10-10T01:00:00'}]),
+      'GET /api/investigations/inv-1/red-flags': {investigation_id: 'inv-1', rules: [], cannot_run: [], flags: [], gone: [],
+        investigation_type: {set_by: 'app', areas: [], suggested: []}}});
+    wrap(<ToCheckPanel investigationId="inv-1"/>);
+    const card = await screen.findByRole('article', {name: 'To check: Find a reviewed source for: M. Ross signs for Harbour Nominees'});
+    expect(within(card).getByText('Link')).toBeInTheDocument();
+    expect(within(card).getByText(/Added from The Wire · a chain breaks at this link/)).toBeInTheDocument();
+    expect(within(card).getByRole('button', {name: 'M. Ross'})).toBeInTheDocument();
+    expect(within(card).getByRole('button', {name: 'Harbour Nominees'})).toBeInTheDocument();
+    expect(within(card).getByRole('link', {name: 'Open the link in The Wire'})).toHaveAttribute('href', '/see?link=rel-9&inv=inv-1#the-wire');
+    await userEvent.setup().click(within(card).getByRole('button', {name: 'Unclear'}));
+    await waitFor(() => expect(api.lastBody('POST /api/checks/c-4/decide')).toEqual({status: 'unclear', note: null}));
+    expect(await screen.findByText('Decided (1)')).toBeInTheDocument();
+  });
+
   it('says when there is nothing to check yet', async () => {
     mockApi({'GET /api/investigations/inv-1/checks': body([])});
     wrap(<ToCheckPanel investigationId="inv-1"/>);

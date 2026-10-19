@@ -4,19 +4,20 @@
 // case meets is tagged), "Could be innocent" first and "Signs" beside it with equal weight, how it is checked and
 // what that needs from outside, the first source with its quote, the first case with its outcome in its own style,
 // and this case's flags for it. A step or quote not yet confirmed is dashed, never error red.
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {caseHref} from '../../lib/case-href';
 import {errorMessage} from '../../lib/api-client';
-import {getIndicatorOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {addLearningCardMutation, getIndicatorOptions, listLearningCardsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {CatalogueIndicatorOut, CatalogueIndicatorRowOut} from '../../lib/generated/types.gen';
 import {LevelMark} from '../act/red-flags-board';
 import {GlossaryText} from '../glossary/glossary-text';
 import type {CaseLayer} from './case-layer';
 import {HOW_CHECKED, UNSET_LEVEL, shortAreaName} from './families';
+import {invalidateLearning, untilWords} from './practise-data';
 
 const OUTCOME: Record<string, string> = {
   convicted: 'Convicted', acquitted: 'Acquitted', settled: 'Settled', fined_by_regulator: 'Fined by a regulator',
@@ -122,14 +123,13 @@ function Body({ind, row, layer, preview}: {ind: CatalogueIndicatorOut; row: Cata
     {!preview && <footer className="kc-actions">
       <button type="button" className="kc-btn primary" disabled={Boolean(reason) || layer.refetching} onClick={check}
         aria-describedby={reason ? `kc-why-${ind.id}` : undefined}>{layer.refetching ? 'Checking…' : 'Check this in my case'}</button>
-      <button type="button" className="kc-btn" disabled aria-describedby={`kc-why-flip-${ind.id}`}>＋ Flip card</button>
+      <FlipCardButton id={ind.id}/>
       <button type="button" className="kc-btn ghost" aria-expanded={allSources} onClick={() => setAllSources(v => !v)}>
         {allSources ? 'Fewer details' : `${ind.sources.length} ${ind.sources.length === 1 ? 'source' : 'sources'}`}</button>
       <button type="button" className="kc-btn ghost" disabled aria-describedby={`kc-why-suggest-${ind.id}`}>Suggest change</button>
       <p className="kc-why">
         {reason && <span id={`kc-why-${ind.id}`}>{reason} </span>}
         {checked && <span role="status">{checked} </span>}
-        <span id={`kc-why-flip-${ind.id}`}>Flip cards come with Practise, not built yet. </span>
         <span id={`kc-why-suggest-${ind.id}`}>Suggestions need a place to send them, not built yet.</span>
       </p>
     </footer>}
@@ -152,4 +152,22 @@ function InThisCase({ind, layer, hasRule}: {ind: CatalogueIndicatorOut; layer: C
   if (hasRule && layer.ran.has(ind.id)) return <div className="kc-incase-box quiet"><b>In this case:</b> the rule ran on the case’s records and did not fire. Records can’t show everything; no flag is not a finding.</div>;
   return <div className="kc-incase-box quiet"><b>In this case:</b> not checked yet.{' '}
     {hasRule ? 'Its rule has not run on this case: the records it needs are not there yet.' : `No rule checks it on records; it is checked ${HOW_CHECKED[ind.checkable].long}.`}</div>;
+}
+
+/** ＋ Flip card: keeps the indicator for Practise (research Knowledge §4 actions, §6). Once kept it says so, and when
+ * it is next due. */
+export function FlipCardButton({id}: {id: string}): ReactElement {
+  const queryClient = useQueryClient();
+  const kept = useQuery({...listLearningCardsOptions({query: {ref: id, limit: 1}})});
+  const add = useMutation({...addLearningCardMutation(), onSuccess: () => invalidateLearning(queryClient)});
+  const card = kept.data?.cards[0];
+  if (card) {
+    const when = card.due ? 'due now in Practise' : `next in Practise ${untilWords(card.due_at)}`;
+    return <span className="kc-flip-kept" role="status" title={`Kept as a flip card: ${when}`}>✓ Flip card<span className="sr-only"> kept, {when}</span></span>;
+  }
+  return <>
+    <button type="button" className="kc-btn" disabled={add.isPending || kept.isPending}
+      onClick={() => add.mutate({body: {kind: 'indicator', ref: id}})}>{add.isPending ? 'Adding…' : '＋ Flip card'}</button>
+    {add.isError && <span className="kc-error" role="alert">{errorMessage(add.error, 'Could not add the flip card')}</span>}
+  </>;
 }

@@ -319,6 +319,7 @@ def investigation_run_plan(investigation_id: str, body: RunPlanRequest, db: Sess
             flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
             options=body.options.model_dump(exclude_none=True) if body.options else None, premises=body.premises,
             handoff_from=body.handoff_from,
+            record_refs=[ref.model_dump() for ref in body.record_refs] if body.record_refs else None,
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc))

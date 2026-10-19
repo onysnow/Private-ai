@@ -2707,3 +2707,30 @@ Not built (new design or no data): standing-number popovers, empty-case first ac
 Wire arrangement switch, worked-out links, source scan, Practise, sort by unlocks / H snooze, Safety & data screen.
 Presentation draft still runs straight from the drafts panel (the plan endpoint does not cover it).
 Tests: vitest 1353 passed; tsc, eslint, mypy, ruff, OpenAPI check clean; touched backend tests pass.
+
+### 2026-10-19 — The rest of the unbuilt features (PR #87)
+
+Built, each from its mockup or, where none draws it, from the research text (agents quoted the lines):
+- AI: Presentation draft goes through Before you run ("Draft a brief" with the record picker; plan endpoint plans it);
+  Run again / Instructions & plan keep a draft a draft (`record_refs` on the run summary).
+- Case home: standing-number popovers (point previews, click pins, Esc closes); an empty case shows four first
+  actions; Formats Editorial / Desk / Story beside Board (`formats.tsx`, `formats.css`; theme suggests, never sets);
+  year rail shows "n flags"; "to decide" leaves out what is put off.
+- Decide: "by what it unlocks" (dry run, nothing written: `decision_unlocks.py`); H puts a card off until it changes
+  (`decision_snoozes` table, Z undoes, "n snoozed" restores).
+- The Wire: arrangement switch with "Chosen because…", dotted ƒ worked-out links (indirect ownership), lettered stubs,
+  link drawer with the source scan and "How is X linked to Y?"; "Add to To check" makes a To check item of kind link.
+- Learn: Practise (`learning_cards`, fixed ladder, decks, ＋ Flip card).
+- Safety & data at /keep/safety: stores, services with modes enforced at every outbound call, the outbound log word
+  for word, Backup / Who can reach it / Housekeeping / Delete cards, Your safety.
+- Backups protected with a passphrase by default (ADR-0015, `cryptography`, AES-256-GCM + scrypt); Housekeeping
+  Keep / Add back / Delete per stray file, every path re-checked on the server.
+Migrations, in order: b7e3d5a9c142 learning cards → d3a7c9e15b48 decision snoozes → c4f8a2d6e913 safety and
+outbound log → f3b9d2a7c615 backup protection and kept stray files.
+Decided (Ony delegated): Ask first as the default service mode; outbound log and modes in backups, safety answers
+not; flip cards not in case backups; snooze per case with "until tomorrow" / "for a week".
+Tests: vitest 1396 passed (204 files); tsc and eslint clean; backend tests for every changed area, test_migrations,
+test_models_split, mypy, ruff and the OpenAPI check pass. Checked live on the restarted API: Case home, Safety & data,
+The Wire, Decide, Practise, To check, Before you run (no HTTP or console errors).
+Not built: GET /export and the operator console still write unprotected backups (ADR-0015 says so); staged backup
+progress and "Test this backup"; Housekeeping thumbnails; popover links open screens unfiltered (they take no filter).

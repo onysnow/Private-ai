@@ -28,8 +28,9 @@ def test_orphan_storage_preview_route_reports_unreferenced_files(tmp_path, monke
     assert body["orphan_file_count"] == 1
     assert body["orphan_files"][0]["relative_path"] == "referenced-but-absent-from-db.bin"
     assert body["orphan_bytes"] == 5
-    assert body["cleanup_available"] is False
-    assert body["policy"] == "preview_only_retain_by_default"
+    # Nothing is removed by looking; the reporter decides per file (Keep, Add back, Delete: test_housekeeping.py).
+    assert body["cleanup_available"] is True and body["kept_file_count"] == 0
+    assert body["policy"] == "retain_until_reporter_decides"
 
 
 def test_orphan_storage_preview_route_is_local_only(tmp_path, monkeypatch):

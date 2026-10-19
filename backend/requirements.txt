@@ -34,3 +34,6 @@ procrastinate==3.10.0
 # The self-hosted base map's tiles, read from its PMTiles file (app/services/basemap.py;
 # ADR-0005 line 18; BSD-3).
 pmtiles==3.8.1
+# Passphrase-protected backups: AES-256-GCM with a key made by scrypt (app/services/backup_crypto.py;
+# ADR-0015; Apache-2.0 OR BSD-3-Clause).
+cryptography==50.0.2

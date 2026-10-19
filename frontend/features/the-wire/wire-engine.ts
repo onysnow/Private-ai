@@ -12,35 +12,73 @@
 // on, a flagged party wears a ring and a badge with its level and count, the active
 // filters show as chips, and the time strip counts the links held in its window.
 //
+// Also from SEE_1 and research §2.2–2.6: the arrangement switch (Who controls whom · Around a party · By kind ·
+// Linked groups · Grid) with its "Chosen because …" line, previewed on hover or scroll (lib/network-rules.ts
+// chooses, lib/network-arrange.ts places); links the app worked out (the server's worked_out) drawn dotted with ƒ;
+// a link too long to draw across the map drawn as two lettered stubs (A ↔ A), pointing at one lighting the
+// other and the whole line faintly; and clicking a link opens its detail panel (link-drawer.tsx, drawn by React).
+//
 // It draws straight into SVG (hundreds of moving parts each frame), so it is plain DOM
 // code mounted by the-wire.tsx; every listener is removed by the returned destroy().
-import type {WireEntityOut, WireLinkOut, WireOut} from '../../lib/generated/types.gen';
+import {arrangeByKind, arrangeControl} from '../../lib/network-arrange';
+import {chooseArrangement, ruleOf} from '../../lib/network-rules';
+import type {ArrLink, ArrParty, Guide} from '../../lib/network-rules';
+import type {WireEntityOut, WireLinkOut, WireOut, WireWorkedOutOut} from '../../lib/generated/types.gen';
 import {onScreen} from '../../lib/on-screen';
+import type {PartyKind} from '../../lib/viz-tokens';
 
 /** How sure a link is (the status grammar): read from the case's review advisory by the-wire.tsx. */
 export type LinkSure = 'shown' | 'unshown' | 'disputed' | 'worked';
 /** Per link id: how sure it is, and its end date when the record gives one (an ended link is drawn faint). */
 export type LinkInfo = Record<string, {sure: LinkSure; end: string}>;
 
+/** A stored link, or one the app worked out (never stored, never reviewed: drawn dotted, marked ƒ). */
+export type WLink = WireLinkOut & {derived?: WireWorkedOutOut};
+/** The arrangement switch's five choices (research §2.3, SEE_1). */
+export type ArrChoice = 'control' | 'around' | 'kind' | 'clusters' | 'grid';
+export const ARR_NAMES: Record<ArrChoice, string> = {control: 'Who controls whom', around: 'Around a party', kind: 'By kind', clusters: 'Linked groups', grid: 'Grid'};
+/** What the link drawer shows: one strand (a link, or several of one kind between a pair), or a pair of parties asked about. */
+export type LinkView =
+  | {kind: 'link'; key: string; s: string; t: string; fam: string; sure: LinkSure | null; links: WLink[]; index: number; total: number; subject: string}
+  | {kind: 'pair'; a: string; b: string};
+/** What the React side can ask of the map. */
+export type WireApi = {
+  openLink: (linkId: string) => void;
+  openPair: (a: string, b: string) => void;
+  lightLinks: (ids: string[] | null) => void;
+  openRecords: (key: string) => void;
+  centre: (id: string) => void;
+  step: (dir: 1 | -1) => void;
+  name: (id: string) => string;
+  link: (id: string) => WLink | undefined;
+  closed: () => void;
+};
+
 export type WireHooks = {
   active: () => boolean;
   openDossier: (entityId: string) => void;
   openFlag: (flagId: string) => void;
   traceEvidence: (evidenceId: string, title: string) => void;
+  /** The link drawer: open on a view, or closed (null). */
+  showLink?: (view: LinkView | null) => void;
+  /** The Grid arrangement is drawn by React (components/connection-grid.tsx) over the map; preview: only shown while pointing. */
+  showGrid?: (on: boolean, preview: boolean) => void;
+  expose?: (api: WireApi) => void;
 };
 
 type Flags = {faint: number; strong: number; textbook: number; items: {level: string; id: string; text: string; flag_id: string}[]};
 type Mode = 'case' | 'party' | 'wire' | 'path';
 type Target = {x: number; y: number; o: number; v: number; a?: number};
-type Strand = {fam: string; s: string; t: string; links: WireLinkOut[]; sum: number; cur: string; sure: LinkSure | null};
-type Bundle = {key: string; a: string; b: string; links: WireLinkOut[]; strands: Record<string, Strand>};
+type Strand = {fam: string; s: string; t: string; links: WLink[]; sum: number; cur: string; sure: LinkSure | null};
+type Bundle = {key: string; a: string; b: string; links: WLink[]; strands: Record<string, Strand>};
 type Chain = {id: string; mids: string[]; ends: string[]; open: boolean};
 type NodeEl = {
   id: string; g: SVGGElement; halo: SVGCircleElement; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
-type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
-  mid?: {x: number; y: number}; q?: number[]; lab: {g: SVGGElement; w: number; t: SVGTextElement; body: SVGTSpanElement; ended: boolean} | null};
+type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; src: Strand; w: number; bend: number; want: boolean;
+  mid?: {x: number; y: number}; q?: number[]; lab: {g: SVGGElement; w: number; t: SVGTextElement; body: SVGTSpanElement; ended: boolean} | null;
+  ghost: SVGPathElement; stub: {g: SVGGElement; a: SVGGElement; b: SVGGElement}; stubF: number};
 type Box = {x0: number; x1: number; y0: number; y1: number};
 type Pt = {x: number; y: number; in: boolean; d?: number};
 
@@ -63,6 +101,8 @@ export const SURE: Record<LinkSure, {g: string; n: string; dash: string; rank: n
 };
 const DISPUTED = '#FF8070';
 const TERR = ['#2E4D67', '#2f4f44', '#4d3d2c', '#4f3036', '#3d3858', '#3b4f5e', '#55402b', '#2d4a52', '#4a3f55', '#34503c'];
+// A link longer on screen than this share of the map's diagonal is drawn as two lettered stubs (research §2.2).
+const STUB_AT = 0.38;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export const esc = (text: unknown): string => String(text ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!));
@@ -90,9 +130,11 @@ const monthYear = (d: string): string => { const [y, m] = d.split('-'); return m
 
 /** A strand's sentence, from the fixed link verbs (research §2.2): "owns 60%", "director since 2017",
  * "paid 29,400 EUR · 3× Feb–Apr 2018", "bid for · 4 Mar 2019". It reads from the strand's first party to its second. */
-export function linkSentence(fam: string, links: WireLinkOut[], ended: string): string {
+export function linkSentence(fam: string, links: WLink[], ended: string): string {
   const l0 = links[0];
   const n = links.length;
+  // Worked out by the app: the share when it could be worked out, and the word that says so (SEE_1 "ƒ owns 40% · worked out").
+  if (l0.derived) return `owns ${l0.pct ? `${l0.pct}%` : 'a share not known'} · worked out`;
   if (fam === 'money') {
     const sum = links.reduce((s, l) => s + (l.amount || 0), 0);
     const ds = links.map(l => l.date).filter(Boolean).sort();
@@ -111,6 +153,28 @@ export function linkSentence(fam: string, links: WireLinkOut[], ended: string): 
   }
   return `${l0.role ? l0.role.slice(0, 32) : 'linked'}${l0.date && !ended ? ` · ${fmtDate(l0.date)}` : ended ? ` · ended ${monthYear(ended)}` : ''}${many}`;
 }
+
+/** The link as one sentence for its detail panel, from the first party to the second (SEE_1: "Harbour Nominees Ltd
+ * is a director of Kestrel SA, since 3 Jul 2017"). Names are filled in by the caller. */
+export function drawerSentence(fam: string, links: WLink[], ended: string): {verb: string; tail: string} {
+  const l0 = links[0];
+  const n = links.length;
+  if (l0.derived) return {verb: l0.pct ? `owns ${l0.pct}% of` : 'owns a share not known of', tail: ''};
+  const since = ended ? `, until ${fmtDate(ended)}` : l0.date ? `, since ${fmtDate(l0.date)}` : '';
+  if (fam === 'money') {
+    const sum = links.reduce((s, l) => s + (l.amount || 0), 0);
+    return {verb: 'paid', tail: `${sum ? fmtAmt(sum, l0.cur) : 'an amount not stated'}${n > 1 ? ` in ${n} payments` : l0.date ? ` on ${fmtDate(l0.date)}` : ''}`};
+  }
+  if (fam === 'owns') return {verb: l0.pct ? `owns ${l0.pct.replace(/%$/, '')}% of` : 'owns', tail: since.replace(/^, /, '')};
+  if (fam === 'runs') {
+    const role = l0.role || (l0.schema === 'Directorship' ? 'director' : l0.schema === 'Employment' ? 'employee' : 'member');
+    return {verb: `is ${/^[aeiou]/i.test(role) ? 'an' : 'a'} ${role} of`, tail: since.replace(/^, /, '')};
+  }
+  return {verb: l0.role || 'is linked to', tail: l0.date ? fmtDate(l0.date) : ''};
+}
+
+/** A wire party's kind as the shared arrangements read it (lib/viz-tokens PartyKind). */
+const ARR_KIND: Record<string, PartyKind> = {person: 'person', company: 'company', org: 'organisation', vehicle: 'vehicle', property: 'property', account: 'other', other: 'other'};
 
 export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, info: LinkInfo = {}): () => void {
   // Calm (Appearance) and the system's reduced motion both stop the camera and the nodes travelling.
@@ -132,6 +196,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   const D = data;
   const E: Record<string, WireEntityOut> = {};
   D.entities.forEach(e => { E[e.id] = e; });
+  // The stored links, then the ones the app worked out (never stored): drawn, but they move nothing and count apart.
+  const LINKS: WLink[] = [...D.links, ...(D.worked_out ?? []).filter(w => E[w.s] && E[w.t]).map(w => ({
+    id: w.id, s: w.s, t: w.t, schema: w.schema, fam: w.fam, amount: null, cur: '', date: '', role: '', pct: w.pct, ev: [], flags: [], derived: w,
+  }) as WLink)];
+  const linkById: Record<string, WLink> = {};
+  LINKS.forEach(l => { linkById[l.id] = l; });
   let rollAccounts = true;
   const rep = (id: string): string => (rollAccounts && E[id]?.holder ? E[id].holder! : id);
   const fscore = (f: Flags | null | undefined) => (f ? f.textbook * 4 + f.strong * 2 + f.faint : 0);
@@ -143,7 +213,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     return out;
   };
   const nOpen = (f: Flags) => f.faint + f.strong + f.textbook;
-  const sureOf = (l: WireLinkOut): LinkSure | null => info[l.id]?.sure ?? null;
+  const sureOf = (l: WLink): LinkSure | null => (l.derived ? 'worked' : info[l.id]?.sure ?? null);
   const endOf = (l: WireLinkOut): string => info[l.id]?.end ?? '';
   const bkey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 
@@ -154,7 +224,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   let chainOf: Record<string, Chain> = {};
   function build(): void {
     bundles = {}; adj = {}; deg = {};
-    for (const l of D.links) {
+    for (const l of LINKS) {
       if (!E[l.s] || !E[l.t]) continue;
       const a = rep(l.s), b = rep(l.t);
       if (a === b) continue;
@@ -168,6 +238,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const S = B.strands[sk] || (B.strands[sk] = {fam: l.fam, s: a, t: b, links: [], sum: 0, cur: l.cur, sure});
       S.links.push(l);
       if (l.amount) S.sum += l.amount;
+      if (l.derived) continue;
       (adj[a] || (adj[a] = new Set())).add(b);
       (adj[b] || (adj[b] = new Set())).add(a);
     }
@@ -217,6 +288,40 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   const mostFlagged = D.entities.filter(e => !e.holder).map(e => [fscore(flagsOf(e.id)), deg[e.id], e.id] as const)
     .sort((a, b) => b[0] - a[0] || b[1] - a[1]).map(x => x[2]);
 
+  /* arrangements (research §2.3): the shared rules choose one and say why (lib/network-rules.ts) and place the
+     parties (lib/network-arrange.ts); Linked groups keeps the server's own groups and patches. Worked-out links
+     move nothing. */
+  const arrParties = (): ArrParty[] => D.entities.filter(e => !(rollAccounts && e.holder)).map(e => ({id: e.id, label: e.short, kind: ARR_KIND[e.kind] ?? 'other'}));
+  const arrLinks = (): ArrLink[] => {
+    const out: ArrLink[] = [];
+    for (const l of D.links) {
+      if (!E[l.s] || !E[l.t]) continue;
+      const a = rep(l.s), b = rep(l.t);
+      if (a !== b) out.push({id: l.id, from: a, to: b, control: l.fam === 'owns' || l.fam === 'runs'});
+    }
+    return out;
+  };
+  const chosen = chooseArrangement(arrParties(), arrLinks());
+  const chosenChoice: ArrChoice = chosen.arrangement === 'around' ? 'clusters' : chosen.arrangement;
+  let caseArr: 'control' | 'kind' | 'clusters' = chosenChoice === 'control' || chosenChoice === 'kind' ? chosenChoice : 'clusters';
+  let gridOn = false;
+  type Layout = {pos: Record<string, {x: number; y: number}>; guides: Guide[]};
+  const layoutCache: Record<string, Layout> = {};
+  function layoutOf(a: 'control' | 'kind'): Layout {
+    const key = `${a}|${rollAccounts}`;
+    if (layoutCache[key]) return layoutCache[key];
+    const placed = a === 'control' ? arrangeControl(arrParties(), arrLinks()) : arrangeByKind(arrParties(), arrLinks());
+    // Into the map's own box. Height is the rule (levels) and keeps its proportion; across a level only the order means
+    // anything, so a narrow drawing is spread wider to give names and sentences room.
+    const ky = Math.min(2.6, 1000 / Math.max(1, placed.height)), kx = Math.min(6, 2160 / Math.max(1, placed.width));
+    const ox = 120 + (2160 - placed.width * kx) / 2, oy = 120 + (1000 - placed.height * ky) / 2;
+    const pos: Layout['pos'] = {};
+    for (const id in placed.positions) pos[id] = {x: ox + placed.positions[id].x * kx, y: oy + placed.positions[id].y * ky};
+    const guides = placed.guides.map((g): Guide => g.type === 'ring' ? {...g, cx: ox + g.cx * kx, cy: oy + g.cy * ky, r: g.r * ky}
+      : {...g, x0: ox + g.x0 * kx, x1: ox + g.x1 * kx, y0: oy + g.y0 * ky, y1: oy + g.y1 * ky});
+    return (layoutCache[key] = {pos, guides});
+  }
+
   /* time span: from the case's own dates */
   const allT = [...D.links.map(l => tval(l.date)), ...D.events.map(e => tval(e.date))].filter((t): t is number => t != null);
   const T0 = allT.length ? Math.floor(Math.min(...allT)) : new Date().getFullYear() - 5;
@@ -260,7 +365,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const flag = el('g', {transform: 'translate(90,-27)'}, card);
     g.appendChild(halo); // over the card, so its ring round the kind dot shows
     const N: NodeEl = {id, g, halo, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
-    on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); onNodeClick(id); });
+    on<MouseEvent>(g, 'click', ev => {
+      ev.stopPropagation();
+      // Shift-click a second party: how is it linked to the one picked before (research §2.6)?
+      if (ev.shiftKey && !isChain) { openPair(picked && picked !== id ? picked : subject(), id); return; }
+      onNodeClick(id);
+    });
     on<MouseEvent>(g, 'mouseenter', ev => showTip(ev, id));
     on(g, 'mouseleave', hideTip);
     node[id] = N;
@@ -312,15 +422,18 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
 
   /* ---------- layouts ---------- */
   const chainPos = (c: Chain) => { let x = 0, y = 0; c.mids.forEach(m => { x += E[m].x; y += E[m].y; }); return {x: x / c.mids.length, y: y / c.mids.length}; };
-  function caseTargets(): Record<string, Target> {
+  function caseTargets(arr: 'control' | 'kind' | 'clusters' = caseArr): Record<string, Target> {
     const T: Record<string, Target> = {};
+    // Linked groups: the server's places, shell chains folded into decks. The other arrangements: the shared rules' places.
+    const lay = arr === 'clusters' ? null : layoutOf(arr);
+    const at = (id: string) => lay?.pos[id] ?? {x: E[id].x, y: E[id].y};
     for (const e of D.entities) {
-      if (rollAccounts && e.holder && E[e.holder]) { T[e.id] = {x: E[e.holder].x, y: E[e.holder].y, o: 0, v: 0}; continue; }
+      if (rollAccounts && e.holder && E[e.holder]) { T[e.id] = {...at(e.holder), o: 0, v: 0}; continue; }
       const c = chainOf[e.id];
-      if (c && !c.open) { const p = chainPos(c); T[e.id] = {x: p.x, y: p.y, o: 0, v: 0}; continue; }
-      T[e.id] = {x: e.x, y: e.y, o: 1, v: 1};
+      if (!lay && c && !c.open) { const p = chainPos(c); T[e.id] = {x: p.x, y: p.y, o: 0, v: 0}; continue; }
+      T[e.id] = {...at(e.id), o: 1, v: 1};
     }
-    chains.forEach(c => { const p = chainPos(c); T[c.id] = {x: p.x, y: p.y, o: c.open ? 0 : 1, v: 1}; });
+    chains.forEach(c => { const p = chainPos(c); T[c.id] = {x: p.x, y: p.y, o: !lay && !c.open ? 1 : 0, v: 1}; });
     return T;
   }
 
@@ -337,6 +450,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     for (const n of ring1) {
       let ci = 0, co = 0, mi = 0, mo = 0;
       for (const l of bundles[bkey(f, n)].links) {
+        if (l.derived) continue;
         const t = rep(l.t);
         if (l.fam === 'owns' || l.fam === 'runs') { if (t === f) ci++; else co++; } else if (l.fam === 'money') { if (t === f) mi++; else mo++; }
       }
@@ -484,6 +598,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   let terrBoxes: Box[] = [], cardBoxes: Box[] = [], secBoxes: Box[] = [];
   let secEls: {t: SVGTextElement; a: number; r: number; rx: number; cx: number; cy: number}[] = [];
   let hopEls: {k: string; g: SVGGElement}[] = [];
+  let guideEls: {t: SVGTextElement; x: number; y: number; band: boolean}[] = [];
   const overlap = (b: Box, list: Box[]) => list.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
 
   function render(): void {
@@ -521,17 +636,41 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       N.lbl.style.display = 'none';
       if (v === 1 && !(lens.on && mode === 'case' && d.in)) cands.push({id, N, d, pri: fscore(fl) * 10 + deg[id] + (mode === 'case' ? 0 : 100)});
     }
+    let stubN = 0;
     for (const k in edgeEls) {
       const R = edgeEls[k], a = P[R.S.s], b = P[R.S.t], na = node[R.S.s], nb = node[R.S.t];
       const vis = Boolean(na && nb && a && b) && na.cur.v > 0 && nb.cur.v > 0 && na.cur.o > 0.02 && nb.cur.o > 0.02 && R.want;
       R.g.style.display = vis ? '' : 'none';
-      if (!vis) continue;
+      if (!vis) { R.stub.g.style.display = 'none'; R.stubF = 0; continue; }
       const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1, bend = R.bend * Math.min(80, len * 0.16);
       const mx = (a.x + b.x) / 2 - dy / len * bend, my = (a.y + b.y) / 2 + dx / len * bend;
       const dd = `M${a.x},${a.y}Q${mx},${my} ${b.x},${b.y}`;
-      R.p.setAttribute('d', dd); R.h.setAttribute('d', dd);
-      if (R.u) R.u.setAttribute('d', dd);
-      if (R.d2) R.d2.setAttribute('d', dd);
+      // A link that would cross the whole map (whole-case view): two short stubs, each with the same letter
+      // (on-page connectors, research §2.2). Pointing at one lights the other and draws the whole line faintly.
+      const sa = toScreen(a.x, a.y), sb = toScreen(b.x, b.y), slen = Math.hypot(sb.x - sa.x, sb.y - sa.y);
+      const stub = mode === 'case' && slen > STUB_AT * Math.hypot(W, H);
+      R.stubF = stub ? Math.min(0.3, 90 / slen) : 0;
+      let line = dd;
+      if (stub) {
+        const pt = (t: number) => { const u = 1 - t; return {x: u * u * a.x + 2 * u * t * mx + t * t * b.x, y: u * u * a.y + 2 * u * t * my + t * t * b.y}; };
+        const seg = (t0: number, t1: number) => Array.from({length: 7}, (_, i) => { const p = pt(t0 + (t1 - t0) * i / 6); return `${i ? 'L' : 'M'}${p.x},${p.y}`; }).join('');
+        line = seg(0, R.stubF) + seg(1 - R.stubF, 1);
+        const letter = String.fromCharCode(65 + (stubN++ % 26));
+        const ends = [pt(R.stubF), pt(1 - R.stubF)];
+        [R.stub.a, R.stub.b].forEach((g, i) => {
+          g.setAttribute('transform', `translate(${ends[i].x},${ends[i].y}) scale(${1 / C.k})`);
+          const t = g.querySelector('text');
+          if (t && t.textContent !== letter) t.textContent = letter;
+        });
+        R.stub.g.style.display = '';
+        R.stub.g.style.opacity = R.g.style.opacity;
+        R.stub.g.setAttribute('aria-label', `${letter}: ${E[R.S.s]?.short ?? ''} to ${E[R.S.t]?.short ?? ''}, drawn as two stubs lettered ${letter}`);
+      } else R.stub.g.style.display = 'none';
+      R.ghost.setAttribute('d', dd);
+      R.g.classList.toggle('stubbed', stub);
+      R.p.setAttribute('d', line); R.h.setAttribute('d', line);
+      if (R.u) R.u.setAttribute('d', line);
+      if (R.d2) R.d2.setAttribute('d', line);
       const live = R.S.links.some(inRange);
       // Ended: every record on the strand ended before the window's end. Drawn faint, and its sentence says when.
       const ended = endedBy(R.S.links, range[1]);
@@ -549,6 +688,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         sizePill(R.lab.g, R.lab.w);
       }
       if (R.u) { R.u.setAttribute('stroke-width', String(sw + 1.4)); R.u.style.opacity = mode === 'case' ? '.55' : '1'; }
+      R.ghost.setAttribute('stroke-width', String(sw));
+      if (R.stubF) R.stub.g.style.opacity = R.g.style.opacity;
       R.mid = {x: mx * 0.5 + (a.x + b.x) / 4, y: my * 0.5 + (a.y + b.y) / 4};
       R.q = [a.x, a.y, mx, my, b.x, b.y];
     }
@@ -600,6 +741,11 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       }
       S.t.style.display = ok ? '' : 'none';
       if (ok) { S.t.setAttribute('x', String(ok.wx)); S.t.setAttribute('y', String(ok.wy)); S.t.setAttribute('font-size', String(10.5 / C.k)); secBoxes.push(ok.b); }
+    }
+    for (const G of guideEls) {
+      G.t.setAttribute('font-size', String(10.5 / C.k));
+      G.t.setAttribute('x', String(G.x - (G.band ? 14 / C.k : 0)));
+      G.t.setAttribute('y', String(G.y + 20 / C.k));
     }
     for (const M of moreEls) {
       const s = toScreen(M.x, M.y);
@@ -669,7 +815,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       // The middle of the curve first, then further along it either way.
       const [ax, ay, mx, my, bx, by] = R.q!;
       let spot: {x: number; y: number; b: Box} | null = null;
-      for (const t of [0.5, 0.4, 0.6, 0.3, 0.7, 0.22, 0.78, 0.15, 0.85]) {
+      // A stubbed link's sentence sits by its first stub, else by its second.
+      const f = R.stubF;
+      for (const t of f ? [f * 0.55, 1 - f * 0.55, f * 0.3, 1 - f * 0.3, f * 0.8, 1 - f * 0.8] : [0.5, 0.4, 0.6, 0.3, 0.7, 0.22, 0.78, 0.15, 0.85]) {
         const u = 1 - t, x = u * u * ax + 2 * u * t * mx + t * t * bx, y = u * u * ay + 2 * u * t * my + t * t * by, s = toScreen(x, y);
         const b = {x0: s.x - L.w / 2 - 2, x1: s.x + L.w / 2 + 2, y0: s.y - 12, y1: s.y + 12};
         if (b.x0 >= 0 && b.x1 <= W && b.y0 >= top && b.y1 <= bottom && !overlap(b, placed)) { spot = {x, y, b}; break; }
@@ -704,11 +852,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         let s = S.s, t = S.t;
         // In the whole-case view a collapsed shell chain stands in for its companies.
         const cs = chainOf[s], ct = chainOf[t];
-        if (mode === 'case') { if (cs && !cs.open) s = cs.id; if (ct && !ct.open) t = ct.id; if (s === t) return; }
+        if (mode === 'case' && caseArr === 'clusters') { if (cs && !cs.open) s = cs.id; if (ct && !ct.open) t = ct.id; if (s === t) return; }
         let want = tgtV(s) && tgtV(t);
         if (mode === 'party' || mode === 'wire') { const v1 = node[s].tgt.v, v2 = node[t].tgt.v; want = v1 > 0 && v2 > 0 && (s === focus || t === focus || v1 === 2 || v2 === 2); }
         if (mode === 'path') want = pathEdge(s, t);
         const fam = FAM[S.fam] || FAM.other;
+        const ek = `${key}#${i}`;
         const g = el('g', {}, gE);
         const money = S.fam === 'money';
         const w = money && S.sum ? 1.2 + Math.log10(S.sum / 1e6 + 1) * 1.25 : 1.6;
@@ -718,6 +867,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         const p = el('path', {class: `strand${S.sure ? ` s-${S.sure}` : ''}`, stroke: isPath || S.sure === 'disputed' ? DISPUTED : fam.c,
           'stroke-opacity': mode === 'case' ? 0.55 : 0.9, 'stroke-dasharray': sure?.dash ?? 'none'}, g);
         const d2 = S.sure === 'disputed' ? el('path', {class: 'strand-core'}, g) : null;
+        // The whole line of a stubbed link, drawn faintly while either stub is pointed at.
+        const ghost = el('path', {class: `ghost${S.sure ? ` s-${S.sure}` : ''}`, stroke: S.sure === 'disputed' ? DISPUTED : fam.c, 'stroke-dasharray': sure?.dash ?? 'none'}, g);
         const u = money ? el('path', {class: 'pulse', stroke: isPath ? '#ffe9e4' : '#ffd9a8', 'stroke-opacity': 0.95}, g) : null;
         const h = el('path', {class: 'hit'}, g);
         const n = strands.length, bend = n === 1 ? 0.25 : (i - (n - 1) / 2) * 1.1 + 0.15;
@@ -738,15 +889,23 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
           sizePill(lg, tw + 14);
           const ti = el('title', {}, lg);
           ti.textContent = `${E[S.s]?.short ?? ''} ${words}${E[S.t] ? ` ${E[S.t].short}` : ''}${sure ? ` (${sure.n.toLowerCase()})` : ''}`;
-          on<MouseEvent>(lg, 'click', ev => { ev.stopPropagation(); openWire(B.key); });
+          on<MouseEvent>(lg, 'click', ev => { ev.stopPropagation(); openLinkDrawer(ek); });
           on<MouseEvent>(lg, 'mouseenter', ev => showLinkTip(ev, S));
           on(lg, 'mouseleave', hideTip);
           lab = {g: lg, w: tw + 14, t, body, ended: false};
         }
-        edgeEls[`${key}#${i}`] = {g, p, u, h, d2, S: {...S, s, t}, w, bend, want, lab};
-        on<MouseEvent>(h, 'click', ev => { ev.stopPropagation(); openWire(B.key); });
-        on<MouseEvent>(h, 'mouseenter', ev => showLinkTip(ev, S));
-        on(h, 'mouseleave', hideTip);
+        // The two lettered stub ends (shown only while the link is drawn as stubs).
+        const sg = el('g', {class: 'stub', role: 'button', tabindex: -1, style: 'display:none'}, gLab);
+        const badge = () => { const bg = el('g', {}, sg); el('circle', {r: 9}, bg); el('text', {y: 3.8, 'text-anchor': 'middle'}, bg); return bg; };
+        const stubLit = (on2: boolean) => { g.classList.toggle('stub-lit', on2); sg.classList.toggle('lit', on2); };
+        const R: EdgeEl = {g, p, u, h, d2, S: {...S, s, t}, src: S, w, bend, want, lab, ghost, stub: {g: sg, a: badge(), b: badge()}, stubF: 0};
+        edgeEls[ek] = R;
+        on<MouseEvent>(sg, 'click', ev => { ev.stopPropagation(); openLinkDrawer(ek); });
+        on<MouseEvent>(sg, 'mouseenter', ev => { stubLit(true); showLinkTip(ev, S); });
+        on(sg, 'mouseleave', () => { stubLit(false); hideTip(); });
+        on<MouseEvent>(h, 'click', ev => { ev.stopPropagation(); openLinkDrawer(ek); });
+        on<MouseEvent>(h, 'mouseenter', ev => { if (R.stubF) stubLit(true); showLinkTip(ev, S); });
+        on(h, 'mouseleave', () => { stubLit(false); hideTip(); });
       });
     }
     // Round trips around the focus: money both ways with one party.
@@ -796,7 +955,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     // Territories.
     const gT = q<SVGGElement>('.tw-terr'), gL = q<SVGGElement>('.tw-terr-l');
     gT.textContent = ''; gL.textContent = ''; terrEls = [];
-    if (mode === 'case') {
+    if (mode === 'case' && caseArr === 'clusters') {
       for (const t of Object.values(terr)) {
         const ms = t.members;
         let x = 0, top = 1e9;
@@ -814,7 +973,17 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     }
     // Sectors and "more" chips.
     const gS = q<SVGGElement>('.tw-sec'), gM = q<SVGGElement>('.tw-more');
-    gS.textContent = ''; gM.textContent = ''; secEls = []; moreEls = [];
+    gS.textContent = ''; gM.textContent = ''; secEls = []; moreEls = []; guideEls = [];
+    // The arrangement's guides, faint, each labelled at its right edge (bands) or top (columns), as SEE_1's levels are.
+    if (mode === 'case' && caseArr !== 'clusters') {
+      for (const gd of layoutOf(caseArr).guides) {
+        if (gd.type === 'ring') continue;
+        el('rect', {x: gd.x0, y: gd.y0, width: gd.x1 - gd.x0, height: gd.y1 - gd.y0, rx: 18, class: `guide ${gd.type}`}, gS);
+        const t = el('text', {class: 'sec guide-l', 'text-anchor': gd.type === 'band' ? 'end' : 'middle'}, gS);
+        t.textContent = gd.label;
+        guideEls.push({t, x: gd.type === 'band' ? gd.x1 : (gd.x0 + gd.x1) / 2, y: gd.y0, band: gd.type === 'band'});
+      }
+    }
     if (mode === 'party' && partyInfo) {
       const I = partyInfo;
       el('ellipse', {cx: I.cx, cy: I.cy, rx: I.R1 * I.RX, ry: I.R1, fill: 'none', stroke: 'rgb(111 138 163 / .22)', 'stroke-dasharray': '2 6'}, gS);
@@ -1005,7 +1174,10 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     q<HTMLElement>('.tw-needle').style.top = `${({case: 5, party: 109, wire: 213, path: 5})[mode]}px`;
     if (!D.entities.length) { showRule('No parties in this case yet. Records you accept in Decide arrive here.'); return; }
     const f = flagsOf(focus);
-    if (mode === 'case') {
+    if (mode === 'case' && caseArr !== 'clusters') {
+      const r = ruleOf(caseArr);
+      showRule(`<b>${esc(r.label)}</b> ${esc(r.text)} Position is the arrangement's rule; the line says how sure.`);
+    } else if (mode === 'case') {
       const nT = Object.values(terr).filter(t => t.id !== 'loose').length;
       showRule(`Each patch is a group of parties more linked to each other than to the rest: <b>${nT} ${nT === 1 ? 'group' : 'groups'}</b>, ${D.entities.length} parties, ${D.links.length} links. Bigger dot, more links. Roll the wheel over a party to go down to it.`);
     }
@@ -1028,26 +1200,120 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     q('.tw-blens').setAttribute('aria-pressed', String(lens.on && mode === 'case'));
     renderActive();
     q('.tw-bpath').setAttribute('aria-pressed', String(mode === 'path'));
+    renderSwitch();
+  }
+
+  /* ---------- the arrangement switch (SEE_1, research §2.3) ---------- */
+  const current = (): ArrChoice => (gridOn ? 'grid' : mode === 'party' || mode === 'wire' ? 'around' : caseArr);
+  let peek: {a: ArrChoice; saved: {caseArr: typeof caseArr; gridOn: boolean; mode: Mode; focus: string}} | null = null;
+  let peekTimer = 0;
+  const ruleLine = (a: ArrChoice): string => {
+    if (a === 'around') return `Arranged around ${E[focus]?.short ?? 'one party'}: owners and directors on the left, what it owns on the right, money in above, money out below.`;
+    if (a === 'grid') return 'Arranged as a grid: one row and one column per party; a link sits in the row of the party it runs from and the column of the one it runs to.';
+    const r = ruleOf(a);
+    return `${r.label} ${r.text}`;
+  };
+  function renderSwitch(): void {
+    const box = root.querySelector('.tw-arr');
+    if (!box) return;
+    const on = peek ? (peek.saved.gridOn ? 'grid' : peek.saved.mode === 'party' || peek.saved.mode === 'wire' ? 'around' : peek.saved.caseArr) : current();
+    box.querySelectorAll<HTMLButtonElement>('[data-a]').forEach(b => {
+      const mine = b.dataset.a === on;
+      b.setAttribute('aria-checked', String(mine));
+      b.tabIndex = mine ? 0 : -1;
+      b.classList.toggle('peek', Boolean(peek) && b.dataset.a === peek!.a);
+      b.title = ruleLine(b.dataset.a as ArrChoice);
+    });
+    const line = q<HTMLParagraphElement>('.tw-chosen');
+    if (!line) return;
+    if (peek) line.textContent = `Preview: ${ARR_NAMES[peek.a]}. Click to keep it; move away to go back.`;
+    else line.textContent = current() === chosenChoice && chosenAuto ? chosen.why : ruleLine(current());
+  }
+  let chosenAuto = true;
+  function applyArr(a: ArrChoice, preview: boolean): void {
+    if (a === 'grid') { gridOn = true; hooks.showGrid?.(true, preview); renderChrome(); return; }
+    if (gridOn) { gridOn = false; hooks.showGrid?.(false, false); }
+    if (a === 'around') { go('party', {id: focus || mostFlagged[0], noTrail: preview}); return; }
+    caseArr = a;
+    go('case', {noTrail: true});
+  }
+  function startPeek(a: ArrChoice): void {
+    if (a === (peek ? peek.a : current())) return;
+    if (!peek) peek = {a, saved: {caseArr, gridOn, mode: mode === 'path' ? 'case' : mode, focus}};
+    peek.a = a;
+    root.classList.add('tw-peeking');
+    applyArr(a, true);
+  }
+  function endPeek(): void {
+    window.clearTimeout(peekTimer);
+    if (!peek) return;
+    const sv = peek.saved;
+    peek = null;
+    root.classList.remove('tw-peeking');
+    hooks.showGrid?.(sv.gridOn, false);
+    gridOn = sv.gridOn; caseArr = sv.caseArr; focus = sv.focus;
+    if (sv.mode === 'wire' && wireKey) openWire(wireKey); else go(sv.mode, {noTrail: true});
+  }
+  function choose(a: ArrChoice): void {
+    window.clearTimeout(peekTimer);
+    peek = null;
+    root.classList.remove('tw-peeking');
+    chosenAuto = false;
+    applyArr(a, false);
+    if (a !== 'grid') hooks.showGrid?.(false, false);
+    renderSwitch();
+  }
+  const ORDER: ArrChoice[] = ['control', 'around', 'kind', 'clusters', 'grid'];
+  const arrBox = root.querySelector<HTMLElement>('.tw-arr');
+  if (arrBox) {
+    arrBox.querySelectorAll<HTMLButtonElement>('[data-a]').forEach(b => {
+      const a = b.dataset.a as ArrChoice;
+      on(b, 'click', () => choose(a));
+      // Hover a choice: after a moment the parties move to it, faded; they come back when the pointer leaves.
+      on(b, 'mouseenter', () => { window.clearTimeout(peekTimer); peekTimer = window.setTimeout(() => startPeek(a), 160); });
+    });
+    on(arrBox, 'mouseleave', endPeek);
+    // Scroll over the switch steps the preview through the choices.
+    on<WheelEvent>(arrBox, 'wheel', e => {
+      e.preventDefault();
+      const at = ORDER.indexOf(peek ? peek.a : current());
+      startPeek(ORDER[(at + (e.deltaY > 0 ? 1 : -1) + ORDER.length) % ORDER.length]);
+    }, {passive: false});
+    // A radio group: arrows move and choose, Home / End the ends.
+    on<KeyboardEvent>(arrBox, 'keydown', e => {
+      const at = ORDER.indexOf(current());
+      const to = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? at + 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? at - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? ORDER.length - 1 : null;
+      if (to === null) return;
+      e.preventDefault();
+      const a = ORDER[(to + ORDER.length) % ORDER.length];
+      choose(a);
+      arrBox.querySelector<HTMLButtonElement>(`[data-a="${a}"]`)?.focus();
+    });
   }
 
   /* drawer */
   const drawer = q<HTMLElement>('.tw-drawer');
+  let picked: string | null = null;
   function openDrawer(id: string): void {
     const e = E[id], f = flagsOf(id), accts = D.entities.filter(a => a.holder === id);
     const nb = [...(adj[id] || [])], fams: Record<string, number> = {};
-    nb.forEach(n => bundles[bkey(id, n)].links.forEach(l => { fams[l.fam] = (fams[l.fam] || 0) + 1; }));
+    nb.forEach(n => bundles[bkey(id, n)].links.forEach(l => { if (!l.derived) fams[l.fam] = (fams[l.fam] || 0) + 1; }));
+    picked = id;
+    if (linkOpen) { linkOpen = false; hooks.showLink?.(null); setLitLink(null); lightLinks(null); }
+    const subj = subject();
     drawer.innerHTML = `<button type="button" class="x" aria-label="Close">✕</button>
       <div class="kind">${esc((KIND[e.kind] ?? KIND.other).name)}${e.jur ? ` · ${esc(e.jur.toUpperCase())}` : ''}</div><h2>${esc(e.name)}</h2>${e.note ? `<p>${esc(e.note)}</p>` : ''}
       ${nOpen(f) ? `<h3>Red Flags · ${nOpen(f)} open</h3><ul>${f.items.slice(0, 4).map(x => `<li><button type="button" class="flagrow" data-flag="${esc(x.flag_id)}"><span class="flagchip ${esc(x.level)}">${esc(x.level)}</span> ${esc(x.text)}</button></li>`).join('')}</ul>` : ''}
       ${accts.length ? `<h3>Accounts held · ${accts.length}</h3><ul>${accts.map(a => `<li>${esc(a.name)}</li>`).join('')}</ul>` : ''}
       <h3>Links · ${nb.length} ${nb.length === 1 ? 'party' : 'parties'}</h3><p class="num">${Object.entries(fams).map(([k, n]) => `${n} ${esc((FAM[k] || FAM.other).n.toLowerCase())}`).join(' · ') || 'None yet'}</p>
-      <div class="acts"><button type="button" class="pri" data-act="centre">Centre here</button><button type="button" data-act="from">Follow the money from here</button><button type="button" data-act="dossier">Open the dossier</button></div>`;
+      <div class="acts"><button type="button" class="pri" data-act="centre">Centre here</button><button type="button" data-act="from">Follow the money from here</button><button type="button" data-act="dossier">Open the dossier</button>${hooks.showLink && subj && subj !== id ? `<button type="button" data-act="how">How is it linked to ${esc(E[subj].short)}?</button>` : ''}</div>`;
     drawer.classList.add('open');
     drawer.querySelector<HTMLButtonElement>('.x')!.onclick = () => drawer.classList.remove('open');
     drawer.querySelectorAll<HTMLButtonElement>('[data-flag]').forEach(b => { b.onclick = () => hooks.openFlag(b.dataset.flag!); });
     drawer.querySelectorAll<HTMLButtonElement>('[data-act]').forEach(b => {
       b.onclick = () => {
         if (b.dataset.act === 'centre') go('party', {id});
+        else if (b.dataset.act === 'how') openPair(id, subj);
         else if (b.dataset.act === 'from') { q<HTMLSelectElement>('.tw-pfrom').value = id; togglePath(true); } else hooks.openDossier(id);
       };
     });
@@ -1084,12 +1350,13 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   }
   const hideTip = () => tip.classList.remove('on');
   let litLink: string | null = null;
-  function setLitLink(k: string | null): void {
+  function setLitLink(k: string | null, tipToo = true): void {
     if (litLink && edgeEls[litLink]) { edgeEls[litLink].g.classList.remove('lit'); edgeEls[litLink].lab?.g.classList.remove('lit'); }
     litLink = k && edgeEls[k] ? k : null;
     if (!litLink) { hideTip(); return; }
     const R = edgeEls[litLink];
     R.g.classList.add('lit'); R.lab?.g.classList.add('lit');
+    if (!tipToo) return;
     const words = R.lab?.body.textContent ?? '';
     const sure = R.S.sure ? SURE[R.S.sure] : null;
     tip.innerHTML = `<b>${esc(E[R.S.s]?.short ?? '')} ${esc(words)} ${esc(E[R.S.t]?.short ?? '')}</b><span class="m">${sure ? `${esc(sure.g)} ${esc(sure.n)} · ` : ''}Enter opens every record on this link · J / K next, previous</span>`;
@@ -1097,6 +1364,71 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     tip.style.left = `${Math.min(W - 290, Math.max(8, (r ? r.left - box.left : W / 2)))}px`;
     tip.style.top = `${Math.min(H - 120, (r ? r.bottom - box.top : H / 2) + 8)}px`;
     tip.classList.add('on');
+  }
+
+  /* ---------- the link drawer (link-drawer.tsx draws it; the map says which link) ---------- */
+  let linkOpen = false;
+  // The party the question is about: the one in the middle, else the most-linked (research §2.2: the title's party).
+  const subject = (): string => (mode === 'party' || mode === 'wire') && E[focus] ? focus
+    : D.entities.filter(e => !e.holder).sort((a, b) => (deg[b.id] ?? 0) - (deg[a.id] ?? 0) || a.short.localeCompare(b.short))[0]?.id ?? '';
+  // The links J / K step through: those with their sentence on screen, most important first; "Link · n of m" counts them.
+  const labelledOrder = (): string[] => Object.keys(edgeEls).filter(k => edgeEls[k].lab && edgeEls[k].lab!.g.style.display !== 'none').sort((a, b) => pri(edgeEls[b]) - pri(edgeEls[a]));
+  const drawnOrder = (k: string): string[] => {
+    const labelled = labelledOrder();
+    return labelled.includes(k) ? labelled : Object.keys(edgeEls).filter(x => edgeEls[x].g.style.display !== 'none').sort((a, b) => pri(edgeEls[b]) - pri(edgeEls[a]));
+  };
+  function showStrand(S: Strand, key: string, index: number, total: number): void {
+    drawer.classList.remove('open');
+    linkOpen = true;
+    hooks.showLink?.({kind: 'link', key, s: S.s, t: S.t, fam: S.fam, sure: S.sure, links: S.links, index, total, subject: subject()});
+  }
+  function openLinkDrawer(k: string): void {
+    const R = edgeEls[k];
+    if (!R || !hooks.showLink) { if (R) openWire(k.split('#')[0]); return; }
+    setLitLink(k, false);
+    const order = drawnOrder(k);
+    showStrand(R.src, k, Math.max(0, order.indexOf(k)) + 1, Math.max(order.length, 1));
+  }
+  function openPair(a: string, b: string): void {
+    if (!hooks.showLink || !E[a] || !E[b] || a === b) return;
+    drawer.classList.remove('open');
+    linkOpen = true;
+    hooks.showLink({kind: 'pair', a, b});
+  }
+  function lightLinks(ids: string[] | null): void {
+    const want = new Set(ids ?? []);
+    root.classList.toggle('chain-on', want.size > 0);
+    for (const k in edgeEls) {
+      const R = edgeEls[k], hit = R.S.links.some(l => want.has(l.id));
+      R.g.classList.toggle('chain-lit', hit); R.lab?.g.classList.toggle('chain-lit', hit);
+    }
+  }
+  hooks.expose?.({
+    openLink: id => {
+      const k = Object.keys(edgeEls).find(x => edgeEls[x].S.links.some(l => l.id === id));
+      if (k && edgeEls[k].g.style.display !== 'none') { openLinkDrawer(k); return; }
+      const l = linkById[id];
+      if (!l) return;
+      const a = rep(l.s), b = rep(l.t);
+      showStrand({fam: l.fam, s: a, t: b, links: [l], sum: l.amount ?? 0, cur: l.cur, sure: sureOf(l)}, `${bkey(a, b)}#x`, 1, 1);
+    },
+    openPair,
+    lightLinks,
+    openRecords: key => { const b = key.split('#')[0]; if (bundles[b]) openWire(b); },
+    centre: id => { if (E[id]) go('party', {id: rep(id)}); },
+    step: dir => stepLink(dir),
+    name: id => E[id]?.short ?? '',
+    link: id => linkById[id],
+    closed: () => { linkOpen = false; setLitLink(null); lightLinks(null); },
+  });
+  function stepLink(dir: 1 | -1): void {
+    // J / K: the next or previous link with its sentence on screen (SEE_1), opened in the drawer.
+    const keys = labelledOrder();
+    if (!keys.length) return;
+    const i = litLink ? keys.indexOf(litLink) : -1;
+    const k = keys[(i + dir + keys.length + (i < 0 && dir < 0 ? 1 : 0)) % keys.length];
+    setLitLink(k);
+    if (hooks.showLink) showStrand(edgeEls[k].src, k, keys.indexOf(k) + 1, keys.length);
   }
 
   /* key */
@@ -1157,8 +1489,10 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const undated = all.filter(l => !l.date).length;
     const held = all.filter(l => l.date && inRange(l)).length + undated;
     const ended = all.filter(l => inRange(l) && endedBy([l], range[1])).length;
+    const worked = LINKS.length - D.links.length;
     const t = `${full ? `Showing all ${all.length} ${all.length === 1 ? 'link' : 'links'}` : `Showing ${held} of ${all.length} links in this window`}`
       + `${ended ? ` · ${ended} ended, drawn faint` : ''}${undated ? ` · ${undated} undated, always shown` : ''}`
+      + `${worked ? ` · ${worked} worked out by the app (ƒ), never stored` : ''}`
       + `${hiddenLabels ? ` · ${hiddenLabels} link ${hiddenLabels === 1 ? 'sentence' : 'sentences'} left off where ${hiddenLabels === 1 ? 'it' : 'they'} would overlap: zoom in` : ''}`;
     if (t === countsText) return;
     countsText = t;
@@ -1288,7 +1622,11 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     else if (mode === 'wire' && e.deltaY > 0) go('party', {noTrail: true});
     else if (mode === 'path' && C.k < 0.3) go('case');
   }, {passive: false});
-  on(svg, 'click', () => { if (drag && drag.moved) return; drawer.classList.remove('open'); });
+  on(svg, 'click', () => {
+    if (drag && drag.moved) return;
+    drawer.classList.remove('open');
+    if (linkOpen) { linkOpen = false; hooks.showLink?.(null); setLitLink(null); lightLinks(null); }
+  });
   root.querySelectorAll<HTMLButtonElement>('.tw-alt .stop').forEach(b => on(b, 'click', () => {
     const m = b.dataset.m as Mode;
     if (m === 'wire') {
@@ -1328,7 +1666,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     if (e.key === '/') { e.preventDefault(); sIn.focus(); } else if (e.key === 'l' || e.key === 'L') toggleLens();
     else if (e.key === 'f' || e.key === 'F') togglePath(mode !== 'path');
     else if (e.key === 'Escape') {
-      if (drawer.classList.contains('open')) drawer.classList.remove('open');
+      if (peek) endPeek();
+      else if (linkOpen) { linkOpen = false; hooks.showLink?.(null); setLitLink(null); lightLinks(null); }
+      else if (drawer.classList.contains('open')) drawer.classList.remove('open');
       else if (mode === 'wire') go('party', {noTrail: true});
       else if (mode === 'party' || mode === 'path') { q('.tw-pathbox').classList.remove('on'); go('case'); }
     } else if (e.key === 'Backspace' && trail.length > 1) { trail.pop(); go('party', {id: trail[trail.length - 1], noTrail: true}); }
@@ -1342,15 +1682,16 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const rect = node[id].card.querySelector('rect');
       rect?.setAttribute('stroke-width', '3');
       window.setTimeout(() => rect?.setAttribute('stroke-width', '1.4'), 900);
-    } else if (e.key === 'Enter' && litLink) { const k = litLink.split('#')[0]; setLitLink(null); openWire(k); }
+    } else if (e.key === 'Enter' && litLink) {
+      const k = litLink.split('#')[0];
+      setLitLink(null);
+      if (linkOpen) { linkOpen = false; hooks.showLink?.(null); }
+      openWire(k);
+    }
     else if (e.key === 'Enter' && mode === 'party' && stepIdx >= 0) { const r = ringOrder(); go('party', {id: r[stepIdx]}); stepIdx = -1; }
     else if ((e.key === 'j' || e.key === 'J' || e.key === 'k' || e.key === 'K') && (mode === 'party' || mode === 'case')) {
-      // J / K: the next or previous link with its sentence on screen (SEE_1); Enter opens it.
-      const keys = Object.keys(edgeEls).filter(k => edgeEls[k].lab && edgeEls[k].lab!.g.style.display !== 'none').sort((a, b) => pri(edgeEls[b]) - pri(edgeEls[a]));
-      if (!keys.length) return;
       e.preventDefault();
-      const i = litLink ? keys.indexOf(litLink) : -1;
-      setLitLink(keys[(i + (e.key.toLowerCase() === 'j' ? 1 : -1) + keys.length + (i < 0 && e.key.toLowerCase() === 'k' ? 1 : 0)) % keys.length]);
+      stepLink(e.key.toLowerCase() === 'j' ? 1 : -1);
     }
   });
   const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(() => {
@@ -1378,10 +1719,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   Object.assign(C, fitBox(Object.values(T).filter(t => t.o), 120));
   mode = 'case';
   drawStatic(); render(); renderChrome(); drawTime();
-  const boot = window.setTimeout(() => { if (focus && deg[focus]) go('party', {id: focus, slow: true}); }, RM() ? 0 : 900);
+  // Linked groups (the rules' choice when no link says who controls whom): start on the whole map, then go down to the
+  // most-flagged party. Any other arrangement stays as chosen.
+  const boot = window.setTimeout(() => { if (caseArr === 'clusters' && focus && deg[focus]) go('party', {id: focus, slow: true}); }, RM() ? 0 : 900);
 
   return () => {
-    window.clearTimeout(boot); window.clearTimeout(wireTimer);
+    window.clearTimeout(boot); window.clearTimeout(wireTimer); window.clearTimeout(peekTimer);
     if (raf) cancelAnimationFrame(raf);
     if (playing) cancelAnimationFrame(playing);
     ro?.disconnect();

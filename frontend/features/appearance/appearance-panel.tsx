@@ -3,7 +3,8 @@
 // specimen cards (each drawn in its own theme) and the effects; on the right the open
 // case's real Case home, split between the theme you use and the one you point at, its
 // four facts, and the formats. Pointing at a card previews it there; choosing a card tries
-// it on the whole app for this session, and the bar at the top keeps it or goes back. "+ Make your own" opens the
+// it on the whole app for this session, and the bar at the top keeps it or goes back. The format (Board, Editorial,
+// Desk, Story) is kept at once, with the same crossfade; the theme on screen may suggest one, never choose it. "+ Make your own" opens the
 // theme maker (theme-maker.tsx); your own themes then sit among the cards and are tried and kept the same way.
 import type {CSSProperties, ReactElement} from 'react';
 import {useEffect, useState} from 'react';
@@ -14,9 +15,10 @@ import {webglAvailable} from '../effects/webgl';
 import {ThemeCompare, type Look} from './theme-compare';
 import {draftFrom, draftOf, ThemeMaker, type ThemeDraft} from './theme-maker';
 import {checkPalette, ratioText} from '../../lib/contrast';
+import '../../styles/formats.css';
 import {customTheme, customThemes, deleteCustomTheme, MAX_CUSTOM_THEMES, onCustomThemesChange, paletteVars, type CustomTheme} from '../../lib/custom-theme';
 import {
-  currentAppearance, DEFAULT_APPEARANCE, FORMATS, keepAppearance, keptAppearance, onAppearanceChange, THEMES, tryingCustom, tryingTheme, tryTheme,
+  currentAppearance, DEFAULT_APPEARANCE, FORMATS, keepAppearance, SUGGESTED_FORMAT, keptAppearance, onAppearanceChange, THEMES, tryingCustom, tryingTheme, tryTheme,
   type Appearance, type Effects, type Format, type NamedEffect, type ThemeId,
 } from '../../lib/theme';
 
@@ -103,14 +105,14 @@ const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeI
 /** Whether a theme has any of the named effects (research §04.11: each card's name says "has effects" when it does). */
 const hasEffects = (theme: ThemeId): boolean => NAMED.some(n => n.themes.includes(theme));
 
-/** A format drawn small: where its panels sit. */
+/** A format drawn small, as mockup HOME_2 draws it: where its panels sit, the one that matters in the accent. */
 function FormatThumb({id}: {id: Format}): ReactElement {
-  const box = (x: number, y: number, w: number, h: number, k = 0) => <rect key={`${x}${y}${k}`} x={x} y={y} width={w} height={h} rx={2}/>;
+  const box = (x: number, y: number, w: number, h: number, cls?: string) => <rect key={`${x}-${y}`} x={x} y={y} width={w} height={h} rx={2} className={cls}/>;
   const parts: Record<Format, ReactElement[]> = {
-    board: [box(4, 6, 16, 26), box(23, 6, 26, 26, 1), box(52, 6, 16, 26, 2), box(4, 36, 64, 6, 3)],
-    editorial: [box(6, 7, 44, 6), box(6, 17, 54, 6, 1), box(6, 27, 38, 6, 2), box(6, 37, 48, 4, 3)],
-    desk: [box(5, 8, 14, 12), box(23, 5, 16, 14, 1), box(44, 10, 13, 12, 2), box(9, 26, 15, 13, 3), box(30, 24, 22, 17, 4)],
-    story: [box(4, 6, 64, 4), box(4, 14, 20, 28, 1), box(27, 14, 20, 28, 2), box(50, 14, 18, 28, 3)],
+    board: [box(5, 7, 18, 31), box(26, 7, 24, 31, 'fm-hot'), box(53, 7, 14, 31)],
+    editorial: [box(8, 9, 46, 5), box(8, 19, 56, 5), box(8, 29, 42, 5)],
+    desk: [box(6, 7, 15, 14), box(26, 14, 15, 11), box(47, 6, 16, 17)],
+    story: [box(44, 4, 24, 38, 'fm-deep'), box(24, 4, 18, 38), box(28, 31, 10, 3, 'fm-hot')],
   };
   return <svg className="ap-format" viewBox="0 0 72 46" aria-hidden="true">{parts[id]}</svg>;
 }
@@ -295,11 +297,26 @@ export function AppearancePanel(): ReactElement {
           <div><dt>Cost on this laptop</dt><dd>{info.cost}</dd></div>
         </dl>
         <header className="ap-pane-head"><h2>Format</h2><span>how home is laid out · chosen apart from theme</span></header>
-        <div className="ap-formats" role="radiogroup" aria-label="Format">
-          {FORMATS.map(f => <button key={f.id} type="button" role="radio" aria-checked={now.format === f.id} disabled={!f.ready} title={f.line}
-            className={`ap-fmt${now.format === f.id ? ' on' : ''}`} onClick={() => keepAppearance({format: f.id})}>
-            <FormatThumb id={f.id}/><b>{f.name}</b><small>{f.ready ? f.line.split(';')[0] : 'Planned'}</small>
-          </button>)}
+        <div className="ap-formats" role="radiogroup" aria-label="Format: arrows move, Enter or Space chooses"
+          onKeyDown={e => {
+            const tiles = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('[role=radio]:not(:disabled)'));
+            const at = tiles.indexOf(document.activeElement as HTMLButtonElement);
+            const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+            if (at < 0 || !step) return;
+            e.preventDefault();
+            tiles[(at + step + tiles.length) % tiles.length].focus();
+          }}>
+          {FORMATS.map(f => {
+            // A theme suggests a format; it never chooses it (research §03 D1).
+            const suggested = SUGGESTED_FORMAT[now.theme] === f.id;
+            return <button key={f.id} type="button" role="radio" aria-checked={now.format === f.id} disabled={!f.ready} title={f.line}
+              tabIndex={now.format === f.id ? 0 : -1}
+              aria-label={`${f.name}: ${f.line}${suggested ? ` Suggested for ${themeName(now.theme)}.` : ''}`}
+              className={`ap-fmt${now.format === f.id ? ' on' : ''}`} onClick={() => { if (now.format !== f.id) fadeTheme(() => keepAppearance({format: f.id}), now.theme); }}>
+              <FormatThumb id={f.id}/><b>{f.name}</b><small>{f.ready ? f.short : 'Planned'}</small>
+              {suggested && <span className="ap-fmt-tag">Suggested for {themeName(now.theme)}</span>}
+            </button>;
+          })}
         </div>
       </div>
     </div>

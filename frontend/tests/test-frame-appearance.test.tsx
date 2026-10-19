@@ -41,7 +41,7 @@ describe('theme storage', () => {
   });
 
   it('ignores unknown or unready values', () => {
-    window.localStorage.setItem('pai:appearance', JSON.stringify({theme: 'neon-pink', format: 'desk', effects: 'loud'}));
+    window.localStorage.setItem('pai:appearance', JSON.stringify({theme: 'neon-pink', format: 'poster', effects: 'loud'}));
     expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], custom: null});
   });
 });
@@ -99,7 +99,7 @@ describe('Settings › Appearance', () => {
     await user.click(screen.getByRole('radio', {name: 'Off'}));
     expect(document.documentElement.dataset.effects).toBe('off');
     expect(screen.getByRole('switch', {name: /Film grain/})).toBeDisabled();
-    expect(screen.getByRole('radio', {name: /Desk/})).toBeDisabled();
+    expect(screen.getByRole('radio', {name: /^Desk/})).toBeEnabled();
   });
 
   it('names each card with its lowest contrast and whether it has effects', () => {
