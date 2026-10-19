@@ -351,3 +351,28 @@ def test_the_migration_anchors_the_quotes_already_in_a_case(tmp_path):
     anchor = json.loads(rows["e"])
     assert anchor["chunk_id"] == "c" and anchor["document_id"] == "d" and (anchor["line_start"], anchor["line_end"]) == (3, 4)
     assert rows["gone"] is None
+
+
+# --- review findings: the evidence's own locator, and viewers' backups ------------------------------------------------
+
+def test_the_evidences_own_span_and_passage_come_before_the_first_match():
+    p1 = {"id": "c1", "locator": "page 1", "page_number": 1, "text": "Paid to Kestrel SA. Later: paid to Kestrel SA."}
+    p2 = {"id": "c2", "locator": "page 2", "page_number": 2, "text": "Again paid to Kestrel SA."}
+    second = p1["text"].rindex("paid to Kestrel SA")
+    by_span = find_anchor([p1, p2], "paid to Kestrel SA", locator=f"page 1@chars:{second}-{second + 18}")
+    assert (by_span["chunk_id"], by_span["start"], by_span["match"], by_span["occurrences"]) == ("c1", second, "exact", 2)
+    assert find_anchor([p1, p2], "paid to Kestrel SA", locator="page 2")["chunk_id"] == "c2"
+    # A span that no longer holds the words falls back to looking for them.
+    assert find_anchor([p1, p2], "paid to Kestrel SA", locator="page 1@chars:0-5")["start"] == second
+    assert find_anchor([p1, p2], "paid to Kestrel SA", locator="p.9")["chunk_id"] == "c1"
+
+
+def test_a_viewer_can_download_a_backup_and_it_is_not_recorded(tmp_path):
+    from app.services.exports import build_investigation_export, record_backup
+
+    inv, _src, _doc = _case_with_page(tmp_path)
+    viewer = AuthorizationScope(actor_id="v", investigation_ids=frozenset({inv}), role="member", investigation_roles=((inv, "viewer"),))
+    with SessionLocal() as db, authorization_scope_context(viewer):
+        data, manifest = build_investigation_export(db, inv, include_documents=True)
+        record_backup(db, inv, data, manifest)
+        assert db.get(Investigation, inv).last_backup is None

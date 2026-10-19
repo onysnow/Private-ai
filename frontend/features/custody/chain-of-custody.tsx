@@ -103,6 +103,18 @@ function excerpt(text: string, span: {start: number; end: number} | null): {text
 
 const spanOf = (a: CustodyAnchorOut | null | undefined) => a && a.start != null && a.end != null ? {start: a.start, end: a.end} : null;
 
+/** The server counts characters (code points); JavaScript strings count UTF-16 units, so a character outside the
+ * basic plane before or inside the quote would shift the highlight. Turn a stored span into this text's units. */
+export function unitSpan(text: string, span: {start: number; end: number} | null): {start: number; end: number} | null {
+  if (!span) return null;
+  const unit = (points: number) => {
+    let i = 0;
+    for (let n = 0; n < points && i < text.length; n += 1) i += (text.codePointAt(i) ?? 0) > 0xffff ? 2 : 1;
+    return i;
+  };
+  return {start: unit(span.start), end: unit(span.end)};
+}
+
 export function ChainOfCustody({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
   const asked = useWorkbenchStore(s => s.chain);
   const openDocument = useWorkbenchStore(s => s.openDocument);
@@ -333,7 +345,7 @@ function CardBox({card, row, picked, lit, falls, against, anchor, onPick, onLigh
   card: CustodyCardOut; row: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; anchor: {start: number; end: number} | null;
   onPick: () => void; onLight: (id: string | null) => void;
 }): ReactElement {
-  const shown = card.kind === 'passage' && card.text ? excerpt(card.text, anchor) : null;
+  const shown = card.kind === 'passage' && card.text ? excerpt(card.text, unitSpan(card.text, anchor)) : null;
   const head = card.kind === 'decision' ? (card.title === 'Answered' ? 'Linked against' : card.title)
     : card.kind === 'passage' ? `Passage${card.page ? ` · p.${card.page}` : ''}${lineSpan(card, 'l.')}` : KIND_WORD[card.kind];
   return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}`}
@@ -376,7 +388,7 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
     <h3>{title}</h3>
     {file && <p className="cc-mono cc-muted">{file.title}{passage && lineSpan(passage, 'lines') ? ` ·${lineSpan(passage, 'lines')}` : passage?.page ? ` · page ${passage.page}` : ''}</p>}
     {(passage?.text || card.quote) && <blockquote><Lit text={passage?.text ?? card.quote ?? ''} quote={card.quote ?? passage?.quote}
-      span={passage?.text ? spanOf(row?.anchor) : null}/></blockquote>}
+      span={passage?.text ? unitSpan(passage.text, spanOf(row?.anchor)) : null}/></blockquote>}
     <dl>
       {src && item('Source', <span className="cc-checks plain">
         <Check label={SOURCE_WORD[src.source_type] ?? src.source_type} ok={true}/>

@@ -51,7 +51,7 @@ def _anchor_existing_quotes():
     bind = op.get_bind()
     now = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     rows = bind.execute(sa.text(
-        "SELECT e.id, e.quote, e.document_id, s.id AS source_id, s.source_type FROM evidence e "
+        "SELECT e.id, e.quote, e.locator, e.document_id, s.id AS source_id, s.source_type FROM evidence e "
         "LEFT JOIN sources s ON s.id = e.source_id WHERE e.quote IS NOT NULL AND e.quote <> ''")).mappings().all()
     for row in rows:
         document_id = row["document_id"]
@@ -62,7 +62,7 @@ def _anchor_existing_quotes():
             continue
         chunks = bind.execute(sa.text("SELECT id, locator, page_number, text FROM document_chunks WHERE document_id = :d ORDER BY ordinal"),
                               {"d": document_id}).mappings().all()
-        anchor = find_anchor([dict(c) for c in chunks], row["quote"])
+        anchor = find_anchor([dict(c) for c in chunks], row["quote"], locator=row["locator"])
         if anchor is None:
             continue
         anchor = {**anchor, "document_id": document_id, "anchored_at": now}

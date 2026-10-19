@@ -690,8 +690,15 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
 
 def record_backup(db: Session, investigation_id: str, data: bytes, manifest: dict[str, Any]) -> None:
     """Keep when this case was last backed up, so Settings › Backups and Safety & data can say so (mockup KEEP_2).
-    A backup that was made but not saved by the browser still counts: the app cannot see where the file went."""
+    A backup that was made but not saved by the browser still counts: the app cannot see where the file went.
+    Someone who may only read the case (a viewer) can still download a backup; it is not recorded, since
+    recording it would be a change to the case they may not make."""
+    from app.core.authorization import current_authorization_scope
     from app.models.investigations import Investigation
+
+    scope = current_authorization_scope()
+    if scope is not None and not scope.allows_write(investigation_id):
+        return
 
     inv = db.get(Investigation, investigation_id)
     if inv is None:

@@ -40,7 +40,7 @@ def anchor_evidence(db: Session, evidence: Evidence, passages: dict[str, list[di
     passages = {} if passages is None else passages
     if document_id not in passages:
         passages[document_id] = chunk_dicts(db, document_id)
-    found = find_anchor(passages[document_id], evidence.quote)
+    found = find_anchor(passages[document_id], evidence.quote, locator=evidence.locator)
     evidence.anchor = {**found, "document_id": document_id, "anchored_at": utcnow_naive().isoformat()} if found else None
 
 
@@ -55,7 +55,8 @@ def anchor_document_quotes(db: Session, document: Document, *, only_missing: boo
         if (only_missing and evidence.anchor) or evidence_document_id(db, evidence) != document.id:
             continue
         old = evidence.anchor or {}
-        found = find_anchor(chunks, evidence.quote, prefix=old.get("prefix") or "", suffix=old.get("suffix") or "")
+        found = find_anchor(chunks, evidence.quote, prefix=old.get("prefix") or "", suffix=old.get("suffix") or "",
+                            locator=None if old else evidence.locator)
         now = utcnow_naive().isoformat()
         # A quote the new reading no longer holds keeps its old place, marked lost, so it can be checked by a person.
         evidence.anchor = ({**found, "document_id": document.id, "anchored_at": now} if found

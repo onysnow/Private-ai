@@ -402,11 +402,13 @@ class WorkbenchBackups:
         handle.log(f"[console] exporting investigation {selection}")
         with self.session_factory() as db:
             data, manifest = build_investigation_export(db, selection, include_documents=True)
-            record_backup(db, selection, data, manifest)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         backup_id = f"{stamp}-{selection}"
         path = self.backups_dir / f"{backup_id}.zip"
         path.write_bytes(data)
+        # Recorded only once the archive is on disk, so a failed write never reads as a fresh backup.
+        with self.session_factory() as db:
+            record_backup(db, selection, data, manifest)
         handle.log(f"[console] wrote {path.name} ({len(data)} bytes)")
         return BackupRecord(id=backup_id, created_at=manifest["generated_at"], bytes=len(data), kind=self.kind, label=manifest["investigation"]["name"], verified=True)
 

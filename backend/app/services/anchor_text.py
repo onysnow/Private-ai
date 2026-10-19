@@ -60,12 +60,42 @@ def _context_score(chunk: dict[str, Any], start: int, end: int, prefix: str, suf
     return score
 
 
-def find_anchor(chunks: Iterable[dict[str, Any]], quote: str | None, *, prefix: str = "", suffix: str = "") -> dict[str, Any] | None:
-    """The quote's place in the passages: the closest match kind that finds it, and among several places the one
-    whose text either side best matches ``prefix``/``suffix`` (the first one when none is given)."""
+_LOCATOR = re.compile(r"^(?P<passage>.*?)(?:@chars:(?P<start>\d+)-(?P<end>\d+))?$", re.DOTALL)
+
+
+def _matches(held: str, quote: str) -> str | None:
+    if held == quote:
+        return "exact"
+    if held.casefold() == quote.casefold():
+        return "case"
+    return "spacing" if " ".join(held.split()).casefold() == " ".join(quote.split()).casefold() else None
+
+
+def find_anchor(chunks: Iterable[dict[str, Any]], quote: str | None, *, prefix: str = "", suffix: str = "",
+                locator: str | None = None) -> dict[str, Any] | None:
+    """The quote's place in the passages. The evidence's own ``locator`` comes first: a reviewed span
+    ("page 3 (OCR)@chars:120-188") is taken as it is when it still holds the words, and a named passage is
+    searched before the rest of the document. Otherwise the closest match kind that finds it, and among several
+    places the one whose text either side best matches ``prefix``/``suffix`` (the first one when none is given)."""
     if not quote or not quote.strip():
         return None
     chunks = [c for c in chunks if c.get("text")]
+    parsed = _LOCATOR.match(locator or "")
+    named = [c for c in chunks if parsed and parsed["passage"] and c.get("locator") == parsed["passage"]]
+    if named and parsed and parsed["start"] is not None:
+        start, end = int(parsed["start"]), int(parsed["end"])
+        match = _matches(named[0]["text"][start:end], quote) if 0 <= start <= end <= len(named[0]["text"]) else None
+        if match:
+            total = sum(len(_places(c["text"], quote, match)) for c in chunks)
+            return _anchor_at(named[0], start, end, match, max(total, 1))
+    if named:
+        found = _find(named, quote, prefix, suffix)
+        if found is not None:
+            return {**found, "occurrences": max(found["occurrences"], sum(len(_places(c["text"], quote, found["match"])) for c in chunks))}
+    return _find(chunks, quote, prefix, suffix)
+
+
+def _find(chunks: list[dict[str, Any]], quote: str, prefix: str, suffix: str) -> dict[str, Any] | None:
     for match in MATCHES:
         found = [(c, s, e) for c in chunks for s, e in _places(c["text"], quote, match)]
         if found:

@@ -8,7 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const push = vi.fn();
 vi.mock('next/navigation', () => ({useRouter: () => ({push})}));
 
-import {ChainOfCustody, logTable, sealLine} from '../features/custody/chain-of-custody';
+import {ChainOfCustody, logTable, sealLine, unitSpan} from '../features/custody/chain-of-custody';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -177,5 +177,17 @@ describe('Chain of Custody', () => {
     mockApi({...routes, 'GET /api/investigations/inv-1/claims': []});
     render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
     expect(await screen.findByText('No claim yet. A Chain of Custody starts from a claim: add one in Claims.')).toBeInTheDocument();
+  });
+});
+
+describe('unitSpan', () => {
+  it('turns the server\'s character offsets into the string\'s UTF-16 units', () => {
+    const text = '📄 Harbour Nominees 𝐋imited';
+    // Server offsets (code points): "Harbour" starts at 2; "𝐋imited" spans 19–26.
+    const a = unitSpan(text, {start: 2, end: 9})!;
+    expect(text.slice(a.start, a.end)).toBe('Harbour');
+    const b = unitSpan(text, {start: 19, end: 26})!;
+    expect(text.slice(b.start, b.end)).toBe('𝐋imited');
+    expect(unitSpan('plain', null)).toBeNull();
   });
 });
