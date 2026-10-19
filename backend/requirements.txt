@@ -1,8 +1,8 @@
-fastapi==0.141.1
+fastapi==0.143.2
 uvicorn[standard]==0.54.0
-sqlalchemy==2.1.1
+sqlalchemy==2.1.4
 psycopg[binary]==3.3.6
-pydantic-settings==2.15.0
+pydantic-settings==2.16.0
 httpx==0.28.1
 followthemoney==4.11.0
 # XLSX sheets read for spreadsheet mappings (app/services/table_mappings.py; MIT).
@@ -11,8 +11,8 @@ openpyxl==3.1.5
 # The layout of diagrams sent to OpenAleph (app/services/openaleph_entitysets.py):
 # networkx's spring layout (BSD-3; already installed with followthemoney, pinned
 # because the Workbench imports it), which computes with numpy (BSD-3).
-networkx==3.6.1
-numpy==2.4.6
+networkx==3.7
+numpy==2.5.4
 # The indicator catalogue's YAML files (app/catalogue/; ADR-0007; MIT). Already
 # installed with followthemoney; pinned because the Workbench imports it.
 PyYAML==6.0.3
