@@ -2696,3 +2696,27 @@ Ony: use the most recent version of the suite, and have one service handle all o
 Tests: `test_suite_service.py` (5, new: routes against AGENTS.md's table, the pipeline reading from the service,
 status, the one endpoint and its refusals, next runs) plus the suite, AI, guard and migration tests pass; mypy and
 ruff clean; vitest 1307 passed, tsc clean.
+
+## 2026-10-19 (cont.): the run map draws every system's run; the stopped and rejected states read right
+
+Ony sent two screenshots of Watch the run (a stopped case synthesis; a candidate with a green check beside "Your
+review: rejected") and asked that every system be hooked up properly and that this screen work. Reproduced locally
+with a stand-in model (all eight suite modules plus TAS, both chains, a stopped run, a rejected run), screenshotted
+each, fixed, screenshotted again.
+
+Backend: a run the checks stopped saved its answer as rejected but its job has no result, so the run summary said
+"none saved"; it now finds the answer through the run record's "Saved as" step. The summary's review status is the
+answer's as it stands now (it was frozen at run time). Each run carries its route from the suite service (system,
+row, node, module count, final audit). A DAS evidence row citing no source now says why it has no upstream tier.
+
+Run map: columns and the Support pills light from the run's route ("not in this run" replaces "not triggered · not
+in the app yet"); EGS and EHS are real nodes; a system's module chip, gate and thoughts sit on its own node, with the
+wires to it; a hand-over lights the Boundaries band ("Hand-over · n held") instead of a Controls badge; the router
+reads "of 7"; "+ n modules" comes from the system's real count (TAS has 13); the final-audit ledger names the run's
+system's audit; lanes appear for the systems a run used. The candidate's mark follows its review (✕ once rejected),
+and Your review says "you rejected it" or, dimmed, "stopped by the checks". A stopped run shows its real reason, not
+"Stopped with an error".
+
+Tests: test_suite_service.py (6), watch-the-run (23, 2 new); vitest 1309 passed, tsc and eslint clean; backend
+touched tests, mypy, ruff and the OpenAPI check pass. Not changed: the map's small size and overlapping axis labels
+at phone width, which were there before.

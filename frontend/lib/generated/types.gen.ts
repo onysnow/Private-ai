@@ -431,6 +431,20 @@ export type AiControlSurfaceOut = {
 };
 
 /**
+ * AiFinalAuditOut
+ */
+export type AiFinalAuditOut = {
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Node
+   */
+  node: string;
+};
+
+/**
  * AiLimitsOut
  */
 export type AiLimitsOut = {
@@ -741,6 +755,10 @@ export type AiRunOut = {
    */
   finished_at: string | null;
   /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
    * Message
    */
   message: string | null;
@@ -760,6 +778,7 @@ export type AiRunOut = {
    * Review Status
    */
   review_status: string | null;
+  route: AiRunRouteOut;
   /**
    * Run Id
    */
@@ -790,6 +809,36 @@ export type AiRunRefOut = {
    * Record Type
    */
   record_type: string;
+};
+
+/**
+ * AiRunRouteOut
+ *
+ * How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+ * not know (a run recorded under a name since removed); "app" for the app-local draft.
+ */
+export type AiRunRouteOut = {
+  final_audit: AiFinalAuditOut | null;
+  /**
+   * Modules In System
+   */
+  modules_in_system: number;
+  /**
+   * Node
+   */
+  node: string | null;
+  /**
+   * Row
+   */
+  row: number | null;
+  /**
+   * System
+   */
+  system: string | null;
+  /**
+   * Title
+   */
+  title: string;
 };
 
 /**
@@ -831,6 +880,7 @@ export type AiSuiteModuleOut = {
  * CHANGELOG numbers them, `latest_change` its newest entry.
  */
 export type AiSuiteSystemOut = {
+  final_audit: AiFinalAuditOut | null;
   /**
    * Kind
    */
@@ -839,6 +889,10 @@ export type AiSuiteSystemOut = {
    * Latest Change
    */
   latest_change: string | null;
+  /**
+   * Module Count
+   */
+  module_count: number;
   /**
    * Modules
    */

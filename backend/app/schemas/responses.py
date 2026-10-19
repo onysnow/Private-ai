@@ -2963,6 +2963,11 @@ class AiControlSurfaceOut(ResponseModel):
     flags: dict[str, AiControlFlagOut]
 
 
+class AiFinalAuditOut(ResponseModel):
+    node: str  # e.g. tas/10
+    file: str
+
+
 class AiSuiteModuleOut(ResponseModel):
     module: str
     title: str
@@ -2980,6 +2985,8 @@ class AiSuiteSystemOut(ResponseModel):
     version: str | None
     latest_change: str | None
     present: bool
+    module_count: int
+    final_audit: AiFinalAuditOut | None
     modules: list[AiSuiteModuleOut]
 
 
@@ -5176,6 +5183,17 @@ class AiRunEventOut(ResponseModel):
     detail: dict[str, Any] | None
 
 
+class AiRunRouteOut(ResponseModel):
+    """How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+    not know (a run recorded under a name since removed); "app" for the app-local draft."""
+    system: str | None
+    row: int | None
+    node: str | None
+    title: str
+    modules_in_system: int
+    final_audit: AiFinalAuditOut | None
+
+
 class AiRunOut(ResponseModel):
     run_id: str
     status: str
@@ -5192,6 +5210,8 @@ class AiRunOut(ResponseModel):
     problems: int
     message: str | None
     error: str | None
+    route: AiRunRouteOut
+    handoff_from: str | None = None
 
 
 class AiRunsOut(ResponseModel):

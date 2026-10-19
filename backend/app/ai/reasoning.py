@@ -879,7 +879,8 @@ def resolve_handoff(db: Session, *, investigation_id: str, module: str, handoff_
 def fill_upstream_tiers(db: Session, payload: dict, citations: list[dict]) -> dict:
     """DAS evidence rows carry the cited source's own TAS tier in `upstream_tier`, beside DAS's comparability tier and
     never in it (INTEROP.md §1 [IN-010]). The Workbench writes it from the sources a person tiered; the model never
-    does. A row whose cited sources hold no tier, or more than one, keeps null and says why."""
+    does. A row whose cited sources hold no tier, or more than one, or that cites no source at all, keeps null and
+    says why."""
     source_of = {(c["record_type"], c["record_id"]): c.get("source_id") for c in citations}
     flags: list[str] = []
     filled = 0
@@ -907,6 +908,8 @@ def fill_upstream_tiers(db: Session, payload: dict, citations: list[dict]) -> di
                          "has one upstream_tier, so it stays empty rather than picking one (a suite gap)")
         elif ids:
             flags.append(f"{row.get('evidence_id')}: no tier has been set on its source yet")
+        else:
+            flags.append(f"{row.get('evidence_id')}: it cites no source or evidence record, so it has no upstream tier")
     return {"filled": filled, "flags": flags}
 
 

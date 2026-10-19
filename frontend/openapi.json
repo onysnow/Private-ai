@@ -720,6 +720,24 @@
         "title": "AiControlSurfaceOut",
         "type": "object"
       },
+      "AiFinalAuditOut": {
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "node": {
+            "title": "Node",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node",
+          "file"
+        ],
+        "title": "AiFinalAuditOut",
+        "type": "object"
+      },
       "AiLimitsOut": {
         "properties": {
           "max_concurrent_runs": {
@@ -1225,6 +1243,17 @@
             ],
             "title": "Finished At"
           },
+          "handoff_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff From"
+          },
           "message": {
             "anyOf": [
               {
@@ -1258,6 +1287,9 @@
               }
             ],
             "title": "Review Status"
+          },
+          "route": {
+            "$ref": "#/components/schemas/AiRunRouteOut"
           },
           "run_id": {
             "title": "Run Id",
@@ -1307,7 +1339,8 @@
           "events",
           "problems",
           "message",
-          "error"
+          "error",
+          "route"
         ],
         "title": "AiRunOut",
         "type": "object"
@@ -1328,6 +1361,72 @@
           "record_id"
         ],
         "title": "AiRunRefOut",
+        "type": "object"
+      },
+      "AiRunRouteOut": {
+        "description": "How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does\nnot know (a run recorded under a name since removed); \"app\" for the app-local draft.",
+        "properties": {
+          "final_audit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiFinalAuditOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "modules_in_system": {
+            "title": "Modules In System",
+            "type": "integer"
+          },
+          "node": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node"
+          },
+          "row": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row"
+          },
+          "system": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "row",
+          "node",
+          "title",
+          "modules_in_system",
+          "final_audit"
+        ],
+        "title": "AiRunRouteOut",
         "type": "object"
       },
       "AiRunsOut": {
@@ -1377,6 +1476,16 @@
       "AiSuiteSystemOut": {
         "description": "One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its\nCHANGELOG numbers them, `latest_change` its newest entry.",
         "properties": {
+          "final_audit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiFinalAuditOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "kind": {
             "title": "Kind",
             "type": "string"
@@ -1391,6 +1500,10 @@
               }
             ],
             "title": "Latest Change"
+          },
+          "module_count": {
+            "title": "Module Count",
+            "type": "integer"
           },
           "modules": {
             "items": {
@@ -1435,6 +1548,8 @@
           "version",
           "latest_change",
           "present",
+          "module_count",
+          "final_audit",
           "modules"
         ],
         "title": "AiSuiteSystemOut",
