@@ -1359,6 +1359,12 @@ export type CanonicalDuplicateCandidateOut = {
    */
   entity_id: string;
   /**
+   * Facts
+   *
+   * How many property values the record already holds.
+   */
+  facts?: number | null;
+  /**
    * Found By
    */
   found_by?: Array<string>;
@@ -6644,6 +6650,106 @@ export type DossierSummaryOut = {
 };
 
 /**
+ * DropHistoryEntryOut
+ *
+ * One drop and what it produced (app/services/drop.py history).
+ */
+export type DropHistoryEntryOut = {
+  /**
+   * Accepted
+   */
+  accepted: number;
+  /**
+   * Batch Id
+   *
+   * The ingestion batch; None for files brought in one at a time, grouped by day.
+   */
+  batch_id: string | null;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Document Ids
+   *
+   * The files saved by this drop (not the files found inside them).
+   */
+  document_ids: Array<string>;
+  /**
+   * Duplicates
+   */
+  duplicates: number;
+  /**
+   * Files
+   */
+  files: number;
+  /**
+   * Files Inside
+   */
+  files_inside: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * In Progress
+   */
+  in_progress: number;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * One At A Time
+   */
+  one_at_a_time?: boolean;
+  /**
+   * Passages
+   */
+  passages: number;
+  /**
+   * Problems
+   */
+  problems: number;
+  /**
+   * Proposals
+   */
+  proposals: {
+    [key: string]: number;
+  };
+  /**
+   * Read
+   */
+  read: number;
+  /**
+   * Refused
+   */
+  refused: number;
+  /**
+   * Waiting
+   */
+  waiting: number;
+};
+
+/**
+ * DropHistoryOut
+ *
+ * The Drop's History tab: every drop, newest first.
+ */
+export type DropHistoryOut = {
+  /**
+   * Drops
+   */
+  drops: Array<DropHistoryEntryOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+};
+
+/**
  * DropLaneOut
  */
 export type DropLaneOut = {
@@ -6696,6 +6802,10 @@ export type DropLaneOut = {
    * Stages
    */
   stages: Array<DropStageOut>;
+  /**
+   * Stalled Minutes
+   */
+  stalled_minutes?: number | null;
   /**
    * Waiting
    */
@@ -7242,6 +7352,12 @@ export type EntityCandidateOut = {
    * Entity Id
    */
   entity_id: string;
+  /**
+   * Facts
+   *
+   * How many property values the record already holds.
+   */
+  facts?: number | null;
   /**
    * Name Similarity
    *
@@ -14350,6 +14466,61 @@ export type RunSettingValueOut = {
    * Value
    */
   value: string;
+};
+
+/**
+ * SameAnswerCandidateOut
+ */
+export type SameAnswerCandidateOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+};
+
+/**
+ * SameAnswerOut
+ *
+ * Other waiting proposals of the same name in the same drop (or the case), offered the same answer
+ * (app/services/same_answer.py). Nothing is applied until a person says so.
+ */
+export type SameAnswerOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Candidates
+   */
+  candidates: Array<SameAnswerCandidateOut>;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Label
+   */
+  label?: string | null;
+  /**
+   * Scope
+   */
+  scope: 'drop' | 'case';
 };
 
 /**
@@ -22248,6 +22419,42 @@ export type ReviewExtractionCandidateResponses = {
 export type ReviewExtractionCandidateResponse =
   ReviewExtractionCandidateResponses[keyof ReviewExtractionCandidateResponses];
 
+export type GetSameAnswerCandidatesData = {
+  body?: never;
+  path: {
+    /**
+     * Candidate Id
+     */
+    candidate_id: string;
+  };
+  query?: never;
+  url: '/api/extraction-candidates/{candidate_id}/same-answer';
+};
+
+export type GetSameAnswerCandidatesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSameAnswerCandidatesError =
+  GetSameAnswerCandidatesErrors[keyof GetSameAnswerCandidatesErrors];
+
+export type GetSameAnswerCandidatesResponses = {
+  /**
+   * Successful Response
+   */
+  200: SameAnswerOut;
+};
+
+export type GetSameAnswerCandidatesResponse =
+  GetSameAnswerCandidatesResponses[keyof GetSameAnswerCandidatesResponses];
+
 export type HealthData = {
   body?: never;
   path?: never;
@@ -23988,6 +24195,42 @@ export type GetDropResponses = {
 };
 
 export type GetDropResponse = GetDropResponses[keyof GetDropResponses];
+
+export type GetDropHistoryData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/drop/history';
+};
+
+export type GetDropHistoryErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDropHistoryError =
+  GetDropHistoryErrors[keyof GetDropHistoryErrors];
+
+export type GetDropHistoryResponses = {
+  /**
+   * Successful Response
+   */
+  200: DropHistoryOut;
+};
+
+export type GetDropHistoryResponse =
+  GetDropHistoryResponses[keyof GetDropHistoryResponses];
 
 export type ListEntitiesData = {
   body?: never;

@@ -610,6 +610,7 @@ export const zCanonicalDuplicateCandidateOut = z.object({
   basis: z.enum(['same_name', 'similar_name', 'shared_words']).nullish(),
   caption: z.string(),
   entity_id: z.string(),
+  facts: z.number().int().nullish(),
   found_by: z.array(z.string()).optional(),
   latest_decision: zCanonicalDecisionSummaryOut.nullish(),
   name_similarity: z.number().nullish(),
@@ -2548,6 +2549,45 @@ export const zDossierSummaryOut = z.object({
 });
 
 /**
+ * DropHistoryEntryOut
+ *
+ * One drop and what it produced (app/services/drop.py history).
+ */
+export const zDropHistoryEntryOut = z.object({
+  accepted: z.number().int(),
+  batch_id: z.string().nullable(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  document_ids: z.array(z.string()),
+  duplicates: z.number().int(),
+  files: z.number().int(),
+  files_inside: z.number().int(),
+  id: z.string(),
+  in_progress: z.number().int(),
+  label: z.string(),
+  one_at_a_time: z.boolean().optional().default(false),
+  passages: z.number().int(),
+  problems: z.number().int(),
+  proposals: z.record(z.number().int()),
+  read: z.number().int(),
+  refused: z.number().int(),
+  waiting: z.number().int(),
+});
+
+/**
+ * DropHistoryOut
+ *
+ * The Drop's History tab: every drop, newest first.
+ */
+export const zDropHistoryOut = z.object({
+  drops: z.array(zDropHistoryEntryOut),
+  investigation_id: z.string(),
+});
+
+/**
  * DropReceiptOut
  */
 export const zDropReceiptOut = z.object({
@@ -2615,6 +2655,7 @@ export const zDropLaneOut: z.AnyZodObject = z.object({
   same_as: z.string().nullish(),
   seconds: z.number().int().nullish(),
   stages: z.array(zDropStageOut),
+  stalled_minutes: z.number().int().nullish(),
   waiting: z.number().int().optional().default(0),
 });
 
@@ -2869,6 +2910,7 @@ export const zEntityCandidateOut = z.object({
   basis: z.enum(['same_name', 'similar_name', 'shared_words']).nullish(),
   caption: z.string(),
   entity_id: z.string(),
+  facts: z.number().int().nullish(),
   name_similarity: z.number().nullish(),
   schema: z.string(),
   score: z.number(),
@@ -6121,6 +6163,31 @@ export const zRunPlanOut = z.object({
   systems: z.array(zRunPlanSystemOut),
   where: zRunPlanWhereOut,
   working_theory: z.string().nullable(),
+});
+
+/**
+ * SameAnswerCandidateOut
+ */
+export const zSameAnswerCandidateOut = z.object({
+  candidate_id: z.string(),
+  caption: z.string(),
+  document_id: z.string(),
+  filename: z.string(),
+  locator: z.string().nullish(),
+});
+
+/**
+ * SameAnswerOut
+ *
+ * Other waiting proposals of the same name in the same drop (or the case), offered the same answer
+ * (app/services/same_answer.py). Nothing is applied until a person says so.
+ */
+export const zSameAnswerOut = z.object({
+  candidate_id: z.string(),
+  candidates: z.array(zSameAnswerCandidateOut),
+  caption: z.string(),
+  label: z.string().nullish(),
+  scope: z.enum(['drop', 'case']),
 });
 
 /**
@@ -9699,6 +9766,15 @@ export const zReviewExtractionCandidatePath = z.object({
  */
 export const zReviewExtractionCandidateResponse = zExtractionReviewOut;
 
+export const zGetSameAnswerCandidatesPath = z.object({
+  candidate_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSameAnswerCandidatesResponse = zSameAnswerOut;
+
 /**
  * Successful Response
  */
@@ -10206,6 +10282,15 @@ export const zGetDropPath = z.object({
  * Successful Response
  */
 export const zGetDropResponse = zDropOut;
+
+export const zGetDropHistoryPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDropHistoryResponse = zDropHistoryOut;
 
 export const zListEntitiesPath = z.object({
   investigation_id: z.string(),

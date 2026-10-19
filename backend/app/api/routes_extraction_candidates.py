@@ -14,9 +14,10 @@ from app.models.domain import ExtractionCandidate
 from app.schemas.api import ExtractionCandidateReviewRequest
 from app.services.documents import preview_entity_candidate_matches, review_candidate, serialize_extraction_lineage
 from app.services.extraction_explanations import explain_extraction_candidate
-from app.schemas.responses import EntityMatchPreviewOut, OpenAlephMatchesOut, ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut, IdentifierTargetsOut
+from app.schemas.responses import EntityMatchPreviewOut, SameAnswerOut, OpenAlephMatchesOut, ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut, IdentifierTargetsOut
 from app.services.identifier_proposals import identifier_targets
 from app.services.openaleph_match import openaleph_matches
+from app.services.same_answer import same_answer_candidates
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -42,6 +43,19 @@ def get_extraction_entity_matches(candidate_id: str, db: Session = Depends(get_d
         raise HTTPException(404, "Extraction candidate not found")
     try:
         return preview_entity_candidate_matches(db, row)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+
+@router.get("/extraction-candidates/{candidate_id}/same-answer", response_model=SameAnswerOut)
+def get_same_answer_candidates(candidate_id: str, db: Session = Depends(get_db)) -> Any:
+    """The other waiting proposals of the same name in this proposal's drop (else the case), so one answer can
+    be offered to all of them (reading room, "Answer once, apply to the batch")."""
+    row = db.get(ExtractionCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "Extraction candidate not found")
+    try:
+        return same_answer_candidates(db, row)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
 

@@ -8,6 +8,8 @@ export class ApiHttpError extends Error {
     public endpoint:string,
     public status:number,
     public detail:string,
+    /** A structured detail as sent ({message, document, ...}: an upload's 409 names the document already there). */
+    public body?:Record<string,unknown>,
   ){
     super(`${detail} (${status} ${endpoint})`);
     this.name='ApiHttpError';
@@ -18,6 +20,7 @@ const normalizeEndpoint=(endpoint:string)=>endpoint.startsWith('/')?endpoint:`/$
 
 async function parseError(response:Response,endpoint:string):Promise<ApiHttpError>{
   let detail=`Request failed with HTTP ${response.status}`;
+  let structured:Record<string,unknown>|undefined;
   const type=response.headers.get('content-type')||'';
   try{
     if(type.includes('application/json')){
@@ -27,14 +30,17 @@ async function parseError(response:Response,endpoint:string):Promise<ApiHttpErro
         if(typeof value==='string'&&value.trim())detail=value.trim();
         else if(Array.isArray(value))detail=value.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('; ');
         // A structured detail ({message, document, ...}: an upload's 409 or 422) says it in its message.
-        else if(typeof value==='object'&&value!==null&&typeof (value as {message?:unknown}).message==='string')detail=(value as {message:string}).message;
+        else if(typeof value==='object'&&value!==null&&typeof (value as {message?:unknown}).message==='string'){
+          detail=(value as {message:string}).message;
+          structured=value as Record<string,unknown>;
+        }
       }
     }else{
       const text=(await response.text()).trim();
       if(text)detail=text.slice(0,1000);
     }
   }catch{/* preserve status fallback */}
-  return new ApiHttpError(endpoint,response.status,detail);
+  return new ApiHttpError(endpoint,response.status,detail,structured);
 }
 
 export class ApiClient {

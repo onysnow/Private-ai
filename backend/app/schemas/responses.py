@@ -1977,6 +1977,7 @@ class EntityCandidateOut(ResponseModel):
     name_similarity: float | None = Field(default=None, description="FollowTheMoney's name comparison, when the two kinds can be the same thing.")
     basis: Literal["same_name", "similar_name", "shared_words"] | None = Field(
         default=None, description="same_name must be answered before accepting; the others are listed. None for a record already established.")
+    facts: int | None = Field(default=None, description="How many property values the record already holds.")
 
 
 class ResolutionDecisionOut(ResponseModel):
@@ -3597,6 +3598,24 @@ class OpenAlephMatchesOut(ResponseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
 
 
+class SameAnswerCandidateOut(ResponseModel):
+    candidate_id: str
+    caption: str
+    document_id: str
+    filename: str
+    locator: str | None = None
+
+
+class SameAnswerOut(ResponseModel):
+    """Other waiting proposals of the same name in the same drop (or the case), offered the same answer
+    (app/services/same_answer.py). Nothing is applied until a person says so."""
+    candidate_id: str
+    caption: str
+    scope: Literal["drop", "case"]
+    label: str | None = None
+    candidates: list[SameAnswerCandidateOut]
+
+
 class EntityMatchPreviewOut(ResponseModel):
     """Canonical entities an entity proposal may be, before the reporter decides."""
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
@@ -4849,6 +4868,7 @@ class DropLaneOut(ResponseModel):
     issues: list[str]
     waiting: int = 0
     seconds: int | None = None
+    stalled_minutes: int | None = None  # minutes its read has not moved, once that is 6 or more
     children: list["DropLaneOut"] = []
     receipt: DropReceiptOut
 
@@ -4881,6 +4901,33 @@ class DropOut(ResponseModel):
     ready_from: int = 0
     ready_unsure: int = 0
     watchlist: DropWatchlistOut | None = None
+
+
+class DropHistoryEntryOut(ResponseModel):
+    """One drop and what it produced (app/services/drop.py history)."""
+    id: str
+    batch_id: str | None = Field(description="The ingestion batch; None for files brought in one at a time, grouped by day.")
+    label: str
+    created_at: Timestamp
+    one_at_a_time: bool = False
+    document_ids: list[str] = Field(description="The files saved by this drop (not the files found inside them).")
+    files: int
+    duplicates: int
+    refused: int
+    read: int
+    problems: int
+    in_progress: int
+    files_inside: int
+    passages: int
+    proposals: dict[str, int]
+    accepted: int
+    waiting: int
+
+
+class DropHistoryOut(ResponseModel):
+    """The Drop's History tab: every drop, newest first."""
+    investigation_id: str
+    drops: list[DropHistoryEntryOut]
 
 
 class RunProfileOut(ResponseModel):

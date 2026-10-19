@@ -2330,6 +2330,18 @@
             "title": "Entity Id",
             "type": "string"
           },
+          "facts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How many property values the record already holds.",
+            "title": "Facts"
+          },
           "found_by": {
             "items": {
               "type": "string"
@@ -15541,6 +15553,139 @@
         "title": "DossierSummaryOut",
         "type": "object"
       },
+      "DropHistoryEntryOut": {
+        "description": "One drop and what it produced (app/services/drop.py history).",
+        "properties": {
+          "accepted": {
+            "title": "Accepted",
+            "type": "integer"
+          },
+          "batch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The ingestion batch; None for files brought in one at a time, grouped by day.",
+            "title": "Batch Id"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_ids": {
+            "description": "The files saved by this drop (not the files found inside them).",
+            "items": {
+              "type": "string"
+            },
+            "title": "Document Ids",
+            "type": "array"
+          },
+          "duplicates": {
+            "title": "Duplicates",
+            "type": "integer"
+          },
+          "files": {
+            "title": "Files",
+            "type": "integer"
+          },
+          "files_inside": {
+            "title": "Files Inside",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "in_progress": {
+            "title": "In Progress",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "one_at_a_time": {
+            "default": false,
+            "title": "One At A Time",
+            "type": "boolean"
+          },
+          "passages": {
+            "title": "Passages",
+            "type": "integer"
+          },
+          "problems": {
+            "title": "Problems",
+            "type": "integer"
+          },
+          "proposals": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Proposals",
+            "type": "object"
+          },
+          "read": {
+            "title": "Read",
+            "type": "integer"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          },
+          "waiting": {
+            "title": "Waiting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "batch_id",
+          "label",
+          "created_at",
+          "document_ids",
+          "files",
+          "duplicates",
+          "refused",
+          "read",
+          "problems",
+          "in_progress",
+          "files_inside",
+          "passages",
+          "proposals",
+          "accepted",
+          "waiting"
+        ],
+        "title": "DropHistoryEntryOut",
+        "type": "object"
+      },
+      "DropHistoryOut": {
+        "description": "The Drop's History tab: every drop, newest first.",
+        "properties": {
+          "drops": {
+            "items": {
+              "$ref": "#/components/schemas/DropHistoryEntryOut"
+            },
+            "title": "Drops",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "drops"
+        ],
+        "title": "DropHistoryOut",
+        "type": "object"
+      },
       "DropLaneOut": {
         "properties": {
           "children": {
@@ -15632,6 +15777,17 @@
             },
             "title": "Stages",
             "type": "array"
+          },
+          "stalled_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stalled Minutes"
           },
           "waiting": {
             "default": 0,
@@ -16525,6 +16681,18 @@
           "entity_id": {
             "title": "Entity Id",
             "type": "string"
+          },
+          "facts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How many property values the record already holds.",
+            "title": "Facts"
           },
           "name_similarity": {
             "anyOf": [
@@ -28750,6 +28918,92 @@
           "label"
         ],
         "title": "RunSettingValueOut",
+        "type": "object"
+      },
+      "SameAnswerCandidateOut": {
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "caption",
+          "document_id",
+          "filename"
+        ],
+        "title": "SameAnswerCandidateOut",
+        "type": "object"
+      },
+      "SameAnswerOut": {
+        "description": "Other waiting proposals of the same name in the same drop (or the case), offered the same answer\n(app/services/same_answer.py). Nothing is applied until a person says so.",
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/SameAnswerCandidateOut"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "scope": {
+            "enum": [
+              "drop",
+              "case"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "caption",
+          "scope",
+          "candidates"
+        ],
+        "title": "SameAnswerOut",
         "type": "object"
       },
       "SavedIn": {
@@ -48548,6 +48802,56 @@
         "summary": "Review Extraction Candidate"
       }
     },
+    "/api/extraction-candidates/{candidate_id}/same-answer": {
+      "get": {
+        "description": "The other waiting proposals of the same name in this proposal's drop (else the case), so one answer can\nbe offered to all of them (reading room, \"Answer once, apply to the batch\").",
+        "operationId": "get_same_answer_candidates",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "candidate_id",
+            "required": true,
+            "schema": {
+              "title": "Candidate Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SameAnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Same Answer Candidates"
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "health",
@@ -51329,6 +51633,56 @@
           }
         },
         "summary": "Get Drop"
+      }
+    },
+    "/api/investigations/{investigation_id}/drop/history": {
+      "get": {
+        "description": "The Drop's History tab: every drop, newest first, with what each produced.",
+        "operationId": "get_drop_history",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DropHistoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Drop History"
       }
     },
     "/api/investigations/{investigation_id}/entities": {
