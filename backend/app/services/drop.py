@@ -77,6 +77,8 @@ def drop(db: Session, investigation_id: str, *, now: datetime | None = None) -> 
     chunks: dict[str, list[tuple[str, int | None]]] = defaultdict(list)
     proposals: dict[str, Counter[str]] = defaultdict(Counter)
     waiting: dict[str, Counter[str]] = defaultdict(Counter)
+    # What each proposer's proposals came to (research §05 "revision rate"): by the rule that proposed them.
+    answered: dict[str, dict[str, Counter[str]]] = defaultdict(lambda: defaultdict(Counter))
     unsure = 0
     hits: Counter[str] = Counter()
     hit_names: set[str] = set()
@@ -86,10 +88,12 @@ def drop(db: Session, investigation_id: str, *, now: datetime | None = None) -> 
         for doc_id, locator, page in db.execute(select(DocumentChunk.document_id, DocumentChunk.locator, DocumentChunk.page_number)
                                                 .where(DocumentChunk.document_id.in_(ids))):
             chunks[doc_id].append((locator or "", page))
-        for doc_id, kind, status, confidence in db.execute(select(ExtractionCandidate.document_id, ExtractionCandidate.candidate_type,
-                                                                  ExtractionCandidate.review_status, ExtractionCandidate.confidence)
-                                                           .where(ExtractionCandidate.document_id.in_(ids))):
+        rule_of = ExtractionCandidate.payload["rationale"]["rule"].as_string()
+        for doc_id, kind, status, confidence, rule in db.execute(select(ExtractionCandidate.document_id, ExtractionCandidate.candidate_type,
+                                                                        ExtractionCandidate.review_status, ExtractionCandidate.confidence, rule_of)
+                                                                 .where(ExtractionCandidate.document_id.in_(ids))):
             proposals[doc_id][kind] += 1
+            answered[doc_id][rule or ""][status] += 1
             if status == "proposed":
                 waiting[doc_id][kind] += 1
                 unsure += (confidence or 0) < 0.8
@@ -198,6 +202,9 @@ def drop(db: Session, investigation_id: str, *, now: datetime | None = None) -> 
                 "passages": len(own_chunks), "proposals": dict(proposals[d.id]), "waiting": dict(waiting[d.id]),
                 "watchlist_hits": hits[d.id], "flags_fed": sorted(fed[d.id]),
                 "files_inside": len(kids),
+                # An accept the reporter corrected first (a name retyped) is not recorded apart from a plain accept.
+                "by_proposer": [{"rule": rule, "accepted": n["accepted"], "rejected": n["rejected"], "waiting": n["proposed"]}
+                                for rule, n in sorted(answered[d.id].items())],
             },
         }
 

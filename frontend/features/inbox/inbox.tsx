@@ -12,6 +12,7 @@ import {AiTag, LevelChip} from '../../components/status';
 import {caseHref} from '../../lib/case-href';
 import {getDecisionsOptions, getSinceOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 
 const SNOOZE_KEY = 'pai:snoozed';
 const DAY_MS = 86_400_000;
@@ -47,6 +48,8 @@ export function useNeedsYouCount(): number {
   const inv = useWorkbenchStore(state => state.investigationId);
   const [snoozed] = useSnoozed();
   const data = useQuery({...getDecisionsOptions({path: {investigation_id: inv}, query: {limit: 200}}), enabled: Boolean(inv)}).data;
+  // The decisions are read as the rules last left them; when the records have changed since, this runs them once.
+  useRedFlagsQuery(inv, Boolean(inv));
   return data ? Math.max(0, data.total - data.items.filter(i => snoozed[`d:${i.kind}:${i.id}`]).length) : 0;
 }
 
@@ -62,6 +65,7 @@ export function Inbox({open, onClose}: {open: boolean; onClose: () => void}): Re
   const [snoozed, snooze] = useSnoozed();
   const after = useMemo(weekAgo, []);
   const decisions = useQuery({...getDecisionsOptions({path: {investigation_id: inv}, query: {limit: 200}}), enabled: Boolean(inv && open)});
+  useRedFlagsQuery(inv, Boolean(inv && open));
   const since = useQuery({...getSinceOptions({path: {investigation_id: inv}, query: {after}}), enabled: Boolean(inv && open)});
   const [tab, setTab] = useState<'needs' | 'else'>('needs');
   useEffect(() => {

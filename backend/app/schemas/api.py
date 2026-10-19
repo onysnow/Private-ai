@@ -381,6 +381,14 @@ class AIAnalysisCandidateReviewRequest(BaseModel):
     decision: str
     note: str | None = None
 
+class AiClaimReviewRequest(BaseModel):
+    """Your decision on one claim (or hypothesis) of a proposed AI answer (research AI §2 "Per-claim decisions").
+    `text` is your corrected wording (correct only); `reason` is required to reject. "clear" takes a decision back."""
+    claim_id: str = Field(min_length=1, max_length=64)
+    decision: Literal["keep", "correct", "reject", "clear"]
+    text: str | None = Field(default=None, max_length=2000)
+    reason: str | None = Field(default=None, max_length=300)
+
 class AiThoughtMarkRequest(BaseModel):
     """Your mark on one thought of an AI run (mockup AI_1, the trace drawer's "To check"): kept in the run record."""
     mark: Literal["to_check", "keep", "reject"]

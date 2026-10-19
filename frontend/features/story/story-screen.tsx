@@ -23,6 +23,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {exportWriteupDocx} from '../../lib/generated/sdk.gen';
 import type {StoryGateOut, StoryOut} from '../../lib/generated/types.gen';
+import {apiTime} from '../../lib/timestamps';
 import type {CitableClaim, DocInfo} from './editor-extensions';
 import {ExportSheet, NotesTab, PassagePane, VersionsPane} from './story-panes';
 
@@ -330,7 +331,7 @@ function Gates({story, onGate, onClear, onReady}: {story: StoryOut; onGate: (gat
           </span>)}
       </span>
     </li>)}</ul>
-    {story.ready ? <p className="sy-ok">Ready to run · decided by {story.ready.by} on {new Date(story.ready.at).toLocaleDateString('en-GB')}</p>
+    {story.ready ? <p className="sy-ok">Ready to run · decided by {story.ready.by} on {apiTime(story.ready.at).toLocaleDateString('en-GB')}</p>
       : <Form {...ready}><form className="gate-form" noValidate onSubmit={submitWith(ready, async ({by}) => { await onReady(by); }, 'Could not record it')}>
         <FormField control={ready.control} name="by" render={({field}) => <FormItemBare>
           <FormControl><input {...field} aria-label="Decided by" placeholder="Decided by" disabled={!story.can_ready}/></FormControl>

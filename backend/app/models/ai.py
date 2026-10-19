@@ -47,6 +47,11 @@ class AIAnalysisCandidate(Base):
     reviewer_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # Your decision on each claim or hypothesis of the answer, by its id (CLM-0001, HYP-0001): {"decision": keep |
+    # correct | reject, "text": your corrected wording (the model's stays in payload), "reason", "reviewed_at"}.
+    # Made one by one while the whole answer is still proposed (app/ai/reasoning.py review_ai_claim). Nullable:
+    # rows predate it, and an answer nobody has gone through claim by claim has none.
+    claim_reviews: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
 
 class AIRunEvent(Base):

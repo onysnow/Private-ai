@@ -283,8 +283,8 @@ def serialize(db: Session, row: PatternFlag, names: dict[str, tuple[str, str]],
 
 def bring_up_to_date(db: Session, investigation_id: str) -> list[dict[str, str]] | None:
     """Brings the flags and To check items (missing values too) up to date. Two
-    requests may do this at the same moment (Case home asks for flags, checks and
-    decisions together): the one that loses the race on a new item's fingerprint
+    requests may do this at the same moment (two screens finding the flags behind
+    run them together): the one that loses the race on a new item's fingerprint
     starts again from what the other wrote. Returns what could not run, or None
     for a reader without write access, who sees them as last computed."""
     from sqlalchemy.exc import IntegrityError
@@ -316,8 +316,9 @@ def run(db: Session, investigation_id: str) -> dict[str, Any] | None:
 
 def flags(db: Session, investigation_id: str) -> dict[str, Any]:
     """The flags as the rules last left them. Reading never writes: it says when
-    the rules last ran and whether the records they read have changed since
-    (``stale``), and the caller runs them (``run``) when it wants them fresh."""
+    the rules last ran and whether a run would change the flags or the To check
+    items (``stale``), and the caller runs them (``run``) when it wants them fresh.
+    GET .../checks, .../decisions and .../wire read the same stored rows."""
     from datetime import datetime
 
     from app.models.domain import Entity
@@ -325,7 +326,10 @@ def flags(db: Session, investigation_id: str) -> dict[str, Any]:
     inv = db.get(Investigation, investigation_id)
     last = (inv.red_flag_run if inv else None) or {}
     ran_at = datetime.fromisoformat(last["at"]) if last.get("at") else None
-    stale = ran_at is None or last.get("digest") != _digest(case_graph.build(db, investigation_id))
+    # Behind when a run would change anything: the flags (the records they read have changed) or the To check
+    # items (documents, missing values or flags changed since they were last brought up to date).
+    stale = (ran_at is None or last.get("digest") != _digest(case_graph.build(db, investigation_id))
+             or not check_items.up_to_date(db, investigation_id))
     cannot: list[dict[str, str]] = list(last.get("cannot_run") or [])
     rows = list(db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id)))
     party_ids = {p for r in rows for p in r.parties}
@@ -354,11 +358,14 @@ def dismiss(db: Session, row: PatternFlag, reason: str) -> None:
         raise ValueError("Say why it is not relevant, so the reason stays with the flag")
     row.status, row.dismissed_reason = "dismissed", reason.strip()
     db.commit()
+    # A dismissed flag no longer calls for its To check items (reading them never brings them up to date).
+    check_items.recompute(db, row.investigation_id)
 
 
 def reopen(db: Session, row: PatternFlag) -> None:
     row.status, row.dismissed_reason = "open", None
     db.commit()
+    check_items.recompute(db, row.investigation_id)
 
 
 def make_lead(db: Session, row: PatternFlag) -> Lead:
