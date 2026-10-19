@@ -3,7 +3,7 @@
 # layers pytest/pytest-cov on top of requirements.txt. See STRUCT-0026.
 -r requirements-test.txt
 mypy==2.4.0
-ruff==0.16.9
-black==26.5.1
+ruff==0.17.1
+black==26.10.1
 
-pypdf==6.19.0
+pypdf==6.21.0
