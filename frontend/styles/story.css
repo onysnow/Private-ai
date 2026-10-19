@@ -12,8 +12,8 @@
 .sy-bad { color: var(--status-disputed); } .sy-warn { color: var(--flag-strong); } .sy-ok { color: var(--status-supported); }
 .sy-quiet { margin: 4px 0; color: var(--text-muted); font-size: 12.5px; }
 .sy-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr); gap: 14px; align-items: start; }
-.sy-body.with-pane { grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr) minmax(260px, 300px); }
-@media (max-width: 1150px) { .sy-body, .sy-body.with-pane { grid-template-columns: 1fr; } }
+@media (max-width: 1150px) { .sy-body { grid-template-columns: 1fr; } }
+.sy-left { position: relative; }
 .sy-left, .sy-right { min-width: 0; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel, none); padding: 12px 14px; display: grid; gap: 10px; align-content: start; }
 .sy-left-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .sy-eyebrow { margin: 0; font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
@@ -151,8 +151,11 @@
 .ai-bar button:focus-visible { outline: 2px solid var(--ai-mark); outline-offset: 2px; }
 
 /* What opens beside the text: a citation's passage, the version history. */
+.sy-pane-slot { position: absolute; z-index: 6; top: 0; right: 0; bottom: 0; width: min(360px, 78%); pointer-events: none; }
+.sy-pane-slot > .sy-pane { pointer-events: auto; }
+@media (max-width: 1150px) { .sy-pane-slot { position: fixed; top: auto; bottom: 12px; right: 12px; width: min(360px, calc(100vw - 24px)); } }
 .sy-pane { position: sticky; top: 8px; min-width: 0; display: grid; gap: 10px; align-content: start; padding: 12px 14px; border-radius: 14px; background: var(--surface-1);
-  box-shadow: var(--shadow-panel, none), inset 0 0 0 1px var(--line); max-height: calc(100vh - 40px); overflow-y: auto; animation: sy-in .14s ease-out; outline: none; }
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .4), inset 0 0 0 1px var(--line); max-height: calc(100vh - 40px); overflow-y: auto; animation: sy-in .14s ease-out; outline: none; }
 .sy-pane > header { display: flex; align-items: center; gap: 8px; }
 .sy-pane > header b { font: 600 13px var(--font-ui); }
 .sy-pane-esc { color: var(--text-muted); font-size: 11px; } .sy-pane-esc kbd { padding: 0 5px; border-radius: 4px; background: var(--surface-2); font: 600 10.5px var(--font-mono); }

@@ -177,7 +177,8 @@ export function WriteupEditor({investigationId, writeupId, claims, onDoc, onOpen
     if (!id || !host) return;
     window.clearTimeout(hideTimer.current);
     const r = chip.getBoundingClientRect();
-    setHover({id, x: Math.max(0, r.left - host.left - 12), y: r.bottom - host.top + 6});
+    const width = Math.min(340, host.width * 0.92); // the card's width (.wu-hover): kept inside the write-up
+    setHover({id, x: Math.max(0, Math.min(r.left - host.left - 12, host.width - width)), y: r.bottom - host.top + 6});
   };
   const hideSoon = () => { window.clearTimeout(hideTimer.current); hideTimer.current = window.setTimeout(() => setHover(null), 250); };
   const onOver = (e: ReactMouseEvent) => { const chip = chipOf(e.target); if (chip) showFor(chip); };

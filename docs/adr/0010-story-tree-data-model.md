@@ -25,6 +25,12 @@ write-up has a citation (from its citation nodes), every open Red Flag's innocen
 statements resting on one record. "Ready to run" is refused until every gate passes, and is cleared when the thesis
 or a recorded gate changes. Reading the story writes nothing.
 
+**Added 2026-10-19 (migration e4c8a1f7b392).** `writeup_versions`: snapshots of the write-up's whole TipTap document,
+named by a person ("Before legal read"), taken on their own before a save (at most one every ten minutes, the newest
+30 kept), or taken just before an older version is restored, so a restore can be undone. A snapshot is never edited;
+it travels in the case backup and goes when its write-up is deleted. The story's own notes are ordinary notes on the
+record type "story" (no new table).
+
 ## Open questions for Ony
 
 - One story per case, or several?

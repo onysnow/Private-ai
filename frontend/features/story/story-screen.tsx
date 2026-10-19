@@ -110,7 +110,7 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
           {c.unshown > 0 && <> · {c.unshown} not yet shown</>} · <span className={gatesOpen ? 'sy-warn' : 'sy-ok'}>{gatesOpen ? `${gatesOpen} gates open` : 'every gate passed'}</span></span></p>
     </header>
     {problem && <p role="alert" className="sy-quiet">{errorMessage(problem, 'Could not save that')}</p>}
-    <div className={`sy-body${pane ? ' with-pane' : ''}`}>
+    <div className="sy-body">
       <div className="sy-left">
         <header className="sy-left-head"><p className="sy-eyebrow">What the story needs <small>thesis → sections → claims → evidence · a branch is as strong as its weakest claim</small></p>
           <button type="button" className="sy-btn" aria-pressed={outline} onClick={() => setOutline(v => !v)}><kbd>L</kbd> list view</button></header>
@@ -126,6 +126,12 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
           <input aria-label="A new section" value={newSection} onChange={e => setNewSection(e.target.value)} placeholder="+ A section: what the story will say next"/>
           <button type="submit" disabled={!newSection.trim()}>Add section</button></form>}
         <Gates story={story} onGate={(gate, who, on) => gateM.mutate({path, body: {gate, who, on}})} onReady={by => readyM.mutate({path, body: {by}})}/>
+        {/* What opens beside the text lies over the tree's edge, next to the write-up, so the text never moves. */}
+        {pane && <div className="sy-pane-slot">
+          {pane.kind === 'passage' && <PassagePane claim={byId.get(pane.claimId)} onClose={() => setPane(null)}/>}
+          {pane.kind === 'versions' && story.writeup_id && <VersionsPane investigationId={investigationId} writeupId={story.writeup_id}
+            onClose={() => setPane(null)} onRestored={() => setReloadKey(k => k + 1)}/>}
+        </div>}
       </div>
       <div className="sy-right">
         <div className="sy-tabs" role="tablist" aria-label="Write-up">
@@ -162,9 +168,6 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
           </footer>
         </>}
       </div>
-      {pane?.kind === 'passage' && <PassagePane claim={byId.get(pane.claimId)} onClose={() => setPane(null)}/>}
-      {pane?.kind === 'versions' && story.writeup_id && <VersionsPane investigationId={investigationId} writeupId={story.writeup_id}
-        onClose={() => setPane(null)} onRestored={() => setReloadKey(k => k + 1)}/>}
     </div>
     {exporting && <ExportSheet story={story} doc={doc} onClose={closeExport} onExportDocx={() => (story.writeup_id ? exportDocx(story.writeup_id) : Promise.resolve())}/>}
   </section>;
