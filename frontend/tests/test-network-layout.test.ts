@@ -4,7 +4,7 @@
 // the connection grid keeps each link's direction.
 import {describe, expect, it} from 'vitest';
 
-import {GAP_PX, connectionGrid, countCrossings, layoutNetwork, networkGraph, packRows, segmentsCross, turnLevel} from '../lib/network-layout';
+import {GAP_PX, connectionGrid, countCrossings, layoutNetwork, networkGraph, noverlapGrid, packRows, segmentsCross, turnLevel} from '../lib/network-layout';
 import type {NetworkLink, NetworkNode} from '../lib/network-layout';
 
 const node = (id: string, label = id): NetworkNode => ({id, label});
@@ -92,6 +92,22 @@ describe('connectionGrid', () => {
     expect(cell(2, 0)?.links.map(l => l.id)).toEqual(['4']);        // Jane -> Meridian ...
     expect(cell(0, 2)).toBeUndefined();                             // ... and not the other way
     expect(grid.cells).toHaveLength(4);
+  });
+});
+
+describe('layoutNetwork for a big linked group', () => {
+  it('compares pairs through a grid once a group is big, so a large case is laid out in bounded time', () => {
+    expect(noverlapGrid(12)).toBe(1);                  // a small group: every pair compared, as before
+    expect(noverlapGrid(150)).toBeGreaterThan(1);
+    expect(noverlapGrid(5000)).toBe(24);               // bounded
+    // A hub-heavy group of 120 parties, as a large case gives.
+    const nodes = Array.from({length: 120}, (_, i) => node(`n${String(i).padStart(3, '0')}`));
+    const links = nodes.slice(1).map((n, i) => link(`l${i}`, nodes[i % 7].id, n.id));
+    const started = performance.now();
+    const places = layoutNetwork(networkGraph(nodes, links), {footprint: () => 30});
+    expect(performance.now() - started).toBeLessThan(5000);
+    expect(Object.values(places).every(p => Number.isFinite(p.x) && Number.isFinite(p.y))).toBe(true);
+    expect(layoutNetwork(networkGraph(nodes, links), {footprint: () => 30})).toEqual(places);   // still the same picture each time
   });
 });
 

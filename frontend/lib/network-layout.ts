@@ -122,9 +122,12 @@ function layoutGroup(graph: Graph, ids: string[], footprint: (id: string) => num
       // It stops as soon as no footprints meet; the cap only bounds a case that will not settle.
       maxIterations: 3000,
       inputReducer: (id, a) => ({x: a.x as number, y: a.y as number, size: footprint(id)}),
-      // gridSize 1: every pair is compared; groups here are small, and the
-      // README notes it can be faster with few nodes.
-      settings: {margin: GAP_PX, ratio: 1, gridSize: 1, expansion: 1.1, speed: 3},
+      // The grid only decides which pairs are compared: two parties whose footprints meet always
+      // share a cell, and each pair is compared once, so a finer grid pushes apart the same pairs
+      // as comparing every pair (gridSize 1); only the order the pushes are added up in differs. A small group keeps gridSize 1 (the README notes it can
+      // be faster with few nodes); a case of a hundred parties compared pair by pair, up to 3000
+      // times, held the page for seconds.
+      settings: {margin: GAP_PX, ratio: 1, gridSize: noverlapGrid(group.order), expansion: 1.1, speed: 3},
     });
     positions = Object.fromEntries(group.mapNodes((id, a) => [id, {x: a.x as number, y: a.y as number}]));
   }
@@ -135,6 +138,11 @@ function layoutGroup(graph: Graph, ids: string[], footprint: (id: string) => num
     minY = Math.min(minY, p.y - r); maxY = Math.max(maxY, p.y + r);
   }
   return {positions, box: {minX, minY, width: maxX - minX, height: maxY - minY}};
+}
+
+/** Noverlap's grid, in cells a side: 1 (every pair compared) for a small group, finer as it grows. */
+export function noverlapGrid(order: number): number {
+  return order < 40 ? 1 : Math.min(24, Math.round(Math.sqrt(order)));
 }
 
 /** The places turned about their centre so their principal axis is level. */
