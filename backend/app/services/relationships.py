@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from typing import Any
 
@@ -80,9 +81,13 @@ def validate_payment_properties(props: dict[str, list[str]]) -> None:
     """
     for value in props.get("amount", []):
         try:
-            float(str(value).replace(",", ""))
+            number = float(str(value).replace(",", ""))
         except ValueError:
             raise ValueError(f"Payment amount must be a number: {value!r}") from None
+        # float() also accepts "nan", "inf" and "1e999"; the detectors cannot read
+        # those back, and one such amount used to switch off Red Flags for the case.
+        if not math.isfinite(number) or number < 0:
+            raise ValueError(f"Payment amount must be a finite, non-negative number: {value!r}")
     for value in props.get("currency", []):
         if not re.fullmatch(r"[A-Za-z]{3}", str(value).strip()):
             raise ValueError(f"Payment currency must be a 3-letter ISO 4217 code: {value!r}")

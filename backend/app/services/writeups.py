@@ -159,11 +159,47 @@ def serialize_writeup(row: Writeup, *, include_content: bool = True) -> dict:
     return data
 
 
+def rebuild_chart_blocks(db: Session, investigation_id: str, content_json: dict) -> dict:
+    """The document with every chart block's rows cooked again from the
+    block's own order slip (decks.rebuild_chart_data): figures a client typed
+    into a chart block do not survive a save. A chart block that cannot be
+    rebuilt is removed. Other blocks are left as they are."""
+    import copy
+
+    from app.services.decks import CHART_VISUAL, rebuild_chart_data
+
+    doc = copy.deepcopy(content_json)
+
+    def fix(node: Any) -> None:
+        if isinstance(node, list):
+            node[:] = [child for child in node if not _drop_chart(child)]
+            for child in node:
+                fix(child)
+        elif isinstance(node, dict):
+            fix(node.get("content") or [])
+
+    def _drop_chart(node: Any) -> bool:
+        if not isinstance(node, dict) or node.get("type") != "evidenceVisual":
+            return False
+        attrs = node.get("attrs") or {}
+        visual = attrs.get("visual")
+        if not isinstance(visual, dict) or visual.get("type") != CHART_VISUAL:
+            return False
+        rebuilt = rebuild_chart_data(db, investigation_id, visual)
+        if rebuilt is None:
+            return True
+        node["attrs"] = {**attrs, "visual": rebuilt}
+        return False
+
+    fix(doc)
+    return doc
+
+
 def create_writeup(db: Session, *, investigation_id: str, title: str, content_json: dict | None = None,
                     status: str = "draft", source_ai_candidate_id: str | None = None, created_by: str | None = None) -> Writeup:
     if status not in WRITEUP_STATUSES:
         raise ValueError(f"status must be one of {sorted(WRITEUP_STATUSES)}")
-    doc = content_json or EMPTY_DOC
+    doc = rebuild_chart_blocks(db, investigation_id, content_json or EMPTY_DOC)
     row = Writeup(
         investigation_id=investigation_id, title=title.strip() or "Untitled write-up",
         content_json=doc, content_text=extract_plain_text(doc), cited_record_refs=extract_cited_refs(doc),
@@ -182,7 +218,7 @@ def update_writeup(db: Session, row: Writeup, data: dict) -> Writeup:
     if "title" in data and data["title"] is not None:
         row.title = data["title"].strip() or row.title
     if "content_json" in data and data["content_json"] is not None:
-        row.content_json = data["content_json"]
+        row.content_json = rebuild_chart_blocks(db, row.investigation_id, data["content_json"])
         row.content_text = extract_plain_text(row.content_json)
         row.cited_record_refs = extract_cited_refs(row.content_json)
     if "status" in data and data["status"] is not None:

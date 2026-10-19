@@ -77,6 +77,25 @@ def _origin_host(origin: str | None) -> str:
         return ""
 
 
+def _peer_is_trusted_proxy(host: str | None) -> bool:
+    """True when the direct peer is a configured reverse proxy (TRUSTED_PROXY_IPS)."""
+    from app.core.config import settings
+
+    entries = [item.strip() for item in (settings.trusted_proxy_ips or "").split(",") if item.strip()]
+    if not entries:
+        return False
+    peer = _host_without_port(host).lower()
+    for entry in entries:
+        if entry.lower() == peer:
+            return True
+        try:
+            if ipaddress.ip_address(peer) in ipaddress.ip_network(entry, strict=False):
+                return True
+        except ValueError:
+            continue
+    return False
+
+
 def request_is_local_request(request: Request) -> bool:
     """Conservatively decide whether a request is truly local.
 
@@ -88,6 +107,11 @@ def request_is_local_request(request: Request) -> bool:
     direct_client = request.client.host if request.client else None
     direct_target = request.url.hostname
     if not request_is_local(client_host=direct_client, target_host=direct_target):
+        return False
+
+    # A configured reverse proxy is the network peer for every remote caller it
+    # forwards, so its loopback address says nothing about who is really asking.
+    if _peer_is_trusted_proxy(direct_client):
         return False
 
     # If a local reverse proxy says any client hop was remote, revoke local trust.
@@ -141,9 +165,16 @@ def decide_api_access(
     target_host: str | None = None,
     authorization: str | None,
     configured_token: str,
+    assume_remote: bool = False,
 ) -> AccessDecision:
-    """Authorize one API request under the local-first security policy."""
-    if request_is_local(client_host=client_host, target_host=target_host):
+    """Authorize one API request under the local-first security policy.
+
+    ``assume_remote`` is for callers that already ran the stricter, forwarded-header
+    aware check (``request_is_local_request``) and found the request not local. The
+    address-only check below ignores forwarded headers, so repeating it would hand
+    local trust back to a request that a proxy header had just revoked it from.
+    """
+    if not assume_remote and request_is_local(client_host=client_host, target_host=target_host):
         return AccessDecision(True)
 
     expected = configured_token.strip()
@@ -246,6 +277,7 @@ async def enforce_api_access(request: Request, configured_token: str) -> JSONRes
         target_host=request.url.hostname,
         authorization=request.headers.get("authorization"),
         configured_token=configured_token,
+        assume_remote=True,
     )
     if decision.allowed:
         return None

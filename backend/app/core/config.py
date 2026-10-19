@@ -105,6 +105,11 @@ class Settings(BaseSettings):
     )
     api_auth_token: str = ""
     api_auth_investigation_ids: str = ""
+    # Comma-separated IPs/CIDRs of reverse proxies that sit in front of the app on
+    # this host (for example "127.0.0.1" for nginx on the same machine). A request
+    # that arrives from one of these is never treated as local, so a remote caller
+    # cannot borrow the loopback trust of the proxy that forwarded them.
+    trusted_proxy_ips: str = ""
     max_api_request_bytes: int = 10 * 1024 * 1024
     audit_log_file: str = "./data/audit/security.jsonl"
     api_auth_failure_limit_per_minute: int = 30

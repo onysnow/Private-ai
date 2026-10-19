@@ -13,6 +13,8 @@ tiles, checks, users and settings).
 
 from __future__ import annotations
 
+import asyncio
+import inspect
 import json
 import time
 from pathlib import Path
@@ -56,6 +58,8 @@ class Console:
     def check(self, method: str, path: str, *args: Any, **params: Any) -> Any:
         route = self.routes[(method, PREFIX + path)]
         raw = route.endpoint(self.request(), *args, **params)
+        if inspect.iscoroutine(raw):   # a route that replays through the app in-process is async
+            raw = asyncio.run(raw)
         assert route.response_model is not None, f"{method} {path} declares no response model"
         _same_through_model(route.response_model, raw)
         self.checked.add((method, path))
@@ -153,15 +157,10 @@ def test_fixture_host_replies(fixture_host: Any, monkeypatch: pytest.MonkeyPatch
     console.check("DELETE", "/query/saved/{qid}", saved["id"])
     console.check("GET", "/query/history", limit=50)
 
-    # API playground. The replay is answered by a stand-in for this server
-    # (the test client has no socket to send it to).
-    def answered(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={"ok": "yes"}, headers={"x-request-id": "req-9"})
-
-    real_client = httpx.Client
-    monkeypatch.setattr(apiplay.httpx, "Client", lambda **kw: real_client(transport=httpx.MockTransport(answered), **kw))
+    # API playground. The replay goes to this app in-process (httpx.ASGITransport), so the
+    # fixture host answers it itself.
     sent = console.check("POST", "/api/send", SendIn(method="GET", path="/ping"))
-    assert sent["body"] == {"ok": "yes"} and sent["request_id"] == "req-9"
+    assert sent["status"] == 200 and sent["body"] == {"ok": "yes"}
     routes = console.check("GET", "/api/routes")
     assert any(r["traffic"] for r in routes["items"]) and any(r["params"] for r in routes["items"])
     console.check("GET", "/api/traffic", since_seconds=None)
@@ -234,8 +233,12 @@ def test_fixture_host_replies(fixture_host: Any, monkeypatch: pytest.MonkeyPatch
 @pytest.fixture
 def workbench(tmp_path: Path) -> Iterator[tuple[TestClient, Any, Console]]:
     from app.core.config import Settings
+    from app.db.session import Base, engine
     from app.main import create_app
 
+    # create_app(bootstrap_schema=False) leaves the tables to the caller; without
+    # this the test passed only when an earlier test in the run had made them.
+    Base.metadata.create_all(engine)
     settings = Settings(console_dir=str(tmp_path / "console"), console_writes="changesets_and_sql",
                         app_log_file=str(tmp_path / "app.jsonl"), audit_log_file=str(tmp_path / "audit.jsonl"))
     app = create_app(settings, bootstrap_schema=False)

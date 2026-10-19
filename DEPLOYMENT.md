@@ -112,6 +112,27 @@ command again; each zoom level above 6 makes the file about three times larger
 (7: 189 MB, 8: 557 MB). Without it, maps say that no base map is installed. The
 map data is © OpenStreetMap contributors (ODbL); every map says so.
 
+### Behind a reverse proxy on the same machine
+
+The app treats a caller on the loopback address as the local owner. A proxy such as
+nginx running on the same host is itself a loopback caller, so without help every
+remote user would look local. If you put a proxy in front of the app:
+
+1. Set `TRUSTED_PROXY_IPS=127.0.0.1` (comma-separated IPs or CIDRs of the proxies) in `.env`.
+   Requests arriving from those addresses are then never treated as local and must send the bearer token.
+2. Have the proxy forward the original client address and host, for example in nginx:
+
+   ```nginx
+   location / {
+       proxy_pass http://127.0.0.1:8000;
+       proxy_set_header Host $host;
+       proxy_set_header X-Forwarded-For $remote_addr;
+       proxy_set_header X-Forwarded-Proto $scheme;
+   }
+   ```
+
+3. Keep the operations console off behind a proxy (`CONSOLE_ENABLED=false`).
+
 ## 4. Upgrade
 
 ```bash

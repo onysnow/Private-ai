@@ -595,14 +595,16 @@ const router = {
   go(hash) { if (!hash.startsWith("#")) hash = "#" + hash; if (location.hash === hash) this.dispatch(); else location.hash = hash; },
   async dispatch() {
     const r = this.parse();
-    if (!state.has(r.section) || !SECTIONS[r.section]) {
+    // r.section comes from the address bar: only a section this file defines may be looked up and called.
+    const known = Object.prototype.hasOwnProperty.call(SECTIONS, r.section) && typeof SECTIONS[r.section] === "function";
+    if (!state.has(r.section) || !known) {
       const first = state.manifest.sections[0]?.id || "overview";
       if (r.section !== first) { location.replace(`#/${first}`); return; }
     }
     $$(".nav-item").forEach((a) => a.classList.toggle("active", a.dataset.id === r.section));
     if (this.currentId === r.section && this.current?.update) { try { this.current.update(r); } catch (e) { toastError(e); } return; }
     if (this.current?.unmount) { try { this.current.unmount(); } catch (e) { console.error(e); } }
-    this.current = SECTIONS[r.section] ? SECTIONS[r.section]() : null; this.currentId = r.section;
+    this.current = known ? SECTIONS[r.section]() : null; this.currentId = r.section;
     clear(this.el);
     const el = h("div", {class: `section section-${r.section}`});
     this.el.append(el);

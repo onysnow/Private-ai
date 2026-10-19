@@ -47,6 +47,8 @@ from app.services.settings import (
     update_app_user as _update_app_user,
 )
 
+log = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 logger = logging.getLogger(__name__)
 
@@ -222,7 +224,8 @@ def save_connector_credential(provider: str, body: ConnectorCredentialPut, reque
     except ValueError as exc:
         raise HTTPException(400, str(exc))
     except RuntimeError as exc:
-        raise HTTPException(500, str(exc))
+        log.warning("connector credential change failed", exc_info=exc)
+        raise HTTPException(500, "The credential could not be changed; the server log has the reason")
 
 
 @router.delete("/settings/connectors/{provider}/credential", response_model=ConnectorCredentialRemovedOut)
@@ -233,7 +236,8 @@ def delete_connector_credential(provider: str, request: Request) -> Any:
     except LookupError as exc:
         raise HTTPException(404, str(exc))
     except RuntimeError as exc:
-        raise HTTPException(500, str(exc))
+        log.warning("connector credential change failed", exc_info=exc)
+        raise HTTPException(500, "The credential could not be changed; the server log has the reason")
 
 
 @router.get("/settings/storage/orphans", response_model=OrphanStoragePreviewOut)

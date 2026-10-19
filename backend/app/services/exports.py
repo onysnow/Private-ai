@@ -52,7 +52,7 @@ MODEL_BY_TABLE = {
 RESTORE_ORDER = [
     "investigations", "entities", "sources", "claims", "leads", "connector_runs",
     "documents", "investigation_corpus_bindings", "document_corpus_syncs", "statements", "evidence", "timeline_events", "reporting_tasks",
-    "reporting_task_workflow_events", "lead_profiles", "lead_links", "lead_workflow_events", "claim_evidence_links", "claim_review_events",
+    "reporting_task_workflow_events", "lead_profiles", "lead_workflow_events", "claim_evidence_links", "claim_review_events",
     "connector_findings", "resolution_decisions",
     # OpenAleph cross-references and reporters' decisions on them (ADR-0006,
     # Wave B): review history. A decision may point at the resolution decision
@@ -60,7 +60,9 @@ RESTORE_ORDER = [
     "cross_reference_proposals", "cross_reference_decisions",
     "canonical_resolution_decisions", "canonical_entity_merge_audits", "post_merge_reconciliation_decisions", "property_conflict_decisions", "statement_assessments",
     "statement_promotions", "enrichment_sessions", "enrichment_session_runs",
-    "enrichment_session_findings", "cross_provider_decisions", "relationship_edges", "relationship_evidence_attachments", "relationship_evidence_review_events",
+    "enrichment_session_findings", "cross_provider_decisions", "relationship_edges",
+    # lead_links.relationship_id points at relationship_edges, so it restores after it.
+    "lead_links", "relationship_evidence_attachments", "relationship_evidence_review_events",
     "external_relationship_reviews", "external_relationship_promotions",
     "document_chunks", "extraction_candidates",
     # Bulk imports and what happened to each file; an item points at its document.
@@ -180,6 +182,8 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "resolution_decisions": direct["resolution_decisions"],
         "canonical_resolution_decisions": direct["canonical_resolution_decisions"],
         "canonical_entity_merge_audits": direct["canonical_entity_merge_audits"],
+        "post_merge_reconciliation_decisions": direct["post_merge_reconciliation_decisions"],
+        "property_conflict_decisions": direct["property_conflict_decisions"],
         "statement_assessments": direct["statement_assessments"],
         "statement_promotions": direct["statement_promotions"],
         "enrichment_sessions": sessions, "enrichment_session_runs": session_runs,

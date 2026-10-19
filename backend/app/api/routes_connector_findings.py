@@ -100,8 +100,12 @@ def resolve_finding(finding_id: str, body: ResolutionRequest, db: Session = Depe
     finding = db.get(ConnectorFinding, finding_id)
     if finding is None:
         raise HTTPException(404, "Finding not found")
-    if body.entity_id and db.get(Entity, body.entity_id) is None:
-        raise HTTPException(404, "Entity not found")
+    if body.entity_id:
+        # The entity must belong to the finding's own investigation; an id from
+        # another case answers the same 404 as an id that does not exist.
+        target = db.get(Entity, body.entity_id)
+        if target is None or target.investigation_id != finding.investigation_id:
+            raise HTTPException(404, "Entity not found")
     try:
         return create_resolution_decision(db, finding, body)
     except ValueError as exc:
@@ -118,8 +122,12 @@ def assess_statement(finding_id: str, body: StatementAssessmentRequest, db: Sess
     finding = db.get(ConnectorFinding, finding_id)
     if finding is None:
         raise HTTPException(404, "Finding not found")
-    if body.entity_id and db.get(Entity, body.entity_id) is None:
-        raise HTTPException(404, "Entity not found")
+    if body.entity_id:
+        # The entity must belong to the finding's own investigation; an id from
+        # another case answers the same 404 as an id that does not exist.
+        target = db.get(Entity, body.entity_id)
+        if target is None or target.investigation_id != finding.investigation_id:
+            raise HTTPException(404, "Entity not found")
     try:
         return create_statement_assessment(db, finding, body)
     except ValueError as exc:
