@@ -10,7 +10,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
-import type {ReactElement} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
@@ -122,6 +122,12 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   const c = story.counts;
   const gatesOpen = story.gates.length - story.gates_passed;
   const ready = Boolean(story.writeup_id) && story.sentences.total > 0 && story.sentences.uncited === 0;
+  const gates = <Gates story={story} onClear={gate => gateM.mutate({path, body: {gate, who: null, on: null}})}
+    onGate={async (gate, who, on) => {
+      // The failure shows in the gate's form, so not again over the screen.
+      try { await gateM.mutateAsync({path, body: {gate, who, on}}); } catch (error) { gateM.reset(); throw error; }
+    }}
+    onReady={async by => { await readyM.mutateAsync({path, body: {by}}); }}/>;
 
   return <section className="sy" aria-label="Story">
     <header className="sy-head">
@@ -145,7 +151,7 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
             <FormMessage className="field-msg"/></FormItemBare>}/>
           <FormRootError className="field-msg"/>
           <button type="submit">Set the thesis</button>
-        </form></Form> : outline ? <Outline story={story}/> : <Tree story={story} lit={lit} setLit={setLit} byId={byId} canDrag={Boolean(story.writeup_id)}
+        </form></Form> : outline ? <Outline story={story}/> : <Tree story={story} lit={lit} setLit={setLit} byId={byId} canDrag={Boolean(story.writeup_id)} gates={gates}
           onRemove={(section, claim) => removeM.mutate({path: {...path, section_id: section, claim_id: claim}})}
           onPlace={(section, claim) => placeM.mutate({path: {...path, section_id: section}, body: {claim_id: claim}})}/>}
         {story.thesis && <Form {...sectionForm}><form className="sy-add" noValidate onSubmit={submitWith(sectionForm, async ({title}) => {
@@ -157,12 +163,8 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
             <FormMessage className={NEXT_LINE}/></FormItemBare>}/>
           <FormRootError className={NEXT_LINE}/>
           <button type="submit">Add section</button></form></Form>}
-        <Gates story={story} onClear={gate => gateM.mutate({path, body: {gate, who: null, on: null}})}
-          onGate={async (gate, who, on) => {
-            // The failure shows in the gate's form, so not again over the screen.
-            try { await gateM.mutateAsync({path, body: {gate, who, on}}); } catch (error) { gateM.reset(); throw error; }
-          }}
-          onReady={async by => { await readyM.mutateAsync({path, body: {by}}); }}/>
+        {/* The gates sit under the thesis in the tree (mockup ACT_2); in the outline, and before there is a thesis, below. */}
+        {(!story.thesis || outline) && gates}
         {/* What opens beside the text lies over the tree's edge, next to the write-up, so the text never moves. */}
         {pane && <div className="sy-pane-slot">
           {pane.kind === 'passage' && <PassagePane claim={byId.get(pane.claimId)} onClose={() => setPane(null)}/>}
@@ -192,7 +194,7 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
             <p className="sy-doc-meta">Draft for the editor · {story.version ? <>version “{story.version.name}”</> : 'no named version yet'}
               <button type="button" className="sy-link" aria-expanded={pane?.kind === 'versions'} onClick={() => setPane(p => (p?.kind === 'versions' ? null : {kind: 'versions'}))}>Version history</button></p>
             <WriteupEditor investigationId={investigationId} writeupId={story.writeup_id} claims={claims} onDoc={setDoc} reloadKey={reloadKey}
-              onOpenPassage={id => setPane({kind: 'passage', claimId: id})}/>
+              onOpenPassage={id => setPane({kind: 'passage', claimId: id})} onPointClaim={setLit}/>
           </div>
           {tab === 'cited' && <ol className="sy-cited" aria-label="Cited in the write-up">
             {cited.length ? cited.map(id => byId.get(id)).filter(Boolean).map(cl => <li key={cl!.id}><span className="wu-n">{cl!.n}</span>
@@ -210,8 +212,8 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   </section>;
 }
 
-function Tree({story, lit, setLit, byId, canDrag, onRemove, onPlace}: {
-  story: StoryOut; lit: string | null; setLit: (id: string | null) => void; byId: Map<string, CitableClaim>; canDrag: boolean;
+function Tree({story, lit, setLit, byId, canDrag, gates, onRemove, onPlace}: {
+  story: StoryOut; lit: string | null; setLit: (id: string | null) => void; byId: Map<string, CitableClaim>; canDrag: boolean; gates?: ReactNode;
   onRemove: (section: string, claim: string) => void; onPlace: (section: string, claim: string) => void;
 }): ReactElement {
   const box = useRef<HTMLDivElement>(null);
@@ -244,15 +246,21 @@ function Tree({story, lit, setLit, byId, canDrag, onRemove, onPlace}: {
     ro?.observe(host);
     return () => ro?.disconnect();
   }, [story]);
-  return <div className="sy-tree" ref={box} role="tree" aria-label="What the story needs">
-    <svg className="sy-lines" aria-hidden="true">{lines.map(l => <path key={l.key} d={l.d} className={`sy-line l-${l.style}${lit && l.key.includes(lit) ? ' lit' : ''}`}/>)}</svg>
+  // A lit claim (pointed at here, or its citation in the write-up) lights its path to the thesis: its section's line too.
+  const litSection = lit ? story.sections.find(s => s.id === lit || s.claims.some(c => c.id === lit))?.id : undefined;
+  const isLit = (key: string) => Boolean(lit && (key.includes(lit) || (litSection && key === `t>${litSection}`)));
+  // The gates sit in the thesis column but are not part of the tree: the tree is the sections' column, which owns the
+  // thesis node (aria-owns), so its items are only the thesis, sections and claims.
+  return <div className="sy-tree" ref={box}>
+    <svg className="sy-lines" aria-hidden="true">{lines.map(l => <path key={l.key} d={l.d} className={`sy-line l-${l.style}${isLit(l.key) ? ' lit' : ''}`}/>)}</svg>
     <div className="sy-col sy-col-thesis">
-      <div className="sy-thesis" data-node="thesis" role="treeitem" aria-level={1} aria-selected={false} aria-label={`Thesis: ${story.thesis}`}>
+      <div className="sy-thesis" id={`sy-thesis-${story.id ?? 'new'}`} data-node="thesis" role="treeitem" aria-level={1} aria-selected={false} aria-label={`Thesis: ${story.thesis}`}>
         <span className="sy-diamond" aria-hidden="true"><b>Thesis</b></span>
         <p>{story.thesis}</p>
       </div>
+      {gates}
     </div>
-    <div className="sy-col sy-col-rest">
+    <div className="sy-col sy-col-rest" role="tree" aria-label="What the story needs" aria-owns={`sy-thesis-${story.id ?? 'new'}`}>
       {!story.sections.length && <p className="sy-quiet">Add the sections the story will say, then put claims under them.</p>}
       {story.sections.map((s, i) => <div key={s.id} className="sy-branch">
         <div className={`sy-section st-${s.status}`} data-node={`s:${s.id}`} role="treeitem" aria-level={2} aria-selected={lit === s.id}
@@ -262,7 +270,7 @@ function Tree({story, lit, setLit, byId, canDrag, onRemove, onPlace}: {
           <small>{s.total ? `${s.shown} of ${s.total} shown` : 'no claim yet'}</small>
         </div>
         <div className="sy-claims">
-          {s.claims.map(cl => <article key={cl.id} className={`sy-claim st-${cl.state}${story.critical.some(x => x.claim_id === cl.id) ? ' critical' : ''}`} data-node={`c:${cl.id}`}
+          {s.claims.map(cl => <article key={cl.id} className={`sy-claim st-${cl.state}${story.critical.some(x => x.claim_id === cl.id) ? ' critical' : ''}${lit === cl.id ? ' lit' : ''}`} data-node={`c:${cl.id}`}
             role="treeitem" aria-level={3} aria-selected={lit === cl.id} aria-label={`Claim, ${cl.state === 'shown' ? 'shown' : cl.state === 'disputed' ? 'disputed' : 'not yet shown'}, ${cl.text}`}
             onMouseEnter={() => setLit(cl.id)} onMouseLeave={() => setLit(null)} draggable={canDrag}
             title={canDrag ? 'Drag into the write-up to cite it there' : undefined}

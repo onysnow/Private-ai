@@ -5126,10 +5126,17 @@ class RunPlanTypeCountOut(ResponseModel):
     count: int
 
 
+class RunPlanTierCountOut(ResponseModel):
+    tier: str
+    count: int
+
+
 class RunPlanPacketOut(ResponseModel):
     records: int
     by_type: list[RunPlanTypeCountOut]
     leads_only: int
+    # Records whose source sits below the tier floor, by tier: in the packet, but never counting toward a fact.
+    below_tier_floor: list[RunPlanTierCountOut]
     first: list[RunPlanRecordOut]
 
 

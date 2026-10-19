@@ -30699,6 +30699,13 @@
       },
       "RunPlanPacketOut": {
         "properties": {
+          "below_tier_floor": {
+            "items": {
+              "$ref": "#/components/schemas/RunPlanTierCountOut"
+            },
+            "title": "Below Tier Floor",
+            "type": "array"
+          },
           "by_type": {
             "items": {
               "$ref": "#/components/schemas/RunPlanTypeCountOut"
@@ -30726,6 +30733,7 @@
           "records",
           "by_type",
           "leads_only",
+          "below_tier_floor",
           "first"
         ],
         "title": "RunPlanPacketOut",
@@ -30960,6 +30968,24 @@
           "state"
         ],
         "title": "RunPlanSystemOut",
+        "type": "object"
+      },
+      "RunPlanTierCountOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "tier": {
+            "title": "Tier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tier",
+          "count"
+        ],
+        "title": "RunPlanTierCountOut",
         "type": "object"
       },
       "RunPlanTypeCountOut": {

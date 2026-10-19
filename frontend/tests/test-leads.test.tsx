@@ -125,7 +125,7 @@ describe('LeadsPanel', () => {
     await user.keyboard('{Enter}');
     await user.click(await screen.findByRole('option', {name: 'Active'}));
     await waitFor(() => expect(api.calls(QUEUE)).toHaveLength(2));
-    expect(api.lastBody('PATCH /api/leads/lead-1')).toEqual({status: 'active', note: 'Updated in Next.js workbench'});
+    expect(api.lastBody('PATCH /api/leads/lead-1')).toEqual({status: 'active'});
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -151,7 +151,8 @@ describe('LeadsPanel', () => {
       expect(api.calls('GET /api/investigations/inv-1/claims')).toHaveLength(2);
     });
     expect(api.lastBody('POST /api/leads/lead-1/convert')).toEqual({kind: 'claim'});
-    await screen.findByText('lead · 0% confidence');
+    await screen.findByText('0% confidence');
+    expect(screen.getByText('0% confidence').closest('button')).toHaveClass('cl-unshown');
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -171,7 +172,7 @@ describe('LeadsPanel', () => {
     api.add({'PATCH /api/reporting-tasks/task-1': done, [QUEUE]: leadQueueBody('inv-1', [leadFixture({status: 'active', tasks: [done]})])});
     await user.click(screen.getByRole('button', {name: 'Done'}));
     await screen.findByText('Call the clerk · done · 2 event(s)');
-    expect(api.lastBody('PATCH /api/reporting-tasks/task-1')).toEqual({status: 'done', workflow_note: 'Task marked done in Next.js workbench'});
+    expect(api.lastBody('PATCH /api/reporting-tasks/task-1')).toEqual({status: 'done'});
     expect(screen.queryByRole('button', {name: 'In progress'})).not.toBeInTheDocument();
     expect(api.calls(QUEUE)).toHaveLength(3);
     expect(api.unmatched()).toEqual([]);

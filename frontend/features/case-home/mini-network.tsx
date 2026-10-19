@@ -10,7 +10,7 @@ import type {KeyboardEvent, ReactElement} from 'react';
 
 import {linkSpan, shownAsOf} from '../../lib/as-of';
 
-import {getInvestigationGraphOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getInvestigationGraphOptions, getStandingOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {RelationshipOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -82,6 +82,8 @@ function Mark({shape}: {shape: Shape}): ReactElement {
 
 export function MiniNetwork({investigationId}: {investigationId: string}): ReactElement {
   const graphQuery = useQuery({...getInvestigationGraphOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  // Every party in the case, counted on the server (the same standing Case home reads).
+  const inCase = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data?.network.parties;
   const graph = graphQuery.data;
   const pointed = useWorkbenchStore(state => state.pointedParty);
   const point = useWorkbenchStore(state => state.setPointedParty);
@@ -177,7 +179,7 @@ export function MiniNetwork({investigationId}: {investigationId: string}): React
       <span><i className="ch-key ch-key-supported"/>shown</span>
       <span><i className="ch-key ch-key-unshown"/>not yet shown</span>
       <span><i className="ch-key ch-key-disputed"/>disputed</span>
-      <span className="ch-net-count">{nodes.length} parties · {edges.length} links{asOf !== null ? ` · as of ${asOf}` : ''}</span>
+      <span className="ch-net-count" title={`${linked.size} ${linked.size === 1 ? 'party has' : 'parties have'} a link${asOf !== null ? ` as of ${asOf}` : ''}. ${inCase !== undefined ? `The case holds ${inCase} in all. ` : ''}The six most linked are drawn.`}>{linked.size} linked{inCase !== undefined ? ` · ${inCase} in the case` : ''}{asOf !== null ? ` · as of ${asOf}` : ''}</span>
     </figcaption>
   </figure>;
 }

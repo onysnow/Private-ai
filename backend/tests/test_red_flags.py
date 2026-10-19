@@ -137,6 +137,9 @@ def test_repeated_payments_just_under_10000_dollars_are_faint_and_say_what_is_no
     assert flag["not_shown"] == ["whether the money was cash", "whether it was split to avoid the report"]
     assert "from 2024-01-02 to 2024-01-03" in flag["summary"]
     assert "Treasury" in flag["indicator"]["levels"]["faint"] and "not a rule" in flag["indicator"]["levels"]["threshold_note"]
+    # Its area is the one its catalogue entry sits in, as its name says, not the first of its other areas (CY).
+    assert (flag["indicator"]["area"], flag["indicator"]["area_name"]) == ("ML", "Money laundering")
+    assert "CY" not in {a["key"] for a in _flags(inv)["investigation_type"]["suggested"]}
 
 
 def test_payments_between_companies_with_a_shared_owner_are_faint():

@@ -34,6 +34,14 @@ describe('sentences', () => {
     expect(s[1].from).toBe(37);
     expect(s[2].to).toBe(115);
   });
+  it('does not end a sentence at an initial or a title (as the server counts them)', () => {
+    const s = sentencesOf([
+      {kind: 'text', text: 'M. Ross, named by Dr. Weber, was paid ', pos: 1},
+      {kind: 'cite', recordId: 'c5', pos: 39},
+      {kind: 'text', text: '. The money went on, e.g. to Kestrel SA.', pos: 40},
+    ]);
+    expect(s.map(x => [x.from, x.cited])).toEqual([[1, true], [42, false]]);
+  });
 });
 
 const claim = (id: string, text: string, state: string, evidence: unknown[] = []) => ({id, text, status: state === 'shown' ? 'supported' : state === 'disputed' ? 'disputed' : 'unverified',
@@ -75,6 +83,9 @@ describe('StoryScreen', () => {
     const gates = screen.getByRole('region', {name: 'Gates'});
     expect(within(gates).getByText('Gates · 0 of 5 passed')).toBeInTheDocument();
     expect(within(gates).getByRole('button', {name: 'Ready to run'})).toBeDisabled();
+    // The gates sit under the thesis (mockup ACT_2), beside the tree, not inside it.
+    expect(gates.closest('.sy-col-thesis')).not.toBeNull();
+    expect(tree.contains(gates)).toBe(false);
     expect(screen.getByRole('button', {name: 'Export for publication'})).toBeDisabled();
     expect(screen.getByText('Start the write-up first')).toBeInTheDocument();
   });

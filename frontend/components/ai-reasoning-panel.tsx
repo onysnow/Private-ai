@@ -27,6 +27,7 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Download, FileText, Presentation} from 'lucide-react';
+import {askBeforeYouRun} from '../features/ai/before-you-run';
 import {RecordPicker} from './presentation/record-picker';
 import type {SelectedRef} from './presentation/record-picker';
 import {DraftPreview} from './presentation/draft-preview';
@@ -244,17 +245,11 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
     }
     if(!question.trim())return;
     if(module==='hypothesis_test'&&!theory.trim()){setRunStatus('A working theory is required for a hypothesis test.');return}
-    setRunning(true);setRunStatus('Running… the model output is validated against the retrieval packet before it can be reviewed.');
-    try{
-      const body:Record<string,unknown>={question:question.trim(),max_results:maxResults,include_external_leads:includeLeads};
-      if(module==='hypothesis_test')body.working_theory=theory.trim();
-      const path=module==='case_synthesis'?'case-synthesis':'hypothesis-test';
-      const result=await startRun(`/api/investigations/${investigationId}/assistant/${path}`,body);
-      setRunStatus(`Proposed for review (candidate ${result.candidate_id}). Nothing has been written to the investigation.`);
-      await loadQueue();
-      await open(result.candidate_id);
-    }catch(error){setRunStatus(runFailureMessage(error));await loadQueue()}
-    finally{setRunning(false)}
+    // Case synthesis and theory tests go through Before you run (Act › AI runs): the plan, the settings and what
+    // leaves the computer are seen before anything is sent. Nothing runs from here.
+    if(module!=='case_synthesis'&&module!=='hypothesis_test')return;
+    setRunStatus('');
+    askBeforeYouRun(investigationId,{module,question:question.trim(),theory:module==='hypothesis_test'?theory.trim():'',maxResults,includeLeads});
   };
 
   const review=async(decision:'accept'|'reject')=>{
@@ -305,8 +300,8 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
         <Select value={module} onValueChange={(v:string)=>setModule(v as AiModuleName)} disabled={!anyCallable||running}><SelectTrigger aria-label="Reasoning module" className="w-auto"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="case_synthesis">Case synthesis</SelectItem><SelectItem value="hypothesis_test">Hypothesis test</SelectItem><SelectItem value="presentation_draft">Presentation draft</SelectItem></SelectContent></Select>
         {module!=='presentation_draft'&&<>
           <Input aria-label="Question" value={question} onChange={(e:ChangeEvent<HTMLInputElement>)=>setQuestion(e.target.value)} placeholder="What does the evidence establish about …?" disabled={!callable||running} className="min-w-[12rem] flex-1"/>
-          <Input aria-label="Max retrieval results" type="number" min={1} max={100} value={maxResults} onChange={(e:ChangeEvent<HTMLInputElement>)=>setMaxResults(Math.min(100,Math.max(1,Number(e.target.value)||30)))} className="w-20" disabled={!callable||running}/>
-          <label className="muted flex items-center gap-1.5 text-sm"><input type="checkbox" className="accent-[hsl(var(--primary))]" checked={includeLeads} onChange={(e:ChangeEvent<HTMLInputElement>)=>setIncludeLeads(e.target.checked)} disabled={!callable||running}/> include external leads</label>
+          <Input aria-label="Max retrieval results" type="number" min={1} max={100} value={maxResults} onChange={(e:ChangeEvent<HTMLInputElement>)=>setMaxResults(Math.min(100,Math.max(1,Number(e.target.value)||30)))} className="w-20" style={{flex:'0 0 5rem',width:'5rem',minWidth:0}} disabled={!callable||running}/>
+          <label className="muted flex items-center gap-1.5 text-sm" style={{whiteSpace:'nowrap'}}><input type="checkbox" className="accent-[hsl(var(--primary))]" style={{flex:'none'}} checked={includeLeads} onChange={(e:ChangeEvent<HTMLInputElement>)=>setIncludeLeads(e.target.checked)} disabled={!callable||running}/> include external leads</label>
         </>}
         <Button onClick={run} disabled={!callable||running||(module==='presentation_draft'?(!goal.trim()||selectedRefs.length===0):!question.trim())}>{running?'Running…':'Run module'}</Button>
       </div>

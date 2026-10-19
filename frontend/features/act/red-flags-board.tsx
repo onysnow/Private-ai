@@ -101,6 +101,9 @@ export function changesSince(flags: RedFlagOut[], gone: RedFlagOut[], since: str
 }
 
 const REPLAY_MS = 1600;
+// Rows enter with a short stagger: the first six one after another, the rest together (research Act §1).
+const STAGGER_MS = 40;
+const STAGGER_MAX = 6;
 const REPLAY_MAX = 6;
 function calm(): boolean {
   if (typeof window === 'undefined') return true;
@@ -176,7 +179,11 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
     if (!investigationId) return;
     try {
       setSince(window.localStorage.getItem(lastVisitKey(investigationId)));
-      return () => { try { window.localStorage.setItem(lastVisitKey(investigationId), new Date().toISOString()); } catch { /* best effort */ } };
+      // This visit becomes the last one when the board closes: on leaving the screen, and on closing or reloading
+      // the tab (React's cleanup does not run then).
+      const keep = () => { try { window.localStorage.setItem(lastVisitKey(investigationId), new Date().toISOString()); } catch { /* best effort */ } };
+      window.addEventListener('pagehide', keep);
+      return () => { window.removeEventListener('pagehide', keep); keep(); };
     } catch { return undefined; }
   }, [investigationId]);
   const isNew = (f: RedFlagOut) => since !== null && utcTime(f.first_seen_at) > utcTime(since);
@@ -187,6 +194,8 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
   const shown = pool.filter(f => (aside || levels[f.level as keyof Levels]) && (!area || f.indicator?.area === area)
     && (!party || f.parties.some(p => p.id === party)) && (!onlyNew || isNew(f)));
   const kinds = useMemo(() => groupFlags(shown), [shown]); // eslint-disable-line react-hooks/exhaustive-deps
+  const asideCount = flags.length - live.length;
+  useEffect(() => { if (aside && asideCount === 0 && flags.length) setAside(false); }, [aside, asideCount, flags.length]);
   const kind = kinds.find(k => k.key === picked) ?? kinds[0];
   const flag = kind ? kind.flags[Math.min(step, kind.flags.length - 1)] : undefined;
   // Pointing at a row previews its flag in the centre; the chosen one comes back when the pointer leaves the list.
@@ -210,7 +219,13 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
     setStep(Math.max(0, flags.filter(f => `${f.indicator_id}:${f.level}` === key && isAside(f) === isAside(target)).findIndex(f => f.id === target.id)));
   }, [askedFlag, flags]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const pick = (key: string) => { setPicked(key); setStep(0); };
+  // Selecting a row slides the centre along the list's axis: down the list, the new flag comes up from below.
+  const [dir, setDir] = useState<'down' | 'up'>('down');
+  const pick = (key: string) => {
+    const from = kinds.findIndex(k => k.key === kind?.key); const to = kinds.findIndex(k => k.key === key);
+    if (from >= 0 && to >= 0 && to !== from) setDir(to > from ? 'down' : 'up');
+    setPicked(key); setStep(0);
+  };
   const move = (by: number) => {
     if (!kinds.length) return;
     const at = Math.max(0, kinds.findIndex(k => k.key === kind?.key));
@@ -219,10 +234,27 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
     listRef.current?.querySelector<HTMLElement>(`[data-kind="${next.key}"]`)?.scrollIntoView?.({block: 'nearest'});
   };
   const [asking, setAsking] = useState(false);
+  const openRef = useRef<HTMLElement>(null);
+  /** L cycles the level filter: all → Textbook → Strong → Faint → all. */
+  const cycleLevels = () => {
+    setAside(false); setPicked(null);
+    setLevels(v => {
+      const only = (['textbook', 'strong', 'faint'] as const).filter(l => v[l]);
+      const next = only.length === 3 ? 'textbook' : only.length === 1 && only[0] === 'textbook' ? 'strong' : only.length === 1 && only[0] === 'strong' ? 'faint' : null;
+      return next ? {textbook: next === 'textbook', strong: next === 'strong', faint: next === 'faint'} : {textbook: true, strong: true, faint: true};
+    });
+  };
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.target instanceof Element && e.target.closest('input, textarea, select')) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.key === 'j') { e.preventDefault(); setHover(null); move(1); }
+    const row = e.target instanceof Element ? e.target.closest<HTMLElement>('.rb-row') : null;
+    // Enter on a row opens it and moves into the open flag; Esc goes back to the list.
+    if (e.key === 'Enter' && row) { e.preventDefault(); setHover(null); const key = row.dataset.kind; if (key) pick(key); window.setTimeout(() => openRef.current?.focus(), 0); return; }
+    if (e.key === 'Escape' && !row && e.target instanceof Element && e.target.closest('.rb-open, .rb-before')) {
+      e.preventDefault(); listRef.current?.querySelector<HTMLElement>('.rb-row.on')?.focus(); return;
+    }
+    if (e.key === 'l' || e.key === 'L') { e.preventDefault(); cycleLevels(); }
+    else if (e.key === 'j') { e.preventDefault(); setHover(null); move(1); }
     else if (e.key === 'k') { e.preventDefault(); setHover(null); move(-1); }
     else if (e.key === ']' && kind) { e.preventDefault(); setStep(s => Math.min(kind.flags.length - 1, s + 1)); }
     else if (e.key === '[') { e.preventDefault(); setStep(s => Math.max(0, s - 1)); }
@@ -299,6 +331,7 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
               const fresh = k.flags.some(isNew);
               return <button key={k.key} id={`rb-${k.key}`} type="button" role="option" aria-selected={k.key === kind?.key} data-kind={k.key}
                 className={`rb-row level-${k.level}${k.key === kind?.key ? ' on' : ''}${k.key === previewKind?.key ? ' peek' : ''}${k.key === litKey ? ' lit' : ''}`}
+                style={{animationDelay: `${Math.min(i, STAGGER_MAX) * STAGGER_MS}ms`}}
                 onClick={() => { setHover(null); pick(k.key); }} onMouseEnter={() => setHover(k.key)}
                 aria-label={`Rank ${i + 1}, ${LEVEL[k.level]?.name ?? k.level}, ${k.name}${k.flags.length > 1 ? `, ${k.flags.length} found` : ''}, ${first.parties.slice(0, 2).map(p => p.name).join(' and ')}${first.parties.length > 2 ? ` and ${first.parties.length - 2} more` : ''}`}>
                 <span className="rb-rank">{i + 1}</span>
@@ -321,8 +354,8 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
         </section>}
       </div>
 
-      <section className={`rb-open level-${openFlag?.level ?? 'none'}${previewKind ? ' preview' : ''}`} aria-label={previewKind ? 'Preview of a Red Flag' : 'The open Red Flag'}
-        aria-live={previewKind ? 'off' : 'polite'}>
+      <section ref={openRef} tabIndex={-1} data-dir={dir} className={`rb-open level-${openFlag?.level ?? 'none'}${previewKind ? ' preview' : ''}`}
+        aria-label={previewKind ? 'Preview of a Red Flag' : 'The open Red Flag'} aria-live={previewKind ? 'off' : 'polite'}>
         {previewKind && openFlag ? <OpenFlag key={`peek-${openFlag.id}`} flag={openFlag} kind={previewKind} step={0} setStep={() => undefined} investigationId={investigationId}
           asking={false} setAsking={() => undefined} preview {...actionsFor(openFlag)}/>
           : flag && kind ? <OpenFlag key={flag.id} flag={flag} kind={kind} step={step} setStep={setStep} investigationId={investigationId}
@@ -349,7 +382,7 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
   return <>
     {preview && <p className="rb-peek-note">Preview · click the row to open it; move off the list to go back</p>}
     <div className="rb-open-head">
-      <span><LevelMark level={flag.level}/> <span className="rb-mono">{flag.indicator_id} · {ind?.area_name ?? ''} · rule v{flag.rule_version} · first seen {first.getDate()} {first.toLocaleString('en-GB', {month: 'short'})}</span></span>
+      <span><LevelMark level={flag.level}/> <span className="rb-mono">{flag.indicator_id} · {ind?.area_name ?? ''} · rule v{flag.rule_version} · first seen {first.getUTCDate()} {first.toLocaleString('en-GB', {month: 'short', timeZone: 'UTC'})}</span></span>
       {kind.flags.length > 1 && !preview && <span className="rb-step" role="group" aria-label="Flags of this kind">
         <button type="button" onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0} aria-label="Previous of this kind">‹</button>
         <span><b>{Math.min(step, kind.flags.length - 1) + 1}</b> of {kind.flags.length}</span>
@@ -411,6 +444,16 @@ function Picture({flag, investigationId}: {flag: RedFlagOut; investigationId: st
     return <Payments pays={pays}/>;
   }
   const names = flag.parties.map(p => p.name);
+  if (family === 'shared_property') {
+    // Two (or more) parties and the one detail they share, with no link drawn between them: none is in the records.
+    const facts = flag.facts as {kind?: string; value?: string; spellings?: string[]};
+    const others = (facts.spellings ?? []).filter(v => v !== facts.value);
+    return <figure className="rb-picture rb-shared" aria-label={`${names.join(' and ')} share the ${facts.kind ?? 'detail'} ${facts.value ?? ''}`}>
+      <figcaption><span>What they share</span><small>no link joins them in the records</small></figcaption>
+      <p className="rb-shared-row">{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> · </i>}<b>{n}</b></span>)}</p>
+      <p className="rb-shared-value"><small>{facts.kind ?? 'detail'}</small> “{facts.value}”{others.length > 0 && <i> also written “{others.join('”, “')}”</i>}</p>
+    </figure>;
+  }
   if (family === 'cycle') return <figure className="rb-picture rb-loop" aria-label={`A loop: ${names.join(' → ')} → ${names[0]}`}>
     <figcaption><span>The loop it rests on</span></figcaption>
     <p>{names.map((n, i) => <span key={i}><b>{n}</b> → </span>)}<b>{names[0]}</b> ↺</p>
@@ -419,6 +462,41 @@ function Picture({flag, investigationId}: {flag: RedFlagOut; investigationId: st
     <figcaption><span>The parties it rests on</span>{unshown(flag) > 0 && <small>○ {unshown(flag)} link{unshown(flag) === 1 ? '' : 's'} not yet shown</small>}</figcaption>
     <p>{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}<b>{n}</b></span>)}</p>
   </figure>;
+}
+
+type Box = {x0: number; x1: number; y0: number; y1: number};
+const hits = (a: Box, b: Box) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+/** Where each payment's label goes (its baseline and anchor): the first of above, beside or below it, on the right
+ * and then on the left, that stays inside the picture and crosses no label placed before it, no payment dot and not
+ * the reporting line. */
+export function placeLabels(points: {x: number; y: number; w: number}[], {line, left, right}: {line: number; left: number; right: number}):
+  {x: number; y: number; anchor: 'start' | 'end'}[] {
+  const H = 12; const R = 9;
+  const taken: Box[] = points.map(p => ({x0: p.x - R, x1: p.x + R, y0: p.y - R, y1: p.y + R}));
+  return points.map(p => {
+    const tries = [{dx: 13, dy: -9}, {dx: 13, dy: 4}, {dx: 13, dy: 20}, {dx: -13, dy: -9}, {dx: -13, dy: 4}, {dx: -13, dy: 20}].map(t => {
+      const base = p.y + t.dy;
+      const x0 = t.dx > 0 ? p.x + t.dx : p.x + t.dx - p.w;
+      return {at: {x: p.x + t.dx, y: base, anchor: (t.dx > 0 ? 'start' : 'end') as 'start' | 'end'}, box: {x0, x1: x0 + p.w, y0: base - H + 2, y1: base + 2}};
+    });
+    const fits = (b: Box) => b.x0 >= left && b.x1 <= right && !(b.y0 < line && b.y1 > line) && !taken.some(o => hits(o, b));
+    const pick = tries.find(t => fits(t.box)) ?? tries.find(t => t.box.x0 >= left && t.box.x1 <= right) ?? tries[0];
+    taken.push(pick.box);
+    return pick.at;
+  });
+}
+
+/** The first day of each month between two times, as axis ticks ("Mar", "Apr", …); at most eight, spread evenly. */
+export function monthTicks(t0: number, t1: number): {t: number; label: string; year: number}[] {
+  const out: {t: number; label: string; year: number}[] = [];
+  const d = new Date(t0); let m = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+  while (m <= t1) {
+    const at = new Date(m);
+    out.push({t: m, label: at.toLocaleDateString('en-GB', {month: 'short', timeZone: 'UTC'}), year: at.getUTCFullYear()});
+    m = Date.UTC(at.getUTCFullYear(), at.getUTCMonth() + 1, 1);
+  }
+  const every = Math.ceil(out.length / 8);
+  return out.filter((_, i) => i % every === 0);
 }
 
 const CERTAINTY_WORD: Record<FinancialTransactionOut['certainty'], string> = {shown: '✓ Shown', not_yet_shown: '○ Not yet shown', disputed: '✕ Disputed'};
@@ -439,12 +517,18 @@ function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
     return () => el.removeEventListener('wheel', stop);
   }, [pays.length]);
   const currency = pays[0].currency; const sign = ({EUR: '€', USD: '$', GBP: '£'} as Record<string, string>)[currency] ?? '';
-  const W = 560; const H = 150; const lo = 8800; const hi = 10200;
+  const W = 560; const H = 170; const L = 50; const R = 14; const TOP = 22; const BOTTOM = 26; const lo = 8800; const hi = 10200;
   const ts = pays.map(p => new Date(`${p.dateTime}T00:00:00Z`).getTime());
   const t0 = Math.min(...ts) - 864e5 * 10; const t1 = Math.max(...ts) + 864e5 * 10;
-  const x = (t: number) => 40 + ((t - t0) / (t1 - t0)) * (W - 60);
-  const y = (a: number) => 20 + (1 - (Math.min(hi, Math.max(lo, a)) - lo) / (hi - lo)) * (H - 50);
+  const x = (t: number) => L + ((t - t0) / (t1 - t0)) * (W - L - R);
+  const y = (a: number) => TOP + (1 - (Math.min(hi, Math.max(lo, a)) - lo) / (hi - lo)) * (H - TOP - BOTTOM);
   const day = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'});
+  const short = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', timeZone: 'UTC'});
+  const months = monthTicks(t0, t1);
+  // Each label takes the first of six places (above, beside or below its payment, right then left) that crosses no other
+  // label, no payment and not the reporting line, so no two overlap.
+  const text = (p: FinancialTransactionOut) => `${sign}${p.amount.toLocaleString('en-GB')} · ${short(p.dateTime!)}`;
+  const labels = placeLabels(pays.map((p, i) => ({x: x(ts[i]), y: y(p.amount), w: text(p).length * 6.4})), {line: y(10000), left: L, right: W - R});
   const cur = pays[at];
   const onKey = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); setFocus(Math.min(pays.length - 1, at + 1)); }
@@ -454,16 +538,22 @@ function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
     aria-label={pays.length > 1 ? 'The payments it rests on: scroll over, or use the arrow keys, to step through them' : undefined} {...wheel}>
     <figcaption><span>The payments it rests on</span><small>{pays.length > 1 ? <>scroll over to step through · <b>{at + 1}</b> of {pays.length} shown</> : `${pays.length} shown`}</small></figcaption>
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${pays.length} payments between ${sign}9,000 and ${sign}10,000, by date`}>
-      <rect x={40} y={y(10000)} width={W - 60} height={y(9000) - y(10000)} className="rb-band"/>
-      <text x={44} y={y(10000) + 12} className="rb-band-label">{sign}9,000–{sign}10,000 band</text>
-      <line x1={40} x2={W - 20} y1={y(10000)} y2={y(10000)} className="rb-threshold"/>
-      <text x={W - 20} y={y(10000) - 5} textAnchor="end" className="rb-threshold-label">{sign}10,000 reporting line</text>
-      {pays.map((p, i) => <g key={p.id} className={`rb-pay c-${p.certainty}${i === at ? ' focus' : ''}`}>
-        {i === at && <circle cx={x(ts[i])} cy={y(p.amount)} r={12} className="rb-pay-ring"/>}
-        <circle cx={x(ts[i])} cy={y(p.amount)} r={7}/>
-        <text x={x(ts[i])} y={y(p.amount) + 4} textAnchor="middle" className="rb-pay-mark">{p.certainty === 'shown' ? '✓' : p.certainty === 'disputed' ? '✕' : '○'}</text>
-        <text x={x(ts[i]) > W - 120 ? x(ts[i]) - 13 : x(ts[i]) + 13} y={y(p.amount) - 9} textAnchor={x(ts[i]) > W - 120 ? 'end' : 'start'} className="rb-pay-label">{sign}{p.amount.toLocaleString('en-GB')} · {p.dateTime!.slice(5)}</text>
-      </g>)}
+      <rect x={L} y={y(10000)} width={W - L - R} height={y(9000) - y(10000)} className="rb-band"/>
+      <text x={L + 4} y={y(10000) + 12} className="rb-band-label">{sign}9,000–{sign}10,000 band</text>
+      {[10000, 9000].map(v => <text key={v} x={L - 6} y={y(v) + 3} textAnchor="end" className="rb-axis">{v.toLocaleString('en-GB')}</text>)}
+      <line x1={L} x2={W - R} y1={y(10000)} y2={y(10000)} className="rb-threshold"/>
+      <text x={W - R} y={y(10000) - 5} textAnchor="end" className="rb-threshold-label">{sign}10,000 reporting line</text>
+      <line x1={L} x2={W - R} y1={H - BOTTOM + 4} y2={H - BOTTOM + 4} className="rb-axis-line"/>
+      {months.map((m, i) => <text key={m.t} x={x(m.t)} y={H - 6} textAnchor="middle" className="rb-axis">{m.label}{i === months.length - 1 ? ` ${m.year}` : ''}</text>)}
+      {pays.map((p, i) => {
+        const cx = x(ts[i]); const cy = y(p.amount);
+        return <g key={p.id} className={`rb-pay c-${p.certainty}${i === at ? ' focus' : ''}`}>
+          {i === at && <circle cx={cx} cy={cy} r={12} className="rb-pay-ring"/>}
+          <circle cx={cx} cy={cy} r={7}/>
+          <text x={cx} y={cy + 4} textAnchor="middle" className="rb-pay-mark">{p.certainty === 'shown' ? '✓' : p.certainty === 'disputed' ? '✕' : '○'}</text>
+          <text x={labels[i].x} y={labels[i].y} textAnchor={labels[i].anchor} className="rb-pay-label">{text(p)}</text>
+        </g>;
+      })}
     </svg>
     <p className="rb-pay-focus" aria-live="polite"><b>{sign}{cur.amount.toLocaleString('en-GB')}{sign ? '' : ` ${currency}`}</b> on {day(cur.dateTime!)} · {cur.from} → {cur.to}
       {' '}<span className={`rb-pay-word c-${cur.certainty}`}>{CERTAINTY_WORD[cur.certainty]}</span>{cur.evidence ? <i> · {cur.evidence}</i> : null}</p>
@@ -494,7 +584,8 @@ function BeforeYouCallIt({flag, investigationId, ranAt}: {flag: RedFlagOut; inve
         <span className="inn-mark" aria-hidden="true">{i.state === 'ruled_out' ? '✓' : i.state === 'could_apply' ? '!' : '○'}</span>
         <span className="inn-body">
           <span>{i.text}</span>
-          {i.state === 'ruled_out' && i.note && <small><i>Ruled out: {i.note}</i></small>}
+          {i.state === 'not_looked_at' && <small>Not looked at</small>}
+          {i.state === 'ruled_out' && <small><i>Ruled out{i.note ? `: ${i.note}` : ''}</i></small>}
           {i.state === 'could_apply' && <small>Could apply{i.note ? `: ${i.note}` : ''}</small>}
           {ruling === i.text ? <Form {...ruleOut}><form className="inn-why" noValidate onSubmit={submitWith(ruleOut, async ({note}) => {
             // The failure shows in this form, so not again under the list.

@@ -98,6 +98,15 @@ export function ClaimDecision({candidate, item, onSaved, compact = false}: {
   </div>;
 }
 
+// What the parts of each answer are called, one and many: a synthesis has claims, a logic check arguments, and so on.
+const PARTS: Record<string, [string, string]> = {
+  hypothesis_test: ['hypothesis', 'hypotheses'], las_argument_check: ['argument', 'arguments'], das_options: ['option', 'options'],
+  evidence_plan: ['plan item', 'plan items'], ehs_harm_minimisation: ['harm', 'harms'], ehs_public_interest: ['element', 'elements'], quant_framing: ['rival', 'rivals'],
+};
+const partWords = (module: string | undefined, n: number) => `${n} ${(PARTS[module ?? ''] ?? ['claim', 'claims'])[n === 1 ? 0 : 1]}`;
+// Only a case synthesis and a theory test give each claim a likelihood (TAS's confidence term); an old answer may lack it.
+const HAS_LIKELIHOOD = new Set(['case_synthesis', 'hypothesis_test']);
+
 /** Step 4 of Ask the case: every claim of the answer, decided one by one, then the whole answer accepted or rejected. */
 export function ReviewSheet({candidateId, header, onBack, onSaved, active = true}: {
   candidateId: string | null; header: ReactNode; onBack: () => void; onSaved?: () => void; active?: boolean;
@@ -137,6 +146,7 @@ export function ReviewSheet({candidateId, header, onBack, onSaved, active = true
   const counts = {keep: 0, correct: 0, reject: 0, wait: 0};
   for (const i of items) counts[(i.decision?.decision as 'keep' | 'correct' | 'reject' | undefined) ?? 'wait'] += 1;
   const open = candidate?.review_status === 'proposed';
+  const likely = HAS_LIKELIHOOD.has(candidate?.module ?? '');
   return <section className="br br-review" aria-label="Review the answer" ref={rootRef}>
     {header}
     {!candidateId ? <p className="br-tray">This run saved no answer to review. <button type="button" className="br-quiet" onClick={onBack}>Back to the run</button></p>
@@ -145,7 +155,7 @@ export function ReviewSheet({candidateId, header, onBack, onSaved, active = true
       : !items.length ? <p className="br-tray">This answer has no claims to decide one by one; accept or reject it as a whole. <button type="button" className="br-quiet" onClick={onBack}>Back to the run</button></p>
       : <>
         <div className="cr-bar">
-          <p role="status"><b>{items.length} {candidate?.module === 'hypothesis_test' ? 'hypotheses' : 'claims'}</b> · {counts.keep} kept · {counts.correct} corrected · {counts.reject} rejected · <em>{counts.wait} wait for you</em></p>
+          <p role="status"><b>{partWords(candidate?.module, items.length)}</b> · {counts.keep} kept · {counts.correct} corrected · {counts.reject} rejected · <em>{counts.wait} wait for you</em></p>
           <UnderlineKey/>
           <button type="button" className="br-quiet" onClick={onBack}>Back to the run</button>
         </div>
@@ -153,17 +163,17 @@ export function ReviewSheet({candidateId, header, onBack, onSaved, active = true
           <ol className="cr-list" ref={listRef} aria-label="The answer’s claims">
             {items.map((i, n) => <li key={i.id} className={`${n === at ? 'on' : ''}${i.decision ? ` ${i.decision.decision}` : ''}`}>
               <button type="button" onClick={() => setAt(n)} aria-current={n === at ? 'true' : undefined}
-                aria-label={`${i.id}, ${words(i.classification) || 'unclassified'}, ${i.confidenceTerm ? words(i.confidenceTerm).toLowerCase() : 'no likelihood given'}, ${i.grounded.length} source${i.grounded.length === 1 ? '' : 's'}, ${decisionWords(i.decision)}`}>
+                aria-label={`${i.id}, ${[words(i.classification) || (likely ? 'unclassified' : ''), i.confidenceTerm ? words(i.confidenceTerm).toLowerCase() : likely ? 'no likelihood given' : ''].filter(Boolean).join(', ')}, ${i.grounded.length} source${i.grounded.length === 1 ? '' : 's'}, ${decisionWords(i.decision)}`}>
                 <DecisionShape decision={i.decision?.decision}/><span className="cr-id">{i.id}</span>
                 <span className="cr-row-text"><ClaimText item={i} reviewStatus={candidate?.review_status}/></span>
                 <small>{words(i.classification)}{i.confidenceTerm ? ` · ${words(i.confidenceTerm).toLowerCase()}` : ''}</small>
                 <b>{i.decision ? decisionWords(i.decision).split(' · ')[0] : 'waits'}</b></button></li>)}
           </ol>
           {item && candidate && <div className="cr-detail" aria-label={`${item.id} in full`} role="region">
-            <p className="br-eyebrow">{item.id} · {words(item.classification) || 'unclassified'} <span className="br-chip ai">model says</span></p>
+            <p className="br-eyebrow">{item.id}{words(item.classification) || likely ? ` · ${words(item.classification) || 'unclassified'}` : ''} <span className="br-chip ai">model says</span></p>
             <p className="cr-big"><ClaimText item={item} reviewStatus={candidate.review_status}/></p>
             <dl className="br-facts">
-              <dt>Likelihood</dt><dd>{item.confidenceTerm ? `model: ${words(item.confidenceTerm).toLowerCase()}` : 'not given (old format)'}</dd>
+              {(likely || item.confidenceTerm) && <><dt>Likelihood</dt><dd>{item.confidenceTerm ? `model: ${words(item.confidenceTerm).toLowerCase()}` : 'not given (old format)'}</dd></>}
               <dt>Rests on</dt><dd>{item.refs.length ? <ul className="wr-refs">{item.refs.map(r => {
                 const inPacket = item.grounded.some(g => g.record_type === r.record_type && g.record_id === r.record_id);
                 return <li key={`${r.record_type}:${r.record_id}`} className={inPacket ? '' : 'out'}><b>{r.record_type}:{r.record_id.slice(0, 8)}</b> {inPacket ? 'in the packet' : 'not in the packet'}</li>;

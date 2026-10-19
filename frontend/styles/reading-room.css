@@ -65,6 +65,10 @@
 .rr-side-head [role=radio] { all: unset; cursor: pointer; padding: 3px 9px; border-radius: 99px; font-size: 11.5px; color: var(--text-muted); border: 1px solid transparent; }
 .rr-side-head [role=radio][aria-checked=true] { border-color: var(--line); color: var(--text); background: var(--surface-2); }
 .rr-side-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 10px; padding: 2px 4px 30px 2px; }
+.rr-elsewhere { margin: 0; }
+.rr-elsewhere a { color: var(--accent-2); text-underline-offset: 2px; }
+.rr-elsewhere a:hover { color: var(--text); }
+.rr-elsewhere a:focus-visible { outline: 2px solid var(--accent-1); border-radius: 3px; }
 .rr-clip { padding: 12px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
 .rr-clip .rr-eyebrow { display: flex; align-items: center; gap: 8px; }
 .rr-clip .rr-eyebrow .st { margin-left: auto; }
@@ -148,3 +152,27 @@
 .rr-anchor { display: inline-block; width: 0; height: 1em; vertical-align: baseline; }
 @media (max-width: 1000px) { .rr { grid-template-columns: 1fr; grid-template-areas: 'top' 'main' 'side' 'foot'; grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr) auto; overflow: auto; } .rr-pages { display: none; } .rr-leader { display: none; } }
 .fr-hint { z-index: 65; }
+
+/* Pointing (research §6): a card and its words light together; every control answers the pointer. */
+.rr-span.lit { text-decoration-style: solid; text-decoration-color: var(--accent-1); }
+.rr-card { transition: border-color 160ms var(--ease-out), opacity 160ms; }
+.rr-card.lit:not(.on) { border-color: color-mix(in srgb, var(--accent-1) 45%, transparent); }
+.rr-card:not(.on):not(.lit):hover { border-color: var(--line); }
+.rr-q button:hover, .rr-answers button:not(:disabled):hover, .rr-held button:hover, .rr-batch-acts button:hover, .rr-next:hover, .rr-undo:hover { border-color: var(--accent-1); }
+.rr-answers button.p:not(:disabled):hover, .rr-next:hover { filter: brightness(1.08); }
+.rr-why-btn:hover { text-decoration: underline; }
+.rr-tabs [role=tab]:not([aria-selected=true]):hover, .rr-side-head [role=radio]:not([aria-checked=true]):hover, .rr-close:hover { color: var(--text); }
+.rr-nav button:not(:disabled):hover { background: var(--surface-3); }
+.rr-pages button:not([aria-current=true]):hover .rr-thumb { box-shadow: 0 0 0 2px var(--line); }
+.rr-card-kind { font: 400 13px var(--font-ui); color: var(--text-muted); }
+.rr-undo { all: unset; cursor: pointer; margin-left: auto; display: inline-flex; gap: 6px; align-items: center; padding: 3px 9px; border-radius: 8px; border: 1px solid var(--line);
+  font: 500 11.5px var(--font-ui); letter-spacing: 0; text-transform: none; color: var(--text); }
+.rr-undo:focus-visible { outline: 2px solid var(--accent-1); }
+.rr-clip-held { border: 1px dashed var(--line); }
+/* Motion (research §6–7): a decision folds into its one-line receipt (motion.feedback 160 ms), Why? and a new clip open
+   with motion.reveal (240 ms), the Accept preview fades in. Calm motion and reduced motion make them instant (themes.css). */
+.rr-held { animation: rr-fold 160ms var(--ease-out) both; }
+.rr-why, .rr-clip, .rr-batch { animation: rr-reveal 240ms var(--ease-out) both; }
+.rr-accept-wrap:hover .rr-impact, .rr-accept-wrap:focus-within .rr-impact { animation: rr-reveal 160ms var(--ease-out) both; }
+@keyframes rr-fold { from { opacity: 0; transform: scaleY(.6); transform-origin: top; } }
+@keyframes rr-reveal { from { opacity: 0; transform: translateY(-4px); } }

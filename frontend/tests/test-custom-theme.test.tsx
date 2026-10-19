@@ -157,7 +157,7 @@ describe('the theme maker', () => {
     await user.click(within(maker).getByRole('button', {name: 'Save and try it'}));
     expect(customThemes()).toMatchObject([{name: 'Night desk', base: 'rain-noir', colours: {'text-muted': '#C8BFB2'}}]);
     expect(screen.queryByRole('region', {name: 'Make your own theme'})).toBeNull();
-    expect(screen.getByRole('radio', {name: 'Night desk theme (your own), trying'})).toBeInTheDocument();
+    expect(screen.getByRole('radio', {name: /^Night desk theme \(your own\), trying, lowest contrast/})).toBeInTheDocument();
     const bar = screen.getByRole('status', {name: ''});
     expect(bar).toHaveTextContent('Trying Night desk');
     await user.click(within(bar).getByRole('button', {name: 'Keep Night desk'}));
@@ -171,7 +171,7 @@ describe('the theme maker', () => {
     keepAppearance({custom: saved.theme.id});
     panel();
     const user = userEvent.setup();
-    expect(screen.getByRole('radio', {name: 'Night desk theme (your own), in use'})).toHaveAttribute('data-theme', 'rain-noir');
+    expect(screen.getByRole('radio', {name: /^Night desk theme \(your own\), in use, lowest contrast/})).toHaveAttribute('data-theme', 'rain-noir');
     await user.click(screen.getByRole('button', {name: 'Edit'}));
     const maker = screen.getByRole('region', {name: 'Edit Night desk'});
     const name = within(maker).getByRole('textbox', {name: 'Name'});

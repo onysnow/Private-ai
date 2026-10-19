@@ -57,15 +57,23 @@ def _saved_candidate(db: Session, job: BackgroundJob) -> AIAnalysisCandidate | N
 def serialize_run(db: Session, job: BackgroundJob) -> dict[str, Any]:
     payload = job.payload or {}
     candidate = _saved_candidate(db, job)
-    counts: dict[str, int] = {str(status): int(n) for status, n in db.execute(
-        select(AIRunEvent.status, func.count()).where(AIRunEvent.run_id == job.id).group_by(AIRunEvent.status)).all()}
+    counts: dict[str, int] = {}
+    # A problem is a stopped step, or an in-between one the app found; what the model says of itself ("model says",
+    # in between) is not one until a check confirms it. Watch the run counts the same way (isProblem).
+    problems = 0
+    for status, self_reported, n in db.execute(
+            select(AIRunEvent.status, AIRunEvent.self_reported, func.count()).where(AIRunEvent.run_id == job.id)
+            .group_by(AIRunEvent.status, AIRunEvent.self_reported)).all():
+        counts[str(status)] = counts.get(str(status), 0) + int(n)
+        if status == "bad" or (status == "partial" and not self_reported):
+            problems += int(n)
     return {
         "run_id": job.id, "status": job.status, "finished": job.status in ("succeeded", "failed", "cancelled"),
         "module": payload.get("module") or "", "question": payload.get("question") or "", "working_theory": payload.get("working_theory"),
         "created_at": job.created_at, "started_at": job.started_at, "finished_at": job.finished_at,
         # The answer as it stands now: its review status changes after the run, when you accept or reject it.
         "candidate_id": candidate.id if candidate else None, "review_status": candidate.review_status if candidate else None,
-        "events": sum(counts.values()), "problems": int(counts.get("bad", 0)) + int(counts.get("partial", 0)),
+        "events": sum(counts.values()), "problems": problems,
         "message": job.message, "error": job.error,
         # How the suite service routed it (app/ai/suite.py), and the accepted answer it started from, if any.
         "route": run_route(payload.get("module") or ""), "handoff_from": payload.get("handoff_from"),

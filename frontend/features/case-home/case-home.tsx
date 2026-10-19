@@ -9,7 +9,8 @@
 // inside it; every step also has a click and a key.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {DragEvent, ReactElement, ReactNode} from 'react';
 import {z} from 'zod';
 
@@ -24,6 +25,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
 import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../lib/generated/types.gen';
+import {singleKeysOn} from '../../lib/shortcuts';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {HIDE_SCREEN_EVENT, OPEN_INBOX_EVENT, OPEN_PALETTE_EVENT, SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
 import {useNeedsYouCount} from '../inbox/inbox';
@@ -47,6 +49,10 @@ const CLAIM_STATUS: Record<string, ClaimStatus> = {
 const CLAIM_ORDER: Record<ClaimStatus, number> = {disputed: 0, unshown: 1, supported: 2, ruled_out: 3};
 const LEVEL_ORDER: Record<string, number> = {textbook: 0, strong: 1, faint: 2};
 const UNREAD = new Set(['queued', 'pending', 'extracting']);
+const typing = (target: EventTarget | null): boolean => {
+  const el = target as HTMLElement | null;
+  return Boolean(el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)));
+};
 const VISIT_KEY = (id: string) => `pai:last-visit:${id}`;
 
 export function money(amount: number, currency: string | null): string {
@@ -93,11 +99,14 @@ function writeVisit(id: string): void {
   try { window.localStorage.setItem(VISIT_KEY(id), new Date().toISOString()); } catch { /* private window */ }
 }
 
+/** Where Enter takes a focused module: its feature, whole-screen (redesign §04.1 "Keyboard"). */
+const MODULE_HREF: Record<string, string> = {'01': '/bring-in', '02': '/check#claim-verification', '03': '/see#the-wire', '04': '/act#red-flags'};
+
 function Module({n, name, href, extra, children, className = '', label, openLabel = 'Open'}: {
   n: string; name: string; href?: string; extra?: ReactNode; children: ReactNode; className?: string; label?: string; openLabel?: string;
 }): ReactElement {
   const inv = useWorkbenchStore(state => state.investigationId);
-  return <FrostPanel className={`ch-mod ${className}`} label={label ?? name}>
+  return <FrostPanel className={`ch-mod ${className}`} label={label ?? name} attrs={{'data-module': n, tabIndex: -1}}>
     <header className="ch-mod-head">
       <h2><span className="ch-n">{n}</span>{name}</h2>
       {extra}
@@ -165,7 +174,7 @@ function StandingStrip({investigationId}: {investigationId: string}): ReactEleme
     {cell('dec', s?.to_decide ?? '·', 'to decide · need a person', '/decide', undefined, 'need')}
     {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? `money traced from ${s.money.from_sources ?? 0} source${s.money.from_sources === 1 ? '' : 's'} · ${s.money.payments} payment${s.money.payments === 1 ? '' : 's'}` : 'money traced', '/see#money-flows')}
     {cell('yrs', s?.timeline.from ? (s.timeline.from === s.timeline.to ? s.timeline.from : `${s.timeline.from}–${s.timeline.to?.slice(2)}`) : '—',
-      s ? `${s.timeline.events} events · ${s.timeline.years.length} years` : 'events', '/see#timeline')}
+      s ? `${s.timeline.events} events · ${continuousYears(s.timeline.years).length} years` : 'events', '/see#timeline')}
     {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread` : 'documents', '/bring-in#document-ingestion')}
   </ul>;
 }
@@ -367,14 +376,14 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
   }, [active, held, undo]);
-  return <section className="ch-mod ch-next" aria-label="Next up" {...wheel}>
+  return <section className="ch-mod ch-next" aria-label="Next up" data-module="next" tabIndex={-1} {...wheel}>
     <header className="ch-mod-head">
       <h2><span className="ch-eyebrow">Next up</span>{item?.kind === 'to_check' ? 'One thing only you can check' : 'One thing only you can decide'}</h2>
       <Stepper index={index} count={items.length} total={query.data?.total} onStep={setIndex} label="Decisions"/>
     </header>
     {query.isError ? <p role="alert">{errorMessage(query.error, 'Could not load what waits for you')} <button type="button" onClick={() => void query.refetch()}>Retry</button></p>
       : query.isPending && investigationId ? <div className="ch-skeleton" aria-busy="true"/>
-      : item ? <DecisionCard item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}/>
+      : item ? <DecisionCard key={item.id} item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}/>
       : <div className="ch-clear"><p>Nothing waits for you.</p><Link href={caseHref('/bring-in#document-ingestion', inv)}>Drop documents</Link></div>}
     <footer className="ch-next-foot">
       <span className="ch-dots" aria-hidden="true">{items.slice(0, 9).map((d, i) => <i key={d.id} className={i === index ? 'on' : ''}/>)}</span>
@@ -387,22 +396,38 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
   </section>;
 }
 
+type RailYear = {year: string; events: number; flags?: number};
+
+/** Every year from the first dated item to the last, in order: a year with nothing
+ *  in it stays on the rail as an empty tick, so the rail reads as continuous time. */
+export function continuousYears(years: RailYear[]): RailYear[] {
+  const known = new Map(years.filter(y => /^\d{4}$/.test(y.year)).map(y => [Number(y.year), y]));
+  if (!known.size) return [];
+  const first = Math.min(...known.keys());
+  const last = Math.max(...known.keys());
+  return Array.from({length: last - first + 1}, (_, i) => known.get(first + i) ?? {year: String(first + i), events: 0, flags: 0});
+}
+
 function YearRail({investigationId}: {investigationId: string}): ReactElement {
   const standingQuery = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const standing = standingQuery.data;
   const asOf = useWorkbenchStore(state => state.asOf);
   const setAsOf = useWorkbenchStore(state => state.setAsOf);
-  const years = standing?.timeline.years ?? [];
+  const years = useMemo(() => continuousYears(standing?.timeline.years ?? []), [standing]);
   const most = Math.max(1, ...years.map(y => y.events));
   const pointed = usePointedYears();
   const lit = new Set(pointed.years);
+  // A long case scrolls the rail; it opens on the latest years.
+  const rail = useRef<HTMLElement>(null);
+  useEffect(() => { if (rail.current) rail.current.scrollLeft = rail.current.scrollWidth; }, [years.length]);
   if (standingQuery.isPending && investigationId) return <div className="ch-years" aria-busy="true"/>;
   if (!years.length) return <div className="ch-years ch-quiet">Dated events place the case in time here.</div>;
-  return <nav className="ch-years" aria-label="Years in the case">
-    {years.slice(-10).map(y => {
+  return <nav ref={rail} className="ch-years" aria-label="Years in the case">
+    {years.map(y => {
       const on = asOf === Number(y.year);
       const flags = y.flags ?? 0;
-      const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit'].filter(Boolean).join(' ');
+      const empty = !y.events && !flags;
+      const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit', empty && 'empty'].filter(Boolean).join(' ');
       return <button key={y.year} type="button" className={cls} aria-pressed={on} onClick={() => setAsOf(on ? null : Number(y.year))}
         title={on ? 'Show all years again' : `Show the case as of ${y.year}`}>
         <b>{y.year}</b><small aria-label={`${y.events} event${y.events === 1 ? '' : 's'}${flags ? `, ${flags} Red Flag${flags === 1 ? '' : 's'}` : ''}`}>
@@ -476,14 +501,45 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
   preview?: boolean;
 }): ReactElement {
   const id = investigation?.id ?? '';
+  const router = useRouter();
+  // 1–4 focus a module, J / K step inside the focused one, Enter opens it whole-screen (redesign §04.1 "Keyboard").
+  useEffect(() => {
+    if (!active || preview || !investigation) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.defaultPrevented || typing(event.target) || !singleKeysOn()) return;
+      if (document.querySelector('[role="dialog"]')) return;
+      const home = document.querySelector<HTMLElement>('[data-testid="case-home"]');
+      if (!home || home.closest('[hidden]')) return;
+      const key = event.key.toLowerCase();
+      if (/^[1-4]$/.test(key)) {
+        const panel = home.querySelector<HTMLElement>(`[data-module="0${key}"]`);
+        if (panel) { event.preventDefault(); panel.focus(); }
+        return;
+      }
+      const panel = (document.activeElement as HTMLElement | null)?.closest<HTMLElement>('[data-module]');
+      if (!panel || !home.contains(panel)) return;
+      if (key === 'j' || key === 'k') {
+        const step = panel.querySelector<HTMLButtonElement>(`.ch-step button[aria-label="${key === 'j' ? 'Next' : 'Previous'}"]`);
+        if (step) { event.preventDefault(); if (!step.disabled) step.click(); }
+      } else if (event.key === 'Enter' && document.activeElement === panel) {
+        const href = MODULE_HREF[panel.dataset.panel ?? ''] ?? (panel.dataset.panel === 'next' ? '/decide' : null);
+        if (href) { event.preventDefault(); router.push(caseHref(href, investigation.id)); }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [active, preview, investigation, router]);
   if (!investigation) return loading ? <div className="ch-home ch-loading" aria-busy="true"><div className="ch-skeleton"/></div> : <div className="ch-home"><FirstCase onSwitch={onSwitch}/></div>;
   return <FrostStill.Provider value={preview}><div className="ch-home" data-testid="case-home">
     <RainPane as="header" className="ch-top" still={preview}>
       <div className="ch-name">
-        <h1>{investigation.name}</h1>
-        <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
-          Switch case <kbd>⌘O</kbd></button>
-        {!preview && <AiStrip investigationId={id}/>}
+        <div className="ch-name-line">
+          <h1 title={investigation.name}>{investigation.name}</h1>
+          <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
+            Switch case <kbd>⌘O</kbd></button>
+        </div>
+        {/* The AI line and its question field share one line, so the band stays as low as HOME_1's. */}
+        {!preview && <div className="ch-ai-line"><AiStrip investigationId={id}/></div>}
       </div>
       {!preview && <HomeTools/>}
       <CaseQuestion investigation={investigation}/>

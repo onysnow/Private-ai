@@ -5,7 +5,7 @@ import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
-import {BeforeYouRun} from '../features/ai/before-you-run';
+import {BeforeYouRun, runTime} from '../features/ai/before-you-run';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -67,6 +67,40 @@ describe('BeforeYouRun', () => {
     expect(sent.changes.map(c => c.text)).toEqual(['evidence:ev-58 · material · ignored', 'devils_advocate off → on', 'research_depth normal → exhaustive', 'premise + USER_STIPULATED']);
     expect(await screen.findByRole('region', {name: 'Watch the run'})).toBeInTheDocument();
     expect(await screen.findByText('Run record')).toBeInTheDocument();
+  });
+
+  it('shows the packet’s first records, the systems not expected as one chip, and past run time in words', async () => {
+    const plan = {...PLAN, packet: {...PLAN.packet, first: [{record_type: 'document', record_id: 'doc-41', title: 'Register extract, 2017'},
+      {record_type: 'evidence', record_id: 'ev-58', title: 'Email, M. Ross'}]}, where: {...PLAN.where, minutes: [0.2, 0.4]}};
+    mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: plan});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    const first = await screen.findByRole('list', {name: 'The first records in the packet'});
+    expect(within(first).getByText('document: Register extract, 2017')).toBeInTheDocument();
+    const region = screen.getByRole('region', {name: 'The plan'});
+    expect(within(region).getByText('QAS · RAS · DAS')).toBeInTheDocument();
+    expect(within(region).getAllByText(/not expected/)).toHaveLength(1);
+    expect(screen.getByText('under a minute on this machine')).toBeInTheDocument();
+    expect(runTime([])).toBe('not measured yet: no run has finished here');
+    expect(runTime([1.2, 3.6])).toBe('about 1–4 min on this machine');
+    expect(runTime([2.1, 1.9])).toBe('about 2 min on this machine');
+  });
+
+  it('counts the records the tier floor leaves out, and says runs make no outside lookups', async () => {
+    const plan = {...PLAN, packet: {...PLAN.packet, below_tier_floor: [{tier: 'E', count: 3}, {tier: 'F', count: 1}]}};
+    mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: plan});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    const region = await screen.findByRole('region', {name: 'The plan'});
+    expect(await within(region).findByText('3 Tier E records left out by the tier floor · leads only')).toBeInTheDocument();
+    expect(within(region).getByText('1 Tier F record left out by the tier floor · leads only')).toBeInTheDocument();
+    const where = screen.getByRole('region', {name: 'Where it runs, what it costs'});
+    expect(within(where).getByText(/Runs make no outside lookups yet/)).toBeInTheDocument();
+    expect(within(where).queryByText(/stop and ask/)).not.toBeInTheDocument();
   });
 
   it('saves this case’s default only with a reason', async () => {

@@ -16,6 +16,8 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Slider} from '@/components/ui/slider';
+import {STATUS_WORDS, StatusChip} from '../../components/status';
+import type {ClaimStatus} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {
   getClaimReviewWorkspaceOptions, getClaimReviewWorkspaceQueryKey, listClaimsOptions, listClaimsQueryKey, listInvestigationEvidenceOptions,
@@ -25,6 +27,7 @@ import type {ClaimOut, ClaimReviewWorkspaceOut, EvidencePoolRow} from '../../lib
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {WatchButton} from '../inbox/watch-button';
+import './claims.css';
 
 /** The canonical relationships the page still holds, as far as this panel
  * needs them: to name a relationship that depends on the open claim. */
@@ -45,6 +48,25 @@ const CLAIM_STATUSES = ['lead', 'unverified', 'supported', 'confirmed', 'dispute
 const EVIDENCE_GRADES = ['limited', 'medium', 'robust'] as const;
 const AGREEMENT_GRADES = ['low', 'medium', 'high'] as const;
 const UNGRADED = 'none';
+
+// The status grammar (docs/handoff/02_RULES.md): each claim status takes the shape of the state it stands for, so
+// every status shows a shape and its own word, never colour alone. The same mapping as the case home's Check module.
+const CLAIM_SHAPE: Record<string, ClaimStatus> = {
+  supported: 'supported', confirmed: 'supported', disputed: 'disputed', rejected: 'ruled_out', lead: 'unshown', unverified: 'unshown',
+};
+const shapeOf = (status: string): ClaimStatus => CLAIM_SHAPE[status] ?? 'unshown';
+const statusWord = (status: string) => status.charAt(0).toUpperCase() + status.slice(1);
+
+/** A status chip for one claim status: the grammar's mark and border, the claim's own word. */
+function ClaimStatusChip({status}: {status: string}): ReactElement {
+  return <StatusChip status={shapeOf(status)} label={statusWord(status)}/>;
+}
+
+/** A status in running text: its mark, then its word. */
+function StatusMarked({status}: {status: string}): ReactElement {
+  const shape = shapeOf(status);
+  return <><span aria-hidden="true" className={`cl-mark cl-mark-${shape}`}>{STATUS_WORDS[shape].mark}</span>{status}</>;
+}
 
 /** A grade in words: "medium evidence, high agreement", or null when the claim has none. */
 export function gradeText(claim: {evidence_grade?: string | null; agreement_grade?: string | null}): string | null {
@@ -179,13 +201,15 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
       {claimsQuery.isError && <p className="muted">{errorMessage(claimsQuery.error, 'Could not load the claims')}</p>}
       <div className="twocol">
         <div>
-          {claims.length === 0 ? <p className="muted">No claims yet.</p> : claims.map(c => <button className="finding" key={c.id} onClick={() => openClaim(c.id)}>
-            <strong>{c.text}</strong><small>{c.status} · {Math.round(c.confidence * 100)}% confidence{gradeText(c) ? ` · ${gradeText(c)}` : ''}</small>
+          {claims.length === 0 ? <p className="muted">No claims yet.</p> : claims.map(c => <button type="button" className={`finding cl-row cl-${shapeOf(c.status)}`} key={c.id} onClick={() => openClaim(c.id)}
+            aria-current={c.id === selectedId ? 'true' : undefined}>
+            <ClaimStatusChip status={c.status}/>
+            <strong>{c.text}</strong><small>{Math.round(c.confidence * 100)}% confidence{gradeText(c) ? ` · ${gradeText(c)}` : ''}</small>
           </button>)}
         </div>
         <div>
           {!selectedClaim ? <p className="muted">Choose a claim to inspect its evidence and verification state.</p> : <>
-            <h4>{selectedClaim.text}</h4>
+            <div className="cl-head"><ClaimStatusChip status={selectedClaim.status}/><h4>{selectedClaim.text}</h4></div>
             <p><Button variant="outline" size="sm" onClick={() => { openChain(selectedClaim.id); window.location.hash = 'chain-of-custody'; }}>
               Chain of Custody: how this got here</Button>{' '}
               <WatchButton investigationId={investigationId} recordType="claim" recordId={selectedClaim.id} className="ap-btn"/></p>
@@ -246,7 +270,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
               })}
               <h4>Immutable review history</h4>
               {workspace.review_history.length === 0 ? <p className="muted">No reporter review has been recorded yet.</p> : workspace.review_history.map(event => <div className="statement" key={event.id}>
-                <b>{event.from_status} → {event.to_status}</b> · {Math.round(event.from_confidence * 100)}% → {Math.round(event.to_confidence * 100)}%
+                <b><StatusMarked status={event.from_status}/> → <StatusMarked status={event.to_status}/></b> · {Math.round(event.from_confidence * 100)}% → {Math.round(event.to_confidence * 100)}%
                 {(event.to_evidence_grade || event.from_evidence_grade) && <span> · {gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
                 <div>{event.rationale}</div>
                 {event.override_reason && <div className="done-overridden">Marked without: {(event.unmet_rules ?? []).join(', ')}. Reason: {event.override_reason}</div>}
