@@ -65,6 +65,10 @@ def test_changes_queue_one_push_and_sync_now_runs_at_once(tmp_path, monkeypatch)
             assert line["push"]["status"] == "succeeded", line
             assert line["pushed_records"] == 2 and line["pending"]["to_send"] == 0
             assert sum(len(batch) for batch in fake.bulk_batches) == 2
+            # The task records "succeeded" before Procrastinate marks its own job row done, so wait for the row too.
+            deadline = time.monotonic() + 30
+            while time.monotonic() < deadline and ("succeeded", f"{lock}:now", 1, False) not in _queue_rows(engine, inv):
+                time.sleep(0.2)
             rows = _queue_rows(engine, inv)
             assert ("succeeded", f"{lock}:now", 1, False) in rows and ("todo", lock, 0, True) in rows
             # The push changed the collection, so it queued cross-referencing
