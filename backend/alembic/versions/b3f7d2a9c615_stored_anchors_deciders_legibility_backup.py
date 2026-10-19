@@ -2,13 +2,13 @@
 each decision, how legible each OCR'd page was, and when the case was last backed up (mockups CHECK_2, KEEP_2)
 
 Revision ID: b3f7d2a9c615
-Revises: e4c8a1f7b392
+Revises: e8c4a1f7b293
 """
 from alembic import op
 import sqlalchemy as sa
 
 revision = "b3f7d2a9c615"
-down_revision = "e4c8a1f7b392"
+down_revision = "e8c4a1f7b293"
 branch_labels = None
 depends_on = None
 

@@ -300,6 +300,7 @@ def _check_item(client: TestClient) -> str:
     for upper, lower in zip(chain, chain[1:]):
         client.post("/api/relationships", json={"investigation_id": inv, "schema": "Ownership", "source_entity_id": upper,
                                                 "target_entity_id": lower, "properties": {}})
+    client.post(f"/api/investigations/{inv}/red-flags/run")  # reading To check never brings it up to date
     return client.get(f"/api/investigations/{inv}/checks").json()["items"][0]["id"]
 
 
@@ -461,7 +462,8 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             **{(method, path): {"candidate_id": ai_candidate} for method, path in (
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-deck"),
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup"),
-                ("POST", "/api/ai-analysis-candidates/{candidate_id}/review"))},
+                ("POST", "/api/ai-analysis-candidates/{candidate_id}/review"),
+                ("POST", "/api/ai-analysis-candidates/{candidate_id}/claim-review"))},
             ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
             ("GET", "/api/documents/{document_id}/email"): {"document_id": email},
             ("GET", "/api/documents/{document_id}/picture"): {"document_id": picture["id"]},

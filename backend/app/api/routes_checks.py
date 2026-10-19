@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import CheckItem, Investigation
-from app.patterns import checks, engine
+from app.patterns import checks
 from app.schemas.api import CheckDecide, MoneyCheckKeep
 from app.schemas.responses import ChecksOut
 
@@ -19,10 +19,10 @@ router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resour
 
 @router.get("/investigations/{investigation_id}/checks", response_model=ChecksOut)
 def get_checks(investigation_id: str, db: Session = Depends(get_db)) -> Any:
-    """Brings the flags and the items up to date with the case's records, then lists the items."""
+    """The items as last brought up to date; reading never writes. GET .../red-flags says (``stale``) when they
+    are behind the case's records, and POST .../red-flags/run brings them up to date."""
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    engine.bring_up_to_date(db, investigation_id)
     return checks.items(db, investigation_id)
 
 

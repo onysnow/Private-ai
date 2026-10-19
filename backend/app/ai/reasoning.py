@@ -30,7 +30,7 @@ from app.ai.chart_check import (
     CHART_VISUAL_TYPE, MAX_CHART_RETRIES, check_presentation_charts, retry_feedback, visual_catalog_for_prompt,
 )
 from app.ai.governor import governor
-from app.ai.run_events import RunRecorder, instructions_in_packet, record_thoughts
+from app.ai.run_events import RunRecorder, instructions_in_packet, record_thoughts, run_events
 from app.ai.quote_check import check_presentation_quotes, prompt_record_texts
 from app.ai.writing_check import check_presentation_writing
 from app.ai.llm_client import LLMConfigurationError, coerce_response, get_llm_client, is_local_endpoint
@@ -1193,6 +1193,68 @@ def review_ai_analysis_candidate(db: Session, candidate: AIAnalysisCandidate, *,
     }
 
 
+CLAIM_DECISIONS = ("keep", "correct", "reject", "clear")
+_CLAIM_DECISION_WORDS = {"keep": ("good", "KEPT", "You kept {t}"), "correct": ("partial", "CORRECTED", "You corrected {t}"),
+                         "reject": ("bad", "REJECTED", "You rejected {t}"), "clear": ("neutral", "UNDECIDED", "You took back your decision on {t}")}
+
+
+def review_items(module: str, payload: dict | None) -> list[dict]:
+    """The parts of an answer a person decides one by one (research AI §2 "Per-claim decisions"): a case synthesis's
+    claims, a theory test's hypotheses. Each with its id, the model's words and the records it cites."""
+    payload = payload or {}
+    if module == "case_synthesis":
+        return [{"id": str(c.get("claim_id") or ""), "text": str(c.get("claim") or ""),
+                 "refs": [r for r in (c.get("supporting_evidence") or []) if isinstance(r, dict)]}
+                for c in payload.get("claims") or [] if isinstance(c, dict) and c.get("claim_id")]
+    if module == "hypothesis_test":
+        return [{"id": str(h.get("hypothesis_id") or ""), "text": str(h.get("hypothesis") or ""),
+                 "refs": [r for key in ("supporting_evidence", "contradicting_evidence") for r in (h.get(key) or []) if isinstance(r, dict)]}
+                for h in payload.get("hypothesis_matrix") or [] if isinstance(h, dict) and h.get("hypothesis_id")]
+    return []
+
+
+def review_ai_claim(db: Session, candidate: AIAnalysisCandidate, *, claim_id: str, decision: str,
+                    text: str | None = None, reason: str | None = None) -> AIAnalysisCandidate:
+    """Keep, correct or reject one claim (or hypothesis) of a proposed answer, or take that decision back ("clear").
+    A correction keeps the model's words in the payload and stores yours beside them; a rejection needs a reason.
+    The decision is also appended to the run record as a step by you that follows the thought, so the run's trace
+    shows it. Decisions close with the whole answer: once it is accepted or rejected they can no longer change."""
+    if candidate.review_status != "proposed":
+        raise ValueError("The answer has already been reviewed as a whole; its claims can no longer change")
+    if decision not in CLAIM_DECISIONS:
+        raise ValueError("Decision must be keep, correct, reject or clear")
+    item = next((i for i in review_items(candidate.module, candidate.payload) if i["id"] == claim_id), None)
+    if item is None:
+        raise LookupError("No such claim in this answer")
+    words = (text or "").strip()
+    why = (reason or "").strip()
+    if decision == "correct" and not words:
+        raise ValueError("Say how the claim should read")
+    if decision == "correct" and words == item["text"].strip():
+        raise ValueError("The correction reads the same as the model's words; keep it instead")
+    if decision == "reject" and not why:
+        raise ValueError("Say why the claim is rejected")
+    reviews = dict(candidate.claim_reviews or {})
+    if decision == "clear":
+        reviews.pop(claim_id, None)
+    else:
+        reviews[claim_id] = {"decision": decision, "text": words[:2000] if decision == "correct" else None,
+                             "reason": why[:300] or None, "reviewed_at": utcnow_naive().strftime("%Y-%m-%dT%H:%M:%SZ")}
+    candidate.claim_reviews = reviews or None
+    db.commit()
+    db.refresh(candidate)
+    run_id = (candidate.trace or {}).get("run_id")
+    if run_id:
+        said = next((e for e in run_events(db, candidate.investigation_id, str(run_id))
+                     if e.self_reported and (e.detail or {}).get("thought") == claim_id), None)
+        status, verdict, line = _CLAIM_DECISION_WORDS[decision]
+        RunRecorder(db, candidate.investigation_id, str(run_id)).emit(
+            "CHECK", "review", system="app", status=status, verdict=verdict, parent=said.n if said else None,
+            refs=said.refs if said else item["refs"], text=line.format(t=claim_id) + (f": {why}" if why else ""),
+            detail={"thought": claim_id, "mark": decision, "reason": why or None})
+    return candidate
+
+
 def rejection_reason(candidate: AIAnalysisCandidate) -> str | None:
     """None unless rejected; then one of REJECTION_REASONS' keys for an
     automatic rejection, or "reviewer" for a human one. Clients branch on
@@ -1231,6 +1293,7 @@ def serialize_ai_analysis_candidate(candidate: AIAnalysisCandidate, *, include_p
         row["payload"] = candidate.payload
         row["checked_citation_ids"] = candidate.checked_citation_ids or []
         row["trace"] = candidate.trace
+        row["claim_reviews"] = candidate.claim_reviews or {}
     return row
 
 

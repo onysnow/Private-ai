@@ -38,9 +38,15 @@ def _chain(inv: str) -> list[str]:
     return chain
 
 
+def _run(inv: str) -> None:
+    """Runs the rules and brings To check up to date, as a screen does when the read says they are behind."""
+    ok(client.post(f"/api/investigations/{inv}/red-flags/run"))
+
+
 def test_what_a_flag_cannot_show_becomes_a_checklist_item_linked_both_ways():
     inv = _inv("Checks: layers")
     chain = _chain(inv)
+    _run(inv)
     body = ok(client.get(f"/api/investigations/{inv}/checks"))
     item = next(i for i in body["items"] if i["indicator_id"] == "BO-002")
     assert item["kind"] == "checklist" and item["status"] == "open"
@@ -54,6 +60,7 @@ def test_what_a_flag_cannot_show_becomes_a_checklist_item_linked_both_ways():
 def test_a_decision_stays_with_its_item_and_a_dismissed_flag_takes_its_item_away():
     inv = _inv("Checks: decide")
     _chain(inv)
+    _run(inv)
     item = next(i for i in ok(client.get(f"/api/investigations/{inv}/checks"))["items"] if i["indicator_id"] == "BO-002")
     body = ok(client.post(f"/api/checks/{item['id']}/decide", json={"status": "shows", "note": "  Annual report gives no reason  "}))
     decided = next(i for i in body["items"] if i["id"] == item["id"])
@@ -68,6 +75,61 @@ def test_a_decision_stays_with_its_item_and_a_dismissed_flag_takes_its_item_away
     assert gone["status"] == "shows" and gone["gone_at"]
     reopened = ok(client.post(f"/api/checks/{item['id']}/decide", json={"status": "open"}))
     assert next(i for i in reopened["gone"] if i["id"] == item["id"])["decided_at"] is None
+
+
+def test_reading_to_check_never_writes_and_shows_what_the_last_run_left():
+    from app.api.routes_checks import get_checks
+    from app.core.authorization import AuthorizationScope, authorization_scope_context
+    from tests.stored_rules_rows import stored
+
+    inv = _inv("Checks: reading never writes")
+    chain = _chain(inv)
+    before = stored(inv)
+    assert before == {"flags": {}, "checks": {}, "run": None}
+    assert ok(client.get(f"/api/investigations/{inv}/checks"))["items"] == [], "never run: nothing stored yet"
+    assert stored(inv) == before, "reading To check runs no rule and adds no item"
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is True, "the read that says they are behind"
+
+    _run(inv)
+    ran = stored(inv)
+    body = ok(client.get(f"/api/investigations/{inv}/checks"))
+    assert any(i["indicator_id"] == "BO-002" for i in body["items"]), "after a run the read shows what it left"
+    assert stored(inv) == ran, "no item added, none marked gone, no time moved"
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is False
+
+    # A new record: the items stay as the run left them until the next run, and the red-flags read says so.
+    ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Ownership", "source_entity_id": chain[-1],
+                                               "target_entity_id": chain[0], "properties": {}}))
+    assert ok(client.get(f"/api/investigations/{inv}/checks")) == body
+    assert stored(inv) == ran
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is True
+    # A reader without write access reads the stored items too.
+    with SessionLocal() as db, authorization_scope_context(AuthorizationScope("reader-1", frozenset({inv}), role="viewer")):
+        read = get_checks(inv, db)
+    assert [(i["id"], i["status"]) for i in read["items"]] == [(i["id"], i["status"]) for i in body["items"]]
+    assert [m["id"] for m in read["missing"]] == [m["id"] for m in body["missing"]]
+    assert stored(inv) == ran
+    _run(inv)
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is False
+
+
+def test_to_check_is_behind_when_a_document_calls_for_a_passage_and_a_run_brings_it_in(monkeypatch):
+    """The flags' records are unchanged, yet a new document calls for an item: the read says it is behind."""
+    from tests.stored_rules_rows import stored
+
+    monkeypatch.setattr(checks, "load", lambda root=None: (PASSAGE,))
+    inv = _inv("Checks: behind on a document")
+    _party(inv, "Harbour Nominees Ltd")
+    _run(inv)
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is False
+    _document(inv, "Harbour Nominees Ltd supplied a nominee director.")
+    ran = stored(inv)
+    assert ok(client.get(f"/api/investigations/{inv}/checks"))["items"] == []
+    assert stored(inv) == ran
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is True
+    _run(inv)
+    assert [i["kind"] for i in ok(client.get(f"/api/investigations/{inv}/checks"))["items"]] == ["passage"]
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is False
 
 
 PASSAGE = CheckSpec(indicator="BO-002", kind="passage", question="Does the passage describe layers hiding the owner?",

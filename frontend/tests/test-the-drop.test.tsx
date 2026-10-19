@@ -60,6 +60,27 @@ describe('The Drop', () => {
     expect(within(line).getByLabelText('All files, stage by stage')).toHaveTextContent('All 2 files');
   });
 
+  it('shows on the receipt what each proposer\'s proposals came to', async () => {
+    const counted = lane('d1', 'minutes.pdf', ['done', 'done', 'done', 'done', 'skipped', 'done', 'needs_you']);
+    counted.receipt = {...counted.receipt, by_proposer: [
+      {rule: 'capitalized_name_sequence', accepted: 31, rejected: 9, waiting: 1},
+      {rule: 'openaleph_ingest_file', accepted: 2, rejected: 0, waiting: 0}, {rule: 'openaleph_ftm_analyze', accepted: 1, rejected: 1, waiting: 0},
+      {rule: 'sentence_assertion', accepted: 0, rejected: 0, waiting: 4},   // nothing answered yet: left out
+    ]} as typeof counted.receipt;
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': {...drop, lanes: [counted]}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const receipt = await screen.findByRole('region', {name: 'Read receipt: minutes.pdf'});
+    const rows = within(within(receipt).getByRole('list', {name: 'What each proposer\'s proposals came to'})).getAllByRole('listitem');
+    expect(rows.map(r => r.textContent)).toEqual(['Name-finder (rules): 31 of 40 accepted · 1 waits', 'OpenAleph: 3 of 4 accepted']);
+  });
+
+  it('leaves the proposers out of a receipt with nothing answered', async () => {
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': {...drop, lanes: [drop.lanes[0]]}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const receipt = await screen.findByRole('region', {name: 'Read receipt: minutes.pdf'});
+    expect(within(receipt).queryByText('By proposer')).not.toBeInTheDocument();
+  });
+
   it('F shows only problems and files still in progress', async () => {
     mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': drop});
     render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);

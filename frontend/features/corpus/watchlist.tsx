@@ -18,6 +18,7 @@ import {
   listLeadsQueryKey, makeLeadFromHitMutation, removeWatchlistEntryMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {WatchlistEntryOut, WatchlistHitOut, WatchlistOut} from '../../lib/generated/types.gen';
+import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {Snippet} from '../search/corpus-results';
 
@@ -29,7 +30,7 @@ const CHECK_STATE: Record<string, string> = {
 /** The entry's last check in plain words. */
 export function lastCheck(entry: WatchlistEntryOut): string {
   if (!entry.checked_at) return 'Not checked yet: it is searched when OpenAleph next reads a document, or on “Check now”.';
-  const at = new Date(/Z$|[+-]\d\d:\d\d$/.test(entry.checked_at) ? entry.checked_at : `${entry.checked_at}Z`).toLocaleString();
+  const at = apiTime(entry.checked_at).toLocaleString();
   if (entry.check_state === 'ok') return `Last checked ${at}.`;
   return `Last checked ${at}: ${CHECK_STATE[entry.check_state ?? ''] ?? entry.check_detail ?? 'OpenAleph could not be asked.'}`;
 }

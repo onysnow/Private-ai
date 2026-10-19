@@ -20,6 +20,7 @@ import {errorMessage} from '../../lib/api-client';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {getClaimCustodyChainOptions, listClaimsOptions, recheckHashMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {ClaimDoneOut, CustodyAnchorOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
+import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 const COLUMNS = ['Files', 'Reading', 'Passage', 'Decision', 'The claim'] as const;
@@ -31,7 +32,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 /** The cards' and the log's short form, as the mockup writes it: "2 Oct 09:14". */
 const short = (iso?: string | null) => {
   if (!iso) return 'not recorded';
-  const d = new Date(iso.endsWith('Z') ? iso : `${iso}Z`);
+  const d = apiTime(iso);   // shown in UTC on purpose: the custody log is kept in UTC
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
 };
 const STATUS: Record<string, ClaimStatus> = {supported: 'supported', disputed: 'disputed', rejected: 'ruled_out', ruled_out: 'ruled_out'};

@@ -21,6 +21,7 @@ import {errorMessage} from '../../lib/api-client';
 import {getInvestigationFinancialFlowsOptions, getRedFlagsQueryKey, markRedFlagInnocentMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {FinancialTransactionOut, FlagInnocentOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {apiTime} from '../../lib/timestamps';
 import {useWheelStep} from '../case-home/wheel-step';
 import {GlossaryText} from '../glossary/glossary-text';
 import {InvestigationType, LEVEL, LEVEL_ORDER, flagsByArea, useRedFlags} from '../red-flags/red-flags-panel';
@@ -70,7 +71,7 @@ export function ladder(flag: RedFlagOut): Rung[] {
 function lastVisitKey(inv: string): string { return `pai:flags-visit:${inv}`; }
 
 /** The server sends UTC times without an offset; read them as UTC wherever the browser is. */
-export function utcTime(at: string): number { return new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(at) ? at : `${at}Z`).getTime(); }
+export function utcTime(at: string): number { return apiTime(at).getTime(); }
 
 /** "just now", "4 min ago", "3 h ago", "2 days ago". */
 export function agoText(at: string, now = Date.now()): string {
@@ -337,7 +338,7 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
 }): ReactElement {
   const ind = flag.indicator;
   const [reason, setReason] = useState('');
-  const first = new Date(flag.first_seen_at);
+  const first = apiTime(flag.first_seen_at);
   const payments = flag.links.length > 0 && (flag.facts as {family?: string})?.family === 'count_in_band';
   const moneyFlag = flag.indicator_id.startsWith('ML') || payments;
   return <>

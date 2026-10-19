@@ -16,6 +16,7 @@ import {
   listCorpusEntitySetsOptions, listCorpusEntitySetsQueryKey, listEntitiesOptions, sendCorpusEntitySetMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {EntitySetSentOut} from '../../lib/generated/types.gen';
+import {apiTime} from '../../lib/timestamps';
 
 const KIND_NAME: Record<string, string> = {diagram: 'Diagram', timeline: 'Timeline', list: 'List'};
 
@@ -79,7 +80,7 @@ export function EntitySets({investigationId}: {investigationId: string}): ReactE
     {(sets.data ?? []).length > 0 && <ul aria-label="Sent to OpenAleph">
       {(sets.data ?? []).map(row => <li key={row.id}>
         <a href={row.url} target="_blank" rel="noreferrer">{KIND_NAME[row.kind]}: {row.label}</a>{' '}
-        <small>· {row.items} record(s) · sent {new Date(/Z$|[+-]\d\d:\d\d$/.test(row.sent_at) ? row.sent_at : `${row.sent_at}Z`).toLocaleString()}</small>
+        <small>· {row.items} record(s) · sent {apiTime(row.sent_at).toLocaleString()}</small>
       </li>)}
     </ul>}
     {status && <p className="muted" role="status">{status}</p>}

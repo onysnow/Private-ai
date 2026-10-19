@@ -133,6 +133,12 @@ export type AiAnalysisCandidateOut = {
    */
   citation_details?: Array<CitationDetailOut> | null;
   /**
+   * Claim Reviews
+   */
+  claim_reviews: {
+    [key: string]: AiClaimReviewOut;
+  };
+  /**
    * Confidence
    */
   confidence: number;
@@ -330,6 +336,56 @@ export type AiAuthoritySuiteOut = {
    * Tas Version
    */
   tas_version: string | null;
+};
+
+/**
+ * AiClaimReviewOut
+ *
+ * Your decision on one claim or hypothesis of an answer. `text` is your corrected wording (the model's stays
+ * in the payload); `reason` says why, and is always there for a rejection.
+ */
+export type AiClaimReviewOut = {
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Reason
+   */
+  reason: string | null;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string;
+  /**
+   * Text
+   */
+  text: string | null;
+};
+
+/**
+ * AiClaimReviewRequest
+ *
+ * Your decision on one claim (or hypothesis) of a proposed AI answer (research AI §2 "Per-claim decisions").
+ * `text` is your corrected wording (correct only); `reason` is required to reject. "clear" takes a decision back.
+ */
+export type AiClaimReviewRequest = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Decision
+   */
+  decision: 'keep' | 'correct' | 'reject' | 'clear';
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Text
+   */
+  text?: string | null;
 };
 
 /**
@@ -7046,9 +7102,35 @@ export type DropOut = {
 };
 
 /**
+ * DropProposerOut
+ */
+export type DropProposerOut = {
+  /**
+   * Accepted
+   */
+  accepted: number;
+  /**
+   * Rejected
+   */
+  rejected: number;
+  /**
+   * Rule
+   */
+  rule: string;
+  /**
+   * Waiting
+   */
+  waiting: number;
+};
+
+/**
  * DropReceiptOut
  */
 export type DropReceiptOut = {
+  /**
+   * By Proposer
+   */
+  by_proposer?: Array<DropProposerOut>;
   /**
    * Files Inside
    */
@@ -18540,6 +18622,42 @@ export type GetAiAnalysisCandidateEndpointResponses = {
 
 export type GetAiAnalysisCandidateEndpointResponse =
   GetAiAnalysisCandidateEndpointResponses[keyof GetAiAnalysisCandidateEndpointResponses];
+
+export type ReviewAiClaimEndpointData = {
+  body: AiClaimReviewRequest;
+  path: {
+    /**
+     * Candidate Id
+     */
+    candidate_id: string;
+  };
+  query?: never;
+  url: '/api/ai-analysis-candidates/{candidate_id}/claim-review';
+};
+
+export type ReviewAiClaimEndpointErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ReviewAiClaimEndpointError =
+  ReviewAiClaimEndpointErrors[keyof ReviewAiClaimEndpointErrors];
+
+export type ReviewAiClaimEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiAnalysisCandidateOut;
+};
+
+export type ReviewAiClaimEndpointResponse =
+  ReviewAiClaimEndpointResponses[keyof ReviewAiClaimEndpointResponses];
 
 export type PromoteAiAnalysisCandidateToDeckEndpointData = {
   body: PromoteToDeckRequest;
