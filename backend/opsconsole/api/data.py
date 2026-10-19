@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from fastapi import APIRouter, Body, Query, Request, Response
@@ -26,6 +27,7 @@ from opsconsole.core.paging import (
 # 64-bit integer, and a larger one failed with a server error instead of a
 # refusal. No table here comes near this many rows.
 MAX_OFFSET = 2**31 - 1
+logger = logging.getLogger(__name__)
 
 
 class ChangeSetIn(BaseModel):
@@ -120,8 +122,9 @@ def router(ctx: ConsoleContext) -> APIRouter:
             with ctx.config.engine.connect() as conn:
                 try:
                     yield from export_rows(conn, table, policy=policy, filters=filters, q=q, fmt=fmt, max_rows=limits.export_rows)
-                except ValueError as exc:
-                    yield f"\n# error: {exc}\n"
+                except ValueError:
+                    logger.exception("Console data export failed for table %s", name)
+                    yield "\n# error: export failed; details are in the server log.\n"
 
         media = "text/csv" if fmt == "csv" else "application/json"
         return StreamingResponse(body(), media_type=media, headers={"Content-Disposition": f'attachment; filename="{name}.{fmt}"'})

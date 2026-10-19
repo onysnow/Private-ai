@@ -231,8 +231,6 @@ button{cursor:pointer}
 <script>
 (()=>{
 const D=JSON.parse(document.getElementById('data').textContent);
-// Names and notes come from the data block above; they are put into HTML strings below, so they are escaped first.
-const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const NS='http://www.w3.org/2000/svg';
 const $=s=>document.querySelector(s);
@@ -622,7 +620,7 @@ function drawStatic(){
     el('ellipse',{cx:I.cx,cy:I.cy,rx:I.R1*I.RX*1.62,ry:I.R1*1.62,fill:'none',stroke:'rgb(111 138 163 / .12)','stroke-dasharray':'2 8'},gS);
     el('circle',{cx:I.cx,cy:I.cy,r:150,fill:'url(#glow)'},gS);
     for(const s of I.secLabels){const t=el('text',{class:'sec','text-anchor':'middle'},gS);t.textContent=s.n;secEls.push({t,a:s.a*Math.PI/180,r:I.R1,rx:I.RX,cx:I.cx,cy:I.cy})}
-    for(const m of I.more){const g=el('g',{class:'more',transform:`translate(${m.x},${m.y})`,role:'button','aria-label':`Show ${m.n} more linked to ${esc(E[m.p].short)}`},gM);
+    for(const m of I.more){const g=el('g',{class:'more',transform:`translate(${m.x},${m.y})`,role:'button','aria-label':`Show ${m.n} more linked to ${E[m.p].short}`},gM);
       el('rect',{x:-40,y:-12,width:80,height:24,rx:12},g);const t=el('text',{'text-anchor':'middle',y:4},g);t.textContent=`+${m.n} more`;
       g.addEventListener('click',ev=>{ev.stopPropagation();expanded.add(m.p);go('party',{noTrail:true})});moreEls.push(m);}
   }
@@ -660,7 +658,7 @@ function drawWire(){
   const B=bundles[wireKey];let [a,b]=[B.a,B.b];if(b===focus)[a,b]=[b,a];
   const r=box.getBoundingClientRect();const w=r.width,h=r.height,cy=h/2;
   const x0=190,x1=w-190;
-  const mk=(id,x,right)=>{const d=document.createElement('div');d.className='end';d.style[right?'right':'left']='0';d.style.borderColor=KIND[E[id].kind].ring;d.innerHTML=`<small>${KIND[E[id].kind].name}</small>${esc(E[id].short)}`;box.appendChild(d)};
+  const mk=(id,x,right)=>{const d=document.createElement('div');d.className='end';d.style[right?'right':'left']='0';d.style.borderColor=KIND[E[id].kind].ring;const label=document.createElement('small');label.textContent=KIND[E[id].kind].name;d.append(label,document.createTextNode(E[id].short));box.appendChild(d)};
   mk(a,0,false);mk(b,0,true);
   el('line',{x1:x0-10,y1:cy,x2:x1+10,y2:cy,stroke:'#6F8AA3','stroke-width':2},s);
   const L=B.links.slice().sort((p,q)=>(tval(p.date)||0)-(tval(q.date)||0));
@@ -685,7 +683,8 @@ function drawWire(){
     const tg=document.createElement('div');tg.className='tag';
     const ev=l.ev[0]||{};
     const head=l.fam==='money'?`${fmtAmt(l.amount,l.cur)} · ${fmtDate(l.date)}`:(FAM[l.fam]||FAM.other).n+(l.pct?` · ${l.pct}%`:'')+(l.date?' · from '+fmtDate(l.date):'');
-    tg.innerHTML=`<b>${head}</b>${(l.role||'').slice(0,90)}${ev.q?`<span style="display:block;margin-top:4px;color:#C6BBA5">“${ev.q.slice(0,120)}${ev.q.length>120?'…':''}”</span><cite>${ev.doc} · ${ev.loc}</cite>`:''}`;
+    const heading=document.createElement('b');heading.textContent=head;tg.append(heading,document.createTextNode((l.role||'').slice(0,90)));
+    if(ev.q){const quote=document.createElement('span');quote.style.cssText='display:block;margin-top:4px;color:#C6BBA5';quote.textContent=`“${ev.q.slice(0,120)}${ev.q.length>120?'…':''}”`;const cite=document.createElement('cite');cite.textContent=`${ev.doc} · ${ev.loc}`;tg.append(quote,cite)}
     const left=Math.max(0,Math.min(w-210,x-105));tg.style.left=left+'px';box.appendChild(tg);
     const th=tg.offsetHeight;let off=48;
     for(const u of used.filter(u=>u.up===up&&left<u.x1+8&&left+210>u.x0-8).sort((a,b)=>a.off-b.off))if(off+th>u.off-8&&off<u.off+u.h+8)off=u.off+u.h+10;
@@ -702,10 +701,11 @@ function shortest(a,b){
       if(dist[u]+w<dist[v]){dist[v]=dist[u]+w;prev[v]=u}}}
   if(dist[b]>=1e9)return null;const p=[b];while(p[0]!==a)p.unshift(prev[p[0]]);return p;
 }
-function runPath(){const a=$('#pFrom').value,b=$('#pTo').value;const p=shortest(a,b);if(!p){showRule(`No chain of links joins <b>${esc(E[a].short)}</b> and <b>${esc(E[b].short)}</b> in the records yet.`);return}pathIds=p;go('path')}
+function runPath(){const a=$('#pFrom').value,b=$('#pTo').value;const p=shortest(a,b);if(!p){showRule([`No chain of links joins `,bold(E[a].short),` and `,bold(E[b].short),' in the records yet.']);return}pathIds=p;go('path')}
 
 /* ---------- chrome ---------- */
-function showRule(h){$('#rule').innerHTML=h}
+function bold(text){const el=document.createElement('b');el.textContent=String(text);return el}
+function showRule(parts){$('#rule').replaceChildren(...parts.map(part=>typeof part==='string'?document.createTextNode(part):part))}
 function renderChrome(){
   const titles={case:'the whole case',party:'around a party',wire:'one link, opened',path:'following the money'};
   $('#alttitle').textContent=titles[mode];
@@ -713,11 +713,11 @@ function renderChrome(){
   $('#needle').style.top=({case:5,party:109,wire:213,path:5})[mode]+'px';
   const f=flagsOf(focus);
   if(mode==='case'){const nT=Object.values(terr).filter(t=>t.id!=='loose').length;
-    showRule(`Each patch is a group of parties more linked to each other than to the rest: <b>${nT} groups</b>, ${D.entities.length} parties, ${D.links.length} links. Bigger dot, more links. Roll the wheel over a party to go down to it.`)}
+    showRule(['Each patch is a group of parties more linked to each other than to the rest: ',bold(nT),' groups, ',String(D.entities.length),' parties, ',String(D.links.length),' links. Bigger dot, more links. Roll the wheel over a party to go down to it.'])}
   if(mode==='party'){const why=focus===mostFlagged[0]?` Opened here because it has the most open Red Flags (${nOpen(f)}).`:'';
-    showRule(`<b>${esc(E[focus].short)}</b> is in the middle. Owners and directors on the left, what it owns on the right, money in above, money out below. The next ring is chosen by flags and links.${why}`)}
-  if(mode==='wire'){const B=bundles[wireKey];showRule(`Every record between <b>${esc(E[B.a].short)}</b> and <b>${esc(E[B.b].short)}</b>, on a line of dates. Above the line goes one way, below goes back. Each tag is the source that shows it.`)}
-  if(mode==='path'){showRule(`The shortest chain of links from <b>${esc(E[pathIds[0]].short)}</b> to <b>${esc(E[pathIds[pathIds.length-1]].short)}</b>: ${pathIds.length-1} steps. Payments are preferred over other links when there is a choice. Everything else is set aside, not removed.`)}
+    showRule([bold(E[focus].short),' is in the middle. Owners and directors on the left, what it owns on the right, money in above, money out below. The next ring is chosen by flags and links.',why])}
+  if(mode==='wire'){const B=bundles[wireKey];showRule(['Every record between ',bold(E[B.a].short),' and ',bold(E[B.b].short),', on a line of dates. Above the line goes one way, below goes back. Each tag is the source that shows it.'])}
+  if(mode==='path'){showRule(['The shortest chain of links from ',bold(E[pathIds[0]].short),' to ',bold(E[pathIds[pathIds.length-1]].short),`: ${pathIds.length-1} steps. Payments are preferred over other links when there is a choice. Everything else is set aside, not removed.`])}
   // trail
   const ol=$('#trailList');ol.textContent='';
   trail.forEach(id=>{const li=document.createElement('li');const b=document.createElement('button');b.textContent=E[id].short;b.onclick=()=>go('party',{id});li.appendChild(b);ol.appendChild(li)});
@@ -725,16 +725,22 @@ function renderChrome(){
 }
 
 /* drawer */
-function openDrawer(html){const d=$('#drawer');d.innerHTML=`<button class="x" aria-label="Close">✕</button>`+html;d.classList.add('open');d.querySelector('.x').onclick=()=>d.classList.remove('open');d.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const [m,id]=b.dataset.go.split(':');if(m==='party')go('party',{id});if(m==='from'){$('#pFrom').value=id;togglePath(true)}if(m==='wire')openWire(id)})}
+function openDrawer(content){const d=$('#drawer'),close=document.createElement('button');close.className='x';close.setAttribute('aria-label','Close');close.textContent='✕';d.replaceChildren(close,content);d.classList.add('open');close.onclick=()=>d.classList.remove('open');d.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const [m,id]=b.dataset.go.split(':');if(m==='party')go('party',{id});if(m==='from'){$('#pFrom').value=id;togglePath(true)}if(m==='wire')openWire(id)})}
 function partyHtml(id){
   const e=E[id],f=flagsOf(id);const accts=D.entities.filter(a=>a.holder===id);
   const nb=[...(adj[id]||[])];const fams={};nb.forEach(n=>{const B=bundles[id<n?id+'|'+n:n+'|'+id];B.links.forEach(l=>fams[l.fam]=(fams[l.fam]||0)+1)});
-  const lvl=f.textbook?'textbook':f.strong?'strong':'faint';
-  return `<div class="kind">${esc(KIND[e.kind].name)}${e.jur?' · '+e.jur.toUpperCase():''}</div><h2>${esc(e.name)}</h2><p>${esc(e.note||'')}</p>
-  ${nOpen(f)?`<h3>Red Flags · ${nOpen(f)} open</h3><ul>${f.items.slice(0,4).map(x=>`<li><span class="flagchip ${x.level}">${x.level}</span> ${esc(x.text)}</li>`).join('')}</ul>`:''}
-  ${accts.length?`<h3>Accounts held · ${accts.length}</h3><ul>${accts.map(a=>`<li>${esc(a.name)}</li>`).join('')}</ul>`:''}
-  <h3>Links · ${nb.length} parties</h3><p class="num" style="font-family:var(--f-mono);font-size:12.5px">${Object.entries(fams).map(([k,n])=>`${n} ${(FAM[k]||FAM.other).n.toLowerCase()}`).join(' · ')}</p>
-  <div class="acts"><button class="pri" data-go="party:${id}">Centre here</button><button data-go="from:${id}">Follow the money from here</button></div>`;
+  const frag=document.createDocumentFragment();
+  const add=(tag,text,parent=frag,className='')=>{const el=document.createElement(tag);if(className)el.className=className;el.textContent=String(text);parent.appendChild(el);return el};
+  add('div',`${KIND[e.kind].name}${e.jur?' · '+e.jur.toUpperCase():''}`,frag,'kind');
+  add('h2',e.name);add('p',e.note||'');
+  if(nOpen(f)){add('h3',`Red Flags · ${nOpen(f)} open`);const ul=add('ul','');for(const item of f.items.slice(0,4)){const li=document.createElement('li'),chip=add('span',item.level,li,'flagchip');if(['faint','strong','textbook'].includes(item.level))chip.classList.add(item.level);li.appendChild(document.createTextNode(` ${item.text}`));ul.appendChild(li)}}
+  if(accts.length){add('h3',`Accounts held · ${accts.length}`);const ul=add('ul','');for(const account of accts)add('li',account.name,ul)}
+  add('h3',`Links · ${nb.length} parties`);
+  const summary=add('p',Object.entries(fams).map(([k,n])=>`${n} ${(FAM[k]||FAM.other).n.toLowerCase()}`).join(' · '),frag,'num');summary.style.cssText='font-family:var(--f-mono);font-size:12.5px';
+  const acts=add('div','',frag,'acts');
+  const centre=add('button','Centre here',acts,'pri');centre.dataset.go=`party:${id}`;
+  const follow=add('button','Follow the money from here',acts);follow.dataset.go=`from:${id}`;
+  return frag;
 }
 function onNodeClick(id){
   if(id.startsWith('chain')){const c=chains.find(c=>c.id===id);c.open=true;go('case');return}
@@ -747,19 +753,21 @@ function onNodeClick(id){
 const tip=$('#tip');
 function placeTip(ev){tip.style.left=Math.min(W-290,ev.clientX+14)+'px';tip.style.top=Math.min(H-120,ev.clientY+14)+'px'}
 function showTip(ev,id){
-  if(id.startsWith('chain')){const c=chains.find(c=>c.id===id);tip.innerHTML=`<b>${c.mids.length>1?'Chain of '+c.mids.length+' companies':'One company in between'}</b><span class="m">${c.mids.map(m=>esc(E[m].short)).join(' → ')}. Each owns the next and nothing else. Click to open it out.</span>`}
-  else{const e=E[id],f=flagsOf(id);tip.innerHTML=`<b>${esc(e.short)}</b><span class="m">${esc(KIND[e.kind].name)} · ${deg[id]} linked parties${nOpen(f)?` · ${nOpen(f)} open flags`:''}</span>`}
+  tip.replaceChildren();
+  if(id.startsWith('chain')){const c=chains.find(c=>c.id===id);const heading=document.createElement('b');heading.textContent=c.mids.length>1?`Chain of ${c.mids.length} companies`:'One company in between';const detail=document.createElement('span');detail.className='m';detail.textContent=`${c.mids.map(m=>E[m].short).join(' → ')}. Each owns the next and nothing else. Click to open it out.`;tip.append(heading,detail)}
+  else{const e=E[id],f=flagsOf(id),heading=document.createElement('b'),detail=document.createElement('span');heading.textContent=e.short;detail.className='m';detail.textContent=`${KIND[e.kind].name} · ${deg[id]} linked parties${nOpen(f)?` · ${nOpen(f)} open flags`:''}`;tip.append(heading,detail)}
   placeTip(ev);tip.classList.add('on')}
 function showLinkTip(ev,B,S){
   const n=S.links.length;const fam=(FAM[S.fam]||FAM.other).n;
-  let h=`<b>${esc(E[S.s].short)} → ${esc(E[S.t].short)}</b><span class="m">${n} ${S.fam==='money'?(n>1?'payments':'payment'):fam.toLowerCase()+(n>1?' ×'+n:'')}${S.sum?' · '+fmtAmt(S.sum,S.cur):''}</span>`;
-  const via=S.links.filter(l=>rep(l.s)!==l.s||rep(l.t)!==l.t);if(via.length)h+=`<span class="m">Through ${via.length>1?'accounts':'an account'} held by ${rep(via[0].s)!==via[0].s?esc(E[rep(via[0].s)].short):esc(E[rep(via[0].t)].short)}</span>`;
-  h+=`<span class="m">Click to open every record on this link.</span>`;tip.innerHTML=h;placeTip(ev);tip.classList.add('on')}
+  const heading=document.createElement('b');heading.textContent=`${E[S.s].short} → ${E[S.t].short}`;
+  const detail=document.createElement('span');detail.className='m';detail.textContent=`${n} ${S.fam==='money'?(n>1?'payments':'payment'):fam.toLowerCase()+(n>1?' ×'+n:'')}${S.sum?' · '+fmtAmt(S.sum,S.cur):''}`;tip.replaceChildren(heading,detail);
+  const via=S.links.filter(l=>rep(l.s)!==l.s||rep(l.t)!==l.t);if(via.length){const through=document.createElement('span');through.className='m';through.textContent=`Through ${via.length>1?'accounts':'an account'} held by ${rep(via[0].s)!==via[0].s?E[rep(via[0].s)].short:E[rep(via[0].t)].short}`;tip.appendChild(through)}
+  const note=document.createElement('span');note.className='m';note.textContent='Click to open every record on this link.';tip.appendChild(note);placeTip(ev);tip.classList.add('on')}
 function hideTip(){tip.classList.remove('on')}
 
 /* key */
 (function(){const k=$('#keyBody');let h='';
-  for(const kk of ['person','company','org','property','vehicle'])h+=`<div class="row"><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="${KIND[kk].fill}" stroke="${KIND[kk].ring}" stroke-width="1.6"/></svg>${esc(KIND[kk].name)}</div>`;
+  for(const kk of ['person','company','org','property','vehicle'])h+=`<div class="row"><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="${KIND[kk].fill}" stroke="${KIND[kk].ring}" stroke-width="1.6"/></svg>${KIND[kk].name}</div>`;
   for(const f of ['owns','runs','money','other'])h+=`<div class="row"><svg width="30" height="10"><path d="M2 5H28" stroke="${FAM[f].c}" stroke-width="2.4" ${f==='other'?'stroke-dasharray="5 4"':''}/></svg>${FAM[f].n}</div>`;
   h+=`<div class="row"><svg width="30" height="10"><path d="M2 5H28" stroke="#c98a5e" stroke-width="2"/><path d="M2 5H28" stroke="#ffd9a8" stroke-width="3.4" stroke-dasharray="1 9" stroke-linecap="round"/></svg>Lights run the way money went</div>`;
   h+=`<div class="row"><svg width="30" height="10"><path d="M2 5H28" stroke="#c98a5e" stroke-width="1.2"/></svg>Thicker line, more money</div>`;
