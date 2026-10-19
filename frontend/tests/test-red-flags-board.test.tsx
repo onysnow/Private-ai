@@ -233,7 +233,8 @@ describe('what changed since the last visit', () => {
     const strip = await screen.findByRole('group', {name: 'What changed since your last visit'});
     expect(strip).toHaveTextContent('Since your last visit · 10 Oct: 1 new · 1 no longer fires');
     await waitFor(() => expect(strip).toHaveTextContent('1 of 2 ✚ New BO-001 Circular ownership'));
-    expect(document.querySelector('.rb-row.lit')).toHaveAccessibleName(/Circular ownership/);
+    // The row is lit by the board after the strip's step renders (an effect), so wait for it too.
+    await waitFor(() => expect(document.querySelector('.rb-row.lit')).toHaveAccessibleName(/Circular ownership/));
     await waitFor(() => expect(strip).toHaveTextContent('2 of 2 − No longer fires BO-032 Unrelated parties share an address'), {timeout: 3000});
     await waitFor(() => expect(within(strip).getByRole('button', {name: 'Replay'})).toBeInTheDocument(), {timeout: 3000});
     expect(document.querySelector('.rb-row.lit')).toBeNull();
