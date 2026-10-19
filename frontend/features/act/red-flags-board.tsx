@@ -15,15 +15,19 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
+import {z} from 'zod';
 
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {caseHref} from '../../lib/case-href';
 import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {getInvestigationFinancialFlowsOptions, getRedFlagsQueryKey, markRedFlagInnocentMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {FinancialTransactionOut, FlagInnocentOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useWheelStep} from '../case-home/wheel-step';
 import {GlossaryText} from '../glossary/glossary-text';
-import {InvestigationType, LEVEL, LEVEL_ORDER, flagsByArea, useRedFlags} from '../red-flags/red-flags-panel';
+import {InvestigationType, LEVEL, LEVEL_ORDER, dismissSchema, flagsByArea, useRedFlags} from '../red-flags/red-flags-panel';
+import type {DismissValues} from '../red-flags/red-flags-panel';
 
 type Kind = {key: string; name: string; level: string; flags: RedFlagOut[]; weight: number};
 type Levels = Record<'textbook' | 'strong' | 'faint', boolean>;
@@ -336,7 +340,7 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
   onLead: () => Promise<void> | void; onDismiss: (reason: string) => Promise<void> | void; onReopen: () => Promise<void> | void;
 }): ReactElement {
   const ind = flag.indicator;
-  const [reason, setReason] = useState('');
+  const form = useZodForm<DismissValues>(dismissSchema, {defaultValues: {reason: ''}, mode: 'onSubmit'});
   const first = new Date(flag.first_seen_at);
   const payments = flag.links.length > 0 && (flag.facts as {family?: string})?.family === 'count_in_band';
   const moneyFlag = flag.indicator_id.startsWith('ML') || payments;
@@ -369,11 +373,17 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
         <div className="rb-acts">
           {flag.status === 'open' ? <>
             <button type="button" className="primary" onClick={() => void onLead()}>Add to leads <kbd>A</kbd></button>
-            {asking ? <form className="rb-why" onSubmit={e => { e.preventDefault(); if (reason.trim()) { void onDismiss(reason.trim()); setAsking(false); setReason(''); } }}>
+            {asking ? <Form {...form}><form className="rb-why" noValidate onSubmit={submitWith(form, async ({reason}) => {
+              await onDismiss(reason);
+              setAsking(false); form.reset();
+            }, 'Could not set it aside')}>
               <label htmlFor={`why-${flag.id}`}>Why set it aside?</label>
-              <input id={`why-${flag.id}`} autoFocus value={reason} onChange={e => setReason(e.target.value)} placeholder="e.g. the payments are rent, seen in the lease"/>
-              <span><button type="submit" disabled={!reason.trim()}>Set aside</button><button type="button" onClick={() => setAsking(false)}>Cancel</button></span>
-            </form> : <button type="button" onClick={() => setAsking(true)}>Set aside with a reason <kbd>X</kbd></button>}
+              <FormField control={form.control} name="reason" render={({field}) => <FormItemBare>
+                <FormControl><input {...field} id={`why-${flag.id}`} autoFocus placeholder="e.g. the payments are rent, seen in the lease"/></FormControl>
+                <FormMessage className="field-msg"/></FormItemBare>}/>
+              <FormRootError className="field-msg"/>
+              <span><button type="submit">Set aside</button><button type="button" onClick={() => setAsking(false)}>Cancel</button></span>
+            </form></Form> : <button type="button" onClick={() => setAsking(true)}>Set aside with a reason <kbd>X</kbd></button>}
           </> : flag.status === 'dismissed' ? <>
             <p className="rb-quiet">Set aside: {flag.dismissed_reason}</p>
             <button type="button" onClick={() => void onReopen()}>Open it again</button>
@@ -457,13 +467,17 @@ function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
   </figure>;
 }
 
+// What ruled an innocent explanation out, as the backend takes it (FlagInnocent: note up to 2000).
+const ruleOutSchema = z.object({note: z.string().trim().min(1, 'Write what ruled it out.').max(2000, 'Keep it under 2,000 characters.')});
+type RuleOutValues = z.infer<typeof ruleOutSchema>;
+
 const INNOCENT_WORD: Record<FlagInnocentOut['state'], string> = {not_looked_at: 'Not looked at', ruled_out: 'Ruled out', could_apply: 'Could apply'};
 
 function BeforeYouCallIt({flag, investigationId, ranAt}: {flag: RedFlagOut; investigationId: string; ranAt: string | null}): ReactElement {
   const queryClient = useQueryClient();
   const mark = useMutation({...markRedFlagInnocentMutation(), onSuccess: data => queryClient.setQueryData(getRedFlagsQueryKey({path: {investigation_id: investigationId}}), data)});
   const [ruling, setRuling] = useState<string | null>(null);
-  const [note, setNote] = useState('');
+  const ruleOut = useZodForm<RuleOutValues>(ruleOutSchema, {defaultValues: {note: ''}, mode: 'onSubmit'});
   const items = flag.innocent ?? [];
   const checked = items.filter(i => i.state !== 'not_looked_at').length;
   const set = (text: string, state: FlagInnocentOut['state'], why?: string) => mark.mutate({path: {flag_id: flag.id}, body: {text, state, note: why ?? null}});
@@ -479,11 +493,18 @@ function BeforeYouCallIt({flag, investigationId, ranAt}: {flag: RedFlagOut; inve
           <span>{i.text}</span>
           {i.state === 'ruled_out' && i.note && <small><i>Ruled out: {i.note}</i></small>}
           {i.state === 'could_apply' && <small>Could apply{i.note ? `: ${i.note}` : ''}</small>}
-          {ruling === i.text ? <form className="inn-why" onSubmit={e => { e.preventDefault(); if (note.trim()) { set(i.text, 'ruled_out', note.trim()); setRuling(null); setNote(''); } }}>
-            <input aria-label={`What ruled out: ${i.text}`} autoFocus value={note} onChange={e => setNote(e.target.value)} placeholder="What ruled it out"/>
-            <button type="submit" disabled={!note.trim()}>Rule out</button><button type="button" onClick={() => setRuling(null)}>Cancel</button>
-          </form> : <span className="inn-acts" role="group" aria-label={`${i.text}: ${INNOCENT_WORD[i.state]}`}>
-            {i.state !== 'ruled_out' && <button type="button" onClick={() => { setRuling(i.text); setNote(''); }}>Rule out…</button>}
+          {ruling === i.text ? <Form {...ruleOut}><form className="inn-why" noValidate onSubmit={submitWith(ruleOut, async ({note}) => {
+            // The failure shows in this form, so not again under the list.
+            try { await mark.mutateAsync({path: {flag_id: flag.id}, body: {text: i.text, state: 'ruled_out', note}}); } catch (error) { mark.reset(); throw error; }
+            setRuling(null); ruleOut.reset();
+          }, 'Could not save that')}>
+            <FormField control={ruleOut.control} name="note" render={({field}) => <FormItemBare>
+              <FormControl><input {...field} aria-label={`What ruled out: ${i.text}`} autoFocus placeholder="What ruled it out"/></FormControl>
+              <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+            <FormRootError className="field-msg next-line"/>
+            <button type="submit">Rule out</button><button type="button" onClick={() => setRuling(null)}>Cancel</button>
+          </form></Form> : <span className="inn-acts" role="group" aria-label={`${i.text}: ${INNOCENT_WORD[i.state]}`}>
+            {i.state !== 'ruled_out' && <button type="button" onClick={() => { setRuling(i.text); ruleOut.reset(); }}>Rule out…</button>}
             {i.state !== 'could_apply' && <button type="button" onClick={() => set(i.text, 'could_apply')}>Could apply</button>}
             {i.state !== 'not_looked_at' && <button type="button" onClick={() => set(i.text, 'not_looked_at')}>Not looked at</button>}
           </span>}

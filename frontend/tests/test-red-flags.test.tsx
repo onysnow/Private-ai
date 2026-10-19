@@ -84,7 +84,10 @@ describe('RedFlagsPanel', () => {
     wrap(<RedFlagsPanel investigationId="inv-1"/>);
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', {name: 'Not relevant'}));
-    expect(screen.getByRole('button', {name: 'Set aside'})).toBeDisabled();
+    await user.click(screen.getByRole('button', {name: 'Set aside'}));
+    expect(await screen.findByText('Write why first.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Why it is not relevant')).toHaveAttribute('aria-invalid', 'true');
+    expect(api.calls('POST /api/red-flags/f-1/dismiss')).toHaveLength(0);
     await user.type(screen.getByLabelText('Why it is not relevant'), 'Known group structure');
     await user.click(screen.getByRole('button', {name: 'Set aside'}));
     await waitFor(() => expect(api.lastBody('POST /api/red-flags/f-1/dismiss')).toEqual({reason: 'Known group structure'}));
