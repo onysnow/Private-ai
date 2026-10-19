@@ -72,6 +72,7 @@ import {
   expandEntityInCorpus,
   exportDeckPptx,
   exportInvestigation,
+  exportOutboundLog,
   exportWriteupDocx,
   externalRelationshipCandidates,
   findExtractionLineageEndpoint,
@@ -130,11 +131,13 @@ import {
   getOpenalephDocumentReviewStatus,
   getOpenalephDocumentSync,
   getOrphanStoragePreview,
+  getOutboundLog,
   getOwnershipChain,
   getPartyYears,
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
+  getSafetyAndData,
   getSameAnswerCandidates,
   getSecurityAlerts,
   getSecurityAudit,
@@ -483,6 +486,9 @@ import type {
   ExportInvestigationData,
   ExportInvestigationError,
   ExportInvestigationResponse,
+  ExportOutboundLogData,
+  ExportOutboundLogError,
+  ExportOutboundLogResponse,
   ExportWriteupDocxData,
   ExportWriteupDocxError,
   ExportWriteupDocxResponse,
@@ -657,6 +663,9 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewError,
   GetOrphanStoragePreviewResponse,
+  GetOutboundLogData,
+  GetOutboundLogError,
+  GetOutboundLogResponse,
   GetOwnershipChainData,
   GetOwnershipChainError,
   GetOwnershipChainResponse,
@@ -672,6 +681,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsError,
   GetRedFlagsResponse,
+  GetSafetyAndDataData,
+  GetSafetyAndDataError,
+  GetSafetyAndDataResponse,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesError,
   GetSameAnswerCandidatesResponse,
@@ -7011,6 +7023,61 @@ export const addNoteMutation = (
   return mutationOptions;
 };
 
+export const getOutboundLogQueryKey = (options: Options<GetOutboundLogData>) =>
+  createQueryKey('getOutboundLog', options);
+
+/**
+ * Get Outbound Log
+ *
+ * Newest first. Only requests that left this computer, unless `include_local` is true.
+ */
+export const getOutboundLogOptions = (options: Options<GetOutboundLogData>) =>
+  queryOptions<
+    GetOutboundLogResponse,
+    GetOutboundLogError,
+    GetOutboundLogResponse,
+    ReturnType<typeof getOutboundLogQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOutboundLog({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getOutboundLogQueryKey(options),
+  });
+
+export const exportOutboundLogQueryKey = (
+  options: Options<ExportOutboundLogData>,
+) => createQueryKey('exportOutboundLog', options);
+
+/**
+ * Export Outbound Log
+ */
+export const exportOutboundLogOptions = (
+  options: Options<ExportOutboundLogData>,
+) =>
+  queryOptions<
+    ExportOutboundLogResponse,
+    ExportOutboundLogError,
+    ExportOutboundLogResponse,
+    ReturnType<typeof exportOutboundLogQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await exportOutboundLog({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: exportOutboundLogQueryKey(options),
+  });
+
 export const howAreTheyConnectedQueryKey = (
   options: Options<HowAreTheyConnectedData>,
 ) => createQueryKey('howAreTheyConnected', options);
@@ -7400,6 +7467,34 @@ export const listReportingTasksInfiniteOptions = (
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const getSafetyAndDataQueryKey = (
+  options: Options<GetSafetyAndDataData>,
+) => createQueryKey('getSafetyAndData', options);
+
+/**
+ * Get Safety And Data
+ */
+export const getSafetyAndDataOptions = (
+  options: Options<GetSafetyAndDataData>,
+) =>
+  queryOptions<
+    GetSafetyAndDataResponse,
+    GetSafetyAndDataError,
+    GetSafetyAndDataResponse,
+    ReturnType<typeof getSafetyAndDataQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSafetyAndData({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSafetyAndDataQueryKey(options),
+  });
 
 export const getSinceQueryKey = (options: Options<GetSinceData>) =>
   createQueryKey('getSince', options);
