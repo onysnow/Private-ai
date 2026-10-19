@@ -55,7 +55,7 @@ class CheckItem(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
     investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
     indicator_id: Mapped[str] = mapped_column(String(16), index=True)
-    kind: Mapped[str] = mapped_column(String(16))  # passage | checklist
+    kind: Mapped[str] = mapped_column(String(16))  # passage | checklist | missing | money (a money check a person kept)
     fingerprint: Mapped[str] = mapped_column(String(64))
     question: Mapped[str] = mapped_column(Text)
     parties: Mapped[list] = mapped_column(JSON, default=list)

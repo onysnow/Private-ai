@@ -23238,6 +23238,67 @@
         "title": "MissingValueOut",
         "type": "object"
       },
+      "MoneyCheckKeep": {
+        "description": "A money check from See › Money to keep in To check; the server runs the check again and keeps it only if it finds it.",
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "maximum": 9999.0,
+                "minimum": 1000.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The year the check was run up to, as on screen.",
+            "title": "As Of"
+          },
+          "currency": {
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Currency",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "grey_hole",
+              "miracle",
+              "black_hole",
+              "round_trip"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "party_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Party Id",
+            "type": "string"
+          },
+          "returning_payment_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A round trip: the payment that returns.",
+            "title": "Returning Payment Id"
+          }
+        },
+        "required": [
+          "currency",
+          "kind",
+          "party_id"
+        ],
+        "title": "MoneyCheckKeep",
+        "type": "object"
+      },
       "MoneyCheckOut": {
         "description": "One party the money checks ask about: a lead, not a finding.",
         "properties": {
@@ -23285,6 +23346,17 @@
           "payments_out": {
             "title": "Payments Out",
             "type": "integer"
+          },
+          "to_check_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Check Id"
           }
         },
         "required": [
@@ -27648,6 +27720,17 @@
           "returning_payment_id": {
             "title": "Returning Payment Id",
             "type": "string"
+          },
+          "to_check_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Check Id"
           }
         },
         "required": [
@@ -32161,7 +32244,7 @@
         "type": "object"
       },
       "ToCheckItemOut": {
-        "description": "Something a person checks: a passage to read, or a checklist item. The\napp never decides it; open until a person does.",
+        "description": "Something a person checks: a passage to read, a checklist item, or a money\ncheck a person kept (kind \"money\", indicator_id the check's kind). The app\nnever decides it; open until a person does.",
         "properties": {
           "decided_at": {
             "anyOf": [
@@ -32242,7 +32325,8 @@
           "kind": {
             "enum": [
               "passage",
-              "checklist"
+              "checklist",
+              "money"
             ],
             "title": "Kind",
             "type": "string"
@@ -49516,6 +49600,66 @@
           }
         },
         "summary": "Get Checks"
+      }
+    },
+    "/api/investigations/{investigation_id}/checks/money": {
+      "post": {
+        "description": "Keeps a money check (See › Money) in To check, once; adding it again changes nothing. The check is run\nagain on this case's own ledger, so only a party it finds now can be kept.",
+        "operationId": "keep_money_check",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoneyCheckKeep"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecksOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Keep Money Check"
       }
     },
     "/api/investigations/{investigation_id}/claim-sources": {

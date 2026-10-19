@@ -162,6 +162,7 @@ import {
   investigationVisualCatalog,
   investigationVisualPreview,
   investigationVisualRestyle,
+  keepMoneyCheck,
   leadQueue,
   linkClaimEvidenceEndpoint,
   linkLead,
@@ -742,6 +743,9 @@ import type {
   InvestigationVisualRestyleData,
   InvestigationVisualRestyleError,
   InvestigationVisualRestyleResponse,
+  KeepMoneyCheckData,
+  KeepMoneyCheckError,
+  KeepMoneyCheckResponse,
   LeadQueueData,
   LeadQueueError,
   LeadQueueResponse,
@@ -5209,6 +5213,36 @@ export const getChecksOptions = (options: Options<GetChecksData>) =>
     },
     queryKey: getChecksQueryKey(options),
   });
+
+/**
+ * Keep Money Check
+ *
+ * Keeps a money check (See › Money) in To check, once; adding it again changes nothing. The check is run
+ * again on this case's own ledger, so only a party it finds now can be kept.
+ */
+export const keepMoneyCheckMutation = (
+  options?: Partial<Options<KeepMoneyCheckData>>,
+): UseMutationOptions<
+  KeepMoneyCheckResponse,
+  KeepMoneyCheckError,
+  Options<KeepMoneyCheckData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    KeepMoneyCheckResponse,
+    KeepMoneyCheckError,
+    Options<KeepMoneyCheckData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await keepMoneyCheck({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getClaimSourcesQueryKey = (
   options: Options<GetClaimSourcesData>,

@@ -4566,6 +4566,19 @@ export const zMissingValueOut = z.object({
 });
 
 /**
+ * MoneyCheckKeep
+ *
+ * A money check from See › Money to keep in To check; the server runs the check again and keeps it only if it finds it.
+ */
+export const zMoneyCheckKeep = z.object({
+  as_of: z.number().int().gte(1000).lte(9999).nullish(),
+  currency: z.string().min(1).max(16),
+  kind: z.enum(['grey_hole', 'miracle', 'black_hole', 'round_trip']),
+  party_id: z.string().min(1).max(64),
+  returning_payment_id: z.string().max(64).nullish(),
+});
+
+/**
  * MoneyCheckOut
  *
  * One party the money checks ask about: a lead, not a finding.
@@ -4581,6 +4594,7 @@ export const zMoneyCheckOut = z.object({
   party_id: z.string(),
   payments_in: z.number().int(),
   payments_out: z.number().int(),
+  to_check_id: z.string().nullish(),
 });
 
 /**
@@ -5812,6 +5826,7 @@ export const zRoundTripOut = z.object({
   path: z.array(z.string()),
   payment_ids: z.array(z.string()),
   returning_payment_id: z.string(),
+  to_check_id: z.string().nullish(),
 });
 
 /**
@@ -7414,8 +7429,9 @@ export const zTimelineOut = z.object({
 /**
  * ToCheckItemOut
  *
- * Something a person checks: a passage to read, or a checklist item. The
- * app never decides it; open until a person does.
+ * Something a person checks: a passage to read, a checklist item, or a money
+ * check a person kept (kind "money", indicator_id the check's kind). The app
+ * never decides it; open until a person does.
  */
 export const zToCheckItemOut = z.object({
   decided_at: z
@@ -7441,7 +7457,7 @@ export const zToCheckItemOut = z.object({
   id: z.string(),
   indicator_id: z.string(),
   indicator_name: z.string(),
-  kind: z.enum(['passage', 'checklist']),
+  kind: z.enum(['passage', 'checklist', 'money']),
   locator: z.string().nullable(),
   note: z.string().nullable(),
   parties: z.array(zFlagPartyOut),
@@ -9837,6 +9853,17 @@ export const zGetChecksPath = z.object({
  * Successful Response
  */
 export const zGetChecksResponse = zChecksOut;
+
+export const zKeepMoneyCheckBody = zMoneyCheckKeep;
+
+export const zKeepMoneyCheckPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zKeepMoneyCheckResponse = zChecksOut;
 
 export const zGetClaimSourcesPath = z.object({
   investigation_id: z.string(),

@@ -11040,6 +11040,38 @@ export type MissingValueOut = {
 };
 
 /**
+ * MoneyCheckKeep
+ *
+ * A money check from See › Money to keep in To check; the server runs the check again and keeps it only if it finds it.
+ */
+export type MoneyCheckKeep = {
+  /**
+   * As Of
+   *
+   * The year the check was run up to, as on screen.
+   */
+  as_of?: number | null;
+  /**
+   * Currency
+   */
+  currency: string;
+  /**
+   * Kind
+   */
+  kind: 'grey_hole' | 'miracle' | 'black_hole' | 'round_trip';
+  /**
+   * Party Id
+   */
+  party_id: string;
+  /**
+   * Returning Payment Id
+   *
+   * A round trip: the payment that returns.
+   */
+  returning_payment_id?: string | null;
+};
+
+/**
  * MoneyCheckOut
  *
  * One party the money checks ask about: a lead, not a finding.
@@ -11085,6 +11117,10 @@ export type MoneyCheckOut = {
    * Payments Out
    */
   payments_out: number;
+  /**
+   * To Check Id
+   */
+  to_check_id?: string | null;
 };
 
 /**
@@ -13762,6 +13798,10 @@ export type RoundTripOut = {
    * Returning Payment Id
    */
   returning_payment_id: string;
+  /**
+   * To Check Id
+   */
+  to_check_id?: string | null;
 };
 
 /**
@@ -16461,8 +16501,9 @@ export type TimelineVisualOut = {
 /**
  * ToCheckItemOut
  *
- * Something a person checks: a passage to read, or a checklist item. The
- * app never decides it; open until a person does.
+ * Something a person checks: a passage to read, a checklist item, or a money
+ * check a person kept (kind "money", indicator_id the check's kind). The app
+ * never decides it; open until a person does.
  */
 export type ToCheckItemOut = {
   /**
@@ -16503,7 +16544,7 @@ export type ToCheckItemOut = {
   /**
    * Kind
    */
-  kind: 'passage' | 'checklist';
+  kind: 'passage' | 'checklist' | 'money';
   /**
    * Locator
    */
@@ -22883,6 +22924,42 @@ export type GetChecksResponses = {
 };
 
 export type GetChecksResponse = GetChecksResponses[keyof GetChecksResponses];
+
+export type KeepMoneyCheckData = {
+  body: MoneyCheckKeep;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/checks/money';
+};
+
+export type KeepMoneyCheckErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type KeepMoneyCheckError =
+  KeepMoneyCheckErrors[keyof KeepMoneyCheckErrors];
+
+export type KeepMoneyCheckResponses = {
+  /**
+   * Successful Response
+   */
+  200: ChecksOut;
+};
+
+export type KeepMoneyCheckResponse =
+  KeepMoneyCheckResponses[keyof KeepMoneyCheckResponses];
 
 export type GetClaimSourcesData = {
   body?: never;

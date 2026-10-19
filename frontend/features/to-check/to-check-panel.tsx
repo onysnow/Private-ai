@@ -5,7 +5,8 @@
 // passage is a part of a document that holds an indicator's words. The app
 // never decides an item. A slim card shows the question, who it is about and,
 // for a passage, the words in place; the decision and an optional note are on
-// the card. Each item names its indicator and links to its Red Flag.
+// the card. Each item names its indicator and links to its Red Flag. A money
+// check a person kept from See › Money carries the check's numbers as they were.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement, ReactNode} from 'react';
@@ -66,15 +67,16 @@ function CheckCard({item, highlighted, onDecide}: {item: ToCheckItemOut; highlig
   return <article id={`check-${item.id}`} className={`tc-card status-${item.status}${highlighted ? ' open' : ''}`}
     aria-label={`To check: ${sentence(item.question)}`}>
     <header className="tc-head">
-      <span className="tc-kind">{item.kind === 'passage' ? 'Passage' : 'Checklist'}</span>
+      <span className="tc-kind">{item.kind === 'passage' ? 'Passage' : item.kind === 'money' ? 'Money check' : 'Checklist'}</span>
       <h4>{sentence(item.question)}</h4>
     </header>
-    <p className="tc-from">{item.indicator_name} · {item.indicator_id}
+    <p className="tc-from">{item.kind === 'money' ? <>Kept from See › Money · {item.locator}</> : <>{item.indicator_name} · {item.indicator_id}</>}
       {item.flag_id && <> · <button type="button" className="tc-link" onClick={() => goToFlag(item.flag_id!)}>Its Red Flag</button></>}
       {item.related_flags.length > 0 && <> · {item.related_flags.length} other flag{item.related_flags.length > 1 ? 's' : ''} on these parties</>}
     </p>
     <Parties parties={item.parties}/>
     {item.kind === 'passage' && item.excerpt && <blockquote className="tc-excerpt">{marked(item.excerpt, item.terms)}</blockquote>}
+    {item.kind === 'money' && item.excerpt && <p className="tc-excerpt">{item.excerpt}</p>}
     {item.document && <p className="tc-from"><button type="button" className="tc-link" onClick={() => {
       openDocument(item.document!.id); document.getElementById('document-ingestion')?.scrollIntoView({behavior: 'smooth', block: 'start'}); }}>
       {item.document.filename}</button>{item.locator ? `, ${item.locator}` : ''}</p>}

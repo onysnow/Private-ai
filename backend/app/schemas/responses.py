@@ -2619,6 +2619,7 @@ class MoneyCheckOut(ResponseModel):
     gap: float
     innocent: str
     lead_idea: str
+    to_check_id: str | None = None  # the To check item a person keeps for it, if any
 
 
 class RoundTripOut(ResponseModel):
@@ -2631,6 +2632,7 @@ class RoundTripOut(ResponseModel):
     gap: float
     innocent: str
     lead_idea: str
+    to_check_id: str | None = None
 
 
 class CurrencyMoneyChecksOut(ResponseModel):
@@ -4287,12 +4289,13 @@ class CheckDocumentOut(ResponseModel):
 
 
 class ToCheckItemOut(ResponseModel):
-    """Something a person checks: a passage to read, or a checklist item. The
-    app never decides it; open until a person does."""
+    """Something a person checks: a passage to read, a checklist item, or a money
+    check a person kept (kind "money", indicator_id the check's kind). The app
+    never decides it; open until a person does."""
     id: str
     indicator_id: str
     indicator_name: str
-    kind: Literal["passage", "checklist"]
+    kind: Literal["passage", "checklist", "money"]
     question: str
     status: Literal["open", "shows", "does_not", "unclear"]
     note: str | None

@@ -2,7 +2,7 @@
 // See › Money (mockup SEE_2): loads with the view, one currency at a time, the columns with the ghost of
 // missing money and the return arc of a round trip, the checks as leads with what could be innocent,
 // the ledger strip with Red Flags' bracket, J / K, and "Traced so far".
-import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -94,6 +94,43 @@ describe('the money picture', () => {
     expect(chip('K', 'not_yet_shown')).toMatchObject({text: '○ €42,000 “deposit”', sub: null});
   });
 
+  it('folds all but the largest flows into one "others (n)" band, and every party keeps its exact totals', () => {
+    // A pays B 100, and pays 30 small payees 1 each (2 payments to each); B pays C 90.
+    const ps = [p('big', 'A', 'B', 100, '2018'), p('on', 'B', 'C', 90, '2019')];
+    for (let i = 0; i < 30; i++) ps.push(p(`s${i}a`, 'A', `S${i}`, 1, '2019'), p(`s${i}b`, 'A', `S${i}`, 1, '2019'));
+    const all = layout(ps, 'EUR');
+    expect(all.flows).toBe(32);
+    expect(all.folded).toBeNull();
+    expect(all.bands).toHaveLength(32);
+    const pic = layout(ps, 'EUR', {top: 20});
+    expect(pic.bands).toHaveLength(21);
+    const others = pic.bands.find(b => b.certainty === 'others')!;
+    expect(pic.folded).toEqual({flows: 12, payments: 24, amount: 24});
+    expect(others.ids).toHaveLength(24);
+    expect(others.label).toBe('others (12) · €24 in 24 payments');
+    // The drawn bands and "others" together carry every payment, exactly once.
+    expect(pic.bands.flatMap(b => b.ids).sort()).toEqual(ps.map(x => x.id).sort());
+    expect(pic.bands.reduce((s, b) => s + b.amount, 0)).toBe(ps.reduce((s, x) => s + x.amount, 0));
+    // A's label is all it paid (100 + 60), though 24 of its payments are folded away.
+    expect(pic.nodes.find(n => n.id === 'A')).toMatchObject({amountOut: 160, others: false});
+    const ends = pic.nodes.filter(n => n.others);
+    expect(ends.map(n => [n.col, n.name])).toEqual([[0, 'others (12)'], [pic.columns.length - 1, 'others (12)']]);
+    // A crowded column packs its parties closer and makes the picture taller, never with overlapping bars.
+    const last = pic.nodes.filter(n => n.col === pic.columns.length - 1).sort((a, b) => a.y - b.y);
+    last.slice(1).forEach((n, i) => expect(n.y).toBeGreaterThanOrEqual(last[i].y + last[i].h));
+    expect(pic.height).toBeGreaterThan(340);
+  });
+
+  it('draws a ledger of thousands of payments in a moment', () => {
+    const ps: Payment[] = [];
+    for (let i = 0; i < 3000; i++) ps.push(p(`x${i}`, `P${i % 400}`, `R${(i * 7) % 900}`, 10 + (i % 97), `20${10 + (i % 10)}-01-01`));
+    const t0 = performance.now();
+    const pic = layout(ps, 'EUR', {top: 20});
+    expect(performance.now() - t0).toBeLessThan(3000);
+    expect(pic.bands.filter(b => b.certainty !== 'worked_out')).toHaveLength(21);
+    expect(pic.bands.reduce((s, b) => s + b.amount, 0)).toBe(ps.reduce((s, x) => s + x.amount, 0));
+  });
+
   it('never refuses a cycle: the latest payment of a round trip is drawn as a return arc', () => {
     const ps = [p('1', 'A', 'B', 100, '2018-01-01'), p('2', 'B', 'C', 90, '2018-06-01'), p('3', 'C', 'A', 85, '2019-01-01')];
     expect([...cycleClosers(ps)]).toEqual(['3']);
@@ -127,7 +164,6 @@ describe('MoneyView', () => {
     expect(grey).toHaveTextContent('Could be innocent: a bank loan, or money from the owners, that the case does not hold yet.');
     expect(screen.getByRole('article', {name: 'Miracle: none found'})).toBeInTheDocument();
     expect(screen.getByRole('article', {name: 'Round trip: none found'})).toHaveTextContent('No euro chain returns to its payer.');
-    expect(within(grey).getByRole('button', {name: 'Add to To check'})).toBeDisabled();
     await userEvent.setup().click(within(grey).getByRole('button', {name: 'Make a lead'}));
     await waitFor(() => expect(api.calls('POST /api/leads')).toHaveLength(1));
     expect(api.lastBody('POST /api/leads')).toMatchObject({investigation_id: 'inv-1', title: 'Grey hole: Kestrel SA (EUR)'});
@@ -162,6 +198,96 @@ describe('MoneyView', () => {
     mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {...LEDGER, transactions: [], incomplete: []}});
     wrap(<MoneyView investigationId="inv-1"/>);
     expect(await screen.findByText('No payment has an amount yet.')).toBeInTheDocument();
+  });
+
+  it('adds a money check to To check once, then says it is already there', async () => {
+    const KEPT = {investigation_id: 'inv-1', gone: [], missing: [], items: [{
+      id: 'tc-1', indicator_id: 'grey_hole', indicator_name: 'Grey hole', kind: 'money', question: 'Grey hole at Kestrel SA: more out than in',
+      status: 'open', note: null, decided_at: null, parties: [{id: 'kes', name: 'Kestrel SA', schema: 'Company'}], flag_id: null, related_flags: [],
+      document: null, locator: 'EUR ledger', excerpt: '29,400 EUR recorded in, 1,430,000 EUR out: 1,400,600 EUR has no recorded source.', terms: [],
+      first_seen_at: '2026-10-10T00:00:00', gone_at: null,
+    }]};
+    const api = mockApi({...routes, 'POST /api/investigations/inv-1/checks/money': KEPT});
+    wrap(<MoneyView investigationId="inv-1"/>);
+    const grey = await screen.findByRole('article', {name: 'Grey hole: Kestrel SA'});
+    await userEvent.setup().click(within(grey).getByRole('button', {name: 'Add to To check'}));
+    await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/checks/money')).toHaveLength(1));
+    expect(api.lastBody('POST /api/investigations/inv-1/checks/money')).toMatchObject({currency: 'EUR', kind: 'grey_hole', party_id: 'kes', as_of: null});
+    expect(await within(grey).findByRole('button', {name: 'In To check ✓'})).toBeDisabled();
+    // The other checks can still be added.
+    expect(within(screen.getByRole('article', {name: 'Black hole: Loop Two BV'})).getByRole('button', {name: 'Add to To check'})).toBeEnabled();
+  });
+
+  it('says a check is already in To check when the server says it is kept', async () => {
+    const kept = {...CHECKS, currencies: [{...CHECKS.currencies[0], checks: CHECKS.currencies[0].checks.map(c => c.kind === 'grey_hole' ? {...c, to_check_id: 'tc-1'} : c)}]};
+    mockApi({...routes, 'GET /api/investigations/inv-1/money-checks': kept});
+    wrap(<MoneyView investigationId="inv-1"/>);
+    const grey = await screen.findByRole('article', {name: 'Grey hole: Kestrel SA'});
+    expect(within(grey).getByRole('button', {name: 'In To check ✓'})).toBeDisabled();
+  });
+
+  it('pointing at a band, with the mouse or the keyboard, lights all its ledger rows in the table and on the strip', async () => {
+    mockApi(routes);
+    const {container} = wrap(<MoneyView investigationId="inv-1"/>);
+    await screen.findByText(/each just under the €10,000 line/);
+    const band = screen.getByRole('button', {name: 'Fernhill Ltd to Kestrel SA: 3 × €9,800 (not yet shown)'});
+    const litRows = () => [...container.querySelectorAll('.mn-table tr.lit')].map(r => r.textContent?.slice(0, 11));
+    fireEvent.mouseEnter(band);
+    expect(litRows()).toEqual(['06 Feb 2018', '09 Mar 2018', '11 Apr 2018']);
+    expect(container.querySelectorAll('.mn-bar.lit')).toHaveLength(3);
+    expect(band).toHaveClass('lit');
+    fireEvent.mouseLeave(band);
+    expect(litRows()).toEqual([]);
+    expect(container.querySelectorAll('.mn-bar.lit')).toHaveLength(0);
+    // Tab onto a band does the same; Enter adds it to Traced so far.
+    act(() => band.focus());
+    expect(litRows()).toHaveLength(3);
+    fireEvent.keyDown(band, {key: 'Enter'});
+    expect(screen.getByText('Traced so far').parentElement).toHaveTextContent('€29,4003 payments');
+    expect(band).toHaveAttribute('aria-pressed', 'true');
+    act(() => band.blur());
+    expect(litRows()).toEqual([]);
+  });
+
+  it('draws the 20 largest flows of a very large ledger, folds the rest into "others (n)" that opens out, and keeps the totals exact', async () => {
+    // 1 large payment from a fund, then 60 payees each paid by one of 30 payers: 61 flows, 151 payments.
+    const FUND: [string, string] = ['fund', 'Northwind Fund'];
+    const big = [tx('b0', FUND, KES, 5000000, {dateTime: '2017-01-01'})];
+    for (let i = 0; i < 150; i++) {
+      const payer: [string, string] = [`pay${i % 30}`, `Payer ${i % 30}`];
+      const payee: [string, string] = [`to${i % 60}`, `Payee ${i % 60}`];
+      big.push(tx(`q${i}`, payer, payee, 1000 + (i % 60) * 100, {dateTime: `2019-${String(1 + (i % 12)).padStart(2, '0')}-01`}));
+    }
+    const total = big.reduce((s, t) => s + t.amount, 0);
+    mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {...LEDGER, transactions: big, incomplete: []},
+      'GET /api/investigations/inv-1/money-checks': {...CHECKS, currencies: [{currency: 'EUR', payments: big.length, round_trips: [], checks: []}]}});
+    const {container} = wrap(<MoneyView investigationId="inv-1"/>);
+    const others = await screen.findByRole('button', {name: /^others \(41\) · €[\d,]+ in \d+ payments: the smaller flows/});
+    expect(container.querySelectorAll('.mn-band')).toHaveLength(21);
+    expect(screen.getByText(/The 20 largest of 61 flows are drawn; others \(41\) holds the/)).toBeInTheDocument();
+    // Pointing at "others" lights every payment folded into it.
+    fireEvent.mouseEnter(others);
+    const foldedCount = Number(others.getAttribute('aria-label')!.match(/in (\d+) payments/)![1]);
+    expect(container.querySelectorAll('.mn-bar.lit')).toHaveLength(foldedCount);
+    fireEvent.mouseLeave(others);
+    // The 20 drawn bands carry exactly the 20 largest flows; "others" carries exactly the rest.
+    const byPair = new Map<string, number>();
+    for (const t of big) byPair.set(`${t.from_entity_id}>${t.to_entity_id}`, (byPair.get(`${t.from_entity_id}>${t.to_entity_id}`) ?? 0) + t.amount);
+    const top20 = [...byPair.values()].sort((a, b) => b - a).slice(0, 20).reduce((s, a) => s + a, 0);
+    expect(others.getAttribute('aria-label')).toContain(`€${(total - top20).toLocaleString('en-GB')} in`);
+    for (const b of container.querySelectorAll('.mn-band')) if (b !== others) fireEvent.click(b);
+    expect(screen.getByText('Traced so far').parentElement).toHaveTextContent(`€${top20.toLocaleString('en-GB')}`);
+    // A party's label keeps its exact total even when some of its flows are folded away: Payer 20 pays
+    // Payee 50 €12,000 (drawn) and Payee 20 €9,000 (folded).
+    expect([...container.querySelectorAll('.mn-node-name')].map(t => t.textContent)).toContain('Payer 20€21,000 · 5 payments');
+    fireEvent.click(others);
+    expect(container.querySelectorAll('.mn-band')).toHaveLength(61);
+    expect(screen.getByText(/All 61 flows are drawn/)).toBeInTheDocument();
+    // Opened out, every band can be traced, and the total is every payment's.
+    for (const b of container.querySelectorAll<SVGPathElement>('.mn-band')) if (!b.classList.contains('traced')) fireEvent.click(b);
+    expect(screen.getByText('Traced so far').parentElement).toHaveTextContent(`€${total.toLocaleString('en-GB')}${big.length} payments`);
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Fold to the 20 largest'}));
+    expect(container.querySelectorAll('.mn-band')).toHaveLength(21);
   });
 
   it('shows the reason when the ledger cannot be read', async () => {
