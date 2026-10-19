@@ -30,6 +30,7 @@ import {
   convertLeadEndpoint,
   createAppUser,
   createCanonicalRelationship,
+  createCapture,
   createCaseRecord,
   createClaimEndpoint,
   createClaimReview,
@@ -85,6 +86,8 @@ import {
   getBasemapSprite,
   getBasemapStatus,
   getBasemapTile,
+  getCapture,
+  getCaptureFile,
   getCaseRecord,
   getCatalogueMap,
   getChecks,
@@ -179,6 +182,7 @@ import {
   listAppUsers,
   listAreas,
   listAssessments,
+  listCaptures,
   listCaseRecords,
   listClaimEvidenceEndpoint,
   listClaims,
@@ -245,6 +249,7 @@ import {
   promoteStatementAssessment,
   pruneSecurityAudit,
   putInvestigationMembership,
+  recheckCapture,
   recheckHash,
   recordStoryGate,
   refreshOpenalephDocumentReview,
@@ -360,6 +365,9 @@ import type {
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipError,
   CreateCanonicalRelationshipResponse,
+  CreateCaptureData,
+  CreateCaptureError,
+  CreateCaptureResponse,
   CreateCaseRecordData,
   CreateCaseRecordError,
   CreateCaseRecordResponse,
@@ -525,6 +533,12 @@ import type {
   GetBasemapTileData,
   GetBasemapTileError,
   GetBasemapTileResponse,
+  GetCaptureData,
+  GetCaptureError,
+  GetCaptureFileData,
+  GetCaptureFileError,
+  GetCaptureFileResponse,
+  GetCaptureResponse,
   GetCaseRecordData,
   GetCaseRecordError,
   GetCaseRecordResponse,
@@ -807,6 +821,9 @@ import type {
   ListAssessmentsData,
   ListAssessmentsError,
   ListAssessmentsResponse,
+  ListCapturesData,
+  ListCapturesError,
+  ListCapturesResponse,
   ListCaseRecordsData,
   ListCaseRecordsError,
   ListCaseRecordsResponse,
@@ -1001,6 +1018,9 @@ import type {
   PutInvestigationMembershipData,
   PutInvestigationMembershipError,
   PutInvestigationMembershipResponse,
+  RecheckCaptureData,
+  RecheckCaptureError,
+  RecheckCaptureResponse,
   RecheckHashData,
   RecheckHashError,
   RecheckHashResponse,
@@ -5377,6 +5397,143 @@ export const saveInvestigationRunProfileMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await saveInvestigationRunProfile({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listCapturesQueryKey = (options: Options<ListCapturesData>) =>
+  createQueryKey('listCaptures', options);
+
+/**
+ * List Captures
+ *
+ * Every capture of this case, newest first.
+ */
+export const listCapturesOptions = (options: Options<ListCapturesData>) =>
+  queryOptions<
+    ListCapturesResponse,
+    ListCapturesError,
+    ListCapturesResponse,
+    ReturnType<typeof listCapturesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listCaptures({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listCapturesQueryKey(options),
+  });
+
+/**
+ * Create Capture
+ *
+ * Fetch the page from this computer and keep it. A link that gave nothing back, or a login wall, is a capture too
+ * (outcome link_only / not_seen): it is recorded, not hidden.
+ */
+export const createCaptureMutation = (
+  options?: Partial<Options<CreateCaptureData>>,
+): UseMutationOptions<
+  CreateCaptureResponse,
+  CreateCaptureError,
+  Options<CreateCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateCaptureResponse,
+    CreateCaptureError,
+    Options<CreateCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createCapture({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getCaptureQueryKey = (options: Options<GetCaptureData>) =>
+  createQueryKey('getCapture', options);
+
+/**
+ * Get Capture
+ */
+export const getCaptureOptions = (options: Options<GetCaptureData>) =>
+  queryOptions<
+    GetCaptureResponse,
+    GetCaptureError,
+    GetCaptureResponse,
+    ReturnType<typeof getCaptureQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCapture({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaptureQueryKey(options),
+  });
+
+export const getCaptureFileQueryKey = (options: Options<GetCaptureFileData>) =>
+  createQueryKey('getCaptureFile', options);
+
+/**
+ * Get Capture File
+ */
+export const getCaptureFileOptions = (options: Options<GetCaptureFileData>) =>
+  queryOptions<
+    GetCaptureFileResponse,
+    GetCaptureFileError,
+    GetCaptureFileResponse,
+    ReturnType<typeof getCaptureFileQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaptureFile({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaptureFileQueryKey(options),
+  });
+
+/**
+ * Recheck Capture
+ *
+ * Capture the address again. Same text: a line in the checks. Changed: a new capture that names this one. Removed:
+ * a link-only capture that names it. This one is never altered.
+ */
+export const recheckCaptureMutation = (
+  options?: Partial<Options<RecheckCaptureData>>,
+): UseMutationOptions<
+  RecheckCaptureResponse,
+  RecheckCaptureError,
+  Options<RecheckCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RecheckCaptureResponse,
+    RecheckCaptureError,
+    Options<RecheckCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await recheckCapture({
         ...options,
         ...fnOptions,
         throwOnError: true,

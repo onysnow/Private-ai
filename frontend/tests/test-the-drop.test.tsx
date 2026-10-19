@@ -290,3 +290,41 @@ describe('The Drop', () => {
     expect(problemsFirst([warn, stuck, drop.lanes[1]] as never).map(l => l.filename)).toEqual(['broken.pdf', 's.pdf', 'w.pdf']);
   });
 });
+
+describe('The Drop: links', () => {
+  const CAPTURES = 'GET /api/investigations/inv-1/captures';
+
+  it('captures a link pasted into the field instead of saving it as a text file', async () => {
+    const api = mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': drop, [CAPTURES]: {captures: []},
+      'POST /api/investigations/inv-1/captures': {status: 422, body: {detail: 'Only http and https addresses can be captured.'}}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const field = await screen.findByLabelText('Drop files here, or paste text or a link');
+    fireEvent.paste(field, {clipboardData: {getData: () => 'https://www.marlow-courier.example/2019/03/sale', files: []}});
+    await screen.findByLabelText('Paste a link');
+    await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/captures')).toHaveLength(1));
+    expect(api.calls('POST /api/documents/upload')).toHaveLength(0);
+    expect((api.lastBody('POST /api/investigations/inv-1/captures') as {url: string}).url).toBe('https://www.marlow-courier.example/2019/03/sale');
+    expect(screen.getByRole('button', {name: 'Links & captures'})).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('still saves pasted text that only mentions a link as a text file', async () => {
+    const api = mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': drop, 'POST /api/investigations/inv-1/ingestion-batches': {id: 'b1', label: 'x'},
+      'POST /api/documents/upload': {status: 415, body: {detail: 'not read in this test'}}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const field = await screen.findByLabelText('Drop files here, or paste text or a link');
+    fireEvent.paste(field, {clipboardData: {getData: () => 'See https://a.example/x for the sale', files: []}});
+    await waitFor(() => expect(api.calls('POST /api/documents/upload')).toHaveLength(1));
+    expect(screen.queryByLabelText('Paste a link')).toBeNull();
+  });
+
+  it('opens Links & captures from its tab and goes back to the line', async () => {
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': drop, [CAPTURES]: {captures: []}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: 'Links & captures'}));
+    expect(await screen.findByLabelText('Captures in this case')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Digestion line'}));
+    expect(await screen.findByRole('region', {name: 'Digestion line'})).toBeInTheDocument();
+  });
+});
+

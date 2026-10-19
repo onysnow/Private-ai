@@ -91,7 +91,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 - **Material types:**
   - CSV and XLSX make no payments unless mapped.
   - MP3, WAV and MP4 give a 415, and the demo's .mp3/.mov show "failed · 0 chunks" with no reason.
-  - A web link isn't fetched or archived, and "not a url" is accepted.
+  - ~~A web link isn't fetched or archived, and "not a url" is accepted.~~ Fixed 19 Oct: a pasted link is captured (Bring in › The Drop › Links & captures, ADR-0016). Still open there: second witness, time proof, the check-again schedule, the quote that finds itself again, a browser in the Docker image.
   - The watchlist "Check now" needs OpenAleph.
   - There is no form for manual entities, relationships or events.
 - **Data quality and counts:**

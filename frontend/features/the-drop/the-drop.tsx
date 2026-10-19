@@ -28,6 +28,8 @@ import type {DropHistoryEntryOut, DropLaneOut, DropOut, DropProposerOut, DropSta
 import {singleKeysOn} from '../../lib/shortcuts';
 import {apiTime} from '../../lib/timestamps';
 import {proposerName} from '../reading-room/proposers';
+import {CapturesView} from '../captures/captures-view';
+import {linksIn} from '../captures/format';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {PagePicture} from '../case-home/decision-card';
 import {batchLabel, upload} from '../documents/documents-panel';
@@ -295,7 +297,9 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   }, [reading, investigationId, queryClient]);
   const settings = useQuery({...settingsStatusOptions()}).data;
   const data = query.data;
-  const [tab, setTab] = useState<'line' | 'history'>('line');
+  const [tab, setTab] = useState<'line' | 'history' | 'links'>('line');
+  // Links pasted into the field wait here for the Links & captures tab to capture them, one after another.
+  const [incoming, setIncoming] = useState<string[]>([]);
   const [shown, setShown] = useState<{label: string; ids: string[]} | null>(null);
   const [duplicates, setDuplicates] = useState<Duplicate[]>([]);
   const batchRef = useRef<string | undefined>(undefined);
@@ -329,7 +333,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   }, [lanes, lane]);
 
   useEffect(() => {
-    if (!active) return undefined;
+    if (!active || tab === 'links') return undefined;
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey || typing(e.target) || !singleKeysOn()) return;
       const k = e.key.toLowerCase();
@@ -341,7 +345,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [active, move, lane, openDocument]);
+  }, [active, tab, move, lane, openDocument]);
 
   // The grid's one tab stop: the cell last focused, else the first file's name.
   const gridRef = useRef<HTMLDivElement>(null);
@@ -425,6 +429,8 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   const onPaste = (text: string) => {
     const clean = text.trim();
     if (!clean) return;
+    const links = linksIn(clean);
+    if (links.length) { setIncoming(links); setTab('links'); return; }
     void send([new File([clean], `Pasted text ${new Date().toISOString().slice(0, 16).replace('T', ' ')}.txt`, {type: 'text/plain'})]);
   };
   const choose = (e: ChangeEvent<HTMLInputElement>) => { void send(Array.from(e.target.files ?? [])); e.target.value = ''; };
@@ -449,9 +455,9 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
 
   const field = <div className={`dp-field${over ? ' over' : ''}`} onDragOver={e => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={onDrop}
     onPaste={e => { const text = e.clipboardData.getData('text'); if (text && !e.clipboardData.files.length) { e.preventDefault(); onPaste(text); } }} tabIndex={0}
-    aria-label="Drop files here, or paste text">
+    aria-label="Drop files here, or paste text or a link">
     <span className="dp-arrow" aria-hidden="true">↓</span>
-    <p><b>Drop files, a folder, or paste text</b></p>
+    <p><b>Drop files, a folder, or paste text or a link</b></p>
     <p className="dp-quiet">or press <kbd>O</kbd> to <button type="button" className="dp-link" onClick={() => files.current?.click()}>choose files</button>
       {' · '}<button type="button" className="dp-link" onClick={() => folder.current?.click()}>a folder</button></p>
     <input ref={files} type="file" multiple hidden onChange={choose}/>
@@ -460,20 +466,28 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
     {status && <p role="status" className="dp-status">{status}</p>}
   </div>;
 
+  const navTabs = <nav className="dp-tabs" aria-label="The Drop">
+    <button type="button" className={tab === 'line' ? 'on' : ''} aria-current={tab === 'line' ? 'page' : undefined} onClick={() => setTab('line')}>Digestion line</button>
+    <button type="button" className={tab === 'links' ? 'on' : ''} aria-current={tab === 'links' ? 'page' : undefined} onClick={() => setTab('links')}>Links &amp; captures</button>
+    <Link href={caseHref('/bring-in#document-ingestion', investigationId)}>Library <small>{every.length}</small></Link>
+    <button type="button" className={tab === 'history' ? 'on' : ''} aria-current={tab === 'history' ? 'page' : undefined} onClick={() => setTab('history')}>History</button>
+    {t && t.unread > 0 && <span className="dp-live"><i aria-hidden="true"/>Reading · {t.unread} file{t.unread === 1 ? '' : 's'}
+      {stream === 'reconnecting' ? <small> · reconnecting</small> : stream === 'polling' ? <small> · checking every 2 s</small> : null}</span>}
+  </nav>;
+  if (tab === 'links') return <section className="dp" aria-label="The Drop">
+    {navTabs}
+    <CapturesView investigationId={investigationId} incoming={incoming} onIncomingDone={() => setIncoming([])}/>
+  </section>;
+
   if (!data || empty) return <section className="dp dp-empty" aria-label="The Drop">
     {field}
     {empty && <p className="dp-quiet">Each file is read on this computer: nothing leaves it.</p>}
+    <p className="dp-quiet">Or paste a web address to <button type="button" className="dp-link" onClick={() => setTab('links')}>capture a page</button>.</p>
     {query.isError && <p role="alert">{errorMessage(query.error, 'Could not see what was brought in')}</p>}
   </section>;
 
   return <section className="dp" aria-label="The Drop">
-    <nav className="dp-tabs" aria-label="The Drop">
-      <button type="button" className={tab === 'line' ? 'on' : ''} aria-current={tab === 'line' ? 'page' : undefined} onClick={() => setTab('line')}>Digestion line</button>
-      <Link href={caseHref('/bring-in#document-ingestion', investigationId)}>Library <small>{every.length}</small></Link>
-      <button type="button" className={tab === 'history' ? 'on' : ''} aria-current={tab === 'history' ? 'page' : undefined} onClick={() => setTab('history')}>History</button>
-      {t!.unread > 0 && <span className="dp-live"><i aria-hidden="true"/>Reading · {t!.unread} file{t!.unread === 1 ? '' : 's'}
-        {stream === 'reconnecting' ? <small> · reconnecting</small> : stream === 'polling' ? <small> · checking every 2 s</small> : null}</span>}
-    </nav>
+    {navTabs}
 
     <div className="dp-left">
       {field}

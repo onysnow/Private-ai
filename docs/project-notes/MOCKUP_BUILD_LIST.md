@@ -111,6 +111,17 @@ INTAKE_2 Reading room:
 - [ ] Still from the research for the reading room: "What changes if I accept" preview; "Answer once, apply to the batch"; revision rate per proposer (19 Oct: the first two done — Accept shows what it adds, from the card's answers, on hover and focus and as its description; after "Same as this", the other waiting mentions of the same name in the drop, else the case, are listed with "Apply to these n", held 6 s with Undo; `GET /extraction-candidates/{id}/same-answer`) on the read receipt (19 Oct, later: done — the receipt's "By proposer" says "Name-finder (rules): 31 of 40 accepted · 1 waits" per proposer, from the rule each proposal records; accepted / rejected only, as an accept corrected first is not recorded apart from a plain accept; `receipt.by_proposer` on `GET /drop`); language chip (the reader does not record the language yet); OCR quality per page
 Also from the backlog: watchlist highlights redesign; Sources & evidence as a browsable list of all sources and evidence; .mbox children titled properly; audio/video intake; web links fetched; manual entity/event forms.
 
+## 4b. Bring in — source-intake mockups (approved 19 Oct; `docs/design/source-intake-mockups/`, research `docs/research/source-intake/`)
+INTAKE_3 Capture a web page (ADR-0016):
+- [x] (19 Oct) Paste a link in the Drop (or the Links & captures tab): fetched from this computer, no cookies or login, private networks refused; kept as the page source, a WARC of the request and answer, a hashed text copy and (with Chromium) a screenshot and the page as scripts built it; read through the existing reader; a web Source with the address; logged in the outbound log
+- [x] (19 Oct) Outcomes are records: saved, link only, not seen, not saved; "already in the case" by fingerprint or text; Re-check now (same / changed → new copy that names the first / gone / unreachable); the capture lane, what was sent and came back, receipt with fingerprints and "as displayed, not verified"; "Content verified: not done by this system"
+- [x] (19 Oct) Files travel with backups, restore and deletion; the stray-file preview does not list them
+- [ ] Second witness (public web archive) and time proof — each sends the address out; Ony's question 2 of the research
+- [ ] "Check again later" schedule (Weekly/Daily) — needs a scheduler; today a re-check is a button
+- [ ] The quote that finds itself again after a re-check; a clock drawn into the screenshot; "Capture all…" for a monitored feed
+- [ ] Chromium in the Docker image (screenshots and script-built pages work without it only on a computer that has one)
+FOLLOW_1 Following, CHECK_3 Is it real?, INTAKE_4 Listen and read along: approved, not built (research Phases 3, 4 and 2).
+
 ## 5. See — mockups SEE_1 (network) and SEE_2 (money) (§07), plus Timeline and Places
 
 SEE_1 "Who controls Kestrel SA": The Wire is now See's map; SEE_1's parts go into it.

@@ -75,6 +75,9 @@ import type {
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipErrors,
   CreateCanonicalRelationshipResponses,
+  CreateCaptureData,
+  CreateCaptureErrors,
+  CreateCaptureResponses,
   CreateCaseRecordData,
   CreateCaseRecordErrors,
   CreateCaseRecordResponses,
@@ -240,6 +243,12 @@ import type {
   GetBasemapTileData,
   GetBasemapTileErrors,
   GetBasemapTileResponses,
+  GetCaptureData,
+  GetCaptureErrors,
+  GetCaptureFileData,
+  GetCaptureFileErrors,
+  GetCaptureFileResponses,
+  GetCaptureResponses,
   GetCaseRecordData,
   GetCaseRecordErrors,
   GetCaseRecordResponses,
@@ -522,6 +531,9 @@ import type {
   ListAssessmentsData,
   ListAssessmentsErrors,
   ListAssessmentsResponses,
+  ListCapturesData,
+  ListCapturesErrors,
+  ListCapturesResponses,
   ListCaseRecordsData,
   ListCaseRecordsErrors,
   ListCaseRecordsResponses,
@@ -717,6 +729,9 @@ import type {
   PutInvestigationMembershipData,
   PutInvestigationMembershipErrors,
   PutInvestigationMembershipResponses,
+  RecheckCaptureData,
+  RecheckCaptureErrors,
+  RecheckCaptureResponses,
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
@@ -923,6 +938,9 @@ import {
   zCreateAppUserResponse,
   zCreateCanonicalRelationshipBody,
   zCreateCanonicalRelationshipResponse,
+  zCreateCaptureBody,
+  zCreateCapturePath,
+  zCreateCaptureResponse,
   zCreateCaseRecordBody,
   zCreateCaseRecordPath,
   zCreateCaseRecordResponse,
@@ -1049,6 +1067,10 @@ import {
   zGetBasemapStatusResponse,
   zGetBasemapTilePath,
   zGetBasemapTileResponse,
+  zGetCaptureFilePath,
+  zGetCaptureFileResponse,
+  zGetCapturePath,
+  zGetCaptureResponse,
   zGetCaseRecordPath,
   zGetCaseRecordResponse,
   zGetCatalogueMapResponse,
@@ -1255,6 +1277,8 @@ import {
   zListAreasResponse,
   zListAssessmentsPath,
   zListAssessmentsResponse,
+  zListCapturesPath,
+  zListCapturesResponse,
   zListCaseRecordsPath,
   zListCaseRecordsQuery,
   zListCaseRecordsResponse,
@@ -1409,6 +1433,8 @@ import {
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
   zPutInvestigationMembershipResponse,
+  zRecheckCapturePath,
+  zRecheckCaptureResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
   zRecordStoryGateBody,
@@ -5833,6 +5859,143 @@ export const saveInvestigationRunProfile = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * List Captures
+ *
+ * Every capture of this case, newest first.
+ */
+export const listCaptures = <ThrowOnError extends boolean = false>(
+  options: Options<ListCapturesData, ThrowOnError>,
+): RequestResult<ListCapturesResponses, ListCapturesErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ListCapturesResponses,
+    ListCapturesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListCapturesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListCapturesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures',
+    ...options,
+  });
+
+/**
+ * Create Capture
+ *
+ * Fetch the page from this computer and keep it. A link that gave nothing back, or a login wall, is a capture too
+ * (outcome link_only / not_seen): it is recorded, not hidden.
+ */
+export const createCapture = <ThrowOnError extends boolean = false>(
+  options: Options<CreateCaptureData, ThrowOnError>,
+): RequestResult<CreateCaptureResponses, CreateCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CreateCaptureResponses,
+    CreateCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateCaptureBody,
+          path: zCreateCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateCaptureResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Capture
+ */
+export const getCapture = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaptureData, ThrowOnError>,
+): RequestResult<GetCaptureResponses, GetCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCaptureResponses,
+    GetCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCaptureResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures/{capture_id}',
+    ...options,
+  });
+
+/**
+ * Get Capture File
+ */
+export const getCaptureFile = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaptureFileData, ThrowOnError>,
+): RequestResult<GetCaptureFileResponses, GetCaptureFileErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCaptureFileResponses,
+    GetCaptureFileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCaptureFilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCaptureFileResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures/{capture_id}/files/{name}',
+    ...options,
+  });
+
+/**
+ * Recheck Capture
+ *
+ * Capture the address again. Same text: a line in the checks. Changed: a new capture that names this one. Removed:
+ * a link-only capture that names it. This one is never altered.
+ */
+export const recheckCapture = <ThrowOnError extends boolean = false>(
+  options: Options<RecheckCaptureData, ThrowOnError>,
+): RequestResult<RecheckCaptureResponses, RecheckCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RecheckCaptureResponses,
+    RecheckCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRecheckCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRecheckCaptureResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures/{capture_id}/recheck',
+    ...options,
   });
 
 /**

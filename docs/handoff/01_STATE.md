@@ -79,6 +79,7 @@ Not built:
 
 - **SEE_1 / The Wire redesign:** needs a new mockup for Ony to approve first.
 - **§9 Knowledge catalogue** (KNOWLEDGE-catalogue.png).
+- **Source intake (Ony approved the four mockups 19 Oct):** INTAKE_3 built: a pasted link becomes a capture (ADR-0016; `MOCKUP_BUILD_LIST.md` §4b). FOLLOW_1, CHECK_3 and INTAKE_4 are next, in the order of the research plan (Phase 2 media/social posts by link and transcripts, Phase 3 following, Phase 4 authenticity); each needs its own look at Ony's open questions in the research §12.
 - **§9 KEEP Safety & data** (KEEP-safety-and-data.png): first slice built 19 Oct (see `MOCKUP_BUILD_LIST.md` §9 and ADR-0015). Still to do there: Your safety panel, plain-language security events, delete or keep stray files, the Off / Ask first / Automatic switch, OpenAleph traffic in the log, encrypted backups.
 - **§10 Website (SITE_1/2):** waits on Ony's name, licence and photos.
 - **Timeline and Places:** there is no mockup yet.

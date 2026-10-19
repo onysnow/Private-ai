@@ -1681,6 +1681,245 @@ export type CapabilitiesOut = {
 };
 
 /**
+ * CaptureCheckOut
+ *
+ * One re-check of a saved capture: `state` is same | changed | gone | unreachable | not_seen. For changed and
+ * gone, `capture_id` is the capture that kept what was found.
+ */
+export type CaptureCheckOut = {
+  /**
+   * At
+   */
+  at: string;
+  /**
+   * Capture Id
+   */
+  capture_id?: string | null;
+  /**
+   * State
+   */
+  state: string;
+};
+
+/**
+ * CaptureCreate
+ */
+export type CaptureCreate = {
+  /**
+   * Url
+   *
+   * The web address to capture. Captures never log in, and refuse a private network.
+   */
+  url: string;
+};
+
+/**
+ * CaptureFileOut
+ *
+ * A file kept for a capture, with its SHA-256. `role`: page | rendered | archive | screenshot | text.
+ */
+export type CaptureFileOut = {
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Note
+   */
+  note: string;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Size
+   */
+  size: number;
+};
+
+/**
+ * CaptureOut
+ *
+ * A web page captured from a link. `outcome`: saved | link_only | not_seen | failed. `displayed` is what the page
+ * SAYS about itself (title, byline, date) and is never verified. `change` is the newest re-check's state.
+ */
+export type CaptureOut = {
+  /**
+   * Change
+   */
+  change?: string | null;
+  /**
+   * Checks
+   */
+  checks: Array<CaptureCheckOut>;
+  /**
+   * Collector
+   */
+  collector: {
+    [key: string]: unknown;
+  };
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Displayed
+   */
+  displayed?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  /**
+   * Ended At
+   */
+  ended_at?: string | null;
+  /**
+   * Files
+   */
+  files: Array<CaptureFileOut>;
+  /**
+   * Final Url
+   */
+  final_url?: string | null;
+  /**
+   * Has Screenshot
+   */
+  has_screenshot?: boolean;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Outcome
+   */
+  outcome: string;
+  /**
+   * Page Sha256
+   */
+  page_sha256?: string | null;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Request
+   */
+  request?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Response
+   */
+  response?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Source Id
+   */
+  source_id?: string | null;
+  /**
+   * Started At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  started_at: string;
+  /**
+   * Steps
+   */
+  steps: Array<CaptureStepOut>;
+  /**
+   * Supersedes Id
+   */
+  supersedes_id?: string | null;
+  /**
+   * Text Sha256
+   */
+  text_sha256?: string | null;
+  /**
+   * Title
+   */
+  title?: string | null;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
+ * CaptureResultOut
+ *
+ * What a capture or a re-check came to. `state`: new | already_in_case | same | changed | gone | unreachable |
+ * not_seen. `job` follows the page's reading, like an upload's.
+ */
+export type CaptureResultOut = {
+  /**
+   * Already In Case
+   */
+  already_in_case: boolean;
+  capture: CaptureOut;
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  job?: BackgroundJobOut | null;
+  /**
+   * State
+   */
+  state: string;
+};
+
+/**
+ * CaptureStepOut
+ *
+ * One stage of the capture lane as it ran: done, skipped (with why) or failed, and how long it took.
+ */
+export type CaptureStepOut = {
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Seconds
+   */
+  seconds: number;
+  /**
+   * State
+   */
+  state: string;
+};
+
+/**
+ * CapturesOut
+ */
+export type CapturesOut = {
+  /**
+   * Captures
+   */
+  captures: Array<CaptureOut>;
+};
+
+/**
  * CaseChangeOut
  */
 export type CaseChangeOut = {
@@ -23976,6 +24215,210 @@ export type SaveInvestigationRunProfileResponses = {
 
 export type SaveInvestigationRunProfileResponse =
   SaveInvestigationRunProfileResponses[keyof SaveInvestigationRunProfileResponses];
+
+export type ListCapturesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/captures';
+};
+
+export type ListCapturesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListCapturesError = ListCapturesErrors[keyof ListCapturesErrors];
+
+export type ListCapturesResponses = {
+  /**
+   * Successful Response
+   */
+  200: CapturesOut;
+};
+
+export type ListCapturesResponse =
+  ListCapturesResponses[keyof ListCapturesResponses];
+
+export type CreateCaptureData = {
+  body: CaptureCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/captures';
+};
+
+export type CreateCaptureErrors = {
+  /**
+   * The address is not one a capture fetches (not http or https, a login in the address, a private network)
+   */
+  422: unknown;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateCaptureError = CreateCaptureErrors[keyof CreateCaptureErrors];
+
+export type CreateCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureResultOut;
+  /**
+   * Saved; the page is read by a background job (follow `job`)
+   */
+  202: CaptureResultOut;
+};
+
+export type CreateCaptureResponse =
+  CreateCaptureResponses[keyof CreateCaptureResponses];
+
+export type GetCaptureData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/captures/{capture_id}';
+};
+
+export type GetCaptureErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaptureError = GetCaptureErrors[keyof GetCaptureErrors];
+
+export type GetCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type GetCaptureResponse = GetCaptureResponses[keyof GetCaptureResponses];
+
+export type GetCaptureFileData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+    /**
+     * Name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/captures/{capture_id}/files/{name}';
+};
+
+export type GetCaptureFileErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaptureFileError =
+  GetCaptureFileErrors[keyof GetCaptureFileErrors];
+
+export type GetCaptureFileResponses = {
+  /**
+   * One kept file of the capture, as stored
+   */
+  200: Blob | File;
+};
+
+export type GetCaptureFileResponse =
+  GetCaptureFileResponses[keyof GetCaptureFileResponses];
+
+export type RecheckCaptureData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/captures/{capture_id}/recheck';
+};
+
+export type RecheckCaptureErrors = {
+  /**
+   * Only a saved capture can be checked again
+   */
+  409: unknown;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecheckCaptureError =
+  RecheckCaptureErrors[keyof RecheckCaptureErrors];
+
+export type RecheckCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureResultOut;
+  /**
+   * Changed and saved; the new copy is read by a background job
+   */
+  202: CaptureResultOut;
+};
+
+export type RecheckCaptureResponse =
+  RecheckCaptureResponses[keyof RecheckCaptureResponses];
 
 export type ListCaseRecordsData = {
   body?: never;

@@ -727,6 +727,118 @@ export const zCanonicalStatementOut = z.object({
 });
 
 /**
+ * CaptureCheckOut
+ *
+ * One re-check of a saved capture: `state` is same | changed | gone | unreachable | not_seen. For changed and
+ * gone, `capture_id` is the capture that kept what was found.
+ */
+export const zCaptureCheckOut = z.object({
+  at: z.string(),
+  capture_id: z.string().nullish(),
+  state: z.string(),
+});
+
+/**
+ * CaptureCreate
+ */
+export const zCaptureCreate = z.object({
+  url: z.string().max(4096),
+});
+
+/**
+ * CaptureFileOut
+ *
+ * A file kept for a capture, with its SHA-256. `role`: page | rendered | archive | screenshot | text.
+ */
+export const zCaptureFileOut = z.object({
+  name: z.string(),
+  note: z.string(),
+  role: z.string(),
+  sha256: z.string(),
+  size: z.number().int(),
+});
+
+/**
+ * CaptureStepOut
+ *
+ * One stage of the capture lane as it ran: done, skipped (with why) or failed, and how long it took.
+ */
+export const zCaptureStepOut = z.object({
+  detail: z.string(),
+  key: z.string(),
+  label: z.string(),
+  seconds: z.number(),
+  state: z.string(),
+});
+
+/**
+ * CaptureOut
+ *
+ * A web page captured from a link. `outcome`: saved | link_only | not_seen | failed. `displayed` is what the page
+ * SAYS about itself (title, byline, date) and is never verified. `change` is the newest re-check's state.
+ */
+export const zCaptureOut = z.object({
+  change: z.string().nullish(),
+  checks: z.array(zCaptureCheckOut),
+  collector: z.record(z.unknown()),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  displayed: z.record(z.unknown()).nullish(),
+  document_id: z.string().nullish(),
+  ended_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  files: z.array(zCaptureFileOut),
+  final_url: z.string().nullish(),
+  has_screenshot: z.boolean().optional().default(false),
+  id: z.string(),
+  investigation_id: z.string(),
+  outcome: z.string(),
+  page_sha256: z.string().nullish(),
+  reason: z.string().nullish(),
+  request: z.record(z.unknown()).nullish(),
+  response: z.record(z.unknown()).nullish(),
+  source_id: z.string().nullish(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  steps: z.array(zCaptureStepOut),
+  supersedes_id: z.string().nullish(),
+  text_sha256: z.string().nullish(),
+  title: z.string().nullish(),
+  url: z.string(),
+});
+
+/**
+ * CaptureResultOut
+ *
+ * What a capture or a re-check came to. `state`: new | already_in_case | same | changed | gone | unreachable |
+ * not_seen. `job` follows the page's reading, like an upload's.
+ */
+export const zCaptureResultOut = z.object({
+  already_in_case: z.boolean(),
+  capture: zCaptureOut,
+  document_id: z.string().nullish(),
+  job: zBackgroundJobOut.nullish(),
+  state: z.string(),
+});
+
+/**
+ * CapturesOut
+ */
+export const zCapturesOut = z.object({
+  captures: z.array(zCaptureOut),
+});
+
+/**
  * CaseChangeOut
  */
 export const zCaseChangeOut = z.object({
@@ -10338,6 +10450,57 @@ export const zSaveInvestigationRunProfilePath = z.object({
  * Successful Response
  */
 export const zSaveInvestigationRunProfileResponse = zRunProfileOut;
+
+export const zListCapturesPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zListCapturesResponse = zCapturesOut;
+
+export const zCreateCaptureBody = zCaptureCreate;
+
+export const zCreateCapturePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateCaptureResponse = zCaptureResultOut;
+
+export const zGetCapturePath = z.object({
+  investigation_id: z.string(),
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCaptureResponse = zCaptureOut;
+
+export const zGetCaptureFilePath = z.object({
+  investigation_id: z.string(),
+  capture_id: z.string(),
+  name: z.string(),
+});
+
+/**
+ * One kept file of the capture, as stored
+ */
+export const zGetCaptureFileResponse = z.string();
+
+export const zRecheckCapturePath = z.object({
+  investigation_id: z.string(),
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRecheckCaptureResponse = zCaptureResultOut;
 
 export const zListCaseRecordsPath = z.object({
   investigation_id: z.string(),
