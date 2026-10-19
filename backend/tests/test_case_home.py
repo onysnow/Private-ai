@@ -12,6 +12,7 @@ from app.core.time import utcnow_naive
 from app.db.session import SessionLocal
 from app.main import app
 from app.models.domain import Document, DocumentChunk, ExtractionCandidate, Source
+from tests.claim_helpers import post_claim
 
 client = TestClient(app)
 
@@ -71,7 +72,7 @@ def test_standing_counts_on_the_server():
     assert empty["claims"]["total"] == 0 and empty["to_decide"] == 0 and empty["money"] == {"currency": None, "amount": 0.0, "payments": 0, "from_sources": 0, "other_currencies": []}
     assert empty["timeline"] == {"events": 0, "from": None, "to": None, "years": []}
     for status in ("supported", "confirmed", "disputed", "lead"):
-        ok(client.post("/api/claims", json={"investigation_id": inv, "text": f"A {status} claim", "status": status, "confidence": 0.5}))
+        ok(post_claim(client, {"investigation_id": inv, "text": f"A {status} claim", "status": status, "confidence": 0.5}))
     ok(client.post("/api/timeline-events", json={"investigation_id": inv, "title": "Board meets", "date_start": "2017-03-04"}))
     ok(client.post("/api/timeline-events", json={"investigation_id": inv, "title": "Transfer", "date_start": "2018-03-14"}))
     _chain(inv)
@@ -150,7 +151,7 @@ def test_the_done_rules_for_supported_run_on_the_stored_records(tmp_path):
         db.add(DocumentChunk(document_id=doc.id, locator="p1", ordinal=0, text="The Board approved the acquisition of the\nharbour parcel."))
         db.commit()
         src_id = src.id
-    claim = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "The Board approved it", "status": "unverified", "confidence": 0}))
+    claim = ok(post_claim(client, {"investigation_id": inv, "text": "The Board approved it", "status": "unverified", "confidence": 0}))
     workspace = ok(client.get(f"/api/claims/{claim['id']}/review-workspace"))
     assert workspace["done"]["supported"]["left"] >= 1 and workspace["done"]["supported"]["rules"][0]["state"] == "not_met"
     ev = ok(client.post("/api/evidence", json={"source_id": src_id, "quote": "approved the acquisition of the harbour parcel", "locator": "p1"}))
@@ -253,8 +254,8 @@ def test_a_party_lights_the_years_of_its_links_and_events():
 
 def test_each_claim_names_the_source_it_rests_on_first():
     inv = _inv("Sources")
-    claim = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "Meridian paid Bellcastle", "status": "unverified", "confidence": 0.5}))["id"]
-    ok(client.post("/api/claims", json={"investigation_id": inv, "text": "Nothing linked", "status": "unverified", "confidence": 0.5}))
+    claim = ok(post_claim(client, {"investigation_id": inv, "text": "Meridian paid Bellcastle", "status": "unverified", "confidence": 0.5}))["id"]
+    ok(post_claim(client, {"investigation_id": inv, "text": "Nothing linked", "status": "unverified", "confidence": 0.5}))
 
     def evidence(title, locator):
         src = ok(client.post("/api/sources", json={"investigation_id": inv, "title": title, "source_type": "document"}))["id"]

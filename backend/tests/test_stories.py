@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.services.stories import sentences_without_source
+from tests.claim_helpers import post_claim
 
 client = TestClient(app)
 
@@ -29,8 +30,8 @@ def test_the_tree_is_as_strong_as_its_weakest_claim_and_ready_waits_for_every_ga
     inv = ok(client.post("/api/investigations", json={"name": "Harbour"}))["id"]
     empty = ok(client.get(f"/api/investigations/{inv}/story"))
     assert empty["id"] is None and empty["thesis"] == "" and empty["gates_passed"] == 2  # no flags and nothing single-source yet
-    shown = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "The council sold the land to Fernhill Ltd", "status": "supported"}))
-    unshown = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "The sale was not put out to tender"}))
+    shown = ok(post_claim(client, {"investigation_id": inv, "text": "The council sold the land to Fernhill Ltd", "status": "supported"}))
+    unshown = ok(post_claim(client, {"investigation_id": inv, "text": "The sale was not put out to tender"}))
     src = ok(client.post("/api/sources", json={"investigation_id": inv, "title": "Land registry", "source_type": "document"}))
     ev = ok(client.post("/api/evidence", json={"source_id": src["id"], "quote": "transferred to Fernhill Ltd", "locator": "title ML-2017"}))
     ok(client.post(f"/api/claims/{shown['id']}/evidence", json={"evidence_id": ev["id"], "stance": "supports"}))
@@ -70,7 +71,7 @@ def test_the_story_travels_with_the_case_backup():
     from app.services.exports import collect_investigation_records
 
     inv = ok(client.post("/api/investigations", json={"name": "Backup"}))["id"]
-    claim = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "The land was sold"}))
+    claim = ok(post_claim(client, {"investigation_id": inv, "text": "The land was sold"}))
     ok(client.put(f"/api/investigations/{inv}/story", json={"thesis": "The land was sold cheaply"}))
     section = ok(client.post(f"/api/investigations/{inv}/story/sections", json={"title": "The sale"}))["sections"][0]
     ok(client.post(f"/api/investigations/{inv}/story/sections/{section['id']}/claims", json={"claim_id": claim["id"]}))

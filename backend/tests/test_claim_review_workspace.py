@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from app.db.session import Base, engine
 from app.main import app
+from tests.claim_helpers import post_claim
 
 def test_claim_review_requires_rationale_preserves_history_and_shows_relationship_dependencies():
     client=TestClient(app)
@@ -8,7 +9,7 @@ def test_claim_review_requires_rationale_preserves_history_and_shows_relationshi
     src=client.post('/api/sources',json={'investigation_id':inv['id'],'title':'Filing','source_type':'document'}).json()
     support=client.post('/api/evidence',json={'source_id':src['id'],'quote':'A employed B','locator':'p. 2 chars 10-22'}).json()
     contra=client.post('/api/evidence',json={'source_id':src['id'],'quote':'B denied employment','locator':'p. 7 chars 4-23'}).json()
-    claim=client.post('/api/claims',json={'investigation_id':inv['id'],'text':'A employed B','status':'unverified','confidence':0}).json()
+    claim=post_claim(client, {'investigation_id':inv['id'],'text':'A employed B','status':'unverified','confidence':0}).json()
     for ev,stance in ((support,'supports'),(contra,'contradicts')): assert client.post(f"/api/claims/{claim['id']}/evidence",json={'evidence_id':ev['id'],'stance':stance}).status_code==200
     a=client.post('/api/entities',json={'investigation_id':inv['id'],'schema':'Person','caption':'A','properties':{}}).json(); b=client.post('/api/entities',json={'investigation_id':inv['id'],'schema':'Company','caption':'B','properties':{}}).json()
     edge=client.post('/api/relationships',json={'investigation_id':inv['id'],'schema':'Employment','source_entity_id':a['id'],'target_entity_id':b['id'],'evidence_id':support['id']}).json()
@@ -33,8 +34,8 @@ def test_reconciled_relationship_advisory_distinguishes_independent_support_and_
     src=client.post('/api/sources',json={'investigation_id':inv['id'],'title':'Two records','source_type':'document'}).json()
     ev1=client.post('/api/evidence',json={'source_id':src['id'],'quote':'A worked for B per filing','locator':'p. 1'}).json()
     ev2=client.post('/api/evidence',json={'source_id':src['id'],'quote':'A worked for B per payroll','locator':'p. 9'}).json()
-    c1=client.post('/api/claims',json={'investigation_id':inv['id'],'text':'Filing says A worked for B','status':'unverified','confidence':0}).json()
-    c2=client.post('/api/claims',json={'investigation_id':inv['id'],'text':'Payroll says A worked for B','status':'supported','confidence':.8}).json()
+    c1=post_claim(client, {'investigation_id':inv['id'],'text':'Filing says A worked for B','status':'unverified','confidence':0}).json()
+    c2=post_claim(client, {'investigation_id':inv['id'],'text':'Payroll says A worked for B','status':'supported','confidence':.8}).json()
     client.post(f"/api/claims/{c1['id']}/evidence",json={'evidence_id':ev1['id'],'stance':'supports'})
     client.post(f"/api/claims/{c2['id']}/evidence",json={'evidence_id':ev2['id'],'stance':'supports'})
     a=client.post('/api/entities',json={'investigation_id':inv['id'],'schema':'Person','caption':'A','properties':{}}).json()
