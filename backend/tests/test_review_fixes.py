@@ -392,3 +392,33 @@ def test_a_chart_whose_query_cannot_run_is_dropped_not_kept():
         {"kind": "content", "heading": "Money", "bullets": [], "evidence": [], "visual": visual}]})
     assert saved.status_code == 200
     assert saved.json()["slides"][0]["visual"] is None
+
+
+def test_forged_items_on_a_chart_block_reach_neither_the_text_nor_the_citations():
+    from tests.test_saved_charts import _deck_and_writeup
+    from fastapi.testclient import TestClient as _TC
+    c = _TC(app)
+    _inv, _d, writeup_id = _deck_and_writeup()
+    visual = _forged_chart_visual()
+    visual["data"] = {"rows": []}
+    visual["items"] = [{"label": "Phantom Corp", "value": 777, "evidence": [{"record_type": "payment", "record_id": "fake-id"}]}]
+    doc = {"type": "doc", "content": [{"type": "evidenceVisual", "attrs": {"visual": visual}}]}
+    saved = c.patch(f"/api/writeups/{writeup_id}", json={"content_json": doc})
+    assert saved.status_code == 200, saved.text
+    body = saved.json()
+    assert "Phantom Corp" not in str(body) and "fake-id" not in str(body)
+    assert body["cited_record_refs"]
+
+
+def test_a_chart_in_a_writeup_keeps_its_drawing_text_and_real_report_through_a_save():
+    from tests.test_saved_charts import ORDER, _deck_and_writeup
+    from fastapi.testclient import TestClient as _TC
+    c = _TC(app)
+    _inv, _d, writeup_id = _deck_and_writeup()
+    added = c.post(f"/api/writeups/{writeup_id}/charts", json={"spec": ORDER})
+    assert added.status_code == 200, added.text
+    doc = added.json()["content_json"]
+    saved = c.patch(f"/api/writeups/{writeup_id}", json={"content_json": doc})
+    visual = saved.json()["content_json"]["content"][-1]["attrs"]["visual"]
+    assert visual["option"] and visual["text"].get("description")
+    assert visual["report"]["ok"] is True and visual["report"].get("checked_rules")

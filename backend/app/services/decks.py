@@ -123,10 +123,24 @@ def rebuild_chart_data(db: Session, investigation_id: str, visual: dict) -> dict
         return None
     if not data.rows:
         return None
-    rebuilt = {k: v for k, v in visual.items() if k not in {"data", "option", "text", "report", "slide_drawing"}}
-    rebuilt["data"] = data.as_dict()
-    rebuilt["report"] = {"ok": True, "errors": [], "warnings": []}
-    rebuilt["text"] = {}
+    # Built from the fields a chart is allowed to have, never copied from the
+    # request: `items` and any other extra keys would otherwise reach the
+    # saved text and the citations (writeups.extract_cited_refs).
+    rebuilt: dict[str, Any] = {"type": CHART_VISUAL, "spec": spec.model_dump(mode="json"), "data": data.as_dict()}
+    style = normalize_chart_style(spec, data, visual.get("style"))
+    if style:
+        rebuilt["style"] = style
+    # Drawn and checked here, so a stored chart always carries the drawing,
+    # words and report of the rows just cooked (a deck draws it again in its
+    # own theme, recheck_charts).
+    checked = checked_chart(rebuilt, resolved_theme(None))
+    if checked.built is not None and checked.report is not None:
+        rebuilt["option"] = checked.built.option
+        rebuilt["text"] = checked.built.text()
+        rebuilt["report"] = checked.report.as_dict()
+    else:
+        rebuilt["text"] = {}
+        rebuilt["report"] = {"ok": False, "errors": [{"rule": 0, "message": checked.problem or "chart not drawn"}], "warnings": []}
     return rebuilt
 
 
