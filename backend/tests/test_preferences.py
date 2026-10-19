@@ -93,14 +93,15 @@ def test_inbox_sends_each_row_where_its_kind_goes():
     assert [r["key"] for r in box["interrupt"]] == [f"f:{textbook}"]
     assert box["needs"][0]["kind"] == "flag_textbook"
     assert box["needs"][0]["title"].startswith("Textbook Red Flag: ")
-    assert [r["kind"] for r in box["else"]] == ["flag_faint"]
+    # Requests the server refused (the shared audit log, which other tests write to) may also be in Everything else.
+    assert [r["kind"] for r in box["else"] if r["kind"] != "security"] == ["flag_faint"]
     assert box["week"]["flag_textbook"] == 1 and box["week"]["flag_strong"] == 0
 
     client.put("/api/settings/notifications", json={"routes": {"flag_textbook": "needs", "flag_faint": "off"}})
     box = client.get(f"/api/investigations/{inv}/inbox").json()
     assert box["interrupt"] == []
     assert [r["kind"] for r in box["needs"]] == ["flag_textbook"]
-    assert box["else"] == []
+    assert [r for r in box["else"] if r["kind"] != "security"] == []
     assert box["week"]["flag_faint"] == 1  # still counted for the replay
 
 
@@ -220,3 +221,16 @@ def test_research_due_only_after_a_run_and_while_asking():
     inv = _case()
     with SessionLocal() as db:
         assert notifications.research_due(db, inv) is None  # never ran: not nagged
+
+
+def test_a_cases_own_lookups_travel_in_its_backup(probe):
+    from app.services.exports import build_investigation_export, inspect_export
+
+    inv = _case()
+    client.put(f"/api/investigations/{inv}/lookups", json={"modes": {"probe": "off"}, "reason": "source protection"})
+    with SessionLocal() as db:
+        preferences.save_notification_prefs(db, "someone", routes={"flag_faint": "off"}, quiet_while_reading=True, desktop=False)
+        package, _ = build_investigation_export(db, inv, include_documents=False)
+    _, records = inspect_export(package)
+    rows = records["app_preferences"]
+    assert [(r["scope"], r["key"], r["value"], r["reason"]) for r in rows] == [("case", "lookups", {"modes": {"probe": "off"}}, "source protection")]

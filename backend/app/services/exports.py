@@ -28,7 +28,7 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
+    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -45,7 +45,7 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
+        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference,
     ]
 }
 
@@ -78,6 +78,9 @@ RESTORE_ORDER = [
     "pattern_flags",
     # What a person checks, with their decisions; an item may point at its flag and its document.
     "check_items",
+    # The case's own settings (Settings › Outside lookups for this case, with the reason it was set); only rows that
+    # belong to the case are exported, so a person's and the server's settings stay where they are.
+    "app_preferences",
     # The Authority System Suite's own records for the case (gaps, replies, hypotheses, ...).
     "case_records",
     # The TAS reasoning review queue travels with the investigation: a restored
@@ -160,7 +163,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion,
+        Story, AIRunEvent, WriteupVersion, Preference,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -207,6 +210,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "collections": direct["collections"], "collection_items": direct["collection_items"],
         "pattern_flags": direct["pattern_flags"],
         "check_items": direct["check_items"],
+        "app_preferences": direct["app_preferences"],
         "case_records": direct["case_records"],
         "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
         "ai_run_events": direct["ai_run_events"],
