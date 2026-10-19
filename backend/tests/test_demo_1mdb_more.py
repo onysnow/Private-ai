@@ -231,7 +231,7 @@ def test_the_records_reach_the_screens(loaded):
     events = list(db.scalars(select(TimelineEvent).where(TimelineEvent.investigation_id == inv.id)))
     assert {e.precision for e in events} >= {"range", "month", "year"} and any(e.date_end for e in events)
     assert {e.verification_status for e in events} >= {"disputed", "approximate"}
-    najib = db.scalar(select(Entity).where(Entity.investigation_id == inv.id, Entity.caption.like("Mohd Najib%")))
+    najib = db.scalar(select(Entity).where(Entity.investigation_id == inv.id, Entity.schema == "Person", Entity.caption.like("Mohd Najib%")))
     assert najib.properties["birthDate"] == ["1953-07-23"] and "role.pep" in najib.properties["topics"]
     yacht = db.scalar(select(Entity).where(Entity.investigation_id == inv.id, Entity.schema == "Vessel"))
     assert yacht.properties["imoNumber"] == ["1012086"] and yacht.properties["mmsi"] == ["319059800"]
