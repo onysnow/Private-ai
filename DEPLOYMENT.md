@@ -133,6 +133,19 @@ remote user would look local. If you put a proxy in front of the app:
 
 3. Keep the operations console off behind a proxy (`CONSOLE_ENABLED=false`).
 
+### The operations console and its SQL workbench
+
+The console (`/console`) can run SQL typed by an operator, which is its purpose. It is
+safe on a computer you control because of four limits, and each one has to stay true:
+
+- Only a caller on the local machine can open it (a remote caller never can). Behind a
+  proxy this depends on `TRUSTED_PROXY_IPS` above.
+- Writing SQL is off unless `CONSOLE_WRITES=changesets_and_sql` is set; it also needs the
+  local admin role and a typed confirmation, and every write is logged.
+- Read mode is held read-only by the database itself: a `READ ONLY` transaction on
+  PostgreSQL, `PRAGMA query_only` on SQLite. The keyword screen is a second layer.
+- Set `CONSOLE_ENABLED=false` on any shared or hosted copy.
+
 ## 4. Upgrade
 
 ```bash
