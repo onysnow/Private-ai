@@ -9,10 +9,14 @@ import type {ReactElement} from 'react';
 import {errorMessage} from '../../lib/api-client';
 import {getWireOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {mountWire} from './wire-engine';
 
 export function TheWire({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
   const query = useQuery({...getWireOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  // The parties' Red Flags are as the rules last left them: when the records have changed since, this runs them once
+  // and the run refetches the Wire.
+  useRedFlagsQuery(investigationId);
   const root = useRef<HTMLDivElement>(null);
   const activeRef = useRef(active);
   activeRef.current = active;

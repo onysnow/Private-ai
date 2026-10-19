@@ -212,6 +212,19 @@ def recompute(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] |
     db.commit()
 
 
+def up_to_date(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] | None = None) -> bool:
+    """Whether the stored items are what ``recompute`` would leave them as now. Reading never writes: a
+    screen that finds them behind runs the rules (POST .../red-flags/run), which recomputes them."""
+    wanted = _wanted(db, investigation_id, load() if specs is None else specs)
+    existing = {c.fingerprint: c for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id,
+                                                                              CheckItem.kind != "money"))}
+    for fp, fields in wanted.items():
+        row = existing.get(fp)
+        if row is None or row.gone_at is not None or any(getattr(row, key) != value for key, value in fields.items()):
+            return False
+    return all(row.gone_at is not None for fp, row in existing.items() if fp not in wanted)
+
+
 def money_fingerprint(currency: str, kind: str, party_id: str, payment_id: str | None = None) -> str:
     """A money check's identity in To check: the currency, the kind, the party and, for a round trip, the
     payment that returns (one party can be at the end of more than one trip)."""

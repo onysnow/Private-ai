@@ -62,3 +62,37 @@ def test_the_wire_of_an_empty_case_is_empty():
     inv = ok(client.post("/api/investigations", json={"name": "Nothing yet"}))["id"]
     assert ok(client.get(f"/api/investigations/{inv}/wire")) == {"investigation_id": inv, "entities": [], "links": [], "events": []}
     assert client.get("/api/investigations/nope/wire").status_code == 404
+
+
+def test_reading_the_wire_never_runs_the_rules_and_shows_what_the_last_run_left():
+    from app.api.routes_case_home import get_wire
+    from app.core.authorization import AuthorizationScope, authorization_scope_context
+    from app.db.session import SessionLocal
+    from tests.stored_rules_rows import stored
+
+    inv = ok(client.post("/api/investigations", json={"name": "Wire: reading never writes"}))["id"]
+    a, b, c = _party(inv, "A Ltd"), _party(inv, "B Ltd"), _party(inv, "C Ltd")
+    for x, y in ((a, b), (b, c), (c, a)):
+        _link(inv, "Ownership", x, y)
+    before = stored(inv)
+    body = ok(client.get(f"/api/investigations/{inv}/wire"))
+    assert all(e["flags"] is None for e in body["entities"]), "never run: no flag on any party yet"
+    assert stored(inv) == before == {"flags": {}, "checks": {}, "run": None}, "reading the Wire runs no rule"
+
+    ok(client.post(f"/api/investigations/{inv}/red-flags/run"))
+    ran = stored(inv)
+    body = ok(client.get(f"/api/investigations/{inv}/wire"))
+    flagged = {e["id"] for e in body["entities"] if e["flags"]}
+    assert flagged == {a, b, c}, "after a run the Wire shows the circle's flag on each party"
+    assert stored(inv) == ran
+
+    d = _party(inv, "D Ltd")
+    _link(inv, "Payment", c, d, amount=["5000"], currency=["EUR"])
+    again = ok(client.get(f"/api/investigations/{inv}/wire"))
+    assert {e["id"] for e in again["entities"] if e["flags"]} == flagged, "the new party carries no flag until the next run"
+    assert d in {e["id"] for e in again["entities"]}, "the records themselves are read as they are"
+    assert stored(inv) == ran
+    with SessionLocal() as db, authorization_scope_context(AuthorizationScope("reader-1", frozenset({inv}), role="viewer")):
+        read = get_wire(inv, db)
+    assert {e["id"] for e in read["entities"] if e["flags"]} == flagged, "a reader reads the stored flags"
+    assert stored(inv) == ran

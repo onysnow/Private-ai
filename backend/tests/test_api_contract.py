@@ -300,6 +300,7 @@ def _check_item(client: TestClient) -> str:
     for upper, lower in zip(chain, chain[1:]):
         client.post("/api/relationships", json={"investigation_id": inv, "schema": "Ownership", "source_entity_id": upper,
                                                 "target_entity_id": lower, "properties": {}})
+    client.post(f"/api/investigations/{inv}/red-flags/run")  # reading To check never brings it up to date
     return client.get(f"/api/investigations/{inv}/checks").json()["items"][0]["id"]
 
 

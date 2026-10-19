@@ -3,11 +3,16 @@
 // own request (POST .../red-flags/run, mockup ACT_1 "Reading never writes"). Every screen that shows flags reads
 // them through here. When the records have changed since the rules last ran (`stale`), the first screen to notice
 // runs them once and puts the fresh answer in place for all, so each screen still shows the flags as of now.
+// To check, Decide and the Wire read the same stored rows (GET .../checks, .../decisions, .../wire never run the
+// rules either): `stale` also covers To check being behind, so the screens that show them mount this hook too, and
+// a run refetches them.
 import {useIsMutating, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import type {QueryClient, UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {useEffect} from 'react';
 
-import {getRedFlagsOptions, getRedFlagsQueryKey, getStandingQueryKey, runRedFlagsMutation} from '../../lib/generated/@tanstack/react-query.gen';
+import {
+  getChecksQueryKey, getDecisionsQueryKey, getRedFlagsOptions, getRedFlagsQueryKey, getStandingQueryKey, getWireQueryKey, runRedFlagsMutation,
+} from '../../lib/generated/@tanstack/react-query.gen';
 import type {Options} from '../../lib/generated/sdk.gen';
 import type {GetRedFlagsError, RedFlagsOut, RunRedFlagsData, RunRedFlagsError} from '../../lib/generated/types.gen';
 
@@ -41,8 +46,12 @@ export function useRedFlagsQuery(investigationId: string, enabled = true): RedFl
     onSuccess: data => {
       if (data.stale) triedFor(queryClient).add(runKey(investigationId, data.ran_at));
       queryClient.setQueryData(getRedFlagsQueryKey({path}), data);
-      // Case home's standing counts read the stored flags.
-      void queryClient.invalidateQueries({queryKey: getStandingQueryKey({path})});
+      // Everything else that reads the stored flags and To check items: Case home's standing counts, To check,
+      // Decide (every kind and order) and the Wire. A first read still on its way may hold what was there before
+      // the run, so it is dropped and read again.
+      for (const queryKey of [getStandingQueryKey({path}), getChecksQueryKey({path}), getDecisionsQueryKey({path}), getWireQueryKey({path})]) {
+        void queryClient.cancelQueries({queryKey}).then(() => queryClient.invalidateQueries({queryKey}));
+      }
     },
   });
   const busy = useIsMutating({mutationKey: runMutationKey(investigationId)}) > 0;

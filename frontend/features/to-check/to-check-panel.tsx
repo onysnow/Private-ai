@@ -16,6 +16,7 @@ import {decideCheckMutation, getChecksOptions, getChecksQueryKey, getRedFlagsQue
 import type {ToCheckItemOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 
 type Status = ToCheckItemOut['status'];
 
@@ -97,6 +98,9 @@ export function ToCheckPanel({investigationId}: {investigationId: string}): Reac
   const queryClient = useQueryClient();
   const path = {investigation_id: investigationId};
   const query = useQuery({...getChecksOptions({path}), enabled: Boolean(investigationId)});
+  // Reading To check never brings it up to date: when it is behind the records, this runs the rules once and the
+  // run refetches the items.
+  useRedFlagsQuery(investigationId);
   const decide = useMutation({...decideCheckMutation()});
   const key = getChecksQueryKey({path});
   const [problem, setProblem] = useState('');

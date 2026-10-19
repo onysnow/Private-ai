@@ -50607,7 +50607,7 @@
     },
     "/api/investigations/{investigation_id}/checks": {
       "get": {
-        "description": "Brings the flags and the items up to date with the case's records, then lists the items.",
+        "description": "The items as last brought up to date; reading never writes. GET .../red-flags says (``stale``) when they\nare behind the case's records, and POST .../red-flags/run brings them up to date.",
         "operationId": "get_checks",
         "parameters": [
           {
@@ -53976,7 +53976,7 @@
     },
     "/api/investigations/{investigation_id}/standing": {
       "get": {
-        "description": "Red Flags and To check counts are as last computed (GET .../decisions recomputes them).",
+        "description": "Red Flags and To check counts are as last computed (POST .../red-flags/run recomputes them).",
         "operationId": "get_standing",
         "parameters": [
           {
@@ -55533,7 +55533,7 @@
     },
     "/api/investigations/{investigation_id}/wire": {
       "get": {
-        "description": "The Wire (See): every party placed on one map, its links and Red Flags, and the dated events.",
+        "description": "The Wire (See): every party placed on one map, its links and Red Flags (as the rules last left them;\nreading never runs them), and the dated events.",
         "operationId": "get_wire",
         "parameters": [
           {

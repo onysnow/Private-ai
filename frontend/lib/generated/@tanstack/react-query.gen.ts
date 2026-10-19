@@ -5401,7 +5401,8 @@ export const getChecksQueryKey = (options: Options<GetChecksData>) =>
 /**
  * Get Checks
  *
- * Brings the flags and the items up to date with the case's records, then lists the items.
+ * The items as last brought up to date; reading never writes. GET .../red-flags says (``stale``) when they
+ * are behind the case's records, and POST .../red-flags/run brings them up to date.
  */
 export const getChecksOptions = (options: Options<GetChecksData>) =>
   queryOptions<
@@ -7524,7 +7525,7 @@ export const getStandingQueryKey = (options: Options<GetStandingData>) =>
 /**
  * Get Standing
  *
- * Red Flags and To check counts are as last computed (GET .../decisions recomputes them).
+ * Red Flags and To check counts are as last computed (POST .../red-flags/run recomputes them).
  */
 export const getStandingOptions = (options: Options<GetStandingData>) =>
   queryOptions<
@@ -8315,7 +8316,8 @@ export const getWireQueryKey = (options: Options<GetWireData>) =>
 /**
  * Get Wire
  *
- * The Wire (See): every party placed on one map, its links and Red Flags, and the dated events.
+ * The Wire (See): every party placed on one map, its links and Red Flags (as the rules last left them;
+ * reading never runs them), and the dated events.
  */
 export const getWireOptions = (options: Options<GetWireData>) =>
   queryOptions<

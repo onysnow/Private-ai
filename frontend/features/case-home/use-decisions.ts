@@ -12,6 +12,7 @@ import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
 import {getDecisionsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {CaseDecisionsOut, DecisionChoiceOut, DecisionItemOut, GetDecisionsError} from '../../lib/generated/types.gen';
+import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 
 export const HOLD_MS = 8000;
 export type DecisionKind = DecisionItemOut['kind'];
@@ -74,6 +75,9 @@ export function useDecisions(investigationId: string, {kind, order = 'consequenc
     ...getDecisionsOptions({path: {investigation_id: investigationId}, query: {order, ...(kind ? {kind} : {})}}),
     enabled: enabled && Boolean(investigationId),
   });
+  // Reading the decisions never brings the To check items up to date: when they are behind the records, this runs
+  // the rules once and the run refetches the list.
+  useRedFlagsQuery(investigationId, enabled);
   const [decided, setDecided] = useState<Decided[]>([]);
   const [undoError, setUndoError] = useState<string | null>(null);
   const timers = useRef(new Map<string, number>());
