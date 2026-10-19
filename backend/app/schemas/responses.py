@@ -4906,6 +4906,13 @@ class DropStageNameOut(ResponseModel):
     label: str
 
 
+class DropProposerOut(ResponseModel):
+    rule: str
+    accepted: int
+    rejected: int
+    waiting: int
+
+
 class DropReceiptOut(ResponseModel):
     fingerprint: str
     pages: int | None = None
@@ -4916,6 +4923,9 @@ class DropReceiptOut(ResponseModel):
     watchlist_hits: int
     flags_fed: list[str]
     files_inside: int
+    # What each proposer's proposals came to, by the rule that proposed them (payload.rationale.rule, "" when
+    # none is recorded). An accept corrected first is counted as accepted: corrections are not recorded apart.
+    by_proposer: list[DropProposerOut] = Field(default_factory=list)
 
 
 class DropLaneOut(ResponseModel):
