@@ -230,7 +230,10 @@ def _zip(**files: str) -> bytes:
 def test_formats_only_openaleph_reads_are_accepted_and_read_by_it(live):
     client, _created = live
     formats = client.get("/api/document-formats").json()
-    assert formats["reader"] == "openaleph" and {"eml", "zip"} <= set(formats["openaleph_only_extensions"])
+    # .eml and .zip also have the Workbench's own reader (app/services/container_readers.py), so the formats only
+    # OpenAleph reads are the ones it adds beyond that: word-processor, presentation and legacy office files, say.
+    assert formats["reader"] == "openaleph" and {"doc", "pptx", "rtf"} <= set(formats["openaleph_only_extensions"])
+    assert not {"eml", "zip"} & set(formats["openaleph_only_extensions"])
     inv = _investigation(live, "Wave A formats")
     email = _upload(live, inv, "transfer.eml", _email(), "message/rfc822")
     assert email["job"]["message"].startswith("Read by OpenAleph (1 paragraph(s))"), email["job"]["message"]
