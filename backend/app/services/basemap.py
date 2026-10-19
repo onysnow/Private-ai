@@ -115,11 +115,14 @@ def font(stack: str, glyph_range: str) -> bytes | None:
     if match is None or int(match.group(1)) % 256 or int(match.group(2)) != int(match.group(1)) + 255:
         return None
     have = set(fonts())
+    root = basemap_dir().resolve()
     for name in (part.strip() for part in stack.split(",")):
         if name in have:
             try:
-                return (basemap_dir() / "fonts" / name / f"{glyph_range}.pbf").read_bytes()
-            except OSError:
+                path = (root / "fonts" / name / f"{glyph_range}.pbf").resolve()
+                path.relative_to(root)
+                return path.read_bytes()
+            except (OSError, ValueError):
                 return None
     return None
 
@@ -129,8 +132,11 @@ def sprite(name: str) -> tuple[bytes, str] | None:
     if not SPRITE_NAME.match(name):
         return None
     try:
-        data = (basemap_dir() / "sprites" / SPRITE_VERSION / name).read_bytes()
-    except OSError:
+        root = basemap_dir().resolve()
+        path = (root / "sprites" / SPRITE_VERSION / name).resolve()
+        path.relative_to(root)
+        data = path.read_bytes()
+    except (OSError, ValueError):
         return None
     return data, ("application/json" if name.endswith(".json") else "image/png")
 
@@ -139,8 +145,8 @@ def status() -> dict[str, Any]:
     """Whether a base map is installed, and what it covers."""
     try:
         opened = _open()
-    except BasemapUnavailable as exc:
-        return {"available": False, "reason": str(exc), "fonts": fonts()}
+    except BasemapUnavailable:
+        return {"available": False, "reason": "No base map is available.", "fonts": fonts()}
     header, metadata = opened.header, opened.metadata
     return {
         "available": True,

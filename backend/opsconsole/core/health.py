@@ -3,6 +3,7 @@ health board that merges built-in tiles with the host's."""
 
 from __future__ import annotations
 
+import logging
 import shutil
 import time
 from datetime import timedelta
@@ -24,6 +25,7 @@ from opsconsole.protocols import (
 )
 
 STATE_ORDER = {"ok": 0, "warn": 1, "fail": 2, "error": 3}
+logger = logging.getLogger(__name__)
 
 
 def _worst(states: list[str]) -> str:
@@ -134,9 +136,10 @@ def run_checks(ctx: ConsoleContext, *, only: list[str] | None, principal: Princi
                     status = "pass" if result.count == 0 else severity
                     entry = {"id": check.id, "title": check.title, "status": status, "count": result.count, "samples": [str(s) if not isinstance(s, (list, tuple)) else list(s) for s in result.samples],
                              "hint": result.hint or check.hint, "table": result.table, "section": check.section}
-                except Exception as exc:
+                except Exception:
                     db.rollback()
-                    entry = {"id": check.id, "title": check.title, "status": "error", "count": None, "samples": [f"{exc.__class__.__name__}: {str(exc)[:300]}"], "hint": "", "table": None, "section": check.section}
+                    logger.exception("Health check %s failed", check.id)
+                    entry = {"id": check.id, "title": check.title, "status": "error", "count": None, "samples": ["Check failed; details are in the server log."], "hint": "", "table": None, "section": check.section}
                 entry["ms"] = int((time.perf_counter() - started) * 1000)
                 summary[entry["status"]] = summary.get(entry["status"], 0) + 1
                 results.append(entry)
@@ -159,8 +162,9 @@ def builtin_tiles(ctx: ConsoleContext) -> list[TileProvider]:
         bind = db.get_bind()
         try:
             db.execute(text("SELECT 1"))
-        except Exception as exc:
-            return Tile(state="fail", headline=f"unreachable: {exc.__class__.__name__}", details={"error": str(exc)[:300]}, section="schema")
+        except Exception:
+            logger.exception("Database health check failed")
+            return Tile(state="fail", headline="database unreachable", details={"error": "Database health check failed; details are in the server log."}, section="schema")
         modeled = len(intro.model_tables())
         present = modeled - len(drift["missing_tables"])
         state: State = "ok" if not drift["missing_tables"] else "fail"
@@ -241,12 +245,13 @@ def health_board(ctx: ConsoleContext, *, only: set[str] | None = None) -> dict[s
             try:
                 tile = p.run(db)
                 entry = {"id": p.id, "title": p.title, "state": tile.state, "headline": tile.headline, "details": tile.details, "section": tile.section or p.section}
-            except Exception as exc:
+            except Exception:
                 try:
                     db.rollback()
                 except Exception:
                     pass
-                entry = {"id": p.id, "title": p.title, "state": "error", "headline": f"{exc.__class__.__name__}: {str(exc)[:200]}", "details": {}, "section": p.section}
+                logger.exception("Health tile %s failed", p.id)
+                entry = {"id": p.id, "title": p.title, "state": "error", "headline": "Health check failed; details are in the server log.", "details": {}, "section": p.section}
             entry["refresh_seconds"] = p.refresh_seconds
             entry["ms"] = int((time.perf_counter() - started) * 1000)
             out.append(entry)

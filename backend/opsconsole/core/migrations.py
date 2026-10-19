@@ -4,6 +4,7 @@ head, the history, an offline SQL plan, and a supervised upgrade."""
 from __future__ import annotations
 
 import io
+import logging
 from contextlib import redirect_stdout
 from typing import Any
 
@@ -11,6 +12,8 @@ from sqlalchemy import inspect, text
 
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.protocols import Principal
+
+logger = logging.getLogger(__name__)
 
 VERSION_TABLE = "alembic_version"
 
@@ -53,8 +56,9 @@ def migration_state(ctx: ConsoleContext) -> dict[str, Any] | None:
                 behind += 1
         at_head = current in heads if current else False
         return {"current": current, "heads": heads, "at_head": at_head, "behind_by": 0 if at_head else behind, "history": history}
-    except Exception as exc:
-        return {"current": None, "heads": [], "at_head": False, "behind_by": None, "history": [], "error": f"{exc.__class__.__name__}: {str(exc)[:300]}"}
+    except Exception:
+        logger.exception("Unable to read migration state")
+        return {"current": None, "heads": [], "at_head": False, "behind_by": None, "history": [], "error": "Migration state is unavailable."}
 
 
 def plan(ctx: ConsoleContext, target: str) -> dict[str, Any]:
@@ -69,7 +73,8 @@ def plan(ctx: ConsoleContext, target: str) -> dict[str, Any]:
         with redirect_stdout(buf):
             command.upgrade(_config(ctx), f"{start}:{target}", sql=True)
     except Exception as exc:
-        raise ConsoleError(400, "plan_failed", f"{exc.__class__.__name__}: {str(exc)[:500]}") from exc
+        logger.exception("Unable to plan migration")
+        raise ConsoleError(400, "plan_failed", "Migration plan could not be generated.") from exc
     return {"from": start, "to": target, "sql": buf.getvalue()}
 
 

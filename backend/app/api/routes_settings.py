@@ -5,6 +5,7 @@ snapshot, persisted app-user (identity) CRUD and token lifecycle,
 investigation membership grants, connector credential storage, and
 security audit log access/retention.
 """
+import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
@@ -47,6 +48,7 @@ from app.services.settings import (
 )
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
+logger = logging.getLogger(__name__)
 
 
 def _require_local_request(request: Request) -> None:
@@ -242,4 +244,8 @@ def get_orphan_storage_preview(request: Request, db: Session = Depends(get_db)) 
     orphan files" button 404'd on every call). Local-only: this walks the server's
     whole document storage root, not just the caller's own investigation's files."""
     _require_local_request(request)
-    return _preview_orphan_document_files(db, settings.document_storage_dir)
+    try:
+        return _preview_orphan_document_files(db, settings.document_storage_dir)
+    except Exception as exc:
+        logger.exception("Orphan storage preview failed")
+        raise HTTPException(500, "Orphan storage preview failed; details are in the server log.") from exc

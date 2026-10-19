@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from typing import Any
 
@@ -15,6 +16,8 @@ from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.core.ids import now_iso
 from opsconsole.core.traffic import iter_api_routes
 from opsconsole.protocols import ActAsPolicy, Principal, Probe
+
+logger = logging.getLogger(__name__)
 
 
 class SendIn(BaseModel):
@@ -74,7 +77,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         return {"items": _routes(request)}
 
     @r.post("/api/send", response_model=s.ConsoleSentOut)
-    def send(request: Request, body: SendIn) -> Any:
+    async def send(request: Request, body: SendIn) -> Any:
         # /api/send lets the caller replay any method/path against this same
         # server -- a strictly more powerful capability than a row-level
         # changeset (it can drive any host write endpoint, not just the ones
@@ -82,7 +85,8 @@ def router(ctx: ConsoleContext) -> APIRouter:
         # same write authority as the console's raw-SQL escape hatch, not
         # merely ctx.read(). It previously bypassed console_writes entirely.
         principal = ctx.write(request, need=WritePolicy.CHANGESETS_AND_SQL)
-        if not body.path.startswith("/"):
+        if (not body.path.startswith("/") or body.path.startswith("//") or "\\" in body.path
+                or any(ord(char) < 0x20 or ord(char) == 0x7F for char in body.path)):
             raise ConsoleError(400, "bad_path", "path must start with '/' (requests only go to this server)")
         headers = {k: v for k, v in (body.headers or {}).items() if k.lower() not in ("host", "content-length")}
         if body.act_as:
@@ -97,15 +101,17 @@ def router(ctx: ConsoleContext) -> APIRouter:
         # replayed request -- not just impersonated ones -- leaves a trail.
         note = f"{body.method} {body.path}" + (f" as {body.act_as}" if body.act_as else "")
         ctx.audit(principal, request, section="api", action="send", note=note)
-        base = str(request.base_url).rstrip("/")
         started = time.perf_counter()
         try:
-            with httpx.Client(base_url=base, timeout=body.timeout_seconds, follow_redirects=False) as client:
-                response = client.request(body.method, body.path, params=body.query, headers=headers,
-                                          json=body.body if body.body is not None and not isinstance(body.body, str) else None,
-                                          content=body.body.encode() if isinstance(body.body, str) else None)
+            transport = httpx.ASGITransport(app=request.app)
+            async with httpx.AsyncClient(transport=transport, base_url="http://workbench.invalid",
+                                         timeout=body.timeout_seconds, follow_redirects=False) as client:
+                response = await client.request(body.method, body.path, params=body.query, headers=headers,
+                                                json=body.body if body.body is not None and not isinstance(body.body, str) else None,
+                                                content=body.body.encode() if isinstance(body.body, str) else None)
         except httpx.HTTPError as exc:
-            raise ConsoleError(502, "self_unreachable", f"{exc.__class__.__name__}: {exc} (tried {base})") from exc
+            logger.exception("API request replay failed")
+            raise ConsoleError(502, "self_unreachable", "The request could not be completed.") from exc
         raw = response.content[: limits.response_body_bytes]
         text_body = raw.decode("utf-8", errors="replace")
         parsed: Any = None

@@ -6,6 +6,7 @@ when no base map is installed."""
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path
 
 import pytest
@@ -28,7 +29,7 @@ def folder(tmp_path, monkeypatch):
 def test_without_a_base_map_the_status_says_so_and_tiles_answer_503(folder):
     reply = client.get("/api/basemap")
     assert reply.status_code == 200
-    assert reply.json()["available"] is False and "compose profile 'maps'" in reply.json()["reason"]
+    assert reply.json()["available"] is False and reply.json()["reason"] == "No base map is available."
     assert client.get("/api/basemap/tiles/0/0/0.mvt").status_code == 503
 
 
@@ -70,3 +71,22 @@ def test_fonts_and_sprites_come_only_from_the_base_map_folder(folder):
     assert sheet.status_code == 200 and sheet.headers["content-type"] == "image/png"
     assert client.get("/api/basemap/sprites/grayscale.json").headers["content-type"] == "application/json"
     assert basemap.sprite("../grayscale.json") is None and basemap.sprite("GRAYSCALE.png") is None
+
+
+def test_font_and_sprite_symlinks_cannot_escape_the_base_map_folder(folder):
+    install_basemap(folder)
+    outside_fonts = folder.parent / "outside-fonts"
+    outside_fonts.mkdir()
+    (outside_fonts / "0-255.pbf").write_bytes(b"outside glyphs")
+    font_dir = folder / "fonts" / "Noto Sans Regular"
+    shutil.rmtree(font_dir)
+    font_dir.symlink_to(outside_fonts, target_is_directory=True)
+    assert basemap.font("Noto Sans Regular", "0-255") is None
+
+    outside_sprites = folder.parent / "outside-sprites"
+    outside_sprites.mkdir()
+    (outside_sprites / "grayscale.json").write_text("{}", encoding="utf-8")
+    sprite_dir = folder / "sprites" / "v4"
+    shutil.rmtree(sprite_dir)
+    sprite_dir.symlink_to(outside_sprites, target_is_directory=True)
+    assert basemap.sprite("grayscale.json") is None

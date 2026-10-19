@@ -708,7 +708,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
               : run?.status === 'failed' ? <><b className="wr-bad">Stopped</b><small>{(run.message ?? run.error ?? 'The run stopped').replace(/[.\s]*$/, '.')} Press N for the step that stopped it.</small></>
               : <><b>None chosen</b><small>Click a light, a chip or a tally to follow one thought from input to output.</small></>}</p>
           <ul className="wr-legend" aria-label="Key">
-            {(['good', 'partial', 'bad', 'neutral'] as Status[]).map(s => <li key={s}><svg width="14" height="14" aria-hidden="true"><Mark status={s} x={7} y={7} r={5}/></svg>{WORD[s].replace('a finding', 'a finding')}</li>)}
+            {(['good', 'partial', 'bad', 'neutral'] as Status[]).map(s => <li key={s}><svg width="14" height="14" aria-hidden="true"><Mark status={s} x={7} y={7} r={5}/></svg>{WORD[s]}</li>)}
             <li><svg width="14" height="14" aria-hidden="true"><Mark status="neutral" self x={7} y={7} r={5}/></svg>model says · not checked</li>
             <li><svg width="16" height="14" aria-hidden="true"><rect x={1} y={1} width={14} height={12} rx={2} className="wr-legend-double"/></svg>enforced app check</li>
           </ul>

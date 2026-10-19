@@ -78,7 +78,8 @@ def sync_openaleph_document(document_id: str, db: Session = Depends(get_db)) -> 
     except ValueError as exc:
         raise HTTPException(404, str(exc))
     except RuntimeError as exc:
-        raise HTTPException(503, str(exc))
+        logger.exception("OpenAleph document synchronization failed")
+        raise HTTPException(503, "OpenAleph synchronization failed; details are in the server log.") from exc
     return {"sync": serialize_sync(row)}
 
 

@@ -14,13 +14,85 @@ from sqlalchemy.engine import Connection
 
 from opsconsole.core.introspect import json_safe
 
-_COMMENT = re.compile(r"--[^\n]*|/\*.*?\*/", re.S)
 _WRITE_WORDS = re.compile(r"\b(INSERT|UPDATE|DELETE|MERGE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE|ATTACH|DETACH|PRAGMA|COPY|VACUUM|REINDEX|REPLACE|CALL|DO|LOCK|SET|RESET|LISTEN|NOTIFY)\b", re.I)
 READ_HEADS = {"SELECT", "WITH", "EXPLAIN", "VALUES", "SHOW", "TABLE"}
 
 
+def _strip_comments(sql: str) -> str:
+    out: list[str] = []
+    i = 0
+    quote: str | None = None
+    dollar_quote: str | None = None
+    while i < len(sql):
+        if dollar_quote:
+            if sql.startswith(dollar_quote, i):
+                out.append(dollar_quote)
+                i += len(dollar_quote)
+                dollar_quote = None
+            else:
+                out.append(sql[i])
+                i += 1
+            continue
+        if quote:
+            char = sql[i]
+            out.append(char)
+            i += 1
+            if char == "\\" and quote == "'" and i < len(sql):
+                out.append(sql[i])
+                i += 1
+            elif char == quote:
+                if i < len(sql) and sql[i] == quote:
+                    out.append(sql[i])
+                    i += 1
+                else:
+                    quote = None
+            continue
+        if sql.startswith("--", i):
+            end = sql.find("\n", i + 2)
+            if end == -1:
+                break
+            out.append("\n")
+            i = end + 1
+            continue
+        if sql.startswith("/*", i):
+            out.append(" ")
+            i += 2
+            depth = 1
+            while i < len(sql) and depth:
+                if sql.startswith("/*", i):
+                    depth += 1
+                    i += 2
+                elif sql.startswith("*/", i):
+                    depth -= 1
+                    i += 2
+                else:
+                    if sql[i] == "\n":
+                        out.append("\n")
+                    i += 1
+            if depth:
+                raise ValueError("unterminated comment")
+            continue
+        if sql[i] in ("'", '"', "`"):
+            quote = sql[i]
+            out.append(sql[i])
+            i += 1
+            continue
+        if sql[i] == "$":
+            end = sql.find("$", i + 1)
+            if end != -1 and (end == i + 1 or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", sql[i + 1:end])):
+                dollar_quote = sql[i:end + 1]
+                out.append(dollar_quote)
+                i = end + 1
+                continue
+        out.append(sql[i])
+        i += 1
+    if quote or dollar_quote:
+        raise ValueError("unterminated quoted value")
+    return "".join(out)
+
+
 def clean(sql: str) -> str:
-    cleaned = _COMMENT.sub(" ", sql or "").strip().rstrip(";").strip()
+    cleaned = _strip_comments(sql or "").strip().rstrip(";").strip()
     if not cleaned:
         raise ValueError("empty statement")
     if ";" in cleaned:

@@ -50,7 +50,14 @@ function markLearned(): void { try { window.localStorage.setItem(LEARNED_KEY, '1
 /** Where you last were in each case, so opening it again goes back there. */
 const CASE_PLACE_KEY = 'pai:case-places';
 function readCasePlaces(): Record<string, Place> {
-  try { const v = JSON.parse(window.localStorage.getItem(CASE_PLACE_KEY) ?? '{}') as Record<string, Place>; return v && typeof v === 'object' ? v : {}; }
+  try {
+    const v = JSON.parse(window.localStorage.getItem(CASE_PLACE_KEY) ?? '{}') as Record<string, Place>;
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return {};
+    return Object.fromEntries(Object.entries(v).flatMap(([id, place]) => {
+      const href = place && typeof place.href === 'string' ? safePlaceHref(place.href) : null;
+      return href && typeof place.label === 'string' ? [[id, {href, label: place.label}]] : [];
+    }));
+  }
   catch { return {}; }
 }
 function rememberCasePlace(inv: string, place: Place): void {
@@ -59,8 +66,23 @@ function rememberCasePlace(inv: string, place: Place): void {
 
 /** The last five places, newest first: a place is its address and the trail's words for it. */
 type Place = {href: string; label: string};
+function safePlaceHref(href: string): string | null {
+  if (!href.startsWith('/') || href.startsWith('//') || href.includes('\\') || /[\u0000-\u001f\u007f]/.test(href)) return null;
+  try {
+    const parsed = new URL(href, 'http://workbench.invalid');
+    return parsed.origin === 'http://workbench.invalid' ? `${parsed.pathname}${parsed.search}${parsed.hash}` : null;
+  } catch {
+    return null;
+  }
+}
 function readPlaces(): Place[] {
-  try { const v = JSON.parse(window.localStorage.getItem(TRAIL_KEY) ?? '[]') as Place[]; return Array.isArray(v) ? v.filter(p => p && typeof p.href === 'string').slice(0, 5) : []; }
+  try {
+    const v = JSON.parse(window.localStorage.getItem(TRAIL_KEY) ?? '[]') as Place[];
+    return Array.isArray(v) ? v.flatMap(p => {
+      const href = p && typeof p.href === 'string' ? safePlaceHref(p.href) : null;
+      return href && typeof p.label === 'string' ? [{href, label: p.label}] : [];
+    }).slice(0, 5) : [];
+  }
   catch { return []; }
 }
 function rememberPlace(place: Place): Place[] {
