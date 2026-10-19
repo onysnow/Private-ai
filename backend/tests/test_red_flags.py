@@ -155,6 +155,18 @@ def test_payments_between_companies_with_a_shared_owner_are_faint():
     assert "M Smith (directorship and ownership)" in flags[0]["summary"]
 
 
+def test_money_moved_between_one_persons_own_accounts_is_not_a_shared_holder_dealing():
+    """BO-031 is about legal persons dealing with each other; two bank accounts
+    one person holds are not two parties."""
+    inv = _inv("Own accounts")
+    owner = _party(inv, "M Smith", "Person")
+    first, second = _party(inv, "Account 1", "BankAccount"), _party(inv, "Account 2", "BankAccount")
+    _link(inv, "Ownership", owner, first)
+    _link(inv, "Ownership", owner, second)
+    _link(inv, "Payment", first, second, amount=["5000"], currency=["GBP"])
+    assert "BO-031" not in {f["indicator_id"] for f in _flags(inv)["flags"]}
+
+
 def test_the_investigation_type_comes_from_flags_and_records_and_the_reporter_can_set_it():
     from app.services.exports import collect_investigation_records
 
