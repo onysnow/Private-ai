@@ -16,7 +16,6 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.db.session import SessionLocal, get_db
 from app.models.domain import Entity, Investigation
-from app.patterns import engine
 from app.schemas.api import InvestigationUpdate
 from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
 from app.services import case_home, case_years, drop, wire
@@ -39,7 +38,7 @@ def patch_investigation(investigation_id: str, body: InvestigationUpdate, db: Se
 
 @router.get("/investigations/{investigation_id}/standing", response_model=CaseStandingOut)
 def get_standing(investigation_id: str, db: Session = Depends(get_db)) -> Any:
-    """Red Flags and To check counts are as last computed (GET .../decisions recomputes them)."""
+    """Red Flags and To check counts are as last computed (POST .../red-flags/run recomputes them)."""
     _case(db, investigation_id)
     return case_home.standing(db, investigation_id)
 
@@ -51,9 +50,9 @@ def get_decisions(
     order: Literal["consequence", "source", "oldest"] = "consequence",
     offset: int = Query(0, ge=0), limit: int = Query(200, ge=1, le=500),
 ) -> Any:
+    # The Red Flags and To check items as last brought up to date: reading never writes (GET .../red-flags says
+    # when they are behind, POST .../red-flags/run brings them up to date).
     _case(db, investigation_id)
-    # Brings the Red Flags and To check items up to date first, as GET .../checks does.
-    engine.bring_up_to_date(db, investigation_id)
     return case_home.decisions(db, investigation_id, kind=kind, order=order, offset=offset, limit=limit)
 
 
@@ -65,9 +64,9 @@ def get_since(investigation_id: str, after: datetime = Query(...), db: Session =
 
 @router.get("/investigations/{investigation_id}/wire", response_model=WireOut)
 def get_wire(investigation_id: str, db: Session = Depends(get_db)) -> Any:
-    """The Wire (See): every party placed on one map, its links and Red Flags, and the dated events."""
+    """The Wire (See): every party placed on one map, its links and Red Flags (as the rules last left them;
+    reading never runs them), and the dated events."""
     _case(db, investigation_id)
-    engine.bring_up_to_date(db, investigation_id)
     return wire.wire(db, investigation_id)
 
 

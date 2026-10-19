@@ -23,6 +23,8 @@ def _inv(name: str) -> str:
 
 
 def _missing(inv: str) -> dict[tuple[str, str], dict]:
+    """Brings To check up to date (as a screen does when the read says it is behind), then reads it."""
+    ok(client.post(f"/api/investigations/{inv}/red-flags/run"))
     return {(m["rule"], m["record_id"]): m for m in ok(client.get(f"/api/investigations/{inv}/checks"))["missing"]}
 
 

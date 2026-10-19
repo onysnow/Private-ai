@@ -195,6 +195,13 @@
             ],
             "title": "Citation Details"
           },
+          "claim_reviews": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AiClaimReviewOut"
+            },
+            "title": "Claim Reviews",
+            "type": "object"
+          },
           "confidence": {
             "title": "Confidence",
             "type": "number"
@@ -320,7 +327,8 @@
           "rejection_reason",
           "payload",
           "checked_citation_ids",
-          "trace"
+          "trace",
+          "claim_reviews"
         ],
         "title": "AiAnalysisCandidateOut",
         "type": "object"
@@ -553,6 +561,100 @@
           "control_surface"
         ],
         "title": "AiAuthoritySuiteOut",
+        "type": "object"
+      },
+      "AiClaimReviewOut": {
+        "description": "Your decision on one claim or hypothesis of an answer. `text` is your corrected wording (the model's stays\nin the payload); `reason` says why, and is always there for a rejection.",
+        "properties": {
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "reviewed_at": {
+            "title": "Reviewed At",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "decision",
+          "text",
+          "reason",
+          "reviewed_at"
+        ],
+        "title": "AiClaimReviewOut",
+        "type": "object"
+      },
+      "AiClaimReviewRequest": {
+        "description": "Your decision on one claim (or hypothesis) of a proposed AI answer (research AI §2 \"Per-claim decisions\").\n`text` is your corrected wording (correct only); `reason` is required to reject. \"clear\" takes a decision back.",
+        "properties": {
+          "claim_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "keep",
+              "correct",
+              "reject",
+              "clear"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "claim_id",
+          "decision"
+        ],
+        "title": "AiClaimReviewRequest",
         "type": "object"
       },
       "AiControlFlagOut": {
@@ -16071,8 +16173,43 @@
         "title": "DropOut",
         "type": "object"
       },
+      "DropProposerOut": {
+        "properties": {
+          "accepted": {
+            "title": "Accepted",
+            "type": "integer"
+          },
+          "rejected": {
+            "title": "Rejected",
+            "type": "integer"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "waiting": {
+            "title": "Waiting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule",
+          "accepted",
+          "rejected",
+          "waiting"
+        ],
+        "title": "DropProposerOut",
+        "type": "object"
+      },
       "DropReceiptOut": {
         "properties": {
+          "by_proposer": {
+            "items": {
+              "$ref": "#/components/schemas/DropProposerOut"
+            },
+            "title": "By Proposer",
+            "type": "array"
+          },
           "files_inside": {
             "title": "Files Inside",
             "type": "integer"
@@ -35709,6 +35846,66 @@
         "summary": "Get Ai Analysis Candidate Endpoint"
       }
     },
+    "/api/ai-analysis-candidates/{candidate_id}/claim-review": {
+      "post": {
+        "description": "Keep, correct or reject one claim (or hypothesis) of a proposed answer; replies with the whole proposal.",
+        "operationId": "review_ai_claim_endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "candidate_id",
+            "required": true,
+            "schema": {
+              "title": "Candidate Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiClaimReviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiAnalysisCandidateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Review Ai Claim Endpoint"
+      }
+    },
     "/api/ai-analysis-candidates/{candidate_id}/promote-to-deck": {
       "post": {
         "description": "Turn an accepted presentation_draft candidate into a reporter-editable\nDeck (see app/services/presentation.py). Not idempotent, for the same\nreason as the write-up promotion endpoint above.",
@@ -50607,7 +50804,7 @@
     },
     "/api/investigations/{investigation_id}/checks": {
       "get": {
-        "description": "Brings the flags and the items up to date with the case's records, then lists the items.",
+        "description": "The items as last brought up to date; reading never writes. GET .../red-flags says (``stale``) when they\nare behind the case's records, and POST .../red-flags/run brings them up to date.",
         "operationId": "get_checks",
         "parameters": [
           {
@@ -53976,7 +54173,7 @@
     },
     "/api/investigations/{investigation_id}/standing": {
       "get": {
-        "description": "Red Flags and To check counts are as last computed (GET .../decisions recomputes them).",
+        "description": "Red Flags and To check counts are as last computed (POST .../red-flags/run recomputes them).",
         "operationId": "get_standing",
         "parameters": [
           {
@@ -55533,7 +55730,7 @@
     },
     "/api/investigations/{investigation_id}/wire": {
       "get": {
-        "description": "The Wire (See): every party placed on one map, its links and Red Flags, and the dated events.",
+        "description": "The Wire (See): every party placed on one map, its links and Red Flags (as the rules last left them;\nreading never runs them), and the dated events.",
         "operationId": "get_wire",
         "parameters": [
           {

@@ -759,6 +759,9 @@ import type {
   ReviewAiAnalysisCandidateEndpointData,
   ReviewAiAnalysisCandidateEndpointErrors,
   ReviewAiAnalysisCandidateEndpointResponses,
+  ReviewAiClaimEndpointData,
+  ReviewAiClaimEndpointErrors,
+  ReviewAiClaimEndpointResponses,
   ReviewExternalRelationshipData,
   ReviewExternalRelationshipErrors,
   ReviewExternalRelationshipResponses,
@@ -1426,6 +1429,9 @@ import {
   zReviewAiAnalysisCandidateEndpointBody,
   zReviewAiAnalysisCandidateEndpointPath,
   zReviewAiAnalysisCandidateEndpointResponse,
+  zReviewAiClaimEndpointBody,
+  zReviewAiClaimEndpointPath,
+  zReviewAiClaimEndpointResponse,
   zReviewExternalRelationshipBody,
   zReviewExternalRelationshipPath,
   zReviewExternalRelationshipResponse,
@@ -1558,6 +1564,41 @@ export const getAiAnalysisCandidateEndpoint = <
       await zGetAiAnalysisCandidateEndpointResponse.parseAsync(data),
     url: '/api/ai-analysis-candidates/{candidate_id}',
     ...options,
+  });
+
+/**
+ * Review Ai Claim Endpoint
+ *
+ * Keep, correct or reject one claim (or hypothesis) of a proposed answer; replies with the whole proposal.
+ */
+export const reviewAiClaimEndpoint = <ThrowOnError extends boolean = false>(
+  options: Options<ReviewAiClaimEndpointData, ThrowOnError>,
+): RequestResult<
+  ReviewAiClaimEndpointResponses,
+  ReviewAiClaimEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ReviewAiClaimEndpointResponses,
+    ReviewAiClaimEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zReviewAiClaimEndpointBody,
+          path: zReviewAiClaimEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zReviewAiClaimEndpointResponse.parseAsync(data),
+    url: '/api/ai-analysis-candidates/{candidate_id}/claim-review',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -5841,7 +5882,8 @@ export const createCaseRecord = <ThrowOnError extends boolean = false>(
 /**
  * Get Checks
  *
- * Brings the flags and the items up to date with the case's records, then lists the items.
+ * The items as last brought up to date; reading never writes. GET .../red-flags says (``stale``) when they
+ * are behind the case's records, and POST .../red-flags/run brings them up to date.
  */
 export const getChecks = <ThrowOnError extends boolean = false>(
   options: Options<GetChecksData, ThrowOnError>,
@@ -7295,7 +7337,7 @@ export const listSources = <ThrowOnError extends boolean = false>(
 /**
  * Get Standing
  *
- * Red Flags and To check counts are as last computed (GET .../decisions recomputes them).
+ * Red Flags and To check counts are as last computed (POST .../red-flags/run recomputes them).
  */
 export const getStanding = <ThrowOnError extends boolean = false>(
   options: Options<GetStandingData, ThrowOnError>,
@@ -8113,7 +8155,8 @@ export const checkWatchlistNow = <ThrowOnError extends boolean = false>(
 /**
  * Get Wire
  *
- * The Wire (See): every party placed on one map, its links and Red Flags, and the dated events.
+ * The Wire (See): every party placed on one map, its links and Red Flags (as the rules last left them;
+ * reading never runs them), and the dated events.
  */
 export const getWire = <ThrowOnError extends boolean = false>(
   options: Options<GetWireData, ThrowOnError>,

@@ -296,3 +296,97 @@ html[data-motion='calm'] .ai-strip svg circle.ring.writing { animation: none; }
 .ai-tallies i { font-style: normal; } .ai-tallies .good { color: var(--wr-good); } .ai-tallies .partial { color: var(--wr-partial); }
 .ai-tallies .bad { color: var(--wr-bad); } .ai-tallies .neutral { color: var(--text-muted); }
 .wr-bloom { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; border-radius: 14px; }
+
+/* Ask the case from the case home: the strip's question field (features/ai/ai-strip.tsx). */
+.ai-ask { display: inline-flex; min-width: 0; }
+.ai-ask input { width: 190px; max-width: 100%; padding: 4px 10px; border-radius: 999px; border: 1px dashed color-mix(in srgb, var(--ai-mark) 70%, var(--line)); background: transparent; color: var(--text); font: 12px var(--font-ui); }
+.ai-ask input::placeholder { color: var(--text-muted); }
+.ai-ask input:focus-visible { outline: 2px solid var(--focus-ring, var(--accent-1)); outline-offset: 2px; border-style: solid; }
+
+/* Edit plan (AI_2): what the plan is made of, and the steps a setting adds or removes. */
+.br-edit { display: grid; gap: 7px; }
+.br-edit > .br-seg { justify-self: start; }
+.br-edit label { display: grid; gap: 3px; font-size: 12px; color: var(--text-muted); }
+.br-edit textarea, .br-packet-edit input[type='number'] { padding: 5px 8px; border-radius: 8px; background: var(--surface-1); color: var(--text); border: 1px solid var(--line); font: inherit; font-size: 12.5px; }
+.br-packet-edit { display: flex; flex-wrap: wrap; align-items: end; gap: 6px 14px; }
+.br-packet-edit input[type='number'] { width: 70px; }
+.br-edit .br-check { display: flex; align-items: center; gap: 6px; color: var(--text); }
+.br-mid.editing .br-qcard { box-shadow: inset 0 0 0 1px var(--flag-strong); }
+.br-step-x { padding: 2px 8px !important; font-size: 11px !important; }
+.br-addsteps { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.br-addsteps .br-eyebrow { margin: 0 4px 0 0; }
+.br-addsteps .br-quiet { padding: 3px 9px; font-size: 12px; border: 1px dashed var(--line); box-shadow: none; }
+
+/* The same instructions and plan as a drawer at the live view's left edge (research AI §6). */
+.wr-body.plan-open { grid-template-columns: 400px minmax(0, 1fr); }
+.wr-body.plan-open.drawer-open { grid-template-columns: 400px minmax(0, 1fr) 420px; }
+@media (max-width: 1100px) { .wr-body.plan-open, .wr-body.plan-open.drawer-open { grid-template-columns: 1fr; } }
+.wr-plan { min-height: 0; overflow: auto; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel, none); animation: wr-in-left 240ms ease-out; }
+@keyframes wr-in-left { from { opacity: 0; transform: translateX(-16px); } }
+html[data-motion='calm'] .wr-plan { animation: none; }
+@media (prefers-reduced-motion: reduce) { .wr-plan { animation: none; } }
+.br-drawer { padding: 10px 12px; gap: 8px; }
+.br-drawer > .br-title { position: relative; padding-right: 30px; }
+.br-drawer > .br-title .br-quiet { position: absolute; top: -2px; right: 0; padding: 0 8px; font-size: 18px; box-shadow: none; }
+.br-drawer .br-col { padding: 0; background: none; box-shadow: none; }
+.br-drawer-foot { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 0 2px; background: var(--surface-1); }
+.br-drawer-foot button:not(.br-primary) { all: unset; cursor: pointer; padding: 6px 10px; border-radius: 8px; font-size: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.br-drawer-foot small { flex-basis: 100%; color: var(--status-disputed); font-size: 11.5px; }
+.wr-pill.ai { color: var(--wr-ai); box-shadow: inset 0 0 0 1px currentColor; border: 1px dashed transparent; }
+
+/* Per-claim review (features/ai/claim-review-view.tsx). Grounded words: a solid underline in the text colour; guessed
+   (no record cited): a dashed plum underline; AI words no person has accepted keep a plum wash. Shapes, not colour alone. */
+.cr-text { text-decoration-line: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.cr-text.grounded { text-decoration-style: solid; text-decoration-color: color-mix(in srgb, var(--text) 75%, transparent); }
+.cr-text.guessed { text-decoration-style: dashed; text-decoration-color: var(--ai-mark); }
+.cr-text.ai { background: color-mix(in srgb, var(--ai-mark) 14%, transparent); border-radius: 3px; }
+.cr-text.mine { text-decoration: none; }
+.cr-was { margin-left: 4px; color: var(--text-muted); font-size: .86em; }
+.cr-claim del { text-decoration-color: var(--status-disputed); color: var(--text-muted); }
+.cr-key { margin: 2px 0 4px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 10.5px; color: var(--text-muted); }
+.cr-key u { color: var(--text); margin-right: 3px; }
+.cr-shape { flex: none; overflow: visible; }
+.cr-shape circle, .cr-shape rect { fill: none; stroke: var(--text-muted); stroke-width: 1.4; }
+.cr-shape.keep circle { fill: var(--status-supported); stroke: var(--status-supported); } .cr-shape.keep path { fill: none; stroke: var(--ground); stroke-width: 1.6; }
+.cr-shape.correct rect { fill: var(--flag-strong); stroke: var(--flag-strong); }
+.cr-shape.reject rect { fill: color-mix(in srgb, var(--status-disputed) 55%, #3a0d0d); stroke: var(--status-disputed); } .cr-shape.reject path { stroke: #fff; stroke-width: 1.4; }
+.cr-shape.wait circle { stroke: var(--ai-mark); stroke-dasharray: 2.5 2; }
+.cr-decide { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 4px; font-size: 12px; }
+.cr-decide.done { margin: 4px 0 0; color: var(--text-muted); }
+.cr-made { display: inline-flex; align-items: center; gap: 5px; }
+.cr-buttons { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.cr-decide button:not(.br-primary) { all: unset; cursor: pointer; padding: 4px 9px; border-radius: 8px; font-size: 11.5px; white-space: nowrap; box-shadow: inset 0 0 0 1px var(--line); }
+.cr-decide button[aria-pressed='true'] { box-shadow: inset 0 0 0 1px var(--text-muted); color: var(--text); }
+.cr-decide button:disabled { opacity: .5; cursor: default; }
+.cr-decide button:focus-visible { outline: 2px solid var(--focus-ring, var(--accent-1)); outline-offset: 2px; }
+.cr-decide .cr-undo { padding: 1px 7px; font-size: 11px; }
+.cr-form { flex-basis: 100%; display: grid; gap: 6px; }
+.cr-form label { display: grid; gap: 3px; font-size: 11.5px; color: var(--text-muted); }
+.cr-form label small { font-size: 10.5px; }
+.cr-form textarea, .cr-form input { padding: 5px 8px; border-radius: 8px; background: var(--surface-1); color: var(--text); border: 1px solid var(--line); font: 400 13px/1.4 var(--font-read); }
+.cr-form > span { display: flex; flex-wrap: wrap; gap: 5px; }
+.cr-form .br-primary { padding: 4px 10px; font-size: 12px; }
+.cr-reasons button[aria-pressed='true'] { box-shadow: inset 0 0 0 1px var(--status-disputed); color: var(--text); }
+.br-review { grid-template-rows: auto auto minmax(0, 1fr) auto; height: calc(100dvh - 170px); min-height: 540px; }
+.cr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; font-size: 12.5px; }
+.cr-bar p[role='status'] { margin: 0; } .cr-bar em { font-style: normal; color: var(--ai-mark); }
+.cr-bar .cr-key { margin: 0; } .cr-bar .br-quiet { margin-left: auto; }
+.cr-cols { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 12px; min-height: 0; }
+@media (max-width: 1000px) { .cr-cols { grid-template-columns: 1fr; } .br-review { height: auto; } }
+.cr-list { margin: 0; padding: 6px; list-style: none; display: grid; gap: 2px; align-content: start; min-height: 0; overflow: auto; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel, none); }
+.cr-list button { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 16px 74px minmax(0, 1fr) auto; gap: 2px 8px; align-items: baseline; padding: 6px 8px; border-radius: 8px; border-left: 3px solid transparent; }
+.cr-list button:focus-visible { outline: 2px solid var(--focus-ring, var(--accent-1)); outline-offset: -2px; }
+.cr-list li.on button { background: var(--surface-2); border-left-color: var(--flag-strong); }
+.cr-list .cr-id { font: 11px var(--font-mono); color: var(--text-muted); }
+.cr-list .cr-shape { align-self: start; margin-top: 3px; }
+.cr-row-text { font: 400 14px/1.4 var(--font-read); min-width: 0; }
+.cr-list small { grid-column: 3; color: var(--text-muted); font-size: 11px; }
+.cr-list b { grid-row: 1; grid-column: 4; font: 600 10px var(--font-mono); text-transform: uppercase; color: var(--text-muted); }
+.cr-list li.keep b { color: var(--status-supported); } .cr-list li.correct b { color: var(--flag-strong); } .cr-list li.reject b { color: var(--status-disputed); }
+.cr-detail { display: grid; gap: 8px; align-content: start; min-height: 0; overflow: auto; padding: 12px 16px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel, none); }
+.cr-detail .br-eyebrow { margin: 0; display: flex; align-items: center; gap: 8px; }
+.cr-big { margin: 0; font: 400 19px/1.45 var(--font-read); }
+.cr-detail .wr-refs { margin: 0; }
+.cr-detail .wr-refs li.out { border: 1px dashed var(--status-disputed); box-shadow: none; }
+.cr-keys { color: var(--text-muted); font-size: 11px; }
+.wr-drawer .cr-key { margin: 2px 0; }

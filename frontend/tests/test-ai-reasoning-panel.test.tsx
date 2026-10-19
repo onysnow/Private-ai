@@ -72,7 +72,7 @@ const fullCandidate = (overrides: Record<string, unknown> = {}) => ({
     right_of_reply_needed: [{subject: 'Ada North', claim_ids: ['CLM-0001'], what_will_be_said: 'That she signed the agreement.', draft_questions: ['Did you sign it on 4 March?']}],
     investigative_gaps: [{gap_id: 'GAP-0001', unresolved_question: 'Is there an independent corroborating source?', bears_on: ['CLM-0001'], needed_record_or_testimony: 'the executed copy'}],
   },
-  checked_citation_ids: [{record_type: 'evidence', record_id: 'ev-1'}],
+  checked_citation_ids: [{record_type: 'evidence', record_id: 'ev-1'}], claim_reviews: {},
   trace: {system_prompt: 'You are operating under the Topic Authority System', user_prompt: 'RETRIEVAL PACKET (quoted)', response: {model: 'claude-test', truncated: false}},
   ...overrides,
 });

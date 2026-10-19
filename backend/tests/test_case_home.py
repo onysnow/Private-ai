@@ -38,6 +38,11 @@ def _chain(inv: str) -> list[str]:
     return chain
 
 
+def _run(inv: str) -> None:
+    """Runs the rules and brings To check up to date, as a screen does when the read says they are behind."""
+    ok(client.post(f"/api/investigations/{inv}/red-flags/run"))
+
+
 def _proposal(inv: str, *, kind: str = "claim", payload: dict) -> str:
     with SessionLocal() as db:
         src = Source(investigation_id=inv, title="Board minutes", source_type="document")
@@ -76,7 +81,7 @@ def test_standing_counts_on_the_server():
     ok(client.post("/api/timeline-events", json={"investigation_id": inv, "title": "Board meets", "date_start": "2017-03-04"}))
     ok(client.post("/api/timeline-events", json={"investigation_id": inv, "title": "Transfer", "date_start": "2018-03-14"}))
     _chain(inv)
-    ok(client.get(f"/api/investigations/{inv}/decisions"))  # recomputes the flags
+    _run(inv)
     body = ok(client.get(f"/api/investigations/{inv}/standing"))
     assert body["claims"] == {"total": 4, "supported": 2, "disputed": 1, "unshown": 1, "ruled_out": 0}
     assert body["timeline"]["from"] == "2017" and body["timeline"]["to"] == "2018" and body["timeline"]["events"] == 2
@@ -88,6 +93,7 @@ def test_decisions_merge_kinds_rank_by_consequence_and_post_to_existing_endpoint
     inv = _inv("Decide")
     _chain(inv)
     claim = _proposal(inv, payload={"text": "Kestrel SA bought the harbour land in 2020", "quote": "The Board approved the acquisition"})
+    _run(inv)
     body = ok(client.get(f"/api/investigations/{inv}/decisions"))
     kinds = [i["kind"] for i in body["items"]]
     assert "to_check" in kinds and "proposal" in kinds and body["counts"]["proposal"] == 1
@@ -111,6 +117,42 @@ def test_decisions_merge_kinds_rank_by_consequence_and_post_to_existing_endpoint
     assert client.get(f"/api/investigations/{inv}/decisions", params={"kind": "bogus"}).status_code == 422
 
 
+def test_reading_the_decisions_never_writes_and_shows_what_the_last_run_left():
+    from app.api.routes_case_home import get_decisions
+    from app.core.authorization import AuthorizationScope, authorization_scope_context
+    from tests.stored_rules_rows import stored
+
+    inv = _inv("Decide: reading never writes")
+    chain = _chain(inv)
+    before = stored(inv)
+    assert before == {"flags": {}, "checks": {}, "run": None}
+    body = ok(client.get(f"/api/investigations/{inv}/decisions"))
+    assert "to_check" not in body["counts"] or body["counts"]["to_check"] == 0, "never run: no To check item yet"
+    assert stored(inv) == before, "reading the decisions runs no rule and adds no item"
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is True
+
+    _run(inv)
+    ran = stored(inv)
+    body = ok(client.get(f"/api/investigations/{inv}/decisions"))
+    assert "to_check" in {i["kind"] for i in body["items"]} and "missing" in {i["kind"] for i in body["items"]}
+    assert stored(inv) == ran, "no flag or item added, none marked gone, no time moved"
+    ok(client.get(f"/api/investigations/{inv}/decisions", params={"kind": "to_check", "order": "oldest"}))
+    assert stored(inv) == ran
+
+    ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Ownership", "source_entity_id": chain[-1],
+                                               "target_entity_id": chain[0], "properties": {}}))
+    assert [i["id"] for i in ok(client.get(f"/api/investigations/{inv}/decisions"))["items"]] == [i["id"] for i in body["items"]]
+    assert stored(inv) == ran
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is True
+    with SessionLocal() as db, authorization_scope_context(AuthorizationScope("reader-1", frozenset({inv}), role="viewer")):
+        read = get_decisions(inv, db, kind=None, order="consequence", offset=0, limit=200)
+    assert [i["id"] for i in read["items"]] == [i["id"] for i in body["items"]], "a reader reads the stored decisions"
+    assert stored(inv) == ran
+    _run(inv)
+    assert stored(inv) != ran, "the run is what brings them up to date"
+    assert ok(client.get(f"/api/investigations/{inv}/red-flags"))["stale"] is False
+
+
 def test_an_entity_proposal_with_a_same_name_record_asks_same_or_different():
     inv = _inv("Identity")
     existing = _party(inv, "Fernhill Ltd")
@@ -126,7 +168,7 @@ def test_since_names_what_changed_after_a_moment():
     inv = _inv("Since")
     before = utcnow_naive() - timedelta(seconds=1)
     _chain(inv)
-    ok(client.get(f"/api/investigations/{inv}/checks"))  # computes the flags
+    _run(inv)
     body = ok(client.get(f"/api/investigations/{inv}/since", params={"after": before.isoformat()}))
     flags = next(c for c in body["changes"] if c["key"] == "flags")
     assert flags["count"] >= 1 and flags["actor_kind"] == "app" and flags["href"] == "/act#red-flags"

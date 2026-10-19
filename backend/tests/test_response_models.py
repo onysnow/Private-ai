@@ -1154,6 +1154,17 @@ def test_ai_reasoning_replies(demo, ai_on, monkeypatch):
     _same_through_model(r.DeckOut, deck)
     _same_through_model(r.AiAnalysisCandidatesOut, list_investigation_ai_analysis_candidates(inv.id, "accepted", "presentation_draft", 100, 0, db))
 
+    # A claim-by-claim decision on a case synthesis replies with the whole proposal, decisions included.
+    from app.api.routes_system import review_ai_claim_endpoint
+    from app.schemas.api import AiClaimReviewRequest
+    synthesis = AIAnalysisCandidate(investigation_id=inv.id, module="case_synthesis", checked_citation_ids=[], payload={"claims": [
+        {"claim_id": "CLM-0001", "claim": "Meridian received the money.", "supporting_evidence": [{"record_type": "evidence", "record_id": evidence.id}]}]})
+    db.add(synthesis)
+    db.commit()
+    decided = review_ai_claim_endpoint(synthesis.id, AiClaimReviewRequest(claim_id="CLM-0001", decision="correct", text="Meridian received part of it."), db)
+    assert decided["claim_reviews"]["CLM-0001"]["decision"] == "correct"
+    _same_through_model(r.AiAnalysisCandidateOut, decided)
+
 
 def test_writeup_and_deck_replies(demo):
     from app.api.routes_decks import delete_deck_endpoint, get_deck_endpoint, list_decks_endpoint, update_deck_endpoint
