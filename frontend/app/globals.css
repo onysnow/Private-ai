@@ -20,6 +20,13 @@
   textarea {
     font: inherit;
   }
+
+  /* v3's preflight styled search fields as plain text fields; v4's does not. */
+  [type='search'] {
+    -webkit-appearance: textfield;
+    appearance: textfield;
+    outline-offset: -2px;
+  }
 }
 
 /* Dark Academia palette, sourced from Ony's reference swatch (shop5, "Dark Academia").
