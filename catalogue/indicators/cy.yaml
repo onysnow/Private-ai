@@ -1,0 +1,4684 @@
+key: CY
+name: Cybercrime and judging sources
+scope: ransomware, online fraud networks, scam compounds (which link to trafficking), business email compromise,
+  crypto fraud and mixers. Separately, collect the published systems for grading source reliability and
+  information credibility (the Admiralty Code / NATO system and similar) as glossary entries, not as indicators
+  about people.
+indicators:
+- id: CY-001
+  name: Network activity linked to known ransomware indicators or actors
+  definition: The organisation's own IT logs, network traffic or files show activity that matches published
+    ransomware technical indicators or known ransomware groups.
+  areas:
+  - CY
+  typology: Ransomware
+  status: verified
+  sources:
+  - title: Advisory on Ransomware and the Use of the Financial System to Facilitate Ransom Payments (FIN-2021-A004)
+    publisher: FinCEN, US Treasury
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Financial Red Flag Indicators, item 1
+    quote: A financial institution or its customer detects IT enterprise activity that is connected to
+      ransomware cyber indicators or known cyber threat actors.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-09'
+  examples:
+  - Incident-response logs from a hospital show a beacon to a server listed in a government ransomware
+    alert.
+  cases: []
+  data_needed:
+  - Document (log files, incident reports)
+  - Company
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - 'Government cyber advisories (CISA/FBI #StopRansomware)'
+  - Threat-intelligence indicator feeds
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Indicator lists contain shared hosting IPs or common tools also used legitimately
+  - Security testing (red-team exercises) can trigger the same indicators
+  - Scanning traffic from the internet hits almost every network
+  jurisdictions: US (FinCEN guidance; widely used internationally)
+  version: 1
+- id: CY-002
+  name: Payer says a payment is a ransom
+  definition: A customer or organisation states, when opening an account or arranging a payment, that
+    the money is to pay a ransomware demand.
+  areas:
+  - CY
+  typology: Ransomware
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 2
+    quote: When opening a new account or during other interactions with the financial institution, a customer
+      provides information that a payment is in response to a ransomware incident.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Colonial Pipeline paid a ransom of about 75 bitcoin in May 2021 (DOJ).
+  cases:
+  - name: Colonial Pipeline ransom and DarkSide seizure
+    year: '2021'
+    jurisdiction: US (N.D. California seizure warrant)
+    what_happened: Colonial Pipeline paid about 75 bitcoin after a ransomware attack; DOJ traced the payment
+      on the public Bitcoin ledger and seized 63.7 bitcoin (about $2.3 million). This was a seizure, not
+      a conviction.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/department-justice-seizes-23-million-cryptocurrency-paid-ransomware-extortionists-darkside
+    source_title: Department of Justice Seizes $2.3 Million in Cryptocurrency Paid to the Ransomware Extortionists
+      Darkside
+  data_needed:
+  - Payment (payer, beneficiary, amount, purpose)
+  - CryptoWallet
+  - Company
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Paying or facilitating a ransom to a sanctioned person or group may breach US sanctions on
+      a strict-liability basis.
+    source_url: https://ofac.treasury.gov/media/912981/download?inline=
+  innocent_explanations:
+  - The victim is the payer and may be acting lawfully; paying a ransom is not itself a crime in most
+    places
+  - The statement may describe a payment for decryption tools or negotiation services rather than the
+    ransom itself
+  jurisdictions: US
+  version: 1
+- id: CY-003
+  name: Wallet or address linked to ransomware, fraud or extortion
+  definition: An account, bank card or crypto address used by the subject, or by its counterparties, has
+    been publicly or commercially linked to ransomware, fraud or extortion.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Proceeds of cybercrime
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 3
+    quote: A customer’s CVC address, or an address with which a customer conducts transactions is connected
+      to ransomware variants, payments, or related activity.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators of Money Laundering and Terrorist Financing'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 15 (source of funds or wealth)
+    quote: Transacting with VA addresses or bank cards that are connected to known fraud, extortion, or
+      ransomware schemes
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A wallet receives funds from an address that blockchain-analytics firms label as a ransomware cash-out.
+  cases: []
+  data_needed:
+  - CryptoWallet (publicKey, holder)
+  - Payment
+  - BankAccount
+  - Sanction
+  - Document (analytics report)
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics / block explorers
+  - OFAC SDN list (includes digital currency addresses)
+  - Government advisories listing addresses
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Exchanges and payment hubs touch huge numbers of addresses, so indirect links are common
+  - Analytics attributions can be wrong or out of date
+  - A victim's own wallet will show links to the ransom address
+  jurisdictions: US; FATF members (international)
+  version: 1
+- id: CY-004
+  name: Unusual payment from a high-risk-sector organisation to an incident-response or cyber-insurance
+    firm
+  definition: An organisation in a sector often hit by ransomware makes an irregular payment to a digital
+    forensics/incident response (DFIR) firm or cyber insurer, especially one known to pay ransoms on clients'
+    behalf.
+  areas:
+  - CY
+  typology: Ransomware payment facilitation
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 4
+    quote: An irregular transaction occurs between an organization, especially an organization from a
+      sector at high risk for targeting by ransomware (e.g., government, financial, educational, healthcare)
+      and a DFIR or CIC, especially one known to facilitate ransomware payments.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A school district wires an unbudgeted sum to an incident-response firm days after a system outage.
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Contract
+  - Document (invoices, board minutes)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: OFAC names DFIR firms, cyber insurers and financial institutions as facilitators who may face
+      strict-liability penalties if a ransom reaches a sanctioned person.
+    source_url: https://ofac.treasury.gov/media/912981/download?inline=
+  innocent_explanations:
+  - Organisations routinely hire DFIR firms for audits and breaches that involve no ransom
+  - Insurance premiums and claims payments are ordinary
+  jurisdictions: US
+  version: 1
+- id: CY-005
+  name: 'Pass-through: incident-response or insurer receives funds then quickly sends the same amount
+    to a crypto exchange'
+  definition: A DFIR firm or cyber insurer receives money from a client and soon after sends an equal
+    amount to a crypto exchange, consistent with buying crypto to pay a ransom.
+  areas:
+  - CY
+  typology: Ransomware payment facilitation
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 5
+    quote: A DFIR or CIC customer receives funds from a counterparty and shortly after receipt of funds
+      sends equivalent amounts to a CVC exchange.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A $400,000 inbound wire from a hospital is followed within a day by a $400,000 wire to a crypto exchange.
+  cases: []
+  data_needed:
+  - Payment (amount, date, payer, beneficiary)
+  - BankAccount
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some firms legitimately buy crypto for clients for lawful purposes
+  - Matching amounts may be coincidental pass-through billing
+  jurisdictions: US
+  version: 1
+- id: CY-006
+  name: Person new to crypto suddenly buys or sends large amounts, often under time pressure
+  definition: Someone with little or no crypto experience urgently converts large sums into crypto or
+    sends large transfers to a crypto platform, which can mean they are a ransomware or scam victim.
+  areas:
+  - CY
+  - FR
+  typology: Victim-side signal
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 6
+    quote: A customer shows limited knowledge of CVC during onboarding or via other interactions with
+      the financial institution, yet inquires about or purchases CVC (particularly if in a large amount
+      or rush requests), which may indicate the customer is a victim of ransomware.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FinCEN Alert on Prevalent Virtual Currency Investment Scam Commonly Known as 'Pig Butchering'
+      (FIN-2023-Alert005)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Behavioral red flags, p.6
+    quote: A customer with no history or background of using, exchanging, or otherwise interacting with
+      virtual currency…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2023-Alert005
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Behavioral red flags, p.6
+    quote: A customer appears distressed or anxious to access funds to meet demands or the timeline…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Paragraph 12, red flags concerning new users, p. 8. The same bullet opens 'Conducting a large
+      initial deposit to open a new relationship with a VASP and funding the entire deposit the first
+      day' and continues 'or if the customer withdraws the whole amount the day after'.
+    quote: the customer starts to trade the total amount or a large portion of the amount on that same
+      day or the day after
+    quote_verified: true
+    licence: not stated
+    checked: '2026-10-10'
+  examples:
+  - A retiree who has never owned crypto asks the bank to wire $150,000 to a crypto exchange the same
+    day.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - BankAccount
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: A customer new to crypto makes a large initial deposit and funds all of it on the first day
+      the account is opened. FATF gives no amount.
+    strong: The same customer trades most or all of that deposit on the same day or the day after.
+    textbook: 'Meets the FATF new-user indicator as worded: a large initial deposit funded in full on
+      the first day, then traded the same day or the day after, or withdrawn in full the day after.'
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    threshold_note: The published numbers are time windows (first day, same day, day after). No published
+      amount for 'large' was found. FinCEN's ransomware advisory (2021) and its pig-butchering alert give
+      no amount or time window. The FATF quote was read through a web fetch of the official PDF.
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FinCEN says pig-butchering scams are largely run by Southeast Asian criminal groups using
+      trafficked workers, so victim-side signals can point back to scam compounds.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  innocent_explanations:
+  - People do start investing in crypto for their own reasons
+  - A large first purchase may follow an inheritance or bonus
+  jurisdictions: US
+  version: 2
+- id: CY-007
+  name: Business with little crypto history makes a large crypto transfer
+  definition: A company with no or limited crypto activity sends a large crypto transaction outside its
+    normal business, which can indicate a ransom payment.
+  areas:
+  - CY
+  typology: Ransomware
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 7
+    quote: A customer that has no or limited history of CVC transactions sends a large CVC transaction,
+      particularly when outside a company’s normal business practices.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A manufacturer with no crypto holdings sends 75 BTC in a single transfer.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Treasury diversification into crypto
+  - Paying a supplier who invoices in crypto
+  jurisdictions: US
+  version: 1
+- id: CY-008
+  name: Unregistered broker using an exchange's liquidity for many offsetting trades
+  definition: A customer who has not identified itself as a money transmitter makes large numbers of offsetting
+    trades through an exchange, suggesting it is acting as an unlicensed over-the-counter (OTC) or peer-to-peer
+    broker.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Unlicensed money transmission / nested services
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 8
+    quote: A customer that has not identified itself to the CVC exchanger, or registered with FinCEN as
+      a money transmitter, appears to be using the liquidity provided by the exchange to execute large
+      numbers of offsetting transactions between various CVCs, which may indicate that the customer is
+      acting as an unregistered MSB.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FinCEN Alert on Scam Centers (FIN-2026-Alert005)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer of a digital asset exchange appears to be using liquidity provided by the digital
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An account trades back and forth between USDT, BTC and ETH thousands of times a month with balanced
+    inflows and outflows.
+  cases:
+  - name: Samourai Wallet (Keonne Rodriguez and William Lonergan Hill)
+    year: '2025'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Founders of the Samourai Wallet mixing service were sentenced to five and four years
+      for conspiracy to operate a money transmitting business; DOJ says over $237 million in criminal
+      proceeds passed through it.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/founders-samourai-wallet-cryptocurrency-mixing-service-sentenced-five-and-four-years
+    source_title: Founders Of Samourai Wallet Cryptocurrency Mixing Service Sentenced
+  data_needed:
+  - Company
+  - UserAccount
+  - Payment
+  - CryptoWallet
+  - Document (MSB registration)
+  checkable: lookups
+  lookup_sources:
+  - FinCEN MSB registration search
+  - Exchange account records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-frequency or arbitrage traders make many offsetting trades for their own account
+  - A registered broker may not have told the exchange of its status
+  jurisdictions: US
+  version: 1
+- id: CY-009
+  name: Use of exchanges in jurisdictions with weak or no crypto regulation
+  definition: Funds come from or go to crypto exchanges that are unregistered where they operate or are
+    based in places with no or weak anti-money-laundering rules for crypto.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: High-risk jurisdiction
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 9
+    quote: A customer uses a foreign-located CVC exchanger in a high-risk jurisdiction lacking, or known
+      to have inadequate, AML/CFT regulations for CVC entities.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 16 (geographical risks)
+    quote: Customer sends funds to VASPs operating in jurisdictions that have no VA regulation
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Withdrawals routed to an offshore exchange that advertises no identity checks.
+  cases:
+  - name: Garantex
+    year: '2022'
+    jurisdiction: US (OFAC)
+    what_happened: OFAC designated the Russia-linked exchange Garantex, stating over $100 million of its
+      transactions were associated with illicit actors and darknet markets, including nearly $6 million
+      from the Conti ransomware gang.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy0701
+    source_title: Treasury press release jy0701
+  data_needed:
+  - Company (jurisdiction)
+  - Payment
+  - CryptoWallet
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - FATF grey/black lists and mutual evaluations
+  - National VASP registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Residents of those countries legitimately use local exchanges
+  - Regulation is changing quickly and lists go out of date
+  jurisdictions: US; FATF members
+  version: 1
+- id: CY-010
+  name: Rapid swaps across coins or blockchains with no clear purpose (chain-hopping)
+  definition: Funds arrive and are quickly swapped between several cryptocurrencies or blockchains, often
+    into privacy coins or lower-fee chains, then moved off the platform, breaking the trail.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Layering via chain-hopping
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 10
+    quote: This may be indicative of attempts to break the chain of custody on the respective blockchains
+      or further obfuscate the transaction.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Technical red flags, p.7
+    quote: A customer receives a large amount of virtual currency such as ether at an exchange, subsequently
+      converts…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: p.9
+    quote: swapping USDT tokens originating from scams from the Ethereum blockchain to the Tron blockchain
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - ETH received, converted to TRX and withdrawn within minutes (FinCEN pig-butchering alert).
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment (date, amount, currency)
+  - UserAccount
+  checkable: lookups
+  lookup_sources:
+  - Blockchain explorers / analytics
+  - Exchange trade records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Traders move to cheaper chains to save fees
+  - Arbitrage and portfolio rebalancing involve fast swaps
+  jurisdictions: US
+  version: 1
+- id: CY-011
+  name: Use of a crypto mixing or tumbling service
+  definition: Funds are sent to or come from a mixer, which pools and reshuffles coins to hide where they
+    came from.
+  areas:
+  - CY
+  - ML
+  typology: Obfuscation
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 11
+    quote: A customer initiates a transfer of funds involving a mixing service.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 13 (anonymity)
+    quote: Transactions making use of mixing and tumbling services
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Withdrawals from an exchange go straight into a CoinJoin coordinator such as Samourai's Whirlpool.
+  cases:
+  - name: Bitcoin Fog (Roman Sterlingov)
+    year: '2024'
+    jurisdiction: US (D.D.C.)
+    what_happened: A jury convicted the operator of money laundering conspiracy, money laundering and
+      unlicensed money transmission; the mixer processed over 1.2 million bitcoin (about $400 million).
+      Sentenced to 12 years 6 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/bitcoin-fog-operator-sentenced-money-laundering-conspiracy
+    source_title: Bitcoin Fog Operator Sentenced for Money Laundering Conspiracy
+  - name: Helix (Larry Dean Harmon)
+    year: '2024'
+    jurisdiction: US (D.D.C.)
+    what_happened: Harmon pleaded guilty in 2021 to money laundering conspiracy for running Helix, which
+      laundered about 354,468 bitcoin; sentenced to three years; FinCEN separately assessed a $60 million
+      civil penalty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/operator-helix-darknet-cryptocurrency-mixer-sentenced-money-laundering-conspiracy-and
+    source_title: Operator of Helix Darknet Cryptocurrency Mixer Sentenced
+  - name: Tornado Cash (Roman Storm)
+    year: '2025'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Storm was convicted of one count of conspiracy to operate an unlicensed money transmitting
+      business; DOJ says Tornado Cash moved over $1 billion in illegal transactions, including Ronin hack
+      proceeds the FBI attributed to North Korea's Lazarus Group. Other charges did not result in a conviction
+      (per trial reporting).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/founder-tornado-cash-crypto-mixing-service-convicted-knowingly-transmitting-criminal
+    source_title: Founder Of Tornado Cash Crypto Mixing Service Convicted
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Company (mixer operator)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics
+  - OFAC SDN list
+  - Court records of mixer prosecutions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Mixers have laundered proceeds of North Korean state hacking (Ronin hack via Tornado Cash).
+    source_url: https://www.justice.gov/usao-sdny/pr/founder-tornado-cash-crypto-mixing-service-convicted-knowingly-transmitting-criminal
+  innocent_explanations:
+  - Privacy-minded users mix funds to avoid surveillance or theft
+  - Some wallets include coin-mixing features by default
+  jurisdictions: US; FATF members
+  version: 1
+- id: CY-012
+  name: Communicating with the payee over Tor or an unidentified web portal
+  definition: The payer talks to the recipient of a crypto payment through an anonymising network or an
+    unknown web portal, as ransomware negotiators typically require.
+  areas:
+  - CY
+  typology: Ransomware
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 12
+    quote: A customer uses an encrypted network (e.g., the onion router) or an unidentified web portal
+      to communicate with the recipient of the CVC transaction.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Payment instructions arrive via a .onion chat page linked from a ransom note.
+  cases: []
+  data_needed:
+  - Message
+  - Document (ransom note)
+  - CryptoWallet
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Journalists, activists and privacy users use Tor for lawful reasons
+  jurisdictions: US
+  version: 1
+- id: CY-013
+  name: Counterparty is an exchange with a high share of illicit business or under sanctions
+  definition: Funds pass through a crypto exchange that government analysis shows serves mainly criminals
+    or that has been sanctioned for doing so.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Complicit exchange
+  status: verified
+  sources:
+  - title: Treasury Takes Robust Actions to Counter Ransomware (jy0364)
+    publisher: US Treasury
+    year: '2021'
+    url: https://home.treasury.gov/news/press-releases/jy0364
+    locator: SUEX section
+    quote: Analysis of known SUEX transactions shows that over 40% of SUEX’s known transaction history
+      is associated with illicit actors.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Treasury sanctions ransomware operators and virtual currency exchange (jy0471)
+    publisher: US Treasury
+    year: '2021'
+    url: https://home.treasury.gov/news/press-releases/jy0471
+    locator: Chatex section
+    quote: over half are directly traced to illicit or high-risk activities
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Treasury Takes Robust Actions to Counter Ransomware
+    publisher: U.S. Department of the Treasury
+    year: '2021'
+    url: https://home.treasury.gov/news/press-releases/jy0364
+    locator: Press release jy0364, paragraph on the SUEX designation
+    quote: Analysis of known SUEX transactions shows that over 40% of SUEX’s known transaction history
+      is associated with illicit actors
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
+  examples:
+  - Ransom proceeds from several ransomware variants cashed out through SUEX (Treasury).
+  cases:
+  - name: SUEX OTC
+    year: '2021'
+    jurisdiction: US (OFAC)
+    what_happened: First OFAC designation of a crypto exchange; Treasury said SUEX facilitated proceeds
+      from at least eight ransomware variants.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy0364
+    source_title: Treasury press release jy0364
+  - name: Chatex and associates; Yaroslav Vasinskyi; Yevgeniy Polyanin
+    year: '2021'
+    jurisdiction: US (OFAC)
+    what_happened: OFAC designated Chatex and its support companies, and ransomware operators including
+      Vasinskyi, said to be responsible for the July 2021 Kaseya attack.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy0471
+    source_title: Treasury press release jy0471
+  data_needed:
+  - Company
+  - Sanction
+  - CryptoWallet
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - OFAC SDN list
+  - UK and EU sanctions lists
+  - Blockchain analytics exposure reports
+  levels:
+    faint: Official analysis traces some of the exchange's known transactions to illicit actors, but no
+      share is published (no published figure for this level).
+    strong: Official analysis attributes over 40% of the exchange's known transaction history to illicit
+      actors.
+    textbook: The exchange is on a sanctions list, or official analysis attributes over 40% of its known
+      transaction history to illicit actors (the share Treasury cited when it designated SUEX).
+    threshold_source: https://home.treasury.gov/news/press-releases/jy0364
+    threshold_note: 'US (OFAC). The 40% figure comes from Treasury''s analysis of one exchange (SUEX)
+      that was given as grounds for sanctions. It is not a general rule that Treasury applies to every
+      exchange. Other figure: Treasury''s 8 Nov 2021 Chatex release (jy0471) says ''over half are directly
+      traced to illicit or high-risk activities''. Both pages were checked on 2026-10-09.'
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary users of a since-sanctioned exchange may have traded before the designation
+  - Indirect exposure through multiple hops is common
+  jurisdictions: US (OFAC)
+  version: 2
+- id: CY-014
+  name: Ransomware group operating as a service with affiliates, data theft and leak-site threats
+  definition: 'An attack follows the affiliate model: affiliates break in, encrypt and steal data, and
+    threaten to publish it on the group''s leak site if the victim does not pay, with the developer taking
+    a cut.'
+  areas:
+  - CY
+  typology: Ransomware-as-a-service / double extortion
+  status: verified
+  sources:
+  - title: Two Foreign Nationals Plead Guilty to Participating in LockBit Ransomware Group
+    publisher: US Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/archives/opa/pr/two-foreign-nationals-plead-guilty-participating-lockbit-ransomware-group
+    locator: Press release body
+    quote: LockBit's members extorted at least approximately $500 million in ransom payments from their
+      victims.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Victim name appears on a ransomware group's leak site with a countdown timer.
+  cases:
+  - name: LockBit affiliates Ruslan Astamirov and Mikhail Vasiliev
+    year: '2024'
+    jurisdiction: US (D.N.J.)
+    what_happened: Both pleaded guilty to charges including conspiracy to commit computer fraud and wire
+      fraud for deploying LockBit; DOJ says LockBit hit over 2,500 victims in at least 120 countries.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/two-foreign-nationals-plead-guilty-participating-lockbit-ransomware-group
+    source_title: Two Foreign Nationals Plead Guilty to Participating in LockBit Ransomware Group
+  data_needed:
+  - Organization (ransomware group)
+  - Person (affiliates, administrator)
+  - Membership
+  - Document (leak-site captures)
+  - Payment
+  - CryptoWallet
+  checkable: lookups
+  lookup_sources:
+  - Leak-site monitoring services
+  - Court indictments and sanctions designations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Leak-site listings are sometimes false or recycled from older breaches
+  - A named company may be a supplier rather than the actual victim
+  jurisdictions: US; international
+  version: 1
+- id: CY-015
+  name: Emailed payment instructions differ from the customer's usual language, timing or amounts
+  definition: An email asking for a payment looks genuine but its wording, timing or amounts do not match
+    the sender's normal pattern.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: Advisory to Financial Institutions on E-Mail Fraud Against Businesses (FIN-2016-A003)
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: BEC and EAC fraud red flags, item 1, p.5
+    quote: A customer’s seemingly legitimate e-mailed transaction instructions contain different language,
+      timing, and amounts...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Updated Advisory on Email Compromise Fraud Schemes (FIN-2019-A005)
+    publisher: FinCEN
+    year: '2019'
+    url: https://www.fincen.gov/sites/default/files/advisory/2019-07-16/Updated%20BEC%20Advisory%20FINAL%20508.pdf
+    locator: Red flags section
+    quote: The red flags from the 2016 BEC Advisory remain relevant.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A CFO's usual monthly supplier run arrives on a Saturday for an unusual round amount.
+  cases:
+  - name: Ramon Olorunwa Abbas ('Ray Hushpuppi')
+    year: '2022'
+    jurisdiction: US (C.D. California)
+    what_happened: Pleaded guilty to conspiracy to engage in money laundering tied to BEC and other online
+      scams, including a scheme against a New York law firm; sentenced to 135 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-cdca/pr/nigerian-man-sentenced-over-11-years-federal-prison-conspiring-launder-tens-millions
+    source_title: Nigerian Man Sentenced to Over 11 Years in Federal Prison
+  data_needed:
+  - Email
+  - Payment
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New staff, new systems or one-off purchases change patterns
+  - Year-end or travel can shift timing
+  jurisdictions: US
+  version: 1
+- id: CY-016
+  name: Instructions sent from a look-alike email address or look-alike company
+  definition: Payment instructions come from an email account that closely resembles a known customer's
+    or supplier's account, or from a company set up with the same name as a real supplier.
+  areas:
+  - CY
+  typology: Business email compromise / impersonation
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 2, p.5
+    quote: Transaction instructions originate from an e-mail account closely resembling a known customer’s
+      e-mail account...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Email from accounts@acme-supp1y.com instead of acme-supply.com.
+  cases:
+  - name: Evaldas Rimasauskas
+    year: '2019'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Registered a Latvian company with the same name as an Asian hardware maker, sent phishing
+      emails and forged invoices, and induced two US internet companies to wire over $120 million; sentenced
+      to 60 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/lithuanian-man-sentenced-5-years-prison-theft-over-120-million-fraudulent-business
+    source_title: Lithuanian Man Sentenced To 5 Years In Prison For Theft Of Over $120 Million
+  data_needed:
+  - Email (sender, headers)
+  - Company (name, jurisdiction, incorporationDate)
+  - LegalEntity:website
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Domain registration (WHOIS) records
+  - Company registries in the beneficiary's country
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Companies do change domains or use regional subsidiaries with similar names
+  - Personal email used while travelling
+  jurisdictions: US
+  version: 1
+- id: CY-017
+  name: Known payee, but new bank details
+  definition: An email directs payment to a familiar supplier or beneficiary but to a different account
+    from the one used before.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 3, p.5
+    quote: E-mailed transaction instructions direct payment to a known beneficiary...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - '''Please note our bank has changed'' email from a long-standing vendor.'
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount (accountNumber, bank, holder)
+  - Company
+  - Email
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Suppliers genuinely change banks after mergers or bank closures
+  - Factoring arrangements redirect payments
+  jurisdictions: US
+  version: 1
+- id: CY-018
+  name: Payment to a foreign account already linked to fraud complaints
+  definition: An email directs a wire to an overseas account that earlier customer complaints have tied
+    to fraud.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 4, p.5
+    quote: E-mailed transaction instructions direct wire transfers to a foreign bank account that has
+      been documented...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Beneficiary account in another country flagged in earlier complaints to the bank.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  - Document (complaints)
+  checkable: lookups
+  lookup_sources:
+  - Bank fraud complaint records
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complaints may be unfounded or relate to a previous account holder
+  jurisdictions: US
+  version: 1
+- id: CY-019
+  name: Payment to a new beneficiary with no history
+  definition: Emailed instructions send money to a payee the customer has never paid before.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 5, p.5
+    quote: E-mailed transaction instructions direct payment to a beneficiary with which the customer has
+      no payment history...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - First-ever wire to an individual's personal account for a 'consulting fee'.
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Businesses take on new suppliers all the time
+  jurisdictions: US
+  version: 1
+- id: CY-020
+  name: Urgent, secret or confidential payment request with little time to verify
+  definition: Instructions are marked urgent, secret or confidential, or arrive in a way that leaves little
+    time to confirm they are real.
+  areas:
+  - CY
+  typology: Business email compromise / CEO fraud
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag items 6 and 7, p.5
+    quote: E-mailed transaction instructions include markings, assertions, or language designating the
+      transaction request...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - '''Confidential acquisition, wire today, do not discuss with anyone'' from the ''CEO''.'
+  cases: []
+  data_needed:
+  - Email
+  - Payment
+  - Person (purported sender)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real deals (acquisitions, property closings) can be confidential and time-critical
+  jurisdictions: US
+  version: 1
+- id: CY-021
+  name: Instructions from a newly authorised or unverifiable person
+  definition: Payment instructions come from an employee newly added to the account, or the employee says
+    they could not confirm the request with the executives or lawyers who supposedly ordered it.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag items 8 and 9, p.5
+    quote: E-mailed transaction instructions originate from a customer’s employee who is a newly authorized
+      person on the account...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A newly authorised clerk sends a large wire request while the CEO is 'travelling'.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Representation (authority on account)
+  - Email
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff turnover means new signatories
+  - Executives are often hard to reach
+  jurisdictions: US
+  version: 1
+- id: CY-022
+  name: Follow-up payment request immediately after a successful one
+  definition: Right after a payment goes through, the same email channel asks for further payments.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 10, p.5
+    quote: A customer e-mails transaction requests for additional payments immediately following a successful
+      payment...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - In the Hushpuppi case, a victim paid about $330,000 and was then asked for $575,000 in fake taxes
+    (DOJ).
+  cases: []
+  data_needed:
+  - Email
+  - Payment (date, amount)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Instalment payments are normal for some contracts
+  jurisdictions: US
+  version: 1
+- id: CY-023
+  name: Named beneficiary does not match the account holder
+  definition: An incoming wire names a beneficiary who is not the holder of the receiving account.
+  areas:
+  - CY
+  - ML
+  typology: Business email compromise / mule account
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 11, p.5
+    quote: A wire transfer is received for credit into an account, however, the wire transfer names a
+      beneficiary...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Wire addressed to 'ABC Steel Ltd' credited to a personal account in another name.
+  cases: []
+  data_needed:
+  - Payment (beneficiary)
+  - BankAccount (holder)
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Trading names, recent name changes and agent/escrow accounts cause mismatches
+  jurisdictions: US
+  version: 1
+- id: CY-024
+  name: 'Signs of mailbox tampering: auto-forwarding or hidden inbox rules'
+  definition: The victim's email account has auto-forwarding or sweep/sorting rules set up that hide or
+    copy messages, a technical trace of account takeover that FinCEN asks institutions to report.
+  areas:
+  - CY
+  typology: Email account compromise
+  status: verified
+  sources:
+  - title: FIN-2019-A005 Updated BEC Advisory
+    publisher: FinCEN
+    year: '2019'
+    url: https://www.fincen.gov/sites/default/files/advisory/2019-07-16/Updated%20BEC%20Advisory%20FINAL%20508.pdf
+    locator: SAR filing information (cyber-related information)
+    quote: Inbox sweep rules or sorting rules set up in victim email accounts.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A rule forwards every email containing 'invoice' to an outside Gmail address.
+  cases: []
+  data_needed:
+  - Email
+  - UserAccount
+  - Document (mail server logs)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff set up forwarding to personal devices or assistants
+  - IT filtering rules
+  jurisdictions: US
+  version: 1
+- id: CY-025
+  name: Unsolicited contact pitching a high-return crypto investment
+  definition: Someone who recently reached out uninvited by text, social media or a dating app introduces
+    a crypto investment with large returns.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering (relationship investment scam)
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Behavioral red flags, p.6
+    quote: A customer mentions or expresses interest in an investment opportunity leveraging virtual currency
+      with significant returns…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A 'wrong number' text grows into a friendship, then an offer to join a 'trading platform'.
+  cases: []
+  data_needed:
+  - Person
+  - UserAccount
+  - Message
+  - CryptoWallet
+  - Payment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FinCEN states these scams are largely run from Southeast Asia using victims of labour trafficking
+      to contact targets.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  innocent_explanations:
+  - Friends do share investment tips
+  - Legitimate brokers do cold-call within regulation
+  jurisdictions: US
+  version: 1
+- id: CY-026
+  name: Told by a new contact to buy crypto at a kiosk or deposit cash and send it to a given wallet
+  definition: A person says someone who recently contacted them told them to change cash into crypto (often
+    at a crypto ATM) and send it to an address the contact supplied.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Pig butchering / money mule
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Behavioral red flags, p.6
+    quote: A customer mentions that they were instructed by an individual who recently contacted them
+      to exchange fiat currency…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Mules
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+    locator: 'Warning signs: cryptocurrency kiosks'
+    quote: You are directed to deposit cash into one or more cryptocurrency kiosks.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Victim feeds cash into a bitcoin ATM while on the phone with the 'adviser'.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - CryptoWallet
+  - Message
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some people buy crypto at kiosks for their own use
+  jurisdictions: US
+  version: 1
+- id: CY-027
+  name: Savings, retirement or home equity drained to buy crypto or gold for a third party
+  definition: A person cashes out savings early, borrows against their home, or withdraws retirement money
+    to buy crypto or gold, sometimes handing gold to a courier.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering / impersonation scams
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.6
+    quote: A customer takes out a HELOC, home equity loan, or second mortgage and uses the proceeds to
+      purchase virtual currency…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Victim Payments, p.10
+    quote: A customer withdraws funds from an investment or retirement account to purchase gold from a
+      precious metals dealer
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - CD broken before maturity; proceeds wired to a crypto exchange next day.
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - Payment
+  - Contract (loan)
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: FATF lists a customer much older than the platform's average user as a red flag, and retirement-account
+      drain is a typical pattern for older victims.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+  innocent_explanations:
+  - People reallocate savings into crypto or gold by choice
+  - Home-equity borrowing has many legitimate uses
+  jurisdictions: US
+  version: 1
+- id: CY-028
+  name: Small crypto 'return' that mirrors an outflow, followed by much larger outflows
+  definition: A person receives a crypto deposit roughly equal to what they just sent, then sends much
+    larger amounts, a sign of a fake 'profit' used to build trust.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.6
+    quote: A customer receives what appears to be a deposit of virtual currency from a virtual currency
+      address…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - $1,000 out, $1,050 'withdrawal' back, then $40,000 out.
+  cases: []
+  data_needed:
+  - Payment
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine trading gains followed by larger investment
+  jurisdictions: US
+  version: 1
+- id: CY-029
+  name: Dormant account suddenly sends large sums to crypto platforms
+  definition: An account with a large balance and little activity starts making frequent, large or unusual
+    withdrawals to crypto platforms.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.7
+    quote: Accounts with large balances that are inactive or have limited activity begin to show constant,
+      uncharacteristic, sudden…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ten-year-old savings account begins weekly wires to a VASP.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Life events (retirement, inheritance) change account use
+  jurisdictions: US
+  version: 1
+- id: CY-030
+  name: Payments labelled as taxes, fees or penalties to release funds
+  definition: Transfers to a crypto platform are described as taxes, fees or penalties needed to withdraw
+    supposed profits.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering / advance-fee
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.7
+    quote: A customer sends multiple electronic funds transfers (EFTs) or wire transfers to a VASP…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - '''Release fee'' of 20% demanded before a withdrawal is processed.'
+  cases: []
+  data_needed:
+  - Payment (purpose)
+  - Message
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real platforms charge withdrawal fees, though not usually as separate up-front 'taxes'
+  jurisdictions: US
+  version: 1
+- id: CY-031
+  name: Small test transfers followed by large wires to unfamiliar parties
+  definition: After several small transfers to a crypto platform, the person switches to multiple large
+    wires to unfamiliar companies or individuals.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Pig butchering
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.7
+    quote: A customer with a short history of conducting several small-value EFTs to a VASP abruptly stops
+      sending EFTs…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three $200 transfers to an exchange, then $60,000 wires to a 'trading company' in Hong Kong.
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Testing a new platform with small amounts is sensible behaviour
+  jurisdictions: US
+  version: 1
+- id: CY-032
+  name: Account accessed from unusual devices, IPs or places that do not match the holder
+  definition: Logins come from IP addresses, devices or locations unlike the account's normal pattern,
+    or the location/device data does not match the identity documents.
+  areas:
+  - CY
+  typology: Account takeover / remote control by scammer
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Technical red flags, p.7
+    quote: System monitoring and logs show that a customer's account is accessed repeatedly by unique
+      IP addresses, device IDs…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FinCEN Alert on Fraud Schemes Involving Deepfake Media (FIN-2024-Alert004)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: Financial red flag indicators, p.6
+    quote: A customer's geographic or device data is inconsistent
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 13
+    quote: A large number of seemingly unrelated VA wallets controlled from the same IP-address
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Many unrelated accounts all log in from one IP in Cambodia.
+  cases: []
+  data_needed:
+  - UserAccount
+  - Address
+  - Document (access logs)
+  - Identification
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - VPN use, travel, shared office or mobile carrier IPs
+  - Family members using one device
+  jurisdictions: US
+  version: 1
+- id: CY-033
+  name: Investment site or app that imitates a real platform or shows amateur warning signs
+  definition: The person uses a trading site or app with poor spelling, fake testimonials, a newly registered
+    or misspelled domain, no physical address, chat-only contact, or an app installed from outside official
+    app stores.
+  areas:
+  - CY
+  - FR
+  typology: Fake trading platform
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Technical red flags, p.7
+    quote: A customer mentions visiting a website or application that is purported to be associated with
+      a legitimate VASP…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Technical red flags, p.7
+    quote: A customer mentions that they downloaded an application on their phone directly from a third-party
+      website…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Domain registered three weeks ago, copying a known exchange's logo.
+  cases: []
+  data_needed:
+  - LegalEntity:website
+  - Company
+  - Document (screenshots)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Domain registration (WHOIS) and certificate logs
+  - Regulator warning lists of unauthorised firms
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small genuine start-ups can have rough websites and new domains
+  jurisdictions: US
+  version: 1
+- id: CY-034
+  name: Payment to a 'recovery' service to get back money lost to fraud
+  definition: A victim pays a law firm or other outfit that promises to recover scam losses, without documents
+    showing it is legitimate.
+  areas:
+  - CY
+  - FR
+  typology: Recovery scam (re-victimisation)
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Victim Payments, p.10
+    quote: A customer states that a payment is intended to retain a law firm or other entity to recover
+      funds lost to fraud
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - After losing $80,000, the victim is contacted by a 'blockchain recovery attorney' demanding an upfront
+    fee.
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - Bar association / lawyer registers
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real lawyers and licensed investigators do help fraud victims
+  jurisdictions: US
+  version: 1
+- id: CY-035
+  name: Payment directed by someone posing as police or a government agency
+  definition: A person says a supposed law enforcement or government official told them to pay in crypto,
+    by international wire, in gold or gift cards.
+  areas:
+  - CY
+  typology: Government impersonation scam
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Victim Payments, p.10
+    quote: A customer states that they were directed by a purported representative of law enforcement
+      or a government agency
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - '''FBI agent'' tells the victim to move savings into a ''safe'' crypto wallet.'
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Message
+  - CryptoWallet
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real agencies do collect fines, but not in crypto, gift cards or gold via couriers
+  jurisdictions: US
+  version: 1
+- id: CY-036
+  name: Money business claims to be 'approved by FinCEN' or exchange advertises no ID checks
+  definition: A money services business receiving funds falsely claims government approval, or an exchange
+    advertises that it runs without know-your-customer checks.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Complicit or fake financial service
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Victim Payments, p.10
+    quote: Open-source information shows that a digital asset exchange receiving customer funds is advertising
+      services
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Website banner reads 'FinCEN approved' (FinCEN registration is not approval).
+  cases: []
+  data_needed:
+  - Company
+  - LegalEntity:website
+  - Document (advertising)
+  checkable: lookups
+  lookup_sources:
+  - FinCEN MSB registration search
+  - Archived web pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Firms sometimes loosely (but wrongly) describe registration as approval
+  jurisdictions: US
+  version: 1
+- id: CY-037
+  name: Dealings with a guarantee marketplace or its tokens and addresses
+  definition: A person or business transacts with tokens or wallet addresses tied to Telegram-based 'guarantee'
+    marketplaces that sell laundering and scam services, with no clear lawful purpose or documented source
+    of funds.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Guarantee marketplace laundering
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Guarantee Marketplaces, p.10
+    quote: A customer conducts transactions involving a digital asset token issued by or associated with
+      a guarantee marketplace
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Guarantee Marketplaces, p.10
+    quote: Blockchain analysis indicates that a customer has transacted directly or indirectly with a
+      digital asset address
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Repeated USDT transfers to addresses attributed to Haowang Guarantee (Huione's marketplace).
+  cases:
+  - name: Huione Group
+    year: '2025'
+    jurisdiction: US (FinCEN Section 311)
+    what_happened: FinCEN found Huione laundered at least $4 billion of illicit proceeds between August
+      2021 and January 2025, including DPRK cyber-heist funds and investment-scam proceeds, and in October
+      2025 issued a final rule cutting it off from the US financial system.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fincen.gov/news/news-releases/fincen-issues-final-rule-severing-huione-group-us-financial-system
+    source_title: FinCEN Issues Final Rule Severing Huione Group from the U.S. Financial System
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Company
+  - UserAccount (Telegram)
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics attributions
+  - FinCEN/OFAC actions
+  - Telegram channel archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FinCEN found Huione laundered DPRK cyber-heist proceeds.
+    source_url: https://www.fincen.gov/news/news-releases/fincen-finds-cambodia-based-huione-group-be-primary-money-laundering-concern
+  innocent_explanations:
+  - Marketplaces also host ordinary trade, so some counterparties may be unaware
+  - Indirect exposure through exchanges
+  jurisdictions: US; Southeast Asia
+  version: 1
+- id: CY-038
+  name: Payment provider rebrands after enforcement or bad press
+  definition: A payment service tied to a guarantee marketplace changes its name, branding or website
+    in an apparent attempt to hide the link to a marketplace that faced enforcement or negative news.
+  areas:
+  - CY
+  - ML
+  typology: Phoenixing / rebranding
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Guarantee Marketplaces, p.10; and p.6
+    quote: Huione Group transitioned operations from Huione Pay PLC to H-Pay
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Huione Pay PLC operations moved to 'H-Pay' (FinCEN).
+  cases: []
+  data_needed:
+  - Company (name, previousName, incorporationDate)
+  - Ownership
+  - Directorship
+  - LegalEntity:website
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Archived websites
+  - Regulator notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Companies rebrand for marketing, mergers or licensing reasons
+  jurisdictions: US; Southeast Asia
+  version: 1
+- id: CY-039
+  name: Payment provider in Burma, Cambodia or Laos that hides its location or structure
+  definition: A payment or exchange service appears to operate in Burma, Cambodia or Laos and seems to
+    obscure where it is or who owns it.
+  areas:
+  - CY
+  - ML
+  typology: Scam-centre financial infrastructure
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Guarantee Marketplaces, p.10
+    quote: A payment service provider that offers digital asset exchange services appears to operate in
+      Burma, Cambodia, or Laos
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Exchange lists a Seychelles address but its support staff and IPs are in Sihanoukville.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Address
+  - LegalEntity:website
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Sanctions lists
+  - Web infrastructure lookups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many lawful fintechs operate in the region
+  - Offshore incorporation is common for tax reasons
+  jurisdictions: Burma (Myanmar), Cambodia, Laos
+  version: 1
+- id: CY-040
+  name: Wallet address advertised in chat groups next to laundering terms
+  definition: Public sources show a wallet the subject uses was posted on a messaging platform near Chinese-language
+    terms related to money laundering.
+  areas:
+  - CY
+  - ML
+  typology: Chinese money laundering networks
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: Open-source information indicates that a digital asset address used by a customer was posted
+      on
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A TRON address appears in a Telegram post offering 'clean USDT' exchange.
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Message
+  - UserAccount
+  - Document (screenshots)
+  checkable: lookups
+  lookup_sources:
+  - Telegram/messaging channel archives
+  - Open-source search
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Addresses can be posted by third parties without the owner's knowledge
+  - Exchange deposit addresses are shared widely
+  jurisdictions: US; Southeast Asia; China
+  version: 1
+- id: CY-041
+  name: Heavy use of a stablecoin that advertises it will not cooperate with law enforcement
+  definition: Large transactions use a stablecoin whose issuer markets it as unfreezable or says it does
+    not cooperate with law enforcement.
+  areas:
+  - CY
+  - ML
+  typology: Seizure-resistant value transfer
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer conducts substantial transactions using a stablecoin whose issuer advertises that
+      it does not cooperate
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Treasury flows shift into a token marketed as 'cannot be frozen'.
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Company (issuer)
+  checkable: lookups
+  lookup_sources:
+  - Issuer marketing material
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Users in unstable countries may seek censorship-resistant savings
+  jurisdictions: US
+  version: 1
+- id: CY-042
+  name: Scam-proceeds aggregation wallets and DeFi services without AML controls used to swap and cash
+    out
+  definition: Deposits arrive from a wallet that pools suspected scam proceeds, or from a DeFi service
+    with no AML controls, and are swapped to another asset or chain or converted to cash and withdrawn.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Layering and cash-out
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer of a DeFi service receives deposits from a wallet that aggregates suspected scam
+      proceeds
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer receives stablecoin deposits from a DeFi service that lacks AML/CFT controls
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 12
+    quote: Incoming transactions from many unrelated wallets in relatively small amounts
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Hundreds of victim deposits consolidate into one wallet, which swaps into USDT on Tron and cashes
+    out.
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics
+  - Exchange records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Merchants and payment processors legitimately receive many small payments
+  - DeFi swaps are ordinary for traders
+  jurisdictions: US
+  version: 1
+- id: CY-043
+  name: Stablecoins arriving from mainstream exchanges with on-chain laundering patterns
+  definition: An exchange customer receives stablecoin transfers that originate at US-operating centralised
+    exchanges and show patterns associated with on-chain laundering.
+  areas:
+  - CY
+  - ML
+  typology: Victim funds in transit
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer of a digital asset exchange receives stablecoin transactions that originate from
+      centralized
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - USDT withdrawn by many US retail users lands, via several hops, in one overseas account.
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Popular exchanges are the source of most retail stablecoin flows
+  jurisdictions: US
+  version: 1
+- id: CY-044
+  name: Overseas job offer with vague details and unusually high pay
+  definition: A job advert, often for work abroad in Southeast Asia, offers unusually high pay and perks
+    but gives vague details about the company or job, a known recruitment route into scam compounds.
+  areas:
+  - CY
+  - HT
+  typology: Trafficking for forced criminality
+  status: verified
+  sources:
+  - title: The FBI Warns of False Job Advertisements Linked to Labor Trafficking at Scam Compounds (I-052223-PSA)
+    publisher: FBI / IC3
+    year: '2023'
+    url: https://www.ic3.gov/PSA/2023/PSA230522
+    locator: Tips
+    quote: Beware of job advertisements with unusually high salaries and many perks.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Crime Trend Update: Human Trafficking-Fuelled Scam Centres'
+    publisher: INTERPOL
+    year: '2025'
+    url: https://www.interpol.int/ar/content/download/23175/file/INTERPOL%20Crime%20Trend%20Update%20-%20Human%20trafficking-fueled%20scam%20centres.pdf
+    locator: Introduction
+    quote: typically through false job ads
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Social-media ad for 'customer service, $3,000/month, flights paid' in Bangkok, with onward travel
+    to Myawaddy.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Company
+  - Document (job advert)
+  - Address
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: OHCHR estimated at least 120,000 people in Myanmar and around 100,000 in Cambodia may be held
+      and forced to carry out online scams.
+    source_url: https://www.ohchr.org/en/press-releases/2023/08/hundreds-thousands-trafficked-work-online-scammers-se-asia-says-un-report
+  innocent_explanations:
+  - Real overseas jobs (e.g. call centres) recruit online with relocation packages
+  jurisdictions: Southeast Asia (Cambodia, Myanmar, Laos); victims worldwide
+  version: 1
+- id: CY-045
+  name: Workers held by passport seizure, invented debts, violence or resale between compounds
+  definition: People in a scam operation have passports taken, are charged 'debts' for travel and board,
+    are threatened or beaten, held for ransom, or sold on to other compounds.
+  areas:
+  - CY
+  - HT
+  typology: Trafficking for forced criminality / debt bondage
+  status: verified
+  sources:
+  - title: FBI PSA I-052223-PSA
+    publisher: FBI / IC3
+    year: '2023'
+    url: https://www.ic3.gov/PSA/2023/PSA230522
+    locator: Body
+    quote: Criminal actors assign debts to victims under the guise of travel fees and room and board.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: p.3
+    quote: victims may have their passports taken to prevent them from leaving
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Hundreds of thousands trafficked to work as online scammers in SE Asia, says UN report
+    publisher: OHCHR
+    year: '2023'
+    url: https://www.ohchr.org/en/press-releases/2023/08/hundreds-thousands-trafficked-work-online-scammers-se-asia-says-un-report
+    locator: Press release
+    quote: at least 120,000 people across Myanmar may be held in situations where they are forced to carry
+      out online scams
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Escaped worker says family paid a ransom to release them (FinCEN p.3).
+  cases:
+  - name: OHCHR report on online scam operations in Southeast Asia
+    year: '2023'
+    jurisdiction: UN (Southeast Asia)
+    what_happened: UN Human Rights Office reported victims forced into online scams facing torture, arbitrary
+      detention, sexual violence and forced labour, with at least 120,000 in Myanmar and around 100,000
+      in Cambodia.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ohchr.org/en/press-releases/2023/08/hundreds-thousands-trafficked-work-online-scammers-se-asia-says-un-report
+    source_title: Hundreds of thousands trafficked to work as online scammers in SE Asia, says UN report
+  data_needed:
+  - Person
+  - Passport
+  - Employment
+  - Address
+  - Payment (ransom)
+  - Document (testimony)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: These are direct trafficking/forced-labour indicators documented by FBI, FinCEN and OHCHR.
+    source_url: https://www.ic3.gov/PSA/2023/PSA230522
+  innocent_explanations:
+  - Some employers unlawfully hold passports without other coercion; this is still abuse but not necessarily
+    trafficking
+  - Workers may be voluntary participants in some operations
+  jurisdictions: Southeast Asia
+  version: 1
+- id: CY-046
+  name: '''Job'' that consists of receiving money and passing it on for a cut'
+  definition: A person is recruited, usually by an unsolicited message, to open accounts, receive funds
+    and forward them by wire, ACH or money transfer, keeping a portion, with no real job description.
+  areas:
+  - CY
+  - ML
+  typology: Money mule recruitment
+  status: verified
+  sources:
+  - title: Money Mules
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+    locator: 'Warning signs: work-from-home job opportunities'
+    quote: You are asked to open a bank account in your own name or in the name of a company you form
+      to receive and transfer money.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Mules
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+    locator: Warning signs
+    quote: You are allowed to keep a portion of the money you transfer.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - '''Payment processing agent'' role advertised via social media, employer uses a Gmail address.'
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - Company
+  - Payment
+  - Employment
+  - Email
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine payment agents and remittance workers do move money for others under licence
+  jurisdictions: US
+  version: 1
+- id: CY-047
+  name: Online companion asks you to receive and forward money
+  definition: Someone met only online asks a person to receive money and send it on to people they do
+    not know.
+  areas:
+  - CY
+  - ML
+  typology: Romance-scam money mule
+  status: verified
+  sources:
+  - title: Money Mules
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+    locator: 'Warning signs: dating and social media sites'
+    quote: An online contact or companion, whom you have never met in person, asks you to receive money
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Partner met on a dating app asks the victim to accept a wire and buy gift cards with it.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  - Message
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Long-distance partners genuinely help each other with money
+  jurisdictions: US
+  version: 1
+- id: CY-048
+  name: Structuring or rapid bursts of crypto transactions
+  definition: Crypto transfers are split into small amounts to stay under reporting limits, or several
+    high-value transfers are made in quick succession, such as within 24 hours.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Structuring
+  status: verified
+  sources:
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 11 (size and frequency)
+    quote: Structuring VA transactions (e.g. exchange or transfer) in small amounts
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 11
+    quote: in short succession, such as within a 24-hour period
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Nine transfers of just under the local reporting threshold in one day.
+  cases: []
+  data_needed:
+  - Payment (amount, date)
+  - CryptoWallet
+  - UserAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Several high-value transfers within a 24-hour period, or deliberate splitting under a reporting
+      limit, as worded
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Daily withdrawal limits force splitting
+  - Active traders make many transfers a day
+  jurisdictions: FATF members
+  version: 1
+- id: CY-049
+  name: Forged or altered ID, AI-generated photos, or multiple accounts under different names
+  definition: Identity documents or photos look edited, contradict each other or match AI-generated faces,
+    or one person opens several accounts under different names.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Identity fraud / deepfake onboarding
+  status: verified
+  sources:
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 14 (senders or recipients)
+    quote: Customer has provided forged documents or has edited photographs and/or identification documents
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: Financial red flag indicators, p.5
+    quote: A customer's photo is internally inconsistent
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: p.6
+    quote: A reverse-image lookup or open-source search
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Reverse-image search matches the ID photo to a gallery of AI-generated faces.
+  cases: []
+  data_needed:
+  - Person
+  - Passport
+  - Identification
+  - Document
+  - UserAccount
+  checkable: lookups
+  lookup_sources:
+  - Reverse-image search
+  - Deepfake detection tools
+  - ID document verification services
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Old photos, name changes and poor scans cause mismatches
+  - Detection tools give false positives
+  jurisdictions: US; FATF members
+  version: 1
+- id: CY-050
+  name: 'Evasive remote verification: third-party webcam plugins or refusing multi-factor authentication'
+  definition: During live identity checks the person uses an outside webcam add-on, switches channels
+    after 'technical problems', or declines multi-factor authentication.
+  areas:
+  - CY
+  typology: Deepfake onboarding
+  status: verified
+  sources:
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: Financial red flag indicators, p.6
+    quote: A customer uses a third-party webcam plugin
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: p.6
+    quote: A customer declines to use multifactor authentication
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Video KYC call drops whenever the agent asks the customer to turn their head.
+  cases: []
+  data_needed:
+  - Person
+  - UserAccount
+  - Document (verification logs)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real connection problems and older devices
+  - Some people distrust MFA or lack a phone
+  jurisdictions: US
+  version: 1
+- id: CY-051
+  name: New account with rapid, high-risk payment activity or many chargebacks
+  definition: A new or barely used account quickly makes large payments to higher-risk destinations such
+    as gambling sites or crypto exchanges, or has many chargebacks or rejected payments.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Mule / fraudulent account
+  status: verified
+  sources:
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: Financial red flag indicators, p.6
+    quote: A newly opened account or an account with little prior
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 15
+    quote: VA transactions originating from or destined to online gambling services
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 12
+    quote: Conducting a large initial deposit to open a new relationship with a VASP
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Account opened Monday, $90,000 through it to an offshore casino by Friday.
+  cases: []
+  data_needed:
+  - UserAccount
+  - BankAccount
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Gamblers and traders open new accounts and move money quickly
+  - Chargebacks follow genuine merchant disputes
+  jurisdictions: US; FATF members
+  version: 1
+- id: CY-052
+  name: Crypto platform customer much older than the typical user
+  definition: A customer far older than the platform's average user opens an account, which FATF lists
+    because older people are often scam victims or recruited mules.
+  areas:
+  - CY
+  - EF
+  - FR
+  typology: Victim-side signal
+  status: verified
+  sources:
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 14
+    quote: A customer significantly older than the average age of platform users opens an account
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Page 1, footnote 2
+    quote: an older adult is considered an individual 60 years of age or older
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-10'
+  examples:
+  - An 82-year-old opens an exchange account and deposits life savings.
+  cases: []
+  data_needed:
+  - Person (birthDate)
+  - UserAccount
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: The customer is noticeably older than the platform's typical user (no published figure for
+      this level).
+    strong: The customer is 60 or older and suddenly starts buying or discussing virtual currency.
+    textbook: The customer is 60 or older and significantly older than the platform's average user, as
+      FATF words it.
+    threshold_source: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    threshold_note: US. FATF gives no age. The 60-year figure is FinCEN's definition of an 'older adult'
+      in its elder financial exploitation advisory, which also lists 'An older customer suddenly begins
+      discussing and buying CVC' as a red flag. It defines the group at risk; it is not a gap from a platform's
+      average age.
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: FATF lists age disparity as a red flag; FinCEN pig-butchering alert notes victims draining
+      retirement accounts.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  innocent_explanations:
+  - Older people invest in crypto by choice
+  jurisdictions: FATF members
+  version: 2
+- id: CY-053
+  name: Crypto converted to cash at a loss or whole balance traded at once
+  definition: A user exchanges crypto for regular money at an obvious loss, or a new user immediately
+    tries to trade the entire balance, showing more interest in moving value than in returns.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Layering
+  status: verified
+  sources:
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 12
+    quote: Conducting VA-fiat currency exchange at a potential loss
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 12
+    quote: A new user attempts to trade the entire balance of VAs
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Selling BTC 8% below market price for quick fiat.
+  cases: []
+  data_needed:
+  - Payment
+  - CryptoWallet
+  - UserAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Panic selling in a falling market
+  - Urgent need for cash
+  jurisdictions: FATF members
+  version: 1
+- id: CY-054
+  name: One freelance or work account logged into from many IP addresses or countries in a short time,
+    or many accounts run from one IP
+  definition: A single developer or worker account is used from several different internet addresses within
+    a short period, or one internet address controls several separate developer accounts, which suggests
+    the account is shared or operated by people other than the named worker.
+  areas:
+  - CY
+  - SF
+  typology: North Korean (DPRK) remote IT workers
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators (for freelance work and payment platform companies)
+    quote: Multiple logins into one account from various IP addresses in a relatively short period of
+      time
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Developers are logging into multiple accounts on the same platform from one IP address;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A contractor's platform account is logged into from three countries in one day
+  - Five supposedly unrelated developer profiles all connect from the same IP address
+  cases: []
+  data_needed:
+  - UserAccount (username, service, ipAddress if recorded, owner)
+  - Person (name, nationality, country, address)
+  - Employment (employer, employee, startDate)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Platform login and IP logs (via the platform or court records)
+  - IP geolocation services
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: OFAC guidance says hiring DPRK IT workers can expose companies to sanctions and that their
+      earnings fund the DPRK government.
+    source_url: https://ofac.treasury.gov/media/923126/download?inline
+  innocent_explanations:
+  - Worker travels or uses a VPN for privacy or corporate policy
+  - Mobile networks and carrier-grade NAT change or share IP addresses
+  - Small agencies legitimately run several staff accounts from one office connection
+  jurisdictions: United States (advisory applies to U.S. persons and platforms; relevant worldwide)
+  version: 1
+- id: CY-055
+  name: Remote-desktop software or settings on a worker's machine, or continuous login for days
+  definition: The worker's connection shows signs of remote-desktop control (for example port 3389 open,
+    or prohibited remote-desktop tools installed) or the account stays logged in around the clock, suggesting
+    someone else is operating the computer from elsewhere.
+  areas:
+  - CY
+  - SF
+  typology: North Korean (DPRK) remote IT workers; laptop farms
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Router port or other technical configurations associated with use of remote desktop sharing
+      software, such as port 3389
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Developers are logged into their accounts continuously for one or more days at a time;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: North Korean IT Workers Conducting Data Extortion (Alert I-012325-PSA)
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2025'
+    url: https://www.ic3.gov/PSA/2025/PSA250123
+    locator: Recommendations
+    quote: the installation/presence of prohibited remote desktop protocols or software.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Democratic People's Republic of Korea Leverages U.S.-Based Individuals to Defraud U.S. Businesses
+      and Generate Revenue
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2024'
+    url: https://www.ic3.gov/PSA/2024/PSA240516
+    locator: Recommendations for businesses
+    quote: Note unusual network traffic, to include remote connections to devices
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A company laptop issued to a U.S.-based hire is controlled through remote-desktop software from abroad
+  cases:
+  - name: U.S. v. Zhenxing "Danny" Wang and others; coordinated actions against North Korean remote IT
+      worker schemes
+    year: '2025'
+    jurisdiction: United States (D. Massachusetts, N.D. Georgia and others)
+    what_happened: DOJ announced searches of 29 known or suspected laptop farms across 16 states and charges
+      against U.S., Chinese, Taiwanese and North Korean nationals; it said North Korean actors obtained
+      employment with more than 100 U.S. companies. DOJ states these are allegations and defendants are
+      presumed innocent.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+    source_title: Justice Department Announces Coordinated, Nationwide Actions to Combat North Korean
+      Remote Information Technology Workers' Illicit Revenue Generation Schemes
+  data_needed:
+  - UserAccount
+  - Employment
+  - Document (IT/security logs, device inventory)
+  - Address (where the device sits)
+  checkable: records
+  lookup_sources:
+  - Employer endpoint/security logs
+  - Network logs produced in litigation or prosecutions
+  levels:
+    faint: Remote-desktop settings or tools are present (for example port 3389 open) where remote desktop
+      is not normal company practice, or one unusually long login session that falls short of one day
+    strong: The account stays logged in continuously for one or more days at a time and remote-desktop
+      configuration is also present
+    textbook: 'Meets the published definition as worded: the account is logged in continuously for one
+      or more days at a time, and/or remote-desktop configuration such as port 3389 is in use where that
+      is not standard company practice'
+    threshold_source: https://ofac.treasury.gov/media/923126/download?inline
+    threshold_note: 'The number is the time window in the joint State/Treasury/FBI advisory on DPRK IT
+      workers (US): continuous login of ''one or more days at a time''. Port 3389 is a technical identifier,
+      not a threshold. The FBI IC3 PSAs (PSA250123, PSA240516) give no duration or count. Applies to freelance
+      and remote-work platforms and to employers.'
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: DOJ reported searches of suspected laptop farms used to let North Korean workers pose as U.S.-based
+      staff.
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+  innocent_explanations:
+  - IT staff legitimately use remote-desktop tools for support
+  - Long sessions may be left open by accident or by automated build jobs
+  - Workers may remote into their own home machine while travelling
+  jurisdictions: United States
+  version: 2
+- id: CY-056
+  name: Worker asks for work equipment to be sent to an address not on their ID, or changes address after
+    hiring
+  definition: A newly hired remote worker asks for the company laptop or other items to go to an address
+    that is not on their identity documents, or changes address between being hired and the laptop being
+    shipped, which can mean a third party is hosting the device for someone else.
+  areas:
+  - CY
+  - SF
+  typology: North Korean (DPRK) remote IT workers; laptop farms
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators (for companies employing freelance developers)
+    quote: the developer requests that items be sent to an address not listed on the developer's identification
+      documentation
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Democratic People's Republic of Korea Leverages U.S.-Based Individuals to Defraud U.S. Businesses
+      and Generate Revenue
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2024'
+    url: https://www.ic3.gov/PSA/2024/PSA240516
+    locator: Recommendations for businesses
+    quote: Monitor applicants for changes in addresses, particularly after being hired but before laptops
+      are delivered
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Several laptops for different named employees are shipped to the same residential address
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Address (shipping address vs. ID address)
+  - Passport / Identification
+  - Document (shipping records)
+  checkable: records
+  lookup_sources:
+  - Employer HR and shipping records
+  - Address/property records to see who lives at the shipping address
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: DOJ described U.S.-based facilitators hosting laptops for North Korean workers.
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+  innocent_explanations:
+  - Worker genuinely moved after accepting the job
+  - ID shows an old address
+  - Items sent to a family member's home or a co-working space while the worker relocates
+  jurisdictions: United States
+  version: 1
+- id: CY-057
+  name: Identity details that do not match across a worker's profiles, documents and interviews
+  definition: A remote applicant's name spelling, nationality, claimed location, contact details or life
+    history differ between profiles and documents, or the person cannot answer basic questions about where
+    they live, or identity checks such as E-Verify throw errors.
+  areas:
+  - CY
+  - SF
+  typology: North Korean (DPRK) remote IT workers; identity fraud
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Inconsistencies in name spelling, nationality, claimed work location, contact information
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Biographical information which does not appear to match the applicant;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Democratic People's Republic of Korea Leverages U.S.-Based Individuals to Defraud U.S. Businesses
+      and Generate Revenue
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2024'
+    url: https://www.ic3.gov/PSA/2024/PSA240516
+    locator: Recommendations for businesses
+    quote: Note inconsistencies in interviews, especially applicants being unable to field questions about
+      where they are located
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Democratic People's Republic of Korea Leverages U.S.-Based Individuals to Defraud U.S. Businesses
+      and Generate Revenue
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2024'
+    url: https://www.ic3.gov/PSA/2024/PSA240516
+    locator: Recommendations for businesses
+    quote: Note errors derived in the hiring process from the E-Verify check and request in-person or
+      other reliable means
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - CV says the applicant lives in Texas but their phone number and email change repeatedly and they cannot
+    name nearby places
+  cases: []
+  data_needed:
+  - Person (name, nationality, birthDate, address, email, phone)
+  - Passport / Identification
+  - UserAccount (developer and social profiles)
+  - Employment
+  - Document (CV, interview notes)
+  checkable: person
+  lookup_sources:
+  - Social media and professional profiles
+  - Identity verification and E-Verify results
+  - Phone and email reverse lookups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transliteration differences in names
+  - Recent moves, name changes through marriage
+  - E-Verify errors from clerical mistakes
+  - Interview nerves or language barriers
+  jurisdictions: United States
+  version: 1
+- id: CY-058
+  name: Remote worker asks to be paid in crypto or through PRC-linked payment services, with frequent
+    onward transfers
+  definition: A freelance or remote worker asks for payment in virtual currency or through payment services
+    linked to China, and money moves on frequently through payment platforms to bank accounts in China,
+    which can be a way to avoid identity checks.
+  areas:
+  - CY
+  - ML
+  - SF
+  typology: North Korean (DPRK) remote IT workers
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Seeking payment in virtual currency in an effort to evade KYC/AML measures and use of the formal
+      financial system;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Frequent transfers of money through payment platforms, especially to PRC-based bank accounts
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A contractor insists on stablecoin payment and the employer's payroll is swept out to a Chinese bank
+    account within days
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, date, purpose)
+  - CryptoWallet
+  - BankAccount (country)
+  - Employment
+  - Person
+  checkable: records
+  lookup_sources:
+  - Bank and payment-platform records
+  - Blockchain explorers / analytics
+  - Sanctions lists (OFAC SDN)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: DOJ seized 29 financial accounts it said were used to launder funds from North Korean IT worker
+      schemes.
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+  innocent_explanations:
+  - Many legitimate freelancers prefer crypto for cross-border pay or lower fees
+  - Workers with family in China send remittances
+  - Some countries have limited access to Western payment services
+  jurisdictions: United States
+  version: 1
+- id: CY-059
+  name: Freelance profile ratings boosted by one client account, heavy bidding with few wins, or a previously
+    shut-down account
+  definition: Several developer accounts get high ratings from the same client account in a short time,
+    the developer bids on many projects but wins few, uses templated bid documents, or has had an earlier
+    freelance or payment account shut down.
+  areas:
+  - CY
+  - SF
+  typology: North Korean (DPRK) remote IT workers; platform manipulation
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Multiple developer accounts receiving high ratings from one client account in a short period
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Developer accounts use a fraudulent client account to increase developer account ratings
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Extensive bidding on projects, and a low number of accepted project bids compared to the number
+      of projects
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A newly created client account leaves five-star reviews on six developer profiles in one week
+  cases: []
+  data_needed:
+  - UserAccount
+  - Associate / UnknownLink (between client and developer accounts)
+  - Contract
+  - Document (reviews, bids)
+  checkable: lookups
+  lookup_sources:
+  - Freelance platform public profiles and review histories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A real client who hires several developers and rates them together
+  - New freelancers bid widely before building a reputation
+  - Templates are common and efficient
+  - Accounts get suspended for unrelated policy reasons
+  jurisdictions: United States
+  version: 1
+- id: CY-060
+  name: Worker unreachable in business hours, misses check-ins, asks to move off-platform, or wants pay
+    before milestones
+  definition: A remote worker cannot work or be reached during required hours, fails to deliver or reply,
+    asks to continue talks on a different platform, or asks to be paid without meeting deliverables or
+    check-ins.
+  areas:
+  - CY
+  - SF
+  typology: North Korean (DPRK) remote IT workers
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Inability to conduct business during required business hours;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Requesting payment for contracts without meeting production benchmarks or check-in meetings;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Requests to communicate with clients and potential clients on a separate platform than the
+      original freelance platform
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A developer supposedly in New York is only ever responsive in the middle of the U.S. night
+  cases: []
+  data_needed:
+  - Employment
+  - Contract
+  - Email / Message
+  - Payment
+  checkable: person
+  lookup_sources:
+  - Employer communications and timesheets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary poor performance or illness
+  - Workers in other time zones on flexible contracts
+  - Moving off-platform to avoid platform fees is common
+  jurisdictions: United States
+  version: 1
+- id: CY-061
+  name: Background noise of others doing similar work, or face-swap and AI used during video interviews
+  definition: In a remote job interview the applicant sounds surrounded by others doing the same work,
+    or uses artificial intelligence or face-swapping so the face on camera is not real.
+  areas:
+  - CY
+  - SF
+  typology: North Korean (DPRK) remote IT workers; AI-enabled identity fraud
+  status: verified
+  sources:
+  - title: Democratic People's Republic of Korea Leverages U.S.-Based Individuals to Defraud U.S. Businesses
+      and Generate Revenue
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2024'
+    url: https://www.ic3.gov/PSA/2024/PSA240516
+    locator: Recommendations for businesses
+    quote: Note increased noise during interviews or sounds as if an applicant is surrounded by others
+      doing similar work.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: North Korean IT Workers Conducting Data Extortion (Alert I-012325-PSA)
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2025'
+    url: https://www.ic3.gov/PSA/2025/PSA250123
+    locator: Recommendations / identity verification
+    quote: using artificial intelligence and face-swapping technology during video job interviews to obfuscate
+      their true identities.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'INTERPOL Financial Fraud assessment: A global threat boosted by technology'
+    publisher: INTERPOL
+    year: '2024'
+    url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+    locator: News release
+    quote: The use of Artificial Intelligence (AI), large language models and cryptocurrencies
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The applicant's lips do not match their speech and their face glitches when they turn
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document (interview recordings, notes)
+  checkable: person
+  lookup_sources:
+  - Interview recordings reviewed by a person; deepfake detection tools
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Applicant interviews from a shared office, café or noisy home
+  - Video filters and poor connections cause glitches
+  - Background blur features distort faces
+  jurisdictions: United States; INTERPOL notes global AI use in fraud
+  version: 1
+- id: CY-062
+  name: Insider copies company code or data to personal accounts, then demands payment to not release
+    it
+  definition: A remote worker copies company code repositories or data to personal accounts or cloud storage,
+    and after leaving or being fired threatens to leak it unless paid.
+  areas:
+  - CY
+  - SF
+  typology: North Korean (DPRK) remote IT workers; data extortion
+  status: verified
+  sources:
+  - title: North Korean IT Workers Conducting Data Extortion (Alert I-012325-PSA)
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2025'
+    url: https://www.ic3.gov/PSA/2025/PSA250123
+    locator: Alert body
+    quote: copied company code repositories, such as GitHub, to their own user profiles and personal cloud
+      accounts.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: North Korean IT Workers Conducting Data Extortion (Alert I-012325-PSA)
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2025'
+    url: https://www.ic3.gov/PSA/2025/PSA250123
+    locator: Alert body
+    quote: holding stolen proprietary data and code hostage until the companies meet ransom demands.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - After termination, a former contractor emails samples of the company's source code with a crypto ransom
+    demand
+  cases:
+  - name: North Korean IT workers theft from Atlanta-based blockchain company and Serbian company (N.D.
+      Georgia charges)
+    year: '2025'
+    jurisdiction: United States (N.D. Georgia)
+    what_happened: DOJ said four North Korean nationals were charged with wire fraud and money laundering
+      and allegedly stole virtual currency worth approximately over $900,000 from two companies that employed
+      them; they remain at large.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+    source_title: Justice Department Announces Coordinated, Nationwide Actions to Combat North Korean
+      Remote Information Technology Workers' Illicit Revenue Generation Schemes
+  data_needed:
+  - Employment
+  - UserAccount
+  - Document (access logs, extortion messages)
+  - Email
+  - Payment
+  - CryptoWallet
+  checkable: records
+  lookup_sources:
+  - Employer access logs; code-hosting audit logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FBI ties this extortion pattern to North Korean IT workers; ransom payments may be sanctioned
+      transactions.
+    source_url: https://www.ic3.gov/PSA/2025/PSA250123
+  innocent_explanations:
+  - Developers sometimes fork code to personal accounts by habit or for portfolio use (still a policy
+    breach, not extortion)
+  - Backups to personal cloud made for convenience
+  jurisdictions: United States
+  version: 1
+- id: CY-063
+  name: Person recruited to receive packages or lend their identity for a remote job they do not do
+  definition: Someone is approached online to receive work laptops or packages for a cut of the pay, is
+    asked by a colleague to lend personal details to obtain contracts, or receives tax forms for a job
+    they never held, showing their identity is being used to front for another worker.
+  areas:
+  - CY
+  - ML
+  - SF
+  typology: North Korean (DPRK) remote IT workers; facilitators and identity lending
+  status: verified
+  sources:
+  - title: Democratic People's Republic of Korea Leverages U.S.-Based Individuals to Defraud U.S. Businesses
+      and Generate Revenue
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2024'
+    url: https://www.ic3.gov/PSA/2024/PSA240516
+    locator: Recommendations for individuals
+    quote: Remain alert regarding outreach for job positions involving the receipt of packages in return
+      for portions of proceeds
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Democratic People's Republic of Korea Leverages U.S.-Based Individuals to Defraud U.S. Businesses
+      and Generate Revenue
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2024'
+    url: https://www.ic3.gov/PSA/2024/PSA240516
+    locator: Recommendations for individuals
+    quote: If you receive a W-4, 1099-NEC, or other IRS form for a job that you did not hold, you should
+      contact the business
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers
+    publisher: U.S. Department of State, U.S. Department of the Treasury (OFAC) and FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators
+    quote: Asking co-workers to borrow some of their personal information to obtain other contracts.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A person paid monthly to keep a rack of company laptops powered on at home
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Address
+  - Payment
+  - Document (tax forms, shipping records)
+  - Representation / UnknownLink (facilitator to worker)
+  checkable: person
+  lookup_sources:
+  - Tax records the person holds; shipping records; interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: CY-046 covers money-mule jobs; this is the parallel goods/identity-mule pattern, and DOJ described
+      U.S. facilitators hosting laptop farms.
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+  innocent_explanations:
+  - Legitimate reshipping or receiving jobs exist
+  - Tax forms can be issued in error or after ordinary identity theft
+  jurisdictions: United States
+  version: 1
+- id: CY-064
+  name: Phone suddenly loses service (goes dark or only allows 911), then password resets and withdrawals
+  definition: A person's mobile phone stops working because their number has been moved to a SIM or carrier
+    the criminal controls, after which one-time codes are intercepted and bank or crypto accounts are
+    reset and emptied.
+  areas:
+  - CY
+  typology: SIM-swap and port-out account takeover
+  status: verified
+  sources:
+  - title: Criminals Increasing SIM Swap Schemes to Steal Millions of Dollars from US Public (PSA I-020822-PSA)
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2022'
+    url: https://www.ic3.gov/PSA/2022/PSA220208
+    locator: Alert body
+    quote: In 2021, IC3 received 1,611 SIM swapping complaints with adjusted losses of more than $68 million.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Criminals Increasing SIM Swap Schemes to Steal Millions of Dollars from US Public (PSA I-020822-PSA)
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2022'
+    url: https://www.ic3.gov/PSA/2022/PSA220208
+    locator: Tips to protect yourself
+    quote: Be aware of any changes in SMS-based connectivity.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Protecting Consumers from SIM-Swap and Port-Out Fraud, Report and Order (FCC 23-95)
+    publisher: Federal Communications Commission
+    year: '2023'
+    url: https://docs.fcc.gov/public/attachments/FCC-23-95A1.pdf
+    locator: Paragraph 7
+    quote: the phone going dark or only allowing 911 calls
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Victim's phone shows 'SOS only'; within an hour their exchange account password is reset and funds
+    withdrawn
+  cases: []
+  data_needed:
+  - Person
+  - UserAccount
+  - Payment
+  - CryptoWallet
+  - Document (carrier account change records, login and reset logs)
+  checkable: records
+  lookup_sources:
+  - Mobile carrier account records (SIM change and port-out history)
+  - Bank/exchange login and password-reset logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Network outages, unpaid bills or a damaged SIM
+  - The holder changed phones or carriers themselves
+  - Password resets made by the holder after losing a phone
+  jurisdictions: United States (FBI, FCC)
+  version: 1
+- id: CY-065
+  name: Phone number ported to a new carrier, or SIM reassigned, without the holder's request
+  definition: Carrier records show the holder's number was moved to another provider or another SIM after
+    someone posing as the holder contacted the carrier, giving the criminal control of calls and texts.
+  areas:
+  - CY
+  typology: SIM-swap and port-out account takeover
+  status: verified
+  sources:
+  - title: Protecting Consumers from SIM-Swap and Port-Out Fraud, Report and Order (FCC 23-95)
+    publisher: Federal Communications Commission
+    year: '2023'
+    url: https://docs.fcc.gov/public/attachments/FCC-23-95A1.pdf
+    locator: Paragraph 5
+    quote: impersonating a customer of a wireless provider and convincing the provider to reassign the
+      virtual SIM card
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Protecting Consumers from SIM-Swap and Port-Out Fraud, Report and Order (FCC 23-95)
+    publisher: Federal Communications Commission
+    year: '2023'
+    url: https://docs.fcc.gov/public/attachments/FCC-23-95A1.pdf
+    locator: Paragraph 6
+    quote: convincing the provider to port the real customer's telephone number to a new wireless provider
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Carrier log shows a SIM change at a retail store the victim never visited
+  cases: []
+  data_needed:
+  - Person
+  - UserAccount (mobile account)
+  - Document (carrier change and port records)
+  - Address (store location)
+  checkable: lookups
+  lookup_sources:
+  - Mobile carrier records (subpoena or the victim's own request)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Holder or a family member on the account made the change
+  - Carrier error during a legitimate upgrade
+  jurisdictions: United States
+  version: 1
+- id: CY-066
+  name: Unsolicited call asking for mobile account details, PINs or one-time codes
+  definition: Someone contacts the holder pretending to be the carrier or another trusted party and asks
+    for mobile account information or codes that could be used to take over the number.
+  areas:
+  - CY
+  typology: SIM-swap and port-out account takeover; social engineering
+  status: verified
+  sources:
+  - title: Criminals Increasing SIM Swap Schemes to Steal Millions of Dollars from US Public (PSA I-020822-PSA)
+    publisher: FBI Internet Crime Complaint Center (IC3)
+    year: '2022'
+    url: https://www.ic3.gov/PSA/2022/PSA220208
+    locator: Tips to protect yourself
+    quote: Do not provide your mobile number account information over the phone
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Caller claiming to be from the carrier asks the victim to read back a code 'to verify the account'
+  cases: []
+  data_needed:
+  - Person
+  - Document (call logs, messages)
+  checkable: person
+  lookup_sources:
+  - Interview with the account holder; phone records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Carriers do sometimes call customers about genuine account issues
+  jurisdictions: United States
+  version: 1
+- id: CY-067
+  name: Caller impersonates a bank official or law enforcement in a telecom fraud
+  definition: A phone or messaging contact pretends to be from the victim's bank or a police force to
+    get the victim to move money or reveal security details; INTERPOL names this as a leading fraud in
+    Asia.
+  areas:
+  - CY
+  typology: Telecom / impersonation fraud
+  status: verified
+  sources:
+  - title: 'INTERPOL Financial Fraud assessment: A global threat boosted by technology'
+    publisher: INTERPOL
+    year: '2024'
+    url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+    locator: 'Regional trends: Asia'
+    quote: telecommunication fraud where perpetrators impersonate law enforcement officers or bank officials
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Caller says the victim's account is compromised and they must move savings to a 'safe account'
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - BankAccount
+  - Document (call records, messages)
+  checkable: person
+  lookup_sources:
+  - Victim interview; bank records; telecom records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: INTERPOL reports human trafficking for forced criminality in call centres running such frauds.
+    source_url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+  innocent_explanations:
+  - Banks genuinely call customers about suspected fraud (but do not ask them to move funds to new accounts)
+  jurisdictions: Global (INTERPOL); noted especially in Asia
+  version: 1
+- id: CY-068
+  name: 'Tech-support scam: contact claiming to fix a computer problem leads to payment or remote access'
+  definition: The victim is told by a pop-up, call or message that their device has a problem and is pushed
+    to pay or allow remote access; INTERPOL lists tech-support fraud among the main frauds in the Americas.
+  areas:
+  - CY
+  typology: Tech-support impersonation fraud
+  status: verified
+  sources:
+  - title: 'INTERPOL Financial Fraud assessment: A global threat boosted by technology'
+    publisher: INTERPOL
+    year: '2024'
+    url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+    locator: 'Regional trends: Americas'
+    quote: impersonation, romance, tech support, advance payment, and telecom frauds
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pop-up says the computer is infected and gives a phone number; caller installs remote software and
+    asks for gift cards
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document (pop-up screenshots, remote-access logs)
+  checkable: person
+  lookup_sources:
+  - Victim interview; device logs; payment records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real IT support the person contacted themselves
+  - Legitimate vendor warnings about outdated software
+  jurisdictions: Global (INTERPOL); noted especially in the Americas
+  version: 1
+- id: CY-069
+  name: 'Romance baiting: online relationship that turns into a crypto investment pitch'
+  definition: A contact builds a romantic relationship online and then steers the victim into a cryptocurrency
+    investment that turns out to be fake; INTERPOL describes this as a hybrid of romance and investment
+    fraud.
+  areas:
+  - CY
+  - HT
+  typology: Romance baiting (pig butchering)
+  status: verified
+  sources:
+  - title: 'INTERPOL Financial Fraud assessment: A global threat boosted by technology'
+    publisher: INTERPOL
+    year: '2024'
+    url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+    locator: News release
+    quote: a hybrid scheme combining romance and investment frauds, using cryptocurrencies
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - After weeks of daily chats, a new online partner shows profits on a trading app and urges the victim
+    to invest
+  cases: []
+  data_needed:
+  - Person
+  - Associate (online relationship)
+  - Payment
+  - CryptoWallet
+  - Document (chat logs)
+  checkable: person
+  lookup_sources:
+  - Victim chat logs; blockchain analytics; scam-domain lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: INTERPOL links these frauds to human trafficking for forced criminality in scam centres.
+    source_url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+  innocent_explanations:
+  - Genuine partners sometimes share investment ideas
+  - Some couples do invest together
+  jurisdictions: Global (INTERPOL)
+  version: 1
+- id: CY-070
+  name: Fraud run by a network using bought services (phishing-as-a-service or ransomware-as-a-service)
+  definition: A fraud or cyberattack uses ready-made tools or services rented from other criminals, such
+    as phishing kits or ransomware, and is carried out by a network of co-offenders rather than one person.
+  areas:
+  - CY
+  typology: Fraud-as-a-service
+  status: verified
+  sources:
+  - title: 'INTERPOL Financial Fraud assessment: A global threat boosted by technology'
+    publisher: INTERPOL
+    year: '2024'
+    url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+    locator: News release
+    quote: phishing- and ransomware-as-a-service business models
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'INTERPOL Financial Fraud assessment: A global threat boosted by technology'
+    publisher: INTERPOL
+    year: '2024'
+    url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+    locator: News release
+    quote: Financial fraud is most often carried out by a network of co-offenders
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Many phishing sites share the same kit code and admin panel, pointing to a common supplier
+  cases: []
+  data_needed:
+  - Domain / Website (as Document)
+  - UserAccount
+  - Associate / UnknownLink
+  - Payment
+  - CryptoWallet
+  checkable: lookups
+  lookup_sources:
+  - Domain registration (WHOIS) and certificate logs
+  - Threat-intelligence reports
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Security researchers and red teams use similar kits for authorised testing
+  - Shared hosting makes unrelated sites look linked
+  jurisdictions: Global (INTERPOL)
+  version: 1
+- id: CY-071
+  name: Breach reported to the regulator more than 72 hours after the company became aware of it
+  definition: A company tells the data protection regulator about a personal data breach later than the
+    72-hour window that starts when it was reasonably certain a breach happened.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.A.1, para. 29
+    quote: not later than 72 hours after having become aware of it
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.A.2, para. 31 (when the controller becomes 'aware')
+    quote: has a reasonable degree of certainty that a security incident has occurred
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Personal data breaches: a guide'
+    publisher: UK Information Commissioner's Office
+    url: https://ico.org.uk/for-organisations/report-a-breach/personal-data-breach/personal-data-breaches-a-guide/
+    locator: Reporting section (deadline for notifiable breaches)
+    quote: 72 hours
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Data Protection Commission announces decision in Twitter inquiry
+    publisher: Data Protection Commission (Ireland)
+    year: '2020'
+    url: https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry
+    quote: a failure to notify the breach on time to the DPC
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Twitter International: Irish DPC found late notification under Art. 33(1) and fined EUR 450,000 (2020).'
+  cases:
+  - name: Twitter International Company (DPC inquiry)
+    year: '2020'
+    jurisdiction: Ireland / EU
+    what_happened: The Irish DPC found Twitter failed to notify a breach to the DPC on time and failed
+      to document it adequately, infringing GDPR Art. 33(1) and 33(5).
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry
+    source_title: Data Protection Commission announces decision in Twitter inquiry
+  data_needed:
+  - Company
+  - Event
+  - Document
+  - PublicBody
+  - Note
+  checkable: records
+  lookup_sources:
+  - Data protection authority decisions and annual reports
+  - Company breach statements and press releases
+  - Court filings
+  levels:
+    faint: Company's own timeline shows a gap between discovery and notification but exact dates are unclear
+    strong: Dated records show notification after 72 hours
+    textbook: Notification made more than 72 hours after awareness (regulator finding of Art. 33(1) breach)
+    threshold_source: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Awareness legitimately began later than the first suspicion, after a short investigation to establish
+    a breach had occurred
+  - Breach judged unlikely to result in risk, so no notification was required
+  - Late notice was made with documented reasons for the delay, which GDPR permits
+  - Processor told the controller late
+  jurisdictions: EU/EEA and UK (GDPR / UK GDPR)
+  version: 1
+- id: CY-072
+  name: Late breach notification with no stated reasons for the delay
+  definition: A breach notice is filed after the deadline but does not explain why it was late, which
+    the rules require.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.A.1
+    quote: it shall be accompanied by reasons for the delay.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Regulator decisions
+  - Freedom-of-information requests to the data protection authority
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reasons were given to the regulator but are not public
+  - Notification was made in phases, with the first phase on time
+  jurisdictions: EU/EEA and UK (GDPR / UK GDPR)
+  version: 1
+- id: CY-073
+  name: Breach not recorded in the company's internal breach register
+  definition: A company fails to keep a written record of a breach, its effects and what it did about
+    it, even though every breach must be documented whether or not it is reported.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section V.A, para. 121 (quoting Art. 33(5))
+    quote: The controller shall document any personal data breaches
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Personal data breaches: a guide'
+    publisher: UK Information Commissioner's Office
+    url: https://ico.org.uk/for-organisations/report-a-breach/personal-data-breach/personal-data-breaches-a-guide/
+    locator: Record-keeping section (wording as returned by the page reader; check before publication)
+    quote: You must also keep a record of any personal data breaches, regardless of whether you are required
+      to notify.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Data Protection Commission announces decision in Twitter inquiry
+    publisher: Data Protection Commission (Ireland)
+    year: '2020'
+    url: https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry
+    quote: a failure to adequately document the breach
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Twitter International: Art. 33(5) documentation failure found by the Irish DPC (2020).'
+  cases:
+  - name: Twitter International Company (DPC inquiry)
+    year: '2020'
+    jurisdiction: Ireland / EU
+    what_happened: DPC found failure to adequately document the breach (Art. 33(5)).
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry
+    source_title: Data Protection Commission announces decision in Twitter inquiry
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: person
+  lookup_sources:
+  - Regulator decisions
+  - Whistleblower or insider documents
+  - Litigation discovery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Record exists but was not disclosed to the journalist
+  - Incident was judged not to involve personal data
+  jurisdictions: EU/EEA and UK (GDPR / UK GDPR)
+  version: 1
+- id: CY-074
+  name: People put at high risk by a breach are not told
+  definition: A breach is likely to cause serious harm to the people whose data was exposed, but the company
+    does not tell them promptly.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section III.A, para. 81 (quoting Art. 34(1))
+    quote: the controller shall communicate the personal data breach to the data subject without undue
+      delay.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section I.B.3, para. 28
+    quote: failure to report a breach to either an individual or a supervisory authority
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Uber: FTC said Uber kept a 2016 breach from consumers until November 2017.'
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Affected people's accounts
+  - Regulator decisions
+  - Company notices to customers
+  levels:
+    faint: Sensitive data reported exposed, no customer notice found
+    strong: Regulator or court record shows high-risk breach without notice to individuals
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Data was securely encrypted, so risk to people was low
+  - Company took steps that removed the high risk
+  - Individual notice was replaced by a public announcement because direct contact was disproportionate
+  jurisdictions: EU/EEA and UK (GDPR Art. 34); comparable duties in US sector laws
+  version: 1
+- id: CY-075
+  name: Supplier or processor sits on a breach before telling its client
+  definition: A service provider handling data for another organisation learns of a breach but delays
+    telling that organisation.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.A.4, para. 44 (quoting Art. 33(2))
+    quote: must notify the controller “without undue delay”
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Contracts and data processing agreements
+  - Client breach notices naming a vendor
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Processor needed time to confirm whose data was affected
+  - Contract set a specific reporting route that was followed
+  jurisdictions: EU/EEA and UK (GDPR Art. 33(2))
+  version: 1
+- id: CY-076
+  name: Payment to attackers booked as a bug bounty, tied to a non-disclosure agreement
+  definition: A company pays the people who stole its data through a vulnerability-reward programme or
+    similar, and gets them to sign a confidentiality agreement, instead of reporting the breach.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Uber Agrees to Expanded Settlement with FTC Related to Privacy, Security Claims
+    publisher: US Federal Trade Commission
+    year: '2018'
+    url: https://www.ftc.gov/news-events/news/press-releases/2018/04/uber-agrees-expanded-settlement-ftc-related-privacy-security-claims
+    quote: paid the intruders $100,000 through its third-party “bug bounty” program
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Former Chief Security Officer Of Uber Convicted Of Federal Charges For Covering Up Data Breach
+    publisher: US Attorney's Office, Northern District of California
+    year: '2022'
+    url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+    quote: contained the false representation that the hackers did not take or store any data in their
+      hack
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Uber 2016 breach: USD 100,000 paid via bug bounty; NDAs falsely stated no data was taken.'
+  cases:
+  - name: United States v. Joseph Sullivan (Uber)
+    year: '2022'
+    jurisdiction: US, N.D. California
+    what_happened: Uber's former chief security officer was convicted of obstructing an FTC proceeding
+      and misprision of felony for concealing the 2016 breach, including paying hackers under NDAs falsely
+      stating no data was taken.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+    source_title: Former Chief Security Officer Of Uber Convicted Of Federal Charges For Covering Up Data
+      Breach
+  - name: FTC v. Uber (expanded settlement)
+    year: '2018'
+    jurisdiction: US
+    what_happened: FTC said Uber failed to tell the Commission of a 2016 breach and paid intruders USD
+      100,000 through its bug bounty programme; revised settlement requires reporting of future incidents.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.ftc.gov/news-events/news/press-releases/2018/04/uber-agrees-expanded-settlement-ftc-related-privacy-security-claims
+    source_title: Uber Agrees to Expanded Settlement with FTC Related to Privacy, Security Claims
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Bug bounty platform disclosures
+  - Court records
+  - Regulator settlements
+  levels:
+    faint: Unusually large bug bounty payout with no published vulnerability report
+    strong: Bounty recipient is shown to have taken data rather than only reported a flaw
+    textbook: Payment to intruders who took data, with an NDA and no breach notice
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine bug bounty for a researcher who reported a flaw responsibly
+  - Large bounties are normal for critical vulnerabilities
+  jurisdictions: US (federal)
+  version: 1
+- id: CY-077
+  name: Breach kept from a regulator that is already investigating the company's security
+  definition: While a regulator is examining the company's data security, the company suffers a new breach
+    and does not tell that regulator.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Uber Agrees to Expanded Settlement with FTC Related to Privacy, Security Claims
+    publisher: US Federal Trade Commission
+    year: '2018'
+    url: https://www.ftc.gov/news-events/news/press-releases/2018/04/uber-agrees-expanded-settlement-ftc-related-privacy-security-claims
+    quote: compounded its misconduct by failing to inform the Commission that it suffered another data
+      breach in 2016
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Former Chief Security Officer Of Uber Convicted Of Federal Charges For Covering Up Data Breach
+    publisher: US Attorney's Office, Northern District of California
+    year: '2022'
+    url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+    quote: never mentioned the incident to them
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Uber: breach of November 2016 withheld from the FTC during its ongoing inquiry.'
+  cases:
+  - name: United States v. Joseph Sullivan (Uber)
+    year: '2022'
+    jurisdiction: US, N.D. California
+    what_happened: Convicted of obstructing the FTC proceeding by concealing the 2016 breach from it.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+  data_needed:
+  - Company
+  - PublicBody
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Regulator dockets and consent orders
+  - Court records
+  levels:
+    faint: Breach date falls inside an open regulator inquiry
+    strong: Regulator later says it was not told
+    textbook: Court or regulator finding that the breach was withheld from the inquiry
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Incident was unrelated to the inquiry's scope and disclosed through another route
+  - Company was still confirming the incident
+  jurisdictions: US (federal)
+  version: 1
+- id: CY-078
+  name: Internal instructions to keep a breach secret or treat the investigation as non-existent
+  definition: Staff are told to restrict knowledge of a breach, or to say no investigation exists, in
+    communications or records.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Former Chief Security Officer Of Uber Convicted Of Federal Charges For Covering Up Data Breach
+    publisher: US Attorney's Office, Northern District of California
+    year: '2022'
+    url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+    quote: this investigation does not exist
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Uber: CSO said the breach information needed to be ''tightly controlled''.'
+  cases:
+  - name: United States v. Joseph Sullivan (Uber)
+    year: '2022'
+    jurisdiction: US, N.D. California
+    what_happened: Evidence at trial included instructions that the breach 'can't let this get out' and
+      that the investigation 'does not exist'; jury convicted.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-convicted-federal-charges-covering-data-breach
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Employment
+  - Event
+  checkable: person
+  lookup_sources:
+  - Leaked or disclosed internal communications
+  - Trial exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Need-to-know limits are normal during live incident response and law-enforcement cooperation
+  - Legal privilege procedures restrict circulation
+  jurisdictions: US
+  version: 1
+- id: CY-079
+  name: Investor filings call cyber risk hypothetical after a known breach
+  definition: A listed company's risk disclosures describe breaches only as something that might happen,
+    when the company already knows one has happened.
+  areas:
+  - CY
+  typology: Misleading breach disclosure to investors
+  status: verified
+  sources:
+  - title: Altaba, Formerly Known as Yahoo!, Charged With Failing to Disclose Massive Cybersecurity Breach;
+      Agrees To Pay $35 Million
+    publisher: US Securities and Exchange Commission
+    year: '2018'
+    url: https://www.sec.gov/newsroom/press-releases/2018-71
+    quote: SEC filings stated that it faced only the risk of, and negative effects that might flow from,
+      data breaches
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: SEC Charges Four Companies With Misleading Cyber Disclosures
+    publisher: US Securities and Exchange Commission
+    year: '2024'
+    url: https://www.sec.gov/newsroom/press-releases/2024-174
+    quote: Downplaying the extent of a material cybersecurity breach is a bad strategy
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Yahoo/Altaba: hypothetical risk language while a 2014 breach was known (USD 35m penalty).'
+  - 'Unisys: described risks as ''hypothetical'' despite two SolarWinds-related intrusions with data exfiltration
+    (USD 4m).'
+  cases:
+  - name: Altaba Inc. (formerly Yahoo!)
+    year: '2018'
+    jurisdiction: US
+    what_happened: SEC found Yahoo failed to disclose a December 2014 breach for over two years while
+      filings described breaches as only a risk; settled without admitting or denying.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2018-71
+    source_title: SEC press release 2018-71
+  - name: Unisys Corp.
+    year: '2024'
+    jurisdiction: US
+    what_happened: SEC charged Unisys with describing cyber risks as hypothetical despite known intrusions;
+      USD 4 million civil penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+    source_title: SEC press release 2024-174
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR (10-K risk factors, 8-K)
+  - SEC enforcement releases
+  levels:
+    faint: Risk-factor text unchanged across years spanning a reported incident
+    strong: Later disclosure shows the company knew of the breach when the hypothetical language was filed
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: SEC treats misleading cyber risk factors as securities-law half-truths
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  innocent_explanations:
+  - Incident was judged immaterial at the time in good faith
+  - Company did not yet know of the breach when filing
+  jurisdictions: US (SEC)
+  version: 1
+- id: CY-080
+  name: Public breach statement understates scope or describes it in generic terms
+  definition: A company discloses a breach but minimises what was taken, how much was accessed, or describes
+    it only vaguely, when it knows more.
+  areas:
+  - CY
+  typology: Misleading breach disclosure to investors
+  status: verified
+  sources:
+  - title: SEC Charges Four Companies With Misleading Cyber Disclosures
+    publisher: US Securities and Exchange Commission
+    year: '2024'
+    url: https://www.sec.gov/newsroom/press-releases/2024-174
+    locator: Avaya findings
+    quote: limited number of [the] Company's email messages
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: SEC Charges Four Companies With Misleading Cyber Disclosures
+    publisher: US Securities and Exchange Commission
+    year: '2024'
+    url: https://www.sec.gov/newsroom/press-releases/2024-174
+    locator: Check Point findings
+    quote: generic terms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Avaya said 'limited' emails while knowing at least 145 cloud files were accessed.
+  - Mimecast did not disclose the nature of code taken or number of encrypted credentials accessed.
+  cases:
+  - name: Avaya Holdings Corp.
+    year: '2024'
+    jurisdiction: US
+    what_happened: SEC charged misleading disclosure understating accessed material; USD 1 million penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  - name: Check Point Software Technologies
+    year: '2024'
+    jurisdiction: US
+    what_happened: SEC said intrusion and risks described in generic terms; USD 995,000 penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  - name: Mimecast Limited
+    year: '2024'
+    jurisdiction: US
+    what_happened: SEC said it omitted the nature of code taken and number of credentials accessed; USD
+      990,000 penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR
+  - Company press releases
+  - Later regulator findings or court filings
+  levels:
+    faint: Successive statements keep enlarging the affected numbers
+    strong: Internal or forensic records show the company knew a larger scope at the time of the statement
+    textbook: Regulator finding of materially misleading understatement
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Charged as misleading statements to investors
+    source_url: https://www.sec.gov/newsroom/press-releases/2024-174
+  innocent_explanations:
+  - Forensic investigation was ongoing and early figures were best estimates
+  - Details withheld at law enforcement request or to avoid helping attackers
+  jurisdictions: US (SEC); general
+  version: 1
+- id: CY-081
+  name: Senior management and lawyers knew of a breach but no disclosure assessment followed
+  definition: A breach is reported up to executives or the legal department, yet the company does not
+    properly investigate it or consider whether it must be disclosed.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Altaba, Formerly Known as Yahoo!, Charged With Failing to Disclose Massive Cybersecurity Breach
+    publisher: US Securities and Exchange Commission
+    year: '2018'
+    url: https://www.sec.gov/newsroom/press-releases/2018-71
+    quote: information relating to the breach was reported to members of Yahoo's senior management and
+      legal department
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Yahoo 2014 breach known to senior management within days.
+  cases:
+  - name: Altaba Inc. (formerly Yahoo!)
+    year: '2018'
+    jurisdiction: US
+    what_happened: SEC found senior management and legal knew but the company did not properly investigate
+      or assess disclosure.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2018-71
+  data_needed:
+  - Company
+  - Person
+  - Employment
+  - Directorship
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Regulator findings
+  - Board minutes in litigation
+  - Insider sources
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Assessment happened but concluded, reasonably, the incident was immaterial
+  - Records of the assessment are privileged and not public
+  jurisdictions: US (SEC)
+  version: 1
+- id: CY-082
+  name: Old breach disclosed only when a sale, merger or other deal forces it
+  definition: A breach that happened long before comes to light only as the company is being sold or doing
+    a major transaction.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Altaba, Formerly Known as Yahoo!, Charged With Failing to Disclose Massive Cybersecurity Breach
+    publisher: US Securities and Exchange Commission
+    year: '2018'
+    url: https://www.sec.gov/newsroom/press-releases/2018-71
+    locator: 'Press release (as summarised by page reader: breach disclosed in 2016 as the Verizon sale
+      was closing; verify exact wording)'
+    quote: in the process of closing the acquisition of its operating business by Verizon
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Yahoo disclosed its December 2014 breach in 2016 during the Verizon deal.
+  cases:
+  - name: Altaba Inc. (formerly Yahoo!)
+    year: '2018'
+    jurisdiction: US
+    what_happened: Breach not disclosed for more than two years, until the Verizon transaction.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2018-71
+  data_needed:
+  - Company
+  - Ownership
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR merger filings
+  - Deal announcements
+  levels:
+    faint: Breach disclosure coincides with due diligence on a deal
+    strong: Breach date is years before disclosure
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Buyer's due diligence genuinely discovered a breach the company had not detected
+  jurisdictions: US (SEC); general
+  version: 1
+- id: CY-083
+  name: Material cyber incident not disclosed on Form 8-K within four business days
+  definition: A US-listed company decides, or should decide, an incident is material but does not file
+    the required Item 1.05 report within four business days.
+  areas:
+  - CY
+  typology: Misleading breach disclosure to investors
+  status: verified
+  sources:
+  - title: SEC Adopts Rules on Cybersecurity Risk Management, Strategy, Governance, and Incident Disclosure
+      by Public Companies
+    publisher: US Securities and Exchange Commission
+    year: '2023'
+    url: https://www.sec.gov/newsroom/press-releases/2023-139
+    quote: will generally be due four business days after a registrant determines that a cybersecurity
+      incident is material
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR full-text search for Item 1.05 and 8.01 filings
+  levels:
+    faint: Incident reported in press with no 8-K
+    strong: Company statements show it regarded incident as significant yet no Item 1.05 filing
+    textbook: Item 1.05 filed more than four business days after materiality determination
+    threshold_source: https://www.sec.gov/newsroom/press-releases/2023-139
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: SEC disclosure rule
+    source_url: https://www.sec.gov/newsroom/press-releases/2023-139
+  innocent_explanations:
+  - Incident not material, so voluntary Item 8.01 or no filing was used
+  - Attorney General authorised delay for national security or public safety
+  - Materiality determination took time
+  jurisdictions: US (SEC)
+  version: 1
+- id: CY-084
+  name: Ransomware attack or lost unencrypted device treated as not reportable
+  definition: A company decides not to report a ransomware incident or a lost device, although the data
+    was unprotected or unavailable in a way the guidance says can require notice.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section II.D, para. 80 (encryption shown to be inadequate)
+    quote: a failure to comply with Article 33 GDPR will exist where a controller does not notify
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines 9/2022 on personal data breach notification under GDPR
+    publisher: European Data Protection Board
+    year: '2022'
+    url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+    locator: Section I.B.2, para. 23 (ransomware as availability breach)
+    quote: could lead to a temporary loss of availability if the data can be restored from backup
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Ransomware leak-site listings
+  - Regulator breach statistics
+  - Company statements
+  levels:
+    faint: Company named on a leak site but says no personal data affected
+    strong: Leaked material shows personal data, no notification found
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Links to ransomware payment indicators CY-001 to CY-005
+    source_url: https://www.edpb.europa.eu/system/files/2022-10/edpb_guidelines_202209_personal_data_breach_notification_targetedupdate_en.pdf
+  innocent_explanations:
+  - Device was securely encrypted, which can mean no notice is required
+  - Data restored quickly from backup with no risk to people
+  - Systems hit held no personal data
+  jurisdictions: EU/EEA and UK (GDPR)
+  version: 1
+- id: CY-085
+  name: US health data breach not reported to patients, HHS or media within 60 days
+  definition: A healthcare body covered by HIPAA does not give the required notices within 60 days of
+    discovering a breach of health information, or treats an incident as non-reportable without a risk
+    assessment.
+  areas:
+  - CY
+  typology: Breach disclosure concealment or delay
+  status: verified
+  sources:
+  - title: Breach Notification Rule
+    publisher: US Department of Health and Human Services
+    url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+    locator: Individual notice
+    quote: in no case later than 60 days following the discovery of a breach
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Breach Notification Rule
+    publisher: US Department of Health and Human Services
+    url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+    locator: Definition of breach / risk assessment
+    quote: presumed to be a breach unless
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Breach Notification Rule
+    publisher: US Department of Health and Human Services
+    url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+    locator: Media notice
+    quote: more than 500 residents of a State or jurisdiction
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Event
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - HHS OCR breach portal (breaches of 500 or more)
+  - State attorney general breach notice databases
+  levels:
+    faint: Incident reported in news but absent from HHS breach portal
+    strong: Gap between discovery and notice approaches 60 days
+    textbook: Notice given more than 60 days after discovery
+    threshold_source: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: HIPAA covered entities are healthcare providers, plans and clearinghouses
+    source_url: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+  innocent_explanations:
+  - Fewer than 500 people affected, so HHS can be told annually
+  - Documented risk assessment showed low probability of compromise
+  - Law enforcement requested delay
+  jurisdictions: US (HIPAA)
+  version: 1
+- id: CY-086
+  name: Communications intercepted without lawful authority
+  definition: Someone intentionally listens to, records or captures phone calls, voicemail, email or other
+    communications in transit without a warrant, consent or other legal authority.
+  areas:
+  - CY
+  typology: Unlawful interception
+  status: verified
+  sources:
+  - title: 18 U.S. Code § 2511
+    publisher: Legal Information Institute (Cornell) reproducing US Code
+    url: https://www.law.cornell.edu/uscode/text/18/2511
+    locator: §2511(1)(a)
+    quote: intentionally intercepts, endeavors to intercept, or procures any other person to intercept
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Investigatory Powers Act 2016, section 3
+    publisher: UK legislation.gov.uk
+    url: https://www.legislation.gov.uk/ukpga/2016/25/section/3
+    locator: s.3(1)(c)
+    quote: the person does not have lawful authority to carry out the interception.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Criminal court records
+  - Telecom provider statements
+  - Civil suits under 18 U.S.C. 2520
+  levels:
+    faint: Third party shows knowledge only obtainable from private communications
+    strong: Technical or documentary evidence of capture without warrant or consent
+    textbook: Conviction or finding under the interception statute
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful warrant or court order existed
+  - One party consented (US one-party-consent rules)
+  - Operator of a private system intercepted its own system, which UK s.3(2) exempts
+  jurisdictions: US (18 U.S.C. 2511); UK (Investigatory Powers Act 2016 s.3)
+  version: 1
+- id: CY-087
+  name: Using or passing on the contents of intercepted communications
+  definition: A person uses or discloses what was in a call or message while knowing, or having reason
+    to know, it was illegally intercepted.
+  areas:
+  - CY
+  typology: Unlawful interception
+  status: verified
+  sources:
+  - title: 18 U.S. Code § 2511
+    publisher: Legal Information Institute (Cornell) reproducing US Code
+    url: https://www.law.cornell.edu/uscode/text/18/2511
+    locator: §2511(1)(d)
+    quote: knowing or having reason to know that the information was obtained through the interception
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Published material whose provenance is in question
+  levels:
+    faint: Published story relies on private message content with unexplained provenance
+    strong: Evidence the publisher or user knew the source was an interception
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Content came from a participant who lawfully shared it
+  - Material was lawfully obtained and published (some US courts protect publication of lawfully obtained
+    information of public concern)
+  jurisdictions: US (18 U.S.C. 2511(1)(c)-(d))
+  version: 1
+- id: CY-088
+  name: Possession or use of a device to intercept oral or wire communications
+  definition: Someone uses a bug, wiretap, or other device to capture conversations or calls without authority.
+  areas:
+  - CY
+  typology: Unlawful interception
+  status: verified
+  sources:
+  - title: 18 U.S. Code § 2511
+    publisher: Legal Information Institute (Cornell) reproducing US Code
+    url: https://www.law.cornell.edu/uscode/text/18/2511
+    locator: §2511(1)(b)
+    quote: or endeavor to use any electronic, mechanical, or other device to intercept any oral communication
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 18 U.S. Code § 2511
+    publisher: Legal Information Institute (Cornell) reproducing US Code
+    url: https://www.law.cornell.edu/uscode/text/18/2511
+    locator: §2511(4)(a)
+    quote: or imprisoned not more than five years, or both.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Purchase records for surveillance equipment
+  - Private investigator invoices
+  levels:
+    faint: Payments to private investigators or surveillance-equipment sellers with no clear lawful purpose
+    strong: Device found or admitted
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful security monitoring of one's own premises with notice
+  - Authorised law-enforcement use
+  - Recording with consent of a party where permitted
+  jurisdictions: US (18 U.S.C. 2511(1)(b))
+  version: 1
+not_reached:
+- 'FATF ''Countering Ransomware Financing'' (March 2023) report and its risk-indicator annex: fatf-gafi.org
+  blocked automated fetching (robots / HTML returned instead of PDF)'
+- 'FATF ''Illicit Financial Flows from Cyber-Enabled Fraud'' (November 2023): same fetch block'
+- 'OHCHR full report ''Online Scam Operations and Trafficking into Forced Criminality in Southeast Asia''
+  (2023) PDF: fetch error; only the OHCHR press release was used'
+- 'US Army FM 2-22.3 Appendix B (source and information reliability matrix, with full A–F/1–6 descriptions):
+  FAS copy empty, marines.mil copy truncated before the appendix; NATO AJP-2.1 Edition B ratification
+  draft (labels only) was used instead'
+- 'UNODC 2024/2025 reports on scam centres and casinos in Southeast Asia: not opened'
+- 'Europol IOCTA and Europol/Eurojust ransomware reports: not opened'
+- 'NCA Operation Cronos (LockBit) press release: not opened from primary site'
+- 'DOJ indictment of Chen Zhi (E.D.N.Y.) and civil forfeiture complaint for ~127,271 BTC: not opened;
+  only the Treasury press release mentioning the unsealed indictment'
+- 'FinCEN 2025 advisory on Chinese money laundering networks (FIN-2025 CMLN): not opened in detail'
+- 'FinCEN Bitzlato Section 9714 order (2023) and OFAC Blender.io / Tornado Cash designations: not opened'
+- 'UK PHIA Probability Yardstick and Berkeley Protocol on Digital Open Source Investigations: not opened
+  (would add glossary entries on judging sources)'
+- '2nd INTERPOL Global Financial Fraud Threat Assessment: could not locate. The WebSearch budget for this
+  turn ran out (the 200-call limit shared by all agents), and the INTERPOL news listing showed only items
+  from August to October 2026, none on it. Only the 2024 INTERPOL news release was used, not the full
+  2024 assessment PDF.'
+- 'U.S. v. Christina Chapman (Arizona laptop-farm case): the DOJ press-release URLs I tried failed to
+  load, so it is not included as a case.'
+- FBI page on North Korean IT workers (fbi.gov) failed to load.
+- FCC SIM-swap news release page failed to load; the full FCC 23-95 order was used instead. Only the first
+  100,000 characters were read.
+- 'SIM-swap prosecution case: no DOJ or court source reached because search was unavailable, so CY-064
+  to CY-066 have no case.'
+- Further searches for 2025–2026 DPRK IT worker advisories (for example later IC3 alerts on laptop farms)
+  were not possible because the search budget was used up.
+- 'NIS2 Directive (EU) 2022/2555 Article 23 (24-hour early warning / 72-hour / one-month timings): EUR-Lex
+  page returned no article text'
+- 'Leveson Inquiry report volumes (phone hacking findings): PDFs located at assets.publishing.service.gov.uk
+  but not read or quoted'
+- 'R v Coulson and others sentencing remarks (judiciary.uk): fetch failed, so no phone-hacking conviction
+  case included'
+- 'ICO ''What price privacy?'' (Operation Motorman, illegal trade in personal data): fetch failed'
+- 'SEC v. SolarWinds and Timothy Brown (2023): complaint press release read, but later court rulings (reported
+  partial dismissal in 2024 and SEC''s later withdrawal) not verified, so case left out'
+- 'US CIRCIA, US state breach-notification laws, SEC v. Pearson (2021), FTC Health Breach Notification
+  Rule: not reached'
+- WebSearch budget was exhausted mid-task, so further widening to other primary sources was not possible

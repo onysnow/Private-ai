@@ -1,0 +1,232 @@
+area: SV
+terms:
+- term: Unfounded
+  definition: A police classification meaning a reported crime was found to be false or baseless, so it
+    is removed from crime counts.
+  examples: []
+  source_url: https://www.buzzfeednews.com/article/alexcampbell/unfounded
+  cases: []
+  related:
+  - Cleared by exceptional means
+  indicators: []
+  areas:
+  - SV
+- term: Cleared by exceptional means
+  definition: A way police close a case without arrest when something outside their control (for example
+    the victim declining to proceed) prevents charges; DOJ warns it can be misused.
+  examples: []
+  source_url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+  cases: []
+  related:
+  - Unfounded
+  indicators: []
+  areas:
+  - SV
+- term: Sexual assault kit (SAK)
+  definition: The evidence collected in a medical exam after a sexual assault, sent to a crime lab for
+    DNA testing.
+  examples: []
+  source_url: https://www.ojp.gov/pdffiles1/nij/250384.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Unsubmitted kit
+  definition: A sexual assault kit held by police that was never sent to a crime lab.
+  examples: []
+  source_url: https://www.everycrsreport.com/reports/R44237.html
+  cases: []
+  related:
+  - Backlogged kit
+  indicators: []
+  areas:
+  - SV
+- term: Backlogged kit
+  definition: A kit that has never been tested; some jurisdictions count a kit as backlogged once it sits
+    untested at the lab for more than 30 days.
+  examples: []
+  source_url: https://www.everycrsreport.com/reports/R44237.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Predominant aggressor
+  definition: The person police judge to be the main abuser in a domestic incident, as opposed to someone
+    who used force in self-defence.
+  examples: []
+  source_url: https://www.justice.gov/ovw/page/file/1509456/dl?inline
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Gender harassment
+  definition: Hostile behaviour based on sex that has no sexual interest, such as crude insults about
+    women.
+  examples: []
+  source_url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Preventative duty (UK)
+  definition: The legal duty on UK employers since 2024 to take reasonable steps to prevent sexual harassment
+    of their workers before it happens.
+  examples: []
+  source_url: https://www.equalityhumanrights.com/guidance/sexual-harassment-and-harassment-work-technical-guidance
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Non-disclosure agreement (NDA)
+  definition: A contract term that keeps information confidential; regulators warn against using it to
+    hide wrongdoing or stop people reporting crimes.
+  examples: []
+  source_url: https://www.sra.org.uk/news/news/sra-update-130-ndas-warning-notice/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: SHARP
+  definition: The US Army's Sexual Harassment/Assault Response and Prevention programme.
+  examples: []
+  source_url: https://www.americanrhetoric.com/speeches/PDFFiles/forthoodRICreportexecutivesummary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Unwanted sexual contact (USC)
+  definition: The Defense Department's survey measure covering sexual assault and attempted sexual assault,
+    used to estimate prevalence.
+  examples: []
+  source_url: https://www.sapr.mil/sites/default/files/public/docs/reports/AR/FY23/FY23_Annual_Report_Fact_Sheet.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Sexual exploitation and abuse (SEA)
+  definition: In humanitarian work, any abuse of a position of vulnerability or power for sexual purposes,
+    including trading aid, money or jobs for sex.
+  examples: []
+  source_url: https://psea.interagencystandingcommittee.org/update/iasc-six-core-principles
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Organisational or institutional abuse
+  definition: Abuse or neglect that comes from the way a care service is run, such as poor staffing, routines
+    and records, rather than one individual.
+  examples: []
+  source_url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Official warning (Charities Act s.75A)
+  definition: A formal regulatory warning the Charity Commission for England and Wales can issue to a
+    charity over misconduct or mismanagement.
+  examples: []
+  source_url: https://www.gov.uk/government/news/charity-commission-reports-on-inquiry-into-oxfam-gb-no-charity-is-more-important-than-the-people-it-serves-or-the-mission-it-pursues
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Intimate image abuse / NCII
+  definition: Sharing, or threatening to share, intimate images of someone without their consent; NCII
+    stands for non-consensual intimate imagery.
+  examples: []
+  source_url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/statement-detecting-intimate-image-abuse
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Hash matching
+  definition: Detecting known images by comparing a digital fingerprint (hash) of uploaded files against
+    a database of fingerprints of abusive images.
+  examples: []
+  source_url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/statement-detecting-intimate-image-abuse
+  cases: []
+  related:
+  - StopNCII
+  indicators: []
+  areas:
+  - SV
+- term: StopNCII
+  definition: A service that lets people create hashes of their intimate images so partner platforms can
+    block them; Ofcom uses it as the benchmark database.
+  examples: []
+  source_url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/statement-detecting-intimate-image-abuse
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Digital forgery
+  definition: Under the US TAKE IT DOWN Act, an intimate image made or altered with technology such as
+    AI so it falsely appears real.
+  examples: []
+  source_url: https://wilmerhale.com/en/insights/client-alerts/20260615-the-take-it-down-act-goes-live
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: TAKE IT DOWN Act
+  definition: A 2025 US federal law that criminalises publishing non-consensual intimate images, including
+    AI forgeries, and requires covered platforms to remove them within 48 hours of a valid request.
+  examples: []
+  source_url: https://wilmerhale.com/en/insights/client-alerts/20260615-the-take-it-down-act-goes-live
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Nudify service
+  definition: A website or app that turns ordinary photos of real people into fake nude or sexual images.
+  examples: []
+  source_url: https://sfcityattorney.org/city-attorney-shuts-down-10-websites-that-create-nonconsensual-deepfake-pornography/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Stalkerware
+  definition: Software secretly installed on someone's phone or device to monitor them without their knowledge.
+  examples: []
+  source_url: https://consumer.ftc.gov/articles/stalkerware-what-know
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Deferred prosecution agreement (DPA)
+  definition: A deal where prosecutors file charges but hold off prosecuting if the company admits facts,
+    pays and meets conditions such as an independent monitor.
+  examples: []
+  source_url: https://www.justice.gov/usao-edny/pr/pornhub-parent-company-admits-receiving-proceeds-sex-trafficking-and-agrees-three-year
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV
+- term: Independent monitor
+  definition: An outside person appointed under a settlement or DPA to check a company's compliance for
+    a set period.
+  examples: []
+  source_url: https://www.justice.gov/usao-edny/pr/pornhub-parent-company-admits-receiving-proceeds-sex-trafficking-and-agrees-three-year
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SV

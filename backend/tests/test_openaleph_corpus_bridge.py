@@ -5,33 +5,25 @@ import pytest
 from app.core.config import settings
 from app.models.domain import Investigation, DocumentCorpusSync, InvestigationCorpusBinding
 from app.db.session import SessionLocal, engine, Base
-from app.services.documents import ingest_document
 from app.services.openaleph_corpus import ensure_openaleph_collection, sync_document_to_openaleph
 from app.services.exports import collect_investigation_records
+from tests.document_helpers import ingest_document
 
 
 
 
-
-@pytest.fixture(autouse=True)
-def _clean_database():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    yield
 
 class FakeOpenAlephClient:
     def __init__(self):
         self.collections = {}
         self.uploads = []
 
-    def load_collection_by_foreign_id(self, foreign_id, config=None):
-        if foreign_id not in self.collections:
-            self.collections[foreign_id] = {
-                "id": "oa-collection-1",
-                "foreign_id": foreign_id,
-                "label": (config or {}).get("label", foreign_id),
-            }
-        return self.collections[foreign_id]
+    def create_collection(self, data):
+        # OpenAleph 5.3.1 rejects a foreign_id on create and picks its own.
+        assert "foreign_id" not in data
+        collection = {"id": f"oa-collection-{len(self.collections) + 1}", "foreign_id": "oa-picked-foreign-id", "label": data["label"]}
+        self.collections[collection["id"]] = collection
+        return collection
 
     def ingest_upload(self, *, collection_id, file_path, metadata, sync=False, index=True):
         self.uploads.append((collection_id, Path(file_path), metadata, sync, index))
@@ -47,7 +39,8 @@ def test_openaleph_corpus_binding_and_document_sync(tmp_path, monkeypatch):
 
         binding = ensure_openaleph_collection(db, inv.id, client_factory=lambda: client)
         assert binding.collection_id == "oa-collection-1"
-        assert binding.foreign_id == f"journalism-workbench:{inv.id}"
+        assert binding.foreign_id == "oa-picked-foreign-id"
+        assert client.collections["oa-collection-1"]["label"] == "Example City investigation"
         assert db.query(InvestigationCorpusBinding).count() == 1
 
         # Idempotent binding: do not create a second OpenAleph collection mapping.
@@ -108,7 +101,9 @@ def test_openaleph_sync_failure_is_persisted(tmp_path, monkeypatch):
         )
         row = sync_document_to_openaleph(db, doc.id, client_factory=lambda: client)
         assert row.status == "failed"
-        assert "OpenAleph unavailable" in (row.error or "")
+        # The upstream text stays in the server log; the reporter gets a plain line.
+        assert row.error == "OpenAleph did not accept the file; the server log has the reason"
+        assert "OpenAleph unavailable" not in row.error
         assert db.get(type(doc), doc.id) is not None
 
 
@@ -167,7 +162,7 @@ def test_openaleph_page_text_is_staged_for_human_review(tmp_path, monkeypatch):
         assert lineage["candidate"]["payload"]["provenance"]["provider_entity_id"] == "oa-page-1"
 
         accepted = review_candidate(db, candidates[0], decision="accept", note="Reporter verified against the source page")
-        assert accepted["candidate"].review_status == "accepted"
+        assert accepted["candidate"]["review_status"] == "accepted"
         evidence = db.get(Evidence, accepted["record"]["id"])
         assert evidence.quote == "Exact extracted page text from OpenAleph."
         assert evidence.locator == "openaleph:page:oa-page-1"
@@ -226,13 +221,62 @@ def test_openaleph_search_uses_exact_collection_and_parent_filters(monkeypatch):
     assert rows[0]["id"] == "page-1"
 
 
-def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolution(tmp_path, monkeypatch):
+def test_every_page_of_a_long_document_is_fetched(monkeypatch, caplog):
+    """A 1,234-page document needs three searches of 500; one call used to
+    keep only the first 500 pages."""
+    import httpx
+    from app.services.openaleph_corpus import _openaleph_search
+
+    monkeypatch.setattr(settings, "openaleph_base_url", "http://openaleph.test")
+    monkeypatch.setattr(settings, "openaleph_api_key", "secret")
+    total = 1234
+    asked: list[tuple[int, int]] = []
+
+    def handler(request: httpx.Request):
+        offset, limit = int(request.url.params["offset"]), int(request.url.params["limit"])
+        asked.append((offset, limit))
+        rows = [{"id": f"page-{i}", "schema": "Page", "properties": {"index": [str(i + 1)]}} for i in range(offset, min(offset + limit, total))]
+        return httpx.Response(200, json={"results": rows, "total": total, "limit": limit, "offset": offset})
+
+    rows = _openaleph_search(collection_id="c", document_record_id="d", transport=httpx.MockTransport(handler))
+    assert asked == [(0, 500), (500, 500), (1000, 500)]
+    assert sorted(row["id"] for row in rows) == sorted(f"page-{i}" for i in range(total))
+    assert not [r for r in caplog.records if "more pages" in r.getMessage()]
+
+
+def test_a_document_beyond_the_search_window_is_read_as_far_as_it_goes(monkeypatch, caplog):
+    import logging
+    import httpx
+    from app.services.openaleph_corpus import PAGE_FETCH_WINDOW, _openaleph_search
+
+    monkeypatch.setattr(settings, "openaleph_base_url", "http://openaleph.test")
+    monkeypatch.setattr(settings, "openaleph_api_key", "secret")
+    total = 12000
+
+    def handler(request: httpx.Request):
+        offset, limit = int(request.url.params["offset"]), int(request.url.params["limit"])
+        assert offset + limit <= PAGE_FETCH_WINDOW   # OpenAleph refuses a deeper window
+        return httpx.Response(200, json={"results": [{"id": f"p{i}"} for i in range(offset, offset + limit)], "total": total})
+
+    with caplog.at_level(logging.WARNING, logger="journalism.openaleph"):
+        rows = _openaleph_search(collection_id="c", document_record_id="d", transport=httpx.MockTransport(handler))
+    assert len(rows) == PAGE_FETCH_WINDOW
+    assert any("more pages" in r.getMessage() for r in caplog.records)
+
+
+def test_openaleph_analysis_is_staged_as_proposals_without_auto_resolution(tmp_path, monkeypatch):
+    """ftm-analyze's results are properties of the document entity
+    (ADR-0006); each becomes a proposal, nothing becomes an entity until a
+    reporter accepts it, and a re-import adds nothing."""
     from sqlalchemy import select
     from app.models.domain import ExtractionCandidate, Entity, Statement
     from app.services.openaleph_corpus import import_openaleph_entity_candidates
     from app.services.documents import review_candidate
 
     monkeypatch.setattr(settings, "openaleph_enabled", True)
+    # The Workbench's own name-finder would propose these names first, and a
+    # name already proposed for the document is not proposed again.
+    monkeypatch.setattr(settings, "enable_local_entity_suggestions", False)
     with SessionLocal() as db:
         inv = Investigation(name="Entity extraction bridge")
         db.add(inv); db.commit(); db.refresh(inv)
@@ -243,38 +287,23 @@ def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolut
             title="Investigative filing",
             filename="filing.txt",
             mime_type="text/plain",
-            data=b"Acme Holdings and Jordan Rivera are mentioned in this filing.",
+            data=b"Acme Holdings Inc. and Jordan Rivera are mentioned in this filing.",
             storage_dir=tmp_path / "documents",
         )
         sync_document_to_openaleph(db, doc.id, client_factory=lambda: client)
+        fetched: list[str] = []
 
-        def fake_searcher(*, collection_id, document_record_id):
-            assert collection_id == "oa-collection-1"
-            assert document_record_id == "oa-document-1"
-            return [
-                {
-                    "id": "oa-mention-1",
-                    "schema": "Mention",
-                    "properties": {
-                        "name": ["Jordan Rivera"],
-                        "document": ["oa-document-1"],
-                        "detectedSchema": ["Person"],
-                        "resolved": ["oa-person-777"],
-                    },
-                },
-                {
-                    "id": "oa-mention-2",
-                    "schema": "Mention",
-                    "properties": {
-                        "name": ["Acme Holdings Inc."],
-                        "document": ["oa-document-1"],
-                        "detectedSchema": ["ORG"],
-                    },
-                },
-            ]
+        def fake_fetch(entity_id):
+            fetched.append(entity_id)
+            return {"id": entity_id, "schema": "PlainText", "properties": {
+                "peopleMentioned": ["jordan rivera"], "companiesMentioned": ["acme holdings inc"],
+                "detectedLanguage": ["eng"], "bodyText": ["Acme Holdings Inc. and Jordan Rivera are mentioned in this filing."],
+            }}
 
         entity_count_before = db.query(Entity).count()
-        result = import_openaleph_entity_candidates(db, doc.id, searcher=fake_searcher)
+        result = import_openaleph_entity_candidates(db, doc.id, fetch_entity=fake_fetch)
+        assert fetched == ["oa-document-1"]
+        assert result["retrieved"] == 2
         assert result["created_candidates"] == 2
         assert result["review_required"] is True
         assert result["automatic_resolution"] is False
@@ -291,61 +320,27 @@ def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolut
         ]
         assert len(candidates) == 2
         person = next(c for c in candidates if c.payload["caption"] == "Jordan Rivera")
-        org = next(c for c in candidates if c.payload["caption"] == "Acme Holdings Inc.")
+        company = next(c for c in candidates if c.payload["caption"] == "Acme Holdings Inc")
         assert person.payload["suggested_schema"] == "Person"
-        assert org.payload["suggested_schema"] == "Organization"
-        assert person.payload["provenance"]["provider_resolved_entity_id"] == "oa-person-777"
+        assert company.payload["suggested_schema"] == "Company"
+        assert person.payload["provenance"]["provider_property"] == "peopleMentioned"
         assert person.review_status == "proposed"
 
-        # A provider-side resolved target is metadata only; reporter acceptance creates
-        # the Workbench entity but still does not create a canonical merge decision.
+        # Acceptance makes the entity; its name statement points at the exact
+        # place in the document where the name was found again.
         accepted = review_candidate(db, person, decision="accept", note="Reporter confirmed the name in the source")
         entity = db.get(Entity, accepted["record"]["id"])
         assert entity.schema == "Person"
         statements = db.scalars(select(Statement).where(Statement.entity_id == entity.id)).all()
         assert len(statements) == 1
         assert statements[0].dataset == "openaleph:oa-collection-1"
-        assert statements[0].origin == "openaleph:entity:oa-mention-1"
+        span = person.payload["span"]
+        assert statements[0].origin == f"document:{doc.id}#line 1@chars:{span['start_char']}-{span['end_char']}"
 
-        # Reimport does not create duplicate provider Mention candidates.
-        again = import_openaleph_entity_candidates(db, doc.id, searcher=fake_searcher)
+        # Reimport does not create duplicate proposals.
+        again = import_openaleph_entity_candidates(db, doc.id, fetch_entity=fake_fetch)
         assert again["created_candidates"] == 0
-
-
-def test_openaleph_mention_search_uses_exact_collection_and_document_filters(monkeypatch):
-    import httpx
-    from app.services.openaleph_corpus import _openaleph_mention_search
-
-    monkeypatch.setattr(settings, "openaleph_base_url", "http://openaleph.test")
-    monkeypatch.setattr(settings, "openaleph_api_key", "secret")
-
-    def handler(request: httpx.Request):
-        assert request.url.path == "/api/2/search"
-        params = request.url.params
-        assert params["q"] == "*"
-        assert params["filter:collection_id"] == "collection-7"
-        assert params["filter:schema"] == "Mention"
-        assert params["filter:properties.document"] == "document-9"
-        assert request.headers["authorization"] == "ApiKey secret"
-        return httpx.Response(
-            200,
-            json={
-                "results": [
-                    {
-                        "id": "mention-1",
-                        "schema": "Mention",
-                        "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]},
-                    }
-                ]
-            },
-        )
-
-    rows = _openaleph_mention_search(
-        collection_id="collection-7",
-        document_record_id="document-9",
-        transport=httpx.MockTransport(handler),
-    )
-    assert rows[0]["id"] == "mention-1"
+        assert again["skipped"] == 2
 
 
 def test_openaleph_review_status_and_combined_refresh(tmp_path, monkeypatch):
@@ -358,6 +353,9 @@ def test_openaleph_review_status_and_combined_refresh(tmp_path, monkeypatch):
     from app.services.documents import review_candidate
 
     monkeypatch.setattr(settings, "openaleph_enabled", True)
+    # Only OpenAleph proposes names here (the Workbench's finder would find
+    # "Example Person" first, and a name is proposed once per document).
+    monkeypatch.setattr(settings, "enable_local_entity_suggestions", False)
     with SessionLocal() as db:
         inv = Investigation(name="Combined OpenAleph review")
         db.add(inv); db.commit(); db.refresh(inv)
@@ -388,28 +386,17 @@ def test_openaleph_review_status_and_combined_refresh(tmp_path, monkeypatch):
                 "properties": {"index": ["1"], "bodyText": ["Provider page text for review."]},
             }]
 
-        def mention_searcher(*, collection_id, document_record_id):
-            assert collection_id == "oa-collection-1"
-            assert document_record_id == "oa-document-1"
-            return [
-                {
-                    "id": "oa-mention-refresh-1",
-                    "schema": "Mention",
-                    "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]},
-                },
-                # Duplicate provider rows must still stage only one review candidate.
-                {
-                    "id": "oa-mention-refresh-1",
-                    "schema": "Mention",
-                    "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]},
-                },
-            ]
+        def entity_fetcher(entity_id):
+            assert entity_id == "oa-document-1"
+            # A value listed twice must still stage only one review candidate.
+            return {"id": entity_id, "schema": "PlainText",
+                    "properties": {"peopleMentioned": ["example person", "Example Person"], "detectedLanguage": ["eng"]}}
 
         refreshed = refresh_openaleph_review_candidates(
             db,
             doc.id,
             evidence_searcher=page_searcher,
-            entity_searcher=mention_searcher,
+            entity_fetcher=entity_fetcher,
         )
         assert refreshed["evidence"]["created_candidates"] == 1
         assert refreshed["entities"]["created_candidates"] == 1
@@ -434,12 +421,12 @@ def test_openaleph_review_status_and_combined_refresh(tmp_path, monkeypatch):
         assert after_review["provider_candidate_pending_review"] == 1
         assert after_review["provider_candidate_rejected"] == 1
 
-        # The combined refresh is idempotent across both Page and Mention imports.
+        # The combined refresh is idempotent across both the page and the name imports.
         again = refresh_openaleph_review_candidates(
             db,
             doc.id,
             evidence_searcher=page_searcher,
-            entity_searcher=mention_searcher,
+            entity_fetcher=entity_fetcher,
         )
         assert again["evidence"]["created_candidates"] == 0
         assert again["entities"]["created_candidates"] == 0

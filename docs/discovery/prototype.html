@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Discovery prototype</title>
+<style>
+:root{--page:#13131d;--card:#1a2328;--card2:#1c262b;--well:#26272b;--rule:#2e3a40;--rule2:#393941;--border:#4e4234;
+--ink:#f3e9d7;--text:#caaf9c;--muted:#927e5d;--soft:#bc9574;--night:#010005;
+--gold:#b98d34;--amber:#d4a152;--sage:#baac91;--copper:#a16948;--steel:#4d7a9b;--parch:#caaf9c;--tan:#bc9574;--plum:#312237;--brick:#9f3632;--forest:#3a5c52;--umber:#61503e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font:14px/1.5 Inter,"Segoe UI",system-ui,sans-serif}
+button{font:inherit;color:inherit}
+.top{height:54px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:22px;padding:0 22px;position:sticky;top:0;z-index:20}
+.top b{font:600 17px Georgia,serif;color:var(--ink);white-space:nowrap}
+.sbox{flex:1;max-width:720px;display:flex;align-items:center;gap:8px;background:var(--well);border:1px solid var(--rule2);border-radius:10px;padding:0 10px;height:36px}
+.sbox:focus-within{border-color:var(--amber);box-shadow:0 0 0 3px rgba(212,161,82,.18)}
+.sbox input{all:unset;flex:1;color:var(--ink)}
+.sbox kbd,.kbd{border:1px solid var(--rule2);border-radius:5px;padding:0 5px;font-size:11px;color:var(--muted)}
+.inv{font-size:12px;color:var(--muted);white-space:nowrap}.inv b{font:600 13px Inter;color:var(--text)}
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr) 420px;gap:18px;padding:18px 22px 40px;max-width:1500px;margin:0 auto}
+/* facets */
+.facets{position:sticky;top:72px;align-self:start;font-size:12.5px}
+.fg{margin-bottom:16px}.fg h4{margin:0 0 6px;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.fr{all:unset;cursor:pointer;display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:center;width:100%;padding:3px 6px;border-radius:6px;color:var(--text)}
+.fr:hover{background:#202a2f}.fr.on{background:#2a2a22;color:var(--ink)}.fr.zero{opacity:.38}
+.fr .sw{width:10px;height:10px;border-radius:3px}.fr .n{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.fr .bar{display:inline-block;height:4px;border-radius:2px;background:currentColor;opacity:.5}
+.sortrow{display:flex;gap:4px;flex-wrap:wrap}
+.chip{all:unset;cursor:pointer;border:1px solid var(--rule2);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--text);white-space:nowrap}
+.chip.on{border-color:var(--border);background:#2a2a22;color:var(--amber)}
+/* results */
+.rhead{display:flex;align-items:baseline;gap:12px;margin:2px 0 10px}.rhead h2{margin:0;font:600 20px Georgia,serif;color:var(--ink)}.rhead span{color:var(--muted);font-size:12.5px}
+.grp{margin-bottom:16px}
+.gh{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:6px 2px;border-bottom:2px solid;margin-bottom:8px}
+.gh b{font-size:11px;letter-spacing:.09em;text-transform:uppercase}.gh span{font-size:12px;color:var(--muted)}.gh i{margin-left:auto;font-style:normal;color:var(--muted);font-size:12px}
+.res{position:relative;display:grid;grid-template-columns:30px 1fr auto;gap:12px;background:var(--card);border:1px solid var(--rule);border-left:4px solid var(--edge);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;outline:none}
+.res:hover,.res.kb{background:#1f2a30;border-color:#3a4a52;border-left-color:var(--edge)}.res.sel{box-shadow:0 0 0 2px var(--amber)}
+.ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--well)}
+.res .t{color:var(--ink);font-weight:600;font-size:14px;line-height:1.35}
+.res mark{background:rgba(212,161,82,.28);color:var(--ink);border-radius:3px;padding:0 2px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:3px;font-size:12px;color:var(--muted)}
+.kl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:0 8px;font-size:11.5px;font-weight:600;line-height:19px;white-space:nowrap}
+.pd{display:inline-flex;align-items:center;gap:5px;color:var(--text)}.pd i{width:9px;height:9px;border-radius:50%;display:inline-block;border:2px solid}
+.sn{margin-top:4px;font-size:12.5px;color:var(--text);line-height:1.45}
+.why{margin-top:3px;font-size:11.5px;color:#7d6c50}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.tag{border-radius:999px;padding:0 8px;font-size:11px;font-weight:600;line-height:18px;color:var(--ink)}
+.notec{margin-top:6px;font-size:12px;color:var(--soft);border-left:2px solid var(--border);padding-left:8px}
+.acts{display:flex;gap:4px;align-items:flex-start;opacity:0;transition:opacity .12s}.res:hover .acts,.res.kb .acts,.res.sel .acts{opacity:1}
+.ab{all:unset;cursor:pointer;width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--muted);border:1px solid transparent}
+.ab:hover{background:var(--well);color:var(--ink);border-color:var(--rule2)}
+.ab[data-tip]:hover::after{content:attr(data-tip);position:absolute;transform:translate(-40%,-30px);background:#10161a;border:1px solid var(--border);color:var(--ink);font-size:11px;padding:2px 8px;border-radius:6px;white-space:nowrap;z-index:9}
+.flagdot{position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--plum);border:1px solid #6f5e44;color:var(--ink);font-size:10.5px;font-weight:700;display:grid;place-items:center;padding:0 5px}
+/* panel */
+.panel{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 90px);display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.tabs{display:flex;border-bottom:1px solid var(--rule2)}
+.tab{all:unset;cursor:pointer;flex:1;text-align:center;padding:10px 6px;font-size:12.5px;color:var(--muted);border-bottom:2px solid transparent}
+.tab.on{color:var(--ink);border-bottom-color:var(--amber)}.tab .c{display:inline-block;min-width:18px;border-radius:9px;background:var(--plum);color:var(--ink);font-size:10.5px;font-weight:700;margin-left:5px;padding:0 5px}
+.pbody{overflow:auto;padding:14px}
+.ph{font:600 15px Georgia,serif;color:var(--ink);margin:0 0 4px}.psub{font-size:12px;color:var(--muted);margin:0 0 12px}
+.flag{border:1px solid var(--rule);border-left:4px solid var(--edge);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--card2)}
+.flag .ft{display:flex;gap:8px;align-items:baseline}.flag .rk{font:700 12px Inter;color:var(--night);background:var(--amber);border-radius:6px;padding:0 6px}
+.flag .fn{font-weight:700;color:var(--ink);font-size:13.5px;line-height:1.35}
+.flag .who{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}
+.flag .row{font-size:12px;margin:5px 0;line-height:1.45}.flag .row b{color:var(--amber);font-weight:600}
+.flag a{color:#c8a46a}
+.score{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin:6px 0}
+.score .track{flex:1;height:6px;border-radius:3px;background:var(--well);display:flex;overflow:hidden}
+.fa{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.btn{all:unset;cursor:pointer;border:1px solid var(--rule2);border-radius:8px;padding:4px 10px;font-size:12px;color:var(--text);white-space:nowrap;background:var(--well)}
+.btn:hover{border-color:var(--border);color:var(--ink)}.btn.p{background:var(--amber);color:var(--night);border-color:var(--amber);font-weight:600}
+.sec{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:16px 0 8px;display:flex;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule2);border-radius:9px;overflow:hidden}.seg button{all:unset;cursor:pointer;white-space:nowrap;font-size:12px;padding:5px 11px;color:var(--muted);border-right:1px solid var(--rule2)}.seg button:last-child{border:0}.seg button.on{background:#3a2f1f;color:var(--amber)}
+.party{border:1px solid var(--rule);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.party>.h{all:unset;cursor:pointer;display:flex;gap:8px;align-items:center;padding:8px 10px;width:100%;box-sizing:border-box;background:var(--card2)}
+.party>.h b{color:var(--ink);font-size:13px}.party>.h span{font-size:11.5px;color:var(--muted)}.party>.h em{margin-left:auto;font-style:normal;font-size:11.5px}
+.srow{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:7px 10px;border-top:1px solid var(--rule);font-size:12px}
+.srow .why2{grid-column:1/3;color:var(--muted);font-size:11.5px}
+.find{border:1px solid #4a3a55;background:linear-gradient(90deg,rgba(49,34,55,.9),rgba(49,34,55,.35));border-radius:10px;padding:9px 11px;margin-bottom:8px;font-size:12.5px}
+.find .fh{display:flex;justify-content:space-between;gap:8px;color:var(--ink);font-weight:600}.find .fs{color:#b39cc0;font-size:11.5px}
+.ex{display:inline-block;border:1px dashed #b39cc0;color:#b39cc0;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.06em;padding:0 5px;margin-left:6px}
+.coll{border:1px solid var(--rule);border-radius:10px;padding:9px 11px;margin-bottom:8px}
+.coll .ch{display:flex;justify-content:space-between;align-items:center}.coll .ch b{color:var(--ink)}
+.ci{display:flex;gap:7px;align-items:center;font-size:12px;padding:3px 0;border-top:1px solid #222c31}
+/* popovers */
+.pop{position:fixed;z-index:50;background:#10161a;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px #000a;padding:12px;width:300px;font-size:12.5px;display:none}
+.pop h5{margin:0 0 8px;font:600 14px Georgia,serif;color:var(--ink)}
+.peek{pointer-events:none;width:330px}
+.peek .pt{display:flex;gap:8px;align-items:center;color:var(--ink);font-weight:600}
+.peek .pr{display:flex;justify-content:space-between;border-top:1px solid #222c31;padding:4px 0;font-size:12px}.peek .pr span:first-child{color:var(--muted)}
+.swatches{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.swatches button{all:unset;cursor:pointer;width:22px;height:22px;border-radius:6px;border:2px solid transparent}.swatches button.on{border-color:var(--ink)}
+.pop input,.pop textarea{width:100%;background:var(--well);border:1px solid var(--rule2);border-radius:8px;color:var(--ink);padding:6px 8px;font:inherit}
+.pop textarea{min-height:70px;resize:vertical}
+.tagpick{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}.tagpick button{all:unset;cursor:pointer;border-radius:999px;padding:1px 9px;font-size:11.5px;font-weight:600;color:var(--ink);opacity:.55}.tagpick button.on{opacity:1;box-shadow:0 0 0 2px var(--ink)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#10161a;border:1px solid var(--amber);color:var(--ink);border-radius:10px;padding:8px 14px;font-size:13px;display:none;z-index:60}
+.note-bar{max-width:1500px;margin:0 auto;padding:0 22px 30px;font-size:12px;color:var(--muted)}
+svg text{font-family:Inter,system-ui,sans-serif}
+</style></head><body>
+<div class="top"><b>Journalism Workbench</b>
+  <label class="sbox"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#927e5d" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" value="Meridian" aria-label="Search this investigation" autocomplete="off"><kbd>⌘K</kbd></label>
+  <span class="inv">Investigation <b>Demo Investigation</b></span></div>
+<div class="wrap">
+  <aside class="facets" id="facets"></aside>
+  <main><div class="rhead"><h2 id="rtitle"></h2><span id="rsub"></span></div><div id="results"></div></main>
+  <aside class="panel"><div class="tabs" id="tabs"></div><div class="pbody" id="pbody"></div></aside>
+</div>
+<p class="note-bar">Prototype for discussion, built on the demo investigation's real records. Outside lookups do not contact anyone here: their results are marked <span class="ex">EXAMPLE</span>. Keys: <span class="kbd">⌘K</span> search · <span class="kbd">↑</span><span class="kbd">↓</span> move · <span class="kbd">T</span> tag · <span class="kbd">N</span> note · <span class="kbd">C</span> collect · <span class="kbd">Enter</span> open.</p>
+<div class="pop peek" id="peek"></div><div class="pop" id="pop"></div><div class="toast" id="toast"></div>
+<script>
+const DATA={"query": "Meridian", "rawTotal": 23, "parties": [{"id": "8e63d6bf-c7dd-4bfc-9292-481e000ccf29", "name": "Alaric Voss", "schema": "Person", "country": "gb"}, {"id": "3c8c4108-ac16-4e8d-b988-db29afdcd421", "name": "Bellcastle Trading Group", "schema": "Company", "country": "ky"}, {"id": "4730b91d-0c5a-492f-9b86-f90d0fcdc118", "name": "Harborline Civic Trust", "schema": "Organization", "country": null}, {"id": "d178d69f-7409-4224-9f5e-eb18d38f0c21", "name": "MV Fair Tern (cargo vessel)", "schema": "Asset", "country": null}, {"id": "652df567-2392-490b-9b10-a56152739602", "name": "Meridian Holdings Ltd", "schema": "Company", "country": "gb"}, {"id": "7dd3e498-47ae-479e-b624-932df54a9044", "name": "Priya Kavanagh", "schema": "Person", "country": null}], "links": [{"id": "74c7c365-42bf-4c43-8c40-c3c674f285b8", "schema": "Payment", "from": "3c8c4108-ac16-4e8d-b988-db29afdcd421", "to": "652df567-2392-490b-9b10-a56152739602", "props": {"amount": "2400000", "currency": "USD", "date": "2023-11-14", "purpose": "Consulting fee (disputed)"}, "support": "challenged_support", "needsReview": true}, {"id": "0554b914-3774-48db-91fa-29f639f8584c", "schema": "Ownership", "from": "652df567-2392-490b-9b10-a56152739602", "to": "d178d69f-7409-4224-9f5e-eb18d38f0c21", "props": {}, "support": "no_claim_dependency", "needsReview": false}, {"id": "0cdc228c-8dd5-4476-820a-9f3c3c9183e0", "schema": "Employment", "from": "7dd3e498-47ae-479e-b624-932df54a9044", "to": "4730b91d-0c5a-492f-9b86-f90d0fcdc118", "props": {}, "support": "no_claim_dependency", "needsReview": false}, {"id": "65803a76-9610-4490-9f95-3e29dbc46c4d", "schema": "Ownership", "from": "3c8c4108-ac16-4e8d-b988-db29afdcd421", "to": "652df567-2392-490b-9b10-a56152739602", "props": {}, "support": "independent_support", "needsReview": false}, {"id": "ef354402-156c-4e67-955a-bab142754b72", "schema": "Directorship", "from": "8e63d6bf-c7dd-4bfc-9292-481e000ccf29", "to": "652df567-2392-490b-9b10-a56152739602", "props": {}, "support": "no_claim_dependency", "needsReview": false}], "claims": [{"id": "e03bc028-2e23-45c1-a150-9ec8ff7589ef", "text": "Alaric Voss has an undisclosed financial interest in the MV Fair Tern.", "status": "unverified", "confidence": 0.2}, {"id": "eb07d251-1604-4a6e-8b92-833c6602eaa6", "text": "Bellcastle Trading Group paid Meridian Holdings Ltd $2.4M described as a consulting fee.", "status": "disputed", "confidence": 0.5}, {"id": "beb67061-71d6-4eeb-9d48-a8f637ce7da1", "text": "Meridian Holdings Ltd is wholly owned by Bellcastle Trading Group.", "status": "supported", "confidence": 0.8}], "leads": [{"id": "7e97fd66-e845-4bca-b561-d92cf462f27b", "title": "Interview Priya Kavanagh re: Harborline Civic Trust", "detail": "She may know whether Harborline has any dealings with Meridian or Bellcastle.", "status": "unreviewed", "priority": "low", "owner": null}, {"id": "59d8456a-b811-4b64-8df1-57151dfa57a1", "title": "Request Meridian's full ownership filing history", "detail": "File a records request for prior-year annual returns to establish when Bellcastle's stake began.", "status": "unreviewed", "priority": "normal", "owner": null}, {"id": "be70251e-c92d-45c2-b413-876c3a2e1a37", "title": "Trace the $2.4M consulting-fee payment", "detail": "Follow the payment through Meridian's bank records; check for a matching invoice.", "status": "active", "priority": "urgent", "owner": "Demo reporter"}], "events": [{"id": "c4e7e7de-665d-47c8-8708-1abbe45c50b7", "title": "Alaric Voss appointed director of Meridian Holdings Ltd", "date": "2019-06-11", "status": "verified"}, {"id": "602c7ee4-dd53-4400-bf5b-2e8e6dac9c0d", "title": "Bellcastle Trading Group becomes sole owner of Meridian Holdings Ltd", "date": "2021-02", "status": "verified"}, {"id": "statement:ed9b512a-2068-4f4d-8937-4323f5f5b92a", "title": "Bellcastle Trading Group \u2014 Payment \u2192 Meridian Holdings Ltd \u2014 date", "date": "2023-11-14", "status": "asserted"}, {"id": "8475e0a2-3af9-407c-9e8d-38b33f33c357", "title": "Disputed $2.4M payment from Bellcastle to Meridian", "date": "2023-11-14", "status": "disputed"}, {"id": "419a0d50-8a91-4395-8f14-96c4a4320c89", "title": "Riverside Gazette publishes \"Offshore ties revealed\"", "date": "2024-03-02", "status": "verified"}, {"id": "200b479e-dc00-4aa7-b9c8-f80370c057cd", "title": "Lead opened: trace the consulting-fee payment", "date": "2024-03-03", "status": "asserted"}], "evidence": [{"id": "3fb0b278-6b84-4ce7-a5e6-3a2d23420edb", "quote": "Director: Alaric Voss, appointed 2019-06-11.", "locator": "p. 2, Officers section", "source": "Meridian Holdings Ltd -- Companies Registry filing (2024 annual return)", "sourceType": "document", "url": null, "stance": []}, {"id": "682846f1-87d9-4752-863e-044536e4d111", "quote": "Bank records show a transfer of $2,400,000 from Bellcastle Trading Group to Meridian Holdings Ltd in November 2023, described in the leaked memo as a \"consulting fee.\"", "locator": "paragraph 6", "source": "\"Offshore ties revealed\" -- Riverside Gazette, 2024-03-02", "sourceType": "web", "url": "https://example.org/riverside-gazette/offshore-ties-revealed", "stance": ["supports"]}, {"id": "d5f4b874-afba-45d9-a18b-7306db63383f", "quote": "A spokesperson for Bellcastle Trading Group denied any ongoing financial relationship with Meridian Holdings Ltd.", "locator": "paragraph 9", "source": "\"Offshore ties revealed\" -- Riverside Gazette, 2024-03-02", "sourceType": "web", "url": "https://example.org/riverside-gazette/offshore-ties-revealed", "stance": ["contradicts"]}, {"id": "e19ec074-7000-4c66-b0d4-188c2345eb5f", "quote": "Meridian Holdings Ltd is wholly owned by Bellcastle Trading Group.", "locator": "p. 4, Ownership structure", "source": "Meridian Holdings Ltd -- Companies Registry filing (2024 annual return)", "sourceType": "document", "url": null, "stance": ["supports"]}]};
+// ---------- the codes ----------
+const KIND={
+  party:{name:'Parties',one:'Party',color:'#b98d34',icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 16 0v1"/>'},
+  link:{name:'Links between parties',one:'Link',color:'#d4a152',icon:'<circle cx="5" cy="12" r="3"/><circle cx="19" cy="12" r="3"/><path d="M8 12h8"/>'},
+  evidence:{name:'Evidence and sources',one:'Evidence',color:'#caaf9c',icon:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>'},
+  claim:{name:'Claims and events',one:'Claim',color:'#baac91',icon:'<path d="M4 6h16M4 12h10M4 18h7"/><circle cx="19" cy="17" r="3"/>'},
+  event:{name:'Claims and events',one:'Event',color:'#baac91',icon:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'},
+  lead:{name:'Leads and tasks',one:'Lead',color:'#a16948',icon:'<path d="M12 3v18M5 8l7-5 7 5"/>'},
+  finding:{name:'Outside findings',one:'Outside finding',color:'#9a83a8',icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'},
+};
+const GROUP_ORDER=['party','link','evidence','claim','lead','finding'];
+const PARTYK={Person:{fill:'#314d65',ring:'#4d7a9b',name:'Person'},Company:{fill:'#4e4234',ring:'#b98d34',name:'Company'},Organization:{fill:'#3a5c52',ring:'#baac91',name:'Organisation'},Asset:{fill:'#45271f',ring:'#bc9574',name:'Property or asset'},Vessel:{fill:'#743a2f',ring:'#a16948',name:'Vessel'}};
+const FAM={Ownership:{c:'#d4a152',v:'owns'},Directorship:{c:'#baac91',v:'directs'},Employment:{c:'#baac91',v:'works for'},Payment:{c:'#a16948',v:'paid'}};
+const SURE={
+  supported:{name:'Supported',bg:'#3a5c52',fg:'#f3e9d7',ic:'✓'},
+  documented:{name:'Shown by a source',bg:'#3a5c52',fg:'#f3e9d7',ic:'✓'},
+  verified:{name:'Verified',bg:'#3a5c52',fg:'#f3e9d7',ic:'✓'},
+  unverified:{name:'Not yet shown',bg:'#61503e',fg:'#f3e9d7',ic:'○'},
+  asserted:{name:'Asserted',bg:'#61503e',fg:'#f3e9d7',ic:'○'},
+  disputed:{name:'Disputed',bg:'#9f3632',fg:'#f3e9d7',ic:'!'},
+  open:{name:'Open',bg:'#26272b',fg:'#caaf9c',ic:'·'},
+};
+const TAGSW=['#314d65','#3a5c52','#8d692b','#663306','#89352a','#61503e','#3e6181','#966926'];
+const COUNTRY={gb:'United Kingdom',ky:'Cayman Islands',us:'United States'};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+const svgI=(p,c,s=16)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const P=id=>DATA.parties.find(p=>p.id===id);
+const money=(a,c)=>a?`${c||''} ${Number(a).toLocaleString('en-GB')}`.trim():'';
+const dateW=d=>{if(!d)return'';const[y,m,dd]=d.split('-');const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return dd?`${+dd} ${M[m-1]} ${y}`:m?`${M[m-1]} ${y}`:y};
+
+// ---------- records (one per thing) ----------
+function linkSure(l){return l.support==='challenged_support'?'disputed':l.support==='independent_support'?'supported':'unverified'}
+const REC=[];
+for(const p of DATA.parties)REC.push({key:'p:'+p.id,kind:'party',title:p.name,schema:p.schema,parties:[p.id],country:p.country,text:`${p.name} ${PARTYK[p.schema]?.name||p.schema} ${COUNTRY[p.country]||''}`});
+for(const l of DATA.links){const a=P(l.from),b=P(l.to),f=FAM[l.schema]||{c:'#927e5d',v:'is linked to'};
+  REC.push({key:'l:'+l.id,kind:'link',title:`${a.name} ${f.v} ${b.name}`,schema:l.schema,parties:[l.from,l.to],sure:linkSure(l),date:l.props.date,amount:l.props.amount,currency:l.props.currency,purpose:l.props.purpose,link:l,text:`${a.name} ${b.name} ${l.schema} ${l.props.purpose||''} ${l.props.amount||''}`})}
+for(const e of DATA.evidence){const st=e.stance.includes('contradicts')?'disputed':e.stance.includes('supports')?'supported':'unverified';
+  REC.push({key:'e:'+e.id,kind:'evidence',title:e.quote,source:e.source,locator:e.locator,sourceType:e.sourceType,url:e.url,stance:e.stance,sure:st,parties:DATA.parties.filter(p=>e.quote.includes(p.name.split(' (')[0])||e.source.includes(p.name)).map(p=>p.id),text:`${e.quote} ${e.source} ${e.locator}`})}
+for(const c of DATA.claims)REC.push({key:'c:'+c.id,kind:'claim',title:c.text,sure:c.status,confidence:c.confidence,parties:DATA.parties.filter(p=>c.text.includes(p.name.split(' (')[0])).map(p=>p.id),text:c.text});
+for(const ev of DATA.events)REC.push({key:'v:'+ev.id,kind:'event',title:ev.title,date:ev.date,sure:ev.status,parties:DATA.parties.filter(p=>ev.title.includes(p.name.split(' (')[0])||ev.title.includes(p.name.split(' ')[0])).map(p=>p.id),text:ev.title+' '+ev.date});
+for(const l of DATA.leads)REC.push({key:'d:'+l.id,kind:'lead',title:l.title,detail:l.detail,priority:l.priority,status:l.status,owner:l.owner,parties:DATA.parties.filter(p=>(l.title+' '+l.detail).includes(p.name.split(' ')[0])).map(p=>p.id),text:l.title+' '+l.detail});
+const recByKey=k=>REC.find(r=>r.key===k);
+
+// ---------- state ----------
+const S={q:'Meridian',f:{kind:new Set(),party:new Set(),sure:new Set(),tag:new Set()},sort:'relevance',sel:null,kb:-1,tab:'dig',
+  tags:{'Follow the money':'#8d692b','Offshore':'#3e6181','Ask at interview':'#89352a'},
+  recTags:{},notes:{},colls:{'Bellcastle money trail':[]},lookupMode:'auto',accepted:new Set(),dismissed:new Set(),open:new Set(['652df567-2392-490b-9b10-a56152739602'])};
+S.recTags['p:3c8c4108-ac16-4e8d-b988-db29afdcd421']=['Offshore'];
+S.recTags['l:74c7c365-42bf-4c43-8c40-c3c674f285b8']=['Follow the money'];
+S.colls['Bellcastle money trail']=['p:3c8c4108-ac16-4e8d-b988-db29afdcd421','l:74c7c365-42bf-4c43-8c40-c3c674f285b8','e:682846f1-87d9-4752-863e-044536e4d111','e:d5f4b874-afba-45d9-a18b-7306db63383f'];
+S.notes['l:74c7c365-42bf-4c43-8c40-c3c674f285b8']=[{text:'Gazette cites bank records it has not published. Ask for the transfer reference.',at:'4 Oct'}];
+
+// ---------- search ----------
+function match(r,q){if(!q)return{score:1,where:''};const t=q.toLowerCase().split(/\s+/).filter(Boolean);let s=0,where=[];
+  for(const w of t){if(r.title.toLowerCase().includes(w)){s+=3;where.push('name or text')}else if((r.source||'').toLowerCase().includes(w)){s+=2;where.push('source')}else if(r.text.toLowerCase().includes(w)){s+=1;where.push('details')}else return null}
+  return{score:s,where:[...new Set(where)].join(', ')}}
+const hi=(s,q)=>{let o=esc(s);for(const w of (q||'').split(/\s+/).filter(x=>x.length>1))o=o.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'),'<mark>$1</mark>');return o};
+const kindGroup=k=>k==='event'?'claim':k;
+function sureOf(r){return r.kind==='lead'?'open':r.sure||(r.kind==='party'?null:null)}
+function results(){
+  const q=S.q.trim();let rs=[];
+  for(const r of [...REC,...findingsAsRecords()]){const m=match(r,q);if(!m)continue;rs.push({...r,score:m.score,where:m.where})}
+  const all=rs;
+  rs=rs.filter(r=>(!S.f.kind.size||S.f.kind.has(kindGroup(r.kind)))&&(!S.f.party.size||r.parties.some(id=>S.f.party.has(P(id)?.schema)))&&(!S.f.sure.size||S.f.sure.has(sureBucket(r)))&&(!S.f.tag.size||(S.recTags[r.key]||[]).some(t=>S.f.tag.has(t))));
+  const rank={disputed:0,unverified:1,asserted:1,open:2,supported:3,verified:3,documented:3};
+  if(S.sort==='unsure')rs.sort((a,b)=>(rank[sureOf(a)]??2)-(rank[sureOf(b)]??2)||b.score-a.score);
+  else if(S.sort==='date')rs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  else rs.sort((a,b)=>b.score-a.score);
+  return{all,rs};
+}
+function sureBucket(r){const s=sureOf(r);return s==='supported'||s==='verified'||s==='documented'?'shown':s==='disputed'?'disputed':s==='open'||!s?'none':'notyet'}
+
+// ---------- patterns ("Red Flags") ----------
+const SECRECY={ky:'Cayman Islands'}; // the app loads the full Tax Justice Network list; the prototype holds the one this case needs
+const SRC={
+  A:['FATF/Egmont, Concealment of Beneficial Ownership (2018), Annex E','https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf'],
+  B:['World Bank/StAR, The Puppet Masters (2011)','https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf'],
+  C:['Global Witness, The Companies We Keep (2018)','https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/'],
+  D:['FinCEN, shell-company LLC assessment (2006)','https://www.fincen.gov/system/files/shared/LLCAssessment_FINAL.pdf'],
+  H:['Fazekas & Tóth (2016), company age','https://www.govtransparency.eu/wp-content/uploads/2016/12/Fazekas-Toth_Corrupt-companies_20160901.pdf'],
+  I:['Tello Arista, Fazekas & Volkotrub (2026)','https://link.springer.com/article/10.1007/s10610-025-09654-9'],
+  L:['Tax Justice Network on circular ownership (2019)','https://taxjustice.net/2019/09/06/more-beneficial-ownership-loopholes-to-plug-circular-ownership-control-with-little-ownership-and-companies-as-parties-to-the-trust/'],
+  P:['Tax Justice Network, Financial Secrecy Index','https://fsi.taxjustice.net/'],
+  J:['Open Contracting Partnership, Red flags (2024)','https://www.open-contracting.org/wp-content/uploads/2024/12/OCP2024-RedFlagProcurement-1.pdf'],
+};
+const MER='652df567-2392-490b-9b10-a56152739602',BEL='3c8c4108-ac16-4e8d-b988-db29afdcd421',ALA='8e63d6bf-c7dd-4bfc-9292-481e000ccf29';
+function facts(){ // facts the reporter accepted from outside findings
+  const f={};for(const k of S.accepted){const x=FINDINGS.find(y=>y.id===k);if(x&&x.fact)Object.assign(f,x.fact)}return f}
+function patterns(){
+  const L=DATA.links,F=facts(),out=[],maybe=[];
+  const owns=L.filter(l=>l.schema==='Ownership');
+  // circular ownership
+  const adj={};owns.forEach(l=>(adj[l.from]=adj[l.from]||[]).push(l.to));
+  let cycle=null;const seen=new Set();const dfs=(n,stack)=>{if(cycle)return;if(stack.includes(n)){cycle=stack.slice(stack.indexOf(n));return}if(seen.has(n))return;seen.add(n);for(const m of adj[n]||[])dfs(m,[...stack,n])};
+  Object.keys(adj).forEach(n=>dfs(n,[]));
+  // chain tops: owned companies whose owner chain ends at a company/org with no owner
+  const ownerOf=id=>owns.filter(l=>l.to===id).map(l=>l.from);
+  const chainTop=id=>{let x=id,path=[id];for(let i=0;i<20;i+=1){const o=ownerOf(x);if(!o.length)break;x=o[0];path.push(x)}return path};
+  for(const l of owns){const top=chainTop(l.to),t=P(top[top.length-1]);
+    if(t&&t.schema!=='Person'&&!out.some(o=>o.id==='top:'+t.id))out.push({id:'top:'+t.id,n:21,name:`No owner recorded for ${t.name}, at the top of the ownership chain`,who:top,rule:`The chain ${top.map(i=>P(i).name).reverse().join(' → ')} stops at a ${PARTYK[t.schema]?.name.toLowerCase()}, not a person: no one is recorded as owning ${t.name}.`,why:'Ownership that ends at a company, trust or foundation hides the real owner. Missing beneficial-owner data was one of the validated risk indicators.',src:['A','C','I'],innocent:'Listed companies and charities often have no single owner; the record may simply be incomplete.',confirm:`${t.name}'s register of members or beneficial owners (${COUNTRY[t.country]||'its country'}).`,base:1,unreviewed:false,lookups:[t.id]})}
+  // secrecy jurisdiction in a chain
+  for(const p of DATA.parties)if(SECRECY[p.country]&&owns.some(l=>l.from===p.id))out.push({id:'sec:'+p.id,n:2,name:`Ownership runs through ${SECRECY[p.country]}`,who:[p.id,...owns.filter(l=>l.from===p.id).map(l=>l.to)],rule:`${p.name} is registered in ${SECRECY[p.country]} and owns ${owns.filter(l=>l.from===p.id).map(l=>P(l.to).name).join(', ')}.`,why:'Secrecy jurisdictions limit what the public can learn about owners. A long-documented feature of concealment schemes.',src:['P','A','C'],innocent:'Many lawful groups use offshore holding companies. This flag on its own was found to predict little, so it counts for less.',confirm:'Annual returns or leaked registry records naming the shareholders.',base:1,jur:true,unreviewed:false,lookups:[p.id]});
+  // payment without a reviewed invoice or contract
+  for(const l of L.filter(x=>x.schema==='Payment')){
+    out.push({id:'pay:'+l.id,n:12,name:`${money(l.props.amount,l.props.currency)} payment with a disputed purpose and no invoice or contract on record`,who:[l.from,l.to],rule:`${P(l.from).name} paid ${P(l.to).name} on ${dateW(l.props.date)} for “${l.props.purpose}”. No invoice or contract is attached, and the evidence for it is not yet reviewed.`,why:'Payments with no stated purpose, or only a vague one, and no matching paperwork are a common sign of moving money for something other than the stated reason.',src:['D','A'],innocent:'The paperwork may exist and simply not be in the file yet.',confirm:'The invoice and the consulting agreement; Meridian\'s accounts for 2023.',base:1,unreviewed:l.needsReview,lookups:[l.from,l.to]});
+    if(+l.props.amount%1000===0)out.push({id:'round:'+l.id,n:11,name:'Round-number payment',who:[l.from,l.to],rule:`${money(l.props.amount,l.props.currency)} is an exact multiple of 1,000.`,why:'Large round sums are one of the signs listed for shell-company transfers.',src:['D'],innocent:'Fees, loans and deposits are often round. Weak on its own.',confirm:'What the sum was for.',base:1,weak:true,unreviewed:l.needsReview,lookups:[]});
+    // company formed shortly before payment: needs incorporation date
+    const inc=F['inc:'+l.to];
+    if(inc){const days=Math.round((Date.parse(l.props.date)-Date.parse(inc))/864e5);if(days>=0&&days<365)out.push({id:'young:'+l.to,n:6,name:`${P(l.to).name} was formed ${days} days before the payment`,who:[l.to,l.from],rule:`Incorporated ${dateW(inc)}; paid ${money(l.props.amount,l.props.currency)} on ${dateW(l.props.date)}.`,why:'Companies younger than a year when they receive large sums are treated as high risk in procurement research.',src:['H','I','A'],innocent:'A new joint venture or start-up.',confirm:'Why the company was set up, and who asked for it.',base:1,unreviewed:false,fresh:true,lookups:[]})}
+    else maybe.push({id:'young?:'+l.to,n:6,name:`Was ${P(l.to).name} formed shortly before it was paid?`,need:`Its incorporation date. The router would ask Companies House (${P(l.to).country==='gb'?'it is a UK company':'—'}).`,who:[l.to],src:['H','A'],lookups:[l.to]});
+  }
+  if(!F['appts:'+ALA])maybe.push({id:'mass?',n:3,name:'Does Alaric Voss direct many other companies?',need:'His officer appointments. The router would ask Companies House (UK national).',who:[ALA],src:['A','C','I'],lookups:[ALA]});
+  else if(F['appts:'+ALA]>100)out.push({id:'mass:'+ALA,n:3,name:`Alaric Voss is an officer of ${F['appts:'+ALA]} companies`,who:[ALA,MER],rule:`Companies House lists ${F['appts:'+ALA]} appointments for him: more than the 100 that Global Witness used to pick out mass officers.`,why:'“Mass” nominee directors appear in a large majority of the FATF/Egmont concealment cases.',src:['A','C','I'],innocent:'A professional company secretary or fund manager.',confirm:'Whether he is paid as a nominee; who instructs him.',base:1,unreviewed:false,fresh:true,lookups:[]});
+  // ranking: equal weights, corroboration bonus, discounts (Fazekas & Kocsis 2015; OCP 2024)
+  for(const f of out){const others=out.filter(o=>o!==f&&o.who.some(w=>f.who.includes(w))).length;
+    f.parts=[['Flag',1],['Other flags on the same parties',others*0.25],['Evidence not yet reviewed',f.unreviewed?-0.3:0],['Country-only flag',f.jur?-0.5:0],['Weak on its own',f.weak?-0.5:0]];
+    f.total=Math.max(0.1,f.parts.reduce((s,p)=>s+p[1],0));f.others=others}
+  out.sort((a,b)=>b.total-a.total);
+  return{flags:out.filter(f=>!S.dismissed.has(f.id)),maybe,cycle};
+}
+
+// ---------- the router (sources chosen by kind and country) ----------
+function route(p){
+  const r=[];const add=(name,why,policy,lic,ex)=>r.push({name,why,policy,lic,ex});
+  add('OpenSanctions (local copy)','Every party: sanctions, politically exposed people, debarments','auto','Non-commercial');
+  add('ICIJ Offshore Leaks (local copy)','Every party: offshore entities, officers, intermediaries','auto','Cite ICIJ');
+  if(p.schema==='Company'||p.schema==='Organization'){
+    if(p.country==='gb'){add('Companies House: profile, officers, people with significant control','UK company',"auto",'',{fact:'inc:'+p.id,label:'Incorporated 2 Oct 2023',val:'2023-10-02'});add('OpenOwnership BODS data','UK ownership chains','auto','CC0');add('Contracts Finder and Find a Tender','UK public contracts','auto','')}
+    else if(p.country==='us'){add('SEC EDGAR','US company filings','auto','');add('USAspending','US federal money','auto','');add('SAM.gov','US contractor registration','click','10 a day')}
+    else{add('GLEIF','Company identifier and parent links, any country','auto','Open');add('OCCRP Aleph Pro','Leaks and registries','auto','Free for non-profit journalism');add('OpenCorporates','Registry record in '+(COUNTRY[p.country]||'its country'),'key','Paid key or journalist grant')}
+    if(!p.country)r.push({name:'Country unknown',why:'Add the country to pick its national registers','policy':'need'});
+  }
+  if(p.schema==='Person'){
+    if(p.country==='gb'){add('Companies House officer search','UK national: other appointments','auto','',{fact:'appts:'+p.id,label:'112 company appointments',val:112});add('UK Parliament Register of Interests','Registered interests','auto','');add('Electoral Commission donations','Political donations','auto','')}
+    else r.push({name:'Country unknown',why:'Add a nationality to pick national registers','policy':'need'});
+    add('Wikidata','Offices held, family links','auto','CC0');
+  }
+  if(p.schema==='Asset')r.push({name:'Kind is “Asset”',why:'Mark it as a Vessel to search ship registries (Global Fishing Watch by IMO number; Equasis as a link only)','policy':'need'});
+  return r;
+}
+const FINDINGS=[];
+function ensureFindings(){
+  if(S.lookupMode!=='auto')return;
+  for(const p of DATA.parties)for(const s of route(p))if(s.policy==='auto'&&s.ex&&!FINDINGS.some(f=>f.id===s.ex.fact))
+    FINDINGS.push({id:s.ex.fact,party:p.id,source:s.name,label:s.ex.label,fact:{[s.ex.fact]:s.ex.val},at:'just now'});
+}
+function findingsAsRecords(){return FINDINGS.filter(f=>!S.accepted.has(f.id)).map(f=>({key:'f:'+f.id,kind:'finding',title:`${P(f.party).name}: ${f.label}`,source:f.source,parties:[f.party],sure:'unverified',text:f.label+' '+P(f.party).name,finding:f}))}
+
+// ---------- render ----------
+const $=id=>document.getElementById(id);
+function partyDot(id){const p=P(id);if(!p)return'';const k=PARTYK[p.schema]||PARTYK.Asset;return`<span class="pd"><i style="background:${k.fill};border-color:${k.ring}"></i>${esc(p.name)}</span>`}
+function surePill(s){const x=SURE[s];return x?`<span class="pill" style="background:${x.bg};color:${x.fg}">${x.ic} ${x.name}</span>`:''}
+function tagChips(key){return(S.recTags[key]||[]).map(t=>`<span class="tag" style="background:${S.tags[t]}">${esc(t)}</span>`).join('')}
+function flagCount(key){const r=recByKey(key)||{};const {flags}=PAT;return flags.filter(f=>(r.parties||[]).some(p=>f.who.includes(p))&&(r.kind==='party'||r.kind==='link')).length}
+let PAT=null;
+function card(r){
+  const K=KIND[r.kind];let meta='',body='';
+  if(r.kind==='party'){const k=PARTYK[r.schema]||PARTYK.Asset;meta=`<span class="pd"><i style="background:${k.fill};border-color:${k.ring}"></i>${k.name}</span>${r.country?`<span>${COUNTRY[r.country]||r.country.toUpperCase()}</span>`:'<span style="color:#7d6c50">country unknown</span>'}<span>${DATA.links.filter(l=>l.from===r.parties[0]||l.to===r.parties[0]).length} links</span>`}
+  if(r.kind==='link'){const f=FAM[r.schema]||{c:'#927e5d'};meta=`<svg width="34" height="10"><path d="M2 5 L32 5" stroke="${f.c}" stroke-width="3"/></svg><span style="color:${f.c};font-weight:600">${r.schema}</span>${r.amount?`<b style="color:var(--ink)">${money(r.amount,r.currency)}</b>`:''}${r.date?`<span>${dateW(r.date)}</span>`:''}${surePill(r.sure)}`;
+    body=r.purpose?`<div class="sn">Purpose: “${hi(r.purpose,S.q)}”</div>`:''}
+  if(r.kind==='evidence'){meta=`<span>${hi(r.source,S.q)}</span><span>· ${esc(r.locator)}</span>${r.stance.map(s=>`<span class="pill" style="background:${s==='supports'?'#3a5c52':'#9f3632'};color:#f3e9d7">${s==='supports'?'supports a claim':'contradicts a claim'}</span>`).join('')||'<span class="pill" style="background:#26272b;color:#927e5d">not attached to a claim</span>'}`}
+  if(r.kind==='claim'){meta=`${surePill(r.sure)}<span style="display:inline-flex;align-items:center;gap:6px">how sure <span style="display:inline-block;width:70px;height:5px;border-radius:3px;background:#26272b;overflow:hidden"><i style="display:block;height:100%;width:${r.confidence*100}%;background:${SURE[r.sure]?.bg||'#927e5d'}"></i></span>${Math.round(r.confidence*100)}%</span>`}
+  if(r.kind==='event'){meta=`<b style="color:var(--ink)">${dateW(r.date)}</b>${surePill(r.sure)}`}
+  if(r.kind==='lead'){const pc={urgent:'#9f3632',normal:'#d4a152',low:'#3e6181'}[r.priority]||'#61503e';meta=`<span class="pill" style="background:${pc};color:${r.priority==='normal'?'#010005':'#f3e9d7'}">${r.priority}</span><span>${r.status}</span>${r.owner?`<span>· ${esc(r.owner)}</span>`:''}`;body=`<div class="sn">${hi(r.detail,S.q)}</div>`}
+  if(r.kind==='finding'){meta=`<span class="pill" style="background:#312237;color:#d9c8e3;border:1px solid #6b5577">from ${esc(r.source)}</span><span class="ex">EXAMPLE</span><span>arrived ${r.finding.at}</span>`;body=`<div class="sn">Waiting for you: accept it into the record, or set it aside.</div>`}
+  const parties=r.kind!=='party'&&r.parties.length?`<div class="meta" style="margin-top:5px">${r.parties.slice(0,3).map(partyDot).join('')}</div>`:'';
+  const fc=PAT.flags.filter(f=>r.kind==='party'?f.who.includes(r.parties[0]):r.kind==='link'?f.who.includes(r.parties[0])&&f.who.includes(r.parties[1]):false).length;
+  const notes=(S.notes[r.key]||[]).map(n=>`<div class="notec">✎ ${esc(n.text)}</div>`).join('');
+  return`<div class="res${S.sel===r.key?' sel':''}" tabindex="0" data-key="${r.key}" style="--edge:${K.color}">
+    ${fc?`<span class="flagdot" title="${fc} pattern${fc>1?'s':''} to dig into">⚑ ${fc}</span>`:''}
+    <div class="ico">${svgI(K.icon,K.color)}</div>
+    <div><div class="t">${hi(r.title,S.q)}</div><div class="meta"><span class="kl" style="color:${K.color}">${K.one}</span>${meta}</div>${body}${parties}
+      <div class="why">Matched on ${r.where||'—'}</div>${S.recTags[r.key]?.length?`<div class="tags">${tagChips(r.key)}</div>`:''}${notes}</div>
+    <div class="acts">${r.kind==='finding'?`<button class="ab" data-act="accept" data-tip="Accept into the record">✓</button><button class="ab" data-act="aside" data-tip="Set aside">✕</button>`:''}
+      <button class="ab" data-act="tag" data-tip="Tag (T)">#</button><button class="ab" data-act="note" data-tip="Note (N)">✎</button><button class="ab" data-act="collect" data-tip="Add to a collection (C)">＋</button><button class="ab" data-act="trace" data-tip="Trace to its source">⤶</button>${r.kind==='party'?`<button class="ab" data-act="lookup" data-tip="Look it up outside">⌕</button>`:''}</div></div>`;
+}
+function renderFacets(all){
+  const cnt=(fn)=>{const m={};for(const r of all){for(const v of [].concat(fn(r)))if(v)m[v]=(m[v]||0)+1}return m};
+  const kinds=cnt(r=>kindGroup(r.kind)),parties=cnt(r=>[...new Set(r.parties.map(id=>P(id)?.schema))]),sure=cnt(sureBucket),tags=cnt(r=>S.recTags[r.key]||[]);
+  const max=Math.max(1,...Object.values(kinds));
+  const row=(facet,val,label,color,n)=>`<button class="fr${S.f[facet].has(val)?' on':''}${n?'':' zero'}" data-facet="${facet}" data-val="${esc(val)}"><span class="sw" style="background:${color}"></span><span>${label}</span><span class="n"><span class="bar" style="width:${Math.round((n||0)/max*34)}px;color:${color}"></span>${n||0}</span></button>`;
+  $('facets').innerHTML=`<div class="fg"><h4>Order</h4><div class="sortrow">${[['relevance','Best match'],['unsure','Least sure first'],['date','Newest']].map(([v,l])=>`<button class="chip${S.sort===v?' on':''}" data-sort="${v}">${l}</button>`).join('')}</div></div>
+  <div class="fg"><h4>Kind of record</h4>${GROUP_ORDER.map(k=>row('kind',k,KIND[k].name,KIND[k].color,kinds[k])).join('')}</div>
+  <div class="fg"><h4>Party involved</h4>${Object.keys(PARTYK).filter(k=>k!=='Vessel').map(k=>row('party',k,PARTYK[k].name,PARTYK[k].ring,parties[k])).join('')}</div>
+  <div class="fg"><h4>How sure</h4>${[['shown','Supported or verified','#3a5c52'],['notyet','Not yet shown','#61503e'],['disputed','Disputed','#9f3632'],['none','No status (leads, parties)','#393941']].map(([v,l,c])=>row('sure',v,l,c,sure[v])).join('')}</div>
+  <div class="fg"><h4>Your tags</h4>${Object.keys(S.tags).map(t=>row('tag',t,t,S.tags[t],tags[t])).join('')}</div>`;
+}
+let VIS=[];
+function render(){
+  ensureFindings();PAT=patterns();
+  const{all,rs}=results();VIS=rs;
+  renderFacets(all);
+  $('rtitle').textContent=S.q.trim()?`“${S.q.trim()}”`:'Everything';
+  $('rsub').innerHTML=`${rs.length} result${rs.length===1?'':'s'}${rs.length!==all.length?` of ${all.length}, filtered`:''} · one card per record (the old search showed 23 hits for 18 records)`;
+  let h='';
+  if(S.sort==='relevance'){for(const g of GROUP_ORDER){const items=rs.filter(r=>kindGroup(r.kind)===g);if(!items.length)continue;const K=KIND[g];
+    h+=`<section class="grp"><div class="gh" style="border-color:${K.color}55">${svgI(K.icon,K.color,15)}<b style="color:${K.color}">${K.name}</b><span>${items.length}</span></div>${items.map(card).join('')}</section>`}}
+  else h=rs.map(card).join('');
+  $('results').innerHTML=h||'<p style="color:var(--muted)">Nothing matches. Try fewer words, or clear a filter on the left.</p>';
+  renderPanel();
+}
+function renderTabs(){const n=PAT.flags.length;$('tabs').innerHTML=[['dig',`Red Flags<span class="c">${n}</span>`],['look',`Lookups${FINDINGS.filter(f=>!S.accepted.has(f.id)&&!S.dismissed.has('f'+f.id)).length?`<span class="c">${FINDINGS.filter(f=>!S.accepted.has(f.id)).length}</span>`:''}`],['coll','Collections & notes']].map(([k,l])=>`<button class="tab${S.tab===k?' on':''}" data-tab="${k}">${l}</button>`).join('')}
+function renderPanel(){
+  renderTabs();let h='';
+  if(S.tab==='dig'){
+    h+=`<p class="ph">Red Flags</p><p class="psub">Patterns seen in published cases, found in this investigation's records. Each is a lead, not a finding: it says why it matters, where the pattern was documented, and what would confirm or clear it.</p>`;
+    PAT.flags.forEach((f,i)=>{const max=2;const col={21:'#89352a',2:'#3e6181',12:'#a16948',11:'#61503e',6:'#9f3632',3:'#9f3632'}[f.n]||'#d4a152';
+      h+=`<div class="flag" style="--edge:${col}"><div class="ft"><span class="rk">${i+1}</span><span class="fn">${esc(f.name)}${f.fresh?' <span class="pill" style="background:#312237;color:#d9c8e3">new from a lookup</span>':''}</span></div>
+      <div class="who">${f.who.map(partyDot).join('')}</div>
+      <div class="row">${esc(f.rule)}</div>
+      <div class="row"><b>Why it matters.</b> ${esc(f.why)}</div>
+      <div class="row"><b>Documented in.</b> ${f.src.map(s=>`<a href="${SRC[s][1]}" target="_blank" rel="noopener">${esc(SRC[s][0])}</a>`).join('; ')}</div>
+      <div class="row"><b>Could be innocent.</b> ${esc(f.innocent)}</div>
+      <div class="row"><b>Would confirm or clear it.</b> ${esc(f.confirm)}</div>
+      <div class="score" title="${f.parts.map(p=>`${p[0]}: ${p[1]>0?'+':''}${p[1]}`).join('\n')}">weight<span class="track">${f.parts.filter(p=>p[1]>0).map((p,j)=>`<i style="width:${p[1]/max*100}%;background:${j?'#8d692b':'#d4a152'}"></i>`).join('')}</span>${f.total.toFixed(2)}${f.others?` · ${f.others} other flag${f.others>1?'s':''} on these parties`:''}${f.unreviewed?' · evidence unreviewed':''}${f.jur?' · country-only':''}</div>
+      <div class="fa"><button class="btn p" data-act="lead" data-flag="${f.id}">Make it a lead</button>${f.lookups.length?`<button class="btn" data-act="runlook" data-party="${f.lookups[0]}">Run the lookups that would help</button>`:''}<button class="btn" data-act="show" data-flag="${f.id}">Show these parties</button><button class="btn" data-act="dismiss" data-flag="${f.id}">Not relevant</button></div></div>`});
+    if(PAT.maybe.length){h+=`<div class="sec"><span>One fact away</span><span>${PAT.maybe.length}</span></div>`;
+      for(const m of PAT.maybe)h+=`<div class="flag" style="--edge:#393941;border-style:dashed"><div class="fn">${esc(m.name)}</div><div class="row" style="color:var(--muted)">Needs: ${esc(m.need)}</div><div class="fa"><button class="btn p" data-act="runlook" data-party="${m.lookups[0]}">Look it up</button></div></div>`}
+    h+=`<div class="sec"><span>Checked, not seen here</span></div><div class="row" style="font-size:12px;color:var(--muted)">Circular ownership (A owns B owns C owns A) ${PAT.cycle?'<b style="color:#e08a80">found</b>':'— no loop in the ownership records'} · <a style="color:#c8a46a" href="${SRC.L[1]}" target="_blank" rel="noopener">why it matters</a><br>Several stakes just under 25% · Mass-registration address · Structuring under a reporting threshold</div>`;
+  }
+  if(S.tab==='look'){
+    h+=`<p class="ph">Lookups</p><p class="psub">The app picks sources by what a party is and where it is registered, then runs the free ones itself. Results arrive as findings for you to accept or set aside.</p>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px"><span style="font-size:12px;color:var(--muted)">Outside lookups for this investigation (a record of each search exists on the other site)</span><span class="seg" id="mode">${[['off','Off'],['ask','Ask each time'],['auto','Automatic']].map(([v,l])=>`<button data-mode="${v}" class="${S.lookupMode===v?'on':''}">${l}</button>`).join('')}</span></div>`;
+    const open=FINDINGS.filter(f=>!S.accepted.has(f.id)&&!S.dismissed.has('f'+f.id));
+    if(open.length){h+=`<div class="sec"><span>Findings waiting</span><span>${open.length}</span></div>`;for(const f of open)h+=`<div class="find"><div class="fh"><span>${esc(P(f.party).name)}: ${esc(f.label)}</span><span class="ex">EXAMPLE</span></div><div class="fs">from ${esc(f.source)} · ${f.at}</div><div class="fa"><button class="btn p" data-act="accept" data-find="${f.id}">Accept into the record</button><button class="btn" data-act="aside" data-find="${f.id}">Set aside</button></div></div>`}
+    h+=`<div class="sec"><span>Sources by party</span></div>`;
+    for(const p of DATA.parties){const rt=route(p),k=PARTYK[p.schema]||PARTYK.Asset,isOpen=S.open.has(p.id);const ran=rt.filter(s=>s.policy==='auto').length;
+      h+=`<div class="party"><button class="h" data-party-toggle="${p.id}"><i style="width:10px;height:10px;border-radius:50%;background:${k.fill};border:2px solid ${k.ring}"></i><b>${esc(p.name)}</b><span>${k.name} · ${COUNTRY[p.country]||'country unknown'}</span><em style="color:${S.lookupMode==='auto'?'#baac91':'#927e5d'}">${S.lookupMode==='auto'?`${ran} ran`:S.lookupMode==='ask'?`${ran} ready`:'off'} ${isOpen?'▾':'▸'}</em></button>
+      ${isOpen?rt.map(s=>`<div class="srow"><span style="color:var(--ink)">${esc(s.name)}</span><span>${s.policy==='auto'?(S.lookupMode==='auto'?'<span class="pill" style="background:#3a5c52;color:#f3e9d7">ran automatically</span>':S.lookupMode==='ask'?`<button class="btn" data-act="runone" data-party="${p.id}">Run</button>`:'<span class="pill" style="background:#26272b;color:#927e5d">off</span>'):s.policy==='click'?`<button class="btn" data-act="runone" data-party="${p.id}">Run (click only)</button>`:s.policy==='key'?'<span class="pill" style="background:#26272b;color:#bc9574">add a key</span>':'<span class="pill" style="background:#61503e;color:#f3e9d7">needs a fact</span>'}</span><span class="why2">${esc(s.why)}${s.lic?` · <span style="color:#b39cc0">${esc(s.lic)}</span>`:''}</span></div>`).join(''):''}</div>`}
+  }
+  if(S.tab==='coll'){
+    h+=`<p class="ph">Collections, tags and notes</p><p class="psub">Your own groupings. A collection can filter any chart, feed the chart builder, or go to OpenAleph as a list. None of this is ever sent to an outside source.</p>`;
+    for(const [name,keys] of Object.entries(S.colls)){h+=`<div class="coll"><div class="ch"><b>${esc(name)}</b><span style="font-size:11.5px;color:var(--muted)">${keys.length} records</span></div>${keys.map(k=>{const r=recByKey(k)||findingsAsRecords().find(x=>x.key===k);if(!r)return'';const K=KIND[r.kind];return`<div class="ci">${svgI(K.icon,K.color,13)}<span style="flex:1">${esc(r.title.length>60?r.title.slice(0,58)+'…':r.title)}</span></div>`}).join('')}
+      <div class="fa"><button class="btn p" data-act="chartcoll" data-coll="${esc(name)}">Chart this collection</button><button class="btn" data-act="filtercoll" data-coll="${esc(name)}">Light it up in the network</button></div><div id="chart-${esc(name).replace(/\W/g,'')}"></div></div>`}
+    h+=`<div class="fa" style="margin-bottom:12px"><button class="btn" data-act="newcoll">+ New collection</button></div>`;
+    h+=`<div class="sec"><span>Tags</span></div><div class="tags">${Object.entries(S.tags).map(([t,c])=>`<span class="tag" style="background:${c}">${esc(t)} · ${Object.values(S.recTags).filter(v=>v.includes(t)).length}</span>`).join('')}</div>`;
+    const notes=Object.entries(S.notes).flatMap(([k,ns])=>ns.map(n=>({k,n})));
+    h+=`<div class="sec"><span>Notes</span><span>${notes.length}</span></div>${notes.map(({k,n})=>{const r=recByKey(k);return`<div class="coll"><div style="font-size:12.5px;color:var(--ink)">✎ ${esc(n.text)}</div><div style="font-size:11.5px;color:var(--muted)">on ${esc(r?r.title:k)} · ${n.at}</div><div class="fa"><button class="btn" data-act="notelead" data-note="${k}">Turn into a lead</button></div></div>`}).join('')}`;
+  }
+  $('pbody').innerHTML=h;
+}
+// a small chart of a collection: its parties as a network strip and its dated records on a line
+function chartColl(name){
+  const keys=S.colls[name];const recs=keys.map(recByKey).filter(Boolean);const ps=[...new Set(recs.flatMap(r=>r.parties))];
+  const W=380,H=150;let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="margin-top:8px;background:#161e22;border-radius:8px;display:block">`;
+  const pos={};ps.forEach((id,i)=>{pos[id]={x:40+i*(W-80)/Math.max(1,ps.length-1),y:44}});
+  for(const l of DATA.links)if(pos[l.from]&&pos[l.to]){const a=pos[l.from],b=pos[l.to],c=(FAM[l.schema]||{c:'#927e5d'}).c;s+=`<path d="M${a.x},${a.y} Q${(a.x+b.x)/2},${a.y-30} ${b.x},${b.y}" fill="none" stroke="${c}" stroke-width="${keys.includes('l:'+l.id)?3.5:1.5}" ${linkSure(l)!=='supported'?'stroke-dasharray="5 4"':''}/>`}
+  for(const id of ps){const p=P(id),k=PARTYK[p.schema]||PARTYK.Asset,{x,y}=pos[id];s+=`<circle cx="${x}" cy="${y}" r="9" fill="${k.fill}" stroke="${k.ring}" stroke-width="2"/><text x="${x}" y="${y+24}" text-anchor="middle" font-size="10.5" fill="#caaf9c">${esc(p.name.split(' ').slice(0,2).join(' '))}</text>`}
+  const dated=recs.filter(r=>r.date);const ys=[2019,2025];s+=`<line x1="20" x2="${W-20}" y1="118" y2="118" stroke="#393941"/>`;for(let y=ys[0];y<=ys[1];y+=1)s+=`<text x="${20+(y-ys[0])/(ys[1]-ys[0])*(W-40)}" y="138" font-size="9.5" text-anchor="middle" fill="#927e5d">${y}</text>`;
+  for(const r of dated){const t=(Date.parse(r.date)-Date.UTC(ys[0],0,1))/(Date.UTC(ys[1],0,1)-Date.UTC(ys[0],0,1));s+=`<circle cx="${20+t*(W-40)}" cy="118" r="5" fill="${KIND[r.kind].color}"/>`}
+  if(!dated.length)s+=`<text x="${W/2}" y="112" text-anchor="middle" font-size="10.5" fill="#927e5d">No dated records in this collection yet</text>`;
+  const el=$('chart-'+name.replace(/\W/g,''));if(el)el.innerHTML=s+'</svg>';
+}
+
+// ---------- hover peek ----------
+function peek(r,ev){
+  const pk=$('peek');if(!r){pk.style.display='none';return}
+  let h='';const K=KIND[r.kind];
+  if(r.kind==='party'){const id=r.parties[0],ls=DATA.links.filter(l=>l.from===id||l.to===id);const k=PARTYK[r.schema]||PARTYK.Asset;
+    const W=300,H=130,cx=W/2,cy=H/2;let s=`<svg width="${W}" height="${H}">`;const nb=[...new Set(ls.map(l=>l.from===id?l.to:l.from))];ls.forEach((l,i0)=>{const o=l.from===id?l.to:l.from,i=nb.indexOf(o),sameBefore=ls.slice(0,i0).filter(x=>(x.from===id?x.to:x.from)===o).length,a=-Math.PI/2+i*2*Math.PI/nb.length+sameBefore*0.18,x=cx+Math.cos(a)*105,y=cy+Math.sin(a)*44,c=(FAM[l.schema]||{c:'#927e5d'}).c,op=P(o),ok=PARTYK[op.schema]||PARTYK.Asset;
+      s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${c}" stroke-width="2" ${linkSure(l)!=='supported'?'stroke-dasharray="4 3"':''}/><circle cx="${x}" cy="${y}" r="7" fill="${ok.fill}" stroke="${ok.ring}" stroke-width="2"/><text x="${x}" y="${y+(y>cy?18:-11)}" text-anchor="middle" font-size="10" fill="#caaf9c">${esc(op.name.split(' ').slice(0,2).join(' '))}</text>`});
+    s+=`<circle cx="${cx}" cy="${cy}" r="11" fill="${k.fill}" stroke="${k.ring}" stroke-width="2.5"/></svg>`;
+    const flags=PAT.flags.filter(f=>f.who.includes(id));
+    h=`<div class="pt">${partyDot(id)}</div>${s}<div class="pr"><span>Kind · country</span><span>${k.name} · ${COUNTRY[r.country]||'unknown'}</span></div><div class="pr"><span>Links</span><span>${ls.length}</span></div><div class="pr"><span>Claims naming it</span><span>${DATA.claims.filter(c=>c.text.includes(r.title.split(' (')[0])).length}</span></div><div class="pr"><span>Patterns to dig into</span><span style="color:${flags.length?'#e08a80':'inherit'}">${flags.length?flags.map(f=>'#'+f.n).join(' '):'none'}</span></div>`}
+  else if(r.kind==='link'){const l=r.link;h=`<div class="pt">${esc(P(l.from).name)} → ${esc(P(l.to).name)}</div><div class="pr"><span>Kind</span><span style="color:${FAM[l.schema]?.c}">${l.schema}</span></div>${l.props.amount?`<div class="pr"><span>Amount</span><span>${money(l.props.amount,l.props.currency)}</span></div>`:''}${l.props.date?`<div class="pr"><span>Date</span><span>${dateW(l.props.date)}</span></div>`:''}<div class="pr"><span>How sure</span><span>${SURE[linkSure(l)].name}</span></div><div class="pr"><span>Evidence waiting for review</span><span>${l.needsReview?'yes':'no'}</span></div>`}
+  else if(r.kind==='evidence'){h=`<div class="pt">${svgI(K.icon,K.color)} ${esc(r.source)}</div><div style="margin:6px 0;font-size:12.5px;color:var(--ink);border-left:3px solid ${K.color};padding-left:8px">“${esc(r.title)}”</div><div class="pr"><span>Where</span><span>${esc(r.locator)}</span></div><div class="pr"><span>Kind of source</span><span>${esc(r.sourceType)}</span></div>${r.url?`<div class="pr"><span>Address</span><span>${esc(r.url.replace('https://',''))}</span></div>`:''}`}
+  else if(r.kind==='claim'){const ev=DATA.evidence.filter(e=>e.stance.length);h=`<div class="pt">${surePill(r.sure)}</div><div style="margin:6px 0;color:var(--ink)">${esc(r.title)}</div><div class="pr"><span>How sure</span><span>${Math.round(r.confidence*100)}%</span></div>`}
+  else{h=`<div class="pt">${svgI(K.icon,K.color)} ${K.one}</div><div style="margin:6px 0;color:var(--ink)">${esc(r.title)}</div>`}
+  pk.innerHTML=h;pk.style.display='block';
+  const x=Math.min(innerWidth-pk.offsetWidth-12,ev.clientX+18),y=Math.min(innerHeight-pk.offsetHeight-12,ev.clientY+14);pk.style.left=x+'px';pk.style.top=y+'px';
+}
+
+// ---------- popovers: tag, note, collect ----------
+let popFor=null;
+function openPop(kind,key,anchor){
+  const pop=$('pop'),r=recByKey(key)||findingsAsRecords().find(x=>x.key===key);popFor=key;$('peek').style.display='none';
+  if(kind==='tag'){let pick=TAGSW[0];
+    pop.innerHTML=`<h5>Tag “${esc(r.title.slice(0,40))}${r.title.length>40?'…':''}”</h5><div class="tagpick">${Object.entries(S.tags).map(([t,c])=>`<button data-t="${esc(t)}" class="${(S.recTags[key]||[]).includes(t)?'on':''}" style="background:${c}">${esc(t)}</button>`).join('')}</div>
+    <input id="newtag" placeholder="New tag name"><div class="swatches">${TAGSW.map((c,i)=>`<button data-c="${c}" class="${i?'':'on'}" style="background:${c}" aria-label="colour ${i+1}"></button>`).join('')}</div><div class="fa"><button class="btn p" id="addtag">Add new tag</button><button class="btn" id="closepop">Done</button></div>`;
+    pop.querySelectorAll('.swatches button').forEach(b=>b.onclick=()=>{pick=b.dataset.c;pop.querySelectorAll('.swatches button').forEach(x=>x.classList.toggle('on',x===b))});
+    pop.querySelectorAll('.tagpick button').forEach(b=>b.onclick=()=>{const t=b.dataset.t,a=S.recTags[key]=S.recTags[key]||[];a.includes(t)?a.splice(a.indexOf(t),1):a.push(t);b.classList.toggle('on');render()});
+    $('addtag').onclick=()=>{const t=$('newtag').value.trim();if(!t)return;S.tags[t]=pick;(S.recTags[key]=S.recTags[key]||[]).push(t);closePop();render();toast(`Tagged “${t}”`)};}
+  if(kind==='note'){pop.innerHTML=`<h5>Note on “${esc(r.title.slice(0,40))}…”</h5><textarea id="notet" placeholder="What you noticed, what to check, who to ask"></textarea><div class="fa"><button class="btn p" id="savenote">Save note</button><button class="btn" id="noteasl">Save and make a lead</button><button class="btn" id="closepop">Cancel</button></div>`;
+    const save=lead=>{const t=$('notet').value.trim();if(!t)return;(S.notes[key]=S.notes[key]||[]).push({text:t,at:'just now'});closePop();render();toast(lead?'Note saved and a lead made from it':'Note saved')};$('savenote').onclick=()=>save(false);$('noteasl').onclick=()=>save(true);setTimeout(()=>$('notet').focus(),0)}
+  if(kind==='collect'){pop.innerHTML=`<h5>Add to a collection</h5>${Object.keys(S.colls).map(c=>`<button class="btn" style="display:block;margin:4px 0;width:100%;box-sizing:border-box" data-coll="${esc(c)}">${S.colls[c].includes(key)?'✓ ':''}${esc(c)}</button>`).join('')}<input id="newcoll" placeholder="Or a new collection" style="margin-top:6px"><div class="fa"><button class="btn p" id="mkcoll">Create and add</button><button class="btn" id="closepop">Done</button></div>`;
+    pop.querySelectorAll('[data-coll]').forEach(b=>b.onclick=()=>{const c=S.colls[b.dataset.coll];if(!c.includes(key))c.push(key);closePop();render();toast(`Added to “${b.dataset.coll}”`)});
+    $('mkcoll').onclick=()=>{const n=$('newcoll').value.trim();if(!n)return;S.colls[n]=[key];closePop();render();toast(`Made “${n}”`)}}
+  const cb=$('closepop');if(cb)cb.onclick=closePop;
+  pop.style.display='block';const b=anchor.getBoundingClientRect();pop.style.left=Math.min(innerWidth-pop.offsetWidth-12,b.left-260)+'px';pop.style.top=Math.min(innerHeight-pop.offsetHeight-12,b.bottom+6)+'px';
+}
+function closePop(){$('pop').style.display='none';popFor=null}
+function toast(t){const el=$('toast');el.textContent=t;el.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>el.style.display='none',2200)}
+
+// ---------- events ----------
+$('q').addEventListener('input',e=>{S.q=e.target.value;S.kb=-1;render()});
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('q').focus();$('q').select();return}
+  if(e.key==='Escape'){closePop();return}
+  if($('pop').style.display==='block'||document.activeElement.tagName==='TEXTAREA'||(document.activeElement.tagName==='INPUT'&&document.activeElement.id!=='q'))return;
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();S.kb=Math.max(0,Math.min(VIS.length-1,S.kb+(e.key==='ArrowDown'?1:-1)));const el=document.querySelectorAll('.res')[S.kb];document.querySelectorAll('.res').forEach(x=>x.classList.remove('kb'));if(el){el.classList.add('kb');el.scrollIntoView({block:'nearest'})}return}
+  const cur=document.querySelectorAll('.res')[S.kb];if(!cur||document.activeElement.id==='q'&&!['Enter'].includes(e.key))return;
+  const k=cur.dataset.key;if(e.key==='Enter'){S.sel=k;render()}if(e.key.toLowerCase()==='t')openPop('tag',k,cur);if(e.key.toLowerCase()==='n')openPop('note',k,cur);if(e.key.toLowerCase()==='c')openPop('collect',k,cur);
+});
+$('results').addEventListener('mousemove',e=>{const c=e.target.closest('.res');if(!c||e.target.closest('.acts')){peek(null);return}const r=recByKey(c.dataset.key)||findingsAsRecords().find(x=>x.key===c.dataset.key);peek(r,e)});
+$('results').addEventListener('mouseleave',()=>peek(null));
+$('results').addEventListener('click',e=>{const c=e.target.closest('.res');if(!c)return;const k=c.dataset.key,a=e.target.closest('[data-act]');
+  if(a){const act=a.dataset.act;if(act==='tag'||act==='note'||act==='collect')openPop(act,k,a);
+    if(act==='trace')toast('Opens the provenance trail for this record in a side drawer');
+    if(act==='lookup'){S.tab='look';S.open.add(k.slice(2));render()}
+    if(act==='accept'){S.accepted.add(k.slice(2));render();toast('Accepted. Patterns re-checked: see Red Flags');S.tab='dig';render()}
+    if(act==='aside'){S.dismissed.add('f'+k.slice(2));FINDINGS.splice(FINDINGS.findIndex(f=>f.id===k.slice(2)),1);render()}
+    return}
+  S.sel=k;render()});
+$('facets').addEventListener('click',e=>{const b=e.target.closest('[data-facet],[data-sort]');if(!b)return;if(b.dataset.sort)S.sort=b.dataset.sort;else{const s=S.f[b.dataset.facet],v=b.dataset.val;s.has(v)?s.delete(v):s.add(v)}render()});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b){S.tab=b.dataset.tab;renderPanel()}});
+$('pbody').addEventListener('click',e=>{const b=e.target.closest('[data-act],[data-mode],[data-party-toggle]');if(!b)return;
+  if(b.dataset.mode){S.lookupMode=b.dataset.mode;if(S.lookupMode!=='auto'){for(let i=FINDINGS.length-1;i>=0;i-=1)if(!S.accepted.has(FINDINGS[i].id))FINDINGS.splice(i,1)}render();return}
+  if(b.dataset.partyToggle){const id=b.dataset.partyToggle;S.open.has(id)?S.open.delete(id):S.open.add(id);renderPanel();return}
+  const a=b.dataset.act;
+  if(a==='accept'){S.accepted.add(b.dataset.find);render();toast('Accepted into the record. Patterns re-checked.');S.tab='dig';render()}
+  if(a==='aside'){S.dismissed.add('f'+b.dataset.find);render()}
+  if(a==='dismiss'){S.dismissed.add(b.dataset.flag);render();toast('Marked not relevant. It stays in the record of decisions.')}
+  if(a==='lead')toast('A lead is made with the pattern, its parties and its source attached');
+  if(a==='show')toast('Opens the network with these parties lit and the rest dimmed');
+  if(a==='runlook'||a==='runone'){const id=b.dataset.party;const was=S.lookupMode;S.lookupMode='auto';ensureFindings();S.lookupMode=was==='off'?'off':was;S.tab='look';S.open.add(id);render();toast('Lookups run for '+P(id).name)}
+  if(a==='chartcoll')chartColl(b.dataset.coll);
+  if(a==='filtercoll')toast('Every chart lights this collection and dims the rest');
+  if(a==='newcoll'){const n='New collection '+(Object.keys(S.colls).length+1);S.colls[n]=[];renderPanel()}
+  if(a==='notelead')toast('A lead is made from this note, linked to its record');
+});
+render();
+</script></body></html>

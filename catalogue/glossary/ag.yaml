@@ -1,0 +1,214 @@
+area: AG
+terms:
+- term: Aggression
+  definition: One state using armed force against another state's sovereignty, territory or political
+    independence, or otherwise against the UN Charter.
+  examples: []
+  source_url: https://hrlibrary.umn.edu/instree/GAres3314.html
+  cases: []
+  related:
+  - Act of aggression
+  - Crime of aggression
+  indicators: []
+  areas:
+  - AG
+- term: Act of aggression
+  definition: One of the state acts listed in Article 3 of UNGA Resolution 3314, such as invasion, bombardment,
+    blockade or sending armed bands.
+  examples: []
+  source_url: https://hrlibrary.umn.edu/instree/GAres3314.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Crime of aggression
+  definition: The individual crime of planning, preparing, starting or carrying out an act of aggression
+    that is a manifest violation of the UN Charter, committed by someone who controls or directs a state's
+    political or military action.
+  examples: []
+  source_url: https://treaties.un.org/doc/Publication/CN/2010/CN.651.2010-Eng.pdf
+  cases: []
+  related:
+  - Leadership clause
+  - Manifest violation
+  indicators: []
+  areas:
+  - AG
+- term: Leadership clause
+  definition: The rule that only a person able to effectively control or direct a state's political or
+    military action can commit the crime of aggression.
+  examples: []
+  source_url: https://treaties.un.org/doc/Publication/CN/2010/CN.651.2010-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Manifest violation
+  definition: A breach of the UN Charter serious enough by its character, gravity and scale to count as
+    the crime of aggression.
+  examples: []
+  source_url: https://treaties.un.org/doc/Publication/CN/2010/CN.651.2010-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Armed bands, irregulars or mercenaries
+  definition: Non-regular fighters a state sends or substantially backs to use force against another state;
+    sending them is an act of aggression if the force is grave enough.
+  examples: []
+  source_url: https://hrlibrary.umn.edu/instree/GAres3314.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Mercenary
+  definition: A person specially recruited to fight, mainly for private gain and well-above-normal pay,
+    who is not a national, resident or member of the armed forces of a party.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-against-recruitment-use-financing-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Private military and security company (PMSC)
+  definition: A private business that provides military or security services, whatever it calls itself.
+  examples: []
+  source_url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Montreux Document
+  definition: A 2008 intergovernmental document, promoted by Switzerland and the ICRC, setting out states'
+    legal obligations and good practices on private military and security companies in armed conflict.
+  examples: []
+  source_url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Direct participation in hostilities
+  definition: Taking part in fighting; the Montreux Document advises states to weigh whether a contracted
+    service could draw PMSC staff into it.
+  examples: []
+  source_url: https://www.icrc.org/sites/default/files/event/file_list/montreux_document_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Coup d'etat
+  definition: An organised effort using illegal or irregular means that credibly threatens to seize, remove
+    or disempower those with meaningful control over national policy.
+  examples: []
+  source_url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Auto-coup (self-coup)
+  definition: A coup in which the sitting chief executive illegally takes extraordinary powers or disables
+    other branches of government.
+  examples: []
+  source_url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Dissident coup
+  definition: A coup started by a small group of discontents, which can include former officials, religious
+    leaders, business owners or civilians.
+  examples: []
+  source_url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Attempted coup
+  definition: A coup in which action is taken against the target but fails.
+  examples: []
+  source_url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Coup conspiracy
+  definition: A coup that is planned but stopped before any action is taken.
+  examples: []
+  source_url: https://clinecenter.illinois.edu/coup-detat-project/statement_dec.15.2022
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Seditious conspiracy
+  definition: 'A US federal crime: two or more people agreeing to overthrow the government by force, levy
+    war against it, or forcibly oppose its authority; up to 20 years in prison.'
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/2384
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Quick reaction force (QRF)
+  definition: In the Oath Keepers case, armed teams stationed outside Washington ready to bring firearms
+    into the city quickly.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/court-sentences-two-oath-keepers-leaders-seditious-conspiracy-and-other-charges-related-us
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Unauthorized private militia
+  definition: An armed group that carries out military or law-enforcement functions without being called
+    up by a governor or federal government and without reporting to any government authority.
+  examples: []
+  source_url: https://www.law.georgetown.edu/icap/wp-content/uploads/sites/32/2020/09/Illinois.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Paramilitary training (Illinois)
+  definition: Teaching or training in weapons, explosives or techniques able to kill or injure, knowing
+    or intending them to be used in a civil disorder; a felony in Illinois.
+  examples: []
+  source_url: https://www.law.georgetown.edu/icap/wp-content/uploads/sites/32/2020/09/Illinois.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Battalion tactical group
+  definition: A Russian combined-arms combat unit; US officials counted possible Russian forces near Ukraine
+    in these units before 2022.
+  examples: []
+  source_url: https://warontherocks.com/2022/05/intelligence-and-the-war-in-ukraine-part-1/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG
+- term: Transnational criminal organization (EO 13581)
+  definition: A US Treasury designation for foreign groups engaged in serious transnational crime, applied
+    to the Wagner Group in 2023.
+  examples: []
+  source_url: https://home.treasury.gov/news/press-releases/jy1220
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AG

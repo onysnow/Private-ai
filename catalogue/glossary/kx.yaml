@@ -1,0 +1,212 @@
+area: KX
+terms:
+- term: Virtual kidnapping
+  definition: A phone extortion scam where criminals claim to have kidnapped a relative and demand a fast
+    ransom, although no one has actually been taken.
+  examples: []
+  source_url: https://www.fbi.gov/news/stories/virtual-kidnapping
+  cases: []
+  related:
+  - Extortion
+  indicators: []
+  areas:
+  - KX
+- term: Kidnapping
+  definition: Holding a person without legal authority. FATF uses this definition.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related:
+  - Kidnapping for ransom (KFR)
+  - Hostage taking
+  indicators: []
+  areas:
+  - KX
+- term: Kidnapping for ransom (KFR)
+  definition: Kidnapping a person in order to get money or other benefits for their release. FATF treats
+    it as a type of hostage taking.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related:
+  - Hostage taking
+  indicators: []
+  areas:
+  - KX
+- term: Piracy for ransom (PFR)
+  definition: Hijacking ships at sea and holding the crew or vessel until a ransom is paid.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Extortion
+  definition: Getting money or goods from someone through threats of violence or harm. FINTRAC describes
+    the diaspora campaign as 'a sustained campaign of coercion'.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Protection racket
+  definition: Regular payments, often called 'taxes' or 'fees', forced from businesses or residents in
+    return for 'protection' from the group demanding them.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Hawala
+  definition: An informal money-transfer system in which brokers move value between places through trust
+    and offsetting balances, often without wiring money directly.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related:
+  - Informal remittance
+  indicators: []
+  areas:
+  - KX
+- term: Intermediary (negotiator or courier)
+  definition: A third party who negotiates a ransom or physically delivers it between the payer and the
+    kidnappers.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Airdrop
+  definition: Delivering a cash ransom by dropping it from an aircraft to a hijacked ship. FATF says about
+    80% of piracy ransoms were delivered this way.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Cash courier
+  definition: A person who physically carries cash, sometimes across borders, on behalf of others.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Emerging-Terrorist-Financing-Risks.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Structuring
+  definition: Splitting cash deposits or withdrawals into smaller amounts or across branches and ATMs,
+    often to stay below reporting thresholds.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Funnelling (many-to-one)
+  definition: Many different senders paying into one account, which then sends the money on.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  cases: []
+  related:
+  - Flow-through
+  indicators: []
+  areas:
+  - KX
+- term: Flow-through activity
+  definition: Money that comes into an account and goes out again quickly, so the account works as a pass-through.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Email money transfer
+  definition: A bank transfer sent to a recipient's email address or phone number. In Canada this is mainly
+    Interac e-Transfer.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Adverse media
+  definition: News coverage linking a person or company to crime or misconduct, used as a risk signal
+    in customer checks.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Suspicious transaction report (STR)
+  definition: A report a bank or other regulated business must file with the national financial intelligence
+    unit when a transaction looks linked to crime.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Financial intelligence unit (FIU)
+  definition: The national agency that receives and analyses suspicious transaction reports, such as FINTRAC
+    in Canada or FinCEN in the United States.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Targeted Indicator Profile (TIP sheet)
+  definition: A FINTRAC indicator profile on extortion proceeds, shared only with key financial institutions
+    and not public.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/extortion-extorsion/profiles-profils-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: '#TAPEX'
+  definition: The term FINTRAC asks reporting entities to put in suspicious transaction reports about
+    extortion proceeds (Operation TAPEX).
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Terrorist entity listing (Canada)
+  definition: A Canadian government decision to list a group under the Criminal Code, as was done for
+    the Bishnoi Gang in September 2025.
+  examples: []
+  source_url: https://www.canada.ca/en/public-safety-canada/news/2025/09/government-of-canada-lists-the-bishnoi-gang-as-a-terrorist-entity.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX
+- term: Docking fees
+  definition: Payments that pirates reportedly made to al-Shabaab to use coastline it controlled.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - KX

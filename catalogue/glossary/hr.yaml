@@ -1,0 +1,1272 @@
+area: HR
+terms:
+- term: Antiquity
+  definition: An old object, often from archaeological digs; UNESCO's list covers antiquities more than
+    100 years old.
+  examples: []
+  source_url: https://www.unesco.org/en/legal-affairs/convention-means-prohibiting-and-preventing-illicit-import-export-and-transfer-ownership-cultural
+  cases: []
+  related:
+  - Cultural property
+  indicators: []
+  areas:
+  - HR
+- term: Cultural property
+  definition: Property a state designates as important for archaeology, history, art, science and similar
+    fields, in the categories of the 1970 UNESCO Convention, Art. 1.
+  examples: []
+  source_url: https://www.unesco.org/en/legal-affairs/convention-means-prohibiting-and-preventing-illicit-import-export-and-transfer-ownership-cultural
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Illicit import, export or transfer (cultural property)
+  definition: Moving or transferring cultural property in breach of the rules states adopt under the 1970
+    UNESCO Convention (Art. 3).
+  examples: []
+  source_url: https://www.unesco.org/en/legal-affairs/convention-means-prohibiting-and-preventing-illicit-import-export-and-transfer-ownership-cultural
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Provenance (objects)
+  definition: The full ownership history of an item from discovery or creation to today, which supports
+    authenticity and ownership.
+  examples: []
+  source_url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Valid title
+  definition: An undisputed right to own property, backed by full provenance since discovery or production.
+  examples: []
+  source_url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Due diligence
+  definition: Making every effort to establish the facts, especially the source and history of an item,
+    before acting or acquiring it.
+  examples: []
+  source_url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Looting
+  definition: Unauthorised removal of cultural artefacts or human remains, typically from archaeological
+    sites.
+  examples: []
+  source_url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Free trade zone / freeport
+  definition: Areas set up within a jurisdiction to promote trade, where goods can be stored with lighter
+    customs controls; FATF flags them as a risk for art.
+  examples: []
+  source_url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: ICOM Red List
+  definition: Lists of categories of cultural objects at risk of illicit trade, used to check whether
+    an object type needs extra scrutiny.
+  examples: []
+  source_url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Import licence / importer statement (EU)
+  definition: Under EU Regulation 2019/880, high-risk archaeological goods over 250 years old need a licence,
+    and other listed goods over 200 years and EUR 18,000 need a signed importer statement.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019R0880
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Suspicious Activity Report (SAR)
+  definition: A report US financial institutions file with FinCEN on possibly illicit transactions; FinCEN
+    asks filers to tag antiquities/art cases 'FIN-2021-NTC2'.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/2021-03/FinCEN%20Notice%20on%20Antiquities%20and%20Art_508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Crimes relating to antiquities and art
+  definition: FinCEN lists looting, theft, illicit excavation, smuggling, sale of stolen or fake objects,
+    money laundering and sanctions violations.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/2021-03/FinCEN%20Notice%20on%20Antiquities%20and%20Art_508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Conflict-affected and high-risk area (CAHRA)
+  definition: An area with armed conflict, widespread violence or other risks of harm to people, often
+    with widespread human rights abuses.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Red flag location of mineral origin and transit
+  definition: 'OECD''s term for an origin or transit point that triggers enhanced due diligence: a CAHRA,
+    a country whose declared output exceeds its reserves, or a known transit country.'
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: 3T / 3TG
+  definition: 'Tin (cassiterite), tantalum (tantalite/coltan), tungsten (wolframite), plus gold: the minerals
+    covered by the OECD supplements.'
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Upstream / known upstream companies
+  definition: Actors from the mine to the smelter or refiner, including immediate suppliers and any known
+    actors further up the chain.
+  examples: []
+  source_url: https://www.lme.com/-/media/Files/Company/Responsibility/Responsible-sourcing/LME-responsible-sourcing-supplier-red-flags-guidance-February-2021.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Direct or indirect support to non-state armed groups
+  definition: Buying minerals from, paying, or giving logistics or equipment to armed groups or their
+    affiliates who control or tax the mineral trade.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Affiliates (of armed groups)
+  definition: Négociants, consolidators, intermediaries and others who work directly with armed groups
+    to help extract or trade minerals.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Extort (OECD)
+  definition: Demanding money or minerals under threat of violence or penalty, often for access to mines,
+    routes or trade.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Forced or compulsory labour
+  definition: Work taken from a person under threat of penalty that they did not volunteer for.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Conflict diamonds
+  definition: Rough diamonds used by rebel movements or their allies to finance conflict against legitimate
+    governments, as described by UN resolutions.
+  examples: []
+  source_url: https://www.kimberleyprocess.com/en/what-kp
+  cases: []
+  related:
+  - Kimberley Process certificate
+  indicators: []
+  areas:
+  - HR
+- term: Kimberley Process certificate
+  definition: The certificate that must travel with every rough diamond export of a KP participant, stating
+    the diamonds are conflict-free.
+  examples: []
+  source_url: https://www.kimberleyprocess.com/en/what-kp
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Crony companies
+  definition: Private businesses with strong and lasting business and family ties to a military, as described
+    for Myanmar by the UN Fact-Finding Mission.
+  examples: []
+  source_url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: War crimes
+  definition: Serious violations of the laws of war, such as grave breaches of the Geneva Conventions,
+    listed in Rome Statute Art. 8.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Crime against humanity
+  definition: Listed acts such as murder or torture committed as part of a widespread or systematic attack
+    on civilians, with knowledge of the attack.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Genocide
+  definition: Listed acts committed with intent to destroy, in whole or in part, a national, ethnic, racial
+    or religious group.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Persecution
+  definition: Intentional, severe deprivation of fundamental rights because of a group's identity, contrary
+    to international law.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Enslavement
+  definition: Exercising powers of ownership over a person, including in the course of trafficking in
+    persons.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Deportation or forcible transfer
+  definition: Forcing people out of an area where they are lawfully present by expulsion or coercion without
+    lawful grounds.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Enforced disappearance
+  definition: Arrest or abduction by or with state or political organisation support, followed by refusal
+    to acknowledge it or reveal the person's fate.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Pillage
+  definition: Taking property for private use in war without the owner's consent; a war crime under Rome
+    Statute Art. 8(2)(b)(xvi).
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Aiding and abetting
+  definition: Helping, encouraging or supporting the commission of a crime by others; the mode of liability
+    in the Charles Taylor conviction.
+  examples: []
+  source_url: https://www.jurist.org/news/2013/09/charles-taylors-50-year-sentence-upheld-on-appeal/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Material support (terrorism)
+  definition: Providing money, goods or services to a designated terrorist organisation, a US federal
+    crime; basis of the Lafarge plea.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Civil forfeiture
+  definition: A legal action against property itself, claiming it is linked to a crime; claims in a complaint
+    are allegations until decided or settled.
+  examples: []
+  source_url: https://www.justice.gov/usao-dc/pr/united-states-files-complaint-seeking-forfeiture-antiquities-associated-islamic-state
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Open source information
+  definition: Information any member of the public can observe, buy or request without special legal status
+    or unauthorised access.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Digital open source investigation
+  definition: An investigation based on publicly available digital information such as social media posts,
+    videos, satellite images and government data.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Chain of custody
+  definition: A dated record of everyone who held, moved or analysed a piece of evidence and what they
+    did with it.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Hash value
+  definition: A fixed-length string calculated from a file that stays the same as long as the file is
+    unchanged, used to show it was not altered.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Metadata
+  definition: Data about a file, such as its creator, dates, size and location, that can help establish
+    authenticity.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Verification
+  definition: Establishing the accuracy of online information by examining the source, the file and the
+    content together.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Source analysis
+  definition: Assessing a source's credibility and reliability, including attribution, posting history
+    and independence.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Technical analysis
+  definition: Examining a digital file itself (metadata, source code, identifiers) to test whether it
+    was altered.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Content analysis
+  definition: Assessing what an image, video or document shows for authenticity and truth, including visual
+    clues and consistency.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Geolocation
+  definition: Identifying where an image or video was taken, for example by matching landmarks to a map.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Chronolocation
+  definition: Confirming the date and time of events shown, for example from shadow length.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Provenance (online content)
+  definition: The earliest known appearance of an item online; investigators speak of the 'first copy
+    found online'.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Circular reporting
+  definition: Sources repeating each other so one claim appears independently confirmed; the Berkeley
+    Protocol lists it as a validity issue.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: WHOIS
+  definition: A record of who registered a domain name, used in source analysis.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Caesar files
+  definition: About 27,000 photographs of bodies of Syrian detainees taken by a military photographer
+    and smuggled out; used as evidence in the Koblenz trial.
+  examples: []
+  source_url: https://iiim.un.org/wp-content/uploads/2025/07/1StE9_19-Judgment_Unofficial-IIIM-Translation_ENG.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Atrocity crimes
+  definition: The UN's umbrella term for genocide, crimes against humanity and war crimes.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related:
+  - Genocide
+  - Crimes against humanity
+  - War crimes
+  indicators: []
+  areas:
+  - HR
+- term: Framework of Analysis for Atrocity Crimes
+  definition: A UN tool (2014, sent to the General Assembly and Security Council in 2016) listing 14 risk
+    factors and their indicators, used to judge whether atrocity crimes may be coming.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related:
+  - Risk factor
+  - Indicator
+  indicators: []
+  areas:
+  - HR
+- term: Risk factor
+  definition: In the UN Framework, a condition that raises the chance of atrocity crimes or shows they
+    may be happening; eight are common to all such crimes and six are specific to genocide, crimes against
+    humanity or war crimes.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Indicator (atrocity early warning)
+  definition: A sign that shows whether, and how strongly, a risk factor is present; the Framework's lists
+    are not exhaustive or ranked.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Enabling circumstances or preparatory action
+  definition: 'Risk factor 7: events or measures that create an environment for atrocities or suggest
+    someone is preparing them.'
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Triggering factors
+  definition: 'Risk factor 8: events, sometimes unrelated, that can suddenly worsen a situation or set
+    off atrocities, such as elections or assassinations.'
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Mitigating factors
+  definition: Things that can prevent or reduce violence, such as a free press, civil society or international
+    presence; their absence is Risk factor 6.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Protected group
+  definition: In the Framework, any national, ethnical, racial or religious group protected by Article
+    2 of the Genocide Convention.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Genocidal intent
+  definition: The specific intent to destroy a protected group in whole or in part; courts may infer it
+    from context and from other acts systematically aimed at the same group.
+  examples: []
+  source_url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-96-4/trial-judgements/en/980902.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Attack directed against any civilian population
+  definition: Under the Rome Statute, repeated crimes against civilians carried out under or to further
+    a state or organisational policy; the context needed for crimes against humanity.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Direct and public incitement to commit genocide
+  definition: Directly and publicly urging others to commit genocide; a crime even if no genocide follows.
+  examples:
+  - RTLM radio and Kangura newspaper, Rwanda 1994
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Rabat threshold test
+  definition: Six questions from the UN Rabat Plan of Action (context, speaker, intent, content and form,
+    extent, likelihood including imminence) for deciding when hateful speech is serious enough to be a
+    crime.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Rabat_draft_outcome.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Militia / paramilitary group
+  definition: An armed group outside, or alongside, the regular armed forces, often formed or backed by
+    political actors; their creation or support is a Framework indicator.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Internet shutdown / communications blackout
+  definition: Deliberate cutting or blocking of internet, phone or other communication services for an
+    area or population.
+  examples: []
+  source_url: https://documents.un.org/api/symbol/access?s=A/HRC/51/46&l=en&t=pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Statelessness (de facto)
+  definition: Being in practice without any nationality, as the UN mission found for most Rohingya after
+    exclusionary citizenship laws.
+  examples: []
+  source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Impunity
+  definition: Serious crimes going unpunished; the Framework treats a policy or practice of impunity as
+    a risk factor for future atrocities.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Fact-finding mission / commission of inquiry
+  definition: A body appointed by the UN (for example by the Human Rights Council) to investigate violations
+    and report findings; it is not a court and its findings are not convictions.
+  examples: []
+  source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Conspiracy to commit genocide
+  definition: An agreement to commit genocide; at the ICTR, when proved only by circumstantial evidence,
+    it must be the only reasonable inference from the evidence.
+  examples: []
+  source_url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-98-41/trial-judgements/en/081218.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Perfidy (treachery)
+  definition: Deceiving the enemy by misusing protected symbols such as Red Cross or UN emblems, or by
+    fighters pretending to be civilians.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: International Criminal Tribunal for Rwanda (ICTR)
+  definition: The UN court that tried those most responsible for the 1994 Rwandan genocide; its records
+    are now held by the International Residual Mechanism for Criminal Tribunals (IRMCT).
+  examples: []
+  source_url: https://unictr.irmct.org/en/cases/ictr-99-52
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Conflict-related sexual violence (CRSV)
+  definition: Rape, sexual slavery, forced prostitution, forced pregnancy, enforced sterilisation or comparable
+    sexual violence linked in time, place or cause to a conflict or political strife.
+  examples: []
+  source_url: https://www.stoprapenow.org/wp-content/uploads/2022/03/Matrix-Early-Warning-Indicators-of-CRSV-Online-Version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Potential, impending and ongoing risk (CRSV matrix)
+  definition: 'The UN matrix''s three grades: possible risk in the medium to long term, sexual violence
+    likely soon, and sexual violence happening now or likely to escalate.'
+  examples: []
+  source_url: https://www.stoprapenow.org/wp-content/uploads/2022/03/Matrix-Early-Warning-Indicators-of-CRSV-Online-Version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: War crime
+  definition: A serious breach of the laws of war that carries individual criminal responsibility; Article
+    8 of the Rome Statute lists the war crimes the ICC can try.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Grave breaches of the Geneva Conventions
+  definition: The most serious violations of the 1949 Geneva Conventions against protected persons or
+    property, listed in Rome Statute Art. 8(2)(a).
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: International and non-international armed conflict
+  definition: Wars between states versus protracted fighting between a government and organised armed
+    groups or between such groups; the Rome Statute lists slightly different war crimes for each.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Military objective
+  definition: Something that may lawfully be attacked; schools, hospitals and homes are protected unless
+    they become military objectives.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Proportionality
+  definition: The rule against attacks expected to cause civilian harm that is excessive compared with
+    the concrete and direct military advantage anticipated.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Distinctive emblems
+  definition: The red cross, red crescent and red crystal symbols of the Geneva Conventions that mark
+    protected medical units, transport and personnel.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Attack on health care (WHO)
+  definition: Any verbal or physical violence, obstruction or threat that interferes with access to and
+    delivery of health services during emergencies.
+  examples: []
+  source_url: https://www.who.int/news-room/q-a-detail/attacks-on-healthcare-initiative-documenting-the-problem
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Surveillance System for Attacks on Health Care (SSA)
+  definition: WHO's global database of attacks on health care; each report is graded rumour, possible,
+    probable or confirmed, and rumours are not published.
+  examples: []
+  source_url: https://extranet.who.int/ssa/LeftMenu/Index.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Attack on education (GCPEA)
+  definition: Any threatened or actual use of force against students, teachers, education staff, buildings
+    or resources by armed forces, police, security forces or armed groups.
+  examples: []
+  source_url: https://protectingeducation.org/wp-content/uploads/eua_2026_methodology.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Military use of schools
+  definition: Armed forces or groups partly or fully occupying schools or universities for military purposes,
+    such as bases, barracks, weapons stores or detention.
+  examples: []
+  source_url: https://protectingeducation.org/wp-content/uploads/eua_2026_methodology.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Safe Schools Guidelines
+  definition: Six non-binding guidelines asking parties not to use functioning schools and universities
+    for military purposes and to build this into doctrine.
+  examples: []
+  source_url: https://protectingeducation.org/wp-content/uploads/documents/documents_guidelines_en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Six grave violations
+  definition: 'The violations against children the UN monitors in war: killing and maiming, recruitment
+    or use, sexual violence, abduction, attacks on schools or hospitals, and denial of humanitarian access.'
+  examples: []
+  source_url: https://childrenandarmedconflict.un.org/six-grave-violations/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Monitoring and Reporting Mechanism (MRM)
+  definition: The system the UN Security Council set up in 2005 to monitor, document and report violations
+    against children in armed conflict.
+  examples: []
+  source_url: https://childrenandarmedconflict.un.org/six-grave-violations/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Listing (annexes of the SG report on children and armed conflict)
+  definition: The UN naming of parties to conflict that commit trigger violations against children; listed
+    parties are asked to agree time-bound action plans.
+  examples: []
+  source_url: https://childrenandarmedconflict.un.org/six-grave-violations/attacks-against-schools/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Airwars civilian harm grades
+  definition: 'Airwars'' ranking of alleged civilian-casualty incidents: Confirmed, Fair, Weak, Contested
+    and Discounted.'
+  examples: []
+  source_url: https://airwars.org/about/methodology
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Airwars strike attribution grades
+  definition: 'Airwars'' ranking of who carried out a strike: Declared, Likely, Contested or Single source
+    claim.'
+  examples: []
+  source_url: https://airwars.org/about/methodology
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Objects indispensable to survival
+  definition: Things civilians need to live, such as food, crops, livestock, drinking water installations
+    and irrigation works, protected by Article 54(2) of Additional Protocol I.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Starvation (IHL sense)
+  definition: Depriving people of what they need to survive, including food, water and other essentials
+    such as heating fuel; no one has to die for starvation to occur.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Siege
+  definition: Encirclement that lets a force control entry and exit of supplies and people; not banned
+    as such, but all IHL rules apply.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Integrated Food Security Phase Classification (IPC)
+  definition: A multi-partner scale for food insecurity running from Phase 1 to Phase 5 (Famine), used
+    to declare famine when set thresholds are met.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Famine Review Committee
+  definition: An independent IPC panel that checks whether famine thresholds have plausibly been reached.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: UN Security Council resolution 2417 (2018)
+  definition: The Security Council resolution on conflict-induced food insecurity, noting that unlawful
+    denial of humanitarian access can threaten international peace and security.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: White Note
+  definition: A rapid early-warning report from the UN to the Security Council when there is a risk of
+    conflict-induced famine, issued under resolution 2417.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Arbitrary withholding of consent
+  definition: Refusing humanitarian relief for unlawful reasons, for example to starve, punish or discriminate
+    against civilians.
+  examples: []
+  source_url: https://alnap.org/documents/21908/Conflict_Hunger_and_International_Humanitarian_Law_A_Practitioners_Legal_Handbook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Hostage-taking
+  definition: Seizing or holding someone and threatening them in order to force a third party to act or
+    not act as the condition for release.
+  examples: []
+  source_url: https://guide-humanitarian-law.org/content/article/3/hostages
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Human shields
+  definition: Using the presence of civilians or other protected people to protect places or forces from
+    attack, which IHL prohibits.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Occupying Power
+  definition: A state that has taken effective control of territory that is not its own; it may not move
+    its own civilians into that territory.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: OHCHR settlement business database
+  definition: The UN human rights office's list of companies with reasonable grounds to believe they are
+    involved in ten listed activities supporting Israeli settlements.
+  examples: []
+  source_url: https://www.un.org/unispal/wp-content/uploads/2020/02/A.HRC_.43.71.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Reasonable grounds to believe
+  definition: The evidence standard used by UN inquiries and the OPCW IIT; lower than proof beyond reasonable
+    doubt in a criminal court.
+  examples: []
+  source_url: https://www.opcw.org/media-centre/news/2020/04/opcw-releases-first-report-investigation-and-identification-team
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: OPCW Investigation and Identification Team (IIT)
+  definition: The OPCW unit that identifies who used chemical weapons in Syria; it does not assign individual
+    criminal responsibility.
+  examples: []
+  source_url: https://www.opcw.org/media-centre/news/2020/04/opcw-releases-first-report-investigation-and-identification-team
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Advisory opinion (ICJ)
+  definition: A non-binding legal opinion of the International Court of Justice given at the request of
+    a UN body.
+  examples: []
+  source_url: https://www.icj-cij.org/node/204176
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Command responsibility
+  definition: Criminal liability of a military commander for crimes by forces under their effective control,
+    under Rome Statute Article 28.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/CaseInformationSheets/BembaEng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Mass atrocities
+  definition: Large-scale, deliberate attacks on civilians; often war crimes, crimes against humanity,
+    ethnic cleansing or genocide.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related:
+  - Genocide
+  - Crimes against humanity
+  indicators: []
+  areas:
+  - HR
+- term: Politicide
+  definition: Harff's term for sustained state policies to destroy a group defined by its politics, studied
+    together with genocide.
+  examples: []
+  source_url: https://adambrown.info/p/notes/harff_no_lessons_learned_from_the_holocaust
+  cases: []
+  related:
+  - Genocide
+  indicators: []
+  areas:
+  - HR
+- term: Crimes against humanity
+  definition: Listed acts such as murder, deportation, persecution or apartheid committed as part of a
+    widespread or systematic attack on a civilian population, with knowledge of the attack.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related:
+  - Attack directed against any civilian population
+  indicators: []
+  areas:
+  - HR
+- term: Apartheid (crime of)
+  definition: Inhumane acts committed within an institutionalised regime of systematic oppression and
+    domination by one racial group over another, meant to keep that regime in place.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related:
+  - Apartheid Convention
+  indicators: []
+  areas:
+  - HR
+- term: Apartheid Convention
+  definition: The 1973 UN treaty that declares apartheid a crime against humanity and lists the inhuman
+    acts that make up the crime; it came into force in 1976.
+  examples: []
+  source_url: https://legal.un.org/avl/pdf/ha/cspca/cspca_e.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Extermination
+  definition: Under the Rome Statute, includes deliberately imposing living conditions, such as denying
+    food and medicine, calculated to destroy part of a population.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Ten Stages of Genocide
+  definition: Gregory Stanton's model of ten overlapping processes (classification, symbolization, discrimination,
+    dehumanization, organization, polarization, preparation, persecution, extermination, denial) used
+    to spot warning signs.
+  examples: []
+  source_url: https://www.genocidewatch.com/tenstages
+  cases: []
+  related:
+  - Genocide Watch alert levels
+  indicators: []
+  areas:
+  - HR
+- term: Othering
+  definition: 'James Waller''s term, quoted by Stanton, for the combined result of the first four stages:
+    classification, symbolization, discrimination and dehumanization.'
+  examples: []
+  source_url: https://www.genocidewatch.com/tenstages
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Genocide Watch alert levels
+  definition: 'Genocide Watch''s three country alerts: Watch (early stages), Warning (preparation and
+    persecution), Emergency (genocidal massacres).'
+  examples: []
+  source_url: https://www.genocidewatch.com/countries-at-risk
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Early Warning Project
+  definition: A USHMM project that publishes a yearly statistical risk assessment of new mass killing
+    in each country, built from over 30 variables.
+  examples: []
+  source_url: https://earlywarningproject.ushmm.org/methodology-statistical-model
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Dangerous speech
+  definition: Inflammatory hate speech of the kind commonly seen before and during genocide and mass atrocities,
+    such as dehumanising a group or accusing it of plotting harm.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Trigger (atrocity)
+  definition: A discrete, highly salient event, such as an assassination or coup, that changes a potential
+    perpetrator's calculation and sets off atrocities.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Window of atrocity risk
+  definition: A change in circumstances that raises perpetrators' incentives or ability to commit atrocities,
+    such as elections, major legal reforms or distracted outside powers.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Resiliencies
+  definition: Relationships, structures or processes that settle disputes and meet needs without violence
+    and can be used to prevent atrocities.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Enablers
+  definition: Local to international actors that supply perpetrators with goods, services, training or
+    political support needed to commit atrocities.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related:
+  - Disablers
+  - Bystanders
+  indicators: []
+  areas:
+  - HR
+- term: Disablers
+  definition: Actors, from local groups to the UN and courts, who work to prevent or respond to atrocities.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Bystanders
+  definition: People who witness but are not directly affected by atrocities and neither support nor resist
+    them.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: DDR (disarmament, demobilization and reintegration)
+  definition: Programmes that disarm fighters and return them to civilian life; the AAF says poorly run
+    DDR is a window of atrocity risk.
+  examples: []
+  source_url: https://sites.utexas.edu/conflict-management/wp-content/uploads/sites/5179/2021/05/Atrocity-Assessment-Framework-2015-March-20.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: De facto statelessness
+  definition: Being left without any effective nationality in practice; the Myanmar mission found most
+    Rohingya in this position.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/A_HRC_39_64.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: VETC facilities
+  definition: '''Vocational Education and Training Centres'' in Xinjiang, which OHCHR assessed as places
+    of arbitrary and discriminatory detention.'
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/documents/countries/2022-08-31/22-08-31-final-assesment.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: V-Dem
+  definition: The Varieties of Democracy dataset, the source of many Early Warning Project risk variables
+    such as political killings and party bans.
+  examples: []
+  source_url: https://earlywarningproject.ushmm.org/methodology-risk-factors
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Ethnic Power Relations (EPR) dataset
+  definition: A dataset coding which ethnic groups hold or are excluded from state power; the Early Warning
+    Project uses it for the share of the population discriminated against.
+  examples: []
+  source_url: https://earlywarningproject.ushmm.org/methodology-risk-factors
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Political upheaval (Harff)
+  definition: An abrupt change in the political community, such as violent conflict, redrawn boundaries
+    or defeat in war, used as a precondition in Harff's model.
+  examples: []
+  source_url: https://adambrown.info/p/notes/harff_no_lessons_learned_from_the_holocaust
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR

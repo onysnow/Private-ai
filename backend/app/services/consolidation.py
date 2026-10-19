@@ -1,9 +1,11 @@
 import hashlib
 import re
 from itertools import combinations
+from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from app.models.domain import ConnectorFinding, EnrichmentSessionFinding
+from app.schemas.api import CrossProviderDecisionRequest
+from app.models.domain import ConnectorFinding, CrossProviderDecision, EnrichmentSession, EnrichmentSessionFinding, EnrichmentSessionRun
 
 STRONG_IDS = {"registrationNumber", "taxNumber", "leiCode", "isin", "idNumber", "imoNumber", "vatCode"}
 NAME_PROPS = {"name", "alias", "weakAlias", "previousName"}
@@ -53,31 +55,128 @@ def cluster_key(finding_ids: list[str]) -> str:
 def session_findings(db: Session, session_id: str) -> list[ConnectorFinding]:
     finding_ids=[r.finding_id for r in db.scalars(select(EnrichmentSessionFinding).where(EnrichmentSessionFinding.session_id==session_id)).all()]
     if not finding_ids: return []
-    return db.scalars(select(ConnectorFinding).where(ConnectorFinding.id.in_(finding_ids))).all()
+    return list(db.scalars(select(ConnectorFinding).where(ConnectorFinding.id.in_(finding_ids))).all())
 
 def consolidate_findings(findings: list[ConnectorFinding], threshold: float=0.60) -> list[dict]:
     by_id={f.id:f for f in findings}; parent={f.id:f.id for f in findings}
-    def find(x):
+    def find(x: str) -> str:
         while parent[x]!=x:
             parent[x]=parent[parent[x]]; x=parent[x]
         return x
-    def union(a,b):
+    def union(a: str, b: str) -> None:
         ra,rb=find(a),find(b)
         if ra!=rb: parent[rb]=ra
     pair_meta={}
     for a,b in combinations(findings,2):
         score,reasons=pair_score(a,b); pair_meta[tuple(sorted((a.id,b.id)))]=(score,reasons)
         if score>=threshold: union(a.id,b.id)
-    groups={}
+    groups: dict[str, list[str]] = {}
     for fid in by_id: groups.setdefault(find(fid),[]).append(fid)
     out=[]
     for ids in groups.values():
         providers={by_id[i].provider for i in ids}
         if len(ids)<2 or len(providers)<2: continue
-        pairs=[]; scores=[]
-        for a,b in combinations(ids,2):
-            score,reasons=pair_meta.get(tuple(sorted((a,b))),(0.0,[]))
-            if score>0: pairs.append({"finding_ids":[a,b],"score":score,"reasons":reasons}); scores.append(score)
+        # Renamed from the outer loop's `a, b` (ConnectorFinding objects, above) to
+        # fid_a/fid_b (their ids, str) -- reusing `a, b` here made mypy keep treating
+        # them as ConnectorFinding from the first loop's binding, flagging this loop's
+        # genuinely different str usage as a type error (the same reused-variable-
+        # different-type pattern fixed in other app/services files in earlier
+        # STRUCT-0013 cycles). `pairs` is explicitly typed since its dict literal's
+        # values are heterogeneous (list[str]/float/list[dict]), which mypy otherwise
+        # infers as dict[str, object] -- not sortable by score below.
+        pairs: list[dict[str, Any]] = []
+        scores=[]
+        for fid_a, fid_b in combinations(ids,2):
+            score,reasons=pair_meta.get(tuple(sorted((fid_a,fid_b))),(0.0,[]))
+            if score>0: pairs.append({"finding_ids":[fid_a,fid_b],"score":score,"reasons":reasons}); scores.append(score)
         findings_payload=[{"id":by_id[i].id,"provider":by_id[i].provider,"provider_record_id":by_id[i].provider_record_id,"caption":by_id[i].caption,"schema":by_id[i].schema,"properties":by_id[i].properties,"source_url":by_id[i].source_url} for i in ids]
         out.append({"cluster_key":cluster_key(ids),"score":round(max(scores) if scores else 0.0,4),"providers":sorted(providers),"finding_ids":sorted(ids),"findings":findings_payload,"pairs":sorted(pairs,key=lambda x:x["score"],reverse=True)})
     return sorted(out,key=lambda x:x["score"],reverse=True)
+
+
+def serialize_enrichment_session_run(row: EnrichmentSessionRun) -> dict:
+    """One provider's part of an enrichment session, the same whether the
+    session has just run (POST /entities/{id}/enrich) or is read back later
+    (GET /enrichment-sessions/{id}). `error` is null unless it failed."""
+    return {
+        "id": row.id, "session_id": row.session_id, "run_id": row.run_id, "provider": row.provider,
+        "status": row.status, "result_count": row.result_count, "error": row.error,
+        "started_at": row.started_at, "finished_at": row.finished_at,
+    }
+
+
+def get_enrichment_session_detail(db: Session, session_id: str) -> dict:
+    """Return an enrichment session with its per-provider runs. Raises
+    LookupError if the session doesn't exist (the caller maps that to 404)."""
+    session = db.get(EnrichmentSession, session_id)
+    if session is None:
+        raise LookupError("Enrichment session not found")
+    runs = db.scalars(
+        select(EnrichmentSessionRun).where(EnrichmentSessionRun.session_id == session_id).order_by(EnrichmentSessionRun.provider)
+    ).all()
+    return {
+        "id": session.id, "entity_id": session.entity_id, "investigation_id": session.investigation_id,
+        "status": session.status, "providers": session.providers, "total_results": session.total_results,
+        "started_at": session.started_at, "finished_at": session.finished_at,
+        "runs": [serialize_enrichment_session_run(row) for row in runs],
+    }
+
+
+def get_enrichment_session_clusters(db: Session, session_id: str) -> list[dict]:
+    """Return this session's consolidated cross-provider clusters, each
+    annotated with its latest recorded decision (if any). Raises
+    LookupError if the session doesn't exist."""
+    session = db.get(EnrichmentSession, session_id)
+    if session is None:
+        raise LookupError("Enrichment session not found")
+    clusters = consolidate_findings(session_findings(db, session_id))
+    decisions = db.scalars(
+        select(CrossProviderDecision).where(CrossProviderDecision.session_id == session_id).order_by(CrossProviderDecision.created_at.desc())
+    ).all()
+    latest: dict[str, CrossProviderDecision] = {}
+    for decision in decisions:
+        latest.setdefault(decision.cluster_key, decision)
+    for cluster in clusters:
+        # Renamed from `decision` (reused below as CrossProviderDecision | None from
+        # latest.get(), colliding with the loop variable above's non-Optional
+        # CrossProviderDecision type) -- the same reused-variable-different-type
+        # pattern fixed elsewhere in this file and in earlier STRUCT-0013 cycles.
+        resolved_decision = latest.get(cluster["cluster_key"])
+        cluster["decision"] = None if resolved_decision is None else {
+            "id": resolved_decision.id, "decision": resolved_decision.decision, "confidence": resolved_decision.confidence,
+            "rationale": resolved_decision.rationale, "created_at": resolved_decision.created_at,
+        }
+    return clusters
+
+
+def create_cross_provider_decision(db: Session, session_id: str, body: CrossProviderDecisionRequest) -> CrossProviderDecision:
+    """Validate and persist a cross-provider consolidation decision.
+
+    Raises ValueError for any validation failure (bad decision enum, fewer
+    than 2 findings, a finding outside this session, or findings that don't
+    actually span 2+ providers) and LookupError if the session doesn't
+    exist. The caller maps LookupError to 404 and ValueError to 400.
+    """
+    if body.decision not in {"positive", "negative", "unsure"}:
+        raise ValueError("Decision must be positive, negative, or unsure")
+    session = db.get(EnrichmentSession, session_id)
+    if session is None:
+        raise LookupError("Enrichment session not found")
+    available = {f.id for f in session_findings(db, session_id)}
+    finding_ids = sorted(set(body.finding_ids))
+    if len(finding_ids) < 2:
+        raise ValueError("A cross-provider decision requires at least two findings")
+    if any(fid not in available for fid in finding_ids):
+        raise ValueError("All findings must belong to this enrichment session")
+    rows = [db.get(ConnectorFinding, fid) for fid in finding_ids]
+    if len({row.provider for row in rows if row}) < 2:
+        raise ValueError("Cross-provider decisions require findings from at least two providers")
+    row = CrossProviderDecision(
+        investigation_id=session.investigation_id, entity_id=session.entity_id, session_id=session.id,
+        cluster_key=cluster_key(finding_ids), finding_ids=finding_ids, decision=body.decision,
+        confidence=body.confidence, rationale=body.rationale,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row

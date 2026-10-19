@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import (
     ConnectorFinding, Entity, ResolutionDecision, Statement, StatementAssessment, StatementPromotion,
 )
@@ -39,12 +40,18 @@ def promote_assessment(db: Session, assessment: StatementAssessment, note: str |
     if finding is None or entity is None:
         raise ValueError("Assessment references missing finding or entity")
 
-    positive_identity = db.scalar(select(ResolutionDecision).where(
+    # The assessment, the finding and the entity must belong to one investigation;
+    # otherwise a reporter of case A could write a value into case B's entity.
+    if finding.investigation_id != assessment.investigation_id or entity.investigation_id != assessment.investigation_id:
+        raise ValueError("Assessment, finding and entity must belong to the same investigation")
+
+    # The reporter's latest word on this finding and entity decides, not any past
+    # "positive": a later "negative" or "unsure" withdraws the earlier agreement.
+    latest_identity = db.scalar(select(ResolutionDecision).where(
         ResolutionDecision.finding_id == finding.id,
         ResolutionDecision.entity_id == entity.id,
-        ResolutionDecision.decision == "positive",
-    ).order_by(ResolutionDecision.created_at.desc()))
-    if positive_identity is None:
+    ).order_by(ResolutionDecision.created_at.desc(), ResolutionDecision.id.desc()))
+    if latest_identity is None or latest_identity.decision != "positive":
         raise ValueError("A positive identity resolution is required before promotion")
 
     values = (finding.properties or {}).get(assessment.prop) or []
@@ -84,4 +91,7 @@ def promote_assessment(db: Session, assessment: StatementAssessment, note: str |
     db.add(promotion)
     db.commit()
     db.refresh(promotion)
+    # The promoted value changed a confirmed entity: re-send it to the
+    # OpenAleph collection (ADR-0006, Wave B).
+    request_corpus_sync(db, promotion.investigation_id)
     return promotion

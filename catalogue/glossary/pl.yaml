@@ -1,0 +1,433 @@
+area: PL
+terms:
+- term: ECHO
+  definition: EPA's Enforcement and Compliance History Online, a public database of inspections, violations
+    and enforcement at regulated facilities.
+  examples: []
+  source_url: https://echo.epa.gov/node/126
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Significant Noncompliance (SNC)
+  definition: EPA's label for the most serious violations at Clean Water Act and RCRA facilities.
+  examples: []
+  source_url: https://echo.epa.gov/node/126
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: High Priority Violation (HPV)
+  definition: EPA's label for the most serious Clean Air Act violations.
+  examples: []
+  source_url: https://echo.epa.gov/node/126
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Watch List
+  definition: EPA's list of facilities with serious violations that have gone past the expected enforcement
+    timeline without formal action.
+  examples: []
+  source_url: https://echo.epa.gov/node/126
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: NPDES permit
+  definition: The Clean Water Act permit that sets what a facility may discharge to US waters.
+  examples: []
+  source_url: https://www.epa.gov/enforcement/national-compliance-initiative-reducing-significant-non-compliance-national-pollutant
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Discharge Monitoring Report (DMR)
+  definition: The regular self-report a permit holder files showing measured pollutant levels in its discharge.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/former-indiana-water-treatment-plant-superintendent-sentenced-prison-falsifying-reports
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Technical Review Criteria (TRC)
+  definition: 'EPA''s test for a serious exceedance: Group I pollutants 40% over, or Group II 20% over,
+    the limit in two or more months of six.'
+  examples: []
+  source_url: https://echo.epa.gov/system/files/Effluent%20Exceedance%20Violations_April%202024-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Chronic violation
+  definition: Exceeding a discharge limit by any amount in four or more months of a six-month period.
+  examples: []
+  source_url: https://echo.epa.gov/system/files/Effluent%20Exceedance%20Violations_April%202024-508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: National Enforcement and Compliance Initiative (NECI)
+  definition: EPA's set of enforcement priorities for a multi-year period; FY2024-2027 covers drinking
+    water, chemical accidents, community air, PFAS, coal ash and border security.
+  examples: []
+  source_url: https://www.epa.gov/enforcement/national-enforcement-and-compliance-initiatives
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Community water system (CWS)
+  definition: A public water system serving the same people year-round, such as a town's water utility.
+  examples: []
+  source_url: https://epa.gov/enforcement/national-enforcement-and-compliance-initiative-increasing-compliance-drinking-water-0
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Health-based violation
+  definition: A breach of a drinking water limit or treatment rule meant to protect health, as opposed
+    to a paperwork violation.
+  examples: []
+  source_url: https://epa.gov/enforcement/national-enforcement-and-compliance-initiative-increasing-compliance-drinking-water-0
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Lead action level
+  definition: 0.015 mg/L (15 ppb) of lead at the 90th percentile of tap samples; exceeding it triggers
+    required steps but is not itself a violation.
+  examples: []
+  source_url: https://www.kdhe.ks.gov/547/Lead-Copper-Rule
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Corrosion control treatment
+  definition: Water treatment that keeps pipes from leaching lead and copper into drinking water.
+  examples: []
+  source_url: https://www.michigan.gov/documents/snyder/FWATF_FINAL_REPORT_21March2016_517805_7.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Lead service line (LSL)
+  definition: A lead pipe connecting a water main to a building.
+  examples: []
+  source_url: https://www.michigan.gov/documents/snyder/FWATF_FINAL_REPORT_21March2016_517805_7.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Environmental injustice
+  definition: When poorer or minority communities bear more pollution harm and get less protection.
+  examples: []
+  source_url: https://www.michigan.gov/documents/snyder/FWATF_FINAL_REPORT_21March2016_517805_7.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: PFAS
+  definition: Per- and polyfluoroalkyl substances, long-lasting industrial chemicals such as PFOA and
+    PFOS.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2024-04-26/html/2024-07773.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Maximum Contaminant Level (MCL)
+  definition: The legal limit for a contaminant in public drinking water.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2024-04-26/html/2024-07773.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Hazard Index (PFAS)
+  definition: A combined measure for mixtures of certain PFAS; a value above 1 breaks the federal limit.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2024-04-26/html/2024-07773.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: TSCA section 8(e)
+  definition: The US rule requiring chemical makers to report information showing a substantial risk to
+    health or the environment.
+  examples: []
+  source_url: https://19january2021snapshot.epa.gov/enforcement/reference-news-release-epa-settles-pfoa-case-against-dupont-largest-environmental_.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Coal combustion residuals (CCR, coal ash)
+  definition: Ash and other waste left from burning coal in power plants, stored in ponds and landfills.
+  examples: []
+  source_url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Statistically significant level (SSL)
+  definition: A groundwater result shown by statistics to be above the protection standard, which triggers
+    corrective action at a coal ash unit.
+  examples: []
+  source_url: https://www.epa.gov/coal-combustion-residuals/frequent-questions-about-groundwater-monitoring-and-corrective-action-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Alternative source demonstration
+  definition: An owner's claim that groundwater contamination near an ash unit comes from some other source.
+  examples: []
+  source_url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Monitored natural attenuation
+  definition: Relying on natural processes to reduce contamination over time while monitoring it, instead
+    of active clean-up.
+  examples: []
+  source_url: https://www.epa.gov/system/files/documents/2023-12/ccr-enf-alert-2023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Risk Management Program (RMP)
+  definition: The EPA rule requiring facilities with extremely hazardous substances to plan to prevent
+    and respond to accidents.
+  examples: []
+  source_url: https://epa.gov/sites/default/files/2015-02/documents/112renforcementalert.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: General Duty Clause
+  definition: The Clean Air Act duty for facilities with hazardous chemicals to identify hazards, design
+    and maintain safe facilities, and minimise releases.
+  examples: []
+  source_url: https://epa.gov/sites/default/files/2015-02/documents/112renforcementalert.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Fenceline monitoring
+  definition: Measuring pollution at a facility's boundary to see what reaches neighbours.
+  examples: []
+  source_url: https://awsedap.epa.gov/public/extensions/Fenceline_Monitoring/welcome.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Δc (delta c)
+  definition: The difference between the highest and lowest benzene readings around a refinery's fence
+    line, used to isolate the refinery's own contribution.
+  examples: []
+  source_url: https://awsedap.epa.gov/public/extensions/Fenceline_Monitoring/welcome.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Emission event (upset)
+  definition: An unplanned malfunction, startup, shutdown or maintenance activity that releases air pollution
+    beyond permitted levels.
+  examples: []
+  source_url: https://environmentalintegrity.org/wp-content/uploads/2023/03/TX-Polluters-Playbook-Report-EMBARGOED-for-3.23.23.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Affirmative defense
+  definition: A Texas rule that shields operators from penalties for some emission events if they report
+    them promptly.
+  examples: []
+  source_url: https://environmentalintegrity.org/wp-content/uploads/2023/03/TX-Polluters-Playbook-Report-EMBARGOED-for-3.23.23.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Oversteaming
+  definition: Adding too much steam or air to a flare, which cools the flame and lowers how much pollution
+    it destroys.
+  examples: []
+  source_url: https://19january2021snapshot.epa.gov/sites/static/files/documents/flaringviolations.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Emission factor
+  definition: A standard estimate of pollution per unit of activity, used instead of measuring a facility's
+    actual emissions.
+  examples: []
+  source_url: https://www.epa.gov/sites/production/files/2015-11/documents/20060322-2006-p-00017_glance.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: RSEI
+  definition: EPA's Risk Screening Environmental Indicators model, which estimates exposure and risk from
+    reported toxic releases.
+  examples: []
+  source_url: https://www.propublica.org/article/were-releasing-the-data-behind-our-toxic-air-analysis
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Overburdened community
+  definition: A community facing more or combined sources of pollution than others.
+  examples: []
+  source_url: https://epa.gov/enforcement/national-enforcement-and-compliance-initiative-reducing-air-toxics-overburdened
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Defeat device
+  definition: A part or software whose main effect is to bypass or disable a vehicle's emission controls.
+  examples: []
+  source_url: https://epa.gov/sites/default/files/2019-05/documents/tampering-aftermarket-defeat-devices-2019-mcdi-mtg-33pp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Tampering
+  definition: Removing or disabling an emission control on a certified vehicle or engine.
+  examples: []
+  source_url: https://epa.gov/sites/default/files/2019-05/documents/tampering-aftermarket-defeat-devices-2019-mcdi-mtg-33pp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: DPF, EGR, SCR
+  definition: 'Diesel particulate filter, exhaust gas recirculation and selective catalytic reduction:
+    the main diesel emission controls targeted by delete kits.'
+  examples: []
+  source_url: https://epa.gov/sites/default/files/2019-05/documents/tampering-aftermarket-defeat-devices-2019-mcdi-mtg-33pp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: ECM tuning
+  definition: Reprogramming a vehicle's engine control module; some tuners are designed to disable emission
+    controls.
+  examples: []
+  source_url: https://epa.gov/sites/default/files/2019-05/documents/tampering-aftermarket-defeat-devices-2019-mcdi-mtg-33pp.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Oil-water separator (OWS)
+  definition: Shipboard equipment that removes oil from bilge water before any lawful discharge.
+  examples: []
+  source_url: https://www.blankrome.com/publications/years-magical-pipe-thinking
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Magic pipe
+  definition: Improvised piping used to send oily waste overboard around the oil-water separator.
+  examples: []
+  source_url: https://www.blankrome.com/publications/years-magical-pipe-thinking
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Oil Record Book (ORB)
+  definition: The log a ship must keep of how oily waste is handled and disposed of; inspectors rely on
+    it.
+  examples: []
+  source_url: https://www.blankrome.com/publications/years-magical-pipe-thinking
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Oil content monitor
+  definition: A device that measures oil in water being discharged and stops the discharge if the oil
+    is too high.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdfl/pr/cruise-line-ordered-pay-40-million-illegal-dumping-oil-contaminated-waste-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Act to Prevent Pollution from Ships (APPS)
+  definition: The US law implementing the MARPOL ship pollution treaty; it lets courts award up to half
+    a fine to whistleblowers.
+  examples: []
+  source_url: https://www.justice.gov/enrd/page/file/851586/dl
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Flow to full treatment
+  definition: The flow a sewage works must fully treat before it is allowed to discharge excess storm
+    water.
+  examples: []
+  source_url: https://environmentagency.blog.gov.uk/2022/02/16/environment-agency-investigation-into-sewage-treatment-works
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Vent and burn
+  definition: Deliberately releasing and burning a hazardous chemical from damaged tank cars to prevent
+    an explosion.
+  examples: []
+  source_url: https://www-s.ntsb.gov/news/press-releases/Pages/NR20240625.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL
+- term: Qualified offence (EU)
+  definition: An aggravated environmental crime under the 2024 EU directive, which can cover conduct comparable
+    to 'ecocide'.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401203
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PL

@@ -1,0 +1,39 @@
+/* Rain Noir's board effects (features/effects/board-effects.tsx, rain-pane.tsx). The bokeh, shutter-frame,
+   neon and glass rules are the OnySnow Studios effect system's own (vendor/onysnow-effects/effects.css);
+   these are only where the workbench places them. */
+
+/* Bokeh: the system's BokehField, fixed behind every panel, in the theme's amber and teal. */
+.board-bokeh { position: fixed; z-index: -1; --amber: var(--accent-1); --teal: var(--accent-2); }
+html[data-effects='light'] .board-bokeh .bokeh, html[data-motion='calm'] .board-bokeh .bokeh { animation: none; }
+@media (prefers-reduced-motion: reduce) { .board-bokeh .bokeh { animation: none; } }
+
+/* The iris when a whole-screen feature opens: the system's CameraIris, its blades sweeping shut over the
+   screen and opening on the feature. */
+.iris-open { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; pointer-events: none;
+  animation: iris-show 560ms linear both; }
+.iris-open svg { width: 160vmax; height: 160vmax; flex: none; }
+.iris-open .custom-cursor__blade { fill: var(--ground); stroke: color-mix(in oklab, var(--accent-1) 40%, transparent); stroke-width: .25; transform-box: view-box; transform-origin: 50px 4px;
+  transform: rotate(-40deg); animation: iris-snap 560ms cubic-bezier(0.3, 0, 0.2, 1) both; }
+@keyframes iris-snap { 0% { transform: rotate(-40deg); } 30% { transform: rotate(2deg); } 42% { transform: rotate(0deg); } 100% { transform: rotate(-40deg); } }
+@keyframes iris-show { 0%, 100% { opacity: 0; } 12%, 60% { opacity: 1; } }
+
+/* Shutter corners on save: the system's frame lines in the theme's accent; brackets only, never the flash. */
+.shutter-frame { --fx-amber: var(--accent-1); }
+
+/* The rain pane over the case title band: the system's Pane, with the band's own spacing kept. */
+.rain-pane.ch-top { border-radius: 14px; padding: 14px 18px; }
+.rain-scene { position: relative; border-radius: 14px; isolation: isolate; }
+.rain-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 14px; z-index: 0; }
+.rain-scene > .rain-pane { position: relative; z-index: 1; }
+
+/* The still "after the rain" frame under Calm motion or reduced motion (rain-pane.tsx): the live water is hidden while
+   its one frame is taken, then the picture stands where the water layer was, under the band's words. */
+.rain-scene[data-still='taking'] .glass__water, .rain-scene[data-still='taking'] .glass__rainfall { visibility: hidden; }
+.rain-still { border-radius: inherit; }
+
+/* Frosted panels (features/effects/frost-panel.tsx): the system's Glass, whose `.glass` rule is the research's blur 30 px
+   and saturate 150%, over the bokeh. Its fill here is the theme's panel colour at 76%, so the words on it keep their
+   contrast over the brightest light behind (tests/test-frost-panel). The pane's side faces and lit edge are placed by
+   the system with transforms, so the board's rise-in animation must not hold them. */
+.ch-mod.frost-panel { --pane-fill: color-mix(in srgb, var(--surface-1) 76%, transparent); background: var(--pane-fill); }
+.ch-col > :is(.glass-side, .glass-glow) { animation: none; }

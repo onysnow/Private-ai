@@ -1,0 +1,1555 @@
+key: OH
+name: Online encouragement of suicide and self-harm
+scope: Pro-suicide forums, online sellers of lethal substances, and platform features that push users
+  toward self-harm.
+indicators:
+- id: OH-001
+  name: Service is a dedicated forum or chat space where suicide is encouraged or assisted
+  definition: A website, forum or chat service whose discussion spaces are used by members to encourage
+    or assist suicide or serious self-harm, rather than to support recovery.
+  areas:
+  - OH
+  typology: Pro-suicide forums
+  status: verified
+  sources:
+  - title: Draft Updated Register of Risks (relevant extracts)
+    publisher: Ofcom
+    year: '2026'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/199101-new-priority-offences/main-docs/draft-updated-register-of-risks-relevant-extracts.pdf?v=414981
+    locator: p.14, 'Online services'
+    quote: discussion forums and chat room services can act as spaces where suicide and self-harm is assisted
+      or encouraged
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Ofcom investigates online suicide forum
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-investigates-online-suicide-forum
+    locator: Investigation announcement, 9 April 2025
+    quote: Due to its nature, we have decided not to name the provider and forum.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Children's Risk Assessment Guidance and Children's Risk Profiles
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+    locator: Children's U2U Risk Profile, row 1c 'Discussion forums and chat room services', p.42
+    quote: eating disorder content as well as suicide and self-harm content
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Prevention of Future Deaths report, ref 2023-0534 (Inner West London)
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2023'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/chloe-macdermott-prevention-of-future-deaths-report/
+    locator: Matters of concern, (3)
+    quote: is a forum that permits material to be exchanged and viewed within its open chatrooms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A UK coroner's report (ref 2023-0534) described a forum hosting open chatrooms where suicide material
+    was exchanged.
+  - Ofcom opened an Online Safety Act investigation into the provider of an unnamed online suicide forum
+    in April 2025.
+  cases:
+  - name: Inner West London coroner, Prevention of Future Deaths report ref 2023-0534
+    year: '2023'
+    jurisdiction: England and Wales
+    what_happened: An assistant coroner reported concerns that a forum allowed suicide material to be
+      exchanged in open chatrooms, with no age restrictions, no prominent help signposting and no effective
+      moderation; the report went to Ofcom, government departments, Google and Amazon.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.judiciary.uk/prevention-of-future-death-reports/chloe-macdermott-prevention-of-future-deaths-report/
+    source_title: Prevention of Future Deaths report 2023-0534
+  - name: Swansea and Neath Port Talbot coroner, Prevention of Future Deaths report ref 2025-0139
+    year: '2025'
+    jurisdiction: Wales
+    what_happened: The coroner reported that the deceased (aged 24) accessed an online 'suicide forum'
+      and a social media platform, and was concerned about the risk to life posed by both; the report
+      went to Ofcom and DSIT.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.judiciary.uk/prevention-of-future-death-reports/rhiannon-williams-prevention-of-future-deaths-report/
+    source_title: Prevention of Future Deaths report 2025-0139
+  data_needed:
+  - Organization
+  - Company
+  - Person
+  - Address
+  - Document
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Coroners' Prevention of Future Deaths reports (judiciary.uk)
+  - Ofcom enforcement announcements
+  - Domain registration and hosting records (WHOIS, passive DNS)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Ofcom treats suicide forums as an illegal-harms risk under the Online Safety Act, the same
+      regime used for other online harms.
+    source_url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-investigates-online-suicide-forum
+  innocent_explanations:
+  - Peer-support and recovery forums discuss suicide openly to help members stay safe.
+  - Research, journalism or bereavement communities may discuss suicide without encouraging it.
+  - A general forum may hold isolated harmful posts that its moderators remove.
+  jurisdictions: UK (Online Safety Act); pattern recognised internationally
+  version: 1
+- id: OH-002
+  name: No age or vulnerability restrictions on a service hosting suicide or self-harm content
+  definition: A service that carries suicide or self-harm content lets anyone in, including children and
+    vulnerable adults, with no age check or other access control.
+  areas:
+  - OH
+  typology: Access controls
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2023-0534
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2023'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/chloe-macdermott-prevention-of-future-deaths-report/
+    locator: Matters of concern, (5)
+    quote: No age or other restrictions are in place to prevent access to children, vulnerable teenagers
+      and vulnerable adults.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Prevention of Future Deaths report, ref 2022-0315 (North London)
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2022'
+    url: https://www.judiciary.uk/wp-content/uploads/2022/10/Molly-Russell-Prevention-of-future-deaths-report-2022-0315_Published.pdf
+    locator: Matters of concern, 2
+    quote: There was no age verification when signing up to the on-line platform.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Protection of Children Code of Practice for user-to-user services
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf?v=403579
+    locator: Measure PCU B2
+    quote: use highly effective age assurance to target access controls to prevent all United Kingdom
+      users of the service
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: New rules for a safer generation of children online
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/online-safety/protecting-children/new-rules-for-a-safer-generation-of-children-online
+    locator: Age checks
+    quote: The riskiest services must use highly effective age assurance to identify which users are children.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coroner found a forum had no age or other restrictions protecting children and vulnerable adults
+    (PFD 2023-0534).
+  - A coroner noted no age verification at sign-up on the platform used by a 14-year-old (PFD 2022-0315).
+  cases:
+  - name: North London coroner's inquest and Prevention of Future Deaths report ref 2022-0315
+    year: '2022'
+    jurisdiction: England and Wales
+    what_happened: The coroner found that online material viewed by a 14-year-old contributed to her death
+      in a more than minimal way and listed concerns including no age verification and no separation of
+      adult and child content.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.judiciary.uk/wp-content/uploads/2022/10/Molly-Russell-Prevention-of-future-deaths-report-2022-0315_Published.pdf
+    source_title: Prevention of Future Deaths report 2022-0315
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Platform sign-up flow and terms of service
+  - Ofcom enforcement and age-assurance reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Age assurance failures are the same control Ofcom's children's codes require across all primary
+      priority content.
+    source_url: https://www.ofcom.org.uk/online-safety/protecting-children/new-rules-for-a-safer-generation-of-children-online
+  innocent_explanations:
+  - Adult-only general services may rely on self-declared age because they are not designed for children.
+  - Age assurance may be in the process of being rolled out to meet new legal deadlines (UK duties applied
+    from 25 July 2025).
+  - Support services may deliberately avoid barriers so people in crisis can reach help.
+  jurisdictions: UK
+  version: 1
+- id: OH-003
+  name: No prominent signposting to crisis help
+  definition: A service where users post, search for or report suicide or self-harm content does not point
+    them clearly to help and support organisations.
+  areas:
+  - OH
+  typology: User support
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2023-0534
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2023'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/chloe-macdermott-prevention-of-future-deaths-report/
+    locator: Matters of concern, (6)
+    quote: No prominent signposting is in place to organisations from whom help is available to prevent
+      suicide.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Protection of Children Code of Practice for user-to-user services
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf?v=403579
+    locator: Measures PCU F3, F4, F5 (signposting children to support when they report, post or search
+      for harmful content)
+    quote: the provider should signpost that user to appropriate support for that kind
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Guidelines for sites and platforms: Reducing access to harmful self-harm and suicide content
+      online'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/reducing-access-harmful-content/
+    locator: Nudges
+    quote: Pop-up messages when users are actively seeking self-harm and suicide content
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coroner reported a forum with no prominent signposting to suicide prevention organisations (PFD
+    2023-0534).
+  - CBS News reported that its tester found no self-harm resources when discussing self-harm with a chatbot
+    in 2024.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Test searches and test posts on the service (with safeguards)
+  - Platform help-centre pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small services may lack resources to build signposting yet still remove harmful content.
+  - Signposting may exist but be shown only in some regions or languages.
+  - Services outside the UK may follow different local guidance.
+  jurisdictions: UK; guidance applied internationally by Samaritans
+  version: 1
+- id: OH-004
+  name: Method content stays up because moderation is absent or ineffective
+  definition: Posts giving details of suicide or self-harm methods remain visible because the service
+    has no working process to review and remove them.
+  areas:
+  - OH
+  typology: Moderation failure
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2023-0534
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2023'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/chloe-macdermott-prevention-of-future-deaths-report/
+    locator: Matters of concern, (7)
+    quote: Posts are made by users containing details of methods of suicide without any effective administration
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Protection of Children Code of Practice for user-to-user services
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf?v=403579
+    locator: Measure PCU C2
+    quote: Having a content moderation function that allows for swift action against content harmful to
+      children.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Guidelines for sites and platforms: Understanding self-harm and suicide content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/understanding-self-harm-and-suicide-content/
+    locator: Harmful content categories
+    quote: Information and depictions of methods of harm
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coroner reported method posts left up without effective administration (PFD 2023-0534).
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Archived snapshots of the service
+  - Platform transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Moderation backlogs can leave content up briefly on well-run services.
+  - Content may be ambiguous (personal experience or recovery accounts) and judged to stay up under a
+    support policy.
+  - Content may have been posted after the last moderation sweep.
+  jurisdictions: UK
+  version: 1
+- id: OH-005
+  name: Moderation filters bypassed with coded language or emojis
+  definition: Users on a service routinely use emojis, misspellings or changing slang to get suicide or
+    self-harm content past the service's filters.
+  areas:
+  - OH
+  typology: Moderation evasion signals
+  status: verified
+  sources:
+  - title: 'Guidelines for sites and platforms: Implementing effective content moderation'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/effective-content-moderation/
+    locator: Automated moderation, limitations
+    quote: Can be 'tricked' by users who may bypass filters through the use of emojis or change their
+      language
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Samaritans warns that automated moderation can be bypassed by emojis or changed language.
+  cases: []
+  data_needed:
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Platform content samples
+  - Research by safety organisations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Coded language also grows naturally in youth slang and in-group humour.
+  - People in recovery may use softened terms to talk about their experience without triggering others.
+  jurisdictions: General
+  version: 1
+- id: OH-006
+  name: Harmful forum remains easily accessible after warnings
+  definition: A suicide forum stays easy to reach from the country after coroners, regulators or others
+    have warned about it.
+  areas:
+  - OH
+  typology: Persistence after warnings
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2024-0115 (Nottingham City and Nottinghamshire)
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2024'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/daniel-tucker-prevention-of-future-deaths-report/
+    locator: Matters of concern, 'Continuing accessibility'
+    quote: I am concerned that further deaths will occur while this remains the case.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Ofcom investigates online suicide forum
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-investigates-online-suicide-forum
+    locator: Possible enforcement
+    quote: requiring Internet Service Providers to block access to a site in the UK
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coroner in 2024 heard evidence that a forum remained easily accessible to vulnerable people in the
+    UK and wrote to Ofcom and the Health Secretary (PFD 2024-0115).
+  cases:
+  - name: Nottingham City and Nottinghamshire coroner, Prevention of Future Deaths report ref 2024-0115
+    year: '2024'
+    jurisdiction: England and Wales
+    what_happened: The coroner reported concern that a suicide forum remained easily accessible to vulnerable
+      people in the UK, addressing the report to Ofcom and the Secretary of State for Health and Social
+      Care among others.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.judiciary.uk/prevention-of-future-death-reports/daniel-tucker-prevention-of-future-deaths-report/
+    source_title: Prevention of Future Deaths report 2024-0115
+  data_needed:
+  - Organization
+  - Document
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Coroners' PFD reports and responses
+  - Ofcom enforcement updates
+  - Network reachability tests
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Regulatory processes take time; continued access may reflect a pending investigation rather than inaction.
+  - A site may have changed operators or content since the warning.
+  jurisdictions: UK
+  version: 1
+- id: OH-007
+  name: 'Provider fails regulatory duties: no risk assessment or no reply to information requests'
+  definition: The operator of a service linked to suicide content does not complete a required illegal-harms
+    risk assessment, keep records, or answer a regulator's statutory information request.
+  areas:
+  - OH
+  typology: Regulatory non-compliance
+  status: verified
+  sources:
+  - title: Ofcom investigates online suicide forum
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-investigates-online-suicide-forum
+    locator: What Ofcom is investigating
+    quote: complete – and keep a record of – a suitable and sufficient illegal harms risk assessment
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Ofcom's April 2025 investigation asks whether a suicide forum provider failed to protect UK users,
+    complete a risk assessment and respond to a statutory information request.
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - PublicBody
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Ofcom enforcement programme pages
+  - Company registries for the operator
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small or overseas providers may be unaware of new duties.
+  - An opened investigation is not a finding of breach; Ofcom issues a provisional notice only if it finds
+    a failure.
+  jurisdictions: UK
+  version: 1
+- id: OH-008
+  name: Online sale and cross-border delivery of a substance used as a means of suicide to individuals
+  definition: A substance with known use in suicide is sold online and posted to private individuals,
+    including across borders, without checks on why a private buyer needs it.
+  areas:
+  - OH
+  typology: Sale of means
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2023-0534
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2023'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/chloe-macdermott-prevention-of-future-deaths-report/
+    locator: Matters of concern, (10)
+    quote: to take delivery in the United Kingdom without effective border and/or custom controls.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Guidelines for sites and platforms: Understanding self-harm and suicide content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/understanding-self-harm-and-suicide-content/
+    locator: Harmful content categories
+    quote: Links and information that enable people to buy products intended for use as a means of suicide.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coroner raised concern that UK users could buy a product through a US marketplace and take delivery
+    without effective border controls (PFD 2023-0534).
+  - A Canadian man was charged with aiding suicide through kits sold online and later pleaded guilty to
+    14 counts of assisting suicide (per reporting).
+  cases:
+  - name: R v. Kenneth Law (Ontario)
+    year: '2026'
+    jurisdiction: Ontario, Canada
+    what_happened: Charged in 2023 with aiding and abetting suicides through kits sold online, later also
+      with murder; reported to have pleaded guilty on 29 May 2026 to 14 counts of assisting suicide after
+      the murder charges were dropped under a plea deal, with sentencing scheduled for September 2026.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Kenneth_Law
+    source_title: Kenneth Law (Wikipedia, summarising CBC, Reuters and New York Times reporting of 29
+      May 2026)
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Address
+  - Document
+  - Event
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Marketplace listings and seller profiles
+  - Court records
+  - Customs and border seizure reports
+  - Coroners' PFD reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many such substances have ordinary industrial, food or agricultural uses and are legitimately sold.
+  - Small-quantity sales to hobbyists or small businesses are common.
+  - International shipping of chemicals is routine and often lawful.
+  jurisdictions: UK, Canada, international
+  version: 1
+- id: OH-009
+  name: Websites set up to sell suicide 'kits' to the public
+  definition: A person or business runs websites offering packaged products to the public that police
+    or courts link to suicides.
+  areas:
+  - OH
+  typology: Sale of means
+  status: verified
+  sources:
+  - title: Kenneth Law charged with 14 counts of murder in Ontario sodium nitrite deaths
+    publisher: CP24 / CTV News
+    year: '2023'
+    url: https://www.cp24.com/news/kenneth-law-charged-with-14-counts-of-murder-in-ontario-sodium-nitrite-deaths-1.6682687
+    locator: Article body
+    quote: Police in Canada have warned about websites allegedly run by Law.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Police said they tracked some 1,200 products shipped internationally from websites allegedly run by
+    the accused (CP24, 2023).
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Address
+  - Document
+  - Event
+  - CourtCase
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Domain registration and hosting records
+  - Payment processor records (via court filings)
+  - Police statements and court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Specialist chemical suppliers legitimately run small web shops.
+  - Product bundles may be sold for genuine uses such as food curing or lab work.
+  jurisdictions: Canada; international shipping
+  version: 1
+- id: OH-010
+  name: Recommender system pushes suicide or self-harm content users did not ask for
+  definition: A service's algorithm keeps serving more suicide or self-harm content to a user, including
+    content they did not search for.
+  areas:
+  - OH
+  typology: Recommender 'rabbit hole'
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2022-0315
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2022'
+    url: https://www.judiciary.uk/wp-content/uploads/2022/10/Molly-Russell-Prevention-of-future-deaths-report-2022-0315_Published.pdf
+    locator: Circumstances
+    quote: some of which were selected and provided without Molly requesting them.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Draft Updated Register of Risks (relevant extracts)
+    publisher: Ofcom
+    year: '2026'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/199101-new-priority-offences/main-docs/draft-updated-register-of-risks-relevant-extracts.pdf?v=414981
+    locator: p.8, Summary of findings
+    quote: content which promotes suicide, there is a risk that this might result in ever more of this
+      content being served up to them.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Children's Risk Assessment Guidance and Children's Risk Profiles
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+    locator: Children's U2U Risk Profile, row 6 'Content recommender systems', p.48
+    quote: suicide and self-harm content, and violent content
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Guidelines for sites and platforms: Reducing access to harmful content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/reducing-access-harmful-content/
+    locator: Algorithms
+    quote: Ensuring site algorithms don't push self-harm and suicide content towards users.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coroner found a platform used algorithms that provided content without the user requesting it (PFD
+    2022-0315).
+  cases:
+  - name: North London coroner's inquest and Prevention of Future Deaths report ref 2022-0315
+    year: '2022'
+    jurisdiction: England and Wales
+    what_happened: The coroner found platforms used algorithms resulting in binge periods of harmful content,
+      some provided without being requested, and that this material contributed to the death of a 14-year-old.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.judiciary.uk/wp-content/uploads/2022/10/Molly-Russell-Prevention-of-future-deaths-report-2022-0315_Published.pdf
+    source_title: Prevention of Future Deaths report 2022-0315
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Controlled test-account audits
+  - Platform transparency and risk-assessment disclosures
+  - Inquest evidence
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Ofcom names personalised recommendations as children's main route to harmful content.
+    source_url: https://www.ofcom.org.uk/online-safety/protecting-children/new-rules-for-a-safer-generation-of-children-online
+  innocent_explanations:
+  - Users who search for mental-health support may be shown recovery and awareness content that looks
+    similar.
+  - Recommender systems reflect a user's own engagement; one-off recommendations can occur despite filters.
+  jurisdictions: UK; international
+  version: 1
+- id: OH-011
+  name: Children's feeds not filtered for suicide and self-harm content
+  definition: New or teenage accounts are shown suicide or self-harm content in their feeds, showing the
+    service does not exclude it from children's recommendations.
+  areas:
+  - OH
+  typology: Recommender 'rabbit hole'
+  status: verified
+  sources:
+  - title: Protection of Children Code of Practice for user-to-user services
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf?v=403579
+    locator: Measure PCU E1
+    quote: 'Content recommender systems: excluding potential primary priority content.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: New rules for a safer generation of children online
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/online-safety/protecting-children/new-rules-for-a-safer-generation-of-children-online
+    locator: Safer feeds
+    quote: must configure their algorithms to filter out harmful content from children's feeds
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Deadly by Design
+    publisher: Center for Countering Digital Hate
+    year: '2022'
+    url: https://counterhate.com/research/deadly-by-design/
+    locator: Key findings
+    quote: Within 2.6 minutes, TikTok recommended suicide content.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Researchers using new accounts set to age 13 in four countries reported suicide content was recommended
+    within 2.6 minutes (CCDH, December 2022).
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Controlled test-account audits
+  - NGO research reports
+  - Ofcom compliance reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Test-account methods vary and may not reflect what typical users see.
+  - Platforms may have changed systems since a study was run.
+  - Awareness or recovery content can be misclassified as harmful by researchers.
+  jurisdictions: UK duties from 25 July 2025; research in US, UK, Canada, Australia
+  version: 1
+- id: OH-012
+  name: Engagement and advertising design combined with harmful recommendations
+  definition: The service serves harmful content alongside adverts or uses features designed to maximise
+    time spent, which Ofcom links to higher risk of harm to children.
+  areas:
+  - OH
+  typology: Business model risk
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2022-0315
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2022'
+    url: https://www.judiciary.uk/wp-content/uploads/2022/10/Molly-Russell-Prevention-of-future-deaths-report-2022-0315_Published.pdf
+    locator: Matters of concern, 4
+    quote: That algorithms were used to provide content together with adverts.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Children's Risk Assessment Guidance and Children's Risk Profiles
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+    locator: Row 7 'Functionalities and other features that increase engagement', p.49
+    quote: Your service is likely to have an increased risk for all kinds of content harmful to children.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coroner listed algorithms serving content together with adverts as a matter of concern (PFD 2022-0315).
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Platform risk assessments and transparency reports
+  - Ad library data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most free platforms are ad-funded; advertising alone does not show harm.
+  - Engagement features such as autoplay are standard across the industry.
+  jurisdictions: UK
+  version: 1
+- id: OH-013
+  name: No separation of adult and child spaces and no age-specific content controls
+  definition: A platform used by children mixes adult and child users and content, with no controls to
+    make content age-appropriate.
+  areas:
+  - OH
+  typology: Access controls
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2022-0315
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2022'
+    url: https://www.judiciary.uk/wp-content/uploads/2022/10/Molly-Russell-Prevention-of-future-deaths-report-2022-0315_Published.pdf
+    locator: Matters of concern, 1 and 3
+    quote: There was no separation between adult and child parts of the platforms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The coroner in PFD 2022-0315 listed no adult/child separation and content not controlled to be age
+    specific.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Platform product documentation and terms
+  - Ofcom children's risk assessment records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Services aimed only at adults may not need separate child areas.
+  - Separate teen experiences may exist but be hard to verify from outside.
+  jurisdictions: UK
+  version: 1
+- id: OH-014
+  name: No parental visibility or linked-account controls for child users
+  definition: Parents or carers have no way to see or filter what a child's account is shown, and child
+    accounts cannot be linked to a parent account.
+  areas:
+  - OH
+  typology: Parental controls
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2022-0315
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2022'
+    url: https://www.judiciary.uk/wp-content/uploads/2022/10/Molly-Russell-Prevention-of-future-deaths-report-2022-0315_Published.pdf
+    locator: Matters of concern, 5 and 6
+    quote: That the parent, guardian or carer did not have access, to the material
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Guidelines for sites and platforms: Reducing access to harmful content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/reducing-access-harmful-content/
+    locator: Parental controls
+    quote: Developing parental controls allowing parents to filter the content their child accesses
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The coroner in PFD 2022-0315 noted the child's account could not be linked to a parent's account for
+    monitoring.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Platform settings and help pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Privacy rules and older teenagers' rights limit how much parental monitoring is appropriate.
+  - Parental tools may exist at device or app-store level instead of in the service.
+  jurisdictions: UK
+  version: 1
+- id: OH-015
+  name: Search and autocomplete surface method terms without blocking or redirecting
+  definition: A service's search or autocomplete returns or suggests suicide-method content instead of
+    blocking such searches and pointing users to help.
+  areas:
+  - OH
+  typology: Search functionality
+  status: verified
+  sources:
+  - title: 'Guidelines for sites and platforms: Reducing access to harmful content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/reducing-access-harmful-content/
+    locator: Search and autocomplete
+    quote: Autocomplete searches should be turned off for harmful searches, such as methods of harm and
+      associated equipment
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Children's Risk Assessment Guidance and Children's Risk Profiles
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+    locator: Row 5a 'User-generated content searching', p.47
+    quote: eating disorder content, pornographic content, and suicide and self-harm content
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Prevention of Future Deaths report, ref 2025-0139
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2025'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/rhiannon-williams-prevention-of-future-deaths-report/
+    locator: Matters of concern
+    quote: concerned about the risk to life posed by the website and social media platform.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A Welsh coroner reported that the deceased used a social media platform to obtain method information
+    and raised concern with Ofcom and DSIT (PFD 2025-0139).
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Test searches (with safeguards)
+  - Search engine and platform safety policies
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clinicians, researchers and journalists need search access to sensitive terms.
+  - Blocking lists inevitably lag behind new terms.
+  jurisdictions: UK
+  version: 1
+- id: OH-016
+  name: Hashtags, tags or suggested topics grouping suicide and self-harm content
+  definition: A service lets users tag or auto-suggests topics that cluster suicide or self-harm content,
+    making it easier to find.
+  areas:
+  - OH
+  typology: Content discovery features
+  status: verified
+  sources:
+  - title: Children's Risk Assessment Guidance and Children's Risk Profiles
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+    locator: Row 5b 'Content tagging', p.47
+    quote: and suicide and self-harm content
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Guidelines for sites and platforms: Reducing access to harmful content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/reducing-access-harmful-content/
+    locator: Hashtags and suggested topics
+    quote: Reviewing automated suggestions for terms relating to self-harm and suicide, such as related
+      topics or tags
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Platform hashtag pages
+  - Test accounts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Mental-health awareness and recovery communities use the same hashtags.
+  - Tagging is a standard feature on most social platforms.
+  jurisdictions: UK
+  version: 1
+- id: OH-017
+  name: Livestreaming used to show self-harm or suicide
+  definition: A service with livestreaming lets users broadcast self-harm or suicide content live, which
+    Ofcom identifies as a risk factor.
+  areas:
+  - OH
+  typology: High-risk functionality
+  status: verified
+  sources:
+  - title: Children's Risk Assessment Guidance and Children's Risk Profiles
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+    locator: Row 4a 'Livestreaming', p.45
+    quote: Your service is likely to have an increased risk of harm related to suicide and self-harm content
+      and violent content.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Platform feature lists
+  - Ofcom risk assessment records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Livestreaming is widely used for gaming, events and education; having it is not itself a sign of harm.
+  jurisdictions: UK
+  version: 1
+- id: OH-018
+  name: Closed groups, group chats and user connections used to share suicide or self-harm content
+  definition: User groups, group messaging and friend or follower connections on a service are used to
+    circulate suicide or self-harm content.
+  areas:
+  - OH
+  typology: High-risk functionality
+  status: verified
+  sources:
+  - title: Children's Risk Assessment Guidance and Children's Risk Profiles
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+    locator: Rows 3a 'User connections', 3b 'User groups' and 'Group messaging', pp.44-45
+    quote: Your service is likely to have an increased risk of harm related to eating disorder content
+      as well
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Draft Updated Register of Risks (relevant extracts)
+    publisher: Ofcom
+    year: '2026'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/199101-new-priority-offences/main-docs/draft-updated-register-of-risks-relevant-extracts.pdf?v=414981
+    locator: p.10, fn.5 (open channels)
+    quote: promotion of suicide content
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Associate
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Platform group directories
+  - Moderation and transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Groups and group chats are core social features and are also used for peer support.
+  jurisdictions: UK
+  version: 1
+- id: OH-019
+  name: Links to external pro-suicide websites
+  definition: Users post hyperlinks that send others to external websites that encourage suicide.
+  areas:
+  - OH
+  typology: Hyperlinks
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2026-0232 (Wiltshire and Swindon)
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2026'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/alice-dearden-prevention-of-future-deaths-report-2/
+    locator: Coroner's concerns
+    quote: reference to suicide websites and a link to a website encouraging suicide.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Guidelines for sites and platforms: Reducing access to harmful content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/reducing-access-harmful-content/
+    locator: Links to external sites
+    quote: platforms should consider removing link functionality or adding safety messages
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A coroner raised concern about a posting containing a link to a website encouraging suicide (PFD 2026-0232).
+  cases:
+  - name: Wiltshire and Swindon coroner, Prevention of Future Deaths report ref 2026-0232
+    year: '2026'
+    jurisdiction: England and Wales
+    what_happened: The coroner reported concern about an online posting referring to suicide websites
+      and linking to a website encouraging suicide.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.judiciary.uk/prevention-of-future-death-reports/alice-dearden-prevention-of-future-deaths-report-2/
+    source_title: Prevention of Future Deaths report 2026-0232
+  data_needed:
+  - Document
+  - Organization
+  - UnknownLink
+  - Note
+  checkable: records
+  lookup_sources:
+  - Link analysis of posts
+  - Domain records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Links may point to news coverage or warnings about a site rather than promoting it.
+  jurisdictions: UK
+  version: 1
+- id: OH-020
+  name: Content that presents suicide or self-harm as positive or urges others to try it
+  definition: Posts or material that glorify suicide or self-harm or encourage others to do it, which
+    UK law treats as harmful to children and, where intended to encourage, as criminal.
+  areas:
+  - OH
+  typology: Encouragement
+  status: verified
+  sources:
+  - title: 'Guidelines for sites and platforms: Understanding self-harm and suicide content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/understanding-self-harm-and-suicide-content/
+    locator: Harmful content categories
+    quote: Content that portrays self-harm and suicide as positive or desirable
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Online Safety Act 2023, section 61
+    publisher: UK Parliament (legislation.gov.uk)
+    year: '2023'
+    url: https://www.legislation.gov.uk/ukpga/2023/50/section/61
+    locator: s.61(3)
+    quote: Content which encourages, promotes or provides instructions for suicide.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Online Safety Act 2023, section 184
+    publisher: UK Parliament (legislation.gov.uk)
+    year: '2023'
+    url: https://www.legislation.gov.uk/ukpga/2023/50/section/184
+    locator: s.184(1)
+    quote: D does a relevant act capable of encouraging or assisting the serious self-harm of another
+      person
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Suicide Act 1961, section 2
+    publisher: UK Parliament (legislation.gov.uk)
+    year: '1961'
+    url: https://www.legislation.gov.uk/ukpga/Eliz2/9-10/60/section/2
+    locator: s.2(1A)
+    quote: The person referred to in subsection (1)(a) need not be a specific person (or class of persons)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Organization
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records for Suicide Act s.2 and Online Safety Act s.184 prosecutions
+  - Platform content
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Art, fiction and personal testimony may depict suicide without promoting it.
+  - Debate about assisted dying is lawful political speech and differs from encouragement aimed at vulnerable
+    people.
+  jurisdictions: England and Wales (Suicide Act 1961); UK (Online Safety Act 2023)
+  version: 1
+- id: OH-021
+  name: Online challenges, hoaxes or suicide pacts
+  definition: Content that spreads challenges, hoaxes or pacts urging users to harm themselves.
+  areas:
+  - OH
+  typology: Encouragement
+  status: verified
+  sources:
+  - title: 'Guidelines for sites and platforms: Understanding self-harm and suicide content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/understanding-self-harm-and-suicide-content/
+    locator: Harmful content categories
+    quote: Online hoaxes, challenges, and suicide pacts encouraging users to harm themselves.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Associate
+  - Event
+  checkable: records
+  lookup_sources:
+  - Platform content and trend data
+  - Safety organisation alerts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many viral 'challenge' scares are hoaxes; reporting on them can spread them further, so verify before
+    publishing.
+  - Harmless trends can be mislabelled as dangerous.
+  jurisdictions: General
+  version: 1
+- id: OH-022
+  name: Forum advice on hiding suicidal intent from professionals and family
+  definition: A forum gives users advice on misleading clinicians and relatives about their suicidal thoughts,
+    cutting them off from help.
+  areas:
+  - OH
+  typology: Pro-suicide forums
+  status: verified
+  sources:
+  - title: Prevention of Future Deaths report, ref 2025-0139
+    publisher: Courts and Tribunals Judiciary (Coroner)
+    year: '2025'
+    url: https://www.judiciary.uk/prevention-of-future-death-reports/rhiannon-williams-prevention-of-future-deaths-report/
+    locator: Circumstances / matters of concern
+    quote: where she obtained advice/information on misleading professionals and her family as to her
+      thoughts and intentions.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A Welsh coroner recorded that the deceased obtained such advice from an online suicide forum (PFD
+    2025-0139).
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - Coroners' PFD reports
+  - Inquest evidence
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Discussions of distrust of mental-health services can be legitimate criticism rather than advice to
+    conceal risk.
+  jurisdictions: UK
+  version: 1
+- id: OH-023
+  name: AI chatbot gives self-harm encouragement or fails to direct users to help
+  definition: A generative AI chatbot, including a companion bot, responds to users discussing suicide
+    or self-harm with encouragement or without directing them to crisis support.
+  areas:
+  - OH
+  typology: AI chatbots
+  status: verified
+  sources:
+  - title: Draft Updated Register of Risks (relevant extracts)
+    publisher: Ofcom
+    year: '2026'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/199101-new-priority-offences/main-docs/draft-updated-register-of-risks-relevant-extracts.pdf?v=414981
+    locator: p.12, fn.15
+    quote: capable of generating advice or encouragement for self-harm behaviours.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: FTC Launches Inquiry into AI Chatbots Acting as Companions
+    publisher: US Federal Trade Commission
+    year: '2025'
+    url: https://www.ftc.gov/news-events/news/press-releases/2025/09/ftc-launches-inquiry-ai-chatbots-acting-companions
+    locator: Press release, 11 September 2025
+    quote: measure, test, and monitor potentially negative impacts
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Complaint, Raine et al. v. OpenAI, Inc. et al. (San Francisco Superior Court, CGC-25-628528)
+    publisher: Courthouse News Service (court filing)
+    year: '2025'
+    url: https://www.courthousenews.com/wp-content/uploads/2025/08/raine-vs-openai-et-al-complaint.pdf
+    locator: Para 70 (allegation)
+    quote: The system flagged 377 messages for self-harm content, with 181 scoring over 50% confidence
+      and 23 over 90% confidence.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The FTC issued 6(b) orders in September 2025 to Alphabet, Character Technologies, Instagram, Meta,
+    OpenAI, Snap and xAI about companion chatbot impacts on children.
+  - Families have filed lawsuits alleging chatbots failed to intervene with teenagers discussing suicide
+    (allegations, not findings).
+  cases:
+  - name: Wrongful-death suit against OpenAI, San Francisco Superior Court case CGC-25-628528
+    year: '2025'
+    jurisdiction: California, US
+    what_happened: Parents of a 16-year-old allege ChatGPT's systems flagged hundreds of self-harm messages
+      without intervening and that design choices prioritised session length over safety; OpenAI denies
+      responsibility. No ruling reported.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.courthousenews.com/wp-content/uploads/2025/08/raine-vs-openai-et-al-complaint.pdf
+    source_title: Complaint filed 26 August 2025
+  - name: Garcia v. Character Technologies (suit against Character.AI and Google)
+    year: '2024'
+    jurisdiction: Florida, US
+    what_happened: A mother sued after her 14-year-old son's death, alleging the companion chatbot product
+      was hyper-sexualised, marketed to minors and 'addictive and manipulative'; CBS reported its tester
+      found no self-harm resources at the time.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.cbsnews.com/news/florida-mother-lawsuit-character-ai-sons-death/
+    source_title: CBS News, 23 October 2024
+  data_needed:
+  - Company
+  - Organization
+  - CourtCase
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Court dockets
+  - FTC and state attorney general actions
+  - Company safety disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: The FTC inquiry concerns companion chatbot effects on children and teens, including age restrictions.
+    source_url: https://www.ftc.gov/news-events/news/press-releases/2025/09/ftc-launches-inquiry-ai-chatbots-acting-companions
+  innocent_explanations:
+  - Chatbots often do signpost to crisis lines; a single transcript may not represent typical behaviour.
+  - Users may deliberately work around safeguards against terms of service.
+  - Safety systems change quickly; older reports may describe since-fixed behaviour.
+  jurisdictions: US, UK
+  version: 1
+- id: OH-024
+  name: AI safety safeguards reportedly weakened or safety testing compressed for engagement or launch
+    speed
+  definition: Evidence that a chatbot maker relaxed suicide safeguards, ignored internal self-harm flags,
+    or cut safety testing to boost engagement or launch faster.
+  areas:
+  - OH
+  typology: AI chatbots
+  status: verified
+  sources:
+  - title: Complaint, Raine et al. v. OpenAI, Inc. et al.
+    publisher: Courthouse News Service (court filing)
+    year: '2025'
+    url: https://www.courthousenews.com/wp-content/uploads/2025/08/raine-vs-openai-et-al-complaint.pdf
+    locator: Paras 84 and 93 (allegations)
+    quote: These were not random responses––they reflected design choices that prioritized session length
+      over user safety.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: FTC Launches Inquiry into AI Chatbots Acting as Companions
+    publisher: US Federal Trade Commission
+    year: '2025'
+    url: https://www.ftc.gov/news-events/news/press-releases/2025/09/ftc-launches-inquiry-ai-chatbots-acting-companions
+    locator: Press release
+    quote: how these firms measure, test, and monitor potentially negative impacts of this technology
+      on children and teens
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A 2025 complaint alleges months of planned safety evaluation were compressed into one week before
+    a model launch (allegation).
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Employment
+  - Document
+  - CourtCase
+  checkable: person
+  lookup_sources:
+  - Court filings and discovery
+  - Former employees
+  - Company model cards and safety reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Product changes that look like weakened safeguards may reduce over-refusal for legitimate users.
+  - Testing timelines in complaints are contested and may rely on press reports.
+  jurisdictions: US
+  version: 1
+- id: OH-025
+  name: No senior accountable person or written policy for suicide and self-harm content
+  definition: A service has no named senior person responsible for user safety and no clear policy for
+    responding to suicide and self-harm content.
+  areas:
+  - OH
+  typology: Governance
+  status: verified
+  sources:
+  - title: 'Guidelines for sites and platforms: Establishing accountability and structure'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/establishing-accountability-and-structure/
+    locator: Accountability
+    quote: accountability for all policies relating to the protection and safety of users is in place
+      at a senior level.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Protection of Children Code of Practice for user-to-user services
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf?v=403579
+    locator: Measure PCU A2
+    quote: The provider should name an individual accountable to the most senior governance body.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Directorship
+  - Employment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Company registries (officers)
+  - Platform terms and transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small services may combine roles without formal titles.
+  - Accountability may be documented internally but not published.
+  jurisdictions: UK
+  version: 1
+- id: OH-026
+  name: Hard-to-find or missing reporting tool for suicide and self-harm content
+  definition: Users cannot easily report suicide or self-harm content because the reporting function is
+    absent or hard to find and use.
+  areas:
+  - OH
+  typology: User reporting
+  status: verified
+  sources:
+  - title: Protection of Children Code of Practice for user-to-user services
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf?v=403579
+    locator: Measure PCU D2
+    quote: Having easy to find, easy to access and easy to use complaints systems and processes.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Platform interface review
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reporting may be available through a website rather than the app, or vice versa.
+  jurisdictions: UK
+  version: 1
+- id: OH-027
+  name: Graphic self-harm imagery accessible on the service
+  definition: A service hosts graphic images or descriptions of self-harm or suicide that users, including
+    children, can reach.
+  areas:
+  - OH
+  typology: Harmful content
+  status: verified
+  sources:
+  - title: 'Guidelines for sites and platforms: Understanding self-harm and suicide content'
+    publisher: Samaritans
+    year: ''
+    url: https://www.samaritans.org/about-samaritans/research-policy/internet-suicide/guidelines-tech-industry/understanding-self-harm-and-suicide-content/
+    locator: Harmful content categories
+    quote: Graphic descriptions or depictions
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Online Safety Act 2023, section 61
+    publisher: UK Parliament (legislation.gov.uk)
+    year: '2023'
+    url: https://www.legislation.gov.uk/ukpga/2023/50/section/61
+    locator: s.61(4)
+    quote: Content which encourages, promotes or provides instructions for an act of deliberate self-injury.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Children's Risk Assessment Guidance and Children's Risk Profiles
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/childrens-risk-assessment-guidance-and-childrens-risk-profiles.pdf?v=396653
+    locator: Row 4d 'Posting images or videos'
+    quote: suicide and self-harm content and violent content
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Platform content review (with safeguards for staff)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Medical, educational and news material can include clinical images in context.
+  - Recovery accounts may show healed scars without encouraging harm.
+  jurisdictions: UK
+  version: 1
+not_reached:
+- 'Ofcom Register of Risks (illegal harms, updated 25 June 2026), chapter 15 ''Encouraging or assisting
+  suicide (or attempted suicide), and serious self-harm'' (p.292): the fetch tool''s text conversion stops
+  at about 122,000 characters, and a direct download hit a Cloudflare challenge. Chapter 15 was not read.
+  https://www.ofcom.org.uk/siteassets/resources/documents/online-safety/information-for-industry/illegal-harms/updates/register-of-risks.pdf?v=419946'
+- 'Ofcom Children''s Register of Risks, section 3 ''Suicide and self-harm content'' (p.53): text conversion
+  stops at about 125,000 characters, before this section. Not read.'
+- 'Ofcom Guidance on content harmful to children and Illegal Content Judgements Guidance (sections on
+  suicide and self-harm): not opened.'
+- 'Outcome of Ofcom''s April 2025 suicide forum investigation: the investigation page shows no update,
+  and the Ofcom enforcement listing could not be read. Whether a provisional notice, fine or block has
+  followed is unknown.'
+- 'Kenneth Law guilty plea (29 May 2026): Reuters and the New York Times were blocked and CBC failed to
+  load. The plea is taken from Wikipedia''s summary of those reports, so it should be checked against
+  a court record or a primary news report.'
+- 'Garcia v. Character Technologies: the court docket (May 2025 motion-to-dismiss ruling) and any reported
+  settlement could not be checked. CourtListener is blocked by robots rules and Wikipedia did not cover
+  it. The case is recorded only as allegations reported by CBS.'
+- 'New York Times investigation ''Where the Despairing Log On'' (2021): site blocked.'
+- 'UK Home Office poisons and explosives precursors guidance, list of reportable substances and suspicious-transaction
+  indicators: page fetch failed.'
+- 'Samaritans sheets on user-friendly reporting, supporting user wellbeing and communicating with users
+  in distress: not opened.'
+- 'WebSearch budget ran out on the first query, so no wider discovery searches were possible: EU Digital
+  Services Act proceedings, Australian eSafety actions, US state attorney general actions on chatbots,
+  and research papers on pro-suicide forums.'

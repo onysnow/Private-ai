@@ -1,0 +1,4922 @@
+{
+ "area": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "granularity": "month"
+   },
+   "query": "payments_over_time",
+   "record_count": 4,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "2023-11",
+     "label": "Nov 2023",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r1",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 2400000
+    },
+    {
+     "key": "2023-12",
+     "label": "Dec 2023",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r4",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 5000
+    },
+    {
+     "key": "2024-01",
+     "label": "Jan 2024",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r2",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r5",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 52000
+    }
+   ],
+   "series_kind": "time",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Area chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#8A6420"
+   ],
+   "grid": {
+    "bottom": 44,
+    "containLabel": true,
+    "left": 0,
+    "right": 69,
+    "top": 96
+   },
+   "series": [
+    {
+     "areaStyle": {
+      "color": "#8A6420",
+      "opacity": 0.22
+     },
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$2.4M · 1 payment †",
+        "position": "top",
+        "show": false
+       },
+       "name": "Nov 2023",
+       "symbol": "emptyCircle",
+       "symbolSize": 8,
+       "tooltip": {
+        "formatter": "Nov 2023: $2.4M · 1 payment †"
+       },
+       "value": 2400000
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$5,000 · 1 payment †",
+        "position": "top",
+        "show": false
+       },
+       "name": "Dec 2023",
+       "symbol": "emptyCircle",
+       "symbolSize": 8,
+       "tooltip": {
+        "formatter": "Dec 2023: $5,000 · 1 payment †"
+       },
+       "value": 5000
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$52K · 2 payments",
+        "position": "top",
+        "show": true
+       },
+       "name": "Jan 2024",
+       "symbol": "circle",
+       "symbolSize": 8,
+       "tooltip": {
+        "formatter": "Jan 2024: $52K · 2 payments"
+       },
+       "value": 52000
+      }
+     ],
+     "itemStyle": {
+      "color": "#8A6420"
+     },
+     "lineStyle": {
+      "color": "#8A6420",
+      "width": 2.5
+     },
+     "name": "Payments fell after the November transfer",
+     "showSymbol": true,
+     "smooth": false,
+     "type": "line"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Amounts in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Payments fell after the November transfer",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 4 payments in this investigation's records (payments_over_time) · † hollow markers rest on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   },
+   "xAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "overflow": "truncate",
+     "width": 220
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": true
+    },
+    "axisTick": {
+     "show": false
+    },
+    "boundaryGap": false,
+    "data": [
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Nov 2023"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Dec 2023"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Jan 2024"
+     }
+    ],
+    "splitLine": {
+     "show": false
+    },
+    "type": "category"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "color": "#6B5B44",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "show": true
+    },
+    "axisLine": {
+     "show": false
+    },
+    "axisTick": {
+     "show": false
+    },
+    "min": 0.0,
+    "scale": false,
+    "splitLine": {
+     "lineStyle": {
+      "color": "#D9CDB6",
+      "width": 1
+     },
+     "show": true
+    },
+    "type": "value"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "area",
+   "limit": null,
+   "query": {
+    "name": "payments_over_time",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Payments fell after the November transfer",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Area chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M.",
+   "data_table": {
+    "columns": [
+     "Label",
+     "Value (USD)",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$2.4M",
+      "label": "Nov 2023",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r1",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 2400000
+     },
+     {
+      "formatted": "$5,000",
+      "label": "Dec 2023",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r4",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 5000
+     },
+     {
+      "formatted": "$52K",
+      "label": "Jan 2024",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r2",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r5",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 52000
+     }
+    ]
+   },
+   "description": "Area chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M. Nov 2023: $2.4M, from 1 payment († one record). Dec 2023: $5,000, from 1 payment († one record). Jan 2024: $52K, from 2 payments. Source: 4 payments in this investigation's records (payments_over_time) · † hollow markers rest on one record.",
+   "source_line": "Source: 4 payments in this investigation's records (payments_over_time) · † hollow markers rest on one record"
+  },
+  "width": 960
+ },
+ "bar": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "direction": "received"
+   },
+   "query": "payments_by_party",
+   "record_count": 5,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "Meridian Holdings Ltd",
+     "label": "Meridian Holdings Ltd",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r1",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 2400000
+    },
+    {
+     "key": "Alaric Voss",
+     "label": "Alaric Voss",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r2",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r3",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 295000
+    },
+    {
+     "key": "Harborline Civic Trust",
+     "label": "Harborline Civic Trust",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r4",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r5",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 12000
+    }
+   ],
+   "series_kind": "category",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Bar chart: Meridian received most of the money. 3 groups ranked by USD. Largest: Meridian Holdings Ltd at $2.4M; smallest: Harborline Civic Trust at $12K.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "grid": {
+    "bottom": 44,
+    "containLabel": true,
+    "left": 0,
+    "right": 145,
+    "top": 84
+   },
+   "series": [
+    {
+     "barCategoryGap": "35%",
+     "barMaxWidth": 36,
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$12K · 2 payments",
+        "position": "right",
+        "show": true
+       },
+       "name": "Harborline Civic Trust",
+       "value": 12000
+      },
+      {
+       "itemStyle": {
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$295K · 2 payments",
+        "position": "right",
+        "show": true
+       },
+       "name": "Alaric Voss",
+       "value": 295000
+      },
+      {
+       "itemStyle": {
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$2.4M · 1 payment †",
+        "position": "right",
+        "show": true
+       },
+       "name": "Meridian Holdings Ltd",
+       "value": 2400000
+      }
+     ],
+     "name": "Meridian received most of the money",
+     "type": "bar"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Amounts in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Meridian received most of the money",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "xAxis": {
+    "axisLabel": {
+     "show": false
+    },
+    "axisLine": {
+     "show": false
+    },
+    "axisTick": {
+     "show": false
+    },
+    "min": 0.0,
+    "scale": false,
+    "splitLine": {
+     "lineStyle": {
+      "color": "#D9CDB6",
+      "width": 1
+     },
+     "show": false
+    },
+    "type": "value"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "interval": 0,
+     "overflow": "truncate",
+     "width": 220
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": true
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Harborline Civic Trust"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Alaric Voss"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Meridian Holdings Ltd"
+     }
+    ],
+    "splitLine": {
+     "show": false
+    },
+    "type": "category"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "bar",
+   "limit": null,
+   "query": {
+    "name": "payments_by_party",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Meridian received most of the money",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Bar chart: Meridian received most of the money. 3 groups ranked by USD. Largest: Meridian Holdings Ltd at $2.4M; smallest: Harborline Civic Trust at $12K.",
+   "data_table": {
+    "columns": [
+     "Label",
+     "Value (USD)",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$2.4M",
+      "label": "Meridian Holdings Ltd",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r1",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 2400000
+     },
+     {
+      "formatted": "$295K",
+      "label": "Alaric Voss",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r2",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r3",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 295000
+     },
+     {
+      "formatted": "$12K",
+      "label": "Harborline Civic Trust",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r4",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r5",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 12000
+     }
+    ]
+   },
+   "description": "Bar chart: Meridian received most of the money. 3 groups ranked by USD. Largest: Meridian Holdings Ltd at $2.4M; smallest: Harborline Civic Trust at $12K. Meridian Holdings Ltd: $2.4M, from 1 payment († one record). Alaric Voss: $295K, from 2 payments. Harborline Civic Trust: $12K, from 2 payments. Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record.",
+   "source_line": "Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record"
+  },
+  "width": 960
+ },
+ "before_after": {
+  "data": {
+   "currency": null,
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "after": "p2",
+    "before": "p1"
+   },
+   "query": "pictures_compared",
+   "record_count": 2,
+   "record_noun": "pictures",
+   "rows": [
+    {
+     "key": "2023-10-03|p1",
+     "label": "The market hall, intact",
+     "picture": "doc-1",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p1",
+       "record_type": "evidence"
+      }
+     ],
+     "start": "2023-10-03",
+     "value": 1.0
+    },
+    {
+     "key": "2023-11-14|p2",
+     "label": "The market hall, destroyed",
+     "picture": "doc-2",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p2",
+       "record_type": "evidence"
+      }
+     ],
+     "start": "2023-11-14",
+     "value": 1.0
+    }
+   ],
+   "series_kind": "pictures",
+   "unit": "pictures",
+   "unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Before and after: The market hall was destroyed within six weeks. Before: The market hall, intact, taken 3 Oct 2023. After: The market hall, destroyed, taken 14 Nov 2023.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "pictures": {
+    "bottom": 44,
+    "divider": 50,
+    "items": [
+     {
+      "caption": "Before · taken 3 Oct 2023",
+      "document_id": "doc-1",
+      "label": "The market hall, intact",
+      "role": "before",
+      "taken": "2023-10-03"
+     },
+     {
+      "caption": "After · taken 14 Nov 2023",
+      "document_id": "doc-2",
+      "label": "The market hall, destroyed",
+      "role": "after",
+      "taken": "2023-11-14"
+     }
+    ],
+    "layout": "slider",
+    "top": 96
+   },
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Before: taken 3 Oct 2023. After: taken 14 Nov 2023",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "The market hall was destroyed within six weeks",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 2 pictures in this investigation's records (pictures_compared)",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ]
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "before_after",
+   "limit": null,
+   "query": {
+    "name": "pictures_compared",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "The market hall was destroyed within six weeks",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Before and after: The market hall was destroyed within six weeks. Before: The market hall, intact, taken 3 Oct 2023. After: The market hall, destroyed, taken 14 Nov 2023.",
+   "data_table": {
+    "columns": [
+     "Picture",
+     "Taken",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "3 Oct 2023",
+      "label": "The market hall, intact",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "p1",
+        "record_type": "evidence"
+       }
+      ],
+      "start": "2023-10-03",
+      "value": 1.0
+     },
+     {
+      "formatted": "14 Nov 2023",
+      "label": "The market hall, destroyed",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "p2",
+        "record_type": "evidence"
+       }
+      ],
+      "start": "2023-11-14",
+      "value": 1.0
+     }
+    ]
+   },
+   "description": "Before and after: The market hall was destroyed within six weeks. Before: The market hall, intact, taken 3 Oct 2023. After: The market hall, destroyed, taken 14 Nov 2023. The market hall, intact: taken 3 Oct 2023. The market hall, destroyed: taken 14 Nov 2023. Source: 2 pictures in this investigation's records (pictures_compared).",
+   "source_line": "Source: 2 pictures in this investigation's records (pictures_compared)"
+  },
+  "width": 960
+ },
+ "column": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "granularity": "month"
+   },
+   "query": "payments_over_time",
+   "record_count": 4,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "2023-11",
+     "label": "Nov 2023",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r1",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 2400000
+    },
+    {
+     "key": "2023-12",
+     "label": "Dec 2023",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r4",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 5000
+    },
+    {
+     "key": "2024-01",
+     "label": "Jan 2024",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r2",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r5",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 52000
+    }
+   ],
+   "series_kind": "time",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Column chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "grid": {
+    "bottom": 44,
+    "containLabel": true,
+    "left": 0,
+    "right": 8,
+    "top": 96
+   },
+   "series": [
+    {
+     "barCategoryGap": "35%",
+     "barMaxWidth": 36,
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$2.4M · 1 payment †",
+        "position": "top",
+        "show": true
+       },
+       "name": "Nov 2023",
+       "value": 2400000
+      },
+      {
+       "itemStyle": {
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$5,000 · 1 payment †",
+        "position": "top",
+        "show": true
+       },
+       "name": "Dec 2023",
+       "value": 5000
+      },
+      {
+       "itemStyle": {
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$52K · 2 payments",
+        "position": "top",
+        "show": true
+       },
+       "name": "Jan 2024",
+       "value": 52000
+      }
+     ],
+     "name": "Payments fell after the November transfer",
+     "type": "bar"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Amounts in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Payments fell after the November transfer",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 4 payments in this investigation's records (payments_over_time) · † rests on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "xAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "interval": 0,
+     "overflow": "truncate",
+     "width": 220
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": true
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Nov 2023"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Dec 2023"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Jan 2024"
+     }
+    ],
+    "splitLine": {
+     "show": false
+    },
+    "type": "category"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "show": false
+    },
+    "axisLine": {
+     "show": false
+    },
+    "axisTick": {
+     "show": false
+    },
+    "min": 0.0,
+    "scale": false,
+    "splitLine": {
+     "lineStyle": {
+      "color": "#D9CDB6",
+      "width": 1
+     },
+     "show": true
+    },
+    "type": "value"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "column",
+   "limit": null,
+   "query": {
+    "name": "payments_over_time",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Payments fell after the November transfer",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Column chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M.",
+   "data_table": {
+    "columns": [
+     "Label",
+     "Value (USD)",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$2.4M",
+      "label": "Nov 2023",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r1",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 2400000
+     },
+     {
+      "formatted": "$5,000",
+      "label": "Dec 2023",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r4",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 5000
+     },
+     {
+      "formatted": "$52K",
+      "label": "Jan 2024",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r2",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r5",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 52000
+     }
+    ]
+   },
+   "description": "Column chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M. Nov 2023: $2.4M, from 1 payment († one record). Dec 2023: $5,000, from 1 payment († one record). Jan 2024: $52K, from 2 payments. Source: 4 payments in this investigation's records (payments_over_time) · † rests on one record.",
+   "source_line": "Source: 4 payments in this investigation's records (payments_over_time) · † rests on one record"
+  },
+  "width": 960
+ },
+ "donut": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "direction": "received"
+   },
+   "query": "payments_by_party",
+   "record_count": 5,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "Meridian Holdings Ltd",
+     "label": "Meridian Holdings Ltd",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r1",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 2400000
+    },
+    {
+     "key": "Alaric Voss",
+     "label": "Alaric Voss",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r2",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r3",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 295000
+    },
+    {
+     "key": "Harborline Civic Trust",
+     "label": "Harborline Civic Trust",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r4",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r5",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 12000
+    }
+   ],
+   "series_kind": "category",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Donut chart: Meridian received most of the money. 3 parts of $2.7M. Largest: Meridian Holdings Ltd at 88.7% ($2.4M).",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#0072B2",
+    "#D55E00",
+    "#009E73"
+   ],
+   "series": [
+    {
+     "avoidLabelOverlap": true,
+     "center": [
+      "50%",
+      "56%"
+     ],
+     "clockwise": true,
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 2,
+        "color": "#0072B2"
+       },
+       "label": {
+        "formatter": "Meridian Holdings Ltd\n88.7% · $2.4M · 1 payment †"
+       },
+       "name": "Meridian Holdings Ltd",
+       "value": 2400000
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 2,
+        "color": "#D55E00"
+       },
+       "label": {
+        "formatter": "Alaric Voss\n10.9% · $295K · 2 payments"
+       },
+       "name": "Alaric Voss",
+       "value": 295000
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 2,
+        "color": "#009E73"
+       },
+       "label": {
+        "formatter": "Harborline Civic Trust\n0.4% · $12K · 2 payments"
+       },
+       "name": "Harborline Civic Trust",
+       "value": 12000
+      }
+     ],
+     "emphasis": {
+      "scale": false
+     },
+     "label": {
+      "color": "#1F1B16",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "position": "outside",
+      "show": true
+     },
+     "labelLine": {
+      "length": 14,
+      "length2": 10,
+      "lineStyle": {
+       "color": "#6B5B44"
+      },
+      "show": true
+     },
+     "radius": [
+      "40%",
+      "64%"
+     ],
+     "selectedMode": false,
+     "selectedOffset": 0,
+     "startAngle": 90,
+     "type": "pie"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Share of the total, amounts in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Meridian received most of the money",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    },
+    {
+     "id": "centre",
+     "left": "50%",
+     "subtext": "in total",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12
+     },
+     "text": "$2.7M",
+     "textAlign": "center",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 22,
+      "fontWeight": "bold"
+     },
+     "textVerticalAlign": "middle",
+     "top": "56%"
+    }
+   ]
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "donut",
+   "limit": null,
+   "query": {
+    "name": "payments_by_party",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Meridian received most of the money",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Donut chart: Meridian received most of the money. 3 parts of $2.7M. Largest: Meridian Holdings Ltd at 88.7% ($2.4M).",
+   "data_table": {
+    "columns": [
+     "Label",
+     "Value (USD)",
+     "Share",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$2.4M",
+      "label": "Meridian Holdings Ltd",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r1",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 88.7,
+      "value": 2400000
+     },
+     {
+      "formatted": "$295K",
+      "label": "Alaric Voss",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r2",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r3",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 10.9,
+      "value": 295000
+     },
+     {
+      "formatted": "$12K",
+      "label": "Harborline Civic Trust",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r4",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r5",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 0.4,
+      "value": 12000
+     }
+    ]
+   },
+   "description": "Donut chart: Meridian received most of the money. 3 parts of $2.7M. Largest: Meridian Holdings Ltd at 88.7% ($2.4M). Meridian Holdings Ltd: 88.7% · $2.4M · 1 payment †. Alaric Voss: 10.9% · $295K · 2 payments. Harborline Civic Trust: 0.4% · $12K · 2 payments. Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record.",
+   "source_line": "Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record"
+  },
+  "width": 960
+ },
+ "heatmap": {
+  "data": {
+   "currency": null,
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "claims_by_strength",
+   "record_count": 3,
+   "record_noun": "claims",
+   "rows": [
+    {
+     "across": "limited",
+     "down": "low",
+     "key": "00",
+     "label": "limited evidence, low agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "limited",
+     "down": "medium",
+     "key": "01",
+     "label": "limited evidence, medium agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "limited",
+     "down": "high",
+     "key": "02",
+     "label": "limited evidence, high agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "medium",
+     "down": "low",
+     "key": "10",
+     "label": "medium evidence, low agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "medium",
+     "down": "medium",
+     "key": "11",
+     "label": "medium evidence, medium agreement",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "claim-medium-medium-0",
+       "record_type": "claim"
+      }
+     ],
+     "value": 1.0
+    },
+    {
+     "across": "medium",
+     "down": "high",
+     "key": "12",
+     "label": "medium evidence, high agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "robust",
+     "down": "low",
+     "key": "20",
+     "label": "robust evidence, low agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "robust",
+     "down": "medium",
+     "key": "21",
+     "label": "robust evidence, medium agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "robust",
+     "down": "high",
+     "key": "22",
+     "label": "robust evidence, high agreement",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "claim-robust-high-0",
+       "record_type": "claim"
+      },
+      {
+       "record_id": "claim-robust-high-1",
+       "record_type": "claim"
+      }
+     ],
+     "value": 2.0
+    }
+   ],
+   "series_kind": "grid",
+   "unit": "claims",
+   "unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Grid: Most claims rest on robust, agreeing evidence. 3 claims in 2 of 9 cells; most in robust evidence, high agreement (2 claims).",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "grid": {
+    "bottom": 80,
+    "containLabel": true,
+    "left": 40,
+    "right": 24,
+    "top": 96
+   },
+   "series": [
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "limited evidence, low agreement",
+       "value": [
+        0,
+        0,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "limited evidence, medium agreement",
+       "value": [
+        0,
+        1,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "limited evidence, high agreement",
+       "value": [
+        0,
+        2,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "medium evidence, low agreement",
+       "value": [
+        1,
+        0,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#D8C08E"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "1 claim",
+        "show": true
+       },
+       "name": "medium evidence, medium agreement",
+       "value": [
+        1,
+        1,
+        1.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "medium evidence, high agreement",
+       "value": [
+        1,
+        2,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "robust evidence, low agreement",
+       "value": [
+        2,
+        0,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "robust evidence, medium agreement",
+       "value": [
+        2,
+        1,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "2 claims",
+        "show": true
+       },
+       "name": "robust evidence, high agreement",
+       "value": [
+        2,
+        2,
+        2.0
+       ]
+      }
+     ],
+     "emphasis": {
+      "disabled": true
+     },
+     "name": "Most claims rest on robust, agreeing evidence",
+     "type": "heatmap"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Number of claims in each cell, darker for more; the further right and up, the more evidence and the more it agrees",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Most claims rest on robust, agreeing evidence",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 3 claims in this investigation's records (claims_by_strength)",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   },
+   "visualMap": {
+    "dimension": 2,
+    "pieces": [
+     {
+      "color": "#F7F2E8",
+      "value": 0
+     },
+     {
+      "color": "#E8D9BB",
+      "gt": 0.0,
+      "lte": 0.5
+     },
+     {
+      "color": "#D8C08E",
+      "gt": 0.5,
+      "lte": 1.0
+     },
+     {
+      "color": "#C8A661",
+      "gt": 1.0,
+      "lte": 1.5
+     },
+     {
+      "color": "#B98D34",
+      "gt": 1.5,
+      "lte": 2.0
+     }
+    ],
+    "seriesIndex": 0,
+    "show": false,
+    "type": "piecewise"
+   },
+   "xAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     "Limited",
+     "Medium",
+     "Robust"
+    ],
+    "name": "Evidence →",
+    "nameGap": 32,
+    "nameLocation": "middle",
+    "nameTextStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "splitArea": {
+     "show": false
+    },
+    "type": "category"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     "Low",
+     "Medium",
+     "High"
+    ],
+    "name": "Agreement →",
+    "nameGap": 80,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "nameTextStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "type": "category"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "heatmap",
+   "limit": null,
+   "query": {
+    "name": "claims_by_strength",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Most claims rest on robust, agreeing evidence",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Grid: Most claims rest on robust, agreeing evidence. 3 claims in 2 of 9 cells; most in robust evidence, high agreement (2 claims).",
+   "data_table": {
+    "columns": [
+     "Cell",
+     "Number of claims",
+     "Records"
+    ],
+    "rows": [
+     {
+      "across": "limited",
+      "down": "low",
+      "formatted": "0",
+      "label": "limited evidence, low agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "limited",
+      "down": "medium",
+      "formatted": "0",
+      "label": "limited evidence, medium agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "limited",
+      "down": "high",
+      "formatted": "0",
+      "label": "limited evidence, high agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "medium",
+      "down": "low",
+      "formatted": "0",
+      "label": "medium evidence, low agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "medium",
+      "down": "medium",
+      "formatted": "1",
+      "label": "medium evidence, medium agreement",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "claim-medium-medium-0",
+        "record_type": "claim"
+       }
+      ],
+      "value": 1.0
+     },
+     {
+      "across": "medium",
+      "down": "high",
+      "formatted": "0",
+      "label": "medium evidence, high agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "robust",
+      "down": "low",
+      "formatted": "0",
+      "label": "robust evidence, low agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "robust",
+      "down": "medium",
+      "formatted": "0",
+      "label": "robust evidence, medium agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "robust",
+      "down": "high",
+      "formatted": "2",
+      "label": "robust evidence, high agreement",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "claim-robust-high-0",
+        "record_type": "claim"
+       },
+       {
+        "record_id": "claim-robust-high-1",
+        "record_type": "claim"
+       }
+      ],
+      "value": 2.0
+     }
+    ]
+   },
+   "description": "Grid: Most claims rest on robust, agreeing evidence. 3 claims in 2 of 9 cells; most in robust evidence, high agreement (2 claims). limited evidence, low agreement: 0 claims. limited evidence, medium agreement: 0 claims. limited evidence, high agreement: 0 claims. medium evidence, low agreement: 0 claims. medium evidence, medium agreement: 1 claim. medium evidence, high agreement: 0 claims. robust evidence, low agreement: 0 claims. robust evidence, medium agreement: 0 claims. robust evidence, high agreement: 2 claims. Source: 3 claims in this investigation's records (claims_by_strength).",
+   "source_line": "Source: 3 claims in this investigation's records (claims_by_strength)"
+  },
+  "width": 960
+ },
+ "histogram": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "payment_amounts",
+   "record_count": 6,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "Payment 0",
+     "label": "Payment 0",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p0",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 5000.0
+    },
+    {
+     "key": "Payment 1",
+     "label": "Payment 1",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p1",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 7000.0
+    },
+    {
+     "key": "Payment 2",
+     "label": "Payment 2",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p2",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 12000.0
+    },
+    {
+     "key": "Payment 3",
+     "label": "Payment 3",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p3",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 45000.0
+    },
+    {
+     "key": "Payment 4",
+     "label": "Payment 4",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p4",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 250000.0
+    },
+    {
+     "key": "Payment 5",
+     "label": "Payment 5",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p5",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 2400000.0
+    }
+   ],
+   "series_kind": "distribution",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Histogram: Most payments were small. 6 payments in 5 bins of $500K from $0 to $2.5M. Most in $0–$500K (5).",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "grid": {
+    "bottom": 76,
+    "containLabel": true,
+    "left": 8,
+    "right": 8,
+    "top": 96
+   },
+   "series": [
+    {
+     "barCategoryGap": "0%",
+     "barGap": "0%",
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 1,
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "5",
+        "position": "top",
+        "show": true
+       },
+       "name": "$0–$500K",
+       "value": 5.0
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 1,
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "0",
+        "position": "top",
+        "show": true
+       },
+       "name": "$500K–$1M",
+       "value": 0.0
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 1,
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "0",
+        "position": "top",
+        "show": true
+       },
+       "name": "$1M–$1.5M",
+       "value": 0.0
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 1,
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "0",
+        "position": "top",
+        "show": true
+       },
+       "name": "$1.5M–$2M",
+       "value": 0.0
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 1,
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "1 †",
+        "position": "top",
+        "show": true
+       },
+       "name": "$2M–$2.5M",
+       "value": 1.0
+      }
+     ],
+     "name": "Most payments were small",
+     "type": "bar"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Number of payments in each amount range (USD)",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Most payments were small",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 6 payments in this investigation's records (payment_amounts) · † rests on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "xAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "interval": 0,
+     "overflow": "truncate",
+     "width": 220
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": true
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "$0–$500K"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "$500K–$1M"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "$1M–$1.5M"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "$1.5M–$2M"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "$2M–$2.5M"
+     }
+    ],
+    "name": "Payments by amount (USD)",
+    "nameGap": 34,
+    "nameLocation": "middle",
+    "nameTextStyle": {
+     "color": "#6B5B44",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "splitLine": {
+     "show": false
+    },
+    "type": "category"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "show": false
+    },
+    "axisLine": {
+     "show": false
+    },
+    "axisTick": {
+     "show": false
+    },
+    "min": 0.0,
+    "scale": false,
+    "splitLine": {
+     "lineStyle": {
+      "color": "#D9CDB6",
+      "width": 1
+     },
+     "show": true
+    },
+    "type": "value"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "histogram",
+   "limit": null,
+   "query": {
+    "name": "payment_amounts",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Most payments were small",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Histogram: Most payments were small. 6 payments in 5 bins of $500K from $0 to $2.5M. Most in $0–$500K (5).",
+   "data_table": {
+    "columns": [
+     "Amount range (USD)",
+     "Number of payments",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "5",
+      "label": "$0–$500K",
+      "record_count": 5,
+      "record_refs": [
+       {
+        "record_id": "p0",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "p1",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "p2",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "p3",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "p4",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 5.0
+     },
+     {
+      "formatted": "0",
+      "label": "$500K–$1M",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "formatted": "0",
+      "label": "$1M–$1.5M",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "formatted": "0",
+      "label": "$1.5M–$2M",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "formatted": "1",
+      "label": "$2M–$2.5M",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "p5",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 1.0
+     }
+    ]
+   },
+   "description": "Histogram: Most payments were small. 6 payments in 5 bins of $500K from $0 to $2.5M. Most in $0–$500K (5). $0–$500K: 5 payments. $500K–$1M: 0 payments. $1M–$1.5M: 0 payments. $1.5M–$2M: 0 payments. $2M–$2.5M: 1 payment († one record). Source: 6 payments in this investigation's records (payment_amounts) · † rests on one record.",
+   "source_line": "Source: 6 payments in this investigation's records (payment_amounts) · † rests on one record"
+  },
+  "width": 960
+ },
+ "line": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "granularity": "month"
+   },
+   "query": "payments_over_time",
+   "record_count": 4,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "2023-11",
+     "label": "Nov 2023",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r1",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 2400000
+    },
+    {
+     "key": "2023-12",
+     "label": "Dec 2023",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r4",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 5000
+    },
+    {
+     "key": "2024-01",
+     "label": "Jan 2024",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r2",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r5",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 52000
+    }
+   ],
+   "series_kind": "time",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Line chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#8A6420"
+   ],
+   "grid": {
+    "bottom": 44,
+    "containLabel": true,
+    "left": 0,
+    "right": 69,
+    "top": 96
+   },
+   "series": [
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$2.4M · 1 payment †",
+        "position": "top",
+        "show": false
+       },
+       "name": "Nov 2023",
+       "symbol": "emptyCircle",
+       "symbolSize": 8,
+       "tooltip": {
+        "formatter": "Nov 2023: $2.4M · 1 payment †"
+       },
+       "value": 2400000
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$5,000 · 1 payment †",
+        "position": "top",
+        "show": false
+       },
+       "name": "Dec 2023",
+       "symbol": "emptyCircle",
+       "symbolSize": 8,
+       "tooltip": {
+        "formatter": "Dec 2023: $5,000 · 1 payment †"
+       },
+       "value": 5000
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$52K · 2 payments",
+        "position": "top",
+        "show": true
+       },
+       "name": "Jan 2024",
+       "symbol": "circle",
+       "symbolSize": 8,
+       "tooltip": {
+        "formatter": "Jan 2024: $52K · 2 payments"
+       },
+       "value": 52000
+      }
+     ],
+     "itemStyle": {
+      "color": "#8A6420"
+     },
+     "lineStyle": {
+      "color": "#8A6420",
+      "width": 2.5
+     },
+     "name": "Payments fell after the November transfer",
+     "showSymbol": true,
+     "smooth": false,
+     "type": "line"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Amounts in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Payments fell after the November transfer",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 4 payments in this investigation's records (payments_over_time) · † hollow markers rest on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   },
+   "xAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "overflow": "truncate",
+     "width": 220
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": true
+    },
+    "axisTick": {
+     "show": false
+    },
+    "boundaryGap": false,
+    "data": [
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Nov 2023"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Dec 2023"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Jan 2024"
+     }
+    ],
+    "splitLine": {
+     "show": false
+    },
+    "type": "category"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "color": "#6B5B44",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "show": true
+    },
+    "axisLine": {
+     "show": false
+    },
+    "axisTick": {
+     "show": false
+    },
+    "min": 0.0,
+    "scale": false,
+    "splitLine": {
+     "lineStyle": {
+      "color": "#D9CDB6",
+      "width": 1
+     },
+     "show": true
+    },
+    "type": "value"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "line",
+   "limit": null,
+   "query": {
+    "name": "payments_over_time",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Payments fell after the November transfer",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Line chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M.",
+   "data_table": {
+    "columns": [
+     "Label",
+     "Value (USD)",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$2.4M",
+      "label": "Nov 2023",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r1",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 2400000
+     },
+     {
+      "formatted": "$5,000",
+      "label": "Dec 2023",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r4",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 5000
+     },
+     {
+      "formatted": "$52K",
+      "label": "Jan 2024",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r2",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r5",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 52000
+     }
+    ]
+   },
+   "description": "Line chart: Payments fell after the November transfer. 3 periods from Nov 2023 to Jan 2024, amounts in USD. Highest: Nov 2023 at $2.4M. Nov 2023: $2.4M, from 1 payment († one record). Dec 2023: $5,000, from 1 payment († one record). Jan 2024: $52K, from 2 payments. Source: 4 payments in this investigation's records (payments_over_time) · † hollow markers rest on one record.",
+   "source_line": "Source: 4 payments in this investigation's records (payments_over_time) · † hollow markers rest on one record"
+  },
+  "width": 960
+ },
+ "map": {
+  "data": {
+   "currency": null,
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "places_on_map",
+   "record_count": 2,
+   "record_noun": "places",
+   "rows": [
+    {
+     "key": "meridian registered office|office",
+     "label": "Meridian registered office",
+     "latitude": 51.5072,
+     "longitude": -0.1276,
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "office",
+       "record_type": "entity"
+      }
+     ],
+     "value": 1.0
+    },
+    {
+     "key": "villa kyrenia|villa",
+     "label": "Villa Kyrenia",
+     "latitude": 35.3364,
+     "longitude": 33.3199,
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "villa",
+       "record_type": "entity"
+      }
+     ],
+     "value": 1.0
+    }
+   ],
+   "series_kind": "places",
+   "unit": "places",
+   "unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Map: The money ended up in a villa in Cyprus. 2 places: Meridian registered office, Villa Kyrenia.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#8A2F1E"
+   ],
+   "map": {
+    "attribution": "Map data © OpenStreetMap contributors",
+    "bottom": 44,
+    "flavor": "grayscale",
+    "places": [
+     {
+      "colour": "#8A2F1E",
+      "label": {
+       "fontSize": 13,
+       "fontWeight": "normal",
+       "text": "Meridian registered office"
+      },
+      "latitude": 51.5072,
+      "longitude": -0.1276,
+      "name": "Meridian registered office",
+      "radius": 7
+     },
+     {
+      "colour": "#8A2F1E",
+      "label": {
+       "fontSize": 13,
+       "fontWeight": "normal",
+       "text": "Villa Kyrenia"
+      },
+      "latitude": 35.3364,
+      "longitude": 33.3199,
+      "name": "Villa Kyrenia",
+      "radius": 7
+     }
+    ],
+    "top": 84
+   },
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Each place where its record puts it; nothing is looked up",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "The money ended up in a villa in Cyprus",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 2 places in this investigation's records (places_on_map) · Map data © OpenStreetMap contributors",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ]
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "map",
+   "limit": null,
+   "query": {
+    "name": "places_on_map",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "The money ended up in a villa in Cyprus",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Map: The money ended up in a villa in Cyprus. 2 places: Meridian registered office, Villa Kyrenia.",
+   "data_table": {
+    "columns": [
+     "Place",
+     "Where",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "51.5072° N, 0.1276° W",
+      "label": "Meridian registered office",
+      "latitude": 51.5072,
+      "longitude": -0.1276,
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "office",
+        "record_type": "entity"
+       }
+      ],
+      "value": 1.0
+     },
+     {
+      "formatted": "35.3364° N, 33.3199° E",
+      "label": "Villa Kyrenia",
+      "latitude": 35.3364,
+      "longitude": 33.3199,
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "villa",
+        "record_type": "entity"
+       }
+      ],
+      "value": 1.0
+     }
+    ]
+   },
+   "description": "Map: The money ended up in a villa in Cyprus. 2 places: Meridian registered office, Villa Kyrenia. Meridian registered office: 51.5072° N, 0.1276° W. Villa Kyrenia: 35.3364° N, 33.3199° E. Source: 2 places in this investigation's records (places_on_map) · Map data © OpenStreetMap contributors.",
+   "source_line": "Source: 2 places in this investigation's records (places_on_map) · Map data © OpenStreetMap contributors"
+  },
+  "width": 960
+ },
+ "sankey": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "payment_flows",
+   "record_count": 6,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "Meridian Holdings Ltd → Bellcastle Trading Group",
+     "label": "Meridian Holdings Ltd → Bellcastle Trading Group",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "f1",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "f2",
+       "record_type": "relationship"
+      }
+     ],
+     "source": "Meridian Holdings Ltd",
+     "target": "Bellcastle Trading Group",
+     "value": 2400000
+    },
+    {
+     "key": "Bellcastle Trading Group → Orrin Ltd",
+     "label": "Bellcastle Trading Group → Orrin Ltd",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "f3",
+       "record_type": "relationship"
+      }
+     ],
+     "source": "Bellcastle Trading Group",
+     "target": "Orrin Ltd",
+     "value": 900000
+    },
+    {
+     "key": "Meridian Holdings Ltd → Orrin Ltd",
+     "label": "Meridian Holdings Ltd → Orrin Ltd",
+     "record_count": 3,
+     "record_refs": [
+      {
+       "record_id": "f4",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "f5",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "f6",
+       "record_type": "relationship"
+      }
+     ],
+     "source": "Meridian Holdings Ltd",
+     "target": "Orrin Ltd",
+     "value": 150000
+    }
+   ],
+   "series_kind": "flows",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Flow diagram: Most of Meridian's money went to Bellcastle. 3 flows between 3 parties, amounts in USD. Largest: Meridian Holdings Ltd → Bellcastle Trading Group at $2.4M; smallest: Meridian Holdings Ltd → Orrin Ltd at $150K.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "series": [
+    {
+     "bottom": 44,
+     "data": [
+      {
+       "depth": 0,
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Meridian Holdings Ltd",
+        "position": "right",
+        "show": true
+       },
+       "name": "Meridian Holdings Ltd",
+       "tooltip": {
+        "formatter": "Meridian Holdings Ltd"
+       }
+      },
+      {
+       "depth": 1,
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Bellcastle Trading Group",
+        "position": "right",
+        "show": true
+       },
+       "name": "Bellcastle Trading Group",
+       "tooltip": {
+        "formatter": "Bellcastle Trading Group"
+       }
+      },
+      {
+       "depth": 2,
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Orrin Ltd",
+        "position": "left",
+        "show": true
+       },
+       "name": "Orrin Ltd",
+       "tooltip": {
+        "formatter": "Orrin Ltd"
+       }
+      }
+     ],
+     "draggable": false,
+     "emphasis": {
+      "focus": "adjacency"
+     },
+     "layoutIterations": 32,
+     "left": 8,
+     "lineStyle": {
+      "curveness": 0.5
+     },
+     "links": [
+      {
+       "edgeLabel": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$2.4M · 2 payments",
+        "show": true
+       },
+       "lineStyle": {
+        "color": "#CDBFA6",
+        "opacity": 0.45
+       },
+       "name": "Meridian Holdings Ltd → Bellcastle Trading Group",
+       "source": "Meridian Holdings Ltd",
+       "target": "Bellcastle Trading Group",
+       "tooltip": {
+        "formatter": "Meridian Holdings Ltd → Bellcastle Trading Group: $2.4M · 2 payments"
+       },
+       "value": 2400000
+      },
+      {
+       "edgeLabel": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$900K · 1 payment †",
+        "show": true
+       },
+       "lineStyle": {
+        "color": "#CDBFA6",
+        "opacity": 0.45
+       },
+       "name": "Bellcastle Trading Group → Orrin Ltd",
+       "source": "Bellcastle Trading Group",
+       "target": "Orrin Ltd",
+       "tooltip": {
+        "formatter": "Bellcastle Trading Group → Orrin Ltd: $900K · 1 payment †"
+       },
+       "value": 900000
+      },
+      {
+       "edgeLabel": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$150K · 3 payments",
+        "show": false
+       },
+       "lineStyle": {
+        "color": "#CDBFA6",
+        "opacity": 0.45
+       },
+       "name": "Meridian Holdings Ltd → Orrin Ltd",
+       "source": "Meridian Holdings Ltd",
+       "target": "Orrin Ltd",
+       "tooltip": {
+        "formatter": "Meridian Holdings Ltd → Orrin Ltd: $150K · 3 payments"
+       },
+       "value": 150000
+      }
+     ],
+     "name": "Most of Meridian's money went to Bellcastle",
+     "nodeAlign": "justify",
+     "nodeGap": 12,
+     "nodeWidth": 14,
+     "right": 8,
+     "top": 84,
+     "type": "sankey"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Money paid from left to right, band width by amount in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Most of Meridian's money went to Bellcastle",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 6 payments in this investigation's records (payment_flows) · † rests on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "sankey",
+   "limit": null,
+   "query": {
+    "name": "payment_flows",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Most of Meridian's money went to Bellcastle",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Flow diagram: Most of Meridian's money went to Bellcastle. 3 flows between 3 parties, amounts in USD. Largest: Meridian Holdings Ltd → Bellcastle Trading Group at $2.4M; smallest: Meridian Holdings Ltd → Orrin Ltd at $150K.",
+   "data_table": {
+    "columns": [
+     "Flow",
+     "From",
+     "To",
+     "Value (USD)",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$2.4M",
+      "label": "Meridian Holdings Ltd → Bellcastle Trading Group",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "f1",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "f2",
+        "record_type": "relationship"
+       }
+      ],
+      "source": "Meridian Holdings Ltd",
+      "target": "Bellcastle Trading Group",
+      "value": 2400000
+     },
+     {
+      "formatted": "$900K",
+      "label": "Bellcastle Trading Group → Orrin Ltd",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "f3",
+        "record_type": "relationship"
+       }
+      ],
+      "source": "Bellcastle Trading Group",
+      "target": "Orrin Ltd",
+      "value": 900000
+     },
+     {
+      "formatted": "$150K",
+      "label": "Meridian Holdings Ltd → Orrin Ltd",
+      "record_count": 3,
+      "record_refs": [
+       {
+        "record_id": "f4",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "f5",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "f6",
+        "record_type": "relationship"
+       }
+      ],
+      "source": "Meridian Holdings Ltd",
+      "target": "Orrin Ltd",
+      "value": 150000
+     }
+    ]
+   },
+   "description": "Flow diagram: Most of Meridian's money went to Bellcastle. 3 flows between 3 parties, amounts in USD. Largest: Meridian Holdings Ltd → Bellcastle Trading Group at $2.4M; smallest: Meridian Holdings Ltd → Orrin Ltd at $150K. Meridian Holdings Ltd → Bellcastle Trading Group: $2.4M, from 2 payments. Bellcastle Trading Group → Orrin Ltd: $900K, from 1 payment († one record). Meridian Holdings Ltd → Orrin Ltd: $150K, from 3 payments. Source: 6 payments in this investigation's records (payment_flows) · † rests on one record.",
+   "source_line": "Source: 6 payments in this investigation's records (payment_flows) · † rests on one record"
+  },
+  "width": 960
+ },
+ "scatter": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "measure_labels": {
+    "x": "Number of payments received",
+    "y": "Total received (USD)"
+   },
+   "omitted": [],
+   "params": {
+    "direction": "received"
+   },
+   "query": "payments_count_and_total_by_party",
+   "record_count": 5,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "Meridian Holdings Ltd",
+     "label": "Meridian Holdings Ltd",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r1",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 2400000,
+     "x": 1.0
+    },
+    {
+     "key": "Alaric Voss",
+     "label": "Alaric Voss",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r2",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r3",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 295000,
+     "x": 2.0
+    },
+    {
+     "key": "Harborline Civic Trust",
+     "label": "Harborline Civic Trust",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r4",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r5",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 12000,
+     "x": 2.0
+    }
+   ],
+   "series_kind": "pairs",
+   "unit": "USD",
+   "unit_kind": "amount",
+   "x_unit": "payments",
+   "x_unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Scatter plot: Meridian took one large payment. 3 parties, total received (USD) against number of payments received. Highest: Meridian Holdings Ltd at $2.4M from 1 payment.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#8A6420"
+   ],
+   "grid": {
+    "bottom": 70,
+    "containLabel": true,
+    "left": 8,
+    "right": 165,
+    "top": 96
+   },
+   "series": [
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Alaric Voss",
+        "position": "right",
+        "show": true
+       },
+       "name": "Alaric Voss",
+       "symbol": "circle",
+       "symbolSize": 11,
+       "tooltip": {
+        "formatter": "Alaric Voss: Number of payments received 2; Total received (USD) $295K; from 2 payments"
+       },
+       "value": [
+        2.0,
+        295000
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Harborline Civic Trust",
+        "position": "right",
+        "show": true
+       },
+       "name": "Harborline Civic Trust",
+       "symbol": "circle",
+       "symbolSize": 11,
+       "tooltip": {
+        "formatter": "Harborline Civic Trust: Number of payments received 2; Total received (USD) $12K; from 2 payments"
+       },
+       "value": [
+        2.0,
+        12000
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#8A6420",
+        "borderWidth": 2,
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Meridian Holdings Ltd †",
+        "position": "right",
+        "show": true
+       },
+       "name": "Meridian Holdings Ltd",
+       "symbol": "emptyCircle",
+       "symbolSize": 11,
+       "tooltip": {
+        "formatter": "Meridian Holdings Ltd: Number of payments received 1; Total received (USD) $2.4M; from 1 payment †"
+       },
+       "value": [
+        1.0,
+        2400000
+       ]
+      }
+     ],
+     "labelLayout": {
+      "moveOverlap": "shiftY"
+     },
+     "name": "Meridian took one large payment",
+     "type": "scatter"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Total received (USD) against number of payments received",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Meridian took one large payment",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 5 payments in this investigation's records (payments_count_and_total_by_party) · † hollow markers rest on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   },
+   "xAxis": {
+    "axisLabel": {
+     "color": "#6B5B44",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": true
+    },
+    "axisTick": {
+     "show": true
+    },
+    "min": 0.0,
+    "minInterval": 1,
+    "name": "Number of payments received",
+    "nameGap": 30,
+    "nameLocation": "middle",
+    "nameTextStyle": {
+     "color": "#6B5B44",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "scale": false,
+    "splitLine": {
+     "show": false
+    },
+    "type": "value"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "color": "#6B5B44",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "show": true
+    },
+    "axisLine": {
+     "show": false
+    },
+    "axisTick": {
+     "show": false
+    },
+    "min": 0.0,
+    "scale": false,
+    "splitLine": {
+     "lineStyle": {
+      "color": "#D9CDB6",
+      "width": 1
+     },
+     "show": true
+    },
+    "type": "value"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "scatter",
+   "limit": null,
+   "query": {
+    "name": "payments_count_and_total_by_party",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Meridian took one large payment",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Scatter plot: Meridian took one large payment. 3 parties, total received (USD) against number of payments received. Highest: Meridian Holdings Ltd at $2.4M from 1 payment.",
+   "data_table": {
+    "columns": [
+     "Label",
+     "Number of payments received",
+     "Total received (USD)",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$295K",
+      "label": "Alaric Voss",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r2",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r3",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 295000,
+      "x": 2.0,
+      "x_formatted": "2"
+     },
+     {
+      "formatted": "$12K",
+      "label": "Harborline Civic Trust",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r4",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r5",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 12000,
+      "x": 2.0,
+      "x_formatted": "2"
+     },
+     {
+      "formatted": "$2.4M",
+      "label": "Meridian Holdings Ltd",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r1",
+        "record_type": "relationship"
+       }
+      ],
+      "value": 2400000,
+      "x": 1.0,
+      "x_formatted": "1"
+     }
+    ]
+   },
+   "description": "Scatter plot: Meridian took one large payment. 3 parties, total received (USD) against number of payments received. Highest: Meridian Holdings Ltd at $2.4M from 1 payment. Alaric Voss: 2 and $295K, from 2 payments. Harborline Civic Trust: 2 and $12K, from 2 payments. Meridian Holdings Ltd: 1 and $2.4M, from 1 payment († one record). Source: 5 payments in this investigation's records (payments_count_and_total_by_party) · † hollow markers rest on one record.",
+   "source_line": "Source: 5 payments in this investigation's records (payments_count_and_total_by_party) · † hollow markers rest on one record"
+  },
+  "width": 960
+ },
+ "stacked_bar_100": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "direction": "received"
+   },
+   "query": "payments_by_party",
+   "record_count": 5,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "Meridian Holdings Ltd",
+     "label": "Meridian Holdings Ltd",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "r1",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 2400000
+    },
+    {
+     "key": "Alaric Voss",
+     "label": "Alaric Voss",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r2",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r3",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 295000
+    },
+    {
+     "key": "Harborline Civic Trust",
+     "label": "Harborline Civic Trust",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "r4",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "r5",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 12000
+    }
+   ],
+   "series_kind": "category",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "100% bar: Meridian received most of the money. 3 parts of $2.7M. Largest: Meridian Holdings Ltd at 88.7% ($2.4M).",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#0072B2",
+    "#D55E00",
+    "#009E73"
+   ],
+   "grid": {
+    "bottom": 120,
+    "containLabel": false,
+    "left": 8,
+    "right": 8,
+    "top": 150
+   },
+   "series": [
+    {
+     "barWidth": 56,
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 1,
+        "color": "#0072B2"
+       },
+       "name": "Meridian Holdings Ltd",
+       "value": 2400000
+      }
+     ],
+     "label": {
+      "align": "center",
+      "color": "#1F1B16",
+      "distance": 10,
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "formatter": "Meridian Holdings Ltd\n88.7% · $2.4M · 1 payment †",
+      "lineHeight": 16,
+      "offset": [
+       0.0,
+       0
+      ],
+      "position": "top",
+      "show": true
+     },
+     "name": "Meridian Holdings Ltd",
+     "stack": "whole",
+     "type": "bar"
+    },
+    {
+     "barWidth": 56,
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 1,
+        "color": "#D55E00"
+       },
+       "name": "Alaric Voss",
+       "value": 295000
+      }
+     ],
+     "label": {
+      "align": "center",
+      "color": "#1F1B16",
+      "distance": 10,
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "formatter": "Alaric Voss\n10.9% · $295K · 2 payments",
+      "lineHeight": 16,
+      "offset": [
+       -33.2,
+       0
+      ],
+      "position": "bottom",
+      "show": true
+     },
+     "name": "Alaric Voss",
+     "stack": "whole",
+     "type": "bar"
+    },
+    {
+     "barWidth": 56,
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#F7F2E8",
+        "borderWidth": 1,
+        "color": "#009E73"
+       },
+       "name": "Harborline Civic Trust",
+       "value": 12000
+      }
+     ],
+     "label": {
+      "align": "center",
+      "color": "#1F1B16",
+      "distance": 10,
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "formatter": "Harborline Civic Trust\n0.4% · $12K · 2 payments",
+      "lineHeight": 16,
+      "offset": [
+       -79.4,
+       0
+      ],
+      "position": "top",
+      "show": true
+     },
+     "name": "Harborline Civic Trust",
+     "stack": "whole",
+     "type": "bar"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Share of the total, amounts in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Meridian received most of the money",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "xAxis": {
+    "max": 2707000.0,
+    "min": 0,
+    "scale": false,
+    "show": false,
+    "splitLine": {
+     "show": false
+    },
+    "type": "value"
+   },
+   "yAxis": {
+    "data": [
+     "payments"
+    ],
+    "show": false,
+    "type": "category"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "stacked_bar_100",
+   "limit": null,
+   "query": {
+    "name": "payments_by_party",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Meridian received most of the money",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "100% bar: Meridian received most of the money. 3 parts of $2.7M. Largest: Meridian Holdings Ltd at 88.7% ($2.4M).",
+   "data_table": {
+    "columns": [
+     "Label",
+     "Value (USD)",
+     "Share",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$2.4M",
+      "label": "Meridian Holdings Ltd",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "r1",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 88.7,
+      "value": 2400000
+     },
+     {
+      "formatted": "$295K",
+      "label": "Alaric Voss",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r2",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r3",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 10.9,
+      "value": 295000
+     },
+     {
+      "formatted": "$12K",
+      "label": "Harborline Civic Trust",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "r4",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "r5",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 0.4,
+      "value": 12000
+     }
+    ]
+   },
+   "description": "100% bar: Meridian received most of the money. 3 parts of $2.7M. Largest: Meridian Holdings Ltd at 88.7% ($2.4M). Meridian Holdings Ltd: 88.7% · $2.4M · 1 payment †. Alaric Voss: 10.9% · $295K · 2 payments. Harborline Civic Trust: 0.4% · $12K · 2 payments. Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record.",
+   "source_line": "Source: 5 payments in this investigation's records (payments_by_party) · † rests on one record"
+  },
+  "width": 960
+ },
+ "timeline": {
+  "data": {
+   "currency": null,
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "events_in_order",
+   "record_count": 4,
+   "record_noun": "events",
+   "rows": [
+    {
+     "key": "2019-06-11",
+     "label": "Alaric Voss appointed director",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "e1",
+       "record_type": "timeline_event"
+      }
+     ],
+     "start": "2019-06-11",
+     "status": "verified",
+     "value": 1.0
+    },
+    {
+     "key": "2021-02-01",
+     "label": "Bellcastle becomes sole owner",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "e2",
+       "record_type": "timeline_event"
+      }
+     ],
+     "start": "2021-02",
+     "status": "verified",
+     "value": 1.0
+    },
+    {
+     "end": "2023-08-31",
+     "key": "2022-03-01",
+     "label": "Consulting contract runs",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "e3",
+       "record_type": "timeline_event"
+      }
+     ],
+     "start": "2022-03-01",
+     "status": "asserted",
+     "value": 1.0
+    },
+    {
+     "key": "2023-11-14",
+     "label": "Disputed $2.4M payment",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "e4",
+       "record_type": "timeline_event"
+      }
+     ],
+     "start": "2023-11-14",
+     "status": "disputed",
+     "value": 1.0
+    }
+   ],
+   "series_kind": "events",
+   "unit": "events",
+   "unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Timeline: The payment came two years after Bellcastle took control. 4 events from 11 Jun 2019 (Alaric Voss appointed director) to 14 Nov 2023 (Disputed $2.4M payment).",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#8A6420"
+   ],
+   "grid": {
+    "bottom": 70,
+    "containLabel": true,
+    "left": 8,
+    "right": 255,
+    "top": 96
+   },
+   "series": [
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "show": false
+       },
+       "name": "Bellcastle becomes sole owner",
+       "tooltip": {
+        "formatter": "Bellcastle becomes sole owner: Feb 2021 (month only) · verified"
+       },
+       "value": [
+        1612137600000,
+        "Bellcastle becomes sole owner"
+       ]
+      },
+      {
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Feb 2021 (month only) · verified",
+        "position": "right",
+        "show": true
+       },
+       "name": "Bellcastle becomes sole owner",
+       "tooltip": {
+        "formatter": "Bellcastle becomes sole owner: Feb 2021 (month only) · verified"
+       },
+       "value": [
+        1614556800000,
+        "Bellcastle becomes sole owner"
+       ]
+      }
+     ],
+     "itemStyle": {
+      "color": "#8A6420"
+     },
+     "lineStyle": {
+      "color": "#8A6420",
+      "type": "dashed",
+      "width": 4
+     },
+     "name": "Bellcastle becomes sole owner",
+     "showSymbol": true,
+     "symbol": "circle",
+     "symbolSize": 7,
+     "type": "line",
+     "z": 2
+    },
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "show": false
+       },
+       "name": "Consulting contract runs",
+       "tooltip": {
+        "formatter": "Consulting contract runs: 1 Mar 2022 – 31 Aug 2023 · asserted"
+       },
+       "value": [
+        1646092800000,
+        "Consulting contract runs"
+       ]
+      },
+      {
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "1 Mar 2022 – 31 Aug 2023 · asserted",
+        "position": "right",
+        "show": true
+       },
+       "name": "Consulting contract runs",
+       "tooltip": {
+        "formatter": "Consulting contract runs: 1 Mar 2022 – 31 Aug 2023 · asserted"
+       },
+       "value": [
+        1693526400000,
+        "Consulting contract runs"
+       ]
+      }
+     ],
+     "itemStyle": {
+      "color": "#8A6420"
+     },
+     "lineStyle": {
+      "color": "#8A6420",
+      "type": "solid",
+      "width": 6
+     },
+     "name": "Consulting contract runs",
+     "showSymbol": true,
+     "symbol": "circle",
+     "symbolSize": 7,
+     "type": "line",
+     "z": 2
+    },
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#8A6420",
+        "opacity": 1
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "11 Jun 2019 · verified",
+        "position": "right",
+        "show": true
+       },
+       "name": "Alaric Voss appointed director",
+       "symbol": "circle",
+       "symbolSize": 10,
+       "tooltip": {
+        "formatter": "Alaric Voss appointed director: 11 Jun 2019 · verified"
+       },
+       "value": [
+        1560211200000,
+        "Alaric Voss appointed director"
+       ]
+      },
+      {
+       "itemStyle": {
+        "color": "#8A6420",
+        "opacity": 1
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "14 Nov 2023 · disputed",
+        "position": "right",
+        "show": true
+       },
+       "name": "Disputed $2.4M payment",
+       "symbol": "circle",
+       "symbolSize": 10,
+       "tooltip": {
+        "formatter": "Disputed $2.4M payment: 14 Nov 2023 · disputed"
+       },
+       "value": [
+        1699920000000,
+        "Disputed $2.4M payment"
+       ]
+      }
+     ],
+     "name": "The payment came two years after Bellcastle took control",
+     "type": "scatter",
+     "z": 3
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Each event at its date, earliest first; a line runs from start to end, dashed where a date is known only to the month or year",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "The payment came two years after Bellcastle took control",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 4 events in this investigation's records (events_in_order)",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   },
+   "useUTC": true,
+   "xAxis": {
+    "axisLabel": {
+     "color": "#6B5B44",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "hideOverlap": true
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": true
+    },
+    "axisTick": {
+     "show": true
+    },
+    "max": 1705508352000,
+    "min": 1554622848000,
+    "splitLine": {
+     "show": false
+    },
+    "type": "time"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "interval": 0,
+     "overflow": "truncate",
+     "width": 220
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": false
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Disputed $2.4M payment"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Consulting contract runs"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Bellcastle becomes sole owner"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Alaric Voss appointed director"
+     }
+    ],
+    "splitLine": {
+     "show": false
+    },
+    "type": "category"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "timeline",
+   "limit": null,
+   "query": {
+    "name": "events_in_order",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "The payment came two years after Bellcastle took control",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Timeline: The payment came two years after Bellcastle took control. 4 events from 11 Jun 2019 (Alaric Voss appointed director) to 14 Nov 2023 (Disputed $2.4M payment).",
+   "data_table": {
+    "columns": [
+     "Event",
+     "When",
+     "Status",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "11 Jun 2019",
+      "label": "Alaric Voss appointed director",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "e1",
+        "record_type": "timeline_event"
+       }
+      ],
+      "start": "2019-06-11",
+      "status": "verified",
+      "value": 1.0
+     },
+     {
+      "formatted": "Feb 2021 (month only)",
+      "label": "Bellcastle becomes sole owner",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "e2",
+        "record_type": "timeline_event"
+       }
+      ],
+      "start": "2021-02",
+      "status": "verified",
+      "value": 1.0
+     },
+     {
+      "end": "2023-08-31",
+      "formatted": "1 Mar 2022 – 31 Aug 2023",
+      "label": "Consulting contract runs",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "e3",
+        "record_type": "timeline_event"
+       }
+      ],
+      "start": "2022-03-01",
+      "status": "asserted",
+      "value": 1.0
+     },
+     {
+      "formatted": "14 Nov 2023",
+      "label": "Disputed $2.4M payment",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "e4",
+        "record_type": "timeline_event"
+       }
+      ],
+      "start": "2023-11-14",
+      "status": "disputed",
+      "value": 1.0
+     }
+    ]
+   },
+   "description": "Timeline: The payment came two years after Bellcastle took control. 4 events from 11 Jun 2019 (Alaric Voss appointed director) to 14 Nov 2023 (Disputed $2.4M payment). Alaric Voss appointed director: 11 Jun 2019 · verified. Bellcastle becomes sole owner: Feb 2021 (month only) · verified. Consulting contract runs: 1 Mar 2022 – 31 Aug 2023 · asserted. Disputed $2.4M payment: 14 Nov 2023 · disputed. Source: 4 events in this investigation's records (events_in_order).",
+   "source_line": "Source: 4 events in this investigation's records (events_in_order)"
+  },
+  "width": 960
+ },
+ "treemap": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "direction": "received"
+   },
+   "query": "payments_by_party",
+   "record_count": 8,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "Meridian Holdings Ltd",
+     "label": "Meridian Holdings Ltd",
+     "record_count": 3,
+     "record_refs": [
+      {
+       "record_id": "t0",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "t1",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "t2",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 1200000
+    },
+    {
+     "key": "Alaric Voss",
+     "label": "Alaric Voss",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "t3",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "t4",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 900000
+    },
+    {
+     "key": "Harborline Civic Trust",
+     "label": "Harborline Civic Trust",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "t5",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "t6",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 600000
+    },
+    {
+     "key": "Orrin Ltd",
+     "label": "Orrin Ltd",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "t7",
+       "record_type": "relationship"
+      }
+     ],
+     "value": 300000
+    }
+   ],
+   "series_kind": "category",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Treemap: Meridian received the largest share. 4 parts of $3.0M. Largest: Meridian Holdings Ltd at 40.0% ($1.2M).",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#0072B2",
+    "#D55E00",
+    "#009E73",
+    "#CC79A7"
+   ],
+   "series": [
+    {
+     "bottom": 40,
+     "breadcrumb": {
+      "show": false
+     },
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#0072B2"
+       },
+       "label": {
+        "color": "#FFFFFF",
+        "fontWeight": "normal",
+        "formatter": "Meridian Holdings Ltd\n40.0% · $1.2M · 3 payments"
+       },
+       "name": "Meridian Holdings Ltd",
+       "tooltip": {
+        "formatter": "Meridian Holdings Ltd: 40.0% · $1.2M · 3 payments"
+       },
+       "value": 1200000
+      },
+      {
+       "itemStyle": {
+        "color": "#D55E00"
+       },
+       "label": {
+        "color": "#000000",
+        "fontWeight": "normal",
+        "formatter": "Alaric Voss\n30.0% · $900K · 2 payments"
+       },
+       "name": "Alaric Voss",
+       "tooltip": {
+        "formatter": "Alaric Voss: 30.0% · $900K · 2 payments"
+       },
+       "value": 900000
+      },
+      {
+       "itemStyle": {
+        "color": "#009E73"
+       },
+       "label": {
+        "color": "#000000",
+        "fontWeight": "normal",
+        "formatter": "Harborline Civic Trust\n20.0% · $600K · 2 payments"
+       },
+       "name": "Harborline Civic Trust",
+       "tooltip": {
+        "formatter": "Harborline Civic Trust: 20.0% · $600K · 2 payments"
+       },
+       "value": 600000
+      },
+      {
+       "itemStyle": {
+        "color": "#CC79A7"
+       },
+       "label": {
+        "color": "#000000",
+        "fontWeight": "normal",
+        "formatter": "Orrin Ltd\n10.0% · $300K · 1 payment †"
+       },
+       "name": "Orrin Ltd",
+       "tooltip": {
+        "formatter": "Orrin Ltd: 10.0% · $300K · 1 payment †"
+       },
+       "value": 300000
+      }
+     ],
+     "itemStyle": {
+      "borderColor": "#F7F2E8",
+      "borderWidth": 2,
+      "gapWidth": 2
+     },
+     "label": {
+      "color": "#1F1B16",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "overflow": "break",
+      "padding": 5,
+      "position": "insideTopLeft",
+      "show": true
+     },
+     "left": 0,
+     "nodeClick": false,
+     "right": 0,
+     "roam": false,
+     "sort": "desc",
+     "top": 84,
+     "type": "treemap",
+     "upperLabel": {
+      "show": false
+     },
+     "visibleMin": 0
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Share of the total, amounts in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Meridian received the largest share",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 8 payments in this investigation's records (payments_by_party) · † rests on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "treemap",
+   "limit": null,
+   "query": {
+    "name": "payments_by_party",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Meridian received the largest share",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Treemap: Meridian received the largest share. 4 parts of $3.0M. Largest: Meridian Holdings Ltd at 40.0% ($1.2M).",
+   "data_table": {
+    "columns": [
+     "Label",
+     "Value (USD)",
+     "Share",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$1.2M",
+      "label": "Meridian Holdings Ltd",
+      "record_count": 3,
+      "record_refs": [
+       {
+        "record_id": "t0",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "t1",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "t2",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 40.0,
+      "value": 1200000
+     },
+     {
+      "formatted": "$900K",
+      "label": "Alaric Voss",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "t3",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "t4",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 30.0,
+      "value": 900000
+     },
+     {
+      "formatted": "$600K",
+      "label": "Harborline Civic Trust",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "t5",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "t6",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 20.0,
+      "value": 600000
+     },
+     {
+      "formatted": "$300K",
+      "label": "Orrin Ltd",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "t7",
+        "record_type": "relationship"
+       }
+      ],
+      "share": 10.0,
+      "value": 300000
+     }
+    ]
+   },
+   "description": "Treemap: Meridian received the largest share. 4 parts of $3.0M. Largest: Meridian Holdings Ltd at 40.0% ($1.2M). Meridian Holdings Ltd: 40.0% · $1.2M · 3 payments. Alaric Voss: 30.0% · $900K · 2 payments. Harborline Civic Trust: 20.0% · $600K · 2 payments. Orrin Ltd: 10.0% · $300K · 1 payment †. Source: 8 payments in this investigation's records (payments_by_party) · † rests on one record.",
+   "source_line": "Source: 8 payments in this investigation's records (payments_by_party) · † rests on one record"
+  },
+  "width": 960
+ }
+}

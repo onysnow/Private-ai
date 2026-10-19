@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@fx/*": [
+        "./vendor/onysnow-effects/*"
       ]
     },
     "incremental": true

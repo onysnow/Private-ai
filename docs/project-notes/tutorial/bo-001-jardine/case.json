@@ -1,0 +1,360 @@
+{
+ "investigation": {
+  "name": "Demo · real case: Jardine Matheson and Jardine Strategic owned each other (Bermuda, 2021)",
+  "question": "How did Jardine Matheson and Jardine Strategic hold shares in each other before their 2021 amalgamation, and what else did Jardine Strategic hold?",
+  "description": "A demo built from one public record: the Supreme Court of Bermuda's judgment of 12 November 2021 giving directions in the dissenting shareholders' appraisal actions after Jardine Strategic's amalgamation. Its background, taken from the affidavit of the Group General Counsel, sets out the cross-holding between the two listed companies: Jardine Matheson held, indirectly, about 84.9% of Jardine Strategic, and Jardine Strategic held, directly and indirectly, 59.3% of Jardine Matheson. Quoted exactly. Loaded to show the ownership-loop red flag (BO-001) on a real record."
+ },
+ "entities": [
+  {
+   "key": "jardine-matheson",
+   "schema": "Company",
+   "caption": "Jardine Matheson Holdings Limited",
+   "properties": {
+    "name": [
+     "Jardine Matheson Holdings Limited"
+    ],
+    "alias": [
+     "Jardine Matheson"
+    ],
+    "jurisdiction": [
+     "bm"
+    ]
+   },
+   "note": "Primary listing on the Main Market of the London Stock Exchange; secondary listings in Singapore and Bermuda.",
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 2",
+     "quote": "Mr. Parr explains that Jardine Matheson Holdings Limited (“Jardine Matheson”) is a company limited by shares and incorporated in Bermuda. It has as its primary listing a standard listing on the Main Market of the London Stock Exchange. It also has secondary listings in Singapore and Bermuda."
+    }
+   ]
+  },
+  {
+   "key": "jardine-strategic",
+   "schema": "Company",
+   "caption": "Jardine Strategic Holdings Limited",
+   "properties": {
+    "name": [
+     "Jardine Strategic Holdings Limited"
+    ],
+    "jurisdiction": [
+     "bm"
+    ]
+   },
+   "note": "“The Company” in the judgment. Amalgamated with JMH Bermuda Limited on 14 April 2021; the two continued as Jardine Strategic Limited.",
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 2, para. 1",
+     "quote": "appraisal of the fair value of their shares in Jardine Strategic Holdings Limited (“the Company”). These proceedings arise out of the amalgamation of the Company with JMH Bermuda Limited (“JMH”) on 14 of April 2021 (“the Amalgamation”) pursuant to the provisions of the Act, on which date JMH and the Company continued as Jardine Strategic Limited (“Jardine Strategic”)."
+    },
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 3",
+     "quote": "Prior to the Amalgamation, the Company was also incorporated in Bermuda and had as its primary listing a standard listing on the Main Market of the London Stock Exchange."
+    }
+   ]
+  },
+  {
+   "key": "hongkong-land",
+   "schema": "Company",
+   "caption": "Hong Kong Land Holdings Ltd",
+   "properties": {
+    "name": [
+     "Hong Kong Land Holdings Ltd"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 5",
+     "quote": "approximately 50.4% of Hong Kong Land Holdings Ltd"
+    }
+   ]
+  },
+  {
+   "key": "dairy-farm",
+   "schema": "Company",
+   "caption": "Dairy Farm International Holdings Ltd",
+   "properties": {
+    "name": [
+     "Dairy Farm International Holdings Ltd"
+    ]
+   },
+   "note": "The name runs over the page break: “Dairy Farm” ends page 3, “International Holdings Ltd” opens page 4.",
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 5",
+     "quote": "77.6% of Dairy Farm"
+    },
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 4, para. 5 (cont.)",
+     "quote": "International Holdings Ltd, 79.5% of Mandarin Oriental International Ltd"
+    }
+   ]
+  },
+  {
+   "key": "mandarin-oriental",
+   "schema": "Company",
+   "caption": "Mandarin Oriental International Ltd",
+   "properties": {
+    "name": [
+     "Mandarin Oriental International Ltd"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 4, para. 5 (cont.)",
+     "quote": "79.5% of Mandarin Oriental International Ltd"
+    }
+   ]
+  },
+  {
+   "key": "jardine-cycle-carriage",
+   "schema": "Company",
+   "caption": "Jardine Cycle & Carriage Ltd",
+   "properties": {
+    "name": [
+     "Jardine Cycle & Carriage Ltd"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 4, para. 5 (cont.)",
+     "quote": "75% of Jardine Cycle & Carriage Ltd."
+    }
+   ]
+  }
+ ],
+ "relationships": [
+  {
+   "schema": "Ownership",
+   "source": "jardine-matheson",
+   "target": "jardine-strategic",
+   "properties": {
+    "percentage": [
+     "84.9"
+    ],
+    "role": [
+     "Held indirectly, approximately 84.9%, prior to the Amalgamation (14 April 2021)"
+    ]
+   },
+   "note": "The judgment does not name the subsidiaries the shares were held through.",
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 3",
+     "quote": "Prior to the Amalgamation, amongst other interests in the Group, Jardine Matheson held, indirectly, approximately 84.9% of the shares in the Company."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jardine-strategic",
+   "target": "jardine-matheson",
+   "properties": {
+    "percentage": [
+     "59.3"
+    ],
+    "role": [
+     "Owned directly and indirectly, 59.3%: the cross-holding between the two listed companies (“almost 59%” in para. 6)"
+    ]
+   },
+   "note": "The judgment does not name the subsidiaries the shares were held through.",
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 5",
+     "quote": "The Group’s structure included a cross-holding structure between the two listed companies. The Company owned, directly and indirectly, 59.3% of the shares in Jardine Matheson."
+    },
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 4, para. 6",
+     "quote": "the subsequent cancellation by Jardine Matheson of the Company’s almost 59% shareholding in it."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jardine-strategic",
+   "target": "hongkong-land",
+   "properties": {
+    "percentage": [
+     "50.4"
+    ],
+    "role": [
+     "Approximately 50.4%, one of the Group's major listed interests held by the Company"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 5",
+     "quote": "In addition, the Company held most of the Group’s major listed interests, including, for example, approximately 50.4% of Hong Kong Land Holdings Ltd, 77.6% of Dairy Farm"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jardine-strategic",
+   "target": "dairy-farm",
+   "properties": {
+    "percentage": [
+     "77.6"
+    ],
+    "role": [
+     "77.6%, one of the Group's major listed interests held by the Company"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 5",
+     "quote": "In addition, the Company held most of the Group’s major listed interests, including, for example, approximately 50.4% of Hong Kong Land Holdings Ltd, 77.6% of Dairy Farm"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jardine-strategic",
+   "target": "mandarin-oriental",
+   "properties": {
+    "percentage": [
+     "79.5"
+    ],
+    "role": [
+     "79.5%, one of the Group's major listed interests held by the Company"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 4, para. 5 (cont.)",
+     "quote": "International Holdings Ltd, 79.5% of Mandarin Oriental International Ltd and 75% of Jardine Cycle & Carriage Ltd."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jardine-strategic",
+   "target": "jardine-cycle-carriage",
+   "properties": {
+    "percentage": [
+     "75"
+    ],
+    "role": [
+     "75%, one of the Group's major listed interests held by the Company"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 4, para. 5 (cont.)",
+     "quote": "International Holdings Ltd, 79.5% of Mandarin Oriental International Ltd and 75% of Jardine Cycle & Carriage Ltd."
+    }
+   ]
+  }
+ ],
+ "events": [
+  {
+   "date": "2021-03-08",
+   "precision": "day",
+   "title": "Jardine Strategic and Jardine Matheson announce plans to simplify the Group's structure",
+   "description": "First, Jardine Matheson buys for cash the roughly 15% of Jardine Strategic it does not own; then it cancels Jardine Strategic's almost 59% shareholding in it.",
+   "entity": "jardine-strategic",
+   "evidence": {
+    "doc": "jardine-strategic-appraisal-directions",
+    "locator": "page 4, para. 6",
+    "quote": "On 8 March 2021, the Company and Jardine Matheson announced plans to simplify the structure of the Group."
+   }
+  },
+  {
+   "date": "2021-04-12",
+   "precision": "day",
+   "title": "Jardine Strategic's general meeting approves the Amalgamation Agreement",
+   "entity": "jardine-strategic",
+   "evidence": {
+    "doc": "jardine-strategic-appraisal-directions",
+    "locator": "page 5, para. 10",
+    "quote": "At the General Meeting of the Company held on 12 April 2021, a resolution approving the Amalgamation Agreement was passed."
+   }
+  },
+  {
+   "date": "2021-04-14",
+   "precision": "day",
+   "title": "The amalgamation takes effect: Jardine Strategic Holdings and JMH Bermuda continue as Jardine Strategic Limited",
+   "entity": "jardine-strategic",
+   "evidence": {
+    "doc": "jardine-strategic-appraisal-directions",
+    "locator": "page 5, para. 10",
+    "quote": "The Amalgamation became effective on 14 April 2021."
+   }
+  },
+  {
+   "date": "2021-11-12",
+   "precision": "day",
+   "title": "Supreme Court of Bermuda gives directions in the dissenting shareholders' appraisal actions",
+   "description": "Hargun CJ, in 18 actions seeking appraisal of the fair value of the dissenting shareholders' shares in Jardine Strategic Holdings.",
+   "entity": "jardine-strategic",
+   "evidence": {
+    "doc": "jardine-strategic-appraisal-directions",
+    "locator": "page 2, heading",
+    "quote": "Date of Judgment: 12 November 2021"
+   }
+  }
+ ],
+ "claims": [
+  {
+   "text": "Before the 2021 amalgamation, Jardine Matheson and Jardine Strategic owned each other: Jardine Matheson held, indirectly, about 84.9% of Jardine Strategic, and Jardine Strategic held, directly and indirectly, 59.3% of Jardine Matheson.",
+   "status": "supported",
+   "rationale": "Stated in the Supreme Court of Bermuda's judgment, from the Group General Counsel's affidavit.",
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 3",
+     "quote": "Prior to the Amalgamation, amongst other interests in the Group, Jardine Matheson held, indirectly, approximately 84.9% of the shares in the Company.",
+     "stance": "supports"
+    },
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 3, para. 5",
+     "quote": "The Group’s structure included a cross-holding structure between the two listed companies. The Company owned, directly and indirectly, 59.3% of the shares in Jardine Matheson.",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "Jardine Matheson undertook to vote, and to have its wholly-owned subsidiaries vote, 940,903,135 Jardine Strategic shares (84.89%) for the amalgamation, so its approval was certain.",
+   "status": "supported",
+   "rationale": "Stated in the Supreme Court of Bermuda's judgment.",
+   "evidence": [
+    {
+     "doc": "jardine-strategic-appraisal-directions",
+     "locator": "page 4, para. 7",
+     "quote": "Jardine Matheson had undertaken to the Company that it would vote and would procure that its wholly-owned subsidiaries would vote the 940,903,135 shares (representing 84.89% of the existing issued share capital of the Company) in favour of the resolution. The requisite approval was therefore certain to be secured.",
+     "stance": "supports"
+    }
+   ]
+  }
+ ],
+ "leads": [
+  {
+   "title": "Which subsidiaries held the cross-holding?",
+   "priority": "high",
+   "detail": "The judgment says Jardine Matheson's 84.9% was held indirectly and Jardine Strategic's 59.3% directly and indirectly, but names no intermediate company. Find them in the two companies' 2020 annual reports."
+  },
+  {
+   "title": "When was Jardine Strategic's stake in Jardine Matheson cancelled?",
+   "priority": "normal",
+   "detail": "The plan announced on 8 March 2021 ended with Jardine Matheson cancelling Jardine Strategic's almost 59% shareholding in it; this judgment deals only with the first step."
+  }
+ ],
+ "watchlist": [
+  "Jardine Matheson Holdings",
+  "Jardine Strategic Holdings"
+ ]
+}

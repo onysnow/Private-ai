@@ -11,7 +11,11 @@ import app.models.domain  # noqa: F401  # register all mapped tables
 
 config = context.config
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # disable_existing_loggers=False: the app runs migrations from its own startup
+    # (ensure_database_schema in the lifespan), and fileConfig's default would
+    # silently switch off every logger created before it -- including the
+    # structured application log the operator console reads.
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # Programmatic callers may provide an explicit database URL through Config.attributes.
 # Otherwise DATABASE_URL is authoritative, with app settings as the final fallback.

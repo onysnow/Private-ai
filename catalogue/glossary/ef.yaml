@@ -1,0 +1,296 @@
+area: EF
+terms:
+- term: Elder financial exploitation (EFE)
+  definition: Illegal or improper use of an older person's money, property or assets by anyone, from family
+    to strangers.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related:
+  - Elder theft
+  - Elder scam
+  indicators: []
+  areas:
+  - EF
+- term: Older adult
+  definition: For US federal guidance, a person aged 60 or over.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Elder theft
+  definition: Theft of an older person's assets, money or income by someone they know and trust, such
+    as a relative or carer.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Elder scam
+  definition: A trick in which an older person sends money to a stranger or impostor for something promised
+    that never arrives.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Money mule
+  definition: A person, knowing or not, who moves illicit money at someone else's direction; scam victims
+    are often recruited as mules.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Suspicious Activity Report (SAR)
+  definition: A confidential report a US financial institution must file with FinCEN when it suspects
+    a transaction involves crime or has no apparent lawful purpose.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related:
+  - FinCEN
+  indicators: []
+  areas:
+  - EF
+- term: FinCEN
+  definition: The US Treasury's Financial Crimes Enforcement Network, which collects SARs and issues advisories
+    with red flags.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Adult Protective Services (APS)
+  definition: A state social-service programme, authorised by law in every US state, that receives and
+    investigates reports of abuse, neglect or exploitation of vulnerable adults.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Fiduciary
+  definition: Someone with legal authority and a duty to manage another person's money or property for
+    that person's benefit, such as an agent under a power of attorney, guardian, trustee or benefits payee.
+  examples: []
+  source_url: https://files.consumerfinance.gov/f/documents/cfpb_suspicious-activity-reports-elder-financial-exploitation_report.pdf
+  cases: []
+  related:
+  - Power of attorney
+  - Guardian / conservator
+  - Representative payee
+  indicators: []
+  areas:
+  - EF
+- term: Power of attorney (agent)
+  definition: A legal document letting one person (the agent) act on another's behalf in money matters;
+    its abuse is a common route to elder theft.
+  examples:
+  - 'US v Hampton: an exterminator got a widow to sign over her power of attorney.'
+  source_url: https://files.consumerfinance.gov/f/documents/cfpb_suspicious-activity-reports-elder-financial-exploitation_report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Guardian / conservator
+  definition: A person appointed by a court to manage the affairs or property of someone found unable
+    to do so; courts are responsible for overseeing them.
+  examples: []
+  source_url: https://gao.gov/assets/a310745.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Representative payee
+  definition: A person or organisation the Social Security Administration appoints to receive and manage
+    benefits for someone who cannot manage them.
+  examples: []
+  source_url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Conduit payee
+  definition: A representative payee who simply passes the full benefit on without managing or accounting
+    for it.
+  examples: []
+  source_url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: De facto representative payee
+  definition: Someone who manages a beneficiary's benefits without being formally appointed by the SSA.
+  examples: []
+  source_url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Undue influence
+  definition: Excessive pressure that overcomes a person's free will and leads to an unfair result; California's
+    statute weighs vulnerability, the influencer's authority, tactics and fairness of outcome.
+  examples: []
+  source_url: https://law.justia.com/codes/california/code-wic/division-9/part-3/chapter-11/article-2/section-15610-70/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Specified adult
+  definition: Under FINRA Rule 2165, a person aged 65 or older, or an adult the firm reasonably believes
+    has an impairment that stops them protecting their own interests.
+  examples: []
+  source_url: https://www.finra.org/industry/notices/17-11
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Trusted contact person
+  definition: Someone a brokerage or bank customer names whom the firm may contact if it suspects the
+    customer is being exploited.
+  examples: []
+  source_url: https://www.finra.org/industry/notices/17-11
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Temporary hold
+  definition: A pause a firm may place on a disbursement from a specified adult's account when it reasonably
+    believes exploitation is happening; under FINRA Rule 2165 it expires within 15 business days, extendable
+    by 10.
+  examples: []
+  source_url: https://www.finra.org/industry/notices/17-11
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Account takeover
+  definition: Deliberate compromise of a victim's account to remove or steal their money; the most cited
+    typology in elder scam reports.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Advance fee scam
+  definition: A scam where the victim pays an upfront fee, framed as tax or admin costs, for a prize or
+    deal that does not exist.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Check fraud
+  definition: Stealing or copying someone's cheques and cashing them, including altering intercepted cheques.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Government imposter scam
+  definition: Scammers pose as officials from agencies such as Social Security, Medicare or the IRS and
+    threaten arrest or account seizure to extract money.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Romance scam
+  definition: A fraudster builds a fake online romantic relationship to get money, personal information,
+    or use of the victim as a money mule.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Emergency / person-in-need ('grandparent') scam
+  definition: A scammer pretends to be a relative or official and claims a loved one urgently needs money
+    for an emergency.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Lottery and sweepstakes scam
+  definition: An advance-fee scheme telling the victim they won a prize but must pay fees or taxes first.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Tech and customer support scam (refund scam)
+  definition: Scammers posing as tech support claim the computer is infected, take remote access and payments,
+    then trick victims into returning a fake 'over-refund'.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Convertible virtual currency (CVC)
+  definition: Digital currency such as bitcoin that can be exchanged for ordinary money; increasingly
+    requested by scammers.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Money services business (MSB)
+  definition: A non-bank financial business such as a money transmitter or currency exchanger; MSBs file
+    many elder-scam SARs.
+  examples: []
+  source_url: https://files.consumerfinance.gov/f/documents/cfpb_suspicious-activity-reports-elder-financial-exploitation_report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF
+- term: Codicil
+  definition: A later document that amends a will; in the Astor case codicils were executed while the
+    testator lacked capacity and one signature was forged.
+  examples: []
+  source_url: https://www.nycourts.gov/Reporter/3dseries/2013/2013_02032.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EF

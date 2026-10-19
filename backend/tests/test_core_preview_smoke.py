@@ -2,11 +2,7 @@ from fastapi.testclient import TestClient
 
 from app.db.session import Base, engine
 from app.main import app
-
-
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+from tests.claim_helpers import post_claim
 
 
 def test_core_preview_capabilities_do_not_require_ai():
@@ -63,7 +59,7 @@ def test_reporter_core_workflow_document_to_evidence_claim_relationship_dossier_
     }).json()
 
     # Evidence -> claim verification.
-    claim = client.post('/api/claims', json={
+    claim = post_claim(client, {
         'investigation_id': inv['id'],
         'text': 'Ada North served on the Meridian Utility board.',
         'status': 'supported', 'confidence': 0.9,

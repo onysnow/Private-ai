@@ -1,0 +1,2452 @@
+key: SV
+name: Sexual harassment and sexual violence against adults
+scope: Workplace and institutional sexual harassment; rape and the police response (unfounded cases, untested
+  kits); sexual abuse of adults by clergy, aid workers and others; non-consensual intimate images, deepfake
+  porn and stalkerware; non-consensual or underage content on porn platforms.
+indicators:
+- id: SV-001
+  name: Homogeneous workforce
+  definition: A workplace where nearly everyone shares the same sex, background or profile, so the few
+    who differ are isolated and more easily targeted.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E, Risk Factors for Harassment
+    quote: Homogenous Workforces
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A trade or engineering team with one or two women among dozens of men
+  - A newsroom or executive floor with almost no staff from minority groups
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Employment
+  - Person
+  - Document
+  checkable: records
+  lookup_sources:
+  - EEO-1 or equivalent workforce diversity disclosures
+  - Company annual or ESG reports
+  - UK gender pay gap filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Industry labour pools are themselves homogeneous
+  - Small employers with few hires
+  - Recent diversity hiring not yet reflected in figures
+  jurisdictions: US (applies generally)
+  version: 1
+- id: SV-002
+  name: Workers who do not fit workplace norms
+  definition: Staff who depart from what is expected in a workplace (for example, the first women in a
+    male-dominated job) face higher harassment risk.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Workplaces Where Some Workers Do Not Conform to Workplace Norms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Women in construction, firefighting or the military
+  - Openly LGBTQ staff in a conservative workplace culture
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Being in a minority group does not itself mean harassment is happening
+  - Many such workplaces have strong inclusion programmes
+  version: 1
+- id: SV-003
+  name: Cultural and language divides in the workforce
+  definition: Sudden influxes of workers from other cultures, large blocs of workers who differ from the
+    majority, or language barriers that leave workers unaware of their rights.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Cultural and Language Differences in the Workplace
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Agricultural or meatpacking workforce with many migrant workers and English-only complaint procedures
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Person
+  - Document
+  checkable: records
+  lookup_sources:
+  - Visa programme employer data (e.g., H-2A/H-2B disclosures)
+  - Company policies and complaint procedures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Migrant workers with language barriers also feature in labour exploitation indicator lists
+    source_url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+  innocent_explanations:
+  - Diverse workforces are common and lawful
+  - Employer may provide translated policies and bilingual complaint channels
+  version: 1
+- id: SV-004
+  name: Coarsened outside discourse spilling into work
+  definition: Crude or hostile public conversation and events outside work make harassment at work more
+    likely or more accepted.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Coarsened Social Discourse Outside the Workplace
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Spike in complaints after a divisive public event
+  cases: []
+  data_needed:
+  - Event
+  - Organization
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Outside events affect all workplaces; this is context, not evidence of a specific failure
+  version: 1
+- id: SV-005
+  name: Many young workers
+  definition: Workforces with many young or first-job workers, who are less familiar with workplace norms
+    and often in precarious jobs.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Workforces with Many Young Workers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fast-food chains, retail, internships and seasonal work
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Person
+  checkable: records
+  lookup_sources:
+  - Workforce disclosures
+  - Labour statistics by industry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many industries naturally employ young people
+  - Strong training and supervision can offset the risk
+  version: 1
+- id: SV-006
+  name: Protected 'high-value' or 'superstar' employee
+  definition: A star performer, rainmaker or senior figure whose misconduct managers overlook because
+    losing them seems too costly.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: pending
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E, Workplaces with "High Value" Employees
+    quote: Employers may find themselves in a position where the harasser is a workplace 'superstar.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: senior management may be reluctant to challenge the behavior of their high value employees
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A founder, star producer, top surgeon or head coach repeatedly complained about but kept on
+  cases:
+  - name: New York Attorney General v. The Weinstein Company, Harvey Weinstein and Robert Weinstein
+    year: '2020'
+    jurisdiction: New York, US
+    what_happened: The AG's 2018 suit alleged the company and Robert Weinstein were aware of and acquiesced
+      in repeated unlawful conduct; it was resolved with an $18,875,000 victims' compensation fund.
+    outcome: settled
+    outcome_verified: false
+    source_url: https://www.jurist.org/news/2020/07/two-lawsuits-against-harvey-weinstein-to-be-settled-for-18-9m
+    source_title: Two lawsuits against Harvey Weinstein to be settled for $18.9M
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Directorship
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Court dockets (civil suits naming the individual)
+  - Regulator and EEOC/state agency actions
+  - Corporate filings showing settlements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High performers attract complaints from competitors or disgruntled staff
+  - Complaints may have been investigated and not substantiated
+  version: 1
+- id: SV-007
+  name: Large power gaps
+  definition: Large gaps in status between workers (for example executives and assistants, supervisors
+    and temps) embolden high-status staff and deter low-status staff from reporting.
+  areas:
+  - CA
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Workplaces with Significant Power Disparities
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Sexual harassment and harassment at work: technical guidance'
+    publisher: Equality and Human Rights Commission (UK)
+    year: '2024'
+    url: https://www.equalityhumanrights.com/guidance/sexual-harassment-and-harassment-work-technical-guidance
+    locator: para 1.28
+    quote: the harasser is in a position of trust or seniority to the worker, or holds any other form
+      of power over them
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Executive and personal assistants
+  - Supervisors with control over shifts of temporary or migrant staff
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Organisation charts
+  - Staffing agency contracts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - All hierarchies have power gaps; the risk rises only without checks and safe reporting routes
+  version: 1
+- id: SV-008
+  name: Pay depends on pleasing customers or clients
+  definition: Workers whose income relies on tips, ratings or client satisfaction may tolerate harassment
+    from customers to protect their pay.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016; third-party harassment, EHRC)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Workplaces that Rely on Customer Service or Client Satisfaction
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Sexual harassment and harassment at work: technical guidance'
+    publisher: Equality and Human Rights Commission (UK)
+    year: '2024'
+    url: https://www.equalityhumanrights.com/guidance/sexual-harassment-and-harassment-work-technical-guidance
+    locator: para 3.32
+    quote: the nature of any contact with third parties, for example, type of third party, frequency,
+      environment
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Restaurant and bar staff on tipped wages
+  - Gig and ride-hail drivers rated by passengers
+  - Hotel housekeepers
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Contract
+  checkable: records
+  lookup_sources:
+  - Wage structure disclosures
+  - Labour department filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Service jobs are common; risk depends on whether employer protects staff from customers
+  version: 1
+- id: SV-009
+  name: Monotonous or low-intensity work
+  definition: Boring, repetitive work where some workers may vent frustration through harassment or bullying.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Workplaces Where Work is Monotonous or Consists of Low-Intensity Tasks
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Warehouse night shifts, security monitoring
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many monotonous workplaces have no harassment problem
+  version: 1
+- id: SV-010
+  name: Isolated or lone working
+  definition: Workers separated from colleagues (night shifts, home visits, hotel rooms, remote sites)
+    are easier to reach and have fewer witnesses.
+  areas:
+  - CA
+  - SV
+  typology: Workplace risk factor (EEOC 2016; EHRC 2024)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Isolated Workspaces
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Sexual harassment and harassment at work: technical guidance'
+    publisher: Equality and Human Rights Commission (UK)
+    year: '2024'
+    url: https://www.equalityhumanrights.com/guidance/sexual-harassment-and-harassment-work-technical-guidance
+    locator: para 3.32 (example)
+    quote: sometimes workers will attend client sites alone
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hotel housekeepers
+  - Home-care workers
+  - Janitors on night shift
+  cases: []
+  data_needed:
+  - Organization
+  - Employment
+  - Address
+  checkable: records
+  lookup_sources:
+  - Job descriptions and shift patterns
+  - OSHA / HSE lone-worker policies
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lone working is normal in many jobs; risk depends on safeguards like panic buttons and check-ins
+  version: 1
+- id: SV-011
+  name: Alcohol-heavy work culture
+  definition: Workplaces or work events where drinking is tolerated or encouraged, lowering inhibitions
+    and judgement.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Workplace Cultures that Tolerate or Encourage Alcohol Consumption
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Sexual harassment and harassment at work: technical guidance'
+    publisher: Equality and Human Rights Commission (UK)
+    year: '2024'
+    url: https://www.equalityhumanrights.com/guidance/sexual-harassment-and-harassment-work-technical-guidance
+    locator: para 3.79
+    quote: dealing with people who have consumed alcohol or drugs
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sales teams with routine client drinking events
+  - Hospitality and nightlife venues
+  cases: []
+  data_needed:
+  - Organization
+  - Event
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Expense records for entertainment
+  - Event invitations and social media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Hospitality businesses serve alcohol by nature
+  - Occasional work socials are normal
+  version: 1
+- id: SV-012
+  name: Decentralised workplace with weak oversight
+  definition: Organisations with many separate sites or units and little communication upward, so local
+    managers go unchecked.
+  areas:
+  - SV
+  typology: Workplace risk factor (EEOC 2016)
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section E
+    quote: Decentralized Workplaces
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Franchise chains
+  - Denominations whose congregations are autonomous
+  cases:
+  - name: Guidepost Solutions independent investigation of the Southern Baptist Convention Executive Committee
+    year: '2022'
+    jurisdiction: US
+    what_happened: An investigation commissioned by the denomination found the Executive Committee stonewalled
+      survivors and was focused on avoiding liability; it recommended an offender information system.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://kutv.com/news/nation-world/top-southern-baptists-stonewalled-sex-abuse-victims-report-says-executive-committee-largest-us-protestant-denomination-clergy-sex-abuse-allegations-2-decades
+    source_title: Top Southern Baptists stonewalled sex abuse victims, report says (AP)
+  data_needed:
+  - Organization
+  - Ownership
+  - Address
+  checkable: records
+  lookup_sources:
+  - Corporate registries and franchise disclosure documents
+  - Denominational directories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Decentralisation is a normal structure; many have strong central reporting lines
+  version: 1
+- id: SV-013
+  name: Retaliation against people who report
+  definition: Complainants or whistleblowers are demoted, isolated, disciplined or pushed out after raising
+    sexual harassment or assault.
+  areas:
+  - SV
+  typology: Reporting failure
+  status: verified
+  sources:
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Part Two, Section B
+    quote: 75% of employees who spoke out against workplace mistreatment faced some form of retaliation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Fort Hood Independent Review Committee report, Executive Summary
+    publisher: US Army (copy hosted by americanrhetoric.com)
+    year: '2020'
+    url: https://www.americanrhetoric.com/speeches/PDFFiles/forthoodRICreportexecutivesummary.pdf
+    locator: Executive Summary
+    quote: victims feared the inevitable consequences of reporting
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Aid charities put their reputation ahead of dealing with 'endemic' sexual abuse, say MPs (on
+      IDC report)
+    publisher: Civil Society (reporting UK House of Commons International Development Committee)
+    year: '2018'
+    url: https://www.civilsociety.co.uk/news/aid-charities-put-their-reputation-ahead-of-dealing-with-endemic-sexual-abuse-say-mps.html
+    locator: article body
+    quote: end up feeling penalised
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Complainant moved to a worse shift after reporting
+  - Whistleblower dismissed within months of a complaint
+  cases:
+  - name: EEOC v. Activision Blizzard
+    year: '2022'
+    jurisdiction: US federal court (California)
+    what_happened: The EEOC found evidence of sexual harassment, pregnancy discrimination and related
+      retaliation; a judge approved an $18 million fund to compensate claimants.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.cnbc.com/2022/03/30/judge-approves-activision-blizzard-sexual-harassment-settlement.html
+    source_title: Judge approves Activision Blizzard sexual harassment settlement (CNBC)
+  data_needed:
+  - Person
+  - Employment
+  - CourtCase
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - EEOC and state civil rights agency charges and lawsuits
+  - Employment tribunal judgments (UK)
+  - Court dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Adverse actions may be for documented performance reasons unrelated to the complaint
+  - Restructuring can coincidentally affect complainants
+  version: 1
+- id: SV-014
+  name: Complaints about the same person over years without action
+  definition: An institution receives repeated complaints about one person over a long period but does
+    not investigate or act meaningfully.
+  areas:
+  - CA
+  - SV
+  typology: Institutional knowledge and inaction
+  status: verified
+  sources:
+  - title: Ohio State investigation finds former doctor Richard Strauss sexually abused at least 177 students
+      (on Perkins Coie report)
+    publisher: Eleven Warriors (reporting university-commissioned investigation)
+    year: '2019'
+    url: https://elevenwarriors.com/the-ohio-state-university/2019/05/104265/ohio-state-investigation-finds-former-doctor-richard-strauss-sexually-abused-at-least-177-students-from-1979
+    locator: article body
+    quote: failed to investigate or act meaningfully
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: $852 Million Settlement Reached In Lawsuits Over Ex-USC Gynecologist George Tyndall
+    publisher: NBC Los Angeles
+    year: '2021'
+    url: https://www.nbclosangeles.com/news/local/global-settlement-reached-in-lawsuits-over-ex-usc-gynecologist-george-tyndall/2559398/
+    locator: article body
+    quote: some complaints dating back to the late 1980s
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: New York sues Harvey Weinstein over sexual misconduct
+    publisher: Al Jazeera
+    year: '2018'
+    url: https://www.aljazeera.com/features/2018/2/12/new-york-sues-harvey-weinstein-over-sexual-misconduct
+    locator: quoting NY AG complaint
+    quote: were aware of and acquiesced in repeated and persistent unlawful conduct
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Team doctor complained about for two decades
+  - Executive with multiple HR complaints over several years
+  cases:
+  - name: Richard Strauss, Ohio State University (Perkins Coie investigation)
+    year: '2019'
+    jurisdiction: Ohio, US
+    what_happened: A university-commissioned investigation found at least 177 students were abused and
+      staff knew of complaints from 1979 but did not act.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://elevenwarriors.com/the-ohio-state-university/2019/05/104265/ohio-state-investigation-finds-former-doctor-richard-strauss-sexually-abused-at-least-177-students-from-1979
+    source_title: Eleven Warriors
+  - name: George Tyndall, University of Southern California
+    year: '2021'
+    jurisdiction: California, US
+    what_happened: USC agreed an $852 million settlement covering 702 plaintiffs; complaints dated to
+      the late 1980s and he was retired with a financial settlement in 2017.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.nbclosangeles.com/news/local/global-settlement-reached-in-lawsuits-over-ex-usc-gynecologist-george-tyndall/2559398/
+    source_title: NBC Los Angeles
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - CourtCase
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court dockets and settlements
+  - Independent investigation reports
+  - Medical board disciplinary records
+  - Public records requests to public universities
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: Same institutional-inaction pattern applies to officer sexual misconduct
+    source_url: https://www.justice.gov/ovw/page/file/1509456/dl?inline
+  innocent_explanations:
+  - Earlier complaints may have been investigated and unsubstantiated
+  - Complaints may have been about different conduct or from a single source
+  version: 1
+- id: SV-015
+  name: Gagging clauses in harassment settlements
+  definition: Settlements or non-disclosure agreements used to silence complainants, including clauses
+    that interfere with reporting crimes to the police.
+  areas:
+  - SV
+  typology: Concealment
+  status: verified
+  sources:
+  - title: 'SRA Update 130: NDAs warning notice'
+    publisher: Solicitors Regulation Authority (UK)
+    year: '2024'
+    url: https://www.sra.org.uk/news/news/sra-update-130-ndas-warning-notice/
+    locator: news item
+    quote: settlement agreements included clauses that appeared to interfere with the reporting of alleged
+      crimes to the police
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Govt must act to prevent abuse of non-disclosure agreements, Committee says
+    publisher: Institute of Employment Rights (reporting UK Women and Equalities Committee)
+    year: '2019'
+    url: https://archive.ier.org.uk/news/govt-must-act-prevent-abuse-non-disclosure-agreements-committee-says
+    locator: quoting Committee chair Maria Miller MP
+    quote: a convenient vehicle for covering up unlawful activity with legally sanctioned secrecy
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several confidential settlements with former staff of the same manager
+  - NDA barring complainant from speaking to regulators or police
+  cases: []
+  data_needed:
+  - Contract
+  - Payment
+  - Person
+  - Organization
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Court filings referencing settlement agreements
+  - Public body settlement registers (FOI)
+  - Company financial statement notes on legal settlements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Confidentiality is a standard settlement term and complainants often want privacy
+  - Settlement is not an admission of wrongdoing
+  version: 1
+- id: SV-016
+  name: Accused person moves on quietly
+  definition: Someone facing sexual misconduct complaints is allowed to retire, resign or move to another
+    organisation with a payout or clean reference, often because vetting and references are weak.
+  areas:
+  - CA
+  - SV
+  typology: Concealment / pass-the-harasser
+  status: verified
+  sources:
+  - title: Charity Commission reports on inquiry into Oxfam GB
+    publisher: Charity Commission for England and Wales
+    year: '2019'
+    url: https://www.gov.uk/government/news/charity-commission-reports-on-inquiry-into-oxfam-gb-no-charity-is-more-important-than-the-people-it-serves-or-the-mission-it-pursues
+    locator: press release (withdrawn 8 Nov 2023)
+    quote: problems around vetting and referencing and management oversight
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: $852 Million Settlement Reached In Lawsuits Over Ex-USC Gynecologist George Tyndall
+    publisher: NBC Los Angeles
+    year: '2021'
+    url: https://www.nbclosangeles.com/news/local/global-settlement-reached-in-lawsuits-over-ex-usc-gynecologist-george-tyndall/2559398/
+    locator: article body
+    quote: retired with a financial settlement in 2017
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Aid worker dismissed for misconduct later hired by another charity
+  - Physician placed on leave then retired with a payout
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Organization
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Employment histories (LinkedIn, professional registers)
+  - Professional licensing boards
+  - Charity regulator reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - People change jobs and retire for ordinary reasons
+  - Referees may be legally constrained in what they can say
+  version: 1
+- id: SV-017
+  name: Leaders put liability or reputation ahead of victims
+  definition: Leadership responds to sexual abuse reports mainly by managing legal risk or reputation,
+    stonewalling or denigrating survivors.
+  areas:
+  - CA
+  - SV
+  typology: Governance failure
+  status: verified
+  sources:
+  - title: Top Southern Baptists stonewalled sex abuse victims, report says
+    publisher: Associated Press via KUTV
+    year: '2022'
+    url: https://kutv.com/news/nation-world/top-southern-baptists-stonewalled-sex-abuse-victims-report-says-executive-committee-largest-us-protestant-denomination-clergy-sex-abuse-allegations-2-decades
+    locator: quoting Guidepost Solutions report
+    quote: singularly focused on avoiding liability for the SBC
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Aid charities put their reputation ahead of dealing with 'endemic' sexual abuse, say MPs
+    publisher: Civil Society (reporting UK International Development Committee)
+    year: '2018'
+    url: https://www.civilsociety.co.uk/news/aid-charities-put-their-reputation-ahead-of-dealing-with-endemic-sexual-abuse-say-mps.html
+    locator: quoting IDC report
+    quote: driven by concern for reputational management
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Board minutes discussing legal exposure but not survivor support
+  - Survivors told to stop contacting leaders
+  cases:
+  - name: UK House of Commons International Development Committee inquiry, sexual exploitation and abuse
+      in the aid sector
+    year: '2018'
+    jurisdiction: UK
+    what_happened: The committee called abuse in the sector endemic and its overall impression one of
+      'complacency, verging on complicity'.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.civilsociety.co.uk/news/aid-charities-put-their-reputation-ahead-of-dealing-with-endemic-sexual-abuse-say-mps.html
+    source_title: Civil Society
+  data_needed:
+  - Organization
+  - Person
+  - Directorship
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Independent investigation reports
+  - Board minutes obtained via litigation discovery or FOI
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Boards have a legitimate duty to consider legal risk
+  - Legal advice may restrict communications during litigation
+  version: 1
+- id: SV-018
+  name: Prevention programme that exists only on paper
+  definition: A sexual harassment and assault prevention and response programme is in place formally but
+    is ineffective, with a command or management climate that is permissive.
+  areas:
+  - SV
+  typology: Programme failure
+  status: verified
+  sources:
+  - title: Fort Hood Independent Review Committee report, Executive Summary
+    publisher: US Army (copy hosted by americanrhetoric.com)
+    year: '2020'
+    url: https://www.americanrhetoric.com/speeches/PDFFiles/forthoodRICreportexecutivesummary.pdf
+    locator: 'Finding #1'
+    quote: The Implementation Of The SHARP Program At Fort Hood Has Been Ineffective
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Fort Hood Independent Review Committee report, Executive Summary
+    publisher: US Army (copy hosted by americanrhetoric.com)
+    year: '2020'
+    url: https://www.americanrhetoric.com/speeches/PDFFiles/forthoodRICreportexecutivesummary.pdf
+    locator: 'Finding #9'
+    quote: The Command Climate At Fort Hood Has Been Permissive Of Sexual Harassment / Sexual Assault.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Sexual harassment and harassment at work: technical guidance'
+    publisher: Equality and Human Rights Commission (UK)
+    year: '2024'
+    url: https://www.equalityhumanrights.com/guidance/sexual-harassment-and-harassment-work-technical-guidance
+    locator: para 3.16
+    quote: Employers have a positive legal duty to prevent sexual harassment of their workers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Training completion is high but climate surveys show low trust
+  - Programme staff untrained or vacant posts
+  cases:
+  - name: Fort Hood Independent Review Committee
+    year: '2020'
+    jurisdiction: US (Army)
+    what_happened: An Army-appointed committee found the SHARP programme ineffective, the command climate
+      permissive and sexual assault and harassment significantly underreported.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.americanrhetoric.com/speeches/PDFFiles/forthoodRICreportexecutivesummary.pdf
+    source_title: Fort Hood Independent Review Committee report, Executive Summary
+  data_needed:
+  - Organization
+  - PublicBody
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Inspector general and audit reports
+  - Climate survey results
+  - Policy documents and training records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New programmes take time to show results
+  - Rising reports can mean more trust, not more abuse
+  version: 1
+- id: SV-019
+  name: Large gap between survey prevalence and formal reports
+  definition: Anonymous surveys show far more sexual harassment or assault than is reported through official
+    channels, signalling underreporting.
+  areas:
+  - SV
+  typology: Underreporting
+  status: verified
+  sources:
+  - title: FY23 Annual Report Fact Sheet
+    publisher: US Department of Defense Sexual Assault Prevention and Response Office
+    year: '2024'
+    url: https://www.sapr.mil/sites/default/files/public/docs/reports/AR/FY23/FY23_Annual_Report_Fact_Sheet.pdf
+    locator: Fact sheet
+    quote: about 25 percent of active duty Service members who indicated experiencing USC reported their
+      incident to a DoD authority
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Select Task Force on the Study of Harassment in the Workplace
+    publisher: US EEOC
+    year: '2016'
+    url: https://www.eeoc.gov/select-task-force-study-harassment-workplace
+    locator: Executive Summary
+    quote: Roughly three out of four individuals who experienced harassment never even talked to a supervisor
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Fort Hood Independent Review Committee report, Executive Summary
+    publisher: US Army (copy hosted by americanrhetoric.com)
+    year: '2020'
+    url: https://www.americanrhetoric.com/speeches/PDFFiles/forthoodRICreportexecutivesummary.pdf
+    locator: 'Finding #2'
+    quote: Significantly Underreported.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Installation with low reports but high survey prevalence
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - DoD SAPRO annual reports and appendices
+  - Service academy reports
+  - Employee climate surveys
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Survey and report definitions differ
+  - Many victims choose not to report for personal reasons unrelated to the institution
+  version: 1
+- id: SV-020
+  name: High rate of rape reports marked 'unfounded'
+  definition: A police department classes an unusually large share of rape reports as false or baseless,
+    often without a full investigation.
+  areas:
+  - PM
+  - SV
+  typology: Police misclassification
+  status: verified
+  sources:
+  - title: Improving Law Enforcement Response to Sexual Assault and Domestic Violence by Identifying and
+      Preventing Gender Bias
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+    locator: Principle 4
+    quote: may reveal a pattern within an LEA of failing to conduct thorough investigations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Unfounded (BuzzFeed News investigation)
+    publisher: BuzzFeed News
+    year: '2016'
+    url: https://www.buzzfeednews.com/article/alexcampbell/unfounded
+    locator: Baltimore County unfounded rate
+    quote: 34%
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Department unfounding a third of rape reports when national average is about 7%
+  cases:
+  - name: Baltimore County Police Department unfounded rape reports
+    year: '2016'
+    jurisdiction: Maryland, US
+    what_happened: BuzzFeed News reviewed 42 case files and reported an unfounded rate of 34% against
+      a national average of 7%.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.buzzfeednews.com/article/alexcampbell/unfounded
+    source_title: BuzzFeed News
+  data_needed:
+  - PublicBody
+  - Document
+  - CourtCase
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - FBI Uniform Crime Reporting / NIBRS 'unfounded' counts
+  - Police records requests for case files and clearance codes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: Misclassification of crime reports is a police accountability issue
+    source_url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+  innocent_explanations:
+  - Some reports are genuinely false or describe non-criminal events
+  - Departments code data differently; small numbers swing rates
+  version: 1
+- id: SV-021
+  name: Sexual assault cases closed without charges or referral
+  definition: Many reported sexual assaults are 'cleared by exceptional means' or never referred to prosecutors,
+    suggesting cases are closed rather than investigated.
+  areas:
+  - PM
+  - SV
+  typology: Police case handling
+  status: verified
+  sources:
+  - title: Improving Law Enforcement Response to Sexual Assault and Domestic Violence by Identifying and
+      Preventing Gender Bias
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+    locator: Principle 8
+    quote: only 30 percent of reported sexual assaults were referred by police to prosecutors
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Improving Law Enforcement Response... (four-page summary)
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509456/dl?inline
+    locator: Principle 4
+    quote: Appropriately classify reports of sexual assault or domestic violence.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - High share of rape cases cleared 'exceptionally' because the victim 'declined to cooperate'
+  cases: []
+  data_needed:
+  - PublicBody
+  - CourtCase
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - NIBRS clearance data
+  - Prosecutor referral and charging data
+  - Police records requests
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Victims may genuinely choose not to proceed
+  - Evidence may be insufficient despite thorough work
+  version: 1
+- id: SV-022
+  name: Sexual assault kits left untested
+  definition: Kits collected after a sexual assault sit in police storage without being sent to a lab,
+    or wait untested at the lab.
+  areas:
+  - PM
+  - SV
+  typology: Evidence handling
+  status: verified
+  sources:
+  - title: 'National Best Practices for Sexual Assault Kits: A Multidisciplinary Approach'
+    publisher: US National Institute of Justice
+    year: '2017'
+    url: https://www.ojp.gov/pdffiles1/nij/250384.pdf
+    locator: Recommendation 16
+    quote: ideally, no later than seven (7) business days from the collection of the SAK, or as specified
+      by statute.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'National Best Practices for Sexual Assault Kits: A Multidisciplinary Approach'
+    publisher: US National Institute of Justice
+    year: '2017'
+    url: https://www.ojp.gov/pdffiles1/nij/250384.pdf
+    locator: Recommendation 20
+    quote: All SAKs that the victim has consented to reporting to law enforcement should be submitted
+      to the laboratory
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Sexual Assault Kits (SAKs) and the Backlog of Untested Sexual Assault Evidence: In Brief'
+    publisher: Congressional Research Service
+    year: '2022'
+    url: https://www.everycrsreport.com/reports/R44237.html
+    locator: reasons kits untested
+    quote: negative perceptions of sexual assault victim's credibility or cooperation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Storage room inventories revealing thousands of kits never sent to a lab
+  cases:
+  - name: Detroit untested sexual assault kits
+    year: '2009'
+    jurisdiction: Michigan, US
+    what_happened: About 11,300 kits were found in police storage; an action-research team counted 8,707
+      unsubmitted kits and 2,512 with indeterminate testing status.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.everycrsreport.com/reports/R44237.html
+    source_title: CRS R44237
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - State kit-tracking systems and audit laws
+  - Police property room inventories via records request
+  - Crime lab backlog reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A kit from a victim who consented to reporting not submitted to the lab within 7 business
+      days of collection (or the state statutory limit)
+    threshold_source: https://www.ojp.gov/pdffiles1/nij/250384.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Victim chose an anonymous/restricted report and did not consent to testing
+  - Lab capacity limits; state statute may set a different deadline
+  version: 1
+- id: SV-023
+  name: Victims doubted, blamed or threatened with charges
+  definition: Officers question a victim's credibility, blame them, pressure them to recant or threaten
+    to charge them with false reporting.
+  areas:
+  - PM
+  - SV
+  typology: Gender-biased policing
+  status: verified
+  sources:
+  - title: Improving Law Enforcement Response to Sexual Assault and Domestic Violence by Identifying and
+      Preventing Gender Bias
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+    locator: Principle 2
+    quote: coercing the victim to recant the report by blaming the victim for the assault or for making
+      unwise choices.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Improving Law Enforcement Response... (full guidance)
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+    locator: Principle 1, bad-practice example
+    quote: threatened to charge her with “slander,”
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Police report notes victim 'did not resist to the best of her ability'
+  - Victim charged with false reporting after recanting under pressure
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources:
+  - Police case files via records request
+  - False-report prosecutions in court dockets
+  - Civil rights lawsuits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Investigators must test evidence, which victims can experience as doubt
+  - Some recantations are genuine
+  version: 1
+- id: SV-024
+  name: Reports dropped because of who the victim is
+  definition: Reports are not investigated because the victim was drunk or drugged, has a criminal record,
+    sells sex, is LGBTQI+ or otherwise fits a stereotype.
+  areas:
+  - PM
+  - SV
+  typology: Gender-biased policing
+  status: verified
+  sources:
+  - title: Improving Law Enforcement Response to Sexual Assault and Domestic Violence by Identifying and
+      Preventing Gender Bias
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+    locator: Principle 4
+    quote: All sexual assault or domestic violence complaints should be investigated, regardless of any
+      of the following circumstances
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Improving Law Enforcement Response... (full guidance)
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+    locator: Principle 4
+    quote: the victim was under the influence of alcohol or drugs at the time of the incident
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Case closed because victim was intoxicated
+  - Report from a sex worker never assigned to a detective
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources:
+  - Police case files
+  - Department audits and consent-decree monitor reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: DOJ guidance names history in the commercial sex trade as a bias trigger
+    source_url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+  innocent_explanations:
+  - Intoxication can genuinely limit available evidence
+  - Victims from marginalised groups may decline to proceed for their own reasons
+  version: 1
+- id: SV-025
+  name: Fewer sexual assaults recorded than homicides
+  definition: A jurisdiction records fewer sexual assaults than homicides, which DOJ treats as a sign
+    that sexual assaults are going unrecorded.
+  areas:
+  - PM
+  - SV
+  typology: Data anomaly
+  status: verified
+  sources:
+  - title: Improving Law Enforcement Response to Sexual Assault and Domestic Violence by Identifying and
+      Preventing Gender Bias
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+    locator: Principle 8
+    quote: in most jurisdictions, the reported rate of sexual assaults typically exceeds the homicide
+      rate.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - City reporting 40 homicides and 25 rapes in a year
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - FBI Crime Data Explorer (UCR/NIBRS)
+  - State crime statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Recorded sexual assaults below recorded homicides in the same jurisdiction and period
+    threshold_source: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Very small jurisdictions have volatile numbers
+  - Agency may not report all offence types to UCR/NIBRS in that year
+  version: 1
+- id: SV-026
+  name: Victim arrested instead of the main aggressor
+  definition: Police arrest a victim who used force in self-defence rather than identifying the predominant
+    aggressor.
+  areas:
+  - PM
+  - SV
+  typology: Gender-biased policing
+  status: verified
+  sources:
+  - title: Improving Law Enforcement Response... (four-page summary)
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509456/dl?inline
+    locator: Principle 6
+    quote: Properly identify the predominant aggressor in domestic violence incidents.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Improving Law Enforcement Response... (full guidance)
+    publisher: US DOJ Office on Violence Against Women
+    year: '2022'
+    url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+    locator: Principle 6
+    quote: Arresting victims punitively subjects them to the legal system when they are, in fact, in urgent
+      need of protection.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - High rate of dual arrests in domestic incidents
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Arrest records and dual-arrest statistics
+  - Court dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: Arrest decisions are police-accountability data
+    source_url: https://www.justice.gov/ovw/page/file/1509451/dl?inline
+  innocent_explanations:
+  - Both parties may have committed offences
+  - Facts at the scene can be genuinely unclear
+  version: 1
+- id: SV-027
+  name: Institutional abuse signs in an adult care setting
+  definition: A care home or service shows the organisational signs that safeguarding bodies link to abuse,
+    such as low staffing, no care plans, poor records, no visitors and unnecessary exposure during bathing.
+  areas:
+  - CA
+  - SV
+  typology: Organisational or institutional abuse (SCIE)
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: Social Care Institute for Excellence (UK)
+    year: ''
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: 'Organisational or institutional abuse: signs and indicators'
+    quote: Inadequate staffing levels
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: Social Care Institute for Excellence (UK)
+    year: ''
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: 'Organisational or institutional abuse: signs and indicators'
+    quote: Unnecessary exposure during bathing or using the toilet
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: Social Care Institute for Excellence (UK)
+    year: ''
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: 'Organisational or institutional abuse: signs and indicators'
+    quote: Lack of management overview and support
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection report noting missing care plans and poor record-keeping
+  - Residents with no visitors and no activities
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Care Quality Commission (England) inspection reports
+  - US CMS nursing home inspection data (Care Compare)
+  - State licensing complaint records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: Same inspection records reveal neglect and billing issues
+    source_url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+  innocent_explanations:
+  - Staffing shortages are sector-wide
+  - Absence of visitors can reflect residents' family situations
+  version: 1
+- id: SV-028
+  name: Signs of sexual abuse recorded for an adult who cannot consent
+  definition: Safeguarding or inspection records note signs that SCIE lists for sexual abuse, such as
+    pregnancy or infection in a person unable to consent, or fear of personal care or of a particular
+    person.
+  areas:
+  - CA
+  - SV
+  typology: Sexual abuse indicators (SCIE)
+  status: verified
+  sources:
+  - title: Types and indicators of abuse
+    publisher: Social Care Institute for Excellence (UK)
+    year: ''
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: 'Sexual abuse: signs and indicators'
+    quote: Pregnancy in a woman who is unable to consent to sexual intercourse
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Types and indicators of abuse
+    publisher: Social Care Institute for Excellence (UK)
+    year: ''
+    url: https://www.scie.org.uk/safeguarding/adults/introduction/types-and-indicators-of-abuse/
+    locator: 'Sexual abuse: signs and indicators'
+    quote: Reluctance to be alone with a particular person
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Safeguarding referral about a resident with a learning disability who becomes pregnant
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Safeguarding adults review reports
+  - Inspection reports
+  - Court and coroner records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - SCIE notes its lists 'are not exhaustive' and many signs have medical or other causes
+  - Behaviour changes may stem from illness or dementia
+  version: 1
+- id: SV-029
+  name: Aid or services traded for sex
+  definition: Aid workers or peacekeepers exchange money, jobs, goods, services or aid owed to beneficiaries
+    for sex, or use their rank to pursue sexual relationships with beneficiaries.
+  areas:
+  - SV
+  typology: Sexual exploitation and abuse (IASC)
+  status: verified
+  sources:
+  - title: IASC Six Core Principles Relating to Sexual Exploitation and Abuse
+    publisher: Inter-Agency Standing Committee
+    year: '2019'
+    url: https://psea.interagencystandingcommittee.org/update/iasc-six-core-principles
+    locator: Principle 3
+    quote: Sexual exploitation and abuse by humanitarian workers constitute acts of gross misconduct and
+      are therefore grounds for termination of employment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: IASC Six Core Principles Relating to Sexual Exploitation and Abuse
+    publisher: Inter-Agency Standing Committee
+    year: '2019'
+    url: https://psea.interagencystandingcommittee.org/update/iasc-six-core-principles
+    locator: Principle 1
+    quote: Sexual exploitation and abuse by humanitarian workers constitute acts of gross misconduct and
+      are therefore grounds for termination of employment.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Staff housing used for parties with local women in a disaster zone
+  - Food distribution staff demanding sexual favours
+  cases:
+  - name: Charity Commission inquiry into Oxfam GB (Haiti 2011)
+    year: '2019'
+    jurisdiction: England and Wales
+    what_happened: The regulator found a culture of tolerating poor behaviour, a flawed 2011 response
+      in Haiti and reports to donors and the regulator that were not full and frank, and issued an official
+      warning.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.gov.uk/government/news/charity-commission-reports-on-inquiry-into-oxfam-gb-no-charity-is-more-important-than-the-people-it-serves-or-the-mission-it-pursues
+    source_title: Charity Commission press release
+  data_needed:
+  - Organization
+  - Person
+  - Employment
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - UN Secretary-General SEA data and agency reports
+  - Charity regulator inquiry reports
+  - Donor (e.g., FCDO, USAID) safeguarding reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Transactional sex in crisis settings overlaps sexual exploitation indicators
+    source_url: https://psea.interagencystandingcommittee.org/update/iasc-six-core-principles
+  innocent_explanations:
+  - Consensual relationships between staff and community members not involving rank or aid occur
+  - Allegations may be unsubstantiated after investigation
+  version: 1
+- id: SV-030
+  name: Incomplete reporting of abuse to regulators or donors
+  definition: An organisation tells its regulator or funders less than the full nature and seriousness
+    of sexual misconduct incidents.
+  areas:
+  - SV
+  typology: Concealment from oversight
+  status: verified
+  sources:
+  - title: Charity Commission reports on inquiry into Oxfam GB
+    publisher: Charity Commission for England and Wales
+    year: '2019'
+    url: https://www.gov.uk/government/news/charity-commission-reports-on-inquiry-into-oxfam-gb-no-charity-is-more-important-than-the-people-it-serves-or-the-mission-it-pursues
+    locator: press release
+    quote: not as full and frank about the nature and seriousness of the incidents and problems in Haiti
+      as they should have been
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Serious incident report describing 'misconduct' with no mention of sexual exploitation
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Charity regulator serious incident data (FOI)
+  - Donor grant reports
+  - Annual reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Same regulator filings and governance failures
+    source_url: https://www.gov.uk/government/news/charity-commission-reports-on-inquiry-into-oxfam-gb-no-charity-is-more-important-than-the-people-it-serves-or-the-mission-it-pursues
+  innocent_explanations:
+  - Early reports are made before facts are known
+  - Victim confidentiality can limit detail
+  version: 1
+- id: SV-031
+  name: Leader promoted despite known sexual misconduct concerns about adults in their charge
+  definition: A religious or institutional leader is advanced although superiors held reports of sexual
+    behaviour with adults under their authority, such as seminarians.
+  areas:
+  - CA
+  - SV
+  typology: Institutional knowledge and inaction
+  status: verified
+  sources:
+  - title: Takeaways from Vatican's McCarrick report (AP)
+    publisher: KTVU / Associated Press
+    year: '2020'
+    url: https://www.ktvu.com/news/takeaways-from-vaticans-mccarrick-report-as-us-bishops-meet
+    locator: article body, summarising the Vatican report
+    quote: confirmed he shared his bed with seminarians
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bishop promoted after an internal inquiry recommended against it
+  cases:
+  - name: Vatican Secretariat of State report on Theodore McCarrick
+    year: '2020'
+    jurisdiction: Holy See / US
+    what_happened: The Vatican's own report found a 2000 inquiry confirmed he shared his bed with seminarians
+      and recommended against promotion, yet he was made archbishop of Washington and a cardinal.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ktvu.com/news/takeaways-from-vaticans-mccarrick-report-as-us-bishops-meet
+    source_title: KTVU / AP
+  data_needed:
+  - Person
+  - Organization
+  - Employment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Church-published investigation reports
+  - Diocesan directories and appointment records
+  - BishopAccountability.org archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Earlier reports may have been anonymous or uncorroborated
+  - Promotion decisions involve many factors
+  version: 1
+- id: SV-032
+  name: Adult-content platform without age and identity checks
+  definition: A platform lets people upload sexual content without documented age and identity verification
+    of the uploader and of everyone depicted.
+  areas:
+  - SV
+  typology: Card-network standard (Mastercard 2021)
+  status: verified
+  sources:
+  - title: 'Protecting our network, protecting you: Preventing illegal adult content on our network'
+    publisher: Mastercard
+    year: '2021'
+    url: https://www.mastercard.com/news/perspectives/2021/protecting-our-network-protecting-you-preventing-illegal-adult-content-on-our-network
+    locator: list of requirements
+    quote: Documented age and identity verification for all people depicted and those uploading the content
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Mastercard''s New Rules: the details for paysite and platform owners/operators'
+    publisher: adultbizlaw.com (law-firm summary)
+    year: '2021'
+    url: https://adultbizlaw.com/2021/04/27/mastercards-new-rules-the-details-for-paysite-and-platform-owners-operators/
+    locator: Age and identity verification
+    quote: must have a robust process for verifying the age and identity of the content provider
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Site allowing anonymous account creation and immediate uploads
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Document
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Platform terms of service and upload flow (test account)
+  - Transparency reports
+  - Regulator decisions (Ofcom, eSafety)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Age verification failures also enable child sexual abuse material
+    source_url: https://www.mastercard.com/news/perspectives/2021/protecting-our-network-protecting-you-preventing-illegal-adult-content-on-our-network
+  innocent_explanations:
+  - Platform may use a third-party verification vendor not visible to the public
+  - Card rules apply only to sites that accept those cards
+  version: 1
+- id: SV-033
+  name: No documented consent from everyone depicted
+  definition: Uploaders are not required to obtain and keep written consent from every person who appears
+    in sexual content.
+  areas:
+  - SV
+  typology: Card-network standard (Mastercard 2021)
+  status: verified
+  sources:
+  - title: 'Mastercard''s New Rules: the details for paysite and platform owners/operators'
+    publisher: adultbizlaw.com (law-firm summary)
+    year: '2021'
+    url: https://adultbizlaw.com/2021/04/27/mastercards-new-rules-the-details-for-paysite-and-platform-owners-operators/
+    locator: Consent
+    quote: Require the content provider to obtain and keep on record written consent from all persons
+      depicted in the content
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Pornhub parent company admits receiving proceeds of sex trafficking and agrees to three-year
+      monitor
+    publisher: US Attorney's Office, Eastern District of New York
+    year: '2023'
+    url: https://www.justice.gov/usao-edny/pr/pornhub-parent-company-admits-receiving-proceeds-sex-trafficking-and-agrees-three-year
+    locator: press release
+    quote: did not independently verify consent and did not remove all the videos that were requested
+      to be taken down.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Model-release forms collected only for the account holder
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - Platform policies
+  - Court filings and DPAs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Consent records may be held privately and not visible
+  - US 2257 record-keeping may be held by producers, not platforms
+  version: 1
+- id: SV-034
+  name: No review before publication
+  definition: Sexual content goes live without any human or automated review first.
+  areas:
+  - SV
+  typology: Card-network standard (Mastercard 2021)
+  status: verified
+  sources:
+  - title: Protecting our network, protecting you
+    publisher: Mastercard
+    year: '2021'
+    url: https://www.mastercard.com/news/perspectives/2021/protecting-our-network-protecting-you-preventing-illegal-adult-content-on-our-network
+    locator: list of requirements
+    quote: Content review process prior to publication
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Uploads appear instantly with no moderation queue
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Platform transparency reports
+  - Test uploads by researchers (ethical limits apply)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Review may be automated and invisible to users
+  version: 1
+- id: SV-035
+  name: Unmonitored live streaming of sexual content
+  definition: A platform streams sexual content live without real-time monitoring and the ability to cut
+    the stream.
+  areas:
+  - SV
+  typology: Card-network standard (Mastercard 2021)
+  status: verified
+  sources:
+  - title: 'Mastercard''s New Rules: the details for paysite and platform owners/operators'
+    publisher: adultbizlaw.com (law-firm summary)
+    year: '2021'
+    url: https://adultbizlaw.com/2021/04/27/mastercards-new-rules-the-details-for-paysite-and-platform-owners-operators/
+    locator: Live streaming
+    quote: allows for real-time monitoring and the removal of the content being streamed
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Cam site with no moderators on duty
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Platform policies
+  - Regulator decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Live-streamed sexual exploitation overlaps trafficking indicators
+    source_url: https://adultbizlaw.com/2021/04/27/mastercards-new-rules-the-details-for-paysite-and-platform-owners-operators/
+  innocent_explanations:
+  - Monitoring may be automated and not visible to viewers
+  version: 1
+- id: SV-036
+  name: Search terms or tags implying minors or non-consent
+  definition: A platform allows or suggests search terms and tags that give the impression content involves
+    children or exploitation.
+  areas:
+  - SV
+  typology: Card-network standard (Mastercard 2021)
+  status: verified
+  sources:
+  - title: 'Mastercard''s New Rules: the details for paysite and platform owners/operators'
+    publisher: adultbizlaw.com (law-firm summary)
+    year: '2021'
+    url: https://adultbizlaw.com/2021/04/27/mastercards-new-rules-the-details-for-paysite-and-platform-owners-operators/
+    locator: Search terms and marketing (prohibition)
+    quote: permit content search terms to give the impression that the content contains child exploitation
+      materials
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Autocomplete suggestions that a platform has not blocked
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Archived platform pages (Wayback Machine)
+  - Regulator and NGO audits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Same platform-level warning sign
+    source_url: https://adultbizlaw.com/2021/04/27/mastercards-new-rules-the-details-for-paysite-and-platform-owners-operators/
+  innocent_explanations:
+  - Some terms describe legal adult role-play; context and platform blocking lists matter
+  version: 1
+- id: SV-037
+  name: Slow or failed removal of non-consensual intimate images
+  definition: A platform does not remove reported non-consensual intimate images (real or AI-made) quickly,
+    or does not remove known copies.
+  areas:
+  - SV
+  typology: Takedown failure
+  status: verified
+  sources:
+  - title: The TAKE IT DOWN Act Goes Live
+    publisher: WilmerHale (law-firm client alert)
+    year: '2026'
+    url: https://wilmerhale.com/en/insights/client-alerts/20260615-the-take-it-down-act-goes-live
+    locator: client alert
+    quote: covered platforms must affirmatively remove instances of NCII within 48 hours of receiving
+      a valid removal request
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Protecting our network, protecting you
+    publisher: Mastercard
+    year: '2021'
+    url: https://www.mastercard.com/news/perspectives/2021/protecting-our-network-protecting-you-preventing-illegal-adult-content-on-our-network
+    locator: list of requirements
+    quote: Complaint resolution process that addresses illegal or nonconsensual content within seven business
+      days
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Takedown requests ignored for months
+  - Content re-uploaded after removal
+  cases:
+  - name: United States v. Aylo Holdings S.A.R.L. (deferred prosecution agreement)
+    year: '2023'
+    jurisdiction: US (E.D.N.Y.)
+    what_happened: Aylo admitted receiving money it knew or should have known came from GirlsDoPorn's
+      sex trafficking, did not remove all requested videos, paid $1,844,952.83 and accepted a three-year
+      monitor.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/pornhub-parent-company-admits-receiving-proceeds-sex-trafficking-and-agrees-three-year
+    source_title: US Attorney's Office EDNY press release
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: records
+  lookup_sources:
+  - FTC TakeItDown complaints portal data (if released)
+  - Lumen database of takedown notices
+  - Platform transparency reports
+  - Court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'For US covered platforms: valid removal request not acted on within 48 hours (TAKE IT DOWN
+      Act, compliance from 19 May 2026); for card-accepting adult sites: complaint unresolved after 7
+      business days (Mastercard standard)'
+    threshold_source: https://wilmerhale.com/en/insights/client-alerts/20260615-the-take-it-down-act-goes-live
+      ; https://www.mastercard.com/news/perspectives/2021/protecting-our-network-protecting-you-preventing-illegal-adult-content-on-our-network
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Invalid or incomplete requests
+  - Platform outside US/card-network jurisdiction
+  - Difficulty verifying requester identity
+  version: 1
+- id: SV-038
+  name: No removal appeal for people depicted
+  definition: People who appear in sexual content have no way to ask for it to be taken down, or no neutral
+    body to settle consent disputes.
+  areas:
+  - SV
+  typology: Card-network standard (Mastercard 2021)
+  status: verified
+  sources:
+  - title: Protecting our network, protecting you
+    publisher: Mastercard
+    year: '2021'
+    url: https://www.mastercard.com/news/perspectives/2021/protecting-our-network-protecting-you-preventing-illegal-adult-content-on-our-network
+    locator: list of requirements
+    quote: Appeals process allowing for any person depicted to request their content be removed
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Mastercard''s New Rules: the details for paysite and platform owners/operators'
+    publisher: adultbizlaw.com (law-firm summary)
+    year: '2021'
+    url: https://adultbizlaw.com/2021/04/27/mastercards-new-rules-the-details-for-paysite-and-platform-owners-operators/
+    locator: Appeals
+    quote: must allow such disagreement to be resolved by a neutral body, at the Merchant's expense
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Only account holders can file complaints
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Platform help pages and terms
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Process may exist but be poorly signposted
+  version: 1
+- id: SV-039
+  name: No hash matching against intimate-image databases
+  definition: A service does not use hash matching against a StopNCII-grade database to detect and block
+    known non-consensual intimate images.
+  areas:
+  - SV
+  typology: Online safety compliance (UK)
+  status: verified
+  sources:
+  - title: 'Statement: Detecting intimate image abuse'
+    publisher: Ofcom
+    year: '2026'
+    url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/statement-detecting-intimate-image-abuse
+    locator: statement page
+    quote: certain service providers should use 'hash matching' technology to detect intimate image abuse
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Statement: Detecting intimate image abuse'
+    publisher: Ofcom
+    year: '2026'
+    url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/statement-detecting-intimate-image-abuse
+    locator: statement page (amended codes)
+    quote: in force 30 September 2026
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Platform not listed as a StopNCII partner and no equivalent disclosed
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - StopNCII.org industry partner list
+  - Ofcom enforcement bulletin
+  - Platform transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: An in-scope UK service not using hash matching after the amended codes came into force on
+      30 September 2026
+    threshold_source: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/statement-detecting-intimate-image-abuse
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Service may be outside the scope Ofcom set (scope not confirmed on the statement page)
+  - Codes allow equivalent alternative measures
+  jurisdictions: UK
+  version: 1
+- id: SV-040
+  name: Platform keeps profiting from a producer after consent complaints
+  definition: A platform continues to host and earn money from a content partner after lawsuits or takedown
+    requests allege people were tricked or filmed without consent.
+  areas:
+  - SV
+  typology: Proceeds after notice
+  status: verified
+  sources:
+  - title: Pornhub parent company admits receiving proceeds of sex trafficking and agrees to three-year
+      monitor
+    publisher: US Attorney's Office, Eastern District of New York
+    year: '2023'
+    url: https://www.justice.gov/usao-edny/pr/pornhub-parent-company-admits-receiving-proceeds-sex-trafficking-and-agrees-three-year
+    locator: press release
+    quote: Despite the above, Aylo continued to host the GDP and GDT channels on its websites and accept
+      money from its partnership with the GDP Operators.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Partner channel stays up for two years after a civil suit is filed
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Payment
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Civil court dockets against producers
+  - Archived channel pages
+  - DOJ press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Aylo's admission concerned unlawful monetary transactions from trafficking proceeds
+    source_url: https://www.justice.gov/usao-edny/pr/pornhub-parent-company-admits-receiving-proceeds-sex-trafficking-and-agrees-three-year
+  innocent_explanations:
+  - Platform may be awaiting court findings before acting
+  - Complaints may concern one video, not a whole partner
+  version: 1
+- id: SV-041
+  name: Recruitment via fake modelling ads and false privacy promises
+  definition: Women are recruited through misleading 'modelling' adverts and told sexual videos will never
+    be posted online, which the producers know is false.
+  areas:
+  - SV
+  typology: Fraud and coercion in recruitment
+  status: verified
+  sources:
+  - title: GirlsDoPorn owner Michael Pratt sentenced to 27 years for sex trafficking hundreds of women
+    publisher: US Attorney's Office, Southern District of California
+    year: '2025'
+    url: https://www.justice.gov/usao-sdca/pr/girlsdoporn-owner-michael-pratt-sentenced-27-years-sex-trafficking-hundreds-women
+    locator: press release
+    quote: promised their sex videos would never be seen online
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: GirlsDoPorn owner Michael Pratt sentenced to 27 years
+    publisher: US Attorney's Office, Southern District of California
+    year: '2025'
+    url: https://www.justice.gov/usao-sdca/pr/girlsdoporn-owner-michael-pratt-sentenced-27-years-sex-trafficking-hundreds-women
+    locator: press release
+    quote: posted misleading modeling ads
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Classified ads for 'clothed modelling' leading to adult shoots
+  cases:
+  - name: United States v. Michael James Pratt (GirlsDoPorn)
+    year: '2025'
+    jurisdiction: US (S.D. Cal.)
+    what_happened: Pratt was sentenced to 27 years for sex trafficking after a scheme using misleading
+      modelling ads and false promises that videos would never be online.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdca/pr/girlsdoporn-owner-michael-pratt-sentenced-27-years-sex-trafficking-hundreds-women
+    source_title: USAO SDCA press release
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Payment
+  - Contract
+  checkable: records
+  lookup_sources:
+  - Archived classified adverts
+  - Court records
+  - Business registrations of production companies
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Prosecuted as sex trafficking by fraud and coercion
+    source_url: https://www.justice.gov/usao-sdca/pr/girlsdoporn-owner-michael-pratt-sentenced-27-years-sex-trafficking-hundreds-women
+  innocent_explanations:
+  - Legitimate agencies advertise modelling work; deception is the warning sign
+  version: 1
+- id: SV-042
+  name: '''Nudify'' or deepfake sexual image service'
+  definition: A website or app lets users upload photos of real people to generate fake nude or sexual
+    images, often marketed with 'undress' features and without safeguards.
+  areas:
+  - SV
+  typology: AI-generated intimate image abuse
+  status: verified
+  sources:
+  - title: City Attorney shuts down 10 websites that create nonconsensual deepfake pornography
+    publisher: San Francisco City Attorney
+    year: '2025'
+    url: https://sfcityattorney.org/city-attorney-shuts-down-10-websites-that-create-nonconsensual-deepfake-pornography/
+    locator: press release
+    quote: realistic pornographic versions
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: eSafety moves against services used to 'nudify' Australian school children
+    publisher: eSafety Commissioner (Australia)
+    year: ''
+    url: https://esafety.gov.au/newsroom/media-releases/esafety-moves-against-services-used-to-nudify-australian-school-children
+    locator: media release
+    quote: failed to provide appropriate safeguards
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: The TAKE IT DOWN Act Goes Live
+    publisher: WilmerHale (law-firm client alert)
+    year: '2026'
+    url: https://wilmerhale.com/en/insights/client-alerts/20260615-the-take-it-down-act-goes-live
+    locator: criminal provisions (digital forgeries)
+    quote: extends not only to real photos and videos but also to
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Site advertising ability to 'undress' any photo
+  - App store listings for face-swap porn tools
+  cases:
+  - name: San Francisco City Attorney v. Briver LLC and others
+    year: '2025'
+    jurisdiction: California, US
+    what_happened: Briver LLC agreed to a permanent injunction and $100,000 in civil penalties; ten heavily
+      visited nudify sites went offline or were blocked in California.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://sfcityattorney.org/city-attorney-shuts-down-10-websites-that-create-nonconsensual-deepfake-pornography/
+    source_title: San Francisco City Attorney
+  data_needed:
+  - Company
+  - Person
+  - Ownership
+  - Payment
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Domain WHOIS and hosting records
+  - Payment processor and app-store listings
+  - Corporate registries
+  - Regulator enforcement releases (SF City Attorney, eSafety, Ofcom)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Regulators found some nudify services also produced images of children
+    source_url: https://sfcityattorney.org/city-attorney-shuts-down-10-websites-that-create-nonconsensual-deepfake-pornography/
+  innocent_explanations:
+  - General image-editing AI tools can be misused without being designed for this
+  - Service may block real-person uploads and require consent
+  version: 1
+- id: SV-043
+  name: Site built on intimate images obtained without consent
+  definition: A website publishes intimate images that were stolen, hacked or submitted by others without
+    the subject's consent ('revenge porn' sites).
+  areas:
+  - SV
+  typology: Non-consensual intimate image distribution
+  status: verified
+  sources:
+  - title: Operator of revenge porn website sentenced to 2½ years in federal prison in email hacking scheme
+    publisher: US Attorney's Office, Central District of California
+    year: '2015'
+    url: https://www.justice.gov/usao-cdca/pr/operator-revenge-porn-website-sentenced-2-years-federal-prison-email-hacking-scheme
+    locator: press release
+    quote: hack into e-mail accounts to steal nude photos that were later posted on his website
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Site inviting ex-partners to submit images with the person's name and social media
+  cases:
+  - name: United States v. Hunter Moore (IsAnyoneUp.com)
+    year: '2015'
+    jurisdiction: US (C.D. Cal.)
+    what_happened: The site operator paid a hacker to steal nude photos from email accounts for posting
+      and was sentenced to 30 months in federal prison.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-cdca/pr/operator-revenge-porn-website-sentenced-2-years-federal-prison-email-hacking-scheme
+    source_title: USAO CDCA press release
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Domain and hosting records
+  - Court records
+  - Payment and ad-network relationships
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Images obtained through computer hacking
+    source_url: https://www.justice.gov/usao-cdca/pr/operator-revenge-porn-website-sentenced-2-years-federal-prison-email-hacking-scheme
+  innocent_explanations:
+  - Adult sites with verified consensual content are lawful
+  version: 1
+- id: SV-044
+  name: Stalkerware business
+  definition: A company sells apps designed to secretly monitor someone else's phone, including instructions
+    to hide the app and bypass phone security.
+  areas:
+  - SV
+  typology: Surveillance tools used in intimate partner abuse
+  status: verified
+  sources:
+  - title: FTC Bans SpyFone and CEO from Surveillance Business
+    publisher: US Federal Trade Commission
+    year: '2021'
+    url: https://www.ftc.gov/news-events/press-releases/2021/09/ftc-bans-spyfone-and-ceo-from-surveillance-business
+    locator: press release
+    quote: required purchasers who used the apps on Android devices to bypass many of the phone’s restrictions
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Stalkerware: What To Know'
+    publisher: US Federal Trade Commission (consumer advice)
+    year: ''
+    url: https://consumer.ftc.gov/articles/stalkerware-what-know
+    locator: definition
+    quote: a type of software program or app that someone installs on your phone or other device without
+      your knowledge
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - App marketed to 'catch a cheating spouse' with hidden-icon mode
+  cases:
+  - name: FTC v. Support King LLC (SpyFone) and Scott Zuckerman
+    year: '2021'
+    jurisdiction: US
+    what_happened: The FTC alleged the app secretly harvested people's data; the order banned the company
+      and CEO from the surveillance business and required deletion of data and notice to device owners.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.ftc.gov/news-events/press-releases/2021/09/ftc-bans-spyfone-and-ceo-from-surveillance-business
+    source_title: FTC press release
+  data_needed:
+  - Company
+  - Person
+  - Directorship
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - FTC case database
+  - Corporate registries
+  - App marketing archived pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Parental-control and employer device-management tools are lawful when disclosed and used on owned
+    devices
+  version: 1
+- id: SV-045
+  name: Card network finds a platform broke its rules
+  definition: A payment card network cuts off or restricts a site after finding it violated rules against
+    unlawful content.
+  areas:
+  - SV
+  typology: Financial-sector signal
+  status: verified
+  sources:
+  - title: Visa and Mastercard block Pornhub charges
+    publisher: Fortune
+    year: '2020'
+    url: https://fortune.com/2020/12/10/visa-mastercard-pornhub-charges-blocked
+    locator: quoting Mastercard statement
+    quote: confirmed violations of standards prohibiting unlawful conduct on the site
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Site suddenly switches to crypto-only payments
+  cases:
+  - name: Mastercard and Visa suspend card payments on Pornhub
+    year: '2020'
+    jurisdiction: Global
+    what_happened: Mastercard said its own investigation confirmed violations of its standards on the
+      site.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://fortune.com/2020/12/10/visa-mastercard-pornhub-charges-blocked
+    source_title: Fortune
+  data_needed:
+  - Company
+  - Payment
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Card network statements
+  - Archived payment pages of the site
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Card networks also restrict whole categories for risk reasons unrelated to abuse
+  - Sites may change processors for cost reasons
+  version: 1
+- id: SV-046
+  name: Platform lacks basic safety design against abuse of women
+  definition: A platform lacks measures Ofcom expects against online violence against women, such as rate
+    limits on pile-ons, bulk blocking, geolocation off by default and nudity blurring.
+  areas:
+  - SV
+  typology: Online safety good practice (UK)
+  status: verified
+  sources:
+  - title: 'Ofcom: Tech firms must up their game to tackle online harms against women and girls'
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-tech-firms-must-up-their-game-to-tackle-online-harms-against-women-and-girls
+    locator: harms covered
+    quote: uses technology to stalk an individual or control a partner
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Ofcom: Tech firms must up their game to tackle online harms against women and girls'
+    publisher: Ofcom
+    year: '2025'
+    url: https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ofcom-tech-firms-must-up-their-game-to-tackle-online-harms-against-women-and-girls
+    locator: measures
+    quote: remove geolocation by default
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Location shown on posts by default
+  - No way to block many accounts at once during a pile-on
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Platform settings review
+  - Ofcom guidance and enforcement bulletins
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ofcom's guidance is good practice, not every measure is legally required
+  - Small services may use other effective measures
+  jurisdictions: UK
+  version: 1
+not_reached:
+- 'Ofcom code amendments: the statement page does not say which services must hash-match; the code text
+  was not opened, so the scope in SV-039 is unconfirmed.'
+- 'Mastercard''s own standards text (AN 5196): only Mastercard''s April 2021 blog post and the adultbizlaw
+  summary were read. The live-streaming, search-term and neutral-body points come from the law-firm summary
+  only.'
+- 'DOJ OVW gender-bias guidance: only the four-page summary and extracts of the full PDF were read, not
+  the whole document.'
+- 'NIJ National Best Practices for Sexual Assault Kits: only the summary recommendations were read. Lab
+  turnaround targets were not found.'
+- 'EEOC Select Task Force report: the last ~26,000 characters and Appendix C (the risk-factor chart) were
+  not read.'
+- 'EHRC technical guidance: the last ~36,000 characters were not read. No single risk-factor list was
+  found.'
+- 'Fort Hood Independent Review Committee: only the executive summary, from a non-Army copy (americanrhetoric.com),
+  was read. The full report was not opened.'
+- 'Guidepost Solutions SBC report and the Vatican McCarrick report: neither primary report was opened.
+  Both were cited through AP reporting.'
+- 'Perkins Coie Strauss report: not opened. It was cited through Eleven Warriors, because the KUOW fetch
+  failed.'
+- 'UK International Development Committee 2018 report and Women and Equalities Committee 2019 NDA report:
+  neither primary report was opened. Both were cited through press coverage.'
+- 'SRA NDA warning notice full text (rules.sra.org.uk): the fetch failed. Only the SRA news item was read.'
+- 'Utah Division of Consumer Protection / FTC settlement with Aylo (Sept 2025): the fetch failed, so it
+  is not used.'
+- 'NY Attorney General Cuomo investigation press release: the fetch failed, so it is not used.'
+- 'FBI UCR handbook definition of ''unfounded'': the FBI source was not opened. The definition was quoted
+  through BuzzFeed News.'
+- 'eSafety nudify formal warning: the release date is not given on the page, so it is not used as a case.'
+- Military sexual assault data beyond the DoD FY23 fact sheet (e.g., retaliation survey data, restricted/unrestricted
+  reporting definitions) was not sourced.
+- Clergy abuse of adults beyond McCarrick, such as other denominations or abuse of vulnerable adults by
+  clergy, was not sourced.
+- 'Aylo DPA: the first EDNY press-release URL failed, and a second EDNY URL was read successfully.'

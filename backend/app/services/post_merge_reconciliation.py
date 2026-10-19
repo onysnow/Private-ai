@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
+from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -14,7 +15,8 @@ def _norm(value: str | None) -> str:
 
 
 def _pair(a: str, b: str) -> tuple[str, str]:
-    return tuple(sorted((a, b)))
+    lo, hi = sorted((a, b))
+    return (lo, hi)
 
 
 def _latest_decisions(db: Session, investigation_id: str, entity_id: str) -> dict[tuple[str, str, str], PostMergeReconciliationDecision]:
@@ -46,6 +48,18 @@ def _statement_row(row: Statement) -> dict:
     }
 
 
+def serialize_reconciliation_decision(row: PostMergeReconciliationDecision | None) -> dict[str, Any] | None:
+    """A reporter's decision on one duplicate pair, as the API sends it. The
+    row used to be returned as an ORM object and relied on FastAPI's encoder
+    reading its columns; with a declared response model that leaks, so the
+    shape is explicit."""
+    if row is None:
+        return None
+    return {"id": row.id, "investigation_id": row.investigation_id, "entity_id": row.entity_id, "record_type": row.record_type,
+            "record_a_id": row.record_a_id, "record_b_id": row.record_b_id, "decision": row.decision, "rationale": row.rationale,
+            "preferred_record_id": row.preferred_record_id, "created_at": row.created_at}
+
+
 def detect_post_merge_reconciliation(db: Session, entity: Entity) -> dict:
     if entity.merged_into_entity_id:
         raise ValueError("Reconciliation must be opened on the active canonical entity")
@@ -55,7 +69,7 @@ def detect_post_merge_reconciliation(db: Session, entity: Entity) -> dict:
     statements = db.scalars(select(Statement).where(Statement.entity_id == entity.id).order_by(Statement.prop, Statement.value, Statement.id)).all()
     for stmt in statements:
         statement_groups[(_norm(stmt.prop), _norm(stmt.value))].append(stmt)
-    statement_pairs = []
+    statement_pairs: list[dict[str, Any]] = []
     for rows in statement_groups.values():
         if len(rows) < 2:
             continue
@@ -69,7 +83,7 @@ def detect_post_merge_reconciliation(db: Session, entity: Entity) -> dict:
                     "record_b": _statement_row(b),
                     "same_assertion": True,
                     "provenance_differs": (a.dataset, a.origin, a.original_value) != (b.dataset, b.origin, b.original_value),
-                    "latest_decision": decision,
+                    "latest_decision": serialize_reconciliation_decision(decision),
                 })
 
     rel_groups: dict[tuple[str, str, str, str, str], list[RelationshipEdge]] = defaultdict(list)
@@ -85,16 +99,16 @@ def detect_post_merge_reconciliation(db: Session, entity: Entity) -> dict:
             _norm(edge.source_prop), _norm(edge.target_prop),
         )
         rel_groups[key].append(edge)
-    relationship_pairs = []
-    for rows in rel_groups.values():
-        if len(rows) < 2:
+    relationship_pairs: list[dict[str, Any]] = []
+    for edge_rows in rel_groups.values():
+        if len(edge_rows) < 2:
             continue
-        for i, a in enumerate(rows):
-            for b in rows[i + 1:]:
-                x, y = _pair(a.id, b.id)
+        for i, edge_a in enumerate(edge_rows):
+            for edge_b in edge_rows[i + 1:]:
+                x, y = _pair(edge_a.id, edge_b.id)
                 decision = latest.get(("relationship", x, y))
-                serialized_a = serialize_relationship(db, a)
-                serialized_b = serialize_relationship(db, b)
+                serialized_a = serialize_relationship(db, edge_a)
+                serialized_b = serialize_relationship(db, edge_b)
                 evidence_a = {
                     item.get("evidence", {}).get("id")
                     for item in (serialized_a.get("provenance", {}).get("evidence_attachments") or [])
@@ -118,12 +132,12 @@ def detect_post_merge_reconciliation(db: Session, entity: Entity) -> dict:
                     "provenance_differs": (
                         evidence_a != evidence_b
                         or statement_sources_a != statement_sources_b
-                        or a.relationship_entity_id != b.relationship_entity_id
+                        or edge_a.relationship_entity_id != edge_b.relationship_entity_id
                     ),
-                    "latest_decision": decision,
+                    "latest_decision": serialize_reconciliation_decision(decision),
                 })
 
-    unresolved = sum(1 for row in statement_pairs + relationship_pairs if row["latest_decision"] is None or row["latest_decision"].decision == "unsure")
+    unresolved = sum(1 for row in statement_pairs + relationship_pairs if row["latest_decision"] is None or row["latest_decision"]["decision"] == "unsure")
     return {
         "entity_id": entity.id,
         "statement_duplicates": statement_pairs,
@@ -162,20 +176,20 @@ def record_post_merge_reconciliation(
             raise ValueError("Preferred record must be one of the duplicate pair")
 
     if record_type == "statement":
-        a, b = db.get(Statement, record_a_id), db.get(Statement, record_b_id)
-        if a is None or b is None or a.entity_id != entity.id or b.entity_id != entity.id:
+        stmt_a, stmt_b = db.get(Statement, record_a_id), db.get(Statement, record_b_id)
+        if stmt_a is None or stmt_b is None or stmt_a.entity_id != entity.id or stmt_b.entity_id != entity.id:
             raise ValueError("Both statements must belong to the active canonical entity")
-        if (_norm(a.prop), _norm(a.value)) != (_norm(b.prop), _norm(b.value)):
+        if (_norm(stmt_a.prop), _norm(stmt_a.value)) != (_norm(stmt_b.prop), _norm(stmt_b.value)):
             raise ValueError("Statements are not a detected duplicate assertion")
     else:
-        a, b = db.get(RelationshipEdge, record_a_id), db.get(RelationshipEdge, record_b_id)
-        if a is None or b is None or a.investigation_id != entity.investigation_id or b.investigation_id != entity.investigation_id:
+        edge_a, edge_b = db.get(RelationshipEdge, record_a_id), db.get(RelationshipEdge, record_b_id)
+        if edge_a is None or edge_b is None or edge_a.investigation_id != entity.investigation_id or edge_b.investigation_id != entity.investigation_id:
             raise ValueError("Both relationships must belong to the same investigation")
-        for edge in (a, b):
+        for edge in (edge_a, edge_b):
             if entity.id not in {edge.source_entity_id, edge.target_entity_id}:
                 raise ValueError("Both relationships must involve the active canonical entity")
-        key_a = (_norm(a.schema), a.source_entity_id, a.target_entity_id, _norm(a.source_prop), _norm(a.target_prop))
-        key_b = (_norm(b.schema), b.source_entity_id, b.target_entity_id, _norm(b.source_prop), _norm(b.target_prop))
+        key_a = (_norm(edge_a.schema), edge_a.source_entity_id, edge_a.target_entity_id, _norm(edge_a.source_prop), _norm(edge_a.target_prop))
+        key_b = (_norm(edge_b.schema), edge_b.source_entity_id, edge_b.target_entity_id, _norm(edge_b.source_prop), _norm(edge_b.target_prop))
         if key_a != key_b:
             raise ValueError("Relationships are not a detected duplicate edge")
 

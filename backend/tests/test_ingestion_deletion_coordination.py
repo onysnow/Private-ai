@@ -8,7 +8,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
-from app.api import routes
+from app.api import routes_sources
 from app.db.session import Base
 from app.models.domain import Document, Investigation, Source
 from app.services import documents
@@ -35,7 +35,7 @@ def test_document_ingest_locks_before_rechecking_investigation(monkeypatch, tmp_
     )
 
     with pytest.raises(ValueError, match='Investigation not found'):
-        documents.ingest_document(
+        documents.store_document(
             _MissingInvestigationDb(),
             investigation_id='deleted-id',
             title='Late upload',
@@ -58,13 +58,13 @@ def test_source_create_locks_before_rechecking_investigation(monkeypatch):
             return None
 
     monkeypatch.setattr(
-        routes,
+        routes_sources,
         'lock_investigation_transaction',
         lambda db, investigation_id: order.append(f'lock:{investigation_id}'),
     )
 
     with pytest.raises(HTTPException) as exc:
-        routes.create_source(SimpleNamespace(investigation_id='deleted-id'), _MissingInvestigationDb())
+        routes_sources.create_source_endpoint(SimpleNamespace(investigation_id='deleted-id'), _MissingInvestigationDb())
 
     assert exc.value.status_code == 404
     assert order == ['lock:deleted-id', 'get:deleted-id']
@@ -83,7 +83,7 @@ def test_failed_document_commit_removes_new_file_and_rows(monkeypatch, tmp_path)
 
     monkeypatch.setattr(db, 'commit', fail_commit)
     with pytest.raises(RuntimeError, match='simulated upload commit failure'):
-        documents.ingest_document(
+        documents.store_document(
             db,
             investigation_id=inv.id,
             title='Atomic memo',
@@ -121,7 +121,7 @@ def test_failed_duplicate_document_commit_never_deletes_preexisting_shared_bytes
 
     monkeypatch.setattr(db, 'commit', fail_commit)
     with pytest.raises(RuntimeError, match='simulated duplicate upload commit failure'):
-        documents.ingest_document(
+        documents.store_document(
             db,
             investigation_id=inv.id,
             title='Duplicate memo',

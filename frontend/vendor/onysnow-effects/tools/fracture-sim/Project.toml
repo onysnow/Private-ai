@@ -1,0 +1,6 @@
+[deps]
+Peridynamics = "4dc47793-80f3-4232-b30e-ca78ca9d621b"
+
+[compat]
+Peridynamics = "0.5"
+julia = "1.11"

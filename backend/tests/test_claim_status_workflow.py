@@ -32,9 +32,11 @@ def test_claim_status_and_confidence_are_validated_and_editable():
     assert created.status_code == 200
     claim_id = created.json()['id']
 
-    updated = client.patch(f'/api/claims/{claim_id}', json={'status': 'supported', 'confidence': 0.8})
+    # Supported goes through a review, so the Done rules run (app/services/claim_done.py).
+    assert client.patch(f'/api/claims/{claim_id}', json={'status': 'supported'}).status_code == 400
+    updated = client.patch(f'/api/claims/{claim_id}', json={'status': 'disputed', 'confidence': 0.8})
     assert updated.status_code == 200
-    assert updated.json()['status'] == 'supported'
+    assert updated.json()['status'] == 'disputed'
     assert updated.json()['confidence'] == 0.8
 
     assert client.patch(f'/api/claims/{claim_id}', json={'status': 'definitely_true'}).status_code == 400

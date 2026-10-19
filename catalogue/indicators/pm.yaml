@@ -1,0 +1,2168 @@
+key: PM
+name: Police misconduct and state violence
+scope: 'Police misconduct and state violence (officer-level). Early intervention system indicators used
+  to flag officers at risk of misconduct or excessive force: use-of-force incidents; officer-involved
+  shootings; community complaints; internal disciplinary actions; reassignment history; civil suits or
+  administrative claims against the officer; suspected or reported misconduct; vehicle pursuits and crashes.'
+indicators:
+- id: PM-001
+  name: Repeated use-of-force incidents by one officer
+  definition: An officer is involved in more use-of-force incidents than the agency's set threshold or
+    than peers with the same assignment.
+  areas:
+  - PM
+  typology: Excessive force / early intervention
+  status: verified
+  sources:
+  - title: 'Early Intervention Systems for Law Enforcement Agencies: A Planning and Management Guide'
+    publisher: US DOJ Office of Community Oriented Policing Services (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.3, p. 29; p. 32
+    quote: All officer-involved use-of-force incidents
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Early Intervention Systems for Law Enforcement Agencies: A Planning and Management Guide'
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: p. 32
+    quote: In the Miami-Dade EIS, an officer is identified if in any quarter he or she has two or more
+      citizen complaints or three or more use-of-force reports in the previous 90 days (or quarter).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: XV. Early Intervention Systems (EIS)
+    publisher: Council on Criminal Justice, Policing assessment
+    url: https://policing.counciloncj.org/assessing-the-evidence/xv-early-intervention-systems-eis
+    locator: Section on performance indicators
+    quote: the most common performance indicators examined are use-of-force incidents, officer-involved
+      shooting incidents,
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer has four use-of-force reports in one quarter while squad peers average one.
+  cases:
+  - name: Christopher Commission inquiry into the Los Angeles Police Department
+    year: '1991'
+    jurisdiction: Los Angeles, US
+    what_happened: The independent commission found a significant number of LAPD officers who repetitively
+      misused force and that the department's efforts to control or discipline them were inadequate; 63
+      officers had 20 or more use-of-force reports each.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://libraryarchives.metro.net:443/DPGTL/publications/1991-ChristopherCommission-LAPD.pdf
+    source_title: Report of the Independent Commission on the Los Angeles Police Department
+  data_needed:
+  - Person (officer)
+  - Employment (officer to PublicBody, with role and unit)
+  - 'Event (use-of-force incident: date, location, involved)'
+  - Document (use-of-force report)
+  checkable: lookups
+  lookup_sources:
+  - Agency use-of-force data released under public records law
+  - Consent-decree monitor reports
+  - Civilian oversight agency data portals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets a published agency threshold, e.g. Miami-Dade: three or more use-of-force reports
+      in the previous 90 days (one agency''s rule, not a national standard)'
+    threshold_source: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Assignment to high-crime areas, night shifts or specialist units that make more arrests (the guide
+    recommends peer comparison for this reason)
+  - Some agencies count low-level force such as handcuffing resistance
+  - Proactive officers make more arrests and so more force reports
+  jurisdictions: US (model used widely; thresholds are agency-specific)
+  version: 1
+- id: PM-002
+  name: Repeated civilian complaints against one officer
+  definition: An officer draws many civilian complaints, particularly about force, compared with peers.
+  areas:
+  - PM
+  typology: Excessive force / early intervention
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: p. 46
+    quote: represented only 12 percent of all officers receiving complaints but accounted for 41 percent
+      of all complaints.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Report of the Independent Commission on the Los Angeles Police Department
+    publisher: Independent Commission (Christopher Commission)
+    year: '1991'
+    url: https://libraryarchives.metro.net:443/DPGTL/publications/1991-ChristopherCommission-LAPD.pdf
+    locator: The Problem of Excessive Force, p. 4
+    quote: But 183 officers had four or more allegations, 44 had six or more
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Police Misconduct: Civilian allegations predict serious misconduct (policy brief)'
+    publisher: 'Northwestern Institute for Policy Research (Schanzenbach and Rozema); published in American
+      Economic Journal: Economic Policy 11(2) 2019'
+    year: '2018'
+    url: https://www.ipr.northwestern.edu/documents/policy-briefs/schanzenbach-max-police-misconduct.pdf
+    locator: Findings
+    quote: Civilian allegations can predict which police officers pose the highest risk for serious misconduct.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer in the top 3 percent of civilian complaints in a city over 12 years (as the study found for
+    Jason Van Dyke).
+  cases:
+  - name: Jason Van Dyke (Chicago Police Department)
+    year: '2018'
+    jurisdiction: Chicago, Illinois, US
+    what_happened: Researchers found the complaints against Van Dyke from 2002 to 2014 put him in the
+      top three percent of Chicago officers; in 2018 a jury found him guilty of second-degree murder and
+      aggravated battery in the shooting of Laquan McDonald.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.law.uchicago.edu/node/68601
+    source_title: 'Study by Kyle Rozema: Van Dyke''s complaint history could have foretold shooting of
+      McDonald (UChicago Law); ABC7 verdict report'
+  data_needed:
+  - Person (officer)
+  - Employment
+  - 'Document (complaint record: category, date, finding)'
+  - Event (incident complained of)
+  checkable: lookups
+  lookup_sources:
+  - Civilian oversight agency complaint data
+  - Public complaint databases such as the Invisible Institute Citizens Police Data Project (Chicago)
+  - Public records requests for internal affairs files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets a published agency threshold, e.g. Miami-Dade: two or more citizen complaints in
+      a quarter; Minneapolis (originally): three complaints in a twelve-month period'
+    threshold_source: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-contact assignments draw more complaints
+  - Complaints can be filed to retaliate against an arrest
+  - Complaint rates differ by shift, district and unit, so raw counts mislead without peer comparison
+  jurisdictions: US
+  version: 1
+- id: PM-003
+  name: Officer-involved shootings, especially more than one
+  definition: An officer has fired a weapon at people in one or more incidents, recorded as officer-involved
+    shootings.
+  areas:
+  - PM
+  typology: Deadly force
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.3, p. 29
+    quote: All officer-involved shooting incidents
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: XV. Early Intervention Systems (EIS)
+    publisher: Council on Criminal Justice
+    url: https://policing.counciloncj.org/assessing-the-evidence/xv-early-intervention-systems-eis
+    quote: the most common performance indicators examined are use-of-force incidents, officer-involved
+      shooting incidents,
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer has fired at people in three separate incidents over five years.
+  cases: []
+  data_needed:
+  - Person (officer)
+  - 'Event (shooting: date, location, injuries, fatalities)'
+  - Document (investigation report, prosecutor declination)
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - Agency shooting data and oversight reports
+  - Prosecutor declination letters
+  - News archives and police-shooting databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shootings can be lawful under the objective-reasonableness standard
+  - Tactical and SWAT assignments face armed suspects more often
+  jurisdictions: US
+  version: 1
+- id: PM-004
+  name: Repeated civil suits, claims or payouts naming the officer
+  definition: The officer is repeatedly named as a defendant in civil rights suits or administrative claims,
+    especially ones the city paid.
+  areas:
+  - PM
+  typology: Accountability / litigation
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.3, p. 29
+    quote: All officer-involved civil suits or administrative claims
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Police Misconduct policy brief
+    publisher: Northwestern IPR (Schanzenbach and Rozema)
+    year: '2018'
+    url: https://www.ipr.northwestern.edu/documents/policy-briefs/schanzenbach-max-police-misconduct.pdf
+    locator: Findings
+    quote: The 1 percent of officers with the most allegations generate almost five times the number of
+      payouts
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Repeated Police Misconduct by 200 Officers Cost Chicago Taxpayers $164.3M Over 5 Years
+    publisher: WTTW News
+    year: '2024'
+    url: https://news.wttw.com/2024/08/12/repeated-police-misconduct-200-officers-cost-chicago-taxpayers-1643m-over-5-years
+    quote: Chicago taxpayers paid $164.3 million to resolve lawsuits that named 200 Chicago police officers
+      whose alleged misconduct led more than once to payouts from 2019 to 2023
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer named in three or more paid cases (57 Chicago officers met this in WTTW's 2019 to 2023 analysis).
+  cases: []
+  data_needed:
+  - Person (officer)
+  - CourtCase
+  - CourtCaseParty (officer as defendant)
+  - Payment (settlement or judgment from PublicBody to plaintiff)
+  - Document (complaint, settlement agreement)
+  checkable: lookups
+  lookup_sources:
+  - Federal court records (PACER, CourtListener)
+  - State court dockets
+  - City law department litigation reports and council settlement approvals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cities settle to avoid trial costs without admitting fault
+  - Officers in high-arrest units are sued more
+  - Plaintiffs often name every officer present
+  jurisdictions: US
+  version: 1
+- id: PM-005
+  name: Prior departmental discipline
+  definition: The officer has a history of disciplinary actions by their own department.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.3, p. 29
+    quote: All departmental disciplinary actions
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer suspended twice in four years for force and report-writing violations.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document (disciplinary record, arbitration award)
+  - Sanction (internal sanction, if modelled)
+  checkable: lookups
+  lookup_sources:
+  - Internal affairs and disciplinary records under state open-records law
+  - Police board or arbitration decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Minor administrative violations (uniform, lateness) appear as discipline
+  - Discipline can be overturned on appeal or arbitration
+  jurisdictions: US
+  version: 1
+- id: PM-006
+  name: Vehicle pursuits and crashes
+  definition: The officer is involved in many vehicle pursuits or police vehicle crashes, particularly
+    with injuries.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.2, p. 27
+    quote: All officer-involved vehicular pursuits
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: XV. Early Intervention Systems (EIS)
+    publisher: Council on Criminal Justice
+    url: https://policing.counciloncj.org/assessing-the-evidence/xv-early-intervention-systems-eis
+    quote: possible or reported officer misconduct, and vehicle pursuits and crashes.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer involved in five pursuits in a year, two ending in injury crashes.
+  cases: []
+  data_needed:
+  - Person
+  - Event (pursuit or crash)
+  - Vehicle
+  - Document (crash report)
+  checkable: lookups
+  lookup_sources:
+  - Agency pursuit logs
+  - State crash reports
+  - City litigation reports (pursuit claims)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Traffic and highway assignments involve more pursuits
+  - Pursuit policies differ by agency
+  jurisdictions: US
+  version: 1
+- id: PM-007
+  name: High ratio of force to arrests
+  definition: The officer uses force in a higher share of arrests than peers.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: XV. Early Intervention Systems (EIS)
+    publisher: Council on Criminal Justice
+    url: https://policing.counciloncj.org/assessing-the-evidence/xv-early-intervention-systems-eis
+    quote: the ratio of two indicators (e.g., use-of-force reports to arrests),
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: p. 37 and pp. 32-33
+    quote: At present, there is no consensus regarding the best set of thresholds.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Early Intervention Systems for Law Enforcement Agencies: A Planning and Management Guide'
+    publisher: US DOJ Office of Community Oriented Policing Services (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Chapter 2, p. 31 (worked example of performance indicators)
+    quote: Officer A used force in more than half of the arrests he made. The ratio of force to arrests
+      is cause for departmental concern and probable intervention.
+    quote_verified: true
+    licence: Not stated (US DOJ-funded publication)
+    checked: '2026-10-10'
+  examples:
+  - Officer uses force in 20 percent of arrests while unit peers use it in 5 percent.
+  cases: []
+  data_needed:
+  - Person
+  - Event (arrests and force incidents)
+  - Document (arrest reports, force reports)
+  checkable: lookups
+  lookup_sources:
+  - Agency arrest and force datasets
+  levels:
+    faint: The officer's force-to-arrest ratio is clearly above unit peers. No published number exists
+      for this level in this source.
+    strong: The officer uses force in close to half of arrests. No separate published cut-off exists for
+      this level.
+    textbook: The officer used force in more than half of the arrests made, which Walker calls cause for
+      concern and probable intervention
+    threshold_source: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    threshold_note: 'This is a worked example in the DOJ COPS guide, not a binding standard. The same
+      guide says ''there is no consensus regarding the best set of thresholds''. Other figures in the
+      same guide: Pittsburgh''s PARS flags officers ''one or more standard deviations greater than their
+      peer officers'' (p. 58), and officers selected by Miami-Dade''s EIS ''averaged twice as many use-of-force
+      incidents per year as their peers'' (p. 48). The quote was read through a fetched-page extract,
+      so check the exact wording against the PDF before publishing.'
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Units that arrest violent suspects have higher force rates
+  - Small numbers make ratios unstable
+  jurisdictions: US
+  version: 2
+- id: PM-008
+  name: Frequent reassignment
+  definition: The officer is moved between units or districts repeatedly, which can be how a department
+    manages a problem officer without discipline.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: XV. Early Intervention Systems (EIS)
+    publisher: Council on Criminal Justice
+    url: https://policing.counciloncj.org/assessing-the-evidence/xv-early-intervention-systems-eis
+    quote: departmental disciplinary actions, reassignment history, officer-involved civil suits or administrative
+      claims,
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer transferred four times in three years, each soon after complaints.
+  cases: []
+  data_needed:
+  - Person
+  - Employment (with start and end dates and unit)
+  - Membership (unit)
+  checkable: records
+  lookup_sources:
+  - Payroll and roster records
+  - Personnel orders
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Promotions, training rotations and staffing shortages move officers
+  - Officers request transfers for family reasons
+  jurisdictions: US
+  version: 1
+- id: PM-009
+  name: Officer arrested, charged or criminally investigated
+  definition: The officer has been arrested, charged or criminally investigated, on or off duty.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.2, p. 27
+    quote: Criminal arrests and investigations of subject officer
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Justice Manual 9-5.100 (Giglio policy)
+    publisher: US Department of Justice
+    url: https://www.justice.gov/jm/jm-9-5000-issues-related-trials-and-other-court-proceedings
+    locator: 9-5.100, para 5(c)
+    quote: any past or pending criminal charge brought against the employee
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer charged with domestic assault while still on patrol.
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - CourtCaseParty
+  - Document (charging document)
+  checkable: lookups
+  lookup_sources:
+  - State and federal court records
+  - Arrest records and booking logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Charges may be dropped or end in acquittal
+  - Investigation may clear the officer
+  jurisdictions: US
+  version: 1
+- id: PM-010
+  name: Police dog bites and canine injuries
+  definition: Canine deployments by the officer result in bites, injuries or complaints.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.2, p. 28
+    quote: Canine unit deployment involving subject officer
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Investigation of the Ferguson Police Department (summary)
+    publisher: US DOJ Civil Rights Division
+    year: '2015'
+    url: https://www.justice.gov/sites/default/files/crt/legacy/2015/03/04/ferguson_findings_summ_3-4-15.pdf
+    locator: p. 5
+    quote: In every canine bite incident for which racial information is available, the person bitten
+      was African American.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Justice Department Finds Civil Rights Violations by the Louisville Metro Police Department
+    publisher: US DOJ Office of Public Affairs
+    year: '2023'
+    url: https://www.justice.gov/archives/opa/pr/justice-department-finds-civil-rights-violations-louisville-metro-police-department-and
+    quote: Uses excessive force, including unjustified neck restraints and the unreasonable use of police
+      dogs and tasers;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Handler's dog bit unarmed people who were not resisting in several incidents.
+  cases: []
+  data_needed:
+  - Person (handler)
+  - Event (deployment, bite)
+  - Document (canine deployment report, medical record)
+  checkable: lookups
+  lookup_sources:
+  - Canine deployment logs
+  - Hospital and litigation records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful building searches for armed suspects
+  - Dog bites can be accidental
+  jurisdictions: US
+  version: 1
+- id: PM-011
+  name: Racial disparities in stops, citations, arrests or force
+  definition: An officer's or agency's enforcement falls on one racial group far more than that group's
+    share of the population or comparable benchmarks.
+  areas:
+  - PM
+  typology: Discriminatory policing
+  status: verified
+  sources:
+  - title: Investigation of the Ferguson Police Department (summary)
+    publisher: US DOJ Civil Rights Division
+    year: '2015'
+    url: https://www.justice.gov/sites/default/files/crt/legacy/2015/03/04/ferguson_findings_summ_3-4-15.pdf
+    locator: p. 4-5
+    quote: African Americans account for 85% of vehicle stops, 90% of citations, and 93% of arrests
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.2, p. 28
+    quote: All motor vehicle stops and pedestrian stops made by subject officer
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: State of Connecticut Traffic Stop Data Analysis and Findings, 2014-15
+    publisher: Connecticut Racial Profiling Prohibition Project (Institute for Municipal and Regional
+      Policy, Central Connecticut State University) with Connecticut Economic Resource Center
+    year: '2016'
+    url: https://imrp.dpp.uconn.edu/wp-content/uploads/sites/3351/2021/09/May-2016.pdf
+    locator: PDF page 45, estimated driving population (EDP) benchmark section; the same 10-point / 5-point
+      / 1.75 rule is restated for the resident-population benchmark and in the summary of findings
+    quote: 'Departments that exceed their EDP percentages by greater than 10 percentage points in any
+      of the three categories: (1) Minority (all race/ethnicity), (2) Black non-Hispanic, and (3) Hispanic,
+      were identified in our tier one group. In addition, departments that exceeded their EDP percentage
+      by more than five but less than 10 percentage points were identified in our tier two group for this
+      benchmark if the ratio of the percentage of stops for the target group compared to the baseline
+      measure for that group also was 1.75 or above (percentage of stops divided by benchmark percentage
+      equals 1.75 or more)'
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
+  examples:
+  - 'Ferguson: 93% of arrests were of African Americans, who were 67% of residents (population share per
+    the full DOJ report).'
+  cases:
+  - name: Ferguson Police Department pattern-or-practice investigation
+    year: '2015'
+    jurisdiction: Ferguson, Missouri, US
+    what_happened: DOJ found a pattern of stops without reasonable suspicion, arrests without probable
+      cause, excessive force and racial disparities driven by a focus on revenue.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/crt/file/764731/dl
+    source_title: Investigation of the Ferguson Police Department
+  data_needed:
+  - Person (officer)
+  - Event (stop, citation, arrest with demographics of the person stopped)
+  - Document (stop data)
+  checkable: lookups
+  lookup_sources:
+  - State traffic-stop data reporting (e.g. racial profiling laws)
+  - Census population data
+  - Agency stop and arrest datasets
+  levels:
+    faint: The group's share of stops is more than 5 percentage points above its benchmark share (the
+      published tier-two floor).
+    strong: The stop share is more than 5 but less than 10 percentage points above the benchmark, and
+      the ratio of stop share to benchmark share is 1.75 or above (published tier two).
+    textbook: The stop share is more than 10 percentage points above the benchmark share (published tier
+      one).
+    threshold_source: https://imrp.dpp.uconn.edu/wp-content/uploads/sites/3351/2021/09/May-2016.pdf
+    threshold_note: These are Connecticut's state traffic-stop thresholds, set at agency level against
+      an estimated driving population (EDP) or resident benchmark. They are a descriptive screen, not
+      proof of bias. The report itself says the margins of error in the EDP estimates are why it uses
+      thresholds. The Ferguson figures cited already (85% of stops, 90% of citations and 93% of arrests)
+      are findings from one investigation, not cut-offs.
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Residential population is a weak benchmark for who drives or walks in an area
+  - Deployment to high-call areas changes who is stopped
+  - Small samples for individual officers
+  jurisdictions: US
+  version: 2
+- id: PM-012
+  name: Force used on people already handcuffed or restrained
+  definition: Officers strike, kick, restrain by the neck or otherwise use force on someone who is already
+    handcuffed or under control.
+  areas:
+  - PM
+  typology: Excessive force
+  status: verified
+  sources:
+  - title: Investigation of the Memphis Police Department and the City of Memphis
+    publisher: US DOJ Civil Rights Division
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 18
+    quote: MPD officers punch, kick, and use other force against people who are already handcuffed or
+      restrained.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Former Minneapolis Police Officer Derek Chauvin Sentenced to More Than 20 Years in Prison
+    publisher: US DOJ Office of Public Affairs
+    year: '2022'
+    url: https://www.justice.gov/archives/opa/pr/former-minneapolis-police-officer-derek-chauvin-sentenced-more-20-years-prison-depriving
+    quote: held his knee on the child's neck, shoulders and upper back for between 15 and 16 minutes
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Body-camera video shows a handcuffed, prone person held with a knee on the neck for minutes.
+  cases:
+  - name: Derek Chauvin (Minneapolis Police Department)
+    year: '2021'
+    jurisdiction: US District of Minnesota
+    what_happened: Pleaded guilty to federal civil rights violations for kneeling on George Floyd, who
+      was restrained, prone and handcuffed for about 10 minutes, and for a 2017 incident in which he held
+      his knee on a handcuffed 14-year-old's neck; sentenced to 252 months in 2022.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/former-minneapolis-police-officer-derek-chauvin-sentenced-more-20-years-prison-depriving
+    source_title: Former Minneapolis Police Officer Derek Chauvin Sentenced to More Than 20 Years in Prison
+  data_needed:
+  - Person (officer and subject)
+  - Event (force incident)
+  - Document (force report, body-worn camera video, medical examiner report)
+  checkable: person
+  lookup_sources:
+  - Body-worn camera footage via records requests
+  - Autopsy reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A restrained person may still kick or bite, and some force can be lawful
+  - Video angles can hide what the subject was doing
+  jurisdictions: US
+  version: 1
+- id: PM-013
+  name: Unreported or under-reported force, including neck restraints
+  definition: Force shows up on video or medical records but not in the officer's report, or the report
+    understates it.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ Civil Rights Division
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 17 and p. 23
+    quote: officers regularly omit information about the number of times they used force
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ Civil Rights Division
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 17
+    quote: neither the officers nor supervisors reported the neck restraints.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Report says 'escorted to the ground'; video shows repeated punches.
+  cases: []
+  data_needed:
+  - Event
+  - Document (force report, body-worn camera video, hospital record)
+  - Person
+  checkable: person
+  lookup_sources:
+  - Body-worn camera footage
+  - Jail intake medical records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Officers may not recall details in fast incidents
+  - Reporting rules differ on what counts as reportable force
+  jurisdictions: US
+  version: 1
+- id: PM-014
+  name: Officer account contradicted by video or other evidence
+  definition: The officer's written or sworn account of an incident is later shown false or incomplete
+    by video, forensic or witness evidence.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Chicago Police Department
+    publisher: US DOJ Civil Rights Division and US Attorney N.D. Illinois
+    year: '2017'
+    url: https://www.justice.gov/opa/file/925846/dl
+    locator: p. 7
+    quote: officers' accounts of force incidents were later discredited, in whole or part, by video evidence.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ Civil Rights Division
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 24
+    quote: Body-worn camera footage shows neither assertion was true.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Report claims the driver accelerated at the officer; dashcam shows the car moving away.
+  cases:
+  - name: Tyre Nichols death (former Memphis officers Haley, Bean, Smith)
+    year: '2024'
+    jurisdiction: US Western District of Tennessee
+    what_happened: A federal jury convicted Demetrius Haley of excessive force and witness tampering and
+      Tadarrius Bean and Justin Smith of witness tampering; the defendants had falsely claimed Nichols
+      actively resisted and omitted that they punched and kicked him. Emmitt Martin and Desmond Mills
+      Jr. pleaded guilty earlier.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/three-former-memphis-tennessee-police-officers-convicted-federal-felonies-related-death-tyre
+    source_title: Three Former Memphis Police Officers Convicted of Federal Felonies Related to the Death
+      of Tyre Nichols
+  data_needed:
+  - Document (report, video, forensic report)
+  - Event
+  - Person
+  checkable: person
+  lookup_sources:
+  - Body-worn and dashboard camera footage
+  - Third-party and bystander video
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest perception errors under stress
+  - Video may not capture what the officer saw
+  jurisdictions: US
+  version: 1
+- id: PM-015
+  name: Cursory supervisory approval of force
+  definition: Supervisors approve use-of-force reports without real review, rarely flagging policy violations.
+  areas:
+  - PM
+  typology: Supervision failure
+  status: verified
+  sources:
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ Civil Rights Division
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 23
+    quote: These supervisors' reviews are cursory, often endorsing conduct without any discussion of the
+      facts.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Report of the Independent Commission on the Los Angeles Police Department
+    publisher: Christopher Commission
+    year: '1991'
+    url: https://libraryarchives.metro.net:443/DPGTL/publications/1991-ChristopherCommission-LAPD.pdf
+    locator: The Problem of Excessive Force, p. 3
+    quote: their supervisors were not held accountable for excessive use of force by officers in their
+      command
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The same sergeant signs off every force report from a squad with one-line approvals.
+  cases: []
+  data_needed:
+  - Person (supervisor)
+  - Employment
+  - Document (force review forms)
+  checkable: records
+  lookup_sources:
+  - Force review files via records requests
+  - Monitor reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most force incidents are within policy and short approvals can be correct
+  - Supervisor workload
+  jurisdictions: US
+  version: 1
+- id: PM-016
+  name: Shooting at moving vehicles or at people fleeing who pose no immediate threat
+  definition: Officers fire at cars or at people running away when there is no immediate threat to anyone.
+  areas:
+  - PM
+  typology: Deadly force
+  status: verified
+  sources:
+  - title: Investigation of the Chicago Police Department
+    publisher: US DOJ
+    year: '2017'
+    url: https://www.justice.gov/opa/file/925846/dl
+    locator: p. 6-7
+    quote: officers shoot at vehicles without justification and in contradiction to CPD policy.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 20
+    quote: A significant number of them involved officers firing into cars or at moving vehicles, without
+      justification.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Graham v. Connor, 490 U.S. 386
+    publisher: US Supreme Court
+    year: '1989'
+    url: https://supreme.justia.com/cases/federal/us/490/386/
+    locator: 490 U.S. at 396
+    quote: whether the suspect poses an immediate threat to the safety of the officers or others
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer fires into the side window of a car driving past.
+  cases: []
+  data_needed:
+  - Event (shooting)
+  - Vehicle
+  - Person
+  - Document (forensic and video evidence)
+  checkable: person
+  lookup_sources:
+  - Shooting investigation files
+  - Forensic reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A vehicle can be used as a weapon against officers or bystanders
+  - The suspect may be armed and shooting
+  jurisdictions: US
+  version: 1
+- id: PM-017
+  name: Foot pursuits that end in shootings
+  definition: Officers chase people on foot for flight alone, and the chases end with officers shooting.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Chicago Police Department
+    publisher: US DOJ
+    year: '2017'
+    url: https://www.justice.gov/opa/file/925846/dl
+    locator: p. 6 and p. 26
+    quote: these foot pursuits too often end with officers unreasonably shooting someone—including unarmed
+      individuals.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Foot chase over a minor offence ends with an unarmed person shot.
+  cases:
+  - name: Chicago Police Department pattern-or-practice investigation
+    year: '2017'
+    jurisdiction: Chicago, Illinois, US
+    what_happened: DOJ found CPD engaged in a pattern of unreasonable force, including shootings at people
+      who posed no immediate threat, a code of silence, and no meaningful early intervention system.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/file/925846/dl
+    source_title: Investigation of the Chicago Police Department
+  data_needed:
+  - Event (pursuit, shooting)
+  - Person
+  - Document
+  checkable: person
+  lookup_sources:
+  - Foot pursuit reports
+  - Body-worn camera footage
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The person fleeing may be armed and turn on officers
+  jurisdictions: US
+  version: 1
+- id: PM-018
+  name: '''Contempt of cop'' charges: failure to comply, resisting or obstruction as the main charge'
+  definition: People are charged mainly with failing to comply, resisting arrest or similar offences after
+    they question or criticise officers, which can disguise retaliation or justify force.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Ferguson Police Department (summary)
+    publisher: US DOJ Civil Rights Division
+    year: '2015'
+    url: https://www.justice.gov/sites/default/files/crt/legacy/2015/03/04/ferguson_findings_summ_3-4-15.pdf
+    locator: p. 4
+    quote: 94% of all Failure to Comply charges
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An arrest report whose only charges are 'failure to comply' and 'resisting', after the person filmed
+    the officer.
+  cases: []
+  data_needed:
+  - Event (arrest)
+  - Document (arrest report, charging document)
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Municipal court dockets
+  - Arrest data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - People do resist arrest and the charge can be accurate
+  jurisdictions: US
+  version: 1
+- id: PM-019
+  name: Retaliation against protected speech or protest
+  definition: Officers act against people for criticising police, filming or protesting, through force,
+    arrest or charges.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Justice Department Finds Civil Rights Violations by the Minneapolis Police Department and the
+      City of Minneapolis
+    publisher: US DOJ
+    year: '2023'
+    url: https://www.justice.gov/usao-mn/pr/justice-department-finds-civil-rights-violations-minneapolis-police-department-and-city
+    quote: Violates the rights of people engaged in protected speech; and
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Justice Department Finds Civil Rights Violations by the Louisville Metro Police Department
+    publisher: US DOJ
+    year: '2023'
+    url: https://www.justice.gov/archives/opa/pr/justice-department-finds-civil-rights-violations-louisville-metro-police-department-and
+    quote: Violates the rights of people engaged in protected free speech critical of policing; and
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Journalist or bystander filming is pepper-sprayed and arrested for obstruction.
+  cases: []
+  data_needed:
+  - Event
+  - Person
+  - Document (video, arrest report)
+  checkable: person
+  lookup_sources:
+  - Protest footage
+  - Press freedom trackers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: Retaliation against people filming or reporting on police can target journalists directly.
+    source_url: https://www.justice.gov/usao-mn/pr/justice-department-finds-civil-rights-violations-minneapolis-police-department-and-city
+  innocent_explanations:
+  - Dispersal orders during unlawful assemblies
+  - Bystanders may physically interfere
+  jurisdictions: US
+  version: 1
+- id: PM-020
+  name: Revenue or ticket-quota pressure on officers
+  definition: Officers are evaluated or pushed on ticket and arrest counts to raise money, not public
+    safety.
+  areas:
+  - PM
+  typology: Revenue-driven policing
+  status: verified
+  sources:
+  - title: Investigation of the Ferguson Police Department (summary)
+    publisher: US DOJ
+    year: '2015'
+    url: https://www.justice.gov/sites/default/files/crt/legacy/2015/03/04/ferguson_findings_summ_3-4-15.pdf
+    locator: p. 2
+    quote: Ferguson's law enforcement practices are shaped by the City's focus on revenue rather than
+      by public safety needs.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - City budget assumes rising fine revenue; emails urge more tickets before year end.
+  cases: []
+  data_needed:
+  - PublicBody (city)
+  - Payment (fines and fees revenue)
+  - Document (budget, emails, performance evaluations)
+  checkable: records
+  lookup_sources:
+  - Municipal budgets and audited financial statements
+  - State court fines and fees reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Ferguson's enforcement was driven by revenue targets set by city officials.
+    source_url: https://www.justice.gov/sites/default/files/crt/legacy/2015/03/04/ferguson_findings_summ_3-4-15.pdf
+  innocent_explanations:
+  - Productivity metrics are common management tools
+  - Fine revenue may rise from real traffic problems
+  jurisdictions: US
+  version: 1
+- id: PM-021
+  name: False or unsupported search warrant affidavits
+  definition: A warrant affidavit contains claims the officer knew were false or cannot support, such
+    as a verification that never happened.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Former Louisville, Kentucky, Police Detective Pleads Guilty to Federal Crime Related to the
+      Death of Breonna Taylor
+    publisher: US DOJ
+    year: '2022'
+    url: https://www.justice.gov/archives/opa/pr/former-louisville-kentucky-police-detective-pleads-guilty-federal-crime-related-death-breonna
+    quote: a U.S. Postal Inspector had verified that a target
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Justice Department Finds Civil Rights Violations by the Louisville Metro Police Department
+    publisher: US DOJ
+    year: '2023'
+    url: https://www.justice.gov/archives/opa/pr/justice-department-finds-civil-rights-violations-louisville-metro-police-department-and
+    quote: Conducts searches based on invalid warrants;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Affidavit says an informant made a controlled buy, but no buy money was logged.
+  cases:
+  - name: Kelly Goodlett (Louisville Metro Police Department)
+    year: '2022'
+    jurisdiction: US Western District of Kentucky
+    what_happened: Pleaded guilty to conspiring with another detective over a falsified warrant affidavit
+      for Breonna Taylor's home and to agreeing a false cover story.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/former-louisville-kentucky-police-detective-pleads-guilty-federal-crime-related-death-breonna
+    source_title: Former Louisville, Kentucky, Police Detective Pleads Guilty to Federal Crime Related
+      to the Death of Breonna Taylor
+  - name: Brett Hankison (Louisville Metro Police Department)
+    year: '2024'
+    jurisdiction: US Western District of Kentucky
+    what_happened: A federal jury convicted him of one civil rights count for firing five shots through
+      a covered window during the Taylor warrant execution; acquitted on a second count.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://justice.gov/opa/pr/former-louisville-kentucky-metro-police-officer-found-guilty-federal-civil-rights-crimes
+    source_title: Former Louisville Metro Police Officer Found Guilty of Federal Civil Rights Crimes
+  data_needed:
+  - Document (warrant affidavit, return of service)
+  - Person (affiant)
+  - Address (premises searched)
+  - CourtCase
+  checkable: person
+  lookup_sources:
+  - Court warrant files
+  - Postal Inspection Service or other agency confirmation
+  - Evidence logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Informants can mislead officers acting in good faith
+  - Clerical errors in boilerplate affidavits
+  jurisdictions: US
+  version: 1
+- id: PM-022
+  name: Warrants executed without knocking and announcing, unlawfully
+  definition: Officers force entry without announcing themselves where the law requires it.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Justice Department Finds Civil Rights Violations by the Louisville Metro Police Department
+    publisher: US DOJ
+    year: '2023'
+    url: https://www.justice.gov/archives/opa/pr/justice-department-finds-civil-rights-violations-louisville-metro-police-department-and
+    quote: Unlawfully executes search warrants without knocking and announcing;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Warrant return shows a dawn entry with no no-knock authorisation.
+  cases: []
+  data_needed:
+  - Document (warrant, return)
+  - Event (entry)
+  - Address
+  checkable: records
+  lookup_sources:
+  - Court warrant files
+  - SWAT deployment logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A judge may have authorised a no-knock entry
+  - Exigent circumstances can excuse announcement
+  jurisdictions: US
+  version: 1
+- id: PM-023
+  name: Theft of cash, drugs or property during stops and searches
+  definition: Officers take money, drugs or property from people they stop or homes they search and leave
+    it out of reports.
+  areas:
+  - PM
+  typology: Police corruption
+  status: verified
+  sources:
+  - title: Two Baltimore City Police Officers Convicted of Federal Racketeering Conspiracy
+    publisher: US Attorney's Office, District of Maryland
+    year: '2018'
+    url: https://www.justice.gov/usao-md/pr/two-baltimore-city-police-officers-convicted-federal-racketeering-conspiracy
+    quote: stole money, property and narcotics from victims, some of whom had not committed crimes.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Arrestee says $20,000 was taken; property report lists $2,000.
+  cases:
+  - name: 'Gun Trace Task Force: Daniel Hersl and Marcus Taylor'
+    year: '2018'
+    jurisdiction: US District of Maryland
+    what_happened: A jury convicted the two Baltimore detectives of racketeering conspiracy, racketeering
+      and Hobbs Act robbery for robbing people, false affidavits and reports, and overtime fraud; acquitted
+      of a firearm count.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-md/pr/two-baltimore-city-police-officers-convicted-federal-racketeering-conspiracy
+    source_title: Two Baltimore City Police Officers Convicted of Federal Racketeering Conspiracy
+  data_needed:
+  - Event (stop, search)
+  - Document (property and evidence logs, arrest report)
+  - Person
+  checkable: person
+  lookup_sources:
+  - Evidence room logs
+  - Civil asset forfeiture filings
+  - Interviews with people searched
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Seized drugs were passed to a dealer for resale and the proceeds shared with the sergeant.
+    source_url: https://www.justice.gov/usao-md/pr/former-baltimore-city-sergeant-pleads-guilty-racketeering-robberies-overtime-fraud-and
+  innocent_explanations:
+  - People arrested may overstate what they had
+  - Counting errors in seized cash
+  jurisdictions: US
+  version: 1
+- id: PM-024
+  name: Overtime and attendance fraud
+  definition: Officers claim pay for hours they did not work.
+  areas:
+  - PM
+  typology: Police corruption
+  status: verified
+  sources:
+  - title: Former Baltimore City Sergeant Pleads Guilty to Racketeering, Robberies, Overtime Fraud
+    publisher: US Attorney's Office, District of Maryland
+    year: '2018'
+    url: https://www.justice.gov/usao-md/pr/former-baltimore-city-sergeant-pleads-guilty-racketeering-robberies-overtime-fraud-and
+    quote: According to the plea agreement, Jenkins admitted that he routinely submitted false and fraudulent
+      individual overtime reports, thereby defrauding the Baltimore Police Department and the citizens
+      of the State of Maryland.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Two Baltimore City Police Officers Convicted of Federal Racketeering Conspiracy
+    publisher: US Attorney's Office, District of Maryland
+    year: '2018'
+    url: https://www.justice.gov/usao-md/pr/two-baltimore-city-police-officers-convicted-federal-racketeering-conspiracy
+    quote: large-scale over time and attendance fraud
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer's overtime pay exceeds base salary while phone or toll records place them elsewhere.
+  cases:
+  - name: Wayne Jenkins (Baltimore Gun Trace Task Force sergeant)
+    year: '2018'
+    jurisdiction: US District of Maryland
+    what_happened: Pleaded guilty to racketeering, robbery, falsification of records and deprivation of
+      rights; admitted seven robberies, false overtime, false affidavits and planting evidence.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-md/pr/former-baltimore-city-sergeant-pleads-guilty-racketeering-robberies-overtime-fraud-and
+    source_title: Former Baltimore City Sergeant Pleads Guilty to Racketeering, Robberies, Overtime Fraud
+  data_needed:
+  - Person
+  - Employment
+  - Payment (payroll and overtime)
+  - Document (timesheets)
+  checkable: lookups
+  lookup_sources:
+  - Public payroll databases
+  - Timesheets and court appearance logs
+  - Toll, GPS or phone records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Payroll fraud against a public employer.
+    source_url: https://www.justice.gov/usao-md/pr/former-baltimore-city-sergeant-pleads-guilty-racketeering-robberies-overtime-fraud-and
+  innocent_explanations:
+  - Staffing shortages create legitimate heavy overtime
+  - Court time and special events
+  jurisdictions: US
+  version: 1
+- id: PM-025
+  name: Planted evidence and false arrest reports
+  definition: Officers plant evidence or write false reports that lead to charges or convictions.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Former Baltimore City Sergeant Pleads Guilty
+    publisher: US Attorney's Office, District of Maryland
+    year: '2018'
+    url: https://www.justice.gov/usao-md/pr/former-baltimore-city-sergeant-pleads-guilty-racketeering-robberies-overtime-fraud-and
+    quote: planting evidence and authoring a false police report
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 33
+    quote: The officer's report did not mention the search.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Same officer recovers a gun 'in plain view' in many arrests with near-identical wording.
+  cases: []
+  data_needed:
+  - Document (arrest report, evidence log)
+  - CourtCase
+  - Person
+  checkable: person
+  lookup_sources:
+  - Court files and motions to suppress
+  - Conviction integrity unit reviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Template report language is common
+  - Defendants' claims of planting are not proof
+  jurisdictions: US
+  version: 1
+- id: PM-026
+  name: Exonerations linked to the officer's work
+  definition: Convictions in cases the officer handled are overturned because of witness tampering, coerced
+    interrogations, fabricated or concealed evidence.
+  areas:
+  - PM
+  typology: Wrongful conviction
+  status: verified
+  sources:
+  - title: 'Government Misconduct and Convicting the Innocent: The Role of Prosecutors, Police and Other
+      Law Enforcement'
+    publisher: National Registry of Exonerations (University of Michigan Law School)
+    year: '2020'
+    url: https://repository.law.umich.edu/pub_law_archive/776
+    locator: Abstract
+    quote: Police officers committed misconduct in 35% of cases.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Government Misconduct and Convicting the Innocent
+    publisher: National Registry of Exonerations
+    year: '2020'
+    url: https://repository.law.umich.edu/pub_law_archive/776
+    locator: Abstract
+    quote: They were responsible for most of the witness tampering, misconduct in interrogation, and fabricating
+      evidence
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three exonerations in a decade from cases led by the same detective.
+  cases:
+  - name: Jon Burge (Chicago Police Department commander)
+    year: '2010'
+    jurisdiction: US Northern District of Illinois
+    what_happened: Convicted of two counts of obstruction of justice and one count of perjury for lying
+      in a civil case about torture and abuse of suspects at Area Two; sentenced to 54 months in 2011.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/former-chicago-police-officer-jon-burge-sentenced-lying-about-police-torture
+    source_title: Former Chicago Police Officer Jon Burge Sentenced for Lying About Police Torture
+  data_needed:
+  - Person (detective)
+  - CourtCase
+  - CourtCaseParty
+  - Document (exoneration ruling, certificate of innocence)
+  checkable: lookups
+  lookup_sources:
+  - National Registry of Exonerations database
+  - Conviction integrity unit reports
+  - Appellate opinions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Exonerations can result from new DNA evidence or witness error without officer misconduct
+  - Prosecutor rather than police misconduct
+  jurisdictions: US
+  version: 1
+- id: PM-027
+  name: Officer has credibility problems disclosed to prosecutors (Giglio/Brady list)
+  definition: The officer has misconduct findings, pending allegations or judicial findings bearing on
+    honesty or bias that prosecutors must disclose to defence.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Justice Manual 9-5.100 Giglio policy
+    publisher: US Department of Justice
+    url: https://www.justice.gov/jm/jm-9-5000-issues-related-trials-and-other-court-proceedings
+    locator: 9-5.100 para 5(c)
+    quote: prior findings by a judge that an agency employee has testified untruthfully
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Justice Manual 9-5.100 Giglio policy
+    publisher: US Department of Justice
+    url: https://www.justice.gov/jm/jm-9-5000-issues-related-trials-and-other-court-proceedings
+    locator: 9-5.100 para 5(c)
+    quote: any finding of misconduct that reflects upon the truthfulness or possible bias of the employee
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer appears on a county prosecutor's 'do not call' or Brady list.
+  cases: []
+  data_needed:
+  - Person
+  - Document (Brady/Giglio list, court ruling)
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - Prosecutor Brady/Giglio lists obtained by records request
+  - Court rulings on credibility
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pending allegations may be unfounded
+  - List criteria vary by prosecutor office
+  jurisdictions: US (federal policy; states vary)
+  version: 1
+- id: PM-028
+  name: Code of silence and coordinated accounts
+  definition: Officers withhold information about colleagues' misconduct, align their stories, or tamper
+    with witnesses.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Chicago Police Department
+    publisher: US DOJ
+    year: '2017'
+    url: https://www.justice.gov/opa/file/925846/dl
+    locator: p. 9
+    quote: a code of silence among Chicago police officers exists, extending to lying and affirmative
+      efforts to conceal evidence.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Report of the Independent Commission on the LAPD
+    publisher: Christopher Commission
+    year: '1991'
+    url: https://libraryarchives.metro.net:443/DPGTL/publications/1991-ChristopherCommission-LAPD.pdf
+    locator: Personnel Complaints and Officer Discipline, p. 14
+    quote: an officer does not provide adverse information against a fellow officer
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Several officers' reports use the same unusual phrases about the same incident.
+  cases:
+  - name: Tyre Nichols death (Memphis)
+    year: '2024'
+    jurisdiction: US Western District of Tennessee
+    what_happened: Three former officers convicted of witness tampering for covering up the force used;
+      two others pleaded guilty to conspiring to cover it up.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/three-former-memphis-tennessee-police-officers-convicted-federal-felonies-related-death-tyre
+    source_title: Three Former Memphis Police Officers Convicted
+  data_needed:
+  - Person (officers present)
+  - Document (each officer's report or statement)
+  - Event
+  - Associate (officers working together)
+  checkable: person
+  lookup_sources:
+  - Internal affairs interview transcripts
+  - Court testimony
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Officers who saw the same event will give similar accounts
+  - Report templates produce shared wording
+  jurisdictions: US
+  version: 1
+- id: PM-029
+  name: Failure to intervene or to give medical aid
+  definition: Officers present do not stop a colleague's excessive force or do not tell medics about injuries.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Three Former Memphis Police Officers Convicted of Federal Felonies Related to the Death of
+      Tyre Nichols
+    publisher: US DOJ
+    year: '2024'
+    url: https://www.justice.gov/archives/opa/pr/three-former-memphis-tennessee-police-officers-convicted-federal-felonies-related-death-tyre
+    quote: willfully failed to inform responding emergency medical personnel of the blows suffered by
+      Nichols
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Consent Decree, United States v. Police Department of Baltimore City
+    publisher: US District Court, District of Maryland
+    year: '2017'
+    url: https://www.mdd.uscourts.gov/sites/mdd/files/ConsentDecree.pdf
+    locator: para 141 (duty to intervene; read via section summary only)
+    quote: BPD will require officers to intervene in incidents in which another officer uses excessive
+      force.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Video shows three officers watching a fourth strike a handcuffed man.
+  cases: []
+  data_needed:
+  - Person (officers present)
+  - Event
+  - Document (video, EMS run sheet)
+  checkable: person
+  lookup_sources:
+  - Body-worn camera
+  - EMS records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Bystander officers may not see the force
+  - Scene may be unsafe for medics
+  jurisdictions: US
+  version: 1
+- id: PM-030
+  name: Complaints rarely sustained or investigated (agency level)
+  definition: The agency sustains almost no complaints, or does not investigate most of them, so repeat
+    officers face no consequence.
+  areas:
+  - PM
+  typology: Accountability failure
+  status: verified
+  sources:
+  - title: Investigation of the Chicago Police Department
+    publisher: US DOJ
+    year: '2017'
+    url: https://www.justice.gov/opa/file/925846/dl
+    locator: p. 8
+    quote: fewer than 2% were sustained, resulting in no discipline in 98%
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Report of the Independent Commission on the LAPD
+    publisher: Christopher Commission
+    year: '1991'
+    url: https://libraryarchives.metro.net:443/DPGTL/publications/1991-ChristopherCommission-LAPD.pdf
+    locator: p. 13
+    quote: Of the 2,152 citizen allegations of excessive force from 1986 through 1990, only 42 were sustained.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Oversight agency sustains 1 to 2 percent of force complaints over five years.
+  cases: []
+  data_needed:
+  - PublicBody (agency, oversight body)
+  - Document (complaint outcome statistics)
+  checkable: lookups
+  lookup_sources:
+  - Oversight agency annual reports
+  - Records requests for complaint dispositions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many complaints lack evidence to sustain
+  - Different standards of proof
+  jurisdictions: US
+  version: 1
+- id: PM-031
+  name: Agency has no working early intervention system
+  definition: The department lacks or does not use a system to flag officers with patterns of problems.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Chicago Police Department
+    publisher: US DOJ
+    year: '2017'
+    url: https://www.justice.gov/opa/file/925846/dl
+    locator: p. 12
+    quote: CPD does not have a meaningful early intervention system (EIS)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Independent Monitor's First Quarterly Report, United States v. City of Newark
+    publisher: Newark Independent Monitor
+    year: '2017'
+    url: https://www.justice.gov/crt/case-document/file/1223396/download
+    quote: NPD's current EWS is based upon limited information, namely, thresholds for complaints and
+      uses of force found within IA Pro, the Internal Affairs database.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Agency's EIS only counts complaints and ignores lawsuits.
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document (policy, monitor report)
+  checkable: records
+  lookup_sources:
+  - Agency policy manuals
+  - Consent decree monitor reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small agencies may supervise directly without a formal system
+  jurisdictions: US
+  version: 1
+- id: PM-032
+  name: Previously fired or decertified officer rehired elsewhere ('wandering officer')
+  definition: An officer fired by one agency, or whose certification was revoked, works for another agency.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: The Wandering Officer
+    publisher: Yale Law Journal (Ben Grunwald and John Rappaport)
+    year: '2020'
+    url: https://yalelawjournal.org/article/the-wandering-officer
+    locator: Abstract
+    quote: a novel data set of all 98,000 full-time law-enforcement officers employed by almost 500 different
+      agencies
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: About NDI
+    publisher: International Association of Directors of Law Enforcement Standards and Training (IADLEST)
+    url: https://iadlest.org/our-services/ndi/about-ndi
+    quote: a national registry of certificate or license revocation actions relating to officer misconduct
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer fired by a city force joins a small town department a year later.
+  cases: []
+  data_needed:
+  - Person
+  - Employment (each agency, with dates and separation reason)
+  - Sanction (decertification)
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - State POST certification records
+  - National Decertification Index (restricted access)
+  - Public officer employment databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Firings can be overturned or later found unfair
+  - Departures for non-misconduct reasons recorded as terminations
+  jurisdictions: US (Florida data in study; NDI covers participating states)
+  version: 1
+- id: PM-033
+  name: Partners and co-accused with force complaints
+  definition: An officer's close colleagues, especially those named in the same complaints, have histories
+    of force complaints.
+  areas:
+  - PM
+  typology: Network exposure
+  status: verified
+  sources:
+  - title: Network exposure and excessive use of force (Criminology & Public Policy, 2019) - Northwestern
+      IPR news
+    publisher: Northwestern Institute for Policy Research
+    year: '2019'
+    url: https://www.ipr.northwestern.edu/news/2019/papachristos-police-misconduct-study.html
+    quote: had a greater proportion of colleagues previously named in use-of-force complaints
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - New officer partnered with three officers in the top decile of force complaints.
+  cases: []
+  data_needed:
+  - Person
+  - Associate (co-accused officers)
+  - Membership (unit)
+  - Document (complaints naming multiple officers)
+  checkable: lookups
+  lookup_sources:
+  - Complaint data listing all accused officers
+  - Unit rosters
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Officers in the same unit share high-risk assignments
+  - Correlation, not proof of influence
+  jurisdictions: US (Chicago data)
+  version: 1
+- id: PM-034
+  name: Signs of sexual misconduct on duty
+  definition: Patterns such as stops targeting one sex, unwarranted call-backs to victims, sexual shakedowns
+    or unnecessary searches.
+  areas:
+  - PM
+  typology: Police sexual misconduct
+  status: verified
+  sources:
+  - title: 'Addressing Sexual Offenses and Misconduct by Law Enforcement: Executive Guide'
+    publisher: International Association of Chiefs of Police
+    year: '2011'
+    url: https://www.prisonlegalnews.org/media/publications/international_association_of_chiefs_of_police_guide_to_addressing_sex_offenses_and_misconduct_by_law_enforcement_2011.pdf
+    locator: p. 3
+    quote: sexual shakedowns (e.g., extorting sexual favors in exchange for not ticketing or arresting
+      a citizen);
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Addressing Sexual Offenses and Misconduct by Law Enforcement: Executive Guide'
+    publisher: IACP
+    year: '2011'
+    url: https://www.prisonlegalnews.org/media/publications/international_association_of_chiefs_of_police_guide_to_addressing_sex_offenses_and_misconduct_by_law_enforcement_2011.pdf
+    locator: p. 9
+    quote: periodic audits of each officer's traffic stops and final call dispositions are essential for
+      identifying
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'IACP example: an officer whose traffic stops were 89 percent female drivers over four months.'
+  cases: []
+  data_needed:
+  - Person
+  - Event (stops, calls)
+  - Document (stop data with driver sex, call-back logs)
+  checkable: lookups
+  lookup_sources:
+  - Traffic stop data
+  - CAD/dispatch records
+  - Victim interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Sexual shakedowns trade non-enforcement for sex, which overlaps with exploitation of people
+      in commercial sex.
+    source_url: https://www.prisonlegalnews.org/media/publications/international_association_of_chiefs_of_police_guide_to_addressing_sex_offenses_and_misconduct_by_law_enforcement_2011.pdf
+  innocent_explanations:
+  - Assignment to areas or times with skewed driver populations
+  - Legitimate follow-up contacts with victims
+  jurisdictions: US
+  version: 1
+- id: PM-035
+  name: Misuse of police databases for personal reasons
+  definition: An officer looks up people in police systems for non-official purposes.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: 'Addressing Sexual Offenses and Misconduct by Law Enforcement: Executive Guide'
+    publisher: IACP
+    year: '2011'
+    url: https://www.prisonlegalnews.org/media/publications/international_association_of_chiefs_of_police_guide_to_addressing_sex_offenses_and_misconduct_by_law_enforcement_2011.pdf
+    locator: p. 4
+    quote: inappropriate and unauthorized use of department resources and/or information systems for other
+      than legitimate law enforcement purposes.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Audit log shows an officer ran an ex-partner's plate twenty times.
+  cases: []
+  data_needed:
+  - Person
+  - Document (database audit logs)
+  - Vehicle
+  checkable: records
+  lookup_sources:
+  - State criminal-justice information system audit logs
+  - Discipline records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SA
+    reason: Database lookups can be used to identify or follow critics or journalists.
+    source_url: https://www.prisonlegalnews.org/media/publications/international_association_of_chiefs_of_police_guide_to_addressing_sex_offenses_and_misconduct_by_law_enforcement_2011.pdf
+  innocent_explanations:
+  - Queries tied to open cases
+  - Shared login misattribution
+  jurisdictions: US
+  version: 1
+- id: PM-036
+  name: Same person stopped or cited over and over
+  definition: Officers stop or cite the same person many times in a short period.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 27
+    quote: MPD stopped and cited one Black man 30 times in three years.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - One resident cited 30 times in three years.
+  cases: []
+  data_needed:
+  - Person (stopped)
+  - Event (stop)
+  - Document (citations)
+  checkable: records
+  lookup_sources:
+  - Citation data
+  - Municipal court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Repeat traffic violations, such as driving on a suspended licence
+  jurisdictions: US
+  version: 1
+- id: PM-037
+  name: Search justifications not supported by video
+  definition: Reports cite grounds for a search (such as smelling marijuana) that body-camera footage
+    does not show.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 33
+    quote: write in reports that they smelled marijuana, but there will be no mention of the odor
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Report says officer smelled marijuana; video has no mention and nothing is found.
+  cases: []
+  data_needed:
+  - Document (report, video)
+  - Event (search)
+  checkable: person
+  lookup_sources:
+  - Body-worn camera footage
+  - Suppression hearing records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Officers may not narrate observations aloud
+  jurisdictions: US
+  version: 1
+- id: PM-038
+  name: Specialised or saturation unit with no written rules
+  definition: A special unit floods neighbourhoods with stops without policies directing its work.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Investigation of the Memphis Police Department
+    publisher: US DOJ
+    year: '2024'
+    url: https://justice.gov/crt/media/1379096/dl?inline=
+    locator: p. 11
+    quote: MPD never adopted policies and procedures to direct the SCORPION Unit's activities
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Plainclothes crime-suppression unit with no unit policy and rising force complaints.
+  cases: []
+  data_needed:
+  - PublicBody
+  - Organization (unit)
+  - Membership
+  - Document (policies)
+  checkable: records
+  lookup_sources:
+  - Agency policy manual
+  - Unit rosters
+  - Budget documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Units can be lawfully created to respond to violent crime spikes
+  jurisdictions: US
+  version: 1
+- id: PM-039
+  name: Pattern-or-practice finding against the agency
+  definition: The US Justice Department has found the agency engages in a pattern or practice of unconstitutional
+    policing.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: 34 U.S.C. 12601
+    publisher: Cornell LII (US Code)
+    url: https://www.law.cornell.edu/uscode/text/34/12601
+    quote: It shall be unlawful for any governmental authority, or any agent thereof
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: U.S. Department of Justice's Civil Rights Division Dismisses Biden-era Police Investigations
+    publisher: US DOJ
+    year: '2025'
+    url: https://www.justice.gov/opa/pr/us-department-justices-civil-rights-division-dismisses-biden-era-police-investigations-and
+    quote: The Civil Rights Division will also be closing its investigations into, and retracting the
+      Biden administration's findings
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Agency under consent decree with an independent monitor.
+  cases:
+  - name: Minneapolis Police Department findings
+    year: '2023'
+    jurisdiction: Minneapolis, Minnesota, US
+    what_happened: DOJ found excessive force including unjustified deadly force, discrimination, and violations
+      of protected speech; DOJ announced in May 2025 it would retract the findings and dismiss the consent-decree
+      lawsuit.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-mn/pr/justice-department-finds-civil-rights-violations-minneapolis-police-department-and-city
+    source_title: Justice Department Finds Civil Rights Violations by the Minneapolis Police Department
+  - name: Louisville Metro Police Department findings
+    year: '2023'
+    jurisdiction: Louisville, Kentucky, US
+    what_happened: DOJ found excessive force, invalid warrants, unlawful no-knock executions and discrimination;
+      announced retraction in May 2025.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/justice-department-finds-civil-rights-violations-louisville-metro-police-department-and
+    source_title: Justice Department Finds Civil Rights Violations by the Louisville Metro Police Department
+  - name: Memphis Police Department findings
+    year: '2024'
+    jurisdiction: Memphis, Tennessee, US
+    what_happened: DOJ found excessive force, unlawful stops and searches and discrimination; announced
+      retraction in May 2025.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://justice.gov/crt/media/1379096/dl?inline=
+    source_title: Investigation of the Memphis Police Department and the City of Memphis
+  data_needed:
+  - PublicBody
+  - CourtCase
+  - Document (findings report, consent decree)
+  checkable: lookups
+  lookup_sources:
+  - DOJ Civil Rights Division case documents
+  - Civil Rights Litigation Clearinghouse
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Findings are agency-level and do not prove any one officer's misconduct
+  - On 21 May 2025 DOJ said it would retract several findings reports; check current status
+  jurisdictions: US
+  version: 1
+- id: PM-040
+  name: Weapons qualification failures and training gaps
+  definition: The officer fails weapons qualification or lacks required training.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.2, p. 28
+    quote: Any failure of an officer to meet weapons qualification requirements
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officer failed firearms qualification twice but stayed on patrol.
+  cases: []
+  data_needed:
+  - Person
+  - Document (training and qualification records)
+  checkable: lookups
+  lookup_sources:
+  - State POST training records
+  - Agency training files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Temporary injury or equipment change
+  jurisdictions: US
+  version: 1
+- id: PM-041
+  name: Failure to appear in court
+  definition: The officer repeatedly misses court dates as a witness.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Early Intervention Systems for Law Enforcement Agencies
+    publisher: US DOJ COPS (Samuel Walker)
+    year: '2003'
+    url: https://corpora.tika.apache.org/base/docs/govdocs1/263/263288.pdf
+    locator: Box 2.2, p. 28
+    quote: Failure to appear in court
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Court No-Shows: A Systemic Issue. New Evidence From Philadelphia'
+    publisher: University of Pennsylvania Carey Law School (Graef, Mayson, Ouss and Stevenson; research
+      forthcoming in University of Pennsylvania Law Review)
+    year: '2023'
+    url: https://www.law.upenn.edu/live/files/13151-court-no-shows-a-systemic-issue
+    locator: Key Results, point 2 (page 2)
+    quote: 'Police officers fail to appear for at least one hearing in 31% of their cases, compared to
+      19% for defendants. At a per-hearing level, police officers fail to appear twice as often as defendants:
+      in 14% versus 7% of cases.'
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
+  examples:
+  - Cases dismissed because the arresting officer did not appear.
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Document (court minutes)
+  checkable: lookups
+  lookup_sources:
+  - Court dockets
+  levels:
+    faint: The officer misses more scheduled hearings than the published police-officer average of 14%
+      of hearings.
+    strong: The officer misses at least one hearing in more than 31% of their cases, above the published
+      police-officer average.
+    textbook: Meets the published definition as worded. The study gives average rates only, not a cut-off
+      for 'repeatedly'.
+    threshold_source: https://www.law.upenn.edu/live/files/13151-court-no-shows-a-systemic-issue
+    threshold_note: This is a benchmark, not a disciplinary threshold. It covers Philadelphia criminal
+      cases from January 2010 to March 2020 (341,417 cases), and the figures are averages for all officers,
+      so an officer above them is only a first sign. The research is in a student-edited law review, not
+      a peer-reviewed journal. Seattle PD's EIS has a '1 within 12 months' trigger, but that is for missed
+      mandatory training, not court, so it is not used here. The cited Walker/COPS early-warning guide
+      could not be opened (host blocked by proxy).
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Scheduling conflicts, leave, or poor notice from courts
+  jurisdictions: US
+  version: 2
+- id: PM-042
+  name: Discrimination against people in behavioural health crisis
+  definition: Officers respond to mental-health calls with force or arrest where the law requires reasonable
+    accommodation.
+  areas:
+  - PM
+  status: verified
+  sources:
+  - title: Justice Department Finds Civil Rights Violations by the Minneapolis Police Department
+    publisher: US DOJ
+    year: '2023'
+    url: https://www.justice.gov/usao-mn/pr/justice-department-finds-civil-rights-violations-minneapolis-police-department-and-city
+    quote: Along with the city, discriminates against people with behavioral health disabilities when
+      responding to calls for assistance.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Welfare-check calls ending in Taser use on unarmed people in crisis.
+  cases: []
+  data_needed:
+  - Event (call, force)
+  - Person
+  - Document (dispatch record)
+  checkable: person
+  lookup_sources:
+  - CAD/dispatch data
+  - Force data with call type
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - People in crisis can be armed and dangerous
+  jurisdictions: US
+  version: 1
+not_reached:
+- 'Baltimore Consent Decree (mdd.uscourts.gov) Early Intervention System section XIII: the fetched text
+  stopped around paragraph 210, so the EIS indicator list and the exact paragraph 141 duty-to-intervene
+  wording were not read (PM-029 cites the section summary only)'
+- 'Mollen Commission report (New York, 1994): not found online; only a later Commission to Combat Police
+  Corruption report citing it was opened'
+- National Registry of Exonerations full 2020 report PDF (law.umich.edu blocked by robots.txt); only the
+  abstract on repository.law.umich.edu was read
+- 'UChicago Urban Labs EIS paper and Seattle randomized trial cited by the Council on Criminal Justice:
+  not opened'
+- 'Chicago consent decree EIS/Officer Support System paragraphs: not opened'
+- Ferguson full report (justice.gov/crt/file/764731/dl) returned the Spanish edition; English summary
+  used instead
+- 'Jason Van Dyke verdict: no court primary source opened; conviction rests on ABC7 news report found
+  by search (abc7news.com) and UChicago Law page'
+- 'IACP model policy on officer-involved domestic violence and the Lautenberg Amendment: not researched'
+- 'Washington Post 2022 repeat-payout analysis: not opened'

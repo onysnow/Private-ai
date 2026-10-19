@@ -1,0 +1,5216 @@
+{
+ "investigation": {
+  "name": "1MDB",
+  "question": "How was money raised by Malaysia's state fund 1MDB between 2009 and 2014 diverted, through which companies, banks and people, and who has been held to account for it?",
+  "description": "A demo investigation of the 1MDB scandal built only from public material: US Justice Department complaints, the Low/Ng indictment, Leissner's criminal information, Goldman Sachs's 2020 deferred prosecution agreement, a Federal Reserve order, Singapore (MAS) and Swiss (FINMA) regulator releases, Malaysian, Singapore and Swiss judgments, news articles and posts, photos, video and audio, and emails rebuilt word for word from the filings. Facts in the DOJ civil forfeiture complaints are allegations unless a guilty plea, an admitted statement of facts or a regulator finding supports them."
+ },
+ "entities": [
+  {
+   "key": "1mdb",
+   "schema": "Company",
+   "caption": "1Malaysia Development Berhad (1MDB)",
+   "properties": {
+    "alias": [
+     "1MDB"
+    ],
+    "jurisdiction": [
+     "my"
+    ],
+    "name": [
+     "1Malaysia Development Berhad (1MDB)"
+    ]
+   },
+   "note": "Malaysian state investment fund wholly owned by the Ministry of Finance; formed 2009 from Terengganu Investment Authority.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 31",
+     "quote": "1Malaysia Development Berhad (“1MDB”) was a strategic investment and development company wholly owned by the Government of Malaysia through its Ministry of Finance (“MOF”)."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 13",
+     "quote": "In September 2009, TIA’s name was changed to 1Malaysia Development Berhad, or 1MDB."
+    }
+   ]
+  },
+  {
+   "key": "tia",
+   "schema": "Organization",
+   "caption": "Terengganu Investment Authority (TIA)",
+   "properties": {
+    "alias": [
+     "TIA"
+    ],
+    "jurisdiction": [
+     "my"
+    ],
+    "name": [
+     "Terengganu Investment Authority (TIA)"
+    ]
+   },
+   "note": "Predecessor of 1MDB; Jho Low advised on its creation.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 12",
+     "quote": "In or around February 2009, the Malaysian municipality of Terengganu, assisted by Goldman, formed TIA with the stated purpose of investing and managing that municipality’s public funds."
+    }
+   ]
+  },
+  {
+   "key": "1mdb-global",
+   "schema": "Company",
+   "caption": "1MDB Global Investments Limited",
+   "properties": {
+    "jurisdiction": [
+     "vg"
+    ],
+    "incorporationDate": [
+     "2013-03-08"
+    ],
+    "name": [
+     "1MDB Global Investments Limited"
+    ]
+   },
+   "note": "1MDB subsidiary that issued the $3 billion Project Catalyze bond in March 2013.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 90",
+     "quote": "The bonds were issued by 1MDB Global Investments Limited (“1MDB Global”), a wholly- owned subsidiary of 1MDB that was incorporated in the British Virgin Islands on March 8, 2013."
+    }
+   ]
+  },
+  {
+   "key": "1mdb-energy",
+   "schema": "Company",
+   "caption": "1MDB Energy Limited",
+   "properties": {
+    "alias": [
+     "1MEL"
+    ],
+    "name": [
+     "1MDB Energy Limited"
+    ]
+   },
+   "note": "1MDB subsidiary that issued the $1.75bn Project Magnolia notes (May 2012) to buy Tanjong Energy.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 57",
+     "quote": "The offering circular for the Project Magnolia bonds, dated May 18, 2012, indicates that 1MDB Energy issued $1.75 billion in privately-placed notes, with an interest rate of 5.99% per annum, redeemable in 2022."
+    }
+   ]
+  },
+  {
+   "key": "1mdb-energy-langat",
+   "schema": "Company",
+   "caption": "1MDB Energy (Langat) Limited",
+   "properties": {
+    "name": [
+     "1MDB Energy (Langat) Limited"
+    ]
+   },
+   "note": "1MDB subsidiary created 13 Aug 2012 to hold the Genting power assets and issue the Project Maximus bonds.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 60",
+     "quote": "another wholly-owned subsidiary called “1MDB Energy (Langat) Limited” (“1MDB Energy Langat”), for the purposes of holding the power assets and issuing debt securities"
+    }
+   ]
+  },
+  {
+   "key": "1mehl",
+   "schema": "Company",
+   "caption": "1MDB Energy Holdings Limited (1MEHL)",
+   "properties": {
+    "alias": [
+     "1MEHL"
+    ],
+    "name": [
+     "1MDB Energy Holdings Limited (1MEHL)"
+    ]
+   },
+   "note": "1MDB power-assets holding company; borrower of the 2014 Deutsche Bank loans used for the \"options buyback\".",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 110",
+     "quote": "On or about May 26, 2014, Deutsche Bank AG, Singapore Branch extended a $250 million bridge loan facility to 1MDB Energy Holdings Limited (“$250 million loan”)."
+    }
+   ]
+  },
+  {
+   "key": "1mdb-petrosaudi-jv",
+   "schema": "Company",
+   "caption": "1MDB PetroSaudi Ltd. (joint venture)",
+   "properties": {
+    "alias": [
+     "1MDB-PetroSaudi JV"
+    ],
+    "name": [
+     "1MDB PetroSaudi Ltd. (joint venture)"
+    ]
+   },
+   "note": "Purported 2009 joint venture: 1MDB 40% for $1bn cash, PetroSaudi 60% for claimed energy concessions.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 9",
+     "quote": "1MDB PetroSaudi, Ltd. was a purported joint venture between 1MDB and PetroSaudi formed in or around September 2009 for the stated purpose of exploiting certain energy concessions PetroSaudi purportedly owned in Turkmenistan and Argentina."
+    }
+   ]
+  },
+  {
+   "key": "admic",
+   "schema": "Company",
+   "caption": "Abu Dhabi Malaysia Investment Company (ADMIC)",
+   "properties": {
+    "alias": [
+     "ADMIC"
+    ],
+    "name": [
+     "Abu Dhabi Malaysia Investment Company (ADMIC)"
+    ]
+   },
+   "note": "Purported 50:50 1MDB–Aabar joint venture that the 2013 Catalyze bond was meant to fund; never capitalized.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 12",
+     "quote": "Abu Dhabi Malaysia Investment Company (“ADMIC”) is a purported joint venture between 1MDB and Aabar that was created in or around March 2013 for the stated purpose of promoting the growth and development of Malaysia and Abu Dhabi. It was never capitalized."
+    }
+   ]
+  },
+  {
+   "key": "petrosaudi",
+   "schema": "Company",
+   "caption": "PetroSaudi International Ltd.",
+   "properties": {
+    "alias": [
+     "PetroSaudi",
+     "PSI"
+    ],
+    "jurisdiction": [
+     "sa"
+    ],
+    "name": [
+     "PetroSaudi International Ltd."
+    ]
+   },
+   "note": "Private Saudi oil services company, 1MDB's 2009 joint-venture partner.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 9",
+     "quote": "PetroSaudi International Ltd. (“PetroSaudi” or “PSI”) is a private Saudi Arabia-based oil services company incorporated in Saudi Arabia, which maintains offices in the United Kingdom."
+    }
+   ]
+  },
+  {
+   "key": "good-star",
+   "schema": "Company",
+   "caption": "Good Star Limited",
+   "properties": {
+    "jurisdiction": [
+     "sc"
+    ],
+    "incorporationDate": [
+     "2009-05-18"
+    ],
+    "address": [
+     "P.O. Box 1239, Offshore Incorporation, Victoria, Mahe, Republic of Seychelles"
+    ],
+    "name": [
+     "Good Star Limited"
+    ]
+   },
+   "note": "Seychelles company that received $1.03bn of 1MDB joint-venture money; alleged to be controlled by Jho Low.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 15",
+     "quote": "RBS Coutts bank account records indicate that Good Star Limited was formed in the Seychelles on or about May 18, 2009."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 27",
+     "quote": "Deutsche Bank submitted to RBS Coutts a revised SWIFT instruction identifying “Good Star Limited” as the beneficiary of the $700 million wire transfer, located at P.O. Box 1239, Offshore Incorporation, Victoria, Mahe, Republic of Seychelles."
+    }
+   ]
+  },
+  {
+   "key": "smart-power",
+   "schema": "Company",
+   "caption": "Smart Power",
+   "properties": {
+    "name": [
+     "Smart Power"
+    ]
+   },
+   "note": "Listed sole director of Good Star; Jho Low is its sole director.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 15",
+     "quote": "The sole director of Good Star is listed as Smart Power, of which LOW is the sole director."
+    }
+   ]
+  },
+  {
+   "key": "ipic",
+   "schema": "Company",
+   "caption": "International Petroleum Investment Company (IPIC)",
+   "properties": {
+    "alias": [
+     "IPIC"
+    ],
+    "jurisdiction": [
+     "ae"
+    ],
+    "name": [
+     "International Petroleum Investment Company (IPIC)"
+    ]
+   },
+   "note": "Abu Dhabi sovereign investment fund; guaranteed the 2012 1MDB bonds. (\"Foreign Agency A\" in the criminal filings.)",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 31",
+     "quote": "International Petroleum Investment Company (“IPIC”) was an investment fund wholly owned by the Government of Abu Dhabi."
+    }
+   ]
+  },
+  {
+   "key": "aabar",
+   "schema": "Company",
+   "caption": "Aabar Investments PJS",
+   "properties": {
+    "alias": [
+     "Aabar"
+    ],
+    "jurisdiction": [
+     "ae"
+    ],
+    "name": [
+     "Aabar Investments PJS"
+    ]
+   },
+   "note": "The real Abu Dhabi company, an IPIC subsidiary (\"Foreign Investment Firm A\" in the criminal filings).",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 32",
+     "quote": "Aabar Investments PJS (“Aabar”) was a private joint stock company incorporated under the laws of Abu Dhabi, and a subsidiary of IPIC."
+    }
+   ]
+  },
+  {
+   "key": "aabar-bvi",
+   "schema": "Company",
+   "caption": "Aabar Investments PJS Limited (BVI)",
+   "properties": {
+    "alias": [
+     "Aabar-BVI",
+     "Aabar BVI"
+    ],
+    "jurisdiction": [
+     "vg"
+    ],
+    "incorporationDate": [
+     "2012-03-14"
+    ],
+    "name": [
+     "Aabar Investments PJS Limited (BVI)"
+    ]
+   },
+   "note": "BVI look-alike of Aabar that received about $1.367bn of 2012 bond proceeds; IPIC and Aabar say it is not theirs.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "A Certificate of Incumbency prepared by Aabar-BVI’s registered agent in the BVI indicates that Aabar-BVI was incorporated in BVI on March 14, 2012."
+    },
+    {
+     "doc": "doj-2025-complaint-20m-ubs-fidelity",
+     "locator": "page 4",
+     "quote": "Aabar-BVI was created and named to give the impression that it was associated with Aabar Investments PJS (“Aabar”), a subsidiary of IPIC incorporated in Abu Dhabi."
+    }
+   ]
+  },
+  {
+   "key": "aabar-seychelles",
+   "schema": "Company",
+   "caption": "Aabar Investments PJS Limited (Seychelles)",
+   "properties": {
+    "alias": [
+     "Aabar-Seychelles",
+     "Aabar-SY"
+    ],
+    "jurisdiction": [
+     "sc"
+    ],
+    "name": [
+     "Aabar Investments PJS Limited (Seychelles)"
+    ]
+   },
+   "note": "Second look-alike, incorporated May 2014 by Husseiny; received about $681m of the 2014 Deutsche Bank loan.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 12",
+     "quote": "one incorporated in the Seychelles5 in May 2014 by HUSSEINY (“Aabar- Seychelles”). Aabar-BVI maintained a bank account at BSI Bank in Switzerland, and Aabar-Seychelles maintained a bank account at UBS AG in Singapore."
+    }
+   ]
+  },
+  {
+   "key": "blackstone-asia",
+   "schema": "Company",
+   "caption": "Blackstone Asia Real Estate Partners",
+   "properties": {
+    "previousName": [
+     "Foreign FX Trading Limited"
+    ],
+    "name": [
+     "Blackstone Asia Real Estate Partners"
+    ]
+   },
+   "note": "Shell holding a Standard Chartered Singapore account controlled by Eric Tan; transit for ~$1.1bn from Aabar-BVI. Unrelated to Blackstone Group.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 71",
+     "quote": "The account name was changed to Blackstone Asia Real Estate Partners on or about May 26, 2011."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 70",
+     "quote": "TAN was identified as the beneficial owner of the Blackstone Account and an authorized signatory on the account."
+    }
+   ]
+  },
+  {
+   "key": "tanore",
+   "schema": "Company",
+   "caption": "Tanore Finance Corporation",
+   "properties": {
+    "name": [
+     "Tanore Finance Corporation"
+    ]
+   },
+   "note": "Shell with a Falcon Bank Singapore account; received more than $1.26bn of 2013 Catalyze proceeds; Eric Tan beneficial owner of record.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 94",
+     "quote": "TAN opened the Tanore Account on or about November 2, 2012, and he was originally its sole authorized signatory."
+    }
+   ]
+  },
+  {
+   "key": "granton",
+   "schema": "Company",
+   "caption": "Granton Property Holdings Limited",
+   "properties": {
+    "name": [
+     "Granton Property Holdings Limited"
+    ]
+   },
+   "note": "Second Tan-controlled shell at Falcon Bank used to layer Catalyze proceeds back and forth with Tanore.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 94",
+     "quote": "Account opening documents for the Granton Account were signed by TAN."
+    }
+   ]
+  },
+  {
+   "key": "vasco",
+   "schema": "Company",
+   "caption": "Vasco Investments Services SA",
+   "properties": {
+    "jurisdiction": [
+     "vg"
+    ],
+    "name": [
+     "Vasco Investments Services SA"
+    ]
+   },
+   "note": "BVI entity affiliated with al-Qubaisi; its Luxembourg account received $472.75m from Blackstone.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 75",
+     "quote": "Vasco Investments Services SA is a BVI entity affiliated with QUBAISI, and QUBAISI is the beneficial owner of the Vasco Account."
+    }
+   ]
+  },
+  {
+   "key": "rayan",
+   "schema": "Company",
+   "caption": "Rayan Inc.",
+   "properties": {
+    "name": [
+     "Rayan Inc."
+    ]
+   },
+   "note": "Husseiny-owned account holder at BHF Bank, Frankfurt; received $55m from Blackstone.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 77",
+     "quote": "HUSSEINY is the beneficial owner of the Rayan Account."
+    }
+   ]
+  },
+  {
+   "key": "mb-consulting",
+   "schema": "Company",
+   "caption": "MB Consulting LLC",
+   "properties": {
+    "country": [
+     "us"
+    ],
+    "name": [
+     "MB Consulting LLC"
+    ]
+   },
+   "note": "Husseiny shell (Bank of America, Texas); received Blackstone money and paid $20m to \"Individual 1\" (2025 complaint).",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 77",
+     "quote": "HUSSEINY is the beneficial owner of the MB Consulting Account and the only authorized signatory on the account."
+    }
+   ]
+  },
+  {
+   "key": "river-dee",
+   "schema": "Company",
+   "caption": "River Dee International SA",
+   "properties": {
+    "name": [
+     "River Dee International SA"
+    ]
+   },
+   "note": "Holder of a Falcon Bank Zurich account beneficially owned by Jasmine Loo.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 78",
+     "quote": "LOO is the beneficial owner of the River Dee Account at Falcon Bank."
+    }
+   ]
+  },
+  {
+   "key": "affinity-equity",
+   "schema": "Company",
+   "caption": "Affinity Equity International Partners Limited",
+   "properties": {
+    "name": [
+     "Affinity Equity International Partners Limited"
+    ]
+   },
+   "note": "Shell (DBS Singapore account, Tan beneficial owner of record) used to pass 2014 loan proceeds to Low. No link to Affinity Equity Partners.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 113",
+     "quote": "TAN was the recorded beneficial owner of the Affinity Equity Account."
+    }
+   ]
+  },
+  {
+   "key": "alpha-synergy",
+   "schema": "Company",
+   "caption": "Alpha Synergy Limited",
+   "properties": {
+    "name": [
+     "Alpha Synergy Limited"
+    ]
+   },
+   "note": "BSI Singapore account holder beneficially owned by Jho Low.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 113",
+     "quote": "According to bank records, LOW was the beneficial owner of the Alpha Synergy Account."
+    }
+   ]
+  },
+  {
+   "key": "enterprise-fund",
+   "schema": "Company",
+   "caption": "Enterprise Emerging Markets Fund",
+   "properties": {
+    "country": [
+     "cw"
+    ],
+    "name": [
+     "Enterprise Emerging Markets Fund"
+    ]
+   },
+   "note": "Curaçao fund used as a pass-through from Aabar-BVI (2012) and 1MDB Global (2013) to Blackstone/Tanore.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 72",
+     "quote": "Aabar-BVI sent approximately $75 million to a bank account at ING Bank N.V. in Amsterdam belonging to Enterprise Emerging Markets Fund (“Enterprise”)."
+    }
+   ]
+  },
+  {
+   "key": "cistenique",
+   "schema": "Company",
+   "caption": "Cistenique Investment Fund",
+   "properties": {
+    "country": [
+     "cw"
+    ],
+    "name": [
+     "Cistenique Investment Fund"
+    ]
+   },
+   "note": "Curaçao fund used as a pass-through in 2012 and 2013.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 72",
+     "quote": "On or about the same day, Aabar-BVI also sent approximately $291 million to another bank account at ING Bank N.V. in Amsterdam belonging to Cistenique Investment Fund (“Cistenique”)."
+    }
+   ]
+  },
+  {
+   "key": "devonshire",
+   "schema": "Company",
+   "caption": "Devonshire Capital Growth Fund",
+   "properties": {
+    "country": [
+     "vg"
+    ],
+    "name": [
+     "Devonshire Capital Growth Fund"
+    ]
+   },
+   "note": "BVI fund that received $646m of Catalyze proceeds and passed money to Tanore and Granton.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 92",
+     "quote": "Devonshire Capital Growth Fund (“Devonshire”), a fund located in the British Virgin Islands; Enterprise, a fund located in Curacao; and Cistenique, another fund located in Curacao"
+    }
+   ]
+  },
+  {
+   "key": "red-granite-capital",
+   "schema": "Company",
+   "caption": "Red Granite Capital Limited",
+   "properties": {
+    "jurisdiction": [
+     "vg"
+    ],
+    "name": [
+     "Red Granite Capital Limited"
+    ]
+   },
+   "note": "Riza Aziz's BVI company; its BSI Singapore account received $238m from Aabar-BVI in 2012.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 79",
+     "quote": "Red Granite Capital is a BVI-incorporated entity owned by AZIZ."
+    }
+   ]
+  },
+  {
+   "key": "red-granite-pictures",
+   "schema": "Company",
+   "caption": "Red Granite Pictures",
+   "properties": {
+    "jurisdiction": [
+     "us"
+    ],
+    "incorporationDate": [
+     "2010-09-30"
+    ],
+    "previousName": [
+     "Red Granite Productions"
+    ],
+    "name": [
+     "Red Granite Pictures"
+    ]
+   },
+   "note": "Hollywood production company co-founded by Riza Aziz; produced \"The Wolf of Wall Street\".",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 84",
+     "quote": "Red Granite Pictures was incorporated in California on September 30, 2010, as Red Granite Productions and"
+    }
+   ]
+  },
+  {
+   "key": "world-view",
+   "schema": "Company",
+   "caption": "World View Ltd.",
+   "properties": {
+    "jurisdiction": [
+     "ky"
+    ],
+    "name": [
+     "World View Ltd."
+    ]
+   },
+   "note": "Cayman trustee company whose Caledonian Bank account received over $250m used to buy the Equanimity.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 191",
+     "quote": "The funds LOW used in 2014 to acquire THE EQUANIMITY were harbored in an account at Caledonian Bank in the Cayman Islands maintained in the name of World View Ltd."
+    }
+   ]
+  },
+  {
+   "key": "equanimity-cayman",
+   "schema": "Company",
+   "caption": "Equanimity (Cayman) Ltd.",
+   "properties": {
+    "jurisdiction": [
+     "ky"
+    ],
+    "name": [
+     "Equanimity (Cayman) Ltd."
+    ]
+   },
+   "note": "Title holder of the yacht Equanimity.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 191",
+     "quote": "THE EQUANIMITY is titled in the name of Equanimity (Cayman) Ltd."
+    }
+   ]
+  },
+  {
+   "key": "park-laurel-nyc",
+   "schema": "Company",
+   "caption": "Park Laurel (NYC) Ltd.",
+   "properties": {
+    "jurisdiction": [
+     "vg"
+    ],
+    "name": [
+     "Park Laurel (NYC) Ltd."
+    ]
+   },
+   "note": "BVI buyer of the Park Laurel condominium in 2010 (Low, per the complaint).",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 90",
+     "quote": "The purchase contract for the Park Laurel Condominium listed the ultimate purchaser as Park Laurel (NYC) Ltd., a BVI corporation,15 the final date of sale as February 5, 2010, and the final sales price as $23,980,000."
+    }
+   ]
+  },
+  {
+   "key": "park-laurel-acquisition",
+   "schema": "Company",
+   "caption": "Park Laurel Acquisition LLC",
+   "properties": {
+    "name": [
+     "Park Laurel Acquisition LLC"
+    ]
+   },
+   "note": "Title holder of the Park Laurel condominium from 2012; Riza Aziz signed for it.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 92",
+     "quote": "Sorcem Investments Inc. (“Sorcem”) and that Sorcem was the sole member of Park Laurel Acquisition LLC."
+    }
+   ]
+  },
+  {
+   "key": "red-mountain",
+   "schema": "Company",
+   "caption": "Red Mountain Global Ltd.",
+   "properties": {
+    "name": [
+     "Red Mountain Global Ltd."
+    ]
+   },
+   "note": "Title holder of the London property bought for Jasmine Loo.",
+   "evidence": [
+    {
+     "doc": "doj-2019-complaint-london-property",
+     "locator": "page 2",
+     "quote": "The persons and entities whose interests may be affected by this action are Jasmine Loo and Red Mountain Global Ltd."
+    }
+   ]
+  },
+  {
+   "key": "adkmic",
+   "schema": "Company",
+   "caption": "Abu Dhabi Kuwait Malaysia Investment Corp. (ADKMIC)",
+   "properties": {
+    "alias": [
+     "ADKMIC"
+    ],
+    "name": [
+     "Abu Dhabi Kuwait Malaysia Investment Corp. (ADKMIC)"
+    ]
+   },
+   "note": "Low-owned entity (distinct from ADMIC) whose BSI Singapore account received about $389m from Good Star.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 44",
+     "quote": "LOW is the beneficial owner of the ADKMIC BSI Account."
+    }
+   ]
+  },
+  {
+   "key": "shearman-sterling",
+   "schema": "Company",
+   "caption": "Shearman & Sterling LLP",
+   "properties": {
+    "country": [
+     "us"
+    ],
+    "name": [
+     "Shearman & Sterling LLP"
+    ]
+   },
+   "note": "US law firm whose client trust (IOLA) account received Good Star and Red Granite Capital money for property purchases.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 41",
+     "quote": "eleven wires totaling approximately $368 million were sent from the Good Star Account to an Interest on Lawyer Account held by the law firm Shearman & Sterling LLP in the United States"
+    }
+   ]
+  },
+  {
+   "key": "goldman-group",
+   "schema": "Company",
+   "caption": "The Goldman Sachs Group, Inc.",
+   "properties": {
+    "jurisdiction": [
+     "us"
+    ],
+    "address": [
+     "New York, New York"
+    ],
+    "name": [
+     "The Goldman Sachs Group, Inc."
+    ]
+   },
+   "note": "Parent; entered the 2020 DPA and admitted the Statement of Facts. (\"U.S. Financial Institution #1\" in 2018 filings.)",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 28",
+     "quote": "Goldman was a global investment banking, securities and investment management firm incorporated in Delaware and headquartered in New York, New York."
+    }
+   ]
+  },
+  {
+   "key": "goldman-intl",
+   "schema": "Company",
+   "caption": "Goldman Sachs International",
+   "properties": {
+    "country": [
+     "gb"
+    ],
+    "name": [
+     "Goldman Sachs International"
+    ]
+   },
+   "note": "London subsidiary; sole arranger and underwriter of the three 1MDB bonds.",
+   "evidence": [
+    {
+     "doc": "fed-2020-goldman-order",
+     "locator": "page 1",
+     "quote": "Goldman Sachs International, a London-based subsidiary of GS Group, served as the sole arranger and underwriter of three bond offerings"
+    }
+   ]
+  },
+  {
+   "key": "goldman-malaysia",
+   "schema": "Company",
+   "caption": "Goldman Sachs (Malaysia) Sdn. Bhd.",
+   "properties": {
+    "jurisdiction": [
+     "my"
+    ],
+    "name": [
+     "Goldman Sachs (Malaysia) Sdn. Bhd."
+    ]
+   },
+   "note": "Wholly-owned subsidiary; pleaded guilty to FCPA conspiracy in 2020.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 29",
+     "quote": "Goldman Sachs (Malaysia) Sdn. Bhd. (“Goldman Malaysia”) was a wholly-owned subsidiary and agent of Goldman. Goldman Malaysia was incorporated in Malaysia and had offices in Kuala Lumpur."
+    }
+   ]
+  },
+  {
+   "key": "bsi",
+   "schema": "Company",
+   "caption": "BSI SA (BSI AG)",
+   "properties": {
+    "jurisdiction": [
+     "ch"
+    ],
+    "name": [
+     "BSI SA (BSI AG)"
+    ]
+   },
+   "note": "Swiss private bank (Lugano) holding Aabar-BVI and 1MDB Global accounts; FINMA found serious AML breaches.",
+   "evidence": [
+    {
+     "doc": "finma-2016-pr-bsi",
+     "locator": "paragraph 10",
+     "quote": "Through business relationships and transactions linked to the corruption scandals surrounding the Malaysian sovereign wealth fund 1MDB, BSI AG committed serious breaches of money laundering regulations and “fit and proper” requirements."
+    }
+   ]
+  },
+  {
+   "key": "bsi-singapore",
+   "schema": "Company",
+   "caption": "BSI Bank Limited (Singapore)",
+   "properties": {
+    "jurisdiction": [
+     "sg"
+    ],
+    "name": [
+     "BSI Bank Limited (Singapore)"
+    ]
+   },
+   "note": "BSI's Singapore merchant bank; MAS withdrew its status on 24 May 2016.",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 6",
+     "quote": "It is a wholly-owned subsidiary of BSI SA, a bank founded in 1873 and headquartered in Switzerland."
+    }
+   ]
+  },
+  {
+   "key": "falcon",
+   "schema": "Company",
+   "caption": "Falcon Private Bank Ltd",
+   "properties": {
+    "jurisdiction": [
+     "ch"
+    ],
+    "previousName": [
+     "AIG Private Bank"
+    ],
+    "name": [
+     "Falcon Private Bank Ltd"
+    ]
+   },
+   "note": "Swiss bank owned by Aabar; Tanore/Granton and 1MDB subsidiary accounts; MAS closed its Singapore branch in 2016.",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 25",
+     "quote": "In 2009, AIG Private Bank was acquired by Aabar Investments PJS and renamed as Falcon Bank."
+    }
+   ]
+  },
+  {
+   "key": "ambank",
+   "schema": "Company",
+   "caption": "AmBank",
+   "properties": {
+    "country": [
+     "my"
+    ],
+    "name": [
+     "AmBank"
+    ]
+   },
+   "note": "Malaysian bank holding the AMPRIVATE BANKING-MR and -MY accounts; also originated 2011 transfers to Good Star.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 36",
+     "quote": "Each of these transfers was a foreign exchange transaction completed through financial institutions in Malaysia, including AmBank and Deutsche Bank"
+    }
+   ]
+  },
+  {
+   "key": "deutsche-bank",
+   "schema": "Company",
+   "caption": "Deutsche Bank",
+   "properties": {
+    "name": [
+     "Deutsche Bank"
+    ]
+   },
+   "note": "Executed the 2009 $700m wire (Malaysia) and lent 1MDB $1.225bn in 2014 (Singapore).",
+   "evidence": [
+    {
+     "doc": "doj-2025-complaint-20m-ubs-fidelity",
+     "locator": "page 5",
+     "quote": "1MDB borrowed a total of $1.225 billion from a syndicate of banks led by Deutsche Bank in Singapore to fund these payments to Aabar."
+    }
+   ]
+  },
+  {
+   "key": "rbs-coutts",
+   "schema": "Company",
+   "caption": "RBS Coutts",
+   "properties": {
+    "country": [
+     "ch"
+    ],
+    "name": [
+     "RBS Coutts"
+    ]
+   },
+   "note": "Swiss bank (Zurich; opened via Singapore branch) holding the Good Star account.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 15",
+     "quote": "On or about June 9, 2009, LOW opened the Good Star Account at an RBS Coutts branch in Singapore"
+    }
+   ]
+  },
+  {
+   "key": "jpm-suisse",
+   "schema": "Company",
+   "caption": "J.P. Morgan (Suisse)",
+   "properties": {
+    "country": [
+     "ch"
+    ],
+    "name": [
+     "J.P. Morgan (Suisse)"
+    ]
+   },
+   "note": "Held the 1MDB-PetroSaudi JV account that received only $300m of the $1bn.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 18",
+     "quote": "The bank account maintained by the Joint Venture at J.P. Morgan (Suisse), into which 1MDB ultimately transferred $300 million, was not opened until September 30, 2009"
+    }
+   ]
+  },
+  {
+   "key": "dbs",
+   "schema": "Company",
+   "caption": "DBS Bank Ltd",
+   "properties": {
+    "country": [
+     "sg"
+    ],
+    "name": [
+     "DBS Bank Ltd"
+    ]
+   },
+   "note": "Singapore bank fined S$1m by MAS; held the Affinity Equity account.",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 19",
+     "quote": "MAS has imposed financial penalties amounting to S$1 million on DBS for 10 breaches and S$1.3 million on UBS for 13 breaches of MAS Notice 626"
+    }
+   ]
+  },
+  {
+   "key": "ubs",
+   "schema": "Company",
+   "caption": "UBS AG",
+   "properties": {
+    "country": [
+     "ch"
+    ],
+    "name": [
+     "UBS AG"
+    ]
+   },
+   "note": "Fined S$1.3m by MAS (Singapore branch); held the Aabar-Seychelles account; 2025 complaint targets a UBS account.",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 6",
+     "quote": "MAS is also imposing financial penalties on DBS Bank Ltd (DBS) and UBS AG, Singapore Branch (UBS) for breaches of MAS’ AML requirements."
+    }
+   ]
+  },
+  {
+   "key": "efg",
+   "schema": "Company",
+   "caption": "EFG International",
+   "properties": {
+    "country": [
+     "ch"
+    ],
+    "name": [
+     "EFG International"
+    ]
+   },
+   "note": "Swiss bank approved by FINMA to take over BSI, on condition BSI be integrated and dissolved.",
+   "evidence": [
+    {
+     "doc": "finma-2016-pr-bsi",
+     "locator": "paragraph 37",
+     "quote": "FINMA has approved the full takeover of BSI by EFG International under the condition that BSI must be completely integrated and dissolved within 12 months."
+    }
+   ]
+  },
+  {
+   "key": "mas",
+   "schema": "PublicBody",
+   "caption": "Monetary Authority of Singapore (MAS)",
+   "properties": {
+    "alias": [
+     "MAS"
+    ],
+    "jurisdiction": [
+     "sg"
+    ],
+    "name": [
+     "Monetary Authority of Singapore (MAS)"
+    ]
+   },
+   "note": "Singapore regulator; shut BSI Bank (May 2016) and Falcon Singapore (Oct 2016).",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 4",
+     "quote": "The Monetary Authority of Singapore (MAS) announced today that it has served BSI Bank Limited (BSI Bank) notice of intention to withdraw its status as a merchant bank in Singapore"
+    }
+   ]
+  },
+  {
+   "key": "finma",
+   "schema": "PublicBody",
+   "caption": "Swiss Financial Market Supervisory Authority (FINMA)",
+   "properties": {
+    "alias": [
+     "FINMA"
+    ],
+    "jurisdiction": [
+     "ch"
+    ],
+    "name": [
+     "Swiss Financial Market Supervisory Authority (FINMA)"
+    ]
+   },
+   "note": "Swiss regulator; ordered BSI to disgorge CHF 95m.",
+   "evidence": [
+    {
+     "doc": "finma-2016-pr-bsi",
+     "locator": "paragraph 10",
+     "quote": "Among other measures, FINMA has ordered the disgorgement of profits amounting to CHF 95 million."
+    }
+   ]
+  },
+  {
+   "key": "fed",
+   "schema": "PublicBody",
+   "caption": "Board of Governors of the Federal Reserve System",
+   "properties": {
+    "alias": [
+     "Federal Reserve"
+    ],
+    "jurisdiction": [
+     "us"
+    ],
+    "name": [
+     "Board of Governors of the Federal Reserve System"
+    ]
+   },
+   "note": "US regulator; Oct 2020 cease-and-desist order and $154m penalty against Goldman.",
+   "evidence": [
+    {
+     "doc": "fed-2020-goldman-order",
+     "locator": "page 11",
+     "quote": "The Board of Governors hereby assesses a civil money penalty in connection with the conduct described above in the amount of $154,000,000"
+    }
+   ]
+  },
+  {
+   "key": "jho-low",
+   "schema": "Person",
+   "caption": "Low Taek Jho (Jho Low)",
+   "properties": {
+    "alias": [
+     "Jho Low",
+     "Low Taek Jho"
+    ],
+    "nationality": [
+     "my"
+    ],
+    "position": [
+     "Intermediary for 1MDB (no formal position)"
+    ],
+    "name": [
+     "Low Taek Jho (Jho Low)"
+    ]
+   },
+   "note": "Malaysian financier; intermediary with no formal 1MDB role; indicted 2018.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 34",
+     "quote": "Low Taek Jho, also known as “Jho Low” (“Low”), was a Malaysian national who worked as an intermediary in relation to 1MDB and other foreign government officials"
+    }
+   ]
+  },
+  {
+   "key": "malaysian-official-1",
+   "schema": "Person",
+   "caption": "Malaysian Official 1",
+   "properties": {
+    "position": [
+     "High-ranking official in the executive branch of the Government of Malaysia and the Ministry of Finance"
+    ],
+    "name": [
+     "Malaysian Official 1"
+    ]
+   },
+   "note": "The documents' own label; identity not given in these documents. Had authority to approve 1MDB business.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 33",
+     "quote": "“Malaysian Official 1,” an individual whose identity is known to the United States and the Company, was a high-ranking government official in the executive branch of the Government of Malaysia and the Ministry of Finance (“MOF”)."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "MALAYSIAN OFFICIAL 1 is a high-ranking official in the Malaysian government who also held a position of authority with 1MDB."
+    }
+   ]
+  },
+  {
+   "key": "riza-aziz",
+   "schema": "Person",
+   "caption": "Riza Shahriz Bin Abdul Aziz",
+   "properties": {
+    "alias": [
+     "Riza Aziz"
+    ],
+    "nationality": [
+     "my"
+    ],
+    "position": [
+     "Co-founder, Red Granite Pictures"
+    ],
+    "name": [
+     "Riza Shahriz Bin Abdul Aziz"
+    ]
+   },
+   "note": "Relative of Malaysian Official 1, friend of Low; co-founded Red Granite Pictures.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "Riza Shahriz Bin Abdul AZIZ (“AZIZ”), a Malaysian national, is a relative of MALAYSIAN OFFICIAL 1 and a friend of LOW. He co-founded Red Granite Pictures, a Hollywood movie production and distribution studio, in 2010."
+    }
+   ]
+  },
+  {
+   "key": "tim-leissner",
+   "schema": "Person",
+   "caption": "Tim Leissner",
+   "properties": {
+    "position": [
+     "Participating Managing Director; Chairman of Southeast Asia, Goldman Sachs"
+    ],
+    "name": [
+     "Tim Leissner"
+    ]
+   },
+   "note": "Goldman banker on the 1MDB deals; pleaded guilty 28 Aug 2018.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 30",
+     "quote": "Leissner was employed by Goldman from in or about and between 1998 and 2016, and was a Participating Managing Director (“PMD”) from in or about and between November 2006 and February 2016."
+    }
+   ]
+  },
+  {
+   "key": "roger-ng",
+   "schema": "Person",
+   "caption": "Ng Chong Hwa (Roger Ng)",
+   "properties": {
+    "alias": [
+     "Roger Ng",
+     "Ng Chong Hwa"
+    ],
+    "nationality": [
+     "my"
+    ],
+    "position": [
+     "Managing Director, Goldman; Head of Investment Banking, Goldman Malaysia"
+    ],
+    "name": [
+     "Ng Chong Hwa (Roger Ng)"
+    ]
+   },
+   "note": "Goldman banker who worked with Leissner; indicted with Low in 2018.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 30",
+     "quote": "Ng Chong Hwa, also known as “Roger Ng” (“Ng”), was employed by various Goldman subsidiaries from in or about and between 2005 and 2014, including Goldman Malaysia"
+    }
+   ]
+  },
+  {
+   "key": "khadem-al-qubaisi",
+   "schema": "Person",
+   "caption": "Khadem Abdulla Al Qubaisi",
+   "properties": {
+    "nationality": [
+     "ae"
+    ],
+    "position": [
+     "Managing Director, IPIC (2007-2015)",
+     "Chairman, Aabar",
+     "Director, Aabar-BVI"
+    ],
+    "name": [
+     "Khadem Abdulla Al Qubaisi"
+    ]
+   },
+   "note": "IPIC managing director and Aabar chairman; director of Aabar-BVI; dismissed 2015.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "Khadem Abdulla Al QUBAISI (“QUBAISI”), a U.A.E. national, was the Managing Director of IPIC from 2007 to 2015 and the Chairman of Aabar in at least 2012 and 2013."
+    }
+   ]
+  },
+  {
+   "key": "mohamed-al-husseiny",
+   "schema": "Person",
+   "caption": "Mohamed Ahmed Badawy Al-Husseiny",
+   "properties": {
+    "nationality": [
+     "us"
+    ],
+    "position": [
+     "CEO, Aabar (2010-2015)",
+     "Chairman, Falcon Private Bank"
+    ],
+    "name": [
+     "Mohamed Ahmed Badawy Al-Husseiny"
+    ]
+   },
+   "note": "Aabar CEO and Falcon Bank chairman; director of both Aabar look-alikes.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "Mohamed Ahmed Badawy Al-HUSSEINY (“HUSSEINY”), a U.S. citizen, was the CEO of Aabar from 2010 to 2015. He was also a director of Aabar-BVI."
+    }
+   ]
+  },
+  {
+   "key": "jasmine-loo",
+   "schema": "Person",
+   "caption": "Jasmine Loo Ai Swan",
+   "properties": {
+    "alias": [
+     "Jasmine Loo"
+    ],
+    "nationality": [
+     "my"
+    ],
+    "position": [
+     "General Counsel and Executive Director of Group Strategy, 1MDB"
+    ],
+    "name": [
+     "Jasmine Loo Ai Swan"
+    ]
+   },
+   "note": "1MDB general counsel; main contact with Goldman on the bonds; signatory on the Tanore account.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 13",
+     "quote": "“Jasmine” LOO Ai Swan (“LOO”) is Malaysian national who served as 1MDB’s General Counsel and Executive Director of Group Strategy during, at a minimum, 2012 and 2013."
+    }
+   ]
+  },
+  {
+   "key": "eric-tan",
+   "schema": "Person",
+   "caption": "Tan Kim Loong (Eric Tan)",
+   "properties": {
+    "alias": [
+     "Eric Tan"
+    ],
+    "nationality": [
+     "my"
+    ],
+    "name": [
+     "Tan Kim Loong (Eric Tan)"
+    ]
+   },
+   "note": "Low associate and proxy; beneficial owner of record of Blackstone, Tanore, Granton and Affinity Equity accounts.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 14",
+     "quote": "He also served as a proxy for LOW in numerous financial transactions. He was the stated beneficial owner of several bank accounts into which misappropriated 1MDB funds were transferred."
+    }
+   ]
+  },
+  {
+   "key": "joey-mcfarland",
+   "schema": "Person",
+   "caption": "Christopher \"Joey\" McFarland",
+   "properties": {
+    "alias": [
+     "Joey McFarland"
+    ],
+    "position": [
+     "Co-founder, Red Granite Pictures"
+    ],
+    "name": [
+     "Christopher \"Joey\" McFarland"
+    ]
+   },
+   "note": "Red Granite co-founder; bid for Tanore at Christie's.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 83",
+     "quote": "AZIZ in turn introduced Cinema Archives Owner to LOW and Red Granite Pictures co-founder Christopher “Joey” McFarland (“McFarland”)."
+    }
+   ]
+  },
+  {
+   "key": "tarek-obaid",
+   "schema": "Person",
+   "caption": "Tarek Obaid",
+   "properties": {
+    "nationality": [
+     "sa"
+    ],
+    "position": [
+     "CEO and co-founder, PetroSaudi"
+    ],
+    "name": [
+     "Tarek Obaid"
+    ]
+   },
+   "note": "Signed the JV agreement for PetroSaudi and the 2011 drawdown notice routing $330m to Good Star.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 20",
+     "quote": "Tarek Obaid (“OBAID”), the CEO and co-founder of PetroSaudi, a Saudi national, signed on behalf of PetroSaudi."
+    }
+   ]
+  },
+  {
+   "key": "1mdb-officer-1",
+   "schema": "Person",
+   "caption": "1MDB OFFICER 1",
+   "properties": {
+    "position": [
+     "Executive Director, 1MDB (to about March 2011)"
+    ],
+    "name": [
+     "1MDB OFFICER 1"
+    ]
+   },
+   "note": "Label used in the civil complaints; signed the 2009 $700m instruction to Deutsche Bank.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 10",
+     "quote": "1MDB OFFICER 1 is a Malaysian national who served as the Executive Director of 1MDB from the time of its creation until approximately March 2011."
+    }
+   ]
+  },
+  {
+   "key": "1mdb-officer-2",
+   "schema": "Person",
+   "caption": "1MDB OFFICER 2",
+   "properties": {
+    "position": [
+     "Chief Executive Officer, 1MDB (at least 2009-2013)"
+    ],
+    "name": [
+     "1MDB OFFICER 2"
+    ]
+   },
+   "note": "Label used in the civil complaints; told Deutsche Bank Good Star was 100% PetroSaudi-owned.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 10",
+     "quote": "1MDB OFFICER 2 is a Malaysian national who served as 1MDB’s Chief Executive Officer (“CEO”) between at least 2009 and 2013."
+    }
+   ]
+  },
+  {
+   "key": "1mdb-officer-4",
+   "schema": "Person",
+   "caption": "1MDB OFFICER 4",
+   "properties": {
+    "position": [
+     "Executive Director of Finance, 1MDB (2012-2015)"
+    ],
+    "name": [
+     "1MDB OFFICER 4"
+    ]
+   },
+   "note": "Label used in the civil complaints; main contact on the 2014 Deutsche Bank loans.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 13",
+     "quote": "1MDB OFFICER 4 is a Malaysian national who served as the Executive Director of Finance at 1MDB from, at a minimum, 2012 to 2015."
+    }
+   ]
+  },
+  {
+   "key": "hans-peter-brunner",
+   "schema": "Person",
+   "caption": "Hans Peter Brunner",
+   "properties": {
+    "position": [
+     "Former CEO, BSI Bank Singapore"
+    ],
+    "name": [
+     "Hans Peter Brunner"
+    ]
+   },
+   "note": "Former BSI Bank Singapore CEO; one of six staff MAS referred to the Public Prosecutor (role line is too short to quote; see paragraph 27).",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 26",
+     "quote": "MAS has referred to the Public Prosecutor the names of the following six members of BSI Bank’s senior management and staff to evaluate whether they have committed criminal offences:"
+    }
+   ]
+  },
+  {
+   "key": "yeo-jiawei",
+   "schema": "Person",
+   "caption": "Yeo Jiawei",
+   "properties": {
+    "position": [
+     "Former Wealth Planner, BSI Bank Singapore"
+    ],
+    "name": [
+     "Yeo Jiawei"
+    ]
+   },
+   "note": "Former BSI wealth planner referred by MAS; in remand and charged at the time.",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 34",
+     "quote": "** Mr Yeo is currently in remand and has been charged by the Public Prosecutor for various offences."
+    }
+   ]
+  },
+  {
+   "key": "jens-sturzenegger",
+   "schema": "Person",
+   "caption": "Jens Sturzenegger",
+   "properties": {
+    "position": [
+     "Singapore Branch Manager, Falcon Private Bank"
+    ],
+    "name": [
+     "Jens Sturzenegger"
+    ]
+   },
+   "note": "Falcon Singapore branch manager; arrested 5 Oct 2016.",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 12",
+     "quote": "MAS has been informed that the Singapore Branch Manager, Mr Jens Sturzenegger, has been arrested by the Commercial Affairs Department on 5 October 2016."
+    }
+   ]
+  },
+  {
+   "key": "individual-1-2025",
+   "schema": "Person",
+   "caption": "INDIVIDUAL 1 (2025 complaint)",
+   "properties": {
+    "name": [
+     "INDIVIDUAL 1 (2025 complaint)"
+    ]
+   },
+   "note": "Unnamed person whose company received $20m from MB Consulting and a $69m 1MDB buyout; the complaint says unknowingly.",
+   "evidence": [
+    {
+     "doc": "doj-2025-complaint-20m-ubs-fidelity",
+     "locator": "page 7",
+     "quote": "In or about November 2012, a shell company owned by HUSSEINY called MB Consulting entered into a consulting contract with a company owned by INDIVIDUAL 1."
+    }
+   ]
+  },
+  {
+   "key": "equanimity",
+   "schema": "Vessel",
+   "caption": "M/Y Equanimity",
+   "properties": {
+    "flag": [
+     "ky"
+    ],
+    "buildDate": [
+     "2014"
+    ],
+    "name": [
+     "M/Y Equanimity"
+    ]
+   },
+   "note": "300-foot superyacht built by Oceanco in 2014; complaint says bought with diverted 1MDB money.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 190",
+     "quote": "to acquire the Equanimity, a 300-foot yacht registered in the Cayman Islands (“THE EQUANIMITY”)."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 190",
+     "quote": "THE EQUANIMITY was built in 2014 by Oceanco, a builder of custom yachts based in Rotterdam, Netherlands at the Alblasserdam shipyard."
+    }
+   ]
+  },
+  {
+   "key": "park-laurel",
+   "schema": "RealEstate",
+   "caption": "Park Laurel Condominium, New York",
+   "properties": {
+    "address": [
+     "New York, New York"
+    ],
+    "amount": [
+     "23980000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "name": [
+     "Park Laurel Condominium, New York"
+    ]
+   },
+   "note": "NY condominium bought 2010 for $23.98m (Low, via Park Laurel (NYC) Ltd.) and resold 2012 to Aziz's company; subject of the 2016 complaint.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 90",
+     "quote": "The purchase contract for the Park Laurel Condominium listed the ultimate purchaser as Park Laurel (NYC) Ltd., a BVI corporation,15 the final date of sale as February 5, 2010, and the final sales price as $23,980,000."
+    }
+   ]
+  },
+  {
+   "key": "london-property",
+   "schema": "RealEstate",
+   "caption": "London property titled to Red Mountain Global Ltd.",
+   "properties": {
+    "address": [
+     "London, United Kingdom"
+    ],
+    "amount": [
+     "3095275.55"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "name": [
+     "London property titled to Red Mountain Global Ltd."
+    ]
+   },
+   "note": "Bought 15 Jan 2014 with $3.1m routed from Loo's River Dee account; subject of the 2019 complaint.",
+   "evidence": [
+    {
+     "doc": "doj-2019-complaint-london-property",
+     "locator": "page 252",
+     "quote": "On January 15, 2014, this $3,095,275.55 was used to purchase the DEFENDANT ASSET."
+    }
+   ]
+  },
+  {
+   "key": "oceana-57",
+   "schema": "RealEstate",
+   "caption": "Oceana 57 property, New York",
+   "properties": {
+    "address": [
+     "New York, New York"
+    ],
+    "name": [
+     "Oceana 57 property, New York"
+    ]
+   },
+   "note": "NY property nominally owned by Oceana 57 LLC; complaint names Husseiny as true owner; sold 2018 for $5.4m net.",
+   "evidence": [
+    {
+     "doc": "doj-2019-complaint-london-property",
+     "locator": "page 255",
+     "quote": "The true beneficial owner of the OCEANA 57 PROPERTY was HUSSEINY."
+    }
+   ]
+  },
+  {
+   "key": "acct-ampb-mr",
+   "schema": "BankAccount",
+   "caption": "AmBank account \"AMPRIVATE BANKING-MR\"",
+   "properties": {
+    "bankName": [
+     "AmBank"
+    ],
+    "country": [
+     "my"
+    ],
+    "name": [
+     "AmBank account \"AMPRIVATE BANKING-MR\""
+    ]
+   },
+   "note": "Account the complaints say belonged to Malaysian Official 1; received $681m in March 2013.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 40",
+     "quote": "MALAYSIAN OFFICIAL 1 is the ultimate beneficiary of the AMPRIVATE BANKING-MR Account."
+    }
+   ]
+  },
+  {
+   "key": "acct-ampb-my",
+   "schema": "BankAccount",
+   "caption": "AmBank account \"AMPRIVATE BANKING-MY\"",
+   "properties": {
+    "bankName": [
+     "AmBank"
+    ],
+    "country": [
+     "my"
+    ],
+    "name": [
+     "AmBank account \"AMPRIVATE BANKING-MY\""
+    ]
+   },
+   "note": "Second AmBank account; sent $620m back to Tanore on 26 Aug 2013.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 99",
+     "quote": "On or about August 26, 2013, $620,010,715 was wired from a different account at AmBank to the Tanore Account held in the name of AMPRIVATE BANKING-MY."
+    }
+   ]
+  },
+  {
+   "key": "acct-scb-2-dpa",
+   "schema": "BankAccount",
+   "caption": "\"Shell Company Account 2\" (DPA label)",
+   "properties": {
+    "name": [
+     "\"Shell Company Account 2\" (DPA label)"
+    ]
+   },
+   "note": "DPA label for an account of a shell beneficially owned and controlled by Low and Individual 1; received $295m from Shell Company Account 1 on 25 May 2012.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 43",
+     "quote": "On or about May 25, 2012, approximately $295 million was transferred via wire from Shell Company Account 1 to an account at a foreign bank in the name of a shell company beneficially owned and controlled by Low and Individual 1 (“Shell Company Account 2”)."
+    }
+   ]
+  },
+  {
+   "key": "acct-hc2-dpa",
+   "schema": "BankAccount",
+   "caption": "\"Holding Company 2 Account\" (DPA label)",
+   "properties": {
+    "name": [
+     "\"Holding Company 2 Account\" (DPA label)"
+    ]
+   },
+   "note": "DPA label for Leissner's and his close relative's account (called Holding Company #1 in the Leissner information, a BVI shell).",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 45",
+     "quote": "approximately $51.96 million was transferred via wire through the United States from Shell Company Account 2 to Holding Company 2 Account, which was beneficially owned and controlled by Leissner and his close relative"
+    }
+   ]
+  },
+  {
+   "key": "acct-mc1-dpa",
+   "schema": "BankAccount",
+   "caption": "\"Management Company 1 Account\" (DPA label)",
+   "properties": {
+    "name": [
+     "\"Management Company 1 Account\" (DPA label)"
+    ]
+   },
+   "note": "Another Leissner-controlled account; paid the New York jeweler in 2014.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 52",
+     "quote": "approximately $6 million was transferred from Holding Company 2 Account to another account beneficially owned and controlled by Leissner and his close relative, Management Company 1 Account."
+    }
+   ]
+  },
+  {
+   "key": "acct-sca6-dpa",
+   "schema": "BankAccount",
+   "caption": "\"Shell Company Account 6\" (DPA label)",
+   "properties": {
+    "name": [
+     "\"Shell Company Account 6\" (DPA label)"
+    ]
+   },
+   "note": "Account beneficially owned by a relative of Roger Ng.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 45",
+     "quote": "approximately $24.4 million was subsequently transferred from Holding Company 2 Account to an account at Foreign Financial Institution E beneficially owned by Ng’s relative (“Shell Company Account 6”)."
+    }
+   ]
+  },
+  {
+   "key": "jeweler-1",
+   "schema": "LegalEntity",
+   "caption": "\"Jeweler 1\" (New York jeweler, DPA label)",
+   "properties": {
+    "country": [
+     "us"
+    ],
+    "name": [
+     "\"Jeweler 1\" (New York jeweler, DPA label)"
+    ]
+   },
+   "note": "New York jeweler who designed jewelry for the wife of Malaysian Official 1 at Low's request.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 53",
+     "quote": "a New York jeweler (“Jeweler 1”) met with Low and the wife of Malaysian Official 1 in a hotel suite at the Mandarin Oriental Hotel in New York, New York"
+    }
+   ]
+  }
+ ],
+ "relationships": [
+  {
+   "schema": "Payment",
+   "source": "1mdb",
+   "target": "good-star",
+   "properties": {
+    "amount": [
+     "700000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-09-30"
+    ],
+    "purpose": [
+     "Represented to Deutsche Bank as a payment to PetroSaudi (\"advance owed to them\") for the joint venture"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 27",
+     "quote": "J.P. Morgan Chase bank records confirm that on or about September 30, 2009, the Good Star Account received the $700 million wire transfer from Deutsche Bank."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 20",
+     "quote": "members of 1MDB’s Senior Management Team, including 1MDB OFFICERS 1 and 2, made material misrepresentations and omissions to Deutsche Bank officials in order to cause Deutsche Bank to divert $700 million of 1MDB’s funds to the Good Star Account."
+    }
+   ],
+   "note": "Executed by Deutsche Bank (Malaysia) as a foreign-exchange transaction into the Good Star account at RBS Coutts."
+  },
+  {
+   "schema": "Payment",
+   "source": "1mdb",
+   "target": "1mdb-petrosaudi-jv",
+   "properties": {
+    "amount": [
+     "300000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2009-09-30"
+    ],
+    "purpose": [
+     "Investment in the 1MDB-PetroSaudi joint venture"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 27",
+     "quote": "Rather, as stated above, the 1MDB-PetroSaudi JV maintained an account at J.P. Morgan, and that account received only $300 million of the total $1 billion that was to be invested in the Joint Venture."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "1mdb",
+   "target": "good-star",
+   "properties": {
+    "amount": [
+     "330000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2011-05-20"
+    ],
+    "endDate": [
+     "2011-10-25"
+    ],
+    "purpose": [
+     "Drawdown under Murabaha financing agreement with the 1MDB-PetroSaudi JV (as represented)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 36",
+     "quote": "Good Star bank statements and J.P. Morgan correspondent bank records show that between May 20 and October 25, 2011, $330,000,000 was transferred from 1MDB to the Good Star Account over four wire transfers"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 37",
+     "quote": "In truth, however, these funds were not being sent to PetroSaudi, but to Good Star."
+    }
+   ],
+   "note": "Four wires: $30m (20 May), $65m (23 May), $110m (27 May), $125m (25 Oct 2011)."
+  },
+  {
+   "schema": "Payment",
+   "source": "good-star",
+   "target": "shearman-sterling",
+   "properties": {
+    "amount": [
+     "368539770"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2009-10-21"
+    ],
+    "endDate": [
+     "2010-10-13"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 41",
+     "quote": "Between approximately October 21, 2009, and October 13, 2010, eleven wires totaling approximately $368 million were sent from the Good Star Account to an Interest on Lawyer Account held by the law firm Shearman & Sterling LLP"
+    }
+   ],
+   "note": "Approximately; table total $368,539,770. Includes $148m on 21 Oct 2009 used in part for the Park Laurel purchase."
+  },
+  {
+   "schema": "Payment",
+   "source": "good-star",
+   "target": "adkmic",
+   "properties": {
+    "amount": [
+     "389000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2011-06-28"
+    ],
+    "endDate": [
+     "2013-09-04"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 44",
+     "quote": "Over the course of five wire transfers between June 28, 2011, and September 4, 2013, approximately $389 million was transferred from the Good Star Account to an account at BSI Bank in Singapore"
+    }
+   ],
+   "note": "Approximately."
+  },
+  {
+   "schema": "Payment",
+   "source": "1mdb-energy",
+   "target": "aabar-bvi",
+   "properties": {
+    "amount": [
+     "576943490"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-05-22"
+    ],
+    "purpose": [
+     "\"Credit enhancement and underwriting contribution\" for the IPIC guarantee (Contribution Agreement shown to BSI)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 62",
+     "quote": "Roughly one day later, on or about May 22, 2012, a wire in the amount of $576,943,490 was sent from 1MDB Energy’s bank account at Falcon Bank to an account at BSI Bank in Lugano, Switzerland maintained by Aabar-BVI"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 43",
+     "quote": "On or about May 22, 2012, approximately $576,943,490 of the Project Magnolia bond proceeds were transferred from the account of 1MDB Subsidiary 1 to an account at Foreign Financial Institution A (“Shell Company Account 1”)"
+    }
+   ],
+   "note": "Project Magnolia proceeds. The DPA describes the same transfer with anonymized labels."
+  },
+  {
+   "schema": "Payment",
+   "source": "1mdb-energy-langat",
+   "target": "aabar-bvi",
+   "properties": {
+    "amount": [
+     "790354855"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-10-19"
+    ],
+    "purpose": [
+     "\"Contribution in cash\" under the Maximus Contribution Agreement (as shown to BSI)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 63",
+     "quote": "On or about that same day (that is, October 19, 2012), 1MDB wire transferred $790,354,855 to the Aabar-BVI Swiss Account."
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 46",
+     "quote": "On or about October 19, 2012, approximately $790,354,855 was transferred from 1MDB Subsidiary 2 to Shell Company Account 1."
+    }
+   ],
+   "note": "Project Maximus proceeds."
+  },
+  {
+   "schema": "Payment",
+   "source": "aabar-bvi",
+   "target": "blackstone-asia",
+   "properties": {
+    "amount": [
+     "636000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-05-25"
+    ],
+    "endDate": [
+     "2012-12-14"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 70",
+     "quote": "Between approximately May 25, 2012, and December 14, 2012, five wire transfers totaling $636,000,000 were sent from the Aabar-BVI Swiss Account to an account at Standard Chartered Bank in Singapore held in the name of Blackstone Asia Real Estate Partners"
+    }
+   ],
+   "note": "Five wires incl. $295m on 25 May 2012 and $133m on 25 Jul 2012."
+  },
+  {
+   "schema": "Payment",
+   "source": "aabar-bvi",
+   "target": "cistenique",
+   "properties": {
+    "amount": [
+     "291000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-10-22"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 72",
+     "quote": "On or about the same day, Aabar-BVI also sent approximately $291 million to another bank account at ING Bank N.V. in Amsterdam belonging to Cistenique Investment Fund (“Cistenique”)."
+    }
+   ],
+   "note": "Approximately."
+  },
+  {
+   "schema": "Payment",
+   "source": "cistenique",
+   "target": "blackstone-asia",
+   "properties": {
+    "amount": [
+     "285000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-10-24"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 73",
+     "quote": "On or about October 24, 2012, roughly two days after receiving approximately $291,000,000 from Aabar-BVI, Cistenique transferred $285,000,000 to the Blackstone Account."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "enterprise-fund",
+   "target": "blackstone-asia",
+   "properties": {
+    "amount": [
+     "170000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-10-24"
+    ],
+    "endDate": [
+     "2012-11-08"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 73",
+     "quote": "Enterprise transferred an additional $95,000,000 to the Blackstone Account, for a total of $170,000,000."
+    }
+   ],
+   "note": "Two transfers: $75m (24 Oct) and $95m (8 Nov 2012), after Aabar-BVI sent Enterprise $75m and $97m."
+  },
+  {
+   "schema": "Payment",
+   "source": "blackstone-asia",
+   "target": "vasco",
+   "properties": {
+    "amount": [
+     "472750000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-05-29"
+    ],
+    "endDate": [
+     "2012-11-30"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 74",
+     "quote": "Between approximately May 29, 2012, and November 30, 2012, four wires totaling $472,750,000 were sent from the Blackstone Account to an account at Bank Privee Edmond de Rothschild (“Bank Rothschild”) in Luxembourg"
+    },
+    {
+     "doc": "doj-2018-indictment-low-ng",
+     "locator": "page 19",
+     "quote": "defendant JHO LOW and others also caused the transfers via wire of approximately $472,750,000 traceable to the Project Magnolia and Project Maximus bond proceeds from Shell Company Account #2"
+    }
+   ],
+   "note": "The indictment describes the same amount with labels (to an account of a company beneficially owned by Abu Dhabi Official #1)."
+  },
+  {
+   "schema": "Payment",
+   "source": "blackstone-asia",
+   "target": "rayan",
+   "properties": {
+    "amount": [
+     "55000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-05-29"
+    ],
+    "endDate": [
+     "2012-12-03"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 77",
+     "quote": "Between approximately May 29, 2012, and December 3, 2012, Blackstone sent four separate wire transfers, totaling $55,000,000, to an account at BHF Bank in Frankfurt, Germany, held in the name of Rayan Inc."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "blackstone-asia",
+   "target": "mb-consulting",
+   "properties": {
+    "amount": [
+     "10100000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-12-18"
+    ],
+    "purpose": [
+     "PAYMENT FOR SERVICES (wire details)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 77",
+     "quote": "Blackstone sent $10,100,000 to an account at Bank of America in Texas held in the name of MB Consulting LLC (“MB Consulting Account”)."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "blackstone-asia",
+   "target": "acct-ampb-mr",
+   "properties": {
+    "amount": [
+     "30000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-10-30"
+    ],
+    "endDate": [
+     "2012-11-19"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 78",
+     "quote": "Blackstone transferred $25,000,000 to the same AMPRIVATE BANKING-MR Account belonging to MALAYSIAN OFFICIAL 1."
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 47",
+     "quote": "Between on or about October 30, 2012 and on or about November 19, 2012, approximately $30 million was transferred from Shell Company Account 2 to an account held by Malaysian Official 1."
+    }
+   ],
+   "note": "$5m on 30 Oct and $25m on 19 Nov 2012. The DPA admits a ~$30m transfer to Malaysian Official 1 on the same dates, from an account it labels Shell Company Account 2."
+  },
+  {
+   "schema": "Payment",
+   "source": "blackstone-asia",
+   "target": "river-dee",
+   "properties": {
+    "amount": [
+     "5000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-12-06"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 78",
+     "quote": "On or about December 6, 2012, a wire in the amount of $5,000,000 was sent from the Blackstone Account to an account at Falcon Bank in Zurich maintained in the name of River Dee International SA"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "aabar-bvi",
+   "target": "red-granite-capital",
+   "properties": {
+    "amount": [
+     "133000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-06-18"
+    ],
+    "purpose": [
+     "Loan to fund the movie \"The Wolf of Wall Street\" (loan agreement shown to BSI)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 80",
+     "quote": "That agreement purported to show that Aabar-BVI had loaned Red Granite Capital $133,000,000 to fund movie “The Wolf of Wall Street.”"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "aabar-bvi",
+   "target": "red-granite-capital",
+   "properties": {
+    "amount": [
+     "105000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-10-23"
+    ],
+    "endDate": [
+     "2012-11-14"
+    ],
+    "purpose": [
+     "Loans to produce additional motion pictures (agreements shown to BSI)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 80",
+     "quote": "The agreements purported to provide for the extension of $60,000,000 and $45,000,000 loans by Aabar-BVI to Red Granite Capital to produce additional motion pictures."
+    }
+   ],
+   "note": "$60m on 23 Oct and $45m on 14 Nov 2012; total from Aabar-BVI to Red Granite Capital $238m."
+  },
+  {
+   "schema": "Payment",
+   "source": "red-granite-capital",
+   "target": "red-granite-pictures",
+   "properties": {
+    "amount": [
+     "64000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-06-20"
+    ],
+    "endDate": [
+     "2012-11-20"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 85",
+     "quote": "eleven wires totaling $64,000,000 were sent from the Red Granite Capital Account to an account at City National Bank in the United States maintained by Red Granite Pictures."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "red-granite-capital",
+   "target": "shearman-sterling",
+   "properties": {
+    "amount": [
+     "33800000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2012-11-16"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 92",
+     "quote": "On or about November 16, 2012, $33,800,000 was transferred from AZIZ’s Red Granite Capital Account at BSI Bank in Singapore to the Shearman IOLA Account in the United States."
+    }
+   ],
+   "note": "Used for Park Laurel Acquisition LLC's purchase of the Park Laurel condominium (closing 19 Nov 2012)."
+  },
+  {
+   "schema": "Payment",
+   "source": "1mdb-global",
+   "target": "devonshire",
+   "properties": {
+    "amount": [
+     "646464649"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-21"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "3/21/2013 1MDB Global Devonshire $646,464,649 3/21/13 - 3/27/2013 1MDB Global Enterprise $414,756,416"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "1mdb-global",
+   "target": "enterprise-fund",
+   "properties": {
+    "amount": [
+     "414756416"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2013-03-21"
+    ],
+    "endDate": [
+     "2013-03-27"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "3/21/13 - 3/27/2013 1MDB Global Enterprise $414,756,416 3/21/13 - 3/22/2013 1MDB Global Cistenique $531,090,534"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "1mdb-global",
+   "target": "cistenique",
+   "properties": {
+    "amount": [
+     "531090534"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2013-03-21"
+    ],
+    "endDate": [
+     "2013-03-22"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "Enterprise $414,756,416 3/21/13 - 3/22/2013 1MDB Global Cistenique $531,090,534"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "devonshire",
+   "target": "tanore",
+   "properties": {
+    "amount": [
+     "210000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-21"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "3/21/2013 Devonshire BSI Bank - Singapore Tanore $210,000,000 3/22/2013 Enterprise ING Bank - Netherlands Tanore $250,000,000"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "enterprise-fund",
+   "target": "tanore",
+   "properties": {
+    "amount": [
+     "250000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-22"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "3/22/2013 Enterprise ING Bank - Netherlands Tanore $250,000,000"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "cistenique",
+   "target": "tanore",
+   "properties": {
+    "amount": [
+     "375000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-22"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 93",
+     "quote": "$250,000,000 3/22/2013 Cistenique ING Bank Netherlands Tanore $375,000,000"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "devonshire",
+   "target": "granton",
+   "properties": {
+    "amount": [
+     "430000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-21"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 94",
+     "quote": "On or about March 21, 2013, Devonshire transferred an additional $430,000,000 in 1MDB funds to the Granton Account."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "granton",
+   "target": "tanore",
+   "properties": {
+    "amount": [
+     "430000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-21"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 94",
+     "quote": "On or about that same day, March 21, 2013, Granton transferred $430,000,000 – the same amount received from Devonshire – to the Tanore Account."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "tanore",
+   "target": "granton",
+   "properties": {
+    "amount": [
+     "378000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-25"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 94",
+     "quote": "Approximately four days later, on or about March 25, 2013, Tanore transferred $378,000,000 back to the Granton Account."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "tanore",
+   "target": "acct-ampb-mr",
+   "properties": {
+    "amount": [
+     "620000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-21"
+    ],
+    "purpose": [
+     "Investment in SRC International under a Mudharabah agreement (as represented to Falcon Bank)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 98",
+     "quote": "On or about March 21, 2013, Tanore transferred $620,000,000 into an account at AmBank in Malaysia, whose beneficiary was listed as “AMPRIVATE BANKING-MR.”"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 50",
+     "quote": "On or about March 21, 2013, approximately $620 million was transferred from a shell entity beneficially owned or controlled by Low, Shell Company Account 7, to an account beneficially owned and controlled by Malaysian Official 1."
+    }
+   ],
+   "note": "First leg of the $681m. The DPA names the sender only as Shell Company Account 7."
+  },
+  {
+   "schema": "Payment",
+   "source": "tanore",
+   "target": "acct-ampb-mr",
+   "properties": {
+    "amount": [
+     "61000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-03-25"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 98",
+     "quote": "On or about March 25, 2013, an additional $61,000,000 was wired from the Tanore Account to the same account at AmBank, for a total of $681,000,000."
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 51",
+     "quote": "or about March 25, 2013, another approximately $61 million was transferred from Shell Company Account 7 to the same account for Malaysian Official 1."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "acct-ampb-my",
+   "target": "tanore",
+   "properties": {
+    "amount": [
+     "620010715"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2013-08-26"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 99",
+     "quote": "On or about August 26, 2013, $620,010,715 was wired from a different account at AmBank to the Tanore Account held in the name of AMPRIVATE BANKING-MY."
+    }
+   ],
+   "note": "The \"return\" leg of the round trip; the complaint says this AmBank account also belonged to Malaysian Official 1."
+  },
+  {
+   "schema": "Payment",
+   "source": "1mehl",
+   "target": "aabar-bvi",
+   "properties": {
+    "amount": [
+     "175000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-05-28"
+    ],
+    "purpose": [
+     "Partial payment to buy back the Aabar options (as represented to BSI)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 111",
+     "quote": "On or about the same day, 1MEHL transferred $175,000,000 in loan proceeds to the Aabar-BVI Swiss Account."
+    }
+   ],
+   "note": "From the $250m Deutsche Bank bridge loan."
+  },
+  {
+   "schema": "Payment",
+   "source": "aabar-bvi",
+   "target": "affinity-equity",
+   "properties": {
+    "amount": [
+     "155000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-05-30"
+    ],
+    "purpose": [
+     "Mudharabah investment agreement (as represented to BSI)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 112",
+     "quote": "On or about May 30, 2014, Aabar-BVI transferred $155,000,000 of the $175,000,000 it received from 1MEHL to an account at DBS Bank Ltd. in Singapore held in the name of Affinity Equity International Partners Limited"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "affinity-equity",
+   "target": "alpha-synergy",
+   "properties": {
+    "amount": [
+     "142000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-06-02"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 113",
+     "quote": "On or about June 2, 2014, Affinity Equity transferred $142,000,000 of the $155,000,000 it received from Aabar-BVI to a bank account at BSI Bank in Singapore held in the name of Alpha Synergy Limited"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "alpha-synergy",
+   "target": "jho-low",
+   "properties": {
+    "amount": [
+     "142000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-06-03"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 113",
+     "quote": "On or about one day later, LOW transferred this $142,000,000 from his Alpha Synergy Account to his personal account at BSI through an intra-bank transfer."
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "jho-low",
+   "target": "world-view",
+   "properties": {
+    "amount": [
+     "140636225"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-06-03"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 197",
+     "quote": "That same day, approximately $140,636,225 was transferred from LOW’s personal account at BSI Bank to the World View Account."
+    }
+   ],
+   "note": "Approximately. Fourth tranche of yacht purchase money."
+  },
+  {
+   "schema": "Payment",
+   "source": "1mehl",
+   "target": "aabar-seychelles",
+   "properties": {
+    "amount": [
+     "223333000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-09-02"
+    ],
+    "purpose": [
+     "Buyback of the Aabar options (as represented to Deutsche Bank and UBS)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 122",
+     "quote": "At 1MEHL’s direction, Deutsche Bank wire transferred $223,333,000 to the Aabar-Seychelles account with a value date of September 2, 2014."
+    }
+   ],
+   "note": "Paid by Deutsche Bank from the $975m loan at 1MEHL's instruction."
+  },
+  {
+   "schema": "Payment",
+   "source": "1mehl",
+   "target": "aabar-seychelles",
+   "properties": {
+    "amount": [
+     "457984607"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-09-30"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 123",
+     "quote": "In execution of that request, Deutsche Bank wired $457,984,607 to the Aabar-Seychelles Account the following day."
+    }
+   ],
+   "note": "Drawdown requested 29 Sep 2014; wired the following day."
+  },
+  {
+   "schema": "Payment",
+   "source": "aabar-seychelles",
+   "target": "affinity-equity",
+   "properties": {
+    "amount": [
+     "103333000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-09-04"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 123",
+     "quote": "On or about September 4, 2014, Aabar-Seychelles sent $103,333,000 of the $223,333,000 that it had received from Deutsche Bank to the Affinity Equity Account"
+    }
+   ]
+  },
+  {
+   "schema": "Payment",
+   "source": "acct-scb-2-dpa",
+   "target": "acct-hc2-dpa",
+   "properties": {
+    "amount": [
+     "51960000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-06-11"
+    ],
+    "endDate": [
+     "2012-07-16"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 45",
+     "quote": "Between on or about June 11, 2012 and on or about July 16, 2012, approximately $51.96 million was transferred via wire through the United States from Shell Company Account 2 to Holding Company 2 Account"
+    }
+   ],
+   "note": "Approximately. Admitted in the DPA Statement of Facts."
+  },
+  {
+   "schema": "Payment",
+   "source": "acct-hc2-dpa",
+   "target": "acct-sca6-dpa",
+   "properties": {
+    "amount": [
+     "24400000"
+    ],
+    "currency": [
+     "USD"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 45",
+     "quote": "approximately $24.4 million was subsequently transferred from Holding Company 2 Account to an account at Foreign Financial Institution E beneficially owned by Ng’s relative (“Shell Company Account 6”)."
+    }
+   ],
+   "note": "Approximately; to an account of Roger Ng's relative."
+  },
+  {
+   "schema": "Payment",
+   "source": "acct-mc1-dpa",
+   "target": "jeweler-1",
+   "properties": {
+    "amount": [
+     "4100000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "date": [
+     "2014-10-10"
+    ],
+    "purpose": [
+     "In part to pay for about $1.3m of jewelry bought by the wife of Malaysian Official 1"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 54",
+     "quote": "On or about October 10, 2014, Leissner caused approximately $4.1 million to be transferred from Management Company 1 Account to Jeweler 1 in New York, New York, in part to pay for approximately $1.3 million in jewelry"
+    },
+    {
+     "doc": "doj-2018-information-leissner",
+     "locator": "page 20",
+     "quote": "On or about October 10, 2014, LEISSNER caused approximately $4.1 million to be wire transferred from a foreign bank account controlled by"
+    }
+   ],
+   "note": "Approximately. Admitted (DPA) and pleaded to (Leissner information, overt act)."
+  },
+  {
+   "schema": "Payment",
+   "source": "mb-consulting",
+   "target": "individual-1-2025",
+   "properties": {
+    "amount": [
+     "20000000"
+    ],
+    "currency": [
+     "USD"
+    ],
+    "startDate": [
+     "2012-12"
+    ],
+    "endDate": [
+     "2013-04"
+    ],
+    "purpose": [
+     "Consulting contract"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2025-complaint-20m-ubs-fidelity",
+     "locator": "page 7",
+     "quote": "Pursuant to that contract, MB Consulting paid $20 million to INDIVIDUAL 1’s company between December 2012 and April 2013."
+    }
+   ],
+   "note": "Paid to Individual 1's company; the 2025 complaint says Individual 1 did not know the source."
+  },
+  {
+   "schema": "Ownership",
+   "source": "jho-low",
+   "target": "good-star",
+   "properties": {
+    "role": [
+     "Beneficial owner and sole authorized signatory"
+    ],
+    "percentage": [
+     "100"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 15",
+     "quote": "According to banking records, Good Star was a company controlled by LOW, and LOW was also the Good Star Account’s beneficial owner and sole authorized signatory."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 15",
+     "quote": "That single bearer share was issued to LOW on or about June 2, 2009, seven days before he opened the Good Star Account."
+    }
+   ],
+   "note": "Alleged in the civil complaints. Low held the single bearer share issued to Smart Power's account."
+  },
+  {
+   "schema": "Directorship",
+   "source": "smart-power",
+   "target": "good-star",
+   "properties": {
+    "role": [
+     "Sole director"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 15",
+     "quote": "The sole director of Good Star is listed as Smart Power, of which LOW is the sole director."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "jho-low",
+   "target": "smart-power",
+   "properties": {
+    "role": [
+     "Sole director"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 15",
+     "quote": "The sole director of Good Star is listed as Smart Power, of which LOW is the sole director."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "1mdb",
+   "target": "1mdb-petrosaudi-jv",
+   "properties": {
+    "percentage": [
+     "40"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 14",
+     "quote": "1MDB agreed to invest $1 billion in cash in the Joint Venture in exchange for a forty percent (40%) equity interest in the Joint Venture"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "petrosaudi",
+   "target": "1mdb-petrosaudi-jv",
+   "properties": {
+    "percentage": [
+     "60"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 14",
+     "quote": "in exchange for a sixty percent (60%) equity interest in the Joint Venture."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "1mdb",
+   "target": "1mdb-global",
+   "properties": {
+    "percentage": [
+     "100"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 90",
+     "quote": "The bonds were issued by 1MDB Global Investments Limited (“1MDB Global”), a wholly- owned subsidiary of 1MDB"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "1mdb",
+   "target": "admic",
+   "properties": {
+    "percentage": [
+     "50"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 88",
+     "quote": "On or about March 12, 2013, 1MDB entered into a 50:50 joint venture with Aabar known as ADMIC."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "aabar",
+   "target": "admic",
+   "properties": {
+    "percentage": [
+     "50"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 88",
+     "quote": "On or about March 12, 2013, 1MDB entered into a 50:50 joint venture with Aabar known as ADMIC."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "ipic",
+   "target": "aabar",
+   "properties": {
+    "role": [
+     "Parent company"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 32",
+     "quote": "Aabar Investments PJS (“Aabar”) was a private joint stock company incorporated under the laws of Abu Dhabi, and a subsidiary of IPIC."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "aabar",
+   "target": "aabar-bvi",
+   "properties": {
+    "role": [
+     "Sole shareholder as listed on the certificate of incumbency (disputed)"
+    ],
+    "percentage": [
+     "100"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "That certificate lists QUBAISI and HUSSEINY as Aabar-BVI’s Directors and “Aabar Investments PJS” as its sole shareholder."
+    }
+   ],
+   "note": "Nominal only: IPIC and Aabar state Aabar-BVI is not part of their group (see claims)."
+  },
+  {
+   "schema": "Ownership",
+   "source": "aabar",
+   "target": "falcon",
+   "properties": {
+    "percentage": [
+     "100"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 62",
+     "quote": "Falcon Bank is wholly-owned by Aabar, and at the time that the $576,943,490 was transferred from 1MDB Energy’s bank account at Falcon Bank to the Aabar-BVI Swiss Account, HUSSEINY was Falcon Bank’s Chairman."
+    },
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 25",
+     "quote": "In 2009, AIG Private Bank was acquired by Aabar Investments PJS and renamed as Falcon Bank."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "eric-tan",
+   "target": "blackstone-asia",
+   "properties": {
+    "role": [
+     "Beneficial owner of the Blackstone account and authorized signatory"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 70",
+     "quote": "TAN was identified as the beneficial owner of the Blackstone Account and an authorized signatory on the account."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "eric-tan",
+   "target": "tanore",
+   "properties": {
+    "role": [
+     "Recorded beneficial owner; described himself as 100% shareholder"
+    ],
+    "percentage": [
+     "100"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 106",
+     "quote": "TAN identified himself as “Tanore’s 100% shareholder and 100% beneficial owner” and indicated that Tanore had been liquidated by him."
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 8",
+     "quote": "diverted to a bank account in Singapore held by Tanore Finance Corporation (“Tanore Account”), for which TAN was the recorded beneficial owner."
+    }
+   ],
+   "note": "The complaint alleges Tan acted as a proxy for Low on this account. The documents do not call Tan Tanore's director."
+  },
+  {
+   "schema": "Ownership",
+   "source": "eric-tan",
+   "target": "granton",
+   "properties": {
+    "role": [
+     "Beneficial owner of record"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 94",
+     "quote": "As set forth above, the Tanore Account and the Granton Account have the same beneficial owner of record (TAN)."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "eric-tan",
+   "target": "affinity-equity",
+   "properties": {
+    "role": [
+     "Recorded beneficial owner of the account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 113",
+     "quote": "TAN was the recorded beneficial owner of the Affinity Equity Account."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "khadem-al-qubaisi",
+   "target": "vasco",
+   "properties": {
+    "role": [
+     "Beneficial owner of the Vasco account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 75",
+     "quote": "Vasco Investments Services SA is a BVI entity affiliated with QUBAISI, and QUBAISI is the beneficial owner of the Vasco Account."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "mohamed-al-husseiny",
+   "target": "rayan",
+   "properties": {
+    "role": [
+     "Beneficial owner of the Rayan account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 77",
+     "quote": "HUSSEINY is the beneficial owner of the Rayan Account."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "mohamed-al-husseiny",
+   "target": "mb-consulting",
+   "properties": {
+    "role": [
+     "Beneficial owner and only authorized signatory"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 77",
+     "quote": "HUSSEINY is the beneficial owner of the MB Consulting Account and the only authorized signatory on the account."
+    },
+    {
+     "doc": "doj-2025-complaint-20m-ubs-fidelity",
+     "locator": "page 7",
+     "quote": "In or about November 2012, a shell company owned by HUSSEINY called MB Consulting entered into a consulting contract with a company owned by INDIVIDUAL 1."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jasmine-loo",
+   "target": "river-dee",
+   "properties": {
+    "role": [
+     "Beneficial owner of the River Dee account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 78",
+     "quote": "LOO is the beneficial owner of the River Dee Account at Falcon Bank."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "riza-aziz",
+   "target": "red-granite-capital",
+   "properties": {
+    "role": [
+     "Owner and beneficial owner of the account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 79",
+     "quote": "Red Granite Capital is a BVI-incorporated entity owned by AZIZ."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 79",
+     "quote": "Bank records reflect that AZIZ is also beneficial owner of the Red Granite Capital Account in Singapore."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jho-low",
+   "target": "alpha-synergy",
+   "properties": {
+    "role": [
+     "Beneficial owner of the account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 113",
+     "quote": "According to bank records, LOW was the beneficial owner of the Alpha Synergy Account."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jho-low",
+   "target": "adkmic",
+   "properties": {
+    "role": [
+     "Beneficial owner of the ADKMIC BSI account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 44",
+     "quote": "LOW is the beneficial owner of the ADKMIC BSI Account."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "malaysian-official-1",
+   "target": "acct-ampb-mr",
+   "properties": {
+    "role": [
+     "Ultimate beneficiary (per complaint)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 40",
+     "quote": "MALAYSIAN OFFICIAL 1 is the ultimate beneficiary of the AMPRIVATE BANKING-MR Account."
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 50",
+     "quote": "approximately $620 million was transferred from a shell entity beneficially owned or controlled by Low, Shell Company Account 7, to an account beneficially owned and controlled by Malaysian Official 1."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "malaysian-official-1",
+   "target": "acct-ampb-my",
+   "properties": {
+    "role": [
+     "Owner (per complaint)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 99",
+     "quote": "This AmBank account also belonged to MALAYSIAN OFFICIAL 1,"
+    }
+   ],
+   "note": "Short clause; the complaint ties it to the 26 Aug 2013 $620m return wire."
+  },
+  {
+   "schema": "Ownership",
+   "source": "jho-low",
+   "target": "acct-scb-2-dpa",
+   "properties": {
+    "role": [
+     "Beneficial owner and controller (with Individual 1)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 43",
+     "quote": "an account at a foreign bank in the name of a shell company beneficially owned and controlled by Low and Individual 1 (“Shell Company Account 2”)."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "tim-leissner",
+   "target": "acct-hc2-dpa",
+   "properties": {
+    "role": [
+     "Beneficial owner and controller (with close relative)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 45",
+     "quote": "Holding Company 2 Account, which was beneficially owned and controlled by Leissner and his close relative"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "tim-leissner",
+   "target": "acct-mc1-dpa",
+   "properties": {
+    "role": [
+     "Beneficial owner and controller (with close relative)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 52",
+     "quote": "another account beneficially owned and controlled by Leissner and his close relative, Management Company 1 Account."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "goldman-group",
+   "target": "goldman-malaysia",
+   "properties": {
+    "percentage": [
+     "100"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 29",
+     "quote": "Goldman Sachs (Malaysia) Sdn. Bhd. (“Goldman Malaysia”) was a wholly-owned subsidiary and agent of Goldman."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "goldman-group",
+   "target": "goldman-intl",
+   "properties": {
+    "role": [
+     "Subsidiary"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fed-2020-goldman-order",
+     "locator": "page 1",
+     "quote": "Goldman Sachs International, a London-based subsidiary of GS Group, served as the sole arranger and underwriter of three bond offerings"
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "bsi",
+   "target": "bsi-singapore",
+   "properties": {
+    "percentage": [
+     "100"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 6",
+     "quote": "It is a wholly-owned subsidiary of BSI SA, a bank founded in 1873 and headquartered in Switzerland."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "equanimity-cayman",
+   "target": "equanimity",
+   "properties": {
+    "role": [
+     "Title holder"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 191",
+     "quote": "THE EQUANIMITY is titled in the name of Equanimity (Cayman) Ltd."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "jho-low",
+   "target": "world-view",
+   "properties": {
+    "role": [
+     "Low family trust (Low email)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 191",
+     "quote": "to confirm that “World View Limited is a family trust of which only the Low Family are beneficial owners of.”"
+    }
+   ],
+   "note": "Low's own statement in a 2015 email quoted in the complaint."
+  },
+  {
+   "schema": "Ownership",
+   "source": "park-laurel-nyc",
+   "target": "park-laurel",
+   "properties": {
+    "startDate": [
+     "2010-02-05"
+    ],
+    "endDate": [
+     "2012-11-28"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 90",
+     "quote": "The purchase contract for the Park Laurel Condominium listed the ultimate purchaser as Park Laurel (NYC) Ltd., a BVI corporation,15 the final date of sale as February 5, 2010, and the final sales price as $23,980,000."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "park-laurel-acquisition",
+   "target": "park-laurel",
+   "properties": {
+    "startDate": [
+     "2012-11-28"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 92",
+     "quote": "Title to the PARK LAUREL CONDOMINIUM was transferred from Park Laurel (NYC) Ltd. to Park Laurel Acquisition LLC for a purchase price of $33,500,000, by deed recorded on or about November 28, 2012."
+    }
+   ],
+   "note": "The same complaint elsewhere gives about $35.5m for this sale."
+  },
+  {
+   "schema": "Ownership",
+   "source": "jho-low",
+   "target": "park-laurel-nyc",
+   "properties": {
+    "role": [
+     "Purchaser (per buyer's agent)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 91",
+     "quote": "The buyer’s real estate agent represented that LOW was the purchaser."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "red-mountain",
+   "target": "london-property",
+   "properties": {
+    "role": [
+     "Title holder"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2019-complaint-london-property",
+     "locator": "page 2",
+     "quote": "The defendant in this action is real property located in London, United Kingdom1 titled in the name of Red Mountain Global Ltd."
+    }
+   ]
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "jasmine-loo",
+   "target": "london-property",
+   "properties": {
+    "role": [
+     "Property bought on her behalf (per complaint)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2019-complaint-london-property",
+     "locator": "page 250",
+     "quote": "used to purchase property in London, United Kingdom owned by Red Mountain Global Ltd. (the “DEFNDANT ASSET”) on behalf of and for the personal benefit of LOO."
+    }
+   ]
+  },
+  {
+   "schema": "Ownership",
+   "source": "mohamed-al-husseiny",
+   "target": "oceana-57",
+   "properties": {
+    "role": [
+     "True beneficial owner (per complaint)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2019-complaint-london-property",
+     "locator": "page 255",
+     "quote": "The true beneficial owner of the OCEANA 57 PROPERTY was HUSSEINY."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "khadem-al-qubaisi",
+   "target": "ipic",
+   "properties": {
+    "role": [
+     "Managing Director"
+    ],
+    "startDate": [
+     "2007"
+    ],
+    "endDate": [
+     "2015"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "Khadem Abdulla Al QUBAISI (“QUBAISI”), a U.A.E. national, was the Managing Director of IPIC from 2007 to 2015"
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "khadem-al-qubaisi",
+   "target": "aabar",
+   "properties": {
+    "role": [
+     "Chairman"
+    ],
+    "startDate": [
+     "2012"
+    ],
+    "endDate": [
+     "2013"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "was the Managing Director of IPIC from 2007 to 2015 and the Chairman of Aabar in at least 2012 and 2013."
+    }
+   ],
+   "note": "At least 2012-2013."
+  },
+  {
+   "schema": "Directorship",
+   "source": "khadem-al-qubaisi",
+   "target": "aabar-bvi",
+   "properties": {
+    "role": [
+     "Director"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "That certificate lists QUBAISI and HUSSEINY as Aabar-BVI’s Directors and “Aabar Investments PJS” as its sole shareholder."
+    }
+   ]
+  },
+  {
+   "schema": "Employment",
+   "source": "mohamed-al-husseiny",
+   "target": "aabar",
+   "properties": {
+    "role": [
+     "Chief Executive Officer"
+    ],
+    "startDate": [
+     "2010"
+    ],
+    "endDate": [
+     "2015"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "Mohamed Ahmed Badawy Al-HUSSEINY (“HUSSEINY”), a U.S. citizen, was the CEO of Aabar from 2010 to 2015."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "mohamed-al-husseiny",
+   "target": "aabar-bvi",
+   "properties": {
+    "role": [
+     "Director; signatory on the Aabar-BVI Swiss account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "That certificate lists QUBAISI and HUSSEINY as Aabar-BVI’s Directors and “Aabar Investments PJS” as its sole shareholder."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 54",
+     "quote": "QUBAISI and HUSSEINY opened the account at BSI Bank in Lugano in the name of Aabar-BVI (“Aabar-BVI Swiss Account”) and used the account to facilitate the diversion of funds from 1MDB."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "mohamed-al-husseiny",
+   "target": "aabar-seychelles",
+   "properties": {
+    "role": [
+     "Sole director; sole authorized signatory on the UBS account"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 121",
+     "quote": "HUSSEINY is listed as the entity’s sole director and Aabar is listed as the sole shareholder."
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 120",
+     "quote": "HUSSEINY opened the Aabar-Seychelles Account at UBS bank in Singapore on or about June 4, 2014. HUSSEINY was the sole authorized signatory on the account."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "mohamed-al-husseiny",
+   "target": "falcon",
+   "properties": {
+    "role": [
+     "Board Chairman (former)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 11",
+     "quote": "when managing the account of a customer who was associated with the bank’s former Board Chairman Mohamed Ahmed Badawy Al-Husseiny."
+    }
+   ]
+  },
+  {
+   "schema": "Employment",
+   "source": "tim-leissner",
+   "target": "goldman-group",
+   "properties": {
+    "role": [
+     "Participating Managing Director; Chairman of Southeast Asia"
+    ],
+    "startDate": [
+     "1998"
+    ],
+    "endDate": [
+     "2016-02"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 30",
+     "quote": "Leissner was employed by Goldman from in or about and between 1998 and 2016, and was a Participating Managing Director (“PMD”) from in or about and between November 2006 and February 2016."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "tim-leissner",
+   "target": "goldman-malaysia",
+   "properties": {
+    "role": [
+     "Board member"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 30",
+     "quote": "Chairman of Southeast Asia, a region that included Malaysia, from in or about and between July 2014 and February 2016, and he served on the Board of Directors for Goldman Malaysia."
+    }
+   ]
+  },
+  {
+   "schema": "Employment",
+   "source": "roger-ng",
+   "target": "goldman-group",
+   "properties": {
+    "role": [
+     "Managing Director"
+    ],
+    "startDate": [
+     "2010-04"
+    ],
+    "endDate": [
+     "2014-05"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 30",
+     "quote": "In or about and between April 2010 and May 2014, Ng was a Managing Director (“MD”) of Goldman."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "roger-ng",
+   "target": "goldman-malaysia",
+   "properties": {
+    "role": [
+     "Head of Investment Banking; board member"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 30",
+     "quote": "For part of that time, Ng served as Head of Investment Banking and on the Board of Directors for Goldman Malaysia"
+    }
+   ]
+  },
+  {
+   "schema": "Employment",
+   "source": "jasmine-loo",
+   "target": "1mdb",
+   "properties": {
+    "role": [
+     "General Counsel and Executive Director of Group Strategy"
+    ],
+    "startDate": [
+     "2012"
+    ],
+    "endDate": [
+     "2013"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 13",
+     "quote": "“Jasmine” LOO Ai Swan (“LOO”) is Malaysian national who served as 1MDB’s General Counsel and Executive Director of Group Strategy during, at a minimum, 2012 and 2013."
+    }
+   ],
+   "note": "At a minimum 2012-2013."
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "jasmine-loo",
+   "target": "tanore",
+   "properties": {
+    "role": [
+     "Authorized signatory on the Tanore account (from 20 Mar 2013)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 94",
+     "quote": "LOO was given signing authority on the Tanore Account through the execution of a Power of Attorney form signed by LOO."
+    }
+   ]
+  },
+  {
+   "schema": "Employment",
+   "source": "1mdb-officer-1",
+   "target": "1mdb",
+   "properties": {
+    "role": [
+     "Executive Director"
+    ],
+    "endDate": [
+     "2011-03"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 10",
+     "quote": "1MDB OFFICER 1 is a Malaysian national who served as the Executive Director of 1MDB from the time of its creation until approximately March 2011."
+    }
+   ]
+  },
+  {
+   "schema": "Employment",
+   "source": "1mdb-officer-2",
+   "target": "1mdb",
+   "properties": {
+    "role": [
+     "Chief Executive Officer"
+    ],
+    "startDate": [
+     "2009"
+    ],
+    "endDate": [
+     "2013"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 10",
+     "quote": "1MDB OFFICER 2 is a Malaysian national who served as 1MDB’s Chief Executive Officer (“CEO”) between at least 2009 and 2013."
+    }
+   ]
+  },
+  {
+   "schema": "Employment",
+   "source": "1mdb-officer-4",
+   "target": "1mdb",
+   "properties": {
+    "role": [
+     "Executive Director of Finance"
+    ],
+    "startDate": [
+     "2012"
+    ],
+    "endDate": [
+     "2015"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 13",
+     "quote": "1MDB OFFICER 4 is a Malaysian national who served as the Executive Director of Finance at 1MDB from, at a minimum, 2012 to 2015."
+    }
+   ]
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "malaysian-official-1",
+   "target": "1mdb",
+   "properties": {
+    "role": [
+     "Position of authority; approved board and senior management appointments"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 13",
+     "quote": "MALAYSIAN OFFICIAL 1 had the authority to approve all appointments to, and removals from, 1MDB’s Board of Directors and 1MDB’s Senior Management Team."
+    }
+   ]
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "riza-aziz",
+   "target": "malaysian-official-1",
+   "properties": {
+    "role": [
+     "Relative"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 11",
+     "quote": "Riza Shahriz Bin Abdul AZIZ (“AZIZ”), a Malaysian national, is a relative of MALAYSIAN OFFICIAL 1 and a friend of LOW."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "riza-aziz",
+   "target": "red-granite-pictures",
+   "properties": {
+    "role": [
+     "CEO, founder, chairman and producer (per company website)"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 85",
+     "quote": "Red Granite Pictures’ website lists AZIZ as CEO, founder, chairman, and producer."
+    }
+   ]
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "joey-mcfarland",
+   "target": "red-granite-pictures",
+   "properties": {
+    "role": [
+     "Co-founder"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 83",
+     "quote": "AZIZ in turn introduced Cinema Archives Owner to LOW and Red Granite Pictures co-founder Christopher “Joey” McFarland (“McFarland”)."
+    }
+   ]
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "eric-tan",
+   "target": "jho-low",
+   "properties": {
+    "role": [
+     "Associate and proxy"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 14",
+     "quote": "“Eric” TAN Kim Loong (“TAN”) is a Malaysian national and an associate of LOW. He also served as a proxy for LOW in numerous financial transactions."
+    }
+   ]
+  },
+  {
+   "schema": "Directorship",
+   "source": "tarek-obaid",
+   "target": "petrosaudi",
+   "properties": {
+    "role": [
+     "CEO and co-founder"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 20",
+     "quote": "Tarek Obaid (“OBAID”), the CEO and co-founder of PetroSaudi, a Saudi national, signed on behalf of PetroSaudi."
+    }
+   ]
+  },
+  {
+   "schema": "Employment",
+   "source": "hans-peter-brunner",
+   "target": "bsi-singapore",
+   "properties": {
+    "role": [
+     "Former CEO"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 26",
+     "quote": "MAS has referred to the Public Prosecutor the names of the following six members of BSI Bank’s senior management and staff to evaluate whether they have committed criminal offences:"
+    }
+   ],
+   "note": "Role is stated in MAS paragraph 27 (\"Mr Hans Peter Brunner, former CEO\"), which is under 8 words."
+  },
+  {
+   "schema": "Employment",
+   "source": "yeo-jiawei",
+   "target": "bsi-singapore",
+   "properties": {
+    "role": [
+     "Former Wealth Planner"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 34",
+     "quote": "** Mr Yeo is currently in remand and has been charged by the Public Prosecutor for various offences."
+    }
+   ],
+   "note": "Role is stated in MAS paragraph 31 (\"Mr Yeo Jiawei**, former Wealth Planner\"), which is under 8 words."
+  },
+  {
+   "schema": "Employment",
+   "source": "jens-sturzenegger",
+   "target": "falcon",
+   "properties": {
+    "role": [
+     "Singapore Branch Manager"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 12",
+     "quote": "MAS has been informed that the Singapore Branch Manager, Mr Jens Sturzenegger, has been arrested by the Commercial Affairs Department on 5 October 2016."
+    }
+   ]
+  },
+  {
+   "schema": "UnknownLink",
+   "source": "goldman-intl",
+   "target": "1mdb",
+   "properties": {
+    "role": [
+     "Sole arranger and underwriter of the 2012-2013 bonds"
+    ]
+   },
+   "evidence": [
+    {
+     "doc": "fed-2020-goldman-order",
+     "locator": "page 1",
+     "quote": "Goldman Sachs International, a London-based subsidiary of GS Group, served as the sole arranger and underwriter of three bond offerings"
+    }
+   ]
+  }
+ ],
+ "events": [
+  {
+   "date": "2009-05-18",
+   "precision": "day",
+   "title": "Good Star Limited formed in the Seychelles",
+   "description": "RBS Coutts records show Good Star incorporated in the Seychelles; Low opened its account on 9 June 2009.",
+   "entity": "good-star",
+   "evidence": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "locator": "page 15",
+    "quote": "RBS Coutts bank account records indicate that Good Star Limited was formed in the Seychelles on or about May 18, 2009."
+   }
+  },
+  {
+   "date": "2009-09",
+   "precision": "month",
+   "title": "TIA renamed 1Malaysia Development Berhad",
+   "description": "The federal government took over Terengganu Investment Authority, which became 1MDB.",
+   "entity": "1mdb",
+   "evidence": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "locator": "page 13",
+    "quote": "In September 2009, TIA’s name was changed to 1Malaysia Development Berhad, or 1MDB."
+   }
+  },
+  {
+   "date": "2009-09-28",
+   "precision": "day",
+   "title": "1MDB–PetroSaudi joint venture agreement signed",
+   "description": "1MDB agreed to put $1bn into the JV for 40%; PetroSaudi contributed claimed concessions for 60%.",
+   "entity": "1mdb-petrosaudi-jv",
+   "evidence": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "locator": "page 17",
+    "quote": "The Joint Venture Agreement (“JVA”) between 1MDB and PetroSaudi was executed on or about September 28, 2009."
+   }
+  },
+  {
+   "date": "2009-09-30",
+   "precision": "day",
+   "title": "$700 million sent to Good Star instead of the JV",
+   "description": "Deutsche Bank wired $700m of 1MDB money to the Good Star account at RBS Coutts; only $300m reached the JV account.",
+   "entity": "good-star",
+   "evidence": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "locator": "page 27",
+    "quote": "J.P. Morgan Chase bank records confirm that on or about September 30, 2009, the Good Star Account received the $700 million wire transfer from Deutsche Bank."
+   }
+  },
+  {
+   "date": "2009-10-21",
+   "precision": "day",
+   "title": "First Good Star wire to Shearman & Sterling trust account",
+   "description": "$148m sent to the Shearman IOLA account; part used to buy the Park Laurel condominium.",
+   "entity": "shearman-sterling",
+   "evidence": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "locator": "page 91",
+    "quote": "on or about October 21, 2009, $148,000,000 was wired from the Good Star Account to a Shearman IOLA Account."
+   }
+  },
+  {
+   "date": "2010-02-05",
+   "precision": "day",
+   "title": "Park Laurel condominium bought for $23.98 million",
+   "description": "Purchase by Park Laurel (NYC) Ltd., funded via the Shearman IOLA account.",
+   "entity": "park-laurel",
+   "evidence": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "locator": "page 90",
+    "quote": "the final date of sale as February 5, 2010, and the final sales price as $23,980,000."
+   }
+  },
+  {
+   "date": "2011-05-20",
+   "precision": "day",
+   "title": "Further $330 million to Good Star begins",
+   "description": "Four wires (20 May–25 Oct 2011) under a JV financing agreement went to Good Star.",
+   "entity": "good-star",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 36",
+    "quote": "Good Star bank statements and J.P. Morgan correspondent bank records show that between May 20 and October 25, 2011, $330,000,000 was transferred from 1MDB to the Good Star Account over four wire transfers"
+   }
+  },
+  {
+   "date": "2012-03-14",
+   "precision": "day",
+   "title": "Aabar-BVI incorporated",
+   "description": "Look-alike of Aabar registered in the BVI with Qubaisi and Husseiny as directors.",
+   "entity": "aabar-bvi",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 68",
+    "quote": "A Certificate of Incumbency prepared by Aabar-BVI’s registered agent in the BVI indicates that Aabar-BVI was incorporated in BVI on March 14, 2012."
+   }
+  },
+  {
+   "date": "2012-03-19",
+   "precision": "day",
+   "title": "1MDB hires Goldman as sole bookrunner for Project Magnolia",
+   "description": "$1.75bn debt financing, in part to pay $822m toward the Malaysian Energy Company A purchase.",
+   "entity": "goldman-group",
+   "evidence": {
+    "doc": "doj-2020-goldman-dpa",
+    "locator": "page 40",
+    "quote": "On or about March 19, 2012, 1MDB formally chose Goldman as the “sole bookrunner and arranger” for the $1.75 billion debt financing transaction"
+   }
+  },
+  {
+   "date": "2012-05-21",
+   "precision": "day",
+   "title": "Project Magnolia $1.75 billion bond closes",
+   "description": "Goldman bought the whole issue; it booked about $192.5m in fees.",
+   "entity": "1mdb-energy",
+   "evidence": {
+    "doc": "doj-2020-goldman-dpa",
+    "locator": "page 43",
+    "quote": "On or about May 16, 2012, Goldman’s committees approved Project Magnolia, and on or about May 21, 2012, the $1.75 billion bond issuance closed."
+   }
+  },
+  {
+   "date": "2012-05-22",
+   "precision": "day",
+   "title": "$576.9 million of Magnolia proceeds sent to Aabar-BVI",
+   "description": "More than a third of the net proceeds went to the BSI Lugano account of Aabar-BVI a day after closing.",
+   "entity": "aabar-bvi",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 62",
+    "quote": "Roughly one day later, on or about May 22, 2012, a wire in the amount of $576,943,490 was sent from 1MDB Energy’s bank account at Falcon Bank"
+   }
+  },
+  {
+   "date": "2012-06-18",
+   "precision": "day",
+   "title": "Aabar-BVI sends $133 million to Red Granite Capital",
+   "description": "Justified to BSI as a loan to fund \"The Wolf of Wall Street\".",
+   "entity": "red-granite-capital",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 79",
+    "quote": "6/18/2012 Aabar-BVI Red Granite Capital $133,000,000 10/23/2012 Aabar-BVI Red Granite Capital $60,000,000"
+   }
+  },
+  {
+   "date": "2012-10-10",
+   "precision": "day",
+   "title": "Leissner tells Goldman committee no intermediary on Maximus",
+   "description": "Leissner falsely said neither Low nor any intermediary was involved (admitted in the DPA; overt act in his plea).",
+   "entity": "tim-leissner",
+   "evidence": {
+    "doc": "doj-2020-goldman-dpa",
+    "locator": "page 46",
+    "quote": "Additionally, on or about October 10, 2012, in response to committee questions, Leissner told a firmwide committee that neither Low nor any intermediary was involved in Project Maximus."
+   }
+  },
+  {
+   "date": "2012-10-19",
+   "precision": "day",
+   "title": "Project Maximus closes; $790 million sent to Aabar-BVI",
+   "description": "Goldman wired about $1.64bn to 1MDB Energy Langat; $790,354,855 went to Aabar-BVI the same day.",
+   "entity": "1mdb-energy-langat",
+   "evidence": {
+    "doc": "doj-2020-goldman-dpa",
+    "locator": "page 46",
+    "quote": "On or about October 19, 2012, Project Maximus closed. Goldman purchased the entire bond issuance from 1MDB."
+   }
+  },
+  {
+   "date": "2012-11-19",
+   "precision": "day",
+   "title": "Park Laurel resold to Aziz-controlled LLC",
+   "description": "Closing of the sale from Park Laurel (NYC) Ltd. to Park Laurel Acquisition LLC, funded from Red Granite Capital.",
+   "entity": "park-laurel",
+   "evidence": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "locator": "page 92",
+    "quote": "Thereafter, $34,406,188 was wired from the Shearman IOLA Account to a Sullivan & Cromwell attorney trust account at Citibank on or about November 19, 2012, the date of the closing"
+   }
+  },
+  {
+   "date": "2013-03-12",
+   "precision": "day",
+   "title": "ADMIC joint venture formed",
+   "description": "1MDB and Aabar set up a 50:50 JV that the Catalyze bond was meant to fund; it was never funded.",
+   "entity": "admic",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 88",
+    "quote": "On or about March 12, 2013, 1MDB entered into a 50:50 joint venture with Aabar known as ADMIC."
+   }
+  },
+  {
+   "date": "2013-03-19",
+   "precision": "day",
+   "title": "Project Catalyze $3 billion bond issued",
+   "description": "Issued by 1MDB Global; Goldman bought the whole issue and booked about $279m in fees.",
+   "entity": "1mdb-global",
+   "evidence": {
+    "doc": "doj-2020-goldman-dpa",
+    "locator": "page 50",
+    "quote": "the proceeds from Project Catalyze were issued on or about March 19, 2013. Goldman purchased the entire bond issuance from 1MDB and booked approximately $279,000,000 in fees on Project Catalyze."
+   }
+  },
+  {
+   "date": "2013-03-21",
+   "precision": "day",
+   "title": "$620 million sent to Malaysian Official 1's AmBank account",
+   "description": "First of two transfers totalling $681m (second $61m on 25 Mar 2013). The DPA notes the upcoming general election.",
+   "entity": "malaysian-official-1",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 98",
+    "quote": "On or about March 21, 2013, Tanore transferred $620,000,000 into an account at AmBank in Malaysia, whose beneficiary was listed as “AMPRIVATE BANKING-MR.”"
+   }
+  },
+  {
+   "date": "2013-05-15",
+   "precision": "day",
+   "title": "Tanore buys art at Christie's New York",
+   "description": "Five works including Basquiat's \"Dustheads\" for $58.3m total (13 and 15 May auctions).",
+   "entity": "tanore",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 101",
+    "quote": "At auctions held in New York on or about May 13, 2013, and May 15, 2013, Tanore purchased five works of art for a collective total price of $58,348,750."
+   }
+  },
+  {
+   "date": "2013-08-26",
+   "precision": "day",
+   "title": "$620 million returned to Tanore",
+   "description": "Wire from a second AmBank account (AMPRIVATE BANKING-MY) back to Tanore.",
+   "entity": "tanore",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 99",
+    "quote": "On or about August 26, 2013, $620,010,715 was wired from a different account at AmBank to the Tanore Account held in the name of AMPRIVATE BANKING-MY."
+   }
+  },
+  {
+   "date": "2013-12-25",
+   "precision": "day",
+   "title": "\"The Wolf of Wall Street\" released in the US",
+   "description": "Red Granite Pictures production funded in part with money from Red Granite Capital.",
+   "entity": "red-granite-pictures",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 85",
+    "quote": "the production of the film “The Wolf of Wall Street,” which was released in the United States on December 25, 2013."
+   }
+  },
+  {
+   "date": "2014-05-26",
+   "precision": "day",
+   "title": "Deutsche Bank $250 million bridge loan to 1MEHL",
+   "description": "Ostensibly to buy back Aabar's options; $175m went to Aabar-BVI on 28 May.",
+   "entity": "1mehl",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 110",
+    "quote": "On or about May 26, 2014, Deutsche Bank AG, Singapore Branch extended a $250 million bridge loan facility to 1MDB Energy Holdings Limited (“$250 million loan”)."
+   }
+  },
+  {
+   "date": "2014-06",
+   "precision": "month",
+   "title": "Equanimity delivered to Low",
+   "description": "Oceanco delivered the 300-foot yacht days after $140.6m reached the World View account.",
+   "entity": "equanimity",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 197",
+    "quote": "Oceanco delivered THE EQUANIMITY to LOW in or around June 2014."
+   }
+  },
+  {
+   "date": "2014-09-01",
+   "precision": "day",
+   "title": "Deutsche Bank $975 million bridge loan",
+   "description": "Syndicated loan to 1MEHL; about $681m went to Aabar-Seychelles.",
+   "entity": "1mehl",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 116",
+    "quote": "Deutsche Bank extended a $975 million syndicated bridge loan to 1MEHL on or about September 1, 2014"
+   }
+  },
+  {
+   "date": "2015",
+   "precision": "year",
+   "title": "Qubaisi and Husseiny dismissed from IPIC and Aabar",
+   "description": "IPIC and Aabar later said Aabar-BVI was not in their group.",
+   "entity": "khadem-al-qubaisi",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 69",
+    "quote": "QUBAISI and HUSSEINY were dismissed from their positions at IPIC and Aabar in 2015."
+   }
+  },
+  {
+   "date": "2016-04-11",
+   "precision": "day",
+   "title": "IPIC and Aabar disown Aabar-BVI",
+   "description": "Statement to the London Stock Exchange; 1MDB replied the same day.",
+   "entity": "ipic",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 68",
+    "quote": "On or about April 11, 2016, IPIC and Aabar issued a statement to the London Stock Exchange in response to media reports"
+   }
+  },
+  {
+   "date": "2016-05-24",
+   "precision": "day",
+   "title": "MAS orders BSI Bank to shut down in Singapore",
+   "description": "First withdrawal of a merchant bank status since 1984; six staff referred to prosecutors; S$13.3m penalties.",
+   "entity": "mas",
+   "evidence": {
+    "doc": "mas-2016-pr-bsi-shutdown",
+    "locator": "paragraph 4",
+    "quote": "Singapore, 24 May 2016…The Monetary Authority of Singapore (MAS) announced today that it has served BSI Bank Limited (BSI Bank) notice of intention to withdraw its status as a merchant bank"
+   }
+  },
+  {
+   "date": "2016-05-24",
+   "precision": "day",
+   "title": "FINMA finds BSI in serious breach; orders CHF 95 million disgorgement",
+   "description": "Press release of 24 May 2016; also approved EFG takeover on condition BSI is dissolved.",
+   "entity": "finma",
+   "evidence": {
+    "doc": "finma-2016-pr-bsi",
+    "locator": "paragraph 10",
+    "quote": "Among other measures, FINMA has ordered the disgorgement of profits amounting to CHF 95 million. FINMA has also launched enforcement proceedings against two of the bank's former top managers."
+   }
+  },
+  {
+   "date": "2016-07-20",
+   "precision": "day",
+   "title": "DOJ files Park Laurel forfeiture complaint",
+   "description": "First wave of civil forfeiture actions (Good Star, Aabar-BVI and Tanore phases).",
+   "entity": "park-laurel",
+   "evidence": {
+    "doc": "doj-2016-complaint-park-laurel",
+    "locator": "page 135",
+    "quote": "for such other and further relief as this Court may deem just and proper, together with the costs and disbursements of this action. Dated: July 20, 2016"
+   }
+  },
+  {
+   "date": "2016-10-11",
+   "precision": "day",
+   "title": "MAS shuts Falcon Bank Singapore; fines DBS and UBS",
+   "description": "Follows MAS examination of 1MDB-related flows from March 2013 to May 2015.",
+   "entity": "falcon",
+   "evidence": {
+    "doc": "mas-2016-pr-falcon-dbs-ubs",
+    "locator": "paragraph 5",
+    "quote": "Singapore, 11 October 2016… The Monetary Authority of Singapore (MAS) announced today that it is withdrawing the merchant bank status of Falcon Private Bank Ltd, Singapore Branch (Falcon Bank)"
+   }
+  },
+  {
+   "date": "2017-06-15",
+   "precision": "day",
+   "title": "DOJ files complaint against the yacht Equanimity",
+   "description": "Adds the 2014 \"options buyback\" phase.",
+   "entity": "equanimity",
+   "evidence": {
+    "doc": "doj-2017-complaint-equanimity-yacht",
+    "locator": "page 249",
+    "quote": "for such other and further relief as this Court may deem just and proper, together with the costs and disbursements of this action. Dated: June 15, 2017"
+   }
+  },
+  {
+   "date": "2018-08-28",
+   "precision": "day",
+   "title": "Tim Leissner pleads guilty",
+   "description": "Pleaded to conspiracies to violate the FCPA and to launder money.",
+   "entity": "tim-leissner",
+   "evidence": {
+    "doc": "fed-2020-goldman-order",
+    "locator": "page 2",
+    "quote": "on August 28, 2018, the Firm's former South East Asia Chairman, a participating managing director at GS Asia, pled guilty to conspiracies to violate the Foreign Corrupt Practices Act"
+   }
+  },
+  {
+   "date": "2018-10-03",
+   "precision": "day",
+   "title": "Jho Low and Roger Ng indicted",
+   "description": "Grand jury indictment in the Eastern District of New York.",
+   "entity": "jho-low",
+   "evidence": {
+    "doc": "fed-2020-goldman-order",
+    "locator": "page 2",
+    "quote": "on October 3, 2018, a former managing director of the Firm and a third- party co-conspirator were each indicted for conspiracies to violate the FCPA and to commit money laundering"
+   }
+  },
+  {
+   "date": "2019-02-22",
+   "precision": "day",
+   "title": "DOJ files complaint against Jasmine Loo's London property",
+   "description": "Also seeks Oceana 57 funds and McFarland-linked funds.",
+   "entity": "london-property",
+   "evidence": {
+    "doc": "doj-2019-complaint-london-property",
+    "locator": "page 260",
+    "quote": "for such other and further relief as this Court may deem just and proper, together with the costs and disbursements of this action. Dated: February 22, 2019"
+   }
+  },
+  {
+   "date": "2019-03-11",
+   "precision": "day",
+   "title": "Federal Reserve bans Leissner and Ng from banking",
+   "description": "Prohibition orders in connection with the conspiracies.",
+   "entity": "fed",
+   "evidence": {
+    "doc": "fed-2020-goldman-order",
+    "locator": "page 2",
+    "quote": "on March 11, 2019, the Board of Governors prohibited from the banking industry the former South East Asia Chairman and the former managing director in connection with the illegal conspiracies"
+   }
+  },
+  {
+   "date": "2020-10-22",
+   "precision": "day",
+   "title": "Goldman DPA and Goldman Malaysia plea agreement",
+   "description": "Criminal penalty of $2,315,088,000 plus $606m disgorgement; Goldman Malaysia pleads guilty.",
+   "entity": "goldman-group",
+   "evidence": {
+    "doc": "doj-2020-goldman-dpa",
+    "locator": "page 12",
+    "quote": "the plea agreement between the Offices and Goldman Malaysia dated October 22, 2020, that they will not bring any criminal or civil case against the Company"
+   }
+  },
+  {
+   "date": "2020-10-22",
+   "precision": "day",
+   "title": "Federal Reserve cease-and-desist order and $154 million penalty",
+   "description": "Consent order against The Goldman Sachs Group, Inc.",
+   "entity": "fed",
+   "evidence": {
+    "doc": "fed-2020-goldman-order",
+    "locator": "page 15",
+    "quote": "By Order of the Board of Governors of the Federal Reserve System effective this 22nd day of October, 2020."
+   }
+  },
+  {
+   "date": "2025-01-17",
+   "precision": "day",
+   "title": "DOJ files $20 million UBS/Fidelity forfeiture complaint",
+   "description": "Assets traced to MB Consulting payments and a 1MDB joint-venture buyout of Individual 1's company.",
+   "entity": "individual-1-2025",
+   "evidence": {
+    "doc": "doj-2025-complaint-20m-ubs-fidelity",
+    "locator": "page 1",
+    "quote": "Case 2:25-cv-00474 Document 1 Filed 01/17/25 Page 1 of 12 Page ID #:1"
+   }
+  }
+ ],
+ "claims": [
+  {
+   "text": "Goldman underwrote three bond offerings in 2012 and 2013 that raised about $6.5 billion for 1MDB and earned it more than $600 million in fees and revenue.",
+   "status": "supported",
+   "rationale": "Admitted by Goldman in the DPA Statement of Facts; consistent with the Federal Reserve order and Leissner's information.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 35",
+     "quote": "three bond offerings that were related to 1MDB’s energy acquisitions and that raised a total of approximately $6.5 billion for 1MDB in 2012 and 2013.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 36",
+     "quote": "ultimately earned Goldman in excess of $600 million in fees and revenue across its divisions, and increased Goldman’s stature in Southeast Asia.",
+     "stance": "supports"
+    },
+    {
+     "doc": "fed-2020-goldman-order",
+     "locator": "page 1",
+     "quote": "Goldman Sachs International, a London-based subsidiary of GS Group, served as the sole arranger and underwriter of three bond offerings",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "Goldman admitted conspiring to provide about $1.6 billion to, or for the benefit of, foreign officials and their relatives to win 1MDB business.",
+   "status": "supported",
+   "rationale": "Admitted in the DPA Statement of Facts, which Goldman stipulated is true and accurate.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 35",
+     "quote": "In total, Goldman conspired to provide approximately $1.6077 billion to, or for the benefit of, foreign officials and their relatives, of which approximately $18.1 million was paid from accounts controlled by Leissner.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 28",
+     "quote": "Goldman hereby agrees and stipulates that the following facts and conclusions of law are true and accurate.",
+     "stance": "context"
+    }
+   ]
+  },
+  {
+   "text": "Leissner falsely told Goldman's control committees that Jho Low was not involved in the bond deals.",
+   "status": "supported",
+   "rationale": "Admitted by Goldman in the DPA and pleaded to by Leissner (overt act in the information to which he pleaded guilty).",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 42",
+     "quote": "Ng was also present during this meeting and did not correct Leissner’s false statement about Low’s involvement.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2018-information-leissner",
+     "locator": "page 20",
+     "quote": "LEISSNER told the committee affirmatively that Co-Conspirator #1 was not involved in Project Maximus, though he knew that this statement was false at the time",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "A day after Project Magnolia closed, about $577 million of the proceeds went to a BVI company named to look like Aabar but not associated with it.",
+   "status": "supported",
+   "rationale": "Admitted in the DPA (with anonymized labels); the civil complaints give the same amount, date and name the company Aabar-BVI.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 43",
+     "quote": "However, Shell Company 1 was not, in fact, associated with Aabar but was rather associated with Abu Dhabi Official 1, Abu Dhabi Official 2 and Low.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 62",
+     "quote": "Roughly one day later, on or about May 22, 2012, a wire in the amount of $576,943,490 was sent from 1MDB Energy’s bank account at Falcon Bank to an account at BSI Bank in Lugano, Switzerland maintained by Aabar-BVI",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "About $681 million of Project Catalyze money reached an account of Malaysian Official 1 in March 2013.",
+   "status": "supported",
+   "rationale": "Admitted in the DPA Statement of Facts ($620m + $61m to Malaysian Official 1); the 2017 civil complaint traces the same sums from the Tanore account.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 50",
+     "quote": "On or about March 21, 2013, approximately $620 million was transferred from a shell entity beneficially owned or controlled by Low, Shell Company Account 7, to an account beneficially owned and controlled by Malaysian Official 1.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 98",
+     "quote": "On or about March 25, 2013, an additional $61,000,000 was wired from the Tanore Account to the same account at AmBank, for a total of $681,000,000.",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "Malaysian Official 1 received about $30 million of Project Maximus proceeds in October and November 2012.",
+   "status": "supported",
+   "rationale": "Admitted in the DPA; the 2017 civil complaint shows Blackstone paying $5m and $25m on the same dates to the AMPRIVATE BANKING-MR account.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 47",
+     "quote": "Between on or about October 30, 2012 and on or about November 19, 2012, approximately $30 million was transferred from Shell Company Account 2 to an account held by Malaysian Official 1.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 78",
+     "quote": "Blackstone transferred $25,000,000 to the same AMPRIVATE BANKING-MR Account belonging to MALAYSIAN OFFICIAL 1.",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "Leissner routed about $4.1 million in 2014 to a New York jeweler, partly to pay for jewelry for the wife of Malaysian Official 1.",
+   "status": "supported",
+   "rationale": "Admitted in the DPA and an overt act in the information to which Leissner pleaded guilty.",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 54",
+     "quote": "On or about October 10, 2014, Leissner caused approximately $4.1 million to be transferred from Management Company 1 Account to Jeweler 1 in New York, New York, in part to pay for approximately $1.3 million in jewelry",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2018-information-leissner",
+     "locator": "page 20",
+     "quote": "On or about October 10, 2014, LEISSNER caused approximately $4.1 million to be wire transferred from a foreign bank account controlled by",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "Goldman Sachs (Malaysia) pleaded guilty and the parent agreed to a $2.3 billion criminal penalty and $606 million disgorgement.",
+   "status": "supported",
+   "rationale": "Terms of the DPA itself (court filing signed by Goldman).",
+   "evidence": [
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 5",
+     "quote": "the Company’s wholly-owned subsidiary, Goldman Malaysia, is pleading guilty pursuant to Federal Rule of Criminal Procedure 11(c)(1)(C) to one count of conspiracy to commit offenses against the United States",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 7",
+     "quote": "a criminal monetary penalty of $2,315,088,000, which reflects an aggregate discount of ten (10) percent off of the bottom of the otherwise-applicable Sentencing Guidelines fine range",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "The Federal Reserve found Goldman failed to adequately investigate a suspicious intermediary on the 1MDB deals and fined it $154 million.",
+   "status": "supported",
+   "rationale": "Regulator order (Federal Reserve, Oct 2020). Note: issued on consent, without Goldman admitting or denying the Board's allegations.",
+   "evidence": [
+    {
+     "doc": "fed-2020-goldman-order",
+     "locator": "page 4",
+     "quote": "adequately investigate the involvement of a suspicious intermediary, who participated in the scheme to divert proceeds and pay bribes to certain foreign government officials",
+     "stance": "supports"
+    },
+    {
+     "doc": "fed-2020-goldman-order",
+     "locator": "page 11",
+     "quote": "The Board of Governors hereby assesses a civil money penalty in connection with the conduct described above in the amount of $154,000,000",
+     "stance": "supports"
+    },
+    {
+     "doc": "fed-2020-goldman-order",
+     "locator": "page 7",
+     "quote": "denying any allegation made or implied by the Board of Governors in connection herewith, and solely for the purpose of settling this matter without a formal proceeding being filed",
+     "stance": "context"
+    }
+   ]
+  },
+  {
+   "text": "Singapore's MAS shut BSI Bank's Singapore operation for serious anti-money-laundering breaches and referred six staff, including Yeo Jiawei, to prosecutors.",
+   "status": "supported",
+   "rationale": "Regulator finding (MAS press release, 24 May 2016).",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 4",
+     "quote": "notice of intention to withdraw its status as a merchant bank in Singapore for serious breaches of anti-money laundering requirements, poor management oversight of the bank’s operations, and gross misconduct by some of the bank’s staff.",
+     "stance": "supports"
+    },
+    {
+     "doc": "mas-2016-pr-bsi-shutdown",
+     "locator": "paragraph 26",
+     "quote": "MAS has referred to the Public Prosecutor the names of the following six members of BSI Bank’s senior management and staff to evaluate whether they have committed criminal offences:",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "Swiss regulator FINMA found BSI seriously breached money-laundering rules in its 1MDB business and ordered it to give up CHF 95 million in profits.",
+   "status": "supported",
+   "rationale": "Regulator finding (FINMA press release, 24 May 2016).",
+   "evidence": [
+    {
+     "doc": "finma-2016-pr-bsi",
+     "locator": "paragraph 10",
+     "quote": "Among other measures, FINMA has ordered the disgorgement of profits amounting to CHF 95 million.",
+     "stance": "supports"
+    },
+    {
+     "doc": "finma-2016-pr-bsi",
+     "locator": "paragraph 13",
+     "quote": "the bank's Board of Directors and Executive Board knowingly and repeatedly expressed their intention to continue with these financially lucrative client relationships",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "MAS closed Falcon Private Bank's Singapore branch and fined DBS and UBS over 1MDB-related fund flows.",
+   "status": "supported",
+   "rationale": "Regulator finding (MAS press release, 11 Oct 2016).",
+   "evidence": [
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 7",
+     "quote": "The actions on the three banks follow supervisory examinations by MAS into 1MDB-related fund flows that took place through these banks from March 2013 to May 2015.",
+     "stance": "supports"
+    },
+    {
+     "doc": "mas-2016-pr-falcon-dbs-ubs",
+     "locator": "paragraph 19",
+     "quote": "MAS has imposed financial penalties amounting to S$1 million on DBS for 10 breaches and S$1.3 million on UBS for 13 breaches of MAS Notice 626",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "Jho Low was the beneficial owner of Good Star Limited, the company that received $1.03 billion meant for the PetroSaudi joint venture.",
+   "status": "unverified",
+   "rationale": "Alleged in the DOJ civil forfeiture complaints (2016, 2017, 2025), citing bank records; not admitted or adjudicated in this document set.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 15",
+     "quote": "According to banking records, Good Star was a company controlled by LOW, and LOW was also the Good Star Account’s beneficial owner and sole authorized signatory.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2025-complaint-20m-ubs-fidelity",
+     "locator": "page 3",
+     "quote": "Contrary to representations made by 1MDB officials, the Good Star Account was beneficially owned not by PetroSaudi or the joint venture, but by LOW Taek Jho, a/k/a Jho Low (“LOW”)",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 38",
+     "quote": "In total, 1MDB purported to invest a total of $1.83 billion in the 1MDB- PetroSaudi Joint Venture through a combination of equity and debt investments. Of this amount, $1.03 billion was fraudulently diverted to the Good Star Account.",
+     "stance": "context"
+    }
+   ]
+  },
+  {
+   "text": "Aabar-BVI sent $238 million to Riza Aziz's Red Granite Capital, money that helped fund Red Granite Pictures and \"The Wolf of Wall Street\".",
+   "status": "unverified",
+   "rationale": "Alleged in the 2017 civil complaint. The DPA admits about $60m went from a shell account to \"U.S. Motion Picture Company 1\" (part-owned by a relative of Malaysian Official 1) to finance films, but does not name Red Granite.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 55",
+     "quote": "Aabar-BVI also transferred $238,000,000 to a Singapore bank account belonging to Red Granite Capital, an entity owned by Riza Shahriz Bin Abdul AZIZ (“AZIZ”).",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 44",
+     "quote": "Between on or about June 20, 2012 and on or about November 20, 2012, approximately $60 million was transferred over multiple wires from Shell Company Account 3 to the account of U.S. Motion Picture Company 1",
+     "stance": "context"
+    }
+   ]
+  },
+  {
+   "text": "Khadem al-Qubaisi received $472.75 million of 2012 bond money through the Blackstone account.",
+   "status": "unverified",
+   "rationale": "Alleged in the 2017 civil complaint. The DPA and indictment admit/charge the same total ($258.75m + $214m) going to an account of \"Abu Dhabi Official 1\" but never name him.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 55",
+     "quote": "Blackstone transferred $472,750,000 into a Luxembourg account beneficially owned by QUBAISI.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 44",
+     "quote": "approximately $258.75 million was transferred via wire from Shell Company Account 2 to an account at Foreign Financial Institution B in the name of Shell Company Account 4, which was beneficially owned and controlled by Abu Dhabi Official 1.",
+     "stance": "context"
+    }
+   ]
+  },
+  {
+   "text": "Jho Low used more than $250 million diverted from 1MDB to buy the superyacht Equanimity.",
+   "status": "unverified",
+   "rationale": "Alleged in the 2017 civil forfeiture complaint; no admission or judgment in this set.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 191",
+     "quote": "between January 7, 2014, and June 3, 2014, over $250 million in funds diverted from 1MDB was funneled into the World View Account in four major tranches for the purpose of acquiring and maintaining THE EQUANIMITY.",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "1MDB general counsel Jasmine Loo received 1MDB money and used $3.1 million of it to buy a London property.",
+   "status": "unverified",
+   "rationale": "Alleged in the 2017 and 2019 civil complaints only.",
+   "evidence": [
+    {
+     "doc": "doj-2019-complaint-london-property",
+     "locator": "page 250",
+     "quote": "More than $3 million from the 2013 1MDB bond offering was diverted into an account of LOO and used to purchase property in London, United Kingdom owned by Red Mountain Global Ltd.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 78",
+     "quote": "On or about December 6, 2012, a wire in the amount of $5,000,000 was sent from the Blackstone Account to an account at Falcon Bank in Zurich maintained in the name of River Dee International SA",
+     "stance": "supports"
+    }
+   ]
+  },
+  {
+   "text": "1MDB officials made the $700 million transfer of September 2009 to PetroSaudi as settlement of amounts the joint venture owed it.",
+   "status": "disputed",
+   "rationale": "This is what 1MDB OFFICER 2 told the 1MDB board (as quoted in the civil complaint); the complaint's bank records show the money went to Good Star, which it alleges Low controlled.",
+   "evidence": [
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 28",
+     "quote": "US$700 million was remitted to PSI directly as settlement of all the amounts owed by the JVCo. to PSI.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 26",
+     "quote": "This payment was for beneficiary ‘Good Star Limited’ in their SWIFT. Good Star is owned 100% by PetroSaudi International Limited.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 27",
+     "quote": "J.P. Morgan Chase bank records confirm that on or about September 30, 2009, the Good Star Account received the $700 million wire transfer from Deutsche Bank.",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2016-complaint-park-laurel",
+     "locator": "page 19",
+     "quote": "As detailed below, the $700 million went to an account controlled by LOW, not by PetroSaudi.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "text": "The $681 million that reached Malaysian Official 1's account was a personal donation from the Saudi royal family.",
+   "status": "disputed",
+   "rationale": "Malaysia's Attorney General's characterisation (as quoted in the 2017 complaint) conflicts with Goldman's admission in the DPA and the complaint's bank records showing bond proceeds via Tanore/Shell Company Account 7.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 100",
+     "quote": "The Malaysian Attorney General ultimately characterized the payment of $681 million as a “personal donation to [MALAYSIAN OFFICIAL 1] from the Saudi royal family which was given to him without any consideration.”",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 100",
+     "quote": "official bank records for the Tanore Account confirm that (a) the payment of $681 million came from the Tanore Account; (b) TAN was the recorded beneficial owner of the Tanore Account",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 50",
+     "quote": "On or about March 21, 2013, approximately $620 million was transferred from a shell entity beneficially owned or controlled by Low, Shell Company Account 7, to an account beneficially owned and controlled by Malaysian Official 1.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "text": "The $1.367 billion 1MDB paid to Aabar-BVI in 2012 was a refundable deposit held as collateral for IPIC's guarantee.",
+   "status": "disputed",
+   "rationale": "1MDB's audited accounts booked it as a refundable deposit; the same complaint says bankers were told the payments were non-refundable, the contribution agreements let Aabar-BVI use the cash as it saw fit, and IPIC/Aabar deny Aabar-BVI is theirs.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 54",
+     "quote": "In their audited financial statements for the year ending on March 31, 2014, 1MDB booked their substantial payments to Aabar-BVI as an asset rather than a payment",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 54",
+     "quote": "In contrast, LOW and 1MDB officers represented to bank officials involved in the transfer of the $1.367 billion that the funds represented non-refundable payments to Aabar-BVI in consideration of IPIC’s guarantee of the 2012 bonds.",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 67",
+     "quote": "This characterization is inconsistent with the terms of the two Contribution Agreements that were provided to BSI to justify the payments.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "text": "Aabar Investments PJS Limited (BVI) was owned by IPIC's subsidiary Aabar.",
+   "status": "disputed",
+   "rationale": "The BVI incumbency certificate and a 1MDB press release say so; IPIC and Aabar told the London Stock Exchange it was not in their group; the DPA admits the shell was not associated with Aabar.",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "That certificate lists QUBAISI and HUSSEINY as Aabar-BVI’s Directors and “Aabar Investments PJS” as its sole shareholder.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 69",
+     "quote": "1MDB company records show documentary evidence of the ownership of Aabar BVI and of each payment made",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 68",
+     "quote": "In that statement, IPIC and Aabar stated that, “Aabar BVI was not an entity within either corporate group”",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2020-goldman-dpa",
+     "locator": "page 43",
+     "quote": "However, Shell Company 1 was not, in fact, associated with Aabar but was rather associated with Abu Dhabi Official 1, Abu Dhabi Official 2 and Low.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "text": "Husseiny invested his own personal money in Red Granite Pictures.",
+   "status": "disputed",
+   "rationale": "Aziz (to the New York Times) and Husseiny's attorney said so, as quoted in the 2017 complaint; the complaint says the money came from Aabar-BVI, i.e. 1MDB bond proceeds, and that Aziz told his accountants part was a \"gift\".",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 85",
+     "quote": "an attorney for HUSSEINY is quoted as saying that HUSSEINY’s investment in Red Granite was made with “personal money.”",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 85",
+     "quote": "The funds sent from Aabar-BVI to Red Granite Capital, which were thereafter transferred into the United States for use by Red Granite Pictures, did not represent a legitimate investment by 1MDB, IPIC, or Aabar in Red Granite Pictures.",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 80",
+     "quote": "AZIZ claimed that this money was a “gift” from Aabar-BVI, including in documentation provided to his accountants in connection with the preparation of his 2012 U.S. tax return.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "text": "In 2014, 1MDB agreed to pay $989 million to buy back the options it had granted Aabar.",
+   "status": "disputed",
+   "rationale": "The figure comes from the agreement shown to BSI and Deutsche Bank's understanding; in the same documents the Settlement Agreement left the price open and the version shown to UBS said $2.45 billion (all as described in the 2017 complaint).",
+   "evidence": [
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 112",
+     "quote": "would assign its rights to the Aabar options to 1MEHL in exchange for $989,000,000, of which $175,000,000 was payable within 30 days of the date of the agreement.",
+     "stance": "supports"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 109",
+     "quote": "The parties did not fix the price for the buyback in the Settlement Agreement but instead provided that 1MDB would pay a “price . . . to be mutually agreed between the parties” at a later date.",
+     "stance": "contradicts"
+    },
+    {
+     "doc": "doj-2017-complaint-equanimity-yacht",
+     "locator": "page 122",
+     "quote": "HUSSEINY represented to UBS that 1MEHL had agreed to pay Aabar-Seychelles $2.45 billion to terminate the Aabar options.",
+     "stance": "contradicts"
+    }
+   ]
+  },
+  {
+   "text": "Malaysian Official 1 was Malaysia's prime minister at the time of the bond deals.",
+   "status": "lead",
+   "rationale": "Every document uses only the label and a role (high-ranking official in the executive branch and Ministry of Finance with authority over 1MDB). The DPA records Leissner describing a letter he carried as \"by the Prime Minister of Malaysia\" and elsewhere as a letter from Malaysian Official 1; that is an inference, not an identification. Needs an outside primary source.",
+   "evidence": []
+  },
+  {
+   "text": "Malaysian courts have convicted people over the 1MDB diversions described in these filings.",
+   "status": "lead",
+   "rationale": "No Malaysian court judgment is in this document set; it must be obtained separately before any statement is made.",
+   "evidence": []
+  },
+  {
+   "text": "The assets named in the US forfeiture complaints, including the Equanimity, were recovered and returned to Malaysia after 2025.",
+   "status": "lead",
+   "rationale": "The set ends with the January 2025 complaint; it contains no forfeiture judgments, settlements or repatriation records.",
+   "evidence": []
+  },
+  {
+   "text": "\"Abu Dhabi Official 1\" and \"Abu Dhabi Official 2\" in the DPA are Khadem al-Qubaisi and Mohamed al-Husseiny.",
+   "status": "lead",
+   "rationale": "The amounts and dates match the named flows in the civil complaints, but the DPA never names them; the link is an inference, not a documented fact.",
+   "evidence": []
+  }
+ ],
+ "leads": [
+  {
+   "title": "Obtain the Malaysian court judgments",
+   "detail": "Get the judgments and charge sheets from the Malaysian prosecutions connected to 1MDB, SRC International and the AmBank accounts. Use them to settle the identity behind \"Malaysian Official 1\" and to test the Attorney General's January 2016 \"Saudi donation\" explanation.",
+   "priority": "urgent"
+  },
+  {
+   "title": "Obtain the SEC administrative order against Goldman (Oct 2020)",
+   "detail": "The DPA cites an SEC settlement ($606m disgorgement, $400m penalty). The order's findings are not in this set and may describe the bond deals and controls in more detail.",
+   "priority": "high"
+  },
+  {
+   "title": "Map the DPA's anonymized accounts to the named entities",
+   "detail": "Shell Company Accounts 1-8, Holding Company 2 and Management Company 1 (DPA) line up by amount and date with Aabar-BVI, Blackstone, Vasco, Tanore and others in the civil complaints. Confirm each link with court exhibits, Leissner's and Ng's trial record, or bank records before treating them as the same.",
+   "priority": "high"
+  },
+  {
+   "title": "Pull the Leissner plea transcript and the Roger Ng trial record",
+   "detail": "Leissner pleaded guilty on 28 Aug 2018 (Fed order). The transcript, sentencing papers and Ng trial exhibits would turn civil-complaint allegations (Red Granite, Qubaisi payments) into tested evidence.",
+   "priority": "high"
+  },
+  {
+   "title": "Track the outcome of each forfeiture case",
+   "detail": "Check dockets CV 16-5371 (Park Laurel), CV 17-4441 (Equanimity), CV 19-1326 (London property) and 2:25-cv-00474 ($20m UBS/Fidelity) for consent judgments, claimants and where the money went.",
+   "priority": "normal"
+  },
+  {
+   "title": "Singapore prosecutions of BSI and Falcon staff",
+   "detail": "MAS referred six BSI staff (incl. Hans Peter Brunner and Yeo Jiawei) and reported Falcon branch manager Jens Sturzenegger's arrest. Obtain Singapore court outcomes and the Raffles Money Change referral result.",
+   "priority": "normal"
+  },
+  {
+   "title": "FINMA proceedings against two former BSI top managers",
+   "detail": "FINMA opened individual proceedings in May 2016 and the Swiss Attorney General opened criminal proceedings. Find the outcomes and whether the managers are named.",
+   "priority": "normal"
+  },
+  {
+   "title": "Identify \"Individual 1\" in the 2025 complaint",
+   "detail": "Their company got $20m from Husseiny's MB Consulting and a $69m buyout of a 2013 infrastructure joint venture with 1MDB. The complaint says Individual 1 did not know the source; check the stipulation filed with it and Malaysian records of the joint venture.",
+   "priority": "normal"
+  },
+  {
+   "title": "IPIC and Aabar filings on the look-alike entities",
+   "detail": "Obtain IPIC's 11 April 2016 London Stock Exchange statement and its 2015 consolidated accounts, which say other offshore \"Aabar\" entities exist and that IPIC paid $103m of 1MDB bond interest.",
+   "priority": "low"
+  }
+ ],
+ "watchlist": [
+  "Low Taek Jho (Jho Low)",
+  "Tan Kim Loong (Eric Tan)",
+  "Mohamed Ahmed Badawy Al-Husseiny",
+  "Khadem Abdulla Al Qubaisi",
+  "Jasmine Loo Ai Swan",
+  "Riza Shahriz Bin Abdul Aziz",
+  "Aabar Investments PJS Limited",
+  "Tanore Finance Corporation"
+ ]
+}

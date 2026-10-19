@@ -1,0 +1,518 @@
+area: SA
+terms:
+- term: SLAPP (Strategic Lawsuit Against Public Participation)
+  definition: A legal action threatened or brought mainly to harass, intimidate or financially drain a
+    critic, not to win a genuine legal claim.
+  examples: []
+  source_url: https://www.coe.int/en/web/freedom-expression/-/council-of-europe-adopts-recommendation-on-countering-the-use-of-slapps
+  cases: []
+  related:
+  - Abusive court proceedings against public participation
+  - Forum shopping
+  indicators: []
+  areas:
+  - SA
+- term: Public participation
+  definition: Any statement or activity in exercise of free expression, information, arts, science, assembly
+    or association on a matter of public interest, including preparatory work such as journalism.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401069
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Abusive court proceedings against public participation
+  definition: EU term for court cases not brought to assert a right but mainly to prevent, restrict or
+    punish public participation, often exploiting a power imbalance and pursuing unfounded claims.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401069
+  cases: []
+  related:
+  - SLAPP
+  indicators: []
+  areas:
+  - SA
+- term: Forum shopping
+  definition: Choosing a court or country to sue in because it favours the claimant or burdens the defendant,
+    not because it is the natural place for the case; the EU lists abusive forum shopping as a sign of
+    a SLAPP.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401069
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Murder (CPJ category)
+  definition: A targeted killing of a journalist, planned or spontaneous, in direct reprisal for their
+    work.
+  examples: []
+  source_url: https://cpj.org/data-methodology/
+  cases: []
+  related:
+  - Crossfire
+  - Dangerous assignment
+  indicators: []
+  areas:
+  - SA
+- term: Crossfire (CPJ category)
+  definition: A journalist killed on a battlefield or in a military context.
+  examples: []
+  source_url: https://cpj.org/data-methodology/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Dangerous assignment (CPJ category)
+  definition: A journalist killed while covering a demonstration, riot, clash between groups or mob.
+  examples: []
+  source_url: https://cpj.org/data-methodology/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Confirmed vs suspected work-related death
+  definition: CPJ labels a killing 'confirmed' when it is reasonably sure the work was the motive, and
+    'suspected' when the motive is unclear.
+  examples: []
+  source_url: https://cpj.org/data-methodology/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Imprisoned journalist (CPJ)
+  definition: A journalist detained or jailed by state authorities in connection with their work.
+  examples: []
+  source_url: https://cpj.org/data-methodology/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Impunity / unsolved murder
+  definition: A journalist's murder in which no one has been convicted, even if suspects are known; CPJ
+    calls cases with some but not all convictions 'partial impunity'.
+  examples: []
+  source_url: https://cpj.org/special-reports/haiti-israel-most-likely-to-let-journalists-murders-go-unpunished-cpj-2024-impunity-index-shows/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Global Impunity Index
+  definition: CPJ's ranking of countries by unsolved journalist murders relative to population, covering
+    countries with five or more unsolved cases over ten years.
+  examples: []
+  source_url: https://cpj.org/special-reports/haiti-israel-most-likely-to-let-journalists-murders-go-unpunished-cpj-2024-impunity-index-shows/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Hostage (RSF)
+  definition: A journalist held by a non-state group that threatens to kill or harm them or uses them
+    to coerce someone else.
+  examples: []
+  source_url: https://rsf.org/en/rsf-s-2024-round-journalism-suffers-exorbitant-human-cost-due-conflicts-and-repressive-regimes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Missing journalist (RSF)
+  definition: A journalist who has disappeared where there is not enough evidence to say whether they
+    were killed or abducted and no credible claim of responsibility.
+  examples: []
+  source_url: https://rsf.org/en/rsf-s-2024-round-journalism-suffers-exorbitant-human-cost-due-conflicts-and-repressive-regimes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Transnational repression
+  definition: Governments reaching across borders to silence critics living abroad, by direct attacks,
+    using other countries' police, controlling travel documents, or threats from a distance including
+    against family.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related:
+  - Coercion-by-proxy
+  indicators: []
+  areas:
+  - SA
+- term: Coercion-by-proxy
+  definition: Pressuring a critic by threatening or harming their relatives or contacts, often in the
+    home country.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Mercenary spyware
+  definition: Commercial surveillance software sold, usually to governments, to secretly break into phones
+    of selected people such as journalists and activists.
+  examples:
+  - Pegasus (NSO Group)
+  - Predator (Cytrox/Intellexa)
+  source_url: https://support.apple.com/en-us/102174
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Pegasus
+  definition: Spyware made by Israel's NSO Group that can take over a phone, sometimes through malicious
+    links and sometimes with no click at all.
+  examples: []
+  source_url: https://citizenlab.ca/2018/10/the-kingdom-came-to-canada-how-saudi-linked-digital-espionage-reached-canadian-soil/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Predator
+  definition: Spyware sold by Cytrox, found by Citizen Lab on phones of a dissident and of Greek journalist
+    Thanasis Koukakis.
+  examples: []
+  source_url: https://citizenlab.ca/2021/12/pegasus-vs-predator-dissidents-doubly-infected-iphone-reveals-cytrox-mercenary-spyware/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Zero-click attack
+  definition: A phone hack that needs no action by the victim, such as opening a link.
+  examples: []
+  source_url: https://www.amnesty.org/en/wp-content/uploads/2021/08/DOC1044872021ENGLISH.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Mobile Verification Toolkit (MVT)
+  definition: Free tool released by Amnesty's Security Lab to look for traces of spyware on phones.
+  examples: []
+  source_url: https://www.amnesty.org/en/wp-content/uploads/2021/08/DOC1044872021ENGLISH.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Threat notification
+  definition: A warning from a company such as Apple that a user may have been individually targeted by
+    state-linked spyware.
+  examples: []
+  source_url: https://support.apple.com/en-us/102174
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Pegasus Project
+  definition: A 2021 collaborative investigation coordinated by Forbidden Stories into a leaked list of
+    more than 50,000 selected targets of NSO clients, including almost 200 journalists.
+  examples: []
+  source_url: https://forbiddenstories.org/the-pegasus-project-a-worldwide-collaboration-to-counter-a-global-crime/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Threat assessment
+  definition: 'Police methods to find out whether a witness''s life is in serious danger: where the threat
+    comes from, the group''s pattern of violence, its organisation and its means.'
+  examples: []
+  source_url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+  cases: []
+  related:
+  - Risk assessment
+  indicators: []
+  areas:
+  - SA
+- term: Risk assessment
+  definition: Weighing how likely a threat is to happen and how to reduce it; UNODC separates it from
+    threat assessment, and safety groups such as Rory Peck use it before reporting trips.
+  examples: []
+  source_url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Collaborator of justice (justice collaborator)
+  definition: A person who took part in crime, often in a criminal group, and now cooperates with prosecutors,
+    usually in exchange for leniency.
+  examples: []
+  source_url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+  cases: []
+  related:
+  - Crown witness
+  indicators: []
+  areas:
+  - SA
+- term: Crown witness (kroongetuige)
+  definition: Dutch term for a suspect who testifies for the prosecution under a deal, such as Nabil B.
+    in the Marengo trial.
+  examples: []
+  source_url: https://rsf.org/en/netherlands-rsf-and-fpu-welcome-convictions-killing-journalist-peter-r-de-vries
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Witness protection programme
+  definition: A formal scheme, set up by law, that can relocate and give a new identity to witnesses whose
+    lives are seriously threatened.
+  examples: []
+  source_url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Target hardening
+  definition: Short-term police security measures for threatened witnesses short of full protection, such
+    as temporary moves or extra patrols.
+  examples: []
+  source_url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Metadata
+  definition: Hidden data about a file, such as time, place and device, that can reveal who made or shared
+    it.
+  examples: []
+  source_url: https://freedom.press/digisec/blog/metadata-101/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Threat modelling
+  definition: Thinking through who might want to harm you or your source, what they could do, and how
+    to reduce it.
+  examples: []
+  source_url: https://freedom.press/digisec/blog/threat-modeling-sources-module/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Doxxing
+  definition: Publishing someone's private details, such as their home address, often with calls for others
+    to target them; CPJ treats it as a sign online abuse may turn physical.
+  examples: []
+  source_url: https://cpj.org/2018/11/digital-safety-protecting-against-online-harassment/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Online violence
+  definition: Abuse of journalists online, including threats of physical or sexual violence, harassing
+    messages, reputational attacks, hacking and manipulated images.
+  examples: []
+  source_url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Smear campaign
+  definition: A coordinated effort to damage a person's reputation, often with false claims spread by
+    many accounts at once.
+  examples: []
+  source_url: https://cpj.org/2018/11/digital-safety-protecting-against-online-harassment/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Anti-state charges
+  definition: Criminal charges such as 'false news', terrorism or threatening state security, which CPJ
+    finds are used against most jailed journalists.
+  examples: []
+  source_url: https://cpj.org/2025/01/attacks-on-the-press-in-2024/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Criminal defamation / cyber libel
+  definition: Treating damage to reputation as a crime that can bring jail, rather than only a civil claim;
+    the Council of Europe warns such laws can be used to silence journalists.
+  examples: []
+  source_url: https://rm.coe.int/09000016806415d9
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Environmental / land defender
+  definition: A person who peacefully defends land, water or environment, often against mining, logging
+    or dams.
+  examples: []
+  source_url: https://globalwitness.org/documents/20688/Global_Witness_Land_and_Environmental_Defenders_2024_report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Forbidden Stories
+  definition: A network of journalists that continues the investigations of reporters who were threatened,
+    jailed or killed.
+  examples: []
+  source_url: https://forbiddenstories.org/about-us/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Safety of Journalists Platform (Council of Europe)
+  definition: A Council of Europe system where press-freedom groups post alerts about attacks, harassment,
+    detention and impunity involving journalists in Europe.
+  examples: []
+  source_url: https://www.coe.int/en/web/portal/-/ten-years-on-safety-of-journalists-platform-issued-2-000-alerts-on-serious-threats-to-media-freedom
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Journalism Security Assessment Tool (JSAT)
+  definition: GIJN's free self-assessment survey that diagnoses a newsroom's digital and physical security
+    and suggests fixes.
+  examples: []
+  source_url: https://gijn.org/resource/gijn-launches-journalism-security-assessment-tool/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Public inquiry
+  definition: An official, independent investigation set up by a government to establish facts and responsibility,
+    as in Malta's inquiry into Daphne Caruana Galizia's death.
+  examples: []
+  source_url: https://rsf.org/en/landmark-public-inquiry-report-finds-maltese-state-must-shoulder-responsibility-assassination
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Extrajudicial killing
+  definition: A killing by or on behalf of a state without any legal process.
+  examples: []
+  source_url: https://www.aljazeera.com/news/2019/6/19/agnes-callamard-qa-saudi-is-responsible-for-khashoggi-murder
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SA
+- term: Online violence against women journalists
+  definition: Gender-based abuse of women journalists carried out or made worse through digital technology,
+    including threats of rape and murder.
+  examples:
+  - Rape threats sent through social media
+  source_url: https://www.icfj.org/sites/default/files/2023-02/ICFJ%20Unesco_TheChilling_OnlineViolence.pdf
+  cases: []
+  related:
+  - Doxxing
+  - Online-to-offline escalation
+  indicators: []
+  areas:
+  - SA
+- term: Online-to-offline escalation
+  definition: When harassment that starts online turns into abuse or physical attacks in person.
+  examples: []
+  source_url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
+  cases: []
+  related:
+  - Online violence against women journalists
+  indicators: []
+  areas:
+  - SA
+- term: Red Notice
+  definition: An INTERPOL alert asking police worldwide to find and provisionally arrest a wanted person
+    pending extradition. It is not an arrest warrant.
+  examples: []
+  source_url: https://www.interpol.int/en/How-we-work/Notices/Red-Notices
+  cases: []
+  related:
+  - Diffusion
+  - Transnational repression
+  indicators: []
+  areas:
+  - SA
+- term: Diffusion (INTERPOL)
+  definition: A less formal alert that one country sends directly to others through INTERPOL's system.
+    Fair Trials says it can have the same effect as a Red Notice.
+  examples: []
+  source_url: https://www.fairtrials.org/campaigns/interpol/
+  cases: []
+  related:
+  - Red Notice
+  indicators: []
+  areas:
+  - SA
+- term: INTERPOL Constitution, Article 3
+  definition: The rule that bars INTERPOL from any intervention or activity of a political, military,
+    religious or racial character. It is the main ground for challenging politically motivated notices.
+  examples: []
+  source_url: https://www.interpol.int/en/Who-we-are/Legal-framework/Legal-documents
+  cases: []
+  related:
+  - Red Notice
+  indicators: []
+  areas:
+  - SA
+- term: Mobility controls
+  definition: Ways an origin state restricts a person's travel, such as revoking passports or refusing
+    consular services.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related:
+  - Transnational repression
+  indicators: []
+  areas:
+  - SA
+- term: Rendition
+  definition: Abducting a person in one country and taking them to another, outside lawful extradition.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related:
+  - Transnational repression
+  indicators: []
+  areas:
+  - SA
+- term: Foreign agent (designation)
+  definition: A government label for people or outlets said to be under foreign influence. In Russia it
+    brings labelling duties, income locked in special accounts, fines and criminal liability.
+  examples: []
+  source_url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+  cases: []
+  related:
+  - Undesirable organisation
+  indicators: []
+  areas:
+  - SA
+- term: Undesirable organisation
+  definition: A Russian designation that bans an organisation, such as a news outlet, and makes taking
+    part in its work an offence.
+  examples: []
+  source_url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+  cases: []
+  related:
+  - Foreign agent (designation)
+  indicators: []
+  areas:
+  - SA

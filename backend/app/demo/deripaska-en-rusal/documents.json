@@ -1,0 +1,37 @@
+{
+ "_about": "The public records the Deripaska demo case is read from (app/services/demo_cases.py). Downloaded when the demo is loaded and pinned by sha256.",
+ "documents": [
+  {
+   "id": "fr-ofac-2018-09147",
+   "title": "Notice of OFAC Sanctions Actions (April 6, 2018 designations), 83 Fed. Reg. 19138-19140, FR Doc. 2018-09147",
+   "kind": "federal_register_notice",
+   "publisher": "U.S. Treasury, Office of Foreign Assets Control (Federal Register)",
+   "date": "2018-05-01",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2018-05-01/pdf/2018-09147.pdf",
+   "filename": "fr-2018-09147-ofac-sdn-notice.pdf",
+   "sha256": "555394c10b5fad2def5d5364a4da63d6affac7303336d5cfc24c6b4181ee253b",
+   "bytes": 217931,
+   "pages": 3,
+   "source_type": "public_record",
+   "why_it_matters": "OFAC's published designations, with addresses, identifiers and the basis for each.",
+   "licence_note": "US federal government work, public domain (17 U.S.C. § 105)",
+   "admitted": true
+  },
+  {
+   "id": "ofac-delisting-letter",
+   "title": "Treasury letter to Congress: notification of intent to terminate sanctions on En+ Group plc, UC Rusal plc and JSC EuroSibEnergo",
+   "kind": "letter",
+   "publisher": "U.S. Department of the Treasury",
+   "date": "2018-12-19",
+   "url": "https://ofac.treasury.gov/media/16561/download",
+   "filename": "ofac-en-rusal-delisting-notification-2018-12-19.pdf",
+   "sha256": "e253132fbf9f6f13f8d6b1dd954291060ca61ab0a0c50c55df1602581a1ea6eb",
+   "bytes": 3904461,
+   "pages": 9,
+   "source_type": "public_record",
+   "why_it_matters": "The restructuring that ended the sanctions on En+, Rusal and ESE, with the ownership percentages.",
+   "licence_note": "US federal government work, public domain (17 U.S.C. § 105)",
+   "admitted": true
+  }
+ ]
+}

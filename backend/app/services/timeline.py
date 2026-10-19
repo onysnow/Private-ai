@@ -11,6 +11,7 @@ from app.models.domain import (
     Claim, ClaimEvidenceLink, Entity, Evidence, Investigation, Lead, PropertyConflictDecision, RelationshipEdge, Source, Statement, TimelineEvent,
 )
 from app.services.relationships import serialize_relationship
+from app.schemas.api import TimelineEventCreate
 
 DATE_PROP_HINTS = {
     "date", "startdate", "enddate", "birthdate", "deathdate", "incorporationdate",
@@ -51,13 +52,20 @@ def _sort_key(date_text: str | None, precision: str | None) -> str:
     return date_text[:10]
 
 
+def _empty_context() -> dict[str, Any]:
+    """Every part of an event's context is present, None when the event does
+    not link to that record, so one reply shape covers every event kind
+    (app/schemas/responses.py: TimelineContextOut)."""
+    return {"source": None, "evidence": None, "claim": None, "claim_advisory": None, "relationship_advisory": None}
+
+
 def _timeline_context(db: Session, row: TimelineEvent) -> dict:
     """Build a read-only, current provenance context for a reporter-authored event.
 
     The event keeps its own verification status; linked claim/evidence state is disclosed
     rather than used to silently promote or demote the event.
     """
-    context: dict[str, Any] = {}
+    context = _empty_context()
     source = db.get(Source, row.source_id) if row.source_id else None
     evidence = db.get(Evidence, row.evidence_id) if row.evidence_id else None
     claim = db.get(Claim, row.claim_id) if row.claim_id else None
@@ -101,6 +109,7 @@ def _manual_event(db: Session, row: TimelineEvent) -> dict:
         "date_end": row.date_end,
         "precision": row.precision,
         "verification_status": row.verification_status,
+        "grade": row.grade,
         "synthetic": False,
         "refs": {
             "entity_id": row.entity_id,
@@ -123,6 +132,8 @@ def investigation_timeline(
     kinds: set[str] | None = None,
     verification_statuses: set[str] | None = None,
     include_record_activity: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
 ) -> dict:
     if db.get(Investigation, investigation_id) is None:
         raise ValueError("Investigation not found")
@@ -151,8 +162,13 @@ def investigation_timeline(
                 continue
             evidence = db.get(Evidence, interval.get("evidence_id")) if interval.get("evidence_id") else None
             source = db.get(Source, evidence.source_id) if evidence else None
-            date_start = start[0] if start else end[0]
-            precision = interval.get("precision") or (start or end)[1]
+            # The `if not start and not end: continue` above guarantees at least one of
+            # them is set, but mypy can't see that across the two independent locals --
+            # resolve to a single non-None tuple once and assert it for the narrowing.
+            resolved = start or end
+            assert resolved is not None
+            date_start = resolved[0]
+            precision = interval.get("precision") or resolved[1]
             events.append({
                 "id": f"property-review:{review.id}:{index}", "kind": "property_temporal_interval",
                 "investigation_id": investigation_id,
@@ -161,7 +177,7 @@ def investigation_timeline(
                 "precision": precision, "verification_status": "reporter_reviewed", "synthetic": True,
                 "refs": {"entity_id": review.entity_id, "evidence_id": evidence.id if evidence else None, "source_id": source.id if source else None, "property_conflict_decision_id": review.id},
                 "provenance": {"decision": review.decision, "reviewed_values": review.values_json, "source_url": source.url if source else None, "locator": evidence.locator if evidence else None},
-                "context": {"evidence": {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "source_id": evidence.source_id} if evidence else None, "source": {"id": source.id, "title": source.title, "url": source.url} if source else None},
+                "context": {**_empty_context(), "evidence": {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "source_id": evidence.source_id} if evidence else None, "source": {"id": source.id, "title": source.title, "url": source.url} if source else None},
                 "sort_key": _sort_key(date_start, precision),
             })
 
@@ -223,7 +239,7 @@ def investigation_timeline(
                      "relationship_entity_id": stmt.entity_id if is_relationship else None},
             "provenance": {"dataset": stmt.dataset, "origin": stmt.origin, "original_value": stmt.original_value,
                            "first_seen": stmt.first_seen, "last_seen": stmt.last_seen},
-            "context": {"relationship_advisory": relationship_advisory} if is_relationship else {},
+            "context": {**_empty_context(), "relationship_advisory": relationship_advisory if is_relationship else None},
             "sort_key": _sort_key(date_text, precision),
         })
 
@@ -275,14 +291,30 @@ def investigation_timeline(
     counts: dict[str, int] = {}
     status_counts: dict[str, int] = {}
     for event in events:
+        # Only reporter-authored events point at records; every event still
+        # carries the key, so one reply shape covers every kind.
+        event.setdefault("context", None)
+        # Only a reporter's event can be graded (Bellingcat's scale); the key is on every event.
+        event.setdefault("grade", None)
         counts[event["kind"]] = counts.get(event["kind"], 0) + 1
         status_counts[event["verification_status"]] = status_counts.get(event["verification_status"], 0) + 1
+    total = len(events)
+    # STRUCT-0018 cycle 4: the timeline is assembled from several tables and
+    # sorted by a computed key, so (like leads/queue) limit/offset are a slice
+    # of the finished list, not a SQL page. counts/total describe the whole
+    # timeline; only `events` is the page.
+    if offset:
+        events = events[offset:]
+    if limit is not None:
+        events = events[:limit]
     return {
         "investigation_id": investigation_id,
         "events": events,
         "counts": counts,
         "verification_counts": status_counts,
-        "total": len(events),
+        "total": total,
+        "returned": len(events),
+        "offset": offset,
     }
 
 
@@ -312,3 +344,62 @@ def validate_timeline_refs(db: Session, row: TimelineEvent) -> None:
         edge = db.scalar(select(RelationshipEdge).where(RelationshipEdge.relationship_entity_id == row.relationship_entity_id))
         if edge is None:
             raise ValueError("relationship_entity_id must reference a canonical relationship entity")
+
+
+# The suite's date_precision values (app/ai/suite_vocab.py DATE_PRECISIONS) plus the app's "year".
+TIMELINE_EVENT_PRECISIONS = {"exact", "day", "month", "year", "range", "before", "after", "estimated", "unknown"}
+TIMELINE_EVENT_VERIFICATION_STATUSES = {"asserted", "verified", "approximate", "disputed", "unresolved"}
+
+# How well an event is substantiated: Bellingcat's incident grading scale
+# (ADR-0005, line 5; Bellingcat, "Yemen Project: Collection protocol",
+# https://yemen.bellingcat.com/methodology/collection-protocol), its words
+# kept, its airstrike-specific level ("cause of explosion as other") left
+# out. A grade is the reporter's; the verification status is about the
+# event's date, the grade about the event itself.
+EVENT_GRADES: dict[str, str] = {
+    "confirmed": "enough evidence, from several verification techniques and at least three sources cross-referenced",
+    "likely": "several sources report it and most of the information can be verified, with minor contradictions",
+    "weak": "a single source says it happened",
+    "unsubstantiated": "no conclusion can be reached for lack of evidence",
+    "unknown": "what happened cannot be identified",
+}
+
+
+def validate_event_grade(grade: str | None) -> None:
+    if grade is not None and grade not in EVENT_GRADES:
+        raise ValueError(f"Grade must be one of: {', '.join(EVENT_GRADES)}")
+
+
+def grade_timeline_event(db: Session, row: TimelineEvent, grade: str | None) -> TimelineEvent:
+    """Set (or, with None, clear) a reporter's event's grade."""
+    validate_event_grade(grade)
+    row.grade = grade
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def create_timeline_event(db: Session, body: TimelineEventCreate) -> TimelineEvent:
+    """Validate and persist a new TimelineEvent from a request body.
+
+    Raises ValueError for any validation failure (bad precision/status
+    enum, unparseable date, or a dangling reference caught by
+    validate_timeline_refs) -- the caller maps that to a 400. The
+    caller is responsible for confirming body.investigation_id exists
+    (a 404 concern, not a validation one).
+    """
+    if body.precision not in TIMELINE_EVENT_PRECISIONS:
+        raise ValueError(f"Precision must be one of: {', '.join(sorted(TIMELINE_EVENT_PRECISIONS))}")
+    if body.verification_status not in TIMELINE_EVENT_VERIFICATION_STATUSES:
+        raise ValueError(f"Verification status must be one of: {', '.join(sorted(TIMELINE_EVENT_VERIFICATION_STATUSES))}")
+    validate_event_grade(body.grade)
+    if _normalize_date(body.date_start) is None:
+        raise ValueError("date_start must be ISO year, month, or date (YYYY, YYYY-MM, YYYY-MM-DD)")
+    if body.date_end and _normalize_date(body.date_end) is None:
+        raise ValueError("date_end must be ISO year, month, or date")
+    row = TimelineEvent(**body.model_dump())
+    validate_timeline_refs(db, row)
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row

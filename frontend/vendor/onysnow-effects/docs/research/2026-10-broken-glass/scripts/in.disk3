@@ -1,0 +1,38 @@
+# Same disk, but: jittered nodes, 4 random strength classes (s00 +-15%), off-centre impact
+units           si
+boundary        s s s
+atom_style      peri
+atom_modify     map array
+neighbor        0.0010 bin
+lattice         sc 0.0005
+region          target cylinder z 0.0 0.0 0.037 0.0 0.0025 units box
+create_box      4 target
+create_atoms    1 region target
+set             group all type/fraction 2 0.25 12345
+set             type 1 type/fraction 3 0.333 23456
+set             type 1 type/fraction 4 0.5 34567
+# no jitter
+pair_style      peri/pmb
+pair_coeff      1 1 1.6863e22 0.0015001 0.00043 0.25
+pair_coeff      2 2 1.6863e22 0.0015001 0.00050 0.25
+pair_coeff      3 3 1.6863e22 0.0015001 0.00055 0.25
+pair_coeff      4 4 1.6863e22 0.0015001 0.00060 0.25
+pair_coeff      1 2 1.6863e22 0.0015001 0.00046 0.25
+pair_coeff      1 3 1.6863e22 0.0015001 0.00049 0.25
+pair_coeff      1 4 1.6863e22 0.0015001 0.00051 0.25
+pair_coeff      2 3 1.6863e22 0.0015001 0.00052 0.25
+pair_coeff      2 4 1.6863e22 0.0015001 0.00055 0.25
+pair_coeff      3 4 1.6863e22 0.0015001 0.00057 0.25
+set             group all density 2200
+set             group all volume 1.25e-10
+velocity        all set 0.0 0.0 0.0 sum no units box
+fix             F1 all nve
+compute         C1 all damage/atom
+timestep        1.0e-7
+variable        z0 equal 0.0025+0.005+0.00002
+variable        z equal "v_z0 - 100.0*elapsed*dt"
+fix             F2 all indent 1e17 sphere 0.0031 -0.0008 v_z 0.005 units box
+thermo          200
+thermo_style    custom step time cpu
+run             600
+write_dump      all custom dump3.final id x y z c_C1 modify sort id

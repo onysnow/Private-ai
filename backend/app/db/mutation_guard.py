@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
@@ -41,6 +41,7 @@ def collect_mutation_investigation_ids(db: Session, objects: Iterable[object] | 
     from app.models.domain import (
         Claim,
         ClaimEvidenceLink,
+        ClaimReviewEvent,
         Document,
         DocumentChunk,
         EnrichmentSession,
@@ -48,13 +49,21 @@ def collect_mutation_investigation_ids(db: Session, objects: Iterable[object] | 
         EnrichmentSessionRun,
         Entity,
         Evidence,
+        IngestionBatch,
+        IngestionBatchItem,
         Investigation,
         Lead,
         LeadLink,
         LeadProfile,
         LeadWorkflowEvent,
+        RelationshipEdge,
+        RelationshipEvidenceAttachment,
+        RelationshipEvidenceReviewEvent,
         Source,
         Statement,
+        Story,
+        StoryClaim,
+        StorySection,
     )
 
     rows = list(objects) if objects is not None else _pending_objects(db)
@@ -75,7 +84,7 @@ def collect_mutation_investigation_ids(db: Session, objects: Iterable[object] | 
     # many statements/chunks/links in one flush.
     entity_ids = {obj.entity_id for obj in rows if isinstance(obj, Statement) and obj.entity_id}
     source_ids = {obj.source_id for obj in rows if isinstance(obj, Evidence) and obj.source_id}
-    claim_ids = {obj.claim_id for obj in rows if isinstance(obj, ClaimEvidenceLink) and obj.claim_id}
+    claim_ids = {obj.claim_id for obj in rows if isinstance(obj, (ClaimEvidenceLink, ClaimReviewEvent, StoryClaim)) and obj.claim_id}
     lead_ids = {
         obj.lead_id
         for obj in rows
@@ -88,7 +97,16 @@ def collect_mutation_investigation_ids(db: Session, objects: Iterable[object] | 
         if isinstance(obj, (EnrichmentSessionRun, EnrichmentSessionFinding)) and obj.session_id
     }
 
-    def add_ids(stmt) -> None:
+    edge_ids = {
+        obj.relationship_edge_id
+        for obj in rows
+        if isinstance(obj, (RelationshipEvidenceAttachment, RelationshipEvidenceReviewEvent)) and obj.relationship_edge_id
+    }
+    batch_ids = {obj.batch_id for obj in rows if isinstance(obj, IngestionBatchItem) and obj.batch_id}
+    story_ids = {obj.story_id for obj in rows if isinstance(obj, StorySection) and obj.story_id}
+    section_ids = {obj.section_id for obj in rows if isinstance(obj, StoryClaim) and obj.section_id}
+
+    def add_ids(stmt: Select[str]) -> None:
         investigation_ids.update(value for value in db.scalars(stmt).all() if value)
 
     if entity_ids:
@@ -103,6 +121,14 @@ def collect_mutation_investigation_ids(db: Session, objects: Iterable[object] | 
         add_ids(select(Document.investigation_id).where(Document.id.in_(document_ids)))
     if session_ids:
         add_ids(select(EnrichmentSession.investigation_id).where(EnrichmentSession.id.in_(session_ids)))
+    if edge_ids:
+        add_ids(select(RelationshipEdge.investigation_id).where(RelationshipEdge.id.in_(edge_ids)))
+    if batch_ids:
+        add_ids(select(IngestionBatch.investigation_id).where(IngestionBatch.id.in_(batch_ids)))
+    if story_ids:
+        add_ids(select(Story.investigation_id).where(Story.id.in_(story_ids)))
+    if section_ids:
+        add_ids(select(Story.investigation_id).join(StorySection, StorySection.story_id == Story.id).where(StorySection.id.in_(section_ids)))
 
     return investigation_ids
 
@@ -133,5 +159,5 @@ def lock_pending_investigation_mutations(db: Session) -> None:
 
 
 @event.listens_for(Session, "before_flush")
-def _lock_mutating_investigations_before_flush(db: Session, _flush_context, _instances) -> None:
+def _lock_mutating_investigations_before_flush(db: Session, _flush_context: object, _instances: object) -> None:
     lock_pending_investigation_mutations(db)

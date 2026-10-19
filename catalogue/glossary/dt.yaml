@@ -1,0 +1,288 @@
+area: DT
+terms:
+- term: Torture
+  definition: Severe physical or mental pain or suffering deliberately inflicted, with the involvement
+    of a public official, for purposes such as getting a confession, punishment or intimidation.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/convention-against-torture-and-other-cruel-inhuman-or-degrading
+  cases: []
+  related:
+  - Cruel, inhuman or degrading treatment
+  - Istanbul Protocol
+  indicators: []
+  areas:
+  - DT
+- term: Cruel, inhuman or degrading treatment or punishment (ill-treatment)
+  definition: Abuse of a detainee that falls short of the torture definition but is still prohibited by
+    the Convention against Torture and the Mandela Rules.
+  examples: []
+  source_url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Enforced disappearance
+  definition: Arrest, detention or abduction by state agents, or people acting with state backing, followed
+    by refusal to acknowledge it or concealment of the person's fate or whereabouts.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+  cases: []
+  related:
+  - Secret detention
+  - WGEID
+  indicators: []
+  areas:
+  - DT
+- term: Secret detention
+  definition: Holding someone in a place that is not an officially recognised and supervised place of
+    detention; banned by ICPED Article 17(1).
+  examples: []
+  source_url: https://lexmea.de/en/gesetz/cped/article-17
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Unacknowledged detention
+  definition: Detention the authorities do not admit to; the European Court of Human Rights calls it a
+    complete negation of the right to liberty safeguards.
+  examples: []
+  source_url: https://hudoc.echr.coe.int/eng?i=001-115621
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Incommunicado detention
+  definition: Detention in which the person is cut off from contact with lawyers, family and others; when
+    prolonged it can itself amount to torture or ill-treatment.
+  examples: []
+  source_url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Arbitrary detention
+  definition: Deprivation of liberty that falls into one of the five categories used by the UN Working
+    Group on Arbitrary Detention, such as no legal basis or detention for exercising rights.
+  examples: []
+  source_url: https://www.ohchr.org/en/about-arbitrary-detention
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Solitary confinement
+  definition: Confinement of a prisoner for 22 hours or more a day without meaningful human contact.
+  examples: []
+  source_url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Prolonged solitary confinement
+  definition: Solitary confinement lasting more than 15 consecutive days; prohibited by the Mandela Rules.
+  examples: []
+  source_url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Nelson Mandela Rules
+  definition: The UN Standard Minimum Rules for the Treatment of Prisoners, revised and adopted by the
+    General Assembly in 2015.
+  examples: []
+  source_url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Istanbul Protocol
+  definition: The UN manual on effectively investigating and documenting torture and ill-treatment; the
+    2022 edition is Professional Training Series No. 8, Rev. 2.
+  examples: []
+  source_url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Medico-legal report
+  definition: A clinician's formal written evaluation of a person's physical and psychological findings
+    for use in legal proceedings or investigations.
+  examples: []
+  source_url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Custody record / detention register
+  definition: The official record of each person deprived of liberty; ICPED lists minimum fields including
+    identity, authority, grounds, place, health and release or transfer.
+  examples: []
+  source_url: https://lexmea.de/en/gesetz/cped/article-17
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Habeas corpus
+  definition: The right to go before a court to challenge the lawfulness of one's detention.
+  examples: []
+  source_url: https://digitallibrary.un.org/record/243400/files/FactSheet6rev-2en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Convention against Torture (CAT)
+  definition: The UN treaty defining and prohibiting torture and requiring prevention, investigation and
+    exclusion of statements obtained by torture.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/convention-against-torture-and-other-cruel-inhuman-or-degrading
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: ICPED
+  definition: The International Convention for the Protection of All Persons from Enforced Disappearance.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: OPCAT and the Subcommittee on Prevention of Torture (SPT)
+  definition: The Optional Protocol to CAT lets the UN SPT visit places of detention and requires states
+    to set up national preventive mechanisms.
+  examples: []
+  source_url: https://www.ohchr.org/en/treaty-bodies/spt
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: National Preventive Mechanism (NPM)
+  definition: An independent national body set up under OPCAT to visit places of detention and recommend
+    ways to prevent torture.
+  examples: []
+  source_url: https://www.ohchr.org/en/treaty-bodies/spt
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: CPT
+  definition: The Council of Europe's European Committee for the Prevention of Torture, which visits places
+    of detention and publishes standards.
+  examples: []
+  source_url: https://www.coe.int/en/web/cpt/standards
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Working Group on Enforced or Involuntary Disappearances (WGEID)
+  definition: UN expert body that receives and transmits cases of disappearance to governments and works
+    to protect relatives and witnesses.
+  examples: []
+  source_url: https://digitallibrary.un.org/record/243400/files/FactSheet6rev-2en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Working Group on Arbitrary Detention (WGAD)
+  definition: UN expert body that assesses whether detentions are arbitrary using five categories.
+  examples: []
+  source_url: https://www.ohchr.org/en/about-arbitrary-detention
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: PBNDS
+  definition: ICE's Performance-Based National Detention Standards (2011, revised 2016), the rules many
+    immigration detention facilities must follow.
+  examples: []
+  source_url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Special Management Unit (SMU)
+  definition: ICE's term for segregation housing, used for administrative or disciplinary segregation.
+  examples: []
+  source_url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Administrative segregation
+  definition: Non-punitive separation of a detainee for safety, security or good order.
+  examples: []
+  source_url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Disciplinary segregation
+  definition: Separation imposed as a sanction after a disciplinary hearing panel finds a violation.
+  examples: []
+  source_url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Means of restraint / seclusion
+  definition: Physical, mechanical or chemical measures to restrict movement; seclusion is involuntary
+    placement of a patient alone in a locked room.
+  examples: []
+  source_url: https://rm.coe.int/16807001c3
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Intrusive search (strip or body cavity search)
+  definition: Searches beyond a pat-down that the Mandela Rules allow only when absolutely necessary,
+    in private and with records kept.
+  examples: []
+  source_url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Unannounced inspection
+  definition: An oversight visit made without advance notice, such as the DHS Inspector General's inspections
+    of ICE facilities.
+  examples: []
+  source_url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT
+- term: Fundamental safeguards (first hours of custody)
+  definition: Lawyer, independent doctor, notice to family, prompt judge, recording and custody records,
+    and information on rights, which reduce torture risk when someone is first detained.
+  examples: []
+  source_url: https://www.apt.ch/sites/default/files/publications/symposium-on-safeguards_outcome-report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - DT

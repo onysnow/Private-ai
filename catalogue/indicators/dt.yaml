@@ -1,0 +1,2531 @@
+key: DT
+name: Torture, arbitrary detention and enforced disappearance
+scope: Torture and ill-treatment of living detainees (prisons, police cells, immigration detention, psychiatric
+  units); missing custody safeguards; solitary confinement; secret or arbitrary detention; enforced disappearance;
+  immigration detention conditions.
+indicators:
+- id: DT-001
+  name: No prompt access to a lawyer, especially during questioning
+  definition: A person in police or other custody is questioned or held through the first hours without
+    a lawyer, or lawyer access is delayed until after interrogation.
+  areas:
+  - DT
+  typology: Missing custody safeguards
+  status: verified
+  sources:
+  - title: 'Symposium on procedural safeguards in the first hours of police custody: outcome report'
+    publisher: Association for the Prevention of Torture
+    url: https://www.apt.ch/sites/default/files/publications/symposium-on-safeguards_outcome-report.pdf
+    locator: p. 9
+    quote: moments of highest risk, including during questioning.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Police custody (extract from 2nd General Report, CPT/Inf(92)3-part1)
+    publisher: Council of Europe, European Committee for the Prevention of Torture (CPT)
+    year: '1992'
+    url: https://rm.coe.int/16806cea2f
+    locator: para. 36
+    quote: as from the very outset of deprivation of liberty
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Professional Training Series No. 8, Rev. 2)
+    publisher: OHCHR
+    year: '2022'
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 659(c)
+    quote: Guaranteeing prompt access to a lawyer of one's choice during all interrogations and judicial
+      proceedings;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Custody logs show an interview held before the lawyer was called.
+  - Lawyer access rules allow long 'delay' periods in practice applied to most suspects.
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Custody records
+  - Court files (suppression motions)
+  - NPM and CPT visit reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Detainee knowingly waived the right to a lawyer.
+  - No duty lawyer was available at night and questioning was postponed.
+  - Lawful, time-limited delay authorised under national law.
+  jurisdictions: International standard; applies to all police custody
+  version: 1
+- id: DT-002
+  name: No independent medical examination on arrival, at request or before transfer
+  definition: Detainees are not examined by a doctor at admission, on request or before transfer, or cannot
+    see an independent clinician of their choice.
+  areas:
+  - DT
+  typology: Missing custody safeguards
+  status: verified
+  sources:
+  - title: 'Symposium on procedural safeguards in the first hours of police custody: outcome report'
+    publisher: Association for the Prevention of Torture
+    url: https://www.apt.ch/sites/default/files/publications/symposium-on-safeguards_outcome-report.pdf
+    locator: p. 13
+    quote: When realised, this safeguard provides a way to report, record, and end abuse.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    year: '2022'
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 660
+    quote: including an initial health examination at the time of detention and every 24 hours thereafter;
+      at the request of the detainee; and before transfers to other places of detention
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: United Nations Standard Minimum Rules for the Treatment of Prisoners (the Nelson Mandela Rules)
+    publisher: UNODC / UN General Assembly
+    year: '2015'
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 30
+    quote: shall see, talk with and examine every prisoner as soon as possible following his or her admission
+      and thereafter as necessary.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Admission medical screening absent from file.
+  - Detainee asked for a doctor and the request is unanswered in the log.
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Custody and medical records
+  - NPM / inspectorate reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: No initial health examination at detention, or none in each 24 hours of police custody,
+      or clinician access to an alleged victim not given within 24 hours
+    threshold_source: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short custody released before an exam was due.
+  - Detainee refused examination.
+  - Staffing shortage rather than intent.
+  jurisdictions: International standard
+  version: 1
+- id: DT-003
+  name: Family or chosen third party not told of the detention
+  definition: Relatives or a person chosen by the detainee are not informed promptly that the person is
+    held, or where.
+  areas:
+  - DT
+  typology: Missing custody safeguards
+  status: verified
+  sources:
+  - title: 'Symposium on procedural safeguards in the first hours of police custody: outcome report'
+    publisher: Association for the Prevention of Torture
+    url: https://www.apt.ch/sites/default/files/publications/symposium-on-safeguards_outcome-report.pdf
+    locator: p. 16
+    quote: significantly reduces the isolation of the person in custody.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: International Convention for the Protection of All Persons from Enforced Disappearance
+    publisher: OHCHR
+    year: '2006'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+    locator: Article 17(2)(d)
+    quote: his or her family, counsel
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    year: '2022'
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 659(d)
+    quote: Allowing prompt contact and visits by relatives and/or friends;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Family learns of the arrest days later from another source.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - PublicBody
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Non-notification is an element of the enforced disappearance pattern covered by HR-031.
+    source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+  innocent_explanations:
+  - Detainee asked that family not be told.
+  - No contact details for a relative.
+  - Lawful short delay to protect an investigation.
+  jurisdictions: International standard
+  version: 1
+- id: DT-004
+  name: Detainee not brought promptly before a judge, or habeas corpus blocked
+  definition: A detainee stays in the detaining authority's hands without prompt judicial review, or courts
+    cannot or do not hear a challenge to the detention.
+  areas:
+  - DT
+  typology: Missing custody safeguards / arbitrary detention
+  status: verified
+  sources:
+  - title: 'Symposium on procedural safeguards in the first hours of police custody: outcome report'
+    publisher: Association for the Prevention of Torture
+    url: https://www.apt.ch/sites/default/files/publications/symposium-on-safeguards_outcome-report.pdf
+    locator: p. 18
+    quote: removing a detainee from the control of the detaining authority at an early opportunity
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Enforced or Involuntary Disappearances, Fact Sheet No. 6 (Rev. 2)
+    publisher: OHCHR / Working Group on Enforced or Involuntary Disappearances
+    url: https://digitallibrary.un.org/record/243400/files/FactSheet6rev-2en.pdf
+    locator: Section III
+    quote: the right to habeas corpus
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: International Convention for the Protection of All Persons from Enforced Disappearance
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+    locator: Article 20(2)
+    quote: may not be suspended or restricted in any circumstances
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Habeas petitions answered with claims the person is not held.
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - PublicBody
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Court dockets (PACER, state court records)
+  - Habeas petitions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Court backlogs or holidays.
+  - Detainee released before a hearing was needed.
+  - Statutory time limit not yet passed.
+  jurisdictions: International standard
+  version: 1
+- id: DT-005
+  name: Interviews and custody areas not recorded or supervised
+  definition: Police interviews are not electronically recorded and custody areas lack audio or video
+    supervision, leaving no independent record of treatment.
+  areas:
+  - DT
+  typology: Missing custody safeguards
+  status: verified
+  sources:
+  - title: Police custody (CPT/Inf(92)3-part1)
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806cea2f
+    locator: para. 39
+    quote: the electronic recording of police interviews is another useful safeguard against the ill-treatment
+      of detainees
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Symposium on procedural safeguards in the first hours of police custody: outcome report'
+    publisher: Association for the Prevention of Torture
+    url: https://www.apt.ch/sites/default/files/publications/symposium-on-safeguards_outcome-report.pdf
+    locator: p. 22
+    quote: Custody may be supervised directly using audio or video equipment such as CCTV
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Recording 'malfunctioned' during the interview at issue.
+  - Interview length and times not logged.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine equipment failure.
+  - Jurisdiction has no recording requirement.
+  - Retention period expired.
+  jurisdictions: International standard
+  version: 1
+- id: DT-006
+  name: Missing, incomplete or inaccurate custody register
+  definition: The official record of who is held, when, where, by whose order and when released or transferred
+    is missing fields, absent or wrong.
+  areas:
+  - DT
+  typology: Records and registers
+  status: verified
+  sources:
+  - title: International Convention for the Protection of All Persons from Enforced Disappearance, Article
+      17
+    publisher: United Nations treaty text (via LexMea)
+    url: https://lexmea.de/en/gesetz/cped/article-17
+    locator: Article 17(3)
+    quote: up-to-date official registers and/or records
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: International Convention for the Protection of All Persons from Enforced Disappearance
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+    locator: Article 22(b) (summary from fetch; full text not quoted)
+    quote: Failure to record the deprivation of liberty of any person, or the recording of any information
+      which the official responsible for the official register knew or should have known to be inaccurate
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Police custody (CPT/Inf(92)3-part1)
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806cea2f
+    locator: para. 40
+    quote: a single and comprehensive custody record
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 7
+    quote: No person shall be received in a prison without a valid commitment order.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Register lacks the ordering authority or grounds.
+  - Release time recorded but no destination.
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - Document
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Register lacks any of the minimum fields in ICPED Article 17(3)(a)-(h)
+    threshold_source: https://lexmea.de/en/gesetz/cped/article-17
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clerical error or system migration.
+  - Paper records not yet digitised.
+  - Short-stay holding not logged under local rules.
+  jurisdictions: ICPED States Parties; good practice elsewhere
+  version: 1
+- id: DT-007
+  name: Rights not explained in a language the detainee understands
+  definition: Detainees are not told their rights promptly, or only in a language they do not understand
+    and without an interpreter.
+  areas:
+  - DT
+  typology: Missing custody safeguards
+  status: verified
+  sources:
+  - title: 'Symposium on procedural safeguards in the first hours of police custody: outcome report'
+    publisher: Association for the Prevention of Torture
+    url: https://www.apt.ch/sites/default/files/publications/symposium-on-safeguards_outcome-report.pdf
+    locator: p. 25
+    quote: logically critical to the effective implementation and operation of all other safeguards.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    year: '2022'
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 659(b)
+    quote: Informing people deprived of their liberty of their rights in a language that they understand;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rights form signed in English by a non-English speaker.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Interpreter used by phone but not logged.
+  - Detainee overstated their language ability.
+  jurisdictions: International standard
+  version: 1
+- id: DT-008
+  name: Officials present during a detainee's medical examination
+  definition: Police, guards or other officials are in the room, or within hearing, during a detainee's
+    medical or medico-legal examination.
+  areas:
+  - DT
+  typology: Deficient medical documentation
+  status: verified
+  sources:
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    year: '2022'
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 314
+    quote: Their presence during the examination may be grounds for disregarding a negative medico-legal
+      report.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Police custody (CPT/Inf(92)3-part1)
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806cea2f
+    locator: para. 38
+    quote: out of the hearing, and preferably out of the sight, of police officers
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: An overview of the Istanbul Protocol
+    publisher: Physicians for Human Rights
+    url: https://phrtoolkits.org/toolkits/istanbul-protocol-model-medical-curriculum/module-2-istanbul-protocol-standards-for-medical-documentation-of-torture-and-medical-ethics/an-overview-of-the-istanbul-protocol/
+    locator: Module 2
+    quote: outside the presence of security agents and other government officials
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Health care services in prisons (3rd General Report, CPT)
+    publisher: CPT, Council of Europe
+    year: '1993'
+    url: https://rm.coe.int/16806ce943
+    locator: para. 51
+    quote: should be conducted out of the hearing
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Medical report lists an officer as present.
+  - Detainee examined in handcuffs with escort in room.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clinician requested security presence for safety.
+  - Facility layout prevents privacy.
+  jurisdictions: International standard
+  version: 1
+- id: DT-009
+  name: Medico-legal exam without consent or report not kept confidential
+  definition: A detainee is examined without informed consent, or the medical report goes to the detaining
+    authority rather than the person or their representative.
+  areas:
+  - DT
+  typology: Deficient medical documentation
+  status: verified
+  sources:
+  - title: An overview of the Istanbul Protocol
+    publisher: Physicians for Human Rights
+    url: https://phrtoolkits.org/toolkits/istanbul-protocol-model-medical-curriculum/module-2-istanbul-protocol-standards-for-medical-documentation-of-torture-and-medical-ethics/an-overview-of-the-istanbul-protocol/
+    locator: Module 2
+    quote: should be confidential and communicated to the subject or his or her nominated representative
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: An overview of the Istanbul Protocol
+    publisher: Physicians for Human Rights
+    url: https://phrtoolkits.org/toolkits/istanbul-protocol-model-medical-curriculum/module-2-istanbul-protocol-standards-for-medical-documentation-of-torture-and-medical-ethics/an-overview-of-the-istanbul-protocol/
+    locator: Module 2
+    quote: obtaining informed consent before any examination is undertaken
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Prosecutors hold the only copy of the medical report.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Report shared with consent for a complaint.
+  - Emergency treatment where consent could not be obtained.
+  jurisdictions: International standard
+  version: 1
+- id: DT-010
+  name: Health staff fail to document and report signs of ill-treatment
+  definition: Injuries or other signs of torture or ill-treatment seen by prison or custody health staff
+    are not recorded or reported to an independent authority.
+  areas:
+  - DT
+  typology: Deficient medical documentation
+  status: verified
+  sources:
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 34
+    quote: they shall document and report such cases to the competent medical, administrative or judicial
+      authority.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Health care services in prisons (3rd General Report)
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806ce943
+    locator: para. 61 (signs of violence on admission)
+    quote: should be fully recorded
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Admission notes say 'no injuries' though photos later show bruising.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Employment
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Injuries pre-dated custody and were recorded elsewhere.
+  - Detainee did not disclose or consent to recording.
+  jurisdictions: International standard
+  version: 1
+- id: DT-011
+  name: Allegations dismissed because no physical marks were found
+  definition: Officials or investigators treat the absence of physical or psychological findings as proof
+    that torture did not happen.
+  areas:
+  - DT
+  typology: Investigation failures
+  status: verified
+  sources:
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    year: '2022'
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: Chapter V, Annex section (pdf text line ~11679)
+    quote: the absence of physical and/or psychological evidence of torture or ill‑treatment, however,
+      does not mean that it did not take place.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Official statement: ''medical exam found no injuries, so the claim is false''.'
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - PublicBody
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Investigation weighed other evidence too and the claim was unsupported.
+  - Allegation was in fact unfounded.
+  jurisdictions: International standard
+  version: 1
+- id: DT-012
+  name: Case rests on a confession the defendant says was coerced
+  definition: A prosecution relies mainly on a statement the defendant says was obtained by torture or
+    ill-treatment, without the claim being examined.
+  areas:
+  - DT
+  typology: Coerced statements
+  status: verified
+  sources:
+  - title: Convention against Torture
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/convention-against-torture-and-other-cruel-inhuman-or-degrading
+    locator: Article 15 (summary from fetch)
+    quote: Each State Party shall ensure that any statement which is established to have been made as
+      a result of torture shall not be invoked as evidence in any proceedings
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    year: '2022'
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 659(k)
+    quote: Prohibiting the use in any proceedings of evidence obtained as a result of torture or ill‑treatment;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Same interrogating unit named in several retraction claims.
+  cases: []
+  data_needed:
+  - CourtCase
+  - Person
+  - Document
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Court records and appellate opinions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Defendants commonly retract confessions as a defence tactic.
+  - Court examined and rejected the claim on evidence.
+  jurisdictions: International standard
+  version: 1
+- id: DT-013
+  name: Torture or ill-treatment allegations not promptly and independently investigated
+  definition: Complaints or reasonable grounds of ill-treatment get no prompt, impartial investigation
+    by a body independent of the detaining authority, or implicated staff take part.
+  areas:
+  - DT
+  typology: Investigation failures
+  status: verified
+  sources:
+  - title: Convention against Torture
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/convention-against-torture-and-other-cruel-inhuman-or-degrading
+    locator: Article 12 (summary from fetch)
+    quote: Each State Party shall ensure that its competent authorities proceed to a prompt and impartial
+      investigation, wherever there is reasonable ground to believe that an act of torture has been committed
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 71(3)
+    quote: steps shall be taken immediately to ensure that all potentially implicated persons have no
+      involvement in the investigation
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Capping Report: Observations of Unannounced Inspections of ICE Facilities in 2019 (OIG-20-45)'
+    publisher: DHS Office of Inspector General
+    year: '2020'
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 8 (Cibola, verbal abuse grievances)
+    quote: neither could provide us documentation detailing what investigative steps were taken
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Facility investigates its own staff and closes the case in days.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - PublicBody
+  - Employment
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Mandela Rule 71 applies the same independent-investigation duty to custodial deaths, covered
+      by HO-001.
+    source_url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+  innocent_explanations:
+  - Investigation exists but is confidential.
+  - Complaint withdrawn by the detainee.
+  jurisdictions: International standard; US ICE facilities
+  version: 1
+- id: DT-014
+  name: Retaliation against detainees, complainants or witnesses
+  definition: People who complain or give evidence about treatment in detention face intimidation, punishment
+    or other negative consequences.
+  areas:
+  - DT
+  typology: Complaints and reprisals
+  status: verified
+  sources:
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 57(2)
+    quote: must not be exposed to any risk of retaliation, intimidation or other negative consequences
+      as a result of having submitted a request or complaint.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Convention against Torture
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/convention-against-torture-and-other-cruel-inhuman-or-degrading
+    locator: Article 13 (summary from fetch)
+    quote: Steps shall be taken to ensure that the complainant and witnesses are protected against all
+      ill-treatment or intimidation as a consequence of his complaint or any evidence given.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    year: '2022'
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: Chapter II, ethical codes (pdf text line ~6147)
+    quote: They may be fearful of the risks of reprisals for themselves or their families.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Complainant moved to segregation shortly after filing.
+  - Transfer of a detainee who spoke to inspectors.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - Employment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transfer or sanction had an unrelated, documented reason.
+  - Routine movement coincided with the complaint.
+  jurisdictions: International standard
+  version: 1
+- id: DT-015
+  name: 'Grievance system failing: late answers and incomplete logs'
+  definition: Detainee grievances or requests go unanswered past required deadlines, or logs omit required
+    information.
+  areas:
+  - DT
+  typology: Complaints and reprisals
+  status: verified
+  sources:
+  - title: 'Capping Report: Observations of Unannounced Inspections of ICE Facilities in 2019 (OIG-20-45)'
+    publisher: DHS Office of Inspector General
+    year: '2020'
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 8 (Northwest)
+    quote: 222 (47 percent) did not meet the 5-calendar-day response requirement
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Capping Report (OIG-20-45)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 7
+    quote: Northwest and El Paso grievance logs did not include required information.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 57(1)
+    quote: Every request or complaint shall be promptly dealt with and replied to without delay.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Grievance log shows many responses past deadline.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - PublicBody
+  - Organization
+  checkable: records
+  lookup_sources:
+  - DHS OIG inspection reports
+  - ICE detention inspection reports
+  - FOIA for grievance logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Grievance responses past the 5-calendar-day (grievances) or 72-hour (detainee communications)
+      requirement applied in the ICE inspections
+    threshold_source: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Surge in grievances during an outbreak or influx.
+  - Late answers are logged late but were given on time verbally.
+  jurisdictions: US ICE facilities; Mandela Rules internationally
+  version: 1
+- id: DT-016
+  name: Prolonged or indefinite solitary confinement
+  definition: A person is held 22 hours or more a day without meaningful human contact for more than 15
+    consecutive days, or without an end date.
+  areas:
+  - DT
+  typology: Solitary confinement
+  status: verified
+  sources:
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 44
+    quote: Prolonged solitary confinement shall refer to solitary confinement for a time period in excess
+      of 15 consecutive days.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 43(1)
+    quote: (a) Indefinite solitary confinement; (b) Prolonged solitary confinement;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Solitary confinement of prisoners (CPT/Inf(2011)28-part2)
+    publisher: CPT, Council of Europe
+    year: '2011'
+    url: https://rm.coe.int/16806cccc6
+    locator: para. 53
+    quote: it can have an extremely damaging effect on the mental, somatic and social health of those
+      concerned.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Segregation log shows a detainee held 40+ days.
+  - Recreation and showers only a few times a week.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - PublicBody
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Confinement 22 hours or more a day without meaningful human contact for more than 15 consecutive
+      days, or indefinite
+    threshold_source: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Protective custody requested by the detainee.
+  - Medical isolation for infection control.
+  - Facility label calls it 'restrictive housing' but time out of cell is actually higher.
+  jurisdictions: International standard
+  version: 1
+- id: DT-017
+  name: Disciplinary solitary beyond the maximum, or back-to-back sanctions
+  definition: Disciplinary isolation exceeds the per-offence maximum, or consecutive sanctions are stacked
+    into one long uninterrupted period.
+  areas:
+  - DT
+  typology: Solitary confinement
+  status: verified
+  sources:
+  - title: Solitary confinement of prisoners (CPT/Inf(2011)28-part2)
+    publisher: CPT, Council of Europe
+    year: '2011'
+    url: https://rm.coe.int/16806cccc6
+    locator: para. 56(b)
+    quote: The CPT considers that the maximum period should be no higher than 14 days for a given offence,
+      and preferably lower.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12 Special Management Units
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section V.B.1
+    quote: The maximum sanction is 30 days in disciplinary segregation per incident, except in extraordinary
+      circumstances
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Three consecutive 14-day terms with no break.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: More than 30 days per incident in an ICE facility (PBNDS maximum)
+    textbook: More than 14 days for a given offence (CPT)
+    threshold_source: https://rm.coe.int/16806cccc6
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Separate serious offences each properly adjudicated.
+  - Exception for 'Greatest' offences under PBNDS.
+  jurisdictions: Council of Europe states (CPT); US ICE facilities (PBNDS)
+  version: 1
+- id: DT-018
+  name: Segregation without documented reasons or required reviews
+  definition: People are placed in administrative or disciplinary segregation without written reasons,
+    supporting documents or the required periodic reviews.
+  areas:
+  - DT
+  typology: Solitary confinement
+  status: verified
+  sources:
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section V.A.3.a
+    quote: A supervisor shall conduct a review within 72 hours of the detainee's placement in administrative
+      segregation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Capping Report (OIG-20-45)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 5
+    quote: Cibola did not always include the relevant documents supporting segregation in the detainee's
+      file.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Solitary confinement of prisoners
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806cccc6
+    locator: para. 55(c)
+    quote: full records should be maintained of all decisions to impose solitary confinement and of all
+      reviews of the decisions.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - No Form I-885 order in file.
+  - No 7-day review recorded.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: No supervisory review within 72 hours of administrative segregation placement (ICE PBNDS)
+    threshold_source: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paperwork completed but filed separately.
+  - Exigent placement with order completed shortly after.
+  jurisdictions: US ICE facilities; Council of Europe
+  version: 1
+- id: DT-019
+  name: Missed welfare checks on segregated detainees
+  definition: Staff do not personally observe and log segregated detainees at the required interval.
+  areas:
+  - DT
+  typology: Solitary confinement
+  status: verified
+  sources:
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section V.M
+    quote: Detainees in SMU shall be personally observed and logged at least every 30 minutes on an irregular
+      schedule.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Capping Report (OIG-20-45)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 6 (Baker)
+    quote: the time between checks was up to 3 hours, rather than 30 minutes as required
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Check logs pre-filled or showing multi-hour gaps.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Gaps longer than 30 minutes between logged checks
+    threshold_source: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Missed checks are a recurring factor in custody death reviews (HO-001).
+    source_url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+  innocent_explanations:
+  - Checks done but logged in batches.
+  - Emergency elsewhere pulled staff away.
+  jurisdictions: US ICE facilities
+  version: 1
+- id: DT-020
+  name: Solitary used on people with disabilities, mental illness, children or women where prohibited
+  definition: Isolation is imposed on groups for whom standards prohibit or restrict it, or people with
+    serious mental illness are segregated because of their illness.
+  areas:
+  - DT
+  typology: Solitary confinement
+  status: verified
+  sources:
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 45(2)
+    quote: The imposition of solitary confinement should be prohibited in the case of prisoners with mental
+      or physical disabilities when their conditions would be exacerbated by such measures.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Solitary confinement of prisoners
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806cccc6
+    locator: para. 54 (juveniles)
+    quote: particularly strong reservations
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section II, item 8
+    quote: may not be automatically placed in an SMU on the basis of such mental illness
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Segregation roster includes people on the mental health caseload.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short placement while a clinical bed is found.
+  - Placement requested by clinicians for safety.
+  jurisdictions: International standard; US ICE facilities
+  version: 1
+- id: DT-021
+  name: Disciplinary segregation imposed before a hearing or mislabelled
+  definition: Detainees are placed in disciplinary segregation before a disciplinary panel finds a violation,
+    or are called 'administrative' while treated as disciplinary.
+  areas:
+  - DT
+  typology: Solitary confinement
+  status: verified
+  sources:
+  - title: Concerns about ICE Detainee Treatment and Care at Four Detention Facilities (OIG-19-47)
+    publisher: DHS Office of Inspector General
+    year: '2019'
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+    locator: p. 5
+    quote: Two facilities prematurely placed detainees in disciplinary segregation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section II, item 5
+    quote: A detainee shall be placed in disciplinary segregation only after a finding by a disciplinary
+      hearing panel that the detainee is guilty of a prohibited act
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Placement date precedes hearing date in the file.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pre-hearing administrative segregation pending investigation is allowed.
+  jurisdictions: US ICE facilities
+  version: 1
+- id: DT-022
+  name: Restraints used routinely, as punishment or without individual grounds
+  definition: Handcuffs or other restraints are applied to whole groups by default, as a sanction, or
+    in degrading or painful forms.
+  areas:
+  - DT
+  typology: Restraint and force
+  status: verified
+  sources:
+  - title: Capping Report (OIG-20-45)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 7 (Northwest)
+    quote: Physically restraining all segregated detainees whenever they are outside their cells does
+      not comport with ICE standards.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section V.E
+    quote: Placement in an SMU does not constitute a valid basis for the use of restraints while in the
+      SMU or during movement around the facility.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 43(2)
+    quote: Instruments of restraint shall never be applied as a sanction for disciplinary offences.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'CPT Factsheet: Immigration detention (CPT/Inf(2017)3)'
+    publisher: CPT, Council of Europe
+    year: '2017'
+    url: https://rm.coe.int/16806fbf12
+    locator: Factsheet, restraint
+    quote: Applying handcuffs as a matter of routine to immigration detainees
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: OIG-19-47
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+    locator: p. 5
+    quote: All three facilities placed detainees in disciplinary segregation in restraints when outside
+      their cells.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Placard: all disciplinary segregation detainees moved in restraints.'
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Organization
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Individual risk assessment justified restraint.
+  - Escape risk during transfer, which standards allow.
+  jurisdictions: International standard; US ICE facilities
+  version: 1
+- id: DT-023
+  name: Restraint or seclusion in psychiatric units without register, supervision or time limits
+  definition: Mechanical restraint or seclusion of patients is used as punishment, for long periods, without
+    continuous supervision or without being logged in a dedicated register.
+  areas:
+  - DT
+  typology: Restraint and force (psychiatric)
+  status: verified
+  sources:
+  - title: Means of restraint in psychiatric establishments for adults (CPT/Inf(2017)6)
+    publisher: CPT, Council of Europe
+    year: '2017'
+    url: https://rm.coe.int/16807001c3
+    locator: para. 1.6
+    quote: Means of restraint should never be used as punishment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Means of restraint in psychiatric establishments for adults
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16807001c3
+    locator: para. 11.1
+    quote: a specific register should be established to record all instances of recourse to means of restraint
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Means of restraint in psychiatric establishments for adults
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16807001c3
+    locator: para. 4.1
+    quote: usually minutes rather than hours
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Health care services in prisons (3rd General Report)
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806ce943
+    locator: para. 44
+    quote: Resort to instruments of physical restraint shall only very rarely be justified.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Restraint episodes lasting days.
+  - No restraint register at the unit.
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: Restraint episodes lasting hours rather than minutes
+    textbook: Restraint used as punishment, or no register, or no continuous supervision
+    threshold_source: https://rm.coe.int/16807001c3
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Acute danger to self or others with medical order.
+  - Register kept electronically under another name.
+  jurisdictions: Council of Europe; good practice elsewhere
+  version: 1
+- id: DT-024
+  name: Routine or unrecorded strip and body cavity searches
+  definition: Intrusive searches are done routinely without suspicion, by the wrong staff, not in private,
+    or are not recorded with reasons and results.
+  areas:
+  - DT
+  typology: Searches
+  status: verified
+  sources:
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 51
+    quote: Searches shall not be used to harass, intimidate or unnecessarily intrude upon a prisoner's
+      privacy.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 52(1)
+    quote: Intrusive searches, including strip and body cavity searches, should be undertaken only if
+      absolutely necessary.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: OIG-19-47
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+    locator: p. 5 (Essex)
+    quote: One facility strip-searched detainees entering segregation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Blanket strip-search policy on entry to a unit.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reasonable suspicion existed and was recorded.
+  - Contraband incident prompted a time-limited policy.
+  jurisdictions: International standard; US ICE facilities
+  version: 1
+- id: DT-025
+  name: Segregated people not seen daily by health staff or reviewed by mental health
+  definition: Health-care staff do not visit people in solitary on placement and at least daily, or required
+    mental health reviews are missed.
+  areas:
+  - DT
+  typology: Solitary confinement / health care
+  status: verified
+  sources:
+  - title: Solitary confinement of prisoners
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806cccc6
+    locator: para. 63
+    quote: should visit the prisoner immediately after placement and thereafter, on a regular basis, at
+      least once per day.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section V.P
+    quote: conduct a face-to-face psychological review of all detainees in an SMU at least once every
+      30 days
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Medical round logs missing for segregation unit.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: No face-to-face mental health review within 30 days (ICE PBNDS)
+    textbook: No health-care visit on placement and at least once per day (CPT)
+    threshold_source: https://rm.coe.int/16806cccc6
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Visits made but recorded in medical, not custody, files.
+  jurisdictions: Council of Europe; US ICE facilities
+  version: 1
+- id: DT-026
+  name: 'Prohibited punishments: dark or constantly lit cells, cut food or water, collective punishment'
+  definition: Restrictions or sanctions include practices the UN rules prohibit outright.
+  areas:
+  - DT
+  typology: Prohibited sanctions
+  status: verified
+  sources:
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 43(1)
+    quote: (c) Placement of a prisoner in a dark or constantly lit cell; (d) Corporal punishment or the
+      reduction of a prisoner's diet or drinking water; (e) Collective punishment.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Whole unit loses privileges after one incident.
+  - Lights left on 24 hours in a unit.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Organization
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lockdown for a genuine security emergency.
+  - Night lighting for observation of at-risk detainees.
+  jurisdictions: International standard
+  version: 1
+- id: DT-027
+  name: Family contact banned as a sanction or visits restricted to non-contact
+  definition: Contact with family is prohibited as a punishment, or visits are limited to non-contact
+    despite capacity for in-person visits.
+  areas:
+  - DT
+  typology: Contact with the outside world
+  status: verified
+  sources:
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 43(3)
+    quote: Disciplinary sanctions or restrictive measures shall not include the prohibition of family
+      contact.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: OIG-19-47
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+    locator: p. 1 summary (Aurora)
+    quote: one facility allowed only non-contact visits, despite being able to accommodate in-person visitation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'CPT Factsheet: Immigration detention'
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806fbf12
+    locator: Factsheet, contact with outside world
+    quote: every opportunity to remain in meaningful contact with the outside world
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Phone privileges removed for weeks as discipline.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Time-limited restriction strictly for security, which Rule 43(3) permits.
+  - Public health visiting restrictions.
+  jurisdictions: International standard; US ICE facilities
+  version: 1
+- id: DT-028
+  name: Unsafe or degrading material conditions
+  definition: Inspectors find broken plumbing, mould, torn bedding, inadequate clothing or hygiene items,
+    or spoiled food in detention.
+  areas:
+  - DT
+  typology: Conditions of detention
+  status: verified
+  sources:
+  - title: OIG-19-47
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+    locator: p. 1 summary
+    quote: All four facilities had issues with expired food, which puts detainees at risk for food-borne
+      illnesses.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Capping Report (OIG-20-45)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 12 (El Paso)
+    quote: we observed toilets and sinks leaking water onto the floor in the housing units
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Capping Report (OIG-20-45)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 11 (El Paso)
+    quote: we found several housing unit mattresses with sizable tears along the seams
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Detainees charged for hygiene items the standard says are free.
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Document
+  - Contract
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - DHS OIG reports
+  - ICE inspection reports
+  - CPT and NPM visit reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Maintenance backlog being fixed.
+  - Single inspection day snapshot.
+  jurisdictions: US ICE facilities; Mandela Rules internationally
+  version: 1
+- id: DT-029
+  name: Denied recreation or no outdoor exercise
+  definition: Detainees, especially in segregation, get less out-of-cell or outdoor recreation than standards
+    require, or the facility has no outdoor space.
+  areas:
+  - DT
+  typology: Conditions of detention
+  status: verified
+  sources:
+  - title: OIG-19-47
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+    locator: p. 6 (Adelanto)
+    quote: some detainees were not offered any recreation or showers while in segregation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: OIG-19-47 (quoting ICE PBNDS 2.12.V.Z)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+    locator: p. 6, footnote 7
+    quote: Detainees in the SMU for administrative reasons shall be offered at least one hour of recreation
+      per day
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Recreation only 3 days a week in administrative segregation.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Less than one hour of out-of-cell recreation a day, seven days a week (administrative) or
+      five days a week (disciplinary)
+    threshold_source: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Weather or lockdown on the days checked.
+  - Detainee declined recreation.
+  jurisdictions: US ICE facilities
+  version: 1
+- id: DT-030
+  name: Detainee classification failures
+  definition: Facilities rely on transfer paperwork instead of their own classification, skip supervisory
+    review, or miss reassessments, risking mixing vulnerable and high-risk detainees.
+  areas:
+  - DT
+  typology: Conditions of detention
+  status: verified
+  sources:
+  - title: Capping Report (OIG-20-45)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 9
+    quote: Baker and Cibola relied on initial classification levels noted on ICE detainee transfer forms
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Capping Report (OIG-20-45)
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-20-45-Jul20.pdf
+    locator: p. 10 (Baker)
+    quote: the supervisor did not review the initial assessment in 6 of 28 (21 percent) classification
+      files
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Classification files with no supervisor signature.
+  cases: []
+  data_needed:
+  - Document
+  - Organization
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transfer classification was accurate and later confirmed.
+  jurisdictions: US ICE facilities
+  version: 1
+- id: DT-031
+  name: Unaddressed immediate safety risks and unreported security incidents
+  definition: Inspectors find immediate risks to life or safety, such as ligature risks in cells, and
+    security incidents that were not reported.
+  areas:
+  - DT
+  typology: Conditions of detention
+  status: verified
+  sources:
+  - title: OIG-19-47
+    publisher: DHS Office of Inspector General
+    url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+    locator: p. 1 summary
+    quote: Because we observed immediate risks or egregious violations of detention standards at facilities
+      in Adelanto, CA, and Essex County, NJ, including nooses in detainee cells
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Inspection report issues a separate urgent memo to the agency.
+  cases: []
+  data_needed:
+  - Organization
+  - Event
+  - Document
+  - Contract
+  checkable: lookups
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Unaddressed safety risks in cells connect to custody-death indicators (HO-001, HR-030).
+    source_url: https://www.oversight.gov/sites/default/files/oig-reports/OIG-19-47-Jun19.pdf
+  innocent_explanations:
+  - Risk existed but was fixed promptly after discovery.
+  jurisdictions: US ICE facilities
+  version: 1
+- id: DT-032
+  name: Serious injuries or disappearances in custody not referred to an independent authority
+  definition: A serious injury, disappearance or alleged ill-treatment in custody is handled internally
+    without prompt report to an independent investigating authority, or evidence is not preserved.
+  areas:
+  - DT
+  typology: Investigation failures
+  status: verified
+  sources:
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 71(1)
+    quote: the prison director shall report, without delay, any custodial death, disappearance or serious
+      injury to a judicial or other competent authority that is independent of the prison administration
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 71(2)
+    quote: irrespective of whether a formal complaint has been received.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hospital transfer for fractures with only an internal incident report.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Same Rule 71 duty covers custodial deaths (HO-001).
+    source_url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+  innocent_explanations:
+  - Referral made but not public.
+  - Injury was accidental and documented as such.
+  jurisdictions: International standard
+  version: 1
+- id: DT-033
+  name: Long segregation not reported to oversight
+  definition: Facility does not notify the responsible agency in writing when a detainee passes set durations
+    in segregation, or when a vulnerable detainee is placed there.
+  areas:
+  - DT
+  typology: Solitary confinement
+  status: verified
+  sources:
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section V.C.1
+    quote: notify the appropriate Field Office Director in writing
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: PBNDS 2011 (rev. 2016), Standard 2.12
+    publisher: U.S. Immigration and Customs Enforcement
+    url: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+    locator: Section V.C.2 (special vulnerabilities)
+    quote: no later than 72 hours after the initial placement
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Segregation stays over 14 days absent from agency segregation reporting data.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - FOIA for ICE segregation review records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: No written notice at 14 continuous days (or 14 of 21), at 30 days and every 30 days after;
+      or for vulnerable detainees within 72 hours
+    threshold_source: https://www.ice.gov/doclib/detention-standards/2011/2-12.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Notice sent but not retained in the file.
+  jurisdictions: US ICE facilities
+  version: 1
+- id: DT-034
+  name: Immigration detainees held in prisons or prison-like settings
+  definition: People held only for immigration reasons are placed in prisons, police cells or facilities
+    with a carceral regime.
+  areas:
+  - DT
+  typology: Immigration detention
+  status: verified
+  sources:
+  - title: 'CPT Factsheet: Immigration detention (CPT/Inf(2017)3)'
+    publisher: CPT, Council of Europe
+    year: '2017'
+    url: https://rm.coe.int/16806fbf12
+    locator: Factsheet
+    quote: A prison is by definition not a suitable place in which to detain someone
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Immigration contract beds inside a county jail.
+  cases: []
+  data_needed:
+  - Organization
+  - PublicBody
+  - Contract
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - ICE detention facility lists and contracts
+  - Intergovernmental service agreements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short overnight stay pending transfer.
+  - Person also faces criminal charges.
+  jurisdictions: Council of Europe standard; relevant to US county-jail contracts
+  version: 1
+- id: DT-035
+  name: Prolonged immigration detention without time limit or review
+  definition: Asylum seekers or migrants are held for long periods without a time limit, periodic review
+    or a realistic prospect of release.
+  areas:
+  - DT
+  typology: Immigration detention / arbitrary detention
+  status: verified
+  sources:
+  - title: 'CPT Factsheet: Immigration detention'
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806fbf12
+    locator: Factsheet, length of detention
+    quote: without a time limit and with unclear prospects for release
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: About arbitrary detention
+    publisher: OHCHR / Working Group on Arbitrary Detention
+    url: https://www.ohchr.org/en/about-arbitrary-detention
+    locator: Category IV
+    quote: When asylum seekers, immigrants or refugees are subjected to prolonged administrative custody…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Detention lasting over a year with no bond hearing.
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Removal imminent and delays caused by the detainee's own appeals.
+  - Statutory mandatory detention category.
+  jurisdictions: International standard
+  version: 1
+- id: DT-036
+  name: Children held in immigration detention
+  definition: Children, including unaccompanied children, are deprived of liberty for immigration reasons.
+  areas:
+  - DT
+  typology: Immigration detention
+  status: verified
+  sources:
+  - title: 'CPT Factsheet: Immigration detention'
+    publisher: CPT, Council of Europe
+    url: https://rm.coe.int/16806fbf12
+    locator: Factsheet, children
+    quote: every effort should be made to avoid resorting to the deprivation of liberty of an irregular
+      migrant who is a child.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Family detention centre population data includes children.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Family
+  checkable: lookups
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Very short holding while a placement is arranged.
+  - Age disputed.
+  jurisdictions: Council of Europe standard; international
+  version: 1
+- id: DT-037
+  name: Poor oversight of medical care in detention, including procedures without consent
+  definition: Detention authorities do not vet or review outside medical providers, consent is not secured
+    for procedures, or known deficient care goes uncorrected.
+  areas:
+  - DT
+  typology: Health care in detention
+  status: verified
+  sources:
+  - title: Medical Mistreatment of Women in ICE Detention (Staff Report)
+    publisher: U.S. Senate Permanent Subcommittee on Investigations
+    year: '2022'
+    url: https://www.hsgac.senate.gov/imo/media/doc/2022-11-15%20PSI%20Staff%20Report%20-%20Medical%20Mistreatment%20of%20Women%20in%20ICE%20Detention.pdf
+    locator: Executive Summary, p. 1
+    quote: There appears to have been repeated failures to secure informed consent for offsite medical
+      procedures performed on ICDC detainees.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Medical Mistreatment of Women in ICE Detention
+    publisher: U.S. Senate Permanent Subcommittee on Investigations
+    url: https://www.hsgac.senate.gov/imo/media/doc/2022-11-15%20PSI%20Staff%20Report%20-%20Medical%20Mistreatment%20of%20Women%20in%20ICE%20Detention.pdf
+    locator: Executive Summary, p. 1
+    quote: ICE did not conduct thorough oversight of off-site medical providers and procedures.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - One outside provider accounts for an outsized share of procedures on detainees.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Contract
+  - Payment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Deficient medical care in detention also appears in custody-death reviews.
+    source_url: https://www.hsgac.senate.gov/imo/media/doc/2022-11-15%20PSI%20Staff%20Report%20-%20Medical%20Mistreatment%20of%20Women%20in%20ICE%20Detention.pdf
+  innocent_explanations:
+  - Provider is the only specialist in a rural area, so volume is high.
+  - Procedures medically necessary and consented but poorly documented.
+  jurisdictions: US ICE facilities
+  version: 1
+- id: DT-038
+  name: Monitors denied access or unable to speak to detainees privately
+  definition: Inspectors, the UN Subcommittee on Prevention of Torture or national preventive mechanisms
+    cannot visit, see records, or interview detainees in private.
+  areas:
+  - DT
+  typology: Oversight
+  status: verified
+  sources:
+  - title: Subcommittee on Prevention of Torture
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/treaty-bodies/spt
+    locator: SPT overview page
+    quote: give the SPT the right to visit their places of detention and examine the treatment of people
+      held there.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Nelson Mandela Rules
+    publisher: UNODC / UN General Assembly
+    url: https://www.unodc.org/documents/justice-and-prison-reform/Nelson_Mandela_Rules-E-ebook.pdf
+    locator: Rule 84(1)(a)
+    quote: To access all information on the numbers of prisoners and places and locations of detention
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 659(e)
+    quote: Allowing regular visits by monitoring bodies;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Visit postponed by the state; NPM refused entry to a unit.
+  cases: []
+  data_needed:
+  - PublicBody
+  - Event
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - SPT visit reports
+  - NPM annual reports
+  - CPT visit reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Security emergency at time of visit.
+  - Visit rescheduled by agreement.
+  jurisdictions: OPCAT States Parties; international
+  version: 1
+- id: DT-039
+  name: Secret or unofficial place of detention
+  definition: A person is held somewhere that is not an officially recognised and supervised place of
+    detention, such as a hotel, apartment or unlisted site.
+  areas:
+  - DT
+  typology: Secret detention / enforced disappearance
+  status: verified
+  sources:
+  - title: ICPED Article 17
+    publisher: United Nations treaty text (via LexMea)
+    url: https://lexmea.de/en/gesetz/cped/article-17
+    locator: Article 17(1)
+    quote: No one shall be held in secret detention.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: International Convention for the Protection of All Persons from Enforced Disappearance
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+    locator: Article 17(2)(c)
+    quote: officially recognized and supervised places
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: El-Masri v. the former Yugoslav Republic of Macedonia (Grand Chamber judgment, App. no. 39630/09)
+    publisher: European Court of Human Rights
+    year: '2012'
+    url: https://hudoc.echr.coe.int/eng?i=001-115621
+    locator: para. 51 (quoting the Council of Europe Parliamentary Assembly report)
+    quote: includes not only prisons, but also places where somebody is held incommunicado, such as private
+      apartments, police stations or hotel rooms
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 659(h)
+    quote: Ensuring that no one is detained in any unrecognized or secret detention facility;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Flight records and hotel bookings by security services matching a missing person's last sighting.
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Address
+  - Event
+  - Vehicle
+  - Document
+  checkable: lookups
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Secret detention is a core element of enforced disappearance (HR-031).
+    source_url: https://lexmea.de/en/gesetz/cped/article-17
+  innocent_explanations:
+  - Lawful witness protection or safe-house arrangement.
+  - Temporary overflow site that is officially designated.
+  jurisdictions: International standard
+  version: 1
+- id: DT-040
+  name: Authorities deny holding the person or refuse information on whereabouts
+  definition: After an arrest or abduction by state agents, officials refuse to acknowledge the detention
+    or give false or no information about the person's fate or location.
+  areas:
+  - DT
+  typology: Enforced disappearance
+  status: verified
+  sources:
+  - title: International Convention for the Protection of All Persons from Enforced Disappearance
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+    locator: Article 2
+    quote: concealment of the fate or whereabouts of the disappeared person
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Enforced or Involuntary Disappearances, Fact Sheet No. 6 (Rev. 2)
+    publisher: OHCHR / WGEID
+    url: https://digitallibrary.un.org/record/243400/files/FactSheet6rev-2en.pdf
+    locator: Introduction
+    quote: a refusal to acknowledge the deprivation of their liberty
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: El-Masri v. the former Yugoslav Republic of Macedonia
+    publisher: European Court of Human Rights
+    url: https://hudoc.echr.coe.int/eng?i=001-115621
+    locator: para. 233
+    quote: the unacknowledged detention of an individual is a complete negation of these guarantees and
+      a most grave violation of Article 5.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Police tell family the person was 'released' with no record of release.
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - Family
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Extends HR-031 (enforced disappearance) with the specific denial element.
+    source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+  innocent_explanations:
+  - Person genuinely released and went missing afterwards.
+  - Administrative confusion between agencies.
+  jurisdictions: International standard
+  version: 1
+- id: DT-041
+  name: Arrests by armed plain-clothes agents with no warrant or identification
+  definition: People are taken by armed agents who show no warrant and do not say who they are, a pattern
+    UN bodies link to disappearances.
+  areas:
+  - DT
+  typology: Enforced disappearance
+  status: verified
+  sources:
+  - title: Enforced or Involuntary Disappearances, Fact Sheet No. 6 (Rev. 2)
+    publisher: OHCHR / WGEID
+    url: https://digitallibrary.un.org/record/243400/files/FactSheet6rev-2en.pdf
+    locator: Introduction
+    quote: They come at any time of the day or night, usually in plain clothes, sometimes in uniform,
+      always carrying weapons.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Enforced or Involuntary Disappearances, Fact Sheet No. 6 (Rev. 2)
+    publisher: OHCHR / WGEID
+    url: https://digitallibrary.un.org/record/243400/files/FactSheet6rev-2en.pdf
+    locator: Introduction
+    quote: producing no arrest warrant, frequently without saying who they are
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Witness videos of arrests by masked agents without insignia.
+  cases: []
+  data_needed:
+  - Event
+  - Person
+  - Vehicle
+  - PublicBody
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful plain-clothes arrest where identification and warrant were later produced and the arrest was
+    recorded.
+  - Warrantless arrest lawful on probable cause.
+  jurisdictions: International
+  version: 1
+- id: DT-042
+  name: Incommunicado detention
+  definition: A detainee is cut off from lawyers, family, doctors and the outside world for a period.
+  areas:
+  - DT
+  typology: Secret detention / torture risk
+  status: verified
+  sources:
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 23 (Chapter I)
+    quote: a significant degree of suffering is involved in being held for prolonged periods in incommunicado
+      detention and that this can amount to torture or ill‑treatment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 659(j)
+    quote: Prohibiting incommunicado and indefinite detention, including in unofficial places of detention;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: El-Masri v. the former Yugoslav Republic of Macedonia
+    publisher: European Court of Human Rights
+    url: https://hudoc.echr.coe.int/eng?i=001-115621
+    locator: Operative provisions, point 7
+    quote: Holds that the applicant's detention in the hotel for twenty-three days was arbitrary, in breach
+      of Article 5 of the Convention;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Lawyer and family requests refused for days.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - PublicBody
+  - Family
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short, lawful and judicially supervised restriction on communications.
+  jurisdictions: International standard
+  version: 1
+- id: DT-043
+  name: Reprisals against relatives and witnesses searching for a missing person
+  definition: Families, lawyers or witnesses who look for a disappeared person face intimidation, persecution
+    or reprisals.
+  areas:
+  - DT
+  typology: Enforced disappearance
+  status: verified
+  sources:
+  - title: Enforced or Involuntary Disappearances, Fact Sheet No. 6 (Rev. 2)
+    publisher: OHCHR / WGEID
+    url: https://digitallibrary.un.org/record/243400/files/FactSheet6rev-2en.pdf
+    locator: Section II, Protection of relatives and witnesses
+    quote: Cases of intimidation, persecution or reprisals against relatives of missing persons
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Mother of a missing man arrested after a public appeal.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - Associate
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Reprisals against families accompany enforced disappearance cases (HR-031).
+    source_url: https://digitallibrary.un.org/record/243400/files/FactSheet6rev-2en.pdf
+  innocent_explanations:
+  - Relative's arrest on an unrelated, documented charge.
+  jurisdictions: International
+  version: 1
+- id: DT-044
+  name: Release or transfer that cannot be verified
+  definition: A detainee is said to be released or transferred but there is no reliable record of the
+    time, destination and responsible authority.
+  areas:
+  - DT
+  typology: Records and registers / enforced disappearance
+  status: verified
+  sources:
+  - title: ICPED Article 17
+    publisher: United Nations treaty text (via LexMea)
+    url: https://lexmea.de/en/gesetz/cped/article-17
+    locator: Article 17(3)(h) (summary from fetch)
+    quote: The date and time of release or transfer to another place of detention, the destination and
+      the authority responsible for the transfer.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: International Convention for the Protection of All Persons from Enforced Disappearance
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+    locator: Article 21 (summary from fetch)
+    quote: in a manner permitting reliable verification that they have actually been released
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 236
+    quote: lists of prisoners and other custody records (e.g. lists of deaths, transfer logs and food
+      delivery logs)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Release logged at night with no witness and the person never arrived home.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - PublicBody
+  - Vehicle
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Released person chose not to contact family.
+  - Transfer record held by receiving agency.
+  jurisdictions: ICPED States Parties; good practice elsewhere
+  version: 1
+- id: DT-045
+  name: Handover to another state despite a real risk of torture
+  definition: A person is transferred into another state's custody, including through informal rendition,
+    where there is a real risk of torture or ill-treatment.
+  areas:
+  - DT
+  typology: Rendition / refoulement
+  status: verified
+  sources:
+  - title: El-Masri v. the former Yugoslav Republic of Macedonia
+    publisher: European Court of Human Rights
+    year: '2012'
+    url: https://hudoc.echr.coe.int/eng?i=001-115621
+    locator: Operative provisions, point 6
+    quote: Holds that the responsibility of the respondent State is engaged with regard to the applicant's
+      transfer into the custody of the US authorities despite the existence of a real risk
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Charter flight records linked to security services moving a detainee without court process.
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - Vehicle
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Flight records
+  - Court judgments
+  - Parliamentary inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful extradition with court review and credible assurances.
+  jurisdictions: International (ECHR, CAT)
+  version: 1
+- id: DT-046
+  name: Detention with no legal basis (WGAD Category I)
+  definition: A person is held although no legal basis for the deprivation of liberty can be invoked,
+    for example after their sentence ends or despite a release order.
+  areas:
+  - DT
+  typology: Arbitrary detention
+  status: verified
+  sources:
+  - title: About arbitrary detention
+    publisher: OHCHR / Working Group on Arbitrary Detention
+    url: https://www.ohchr.org/en/about-arbitrary-detention
+    locator: Category I
+    quote: When it is clearly impossible to invoke any legal basis justifying the deprivation of liberty
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Person still held weeks after a release order.
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Document
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Separate detainer or warrant exists.
+  - Processing lag of hours, not days.
+  jurisdictions: International
+  version: 1
+- id: DT-047
+  name: Detention for exercising rights (WGAD Category II)
+  definition: A person is detained because they exercised protected rights such as expression, assembly,
+    association or religion.
+  areas:
+  - DT
+  typology: Arbitrary detention
+  status: verified
+  sources:
+  - title: About arbitrary detention
+    publisher: OHCHR / Working Group on Arbitrary Detention
+    url: https://www.ohchr.org/en/about-arbitrary-detention
+    locator: Category II
+    quote: When the deprivation of liberty results from the exercise of the rights or freedoms guaranteed…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Journalist held after publishing criticism.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - CourtCase
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Arrest for unrelated criminal conduct during a protest.
+  jurisdictions: International
+  version: 1
+- id: DT-048
+  name: Detention after a grossly unfair trial (WGAD Category III)
+  definition: A person is held following proceedings that seriously failed to meet fair-trial standards.
+  areas:
+  - DT
+  typology: Arbitrary detention
+  status: verified
+  sources:
+  - title: About arbitrary detention
+    publisher: OHCHR / Working Group on Arbitrary Detention
+    url: https://www.ohchr.org/en/about-arbitrary-detention
+    locator: Category III
+    quote: When the total or partial non-observance of the international norms relating to the right to
+      a fair trial…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Closed trial with no defence lawyer of choice.
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Procedural defects later cured on appeal.
+  jurisdictions: International
+  version: 1
+- id: DT-049
+  name: Discriminatory detention (WGAD Category V)
+  definition: Detention targets people for discriminatory reasons such as birth, national, ethnic or social
+    origin, language, religion, political opinion, gender, sexual orientation or disability.
+  areas:
+  - DT
+  typology: Arbitrary detention
+  status: verified
+  sources:
+  - title: About arbitrary detention
+    publisher: OHCHR / Working Group on Arbitrary Detention
+    url: https://www.ohchr.org/en/about-arbitrary-detention
+    locator: Category V
+    quote: When the deprivation of liberty constitutes a violation of international law for reasons of
+      discrimination…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Arrest data showing one ethnic group detained far above its share.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Mass discriminatory detention links to HR-069 (camps).
+    source_url: https://www.ohchr.org/en/about-arbitrary-detention
+  innocent_explanations:
+  - Disparity explained by documented, non-discriminatory factors.
+  jurisdictions: International
+  version: 1
+- id: DT-050
+  name: Foreign detainees denied consular access
+  definition: A foreign national in detention is not allowed prompt contact with their consulate.
+  areas:
+  - DT
+  typology: Missing custody safeguards
+  status: verified
+  sources:
+  - title: Istanbul Protocol (Rev. 2)
+    publisher: OHCHR
+    url: https://www.veritaszim.net/sites/veritas_d/files/Istanbul-Protocol_Rev2_EN.pdf
+    locator: para. 659(g)
+    quote: Allowing prompt consular access for those detained in a foreign State
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: International Convention for the Protection of All Persons from Enforced Disappearance
+    publisher: OHCHR
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/international-convention-protection-all-persons-enforced
+    locator: Article 17(2)(d) (summary from fetch)
+    quote: if he or she is a foreigner, to communicate with his or her consular authorities, in accordance
+      with applicable international law
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Consulate learns of detention only after removal.
+  cases: []
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Detainee declined consular contact (for example an asylum seeker fearing their own state).
+  jurisdictions: International
+  version: 1
+not_reached:
+- WebSearch budget for this turn was used up after one query, so the research used only direct fetches
+  of known URLs. Wider sources could not be searched.
+- 'U.S. v. Burge (Chicago police torture, perjury conviction): the DOJ press release returned no content,
+  and the CourtListener API throttled the request. The case was not included.'
+- 'Taguba report (Abu Ghraib): irp.fas.org and fas.org returned empty files.'
+- 'Baha Mousa Public Inquiry report (UK, 2011): the gov.uk page links PDF volumes that were not fetched.
+  Only the publication date was confirmed.'
+- 'Senate Select Committee on Intelligence CIA detention study (2014): only the release date of 9 December
+  2014 was confirmed. The findings PDF download was corrupt.'
+- 'Brook House Inquiry report (UK immigration detention): a CAPTCHA blocked access.'
+- 'DHS OIG-18-86 (Adelanto management alert): oig.dhs.gov and the oversight.gov mirror both returned Access
+  Denied. Adelanto findings were taken from OIG-19-47 instead.'
+- 'UN Special Rapporteur on Torture report A/66/268 on solitary confinement: not fetched.'
+- 'CPT standards on complaints mechanisms and access to a lawyer: not fetched.'
+- 'APT Detention Focus Database topic pages (solitary, restraint, body searches): only the index was fetched.'
+- 'SPT ''Visits and public reports'' and ''Non-compliance'' pages: not fetched.'
+- 'Istanbul Protocol Chapter V on physical evidence: deliberately not turned into method-level indicators.
+  Only the documentation and safeguard levels are used.'
+- 'Full text of CAT Articles 12, 13 and 15, ICPED Articles 21 and 22, and ICPED Article 17(3)(h): the
+  fetch tool returned paraphrases only. Those sources are marked ''(as summarised)'' and need checking
+  against the treaty text before publishing.'

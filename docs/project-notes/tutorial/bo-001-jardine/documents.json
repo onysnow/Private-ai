@@ -1,0 +1,21 @@
+{
+ "_about": "The public record the Jardine cross-holding demo case is read from (app/services/demo_cases.py). Downloaded when the demo is loaded and pinned by sha256.",
+ "documents": [
+  {
+   "id": "jardine-strategic-appraisal-directions",
+   "title": "In the Matter of Jardine Strategic Holdings Limited, Supreme Court of Bermuda (Commercial Court), 2021 Nos. 107-126 - Judgment of Hargun CJ on directions for the appraisal of fair value under section 106 of the Companies Act 1981",
+   "kind": "judgment",
+   "publisher": "Supreme Court of Bermuda (published by the Government of Bermuda)",
+   "date": "2021-11-12",
+   "url": "https://www.gov.bm/files/media-library/20260413/ee59525b-final_judgment_2021_no_107_109_11_121_&_123_126_in_the_matter_of_jardine_strategic_holdings_0.pdf",
+   "filename": "jardine-strategic-holdings-appraisal-directions-2021-11-12.pdf",
+   "sha256": "994d28faf2e1979bda3eeac1d8a49f32c837aec50ba1e65fb62b23814fbe81c1",
+   "bytes": 875507,
+   "pages": 37,
+   "source_type": "public_record",
+   "why_it_matters": "The court's account of the Group's structure before the 2021 amalgamation: Jardine Matheson held about 84.9% of Jardine Strategic, and Jardine Strategic held 59.3% of Jardine Matheson.",
+   "licence_note": "Judgment of the Supreme Court of Bermuda, published on gov.bm; downloaded from the publisher at load, quoted here only",
+   "admitted": false
+  }
+ ]
+}

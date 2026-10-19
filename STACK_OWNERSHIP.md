@@ -65,3 +65,7 @@ OpenAleph/`ftm-analyze` now owns named-entity detection in the integrated target
 
 OpenAleph/`ingest-file`/`ftm-analyze` own provider-side generic document parsing, OCR, Page creation, Mention extraction, and schema prediction. Workbench owns synchronization bookkeeping, review queue state, exact provenance retention, reporter accept/reject decisions, canonical entities, evidence, claims, relationship truth, dossiers/graph/timeline, leads/tasks, and export/backup. The new combined refresh endpoint only stages provider outputs; it deliberately cannot establish canonical or evidentiary truth.
 
+
+## ADR-0006 refinement (Wave A)
+
+OpenAleph 5.3 writes ftm-analyze's results as `*Mentioned` properties on the document entity and creates no `Mention` entities unless juditha is configured (ADR-0006), so the Workbench reads them from the document (`app/services/openaleph_analysis.py`) instead of searching for `Mention` entities. Each value becomes a review proposal located in the document text; emails and phone numbers become `identifier` proposals whose owner the reporter chooses. The Workbench's own pattern name-finder is the fallback only, for documents OpenAleph did not analyse.

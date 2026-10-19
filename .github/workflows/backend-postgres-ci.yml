@@ -1,4 +1,4 @@
-name: Backend PostgreSQL CI  # touched 20260917T190615Z to test task #35 (phantom 0-job failure)
+name: Backend PostgreSQL CI
 
 on:
   push:
@@ -39,24 +39,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # Dependabot-triggered runs never receive repository secrets (by GitHub's
-      # design, to stop a malicious dependency bump from exfiltrating them), so
-      # TAS_REPO_TOKEN is empty in that context. actions/checkout@v6+ hard-fails
-      # ("Input required and not supplied: token") if handed an explicitly-empty
-      # token, where v4 tolerated it - so the submodule is fetched as its own
-      # step here instead of via checkout's `submodules:` input, gated on the
-      # secret actually being present, so a Dependabot PR's checkout still
-      # succeeds (just without the submodule) instead of failing outright.
-      - name: Fetch TAS submodule
-        if: ${{ secrets.TAS_REPO_TOKEN != '' }}
-        working-directory: ${{ github.workspace }}
-        env:
-          TAS_REPO_TOKEN: ${{ secrets.TAS_REPO_TOKEN }}
-        run: |
-          git config submodule.backend/app/ai/tas_spec.url "https://x-access-token:${TAS_REPO_TOKEN}@github.com/onysnow/topic-authority-system.git"
-          git submodule update --init --recursive backend/app/ai/tas_spec
-        continue-on-error: true
-
+      # The Authority System Suite is vendored in backend/app/ai/authority_suite,
+      # so nothing beyond the checkout is fetched (it was a private submodule).
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -65,7 +49,27 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
 
       - name: Install backend dependencies
-        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+        # STRUCT-0026: requirements.txt is now production-only (no pytest/
+        # pytest-cov, which the Dockerfile-built image never runs); this job
+        # actually runs the test suite, so it installs requirements-test.txt,
+        # which layers pytest/pytest-cov on top of requirements.txt.
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-test.txt
+
+      - name: Verify Alembic migration chain has a single head
+        # STRUCT-0006: the chain forked into two heads once already this
+        # session (two independently-merged PRs, neither aware of the
+        # other's migration) and went unnoticed until someone ran alembic
+        # locally. Fail fast in CI instead.
+        run: |
+          heads="$(python -m alembic heads)"
+          count="$(echo "$heads" | grep -c .)"
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Alembic migration chain has $count heads, expected exactly 1:"
+            echo "$heads"
+            exit 1
+          fi
+          echo "Single migration head confirmed:"
+          echo "$heads"
 
       - name: Apply Alembic migrations on PostgreSQL
         run: python -m alembic upgrade head

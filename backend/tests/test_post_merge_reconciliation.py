@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from tests.claim_helpers import post_claim
 
 
 def _inv(client):
@@ -287,8 +288,8 @@ def test_relationship_trace_collects_claim_stances_across_reviewed_duplicate_evi
         evidence_ids.append(evidence["id"])
     first = client.post("/api/relationships", json={"investigation_id": inv, "schema": "Directorship", "source_entity_id": person["id"], "target_entity_id": alias["id"], "properties": {"role": ["Director"]}, "dataset": "filing-a", "evidence_id": evidence_ids[0]}).json()
     second = client.post("/api/relationships", json={"investigation_id": inv, "schema": "Directorship", "source_entity_id": person["id"], "target_entity_id": canonical["id"], "properties": {"role": ["Director"]}, "dataset": "filing-b", "evidence_id": evidence_ids[1]}).json()
-    support = client.post("/api/claims", json={"investigation_id": inv, "text": "The person served as a director.", "status": "supported", "confidence": 0.8}).json()
-    dispute = client.post("/api/claims", json={"investigation_id": inv, "text": "The directorship ended before the filing date.", "status": "disputed", "confidence": 0.4}).json()
+    support = post_claim(client, {"investigation_id": inv, "text": "The person served as a director.", "status": "supported", "confidence": 0.8}).json()
+    dispute = post_claim(client, {"investigation_id": inv, "text": "The directorship ended before the filing date.", "status": "disputed", "confidence": 0.4}).json()
     assert client.post(f"/api/claims/{support['id']}/evidence", json={"evidence_id": evidence_ids[0], "stance": "supports"}).status_code == 200
     assert client.post(f"/api/claims/{dispute['id']}/evidence", json={"evidence_id": evidence_ids[1], "stance": "contradicts"}).status_code == 200
     _merge(client, alias, canonical)
@@ -314,8 +315,8 @@ def test_relationship_context_lead_preserves_duplicate_edges_evidence_and_claim_
         evidence_ids.append(evidence["id"])
     first = client.post("/api/relationships", json={"investigation_id": inv, "schema": "Directorship", "source_entity_id": person["id"], "target_entity_id": alias["id"], "properties": {"role": ["Director"]}, "dataset": "filing-a", "evidence_id": evidence_ids[0]}).json()
     second = client.post("/api/relationships", json={"investigation_id": inv, "schema": "Directorship", "source_entity_id": person["id"], "target_entity_id": canonical["id"], "properties": {"role": ["Director"]}, "dataset": "filing-b", "evidence_id": evidence_ids[1]}).json()
-    support = client.post("/api/claims", json={"investigation_id": inv, "text": "Director claim", "status": "supported", "confidence": 0.8}).json()
-    dispute = client.post("/api/claims", json={"investigation_id": inv, "text": "Timing dispute", "status": "disputed", "confidence": 0.4}).json()
+    support = post_claim(client, {"investigation_id": inv, "text": "Director claim", "status": "supported", "confidence": 0.8}).json()
+    dispute = post_claim(client, {"investigation_id": inv, "text": "Timing dispute", "status": "disputed", "confidence": 0.4}).json()
     client.post(f"/api/claims/{support['id']}/evidence", json={"evidence_id": evidence_ids[0], "stance": "supports"})
     client.post(f"/api/claims/{dispute['id']}/evidence", json={"evidence_id": evidence_ids[1], "stance": "contradicts"})
     _merge(client, alias, canonical)
@@ -344,7 +345,7 @@ def test_reporting_task_freezes_rich_lead_context():
     company = _entity(client, inv, "Task Company", "Company")
     source = client.post("/api/sources", json={"investigation_id": inv, "title": "Task filing", "source_type": "filing", "url": "https://example.test/task"}).json()
     evidence = client.post("/api/evidence", json={"source_id": source["id"], "quote": "Task Person is a director of Task Company.", "locator": "p. 7"}).json()
-    claim = client.post("/api/claims", json={"investigation_id": inv, "text": "Task Person directs Task Company", "status": "disputed", "confidence": 0.5}).json()
+    claim = post_claim(client, {"investigation_id": inv, "text": "Task Person directs Task Company", "status": "disputed", "confidence": 0.5}).json()
     client.post(f"/api/claims/{claim['id']}/evidence", json={"evidence_id": evidence["id"], "stance": "contradicts"})
     rel = client.post("/api/relationships", json={"investigation_id": inv, "schema": "Directorship", "source_entity_id": person["id"], "target_entity_id": company["id"], "properties": {}, "evidence_id": evidence["id"]}).json()
     lead = client.post(f"/api/relationships/{rel['id']}/lead-from-context", json={}).json()

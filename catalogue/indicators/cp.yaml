@@ -1,0 +1,3133 @@
+key: CP
+name: Child protection failures and illicit adoption
+scope: Physical abuse and neglect of children outside institutions; deaths known to child-protection services;
+  foster care; troubled-teen residential programmes; parental and family abduction; illicit intercountry
+  adoption.
+indicators:
+- id: CP-001
+  name: Earlier reports to child protection before a child's death or serious injury
+  definition: A child who died or was seriously hurt had already been reported to child protection services,
+    whatever happened to those reports.
+  areas:
+  - CP
+  typology: Child deaths known to services
+  status: pending
+  sources:
+  - title: 'Within Our Reach: A National Strategy to Eliminate Child Abuse and Neglect Fatalities'
+    publisher: Commission to Eliminate Child Abuse and Neglect Fatalities (US)
+    year: '2016'
+    url: https://www.azcourts.gov/Portals/0/46/Reading%20List/CECANF%20Final%20Report.pdf
+    locator: Section 'Past CPS Reports Are Associated With Increased Risk of Fatality'
+    quote: A prior report to CPS, regardless of its disposition, was the single strongest predictor of
+      a child’s potential risk for injury death (intentional or unintentional) before age 5.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Within Our Reach: A National Strategy to Eliminate Child Abuse and Neglect Fatalities'
+    publisher: Commission to Eliminate Child Abuse and Neglect Fatalities (US)
+    year: '2016'
+    url: https://www.azcourts.gov/Portals/0/46/Reading%20List/CECANF%20Final%20Report.pdf
+    locator: Chairman's letter
+    quote: A call to a child protection hotline, regardless of the disposition, is the best predictor
+      of a later child abuse or neglect fatality.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A hotline call about a toddler was screened out; months later the child died of injuries.
+  - Several reports about one household were closed as unsubstantiated before a child's death.
+  cases:
+  - name: Los Angeles County DCFS social workers prosecution (Palmdale child death, 2013)
+    year: '2020'
+    jurisdiction: California, US
+    what_happened: Four county social workers were charged with felony child abuse and falsifying public
+      records over a 2013 child death; the charges were dismissed in July 2020 after an appellate ruling.
+      The child's mother was sentenced to life without parole and her boyfriend to death in 2018.
+    outcome: convicted
+    outcome_verified: false
+    source_url: https://www.cbsnews.com/losangeles/news/judge-dismisses-charges-against-la-county-social-workers-in-death-of-gabriel-fernandez/
+    source_title: Judge dismisses charges against LA County social workers (CBS Los Angeles)
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - CourtCase
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Child fatality review reports
+  - State CPS fatality disclosures (CAPTA public disclosure)
+  - Court records in criminal cases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Child homicides often follow earlier reports to services; homicide indicators cover the death
+      scene.
+    source_url: https://www.azcourts.gov/Portals/0/46/Reading%20List/CECANF%20Final%20Report.pdf
+  innocent_explanations:
+  - Many families are reported and never harm a child; a prior report alone does not show an agency failed.
+  - Reports can be malicious or mistaken.
+  - The commission notes that half or more of fatalities involve children not known to the local agency,
+    so the absence of a report is not reassurance either.
+  jurisdictions: US; principle used in UK reviews too
+  version: 1
+- id: CP-002
+  name: Deaths and serious harm concentrated among infants and very young children
+  definition: The child who died or was seriously hurt was a baby or toddler, the age group that makes
+    up most maltreatment deaths and serious-incident notifications.
+  areas:
+  - CP
+  typology: Child deaths known to services
+  status: verified
+  sources:
+  - title: 'Within Our Reach: A National Strategy to Eliminate Child Abuse and Neglect Fatalities'
+    publisher: Commission to Eliminate Child Abuse and Neglect Fatalities (US)
+    year: '2016'
+    url: https://www.azcourts.gov/Portals/0/46/Reading%20List/CECANF%20Final%20Report.pdf
+    locator: Characteristics of Child Maltreatment Deaths
+    quote: approximately half are infants younger than 1 year old, and approximately three-quarters are
+      under 3 years of age.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.12, para 12 'Harm to babies under 12 months old'
+    quote: Babies under 12 months old continue to be the most prevalent group notified, and there were
+      a high proportion of cases involving non-accidental injury and sudden unexpected infant death.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A local authority's serious incident notifications are mostly babies, with face-to-face visits replaced
+    by phone contact.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Child death review data
+  - Serious incident notifications (England)
+  - NCANDS child fatality data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Child aged under 1 (or under 3) who died or was seriously harmed while known to services;
+      ages from the CECANF report
+    threshold_source: https://www.azcourts.gov/Portals/0/46/Reading%20List/CECANF%20Final%20Report.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: HO-033 covers infant death scenes; the Panel links sudden unexpected infant death to its notifications.
+    source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  innocent_explanations:
+  - Infants die of natural causes, accidents and sudden unexplained infant death without any maltreatment.
+  - Age alone is a risk statistic, not evidence about any one family.
+  jurisdictions: US, England
+  version: 1
+- id: CP-003
+  name: Official child-fatality counts lower than other sources
+  definition: The official count of child maltreatment deaths is lower than counts from other records,
+    such as death certificates, police files or fatality reviews.
+  areas:
+  - CP
+  typology: Child deaths known to services
+  status: verified
+  sources:
+  - title: 'Within Our Reach: A National Strategy to Eliminate Child Abuse and Neglect Fatalities'
+    publisher: Commission to Eliminate Child Abuse and Neglect Fatalities (US)
+    year: '2016'
+    url: https://www.azcourts.gov/Portals/0/46/Reading%20List/CECANF%20Final%20Report.pdf
+    locator: Chapter on data and the undercount
+    quote: Yet a peer-reviewed study of fatal child maltreatment in three states that reviewed multiple
+      sources of data on child deaths found that state child welfare records undercount child fatalities
+      from maltreatment by 55-76 percent.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A state reports far fewer maltreatment deaths to the federal system than its own child death review
+    team counts.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - NCANDS / Child Maltreatment annual report
+  - State child death review team reports
+  - Vital statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agencies define maltreatment deaths differently and some deaths are classified only after court cases
+    end.
+  - Nearly half of states report only children already known to CPS, so the gap may come from the reporting
+    rule rather than concealment.
+  jurisdictions: US
+  version: 1
+- id: CP-004
+  name: Statutory child-protection process not started at key moments
+  definition: Agencies dealt with signs of serious harm through single-agency or informal work instead
+    of starting formal multi-agency child-protection enquiries.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'Child Protection in England: National review (May 2022)'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1078488/ALH_SH_National_Review_26-5-22.pdf
+    locator: Key findings
+    quote: A lack of robust critical thinking and challenge within and between agencies, compounded by
+      a failure to trigger statutory multi-agency child protection processes at a number of key moments.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Bruising reported by relatives is followed by a single social worker home visit, with no strategy
+    discussion or section 47 enquiry.
+  cases:
+  - name: National review of two child murders in Solihull and Bradford
+    year: '2022'
+    jurisdiction: England
+    what_happened: The national Panel found failures to trigger statutory multi-agency child-protection
+      processes, weak information sharing, and wider family members who were not listened to.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1078488/ALH_SH_National_Review_26-5-22.pdf
+    source_title: 'Child Protection in England: National review (May 2022)'
+  data_needed:
+  - Event
+  - Document
+  - PublicBody
+  - Person
+  checkable: records
+  lookup_sources:
+  - Local child safeguarding practice reviews
+  - Serious case reviews
+  - Inspection reports (Ofsted)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Professionals may judge, on the information they had, that the threshold for formal enquiries was
+    not met.
+  - Hindsight makes earlier moments look clearer than they were.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-005
+  name: Risk assessments not updated as circumstances change
+  definition: An early risk assessment stayed in use after the family's situation changed, for example
+    when a new adult arrived or parental problems got worse.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.30, Theme 4 'Responding to changing risk and need'
+    quote: In many cases, initial assessments of risk have not been reviewed and updated in response to
+      changing circumstances or taken sufficient account of the potential risk to children arising from
+      known information about factors such as parental mental health concerns, adverse childhood experiences
+      or criminality.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A case plan written before a parent's relapse is still the operative assessment months later.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - Person
+  checkable: records
+  lookup_sources:
+  - Case reviews
+  - Court bundles in care proceedings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some changes are not known to the agency.
+  - Assessments may have been reviewed informally without a written update.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-006
+  name: Information not shared between agencies
+  definition: Agencies each held part of the picture (siblings, domestic abuse, substance misuse, mental
+    health) but did not share it, so no one saw the full risk.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.31, Theme 5 'Sharing information in a timely and appropriate way'
+    quote: Lack of appropriate and timely sharing of information (particularly about siblings, domestic
+      violence, substance misuse and mental health concerns) means that the nature of risk to the child
+      is not recognised or acted upon.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Child Protection in England: National review (May 2022)'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1078488/ALH_SH_National_Review_26-5-22.pdf
+    locator: Key findings
+    quote: 'These are: • Weaknesses in information sharing and seeking within and between agencies.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Health records showing a parent's earlier mental health crisis were not accessed at booking, so alerts
+    to the GP never triggered.
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  - Person
+  checkable: records
+  lookup_sources:
+  - Case reviews
+  - Inquest records
+  - Inspection reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Data-protection rules and incompatible IT systems limit sharing even when staff act in good faith.
+  - Information may have been shared verbally without a record.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-007
+  name: 'Avoidant family engagement: missed appointments and cancelled visits'
+  definition: A family repeatedly misses appointments, cancels home visits or blocks contact, and agencies
+    do not follow up firmly.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.28, Theme 2
+    quote: Missed appointments, blocking of communications and cancelled visits are all indications of
+      avoidant behaviour and require proactive follow-up.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Child abuse and neglect (NICE guideline NG76)
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2017'
+    url: https://www.nice.org.uk/guidance/ng76/chapter/Recommendations
+    locator: Recommendation 1.2.4
+    quote: 'Recognise the following as vulnerability factors for recurring or persistent child abuse and
+      neglect: The parent or carer does not engage with services.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Case notes show five 'no access' visits in two months with no escalation.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - Case records
+  - Health visiting records
+  - School attendance records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The Panel notes non-engagement can reflect trauma, poverty or too many professionals rather than concealment.
+  - Work, illness, transport or language barriers cause missed appointments.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-008
+  name: '''Disguised compliance'' and parental self-report accepted without checking'
+  definition: Professionals accept a parent's account of change or cooperation without checking it against
+    other agencies' information.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.29, Theme 3
+    quote: Positive self-reports of change need to be considered alongside reports and information from
+      other practitioners.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.28, Theme 2
+    quote: This is sometimes characterised as ‘disguised compliance’ or ‘resistance’.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A parent's statement that drug use had stopped was recorded as fact despite concerns from the children's
+    centre.
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Event
+  checkable: records
+  lookup_sources:
+  - Case reviews
+  - Care proceedings judgments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many parents' self-reports are true; building trust sometimes means accepting them at first.
+  - The Panel itself warns that the label 'disguised compliance' can be misused.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-009
+  name: Lack of professional curiosity and over-optimism
+  definition: Assessments rest on the same hopeful assumptions for years while risk continues or grows.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.29, Theme 3 'Critical thinking and challenge'
+    quote: Reviews frequently highlight a lack of ‘professional curiosity’ and ‘over optimism’.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Low-level neglect incidents were each explained away rather than considered together.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Case reviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Strength-based practice deliberately looks for positives.
+  - Outcomes are often judged with hindsight.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-010
+  name: Concerns not escalated; professional disagreement left unresolved
+  definition: Staff disagreed with a decision, or knew of an escalation procedure, but did not use it.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.29, Theme 3
+    quote: Practitioners are often aware of escalation protocols but reluctant to invoke them.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A school's disagreement with closing a case is recorded in minutes but never escalated.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Meeting minutes
+  - Case reviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Disagreements can be resolved informally.
+  - The other professional may have been right.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-011
+  name: Case closed or stepped down without evidence that risk had fallen
+  definition: A child-protection or child-in-need case is closed or downgraded even though records show
+    no evidence that risk had gone down.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.29, Theme 3
+    quote: Decisions to close cases, step down, or maintain at the same level need to be based on evidence
+      of the positive impact of previous interventions or reducing risk.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A case was closed while housing remained the only focus and other safeguarding issues had emerged.
+  cases: []
+  data_needed:
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Case records
+  - Case reviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Families do improve, and closing cases is meant to happen.
+  - Evidence of improvement may not be written down.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-012
+  name: Cumulative neglect treated as separate incidents
+  definition: Repeated low-level neglect is handled one incident at a time, so its build-up and combined
+    effect are missed.
+  areas:
+  - CP
+  typology: Neglect
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.20, box 'Recognising and responding to neglect'
+    quote: Learning from practice reviews indicates that the recognition of cumulative neglect and its
+      impact continues to be a key challenge for practitioners, with incidents of neglect too often treated
+      in isolation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated school reports of a hungry, poorly dressed child are logged separately for two years.
+  cases: []
+  data_needed:
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - Case reviews
+  - School and health records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poverty and poor housing produce the same signs without neglectful parenting; the Panel warns that
+    professionals can become desensitised to poverty rather than treat it as neglect.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-013
+  name: New male carer or adult in the household not assessed
+  definition: A new partner or other adult joined the child's household, and agencies did not find out
+    or assess his history and role.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.30, Theme 4
+    quote: The role of fathers/adult males is not sufficiently understood or taken into account in assessing
+      risk.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Professionals knew of a mother's new partner with a history of court-restricted contact with his own
+    children, but no one assessed him.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Address
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court records
+  - Address and electoral records
+  - Prior care proceedings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: The Panel links fathers and male carers to non-accidental injury cases.
+    source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  innocent_explanations:
+  - Most new partners pose no risk.
+  - Families are not required to tell agencies about new relationships.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-014
+  name: Wider family's concerns dismissed or treated as malicious
+  definition: Grandparents, relatives or other referrers repeatedly raise concerns, and agencies dismiss
+    them or label them malicious without a full assessment.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'Child Protection in England: National review (May 2022)'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2022'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1078488/ALH_SH_National_Review_26-5-22.pdf
+    locator: Recommendations to safeguarding partners
+    quote: No referral is deemed malicious without a full and thorough multi-agency assessment, including
+      talking with the referrer, and agreement with the appropriate manager
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Repeated calls from a grandparent about bruising are recorded as a family dispute.
+  cases:
+  - name: National review of two child murders in Solihull and Bradford
+    year: '2022'
+    jurisdiction: England
+    what_happened: The review found that in both cases wider family members' concerns were not listened
+      to.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1078488/ALH_SH_National_Review_26-5-22.pdf
+    source_title: 'Child Protection in England: National review (May 2022)'
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Case reviews
+  - Interviews with referrers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some referrals do come from custody disputes or grudges.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-015
+  name: Child's daily life and views not understood; child not seen alone
+  definition: Professionals never find out what daily life is like for the child, or speak to the child
+    only in front of the carers.
+  areas:
+  - CP
+  typology: Agency failure
+  status: verified
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.27, Theme 1
+    quote: The complexity of situations in vulnerable families can lead to a particular focus on parental
+      needs, which can get in the way of professionals understanding risks faced by the children.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Child abuse and neglect (NICE guideline NG76)
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2017'
+    url: https://www.nice.org.uk/guidance/ng76/chapter/Recommendations
+    locator: Recommendation 1.3.36
+    quote: Consider child abuse and neglect if a parent or carer refuses to allow a child or young person
+      to speak to a practitioner on their own when it is necessary for the assessment of the child or
+      young person.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A child in kinship care gave positive views at every review, always in front of her carers, and changes
+    in her behaviour were not recognised as distress.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Case records
+  - Looked-after-child review records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Very young children cannot be interviewed alone, and some children refuse to be.
+  jurisdictions: England (principle general)
+  version: 1
+- id: CP-016
+  name: Drift, delay, high caseloads and staff turnover
+  definition: Assessments and decisions are delayed, and caseloads, vacancies or turnover are high enough
+    to stop direct work with families.
+  areas:
+  - CP
+  typology: Systemic failure
+  status: pending
+  sources:
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.32, Theme 6
+    quote: Funding constraints, high levels of vacancies and turnover, and high caseloads can make it
+      more difficult for practitioners to sustain the direct work on cases to make an impact.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.32, Theme 6
+    quote: Drift and delay in completing assessments and decision making are common features in case reviews.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An agency's workforce data show high vacancy rates and caseloads well above the local standard.
+  cases:
+  - name: M.D. v. Abbott (Texas foster care class action)
+    year: '2015'
+    jurisdiction: Texas, US (federal court)
+    what_happened: A federal district court ruled for foster children in December 2015, citing unsafe
+      placements, high caseloads and inadequate investigations. In April 2024 it held the state in contempt
+      for noncompliance with remedial orders; the Fifth Circuit stayed the penalties pending appeal.
+    outcome: found_by_official_inquiry
+    outcome_verified: false
+    source_url: https://www.clearinghouse.net/detail.php?id=12435
+    source_title: 'Case: M.D. v. Abbott (Civil Rights Litigation Clearinghouse summary)'
+  data_needed:
+  - PublicBody
+  - Document
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Workforce statistics
+  - Inspection reports
+  - Court monitor reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shortages are often national and outside a local manager's control.
+  - High caseloads do not by themselves show that any child was harmed.
+  jurisdictions: England; US
+  version: 1
+- id: CP-017
+  name: 'Combined parental vulnerability factors: domestic abuse, substance misuse, mental health'
+  definition: A caregiver has several factors that NICE lists as raising vulnerability to abuse and neglect,
+    especially without family support.
+  areas:
+  - CP
+  typology: Risk factors
+  status: verified
+  sources:
+  - title: Child abuse and neglect (NICE guideline NG76)
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2017'
+    url: https://www.nice.org.uk/guidance/ng76/chapter/Recommendations
+    locator: Recommendation 1.2.3
+    quote: 'Recognise that the following parental factors increase vulnerability to child abuse and neglect,
+      and that these may be compounded if the parent or carer lacks support from family or friends: Substance
+      misuse problems. A history of domestic abuse , including sexual violence or exploitation.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.30, Theme 4
+    quote: Concerns about domestic abuse, parental mental health concerns and substance misuse are not
+      sufficiently taken into account in assessing risks to children.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Police domestic-abuse call-outs to an address where a baby lives are not linked to the child's health-visitor
+    record.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Event
+  - CourtCase
+  - Address
+  checkable: records
+  lookup_sources:
+  - Police call logs
+  - Court records (protective orders)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most parents with these difficulties do not abuse their children; these are population risk factors,
+    not evidence.
+  - Using them to judge individuals risks stigma.
+  jurisdictions: UK (general)
+  version: 1
+- id: CP-018
+  name: Previous abuse, neglect or removal of a child in the family
+  definition: The family had earlier episodes of abuse or neglect, or a previous child had been taken
+    into care.
+  areas:
+  - CP
+  typology: Risk factors
+  status: verified
+  sources:
+  - title: Child abuse and neglect (NICE guideline NG76)
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2017'
+    url: https://www.nice.org.uk/guidance/ng76/chapter/Recommendations
+    locator: Recommendation 1.2.4
+    quote: There have been 1 or more previous episodes of child abuse or neglect.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'The Child Safeguarding Practice Review Panel: Annual Report 2020'
+    publisher: Child Safeguarding Practice Review Panel (England)
+    year: '2021'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+    locator: p.30, Theme 4
+    quote: This goes beyond the immediate presentation and takes account of any prior involvement with
+      the family (for example if a previous child had been taken into care).
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A pre-birth assessment was deferred even though an older sibling had been removed.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Family court records
+  - Case reviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Parents can and do change; a past removal does not settle a new case.
+  jurisdictions: UK (general)
+  version: 1
+- id: CP-019
+  name: Injury with an absent, conflicting or unsuitable explanation
+  definition: A child's injury comes with no explanation, or one that does not fit the injury, the child's
+    age or development, or that changes between carers or over time.
+  areas:
+  - CP
+  typology: Physical abuse
+  status: verified
+  sources:
+  - title: 'Child maltreatment: when to suspect maltreatment in under 18s (NICE guideline CG89)'
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2009'
+    url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+    locator: 'Terms used: ''Unsuitable explanation'''
+    quote: 'For the purposes of this guidance, an unsuitable explanation for an injury or presentation
+      is one that is implausible, inadequate or inconsistent: with the child or young person''s presentation
+      normal activities existing medical condition age or developmental stage account compared to that
+      given by parent and carers between parents or carers between accounts over time.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is Child Abuse and Neglect? Recognizing the Signs and Symptoms
+    publisher: Child Welfare Information Gateway (US HHS, Children's Bureau)
+    year: '2019'
+    url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+    locator: PDF p.6, 'Signs of physical abuse'
+    quote: Offers conflicting, unconvincing, or no explanation for the child's injury or provides an explanation
+      that is not consistent with the injury
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Court records show carers gave three different accounts of how a toddler's arm was broken.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court judgments
+  - Medical evidence in care proceedings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: Changing explanations for a child's fatal injuries are also a homicide-investigation signal.
+    source_url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+  innocent_explanations:
+  - Carers may not have seen an accident happen.
+  - Medical conditions (bleeding disorders, brittle bones) can produce injuries that look inflicted; NICE
+    requires them to be ruled out.
+  jurisdictions: UK, US
+  version: 1
+- id: CP-020
+  name: Injuries to a baby who is not yet mobile, or serious injuries in a very young child
+  definition: Bruises, burns, fractures or head injuries in a child who cannot yet move about on their
+    own, or head injury in a child under 3 with no accident or medical cause.
+  areas:
+  - CP
+  typology: Physical abuse
+  status: verified
+  sources:
+  - title: 'Child maltreatment: when to suspect maltreatment in under 18s (NICE guideline CG89)'
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2009'
+    url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+    locator: Recommendation 1.1.2 (examples)
+    quote: 'Examples include: bruising in a child who is not independently mobile multiple bruises or
+      bruises in clusters bruises of a similar shape and size'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Child maltreatment: when to suspect maltreatment in under 18s (NICE guideline CG89)'
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2009'
+    url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+    locator: Recommendation 1.1.10
+    quote: 'Suspect child maltreatment if a child has an intracranial injury in the absence of major confirmed
+      accidental trauma or known medical cause, in one or more of the following circumstances: the explanation
+      is absent or unsuitable the child is aged under 3 years'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A care-proceedings judgment records multiple fractures in a pre-mobile infant.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Family court judgments
+  - Criminal trial records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Intracranial injury with no accidental or medical cause in a child aged under 3 (NICE CG89
+      1.1.10), or bruising in a child who is not independently mobile (1.1.2)
+    threshold_source: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+  threshold_verified: true
+  cross_hints:
+  - target_area: HO
+    reason: HO-033 covers infant death scenes; non-accidental injury in under-ones is a major category
+      of harm notified to the Panel.
+    source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  innocent_explanations:
+  - Birth injuries, coagulation disorders, osteogenesis imperfecta and other conditions can explain these
+    findings; NICE names exclusions.
+  - Contested medical evidence is common in these cases.
+  jurisdictions: UK (clinical guidance)
+  version: 1
+- id: CP-021
+  name: Delay in seeking medical help, or failure to get treatment
+  definition: Carers wait to get help for an injury or illness, or fail to get or give essential treatment,
+    so the child's health suffers.
+  areas:
+  - CP
+  typology: Neglect
+  status: verified
+  sources:
+  - title: Child abuse and neglect (NICE guideline NG76)
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2017'
+    url: https://www.nice.org.uk/guidance/ng76/chapter/Recommendations
+    locator: Recommendation 1.3.39
+    quote: Consider neglect if parents or carers fail to administer essential prescribed treatment for
+      their child.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Child maltreatment: when to suspect maltreatment in under 18s (NICE guideline CG89)'
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2009'
+    url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+    locator: Recommendation 1.1.13
+    quote: Suspect child maltreatment if a child has an intra-abdominal or intrathoracic injury in the
+      absence of major confirmed accidental trauma and there is an absent or unsuitable explanation ,
+      or a delay in presentation.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is Child Abuse and Neglect? Recognizing the Signs and Symptoms
+    publisher: Child Welfare Information Gateway (US HHS, Children's Bureau)
+    year: '2019'
+    url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+    locator: PDF p.5, general signs (child)
+    quote: Has not received help for physical or medical problems brought to the parents' attention
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hospital records show a child brought in days after an injury.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Medical records in court bundles
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cost, lack of insurance, distance and distrust of services delay care.
+  - Symptoms can look minor at first.
+  jurisdictions: UK, US
+  version: 1
+- id: CP-022
+  name: Child repeatedly not brought to essential health appointments
+  definition: Carers repeatedly fail to bring a child to follow-up appointments or health programmes the
+    child needs.
+  areas:
+  - CP
+  typology: Neglect
+  status: verified
+  sources:
+  - title: 'Child maltreatment: when to suspect maltreatment in under 18s (NICE guideline CG89)'
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2009'
+    url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+    locator: Recommendation 1.3.10
+    quote: Consider neglect if parents or carers repeatedly fail to bring their child to follow-up appointments
+      that are essential for their child's health and wellbeing.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A child with a chronic condition misses most specialist appointments over a year.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Health records (with consent or via court)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transport, work, other children and confusing letters cause missed appointments.
+  jurisdictions: UK
+  version: 1
+- id: CP-023
+  name: 'Persistent failure of basic provision: food, hygiene, safe home, clothing'
+  definition: There are repeated reports that the child lacks food, hygiene, adequate clothing or a safe
+    place to live, in matters the carers control.
+  areas:
+  - CP
+  typology: Neglect
+  status: verified
+  sources:
+  - title: 'Child maltreatment: when to suspect maltreatment in under 18s (NICE guideline CG89)'
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2009'
+    url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+    locator: Recommendation 1.3.4
+    quote: 'Suspect neglect if you repeatedly observe or hear reports of any of the following in the home
+      that is in the parents'' or carers'' control: a poor standard of hygiene that affects a child''s
+      health inadequate provision of food a living environment that is unsafe for the child''s developmental
+      stage.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is Child Abuse and Neglect? Recognizing the Signs and Symptoms
+    publisher: Child Welfare Information Gateway (US HHS, Children's Bureau)
+    year: '2019'
+    url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+    locator: PDF p.6, 'Signs of neglect'
+    quote: Begs or steals food or money
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A school logs a child arriving hungry and without a coat through the winter.
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - School records
+  - Housing inspection records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poverty, homelessness and poor housing produce these signs; NICE limits the indicator to matters within
+    the carers' control.
+  jurisdictions: UK, US
+  version: 1
+- id: CP-024
+  name: Child shows general signs of maltreatment reported by school or others
+  definition: A child shows signs the US Children's Bureau lists for general maltreatment, such as fear
+    of going home, frequent absence or sudden changes in behaviour.
+  areas:
+  - CP
+  typology: Child signs
+  status: verified
+  sources:
+  - title: What Is Child Abuse and Neglect? Recognizing the Signs and Symptoms
+    publisher: Child Welfare Information Gateway (US HHS, Children's Bureau)
+    year: '2019'
+    url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+    locator: PDF p.5, general signs (child)
+    quote: Comes to school or other activities early, stays late, and does not want to go home
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is Child Abuse and Neglect? Recognizing the Signs and Symptoms
+    publisher: Child Welfare Information Gateway (US HHS, Children's Bureau)
+    year: '2019'
+    url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+    locator: PDF p.6, 'Signs of physical abuse'
+    quote: Has fading bruises or other noticeable marks after an absence from school
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Child abuse and neglect (NICE guideline NG76)
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2017'
+    url: https://www.nice.org.uk/guidance/ng76/chapter/Recommendations
+    locator: Recommendation 1.3.17
+    quote: Consider child abuse and neglect if a child or young person has run away from home or care,
+      or is living in alternative accommodation without the full agreement of their parents or carers.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Records show a pattern of absences followed by visible marks, and a child reluctant to go home.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Case records and court judgments only; journalists should not assess children directly
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The Gateway states that these signs do not necessarily mean a child is being maltreated and that there
+    may be other causes; it advises concern mainly when several signs appear or they recur.
+  - Neurodevelopmental conditions, bereavement or parental separation can cause the same behaviour (NICE
+    NG76).
+  jurisdictions: US, UK
+  version: 1
+- id: CP-025
+  name: 'Caregiver attitudes linked to abuse: rejecting the child, harsh discipline, indifference'
+  definition: A caregiver treats the child as entirely bad or a burden, asks for or uses harsh physical
+    discipline, or shows little concern for the child.
+  areas:
+  - CP
+  typology: Caregiver signs
+  status: verified
+  sources:
+  - title: What Is Child Abuse and Neglect? Recognizing the Signs and Symptoms
+    publisher: Child Welfare Information Gateway (US HHS, Children's Bureau)
+    year: '2019'
+    url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+    locator: PDF p.5, general signs (parent)
+    quote: Asks teachers or other caregivers to use harsh physical discipline if the child misbehaves
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: What Is Child Abuse and Neglect? Recognizing the Signs and Symptoms
+    publisher: Child Welfare Information Gateway (US HHS, Children's Bureau)
+    year: '2019'
+    url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+    locator: PDF p.5, general signs (parent)
+    quote: Sees the child as entirely bad, worthless, or burdensome
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Testimony in a criminal trial shows a carer describing the child as 'evil' and demanding physical
+    punishment at school.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - CourtCase
+  checkable: person
+  lookup_sources:
+  - Court transcripts
+  - School records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Parents under stress say harsh things without abusing their children; a single remark is not a pattern.
+  jurisdictions: US
+  version: 1
+- id: CP-026
+  name: Reported illness that does not match the clinical picture (fabricated or induced illness)
+  definition: A child's reported symptoms or history do not match any recognised medical picture, for
+    example appearing only when one carer is present.
+  areas:
+  - CP
+  typology: Fabricated or induced illness
+  status: verified
+  sources:
+  - title: 'Child maltreatment: when to suspect maltreatment in under 18s (NICE guideline CG89)'
+    publisher: National Institute for Health and Care Excellence (UK)
+    year: '2009'
+    url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+    locator: Recommendation 1.2.11
+    quote: Consider fabricated or induced illness if a child's history, physical or psychological presentations
+      or findings of assessments, examinations or investigations leads to a discrepancy with a recognised
+      clinical picture.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Medical records show many hospital admissions and tests with no confirmed diagnosis, and symptoms
+    seen only by one parent.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Family court judgments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rare and poorly understood conditions produce puzzling presentations; anxious parents seek repeated
+    opinions; wrongful suspicion causes severe harm to families.
+  jurisdictions: UK
+  version: 1
+- id: CP-027
+  name: Children missing from foster care not reported to NCMEC within 24 hours
+  definition: A state child-welfare agency fails to report a child missing from foster care to the National
+    Center for Missing and Exploited Children on time, or at all.
+  areas:
+  - CP
+  typology: Foster care
+  status: verified
+  sources:
+  - title: State Agencies Did Not Always Ensure That Children Missing From Foster Care Were Reported to
+      the National Center for Missing and Exploited Children in Accordance With Federal Requirements (A-07-21-06102)
+    publisher: US HHS Office of Inspector General
+    year: '2023'
+    url: https://oig.hhs.gov/reports/all/2023/state-agencies-did-not-always-ensure-that-children-missing-from-foster-care-were-reported-to-the-national-center-for-missing-and-exploited-children-in-accordance-with-federal-requirements
+    locator: Report summary
+    quote: within 24 hours after the State agency received information that the child was missing)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A state's missing-from-care log shows episodes with no matching NCMEC report.
+  cases:
+  - name: HHS OIG audit of state reporting of missing foster children
+    year: '2023'
+    jurisdiction: US
+    what_happened: OIG found that, of 100 sampled episodes, 45 were never reported to NCMEC and 22 were
+      reported late, and estimated that 51,115 of 74,353 episodes were not reported as required.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://oig.hhs.gov/reports/all/2023/state-agencies-did-not-always-ensure-that-children-missing-from-foster-care-were-reported-to-the-national-center-for-missing-and-exploited-children-in-accordance-with-federal-requirements
+    source_title: HHS OIG A-07-21-06102
+  data_needed:
+  - Person
+  - PublicBody
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - HHS OIG audits
+  - State missing-from-care data (records requests)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Not reported to NCMEC within 24 hours of the agency learning the child was missing (federal
+      requirement as stated by HHS OIG)
+    threshold_source: https://oig.hhs.gov/reports/all/2023/state-agencies-did-not-always-ensure-that-children-missing-from-foster-care-were-reported-to-the-national-center-for-missing-and-exploited-children-in-accordance-with-federal-requirements
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Children missing from care are at risk of trafficking; the federal rule on reporting to NCMEC
+      sits within child sex-trafficking prevention law.
+    source_url: https://oig.hhs.gov/reports/all/2023/state-agencies-did-not-always-ensure-that-children-missing-from-foster-care-were-reported-to-the-national-center-for-missing-and-exploited-children-in-accordance-with-federal-requirements
+  innocent_explanations:
+  - A child may return within hours, and agencies sometimes record episodes late for administrative reasons.
+  jurisdictions: US
+  version: 1
+- id: CP-028
+  name: Children in care placed in unregistered or illegal homes
+  definition: A local authority places a child in care in accommodation that is not registered with the
+    regulator, often at high cost to private providers.
+  areas:
+  - CP
+  typology: Foster and residential care
+  status: verified
+  sources:
+  - title: Illegal Children’s Homes
+    publisher: Children's Commissioner for England
+    year: '2024'
+    url: https://assets.childrenscommissioner.gov.uk/wpuploads/2024/12/cco-illegal-childrens-homes.pdf
+    locator: Foreword
+    quote: I have found that 775 children were in unregistered accommodation on 1st September this year
+      but I strongly believe the total number of children impacted by this issue is much higher.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Illegal Children’s Homes
+    publisher: Children's Commissioner for England
+    year: '2024'
+    url: https://assets.childrenscommissioner.gov.uk/wpuploads/2024/12/cco-illegal-childrens-homes.pdf
+    locator: Foreword
+    quote: Altogether, the estimated yearly cost of unregistered placements to English local authorities
+      is almost £440 million, much of which goes to private profit.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Council spending data show large weekly payments to a provider with no Ofsted registration.
+  cases:
+  - name: Children's Commissioner review of illegal children's homes
+    year: '2024'
+    jurisdiction: England
+    what_happened: The Commissioner found 775 children in unregistered accommodation on one day, almost
+      a third under court-ordered Deprivation of Liberty orders, at an estimated yearly cost of almost
+      £440 million.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://assets.childrenscommissioner.gov.uk/wpuploads/2024/12/cco-illegal-childrens-homes.pdf
+    source_title: Illegal Children’s Homes
+  data_needed:
+  - Company
+  - PublicBody
+  - Payment
+  - Contract
+  - Address
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Ofsted register of children's homes
+  - Council spending data (over £500)
+  - Companies House
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Councils use unregistered placements in emergencies when no registered place exists; some are registering
+    at the time.
+  - Supported accommodation for over-16s follows different rules.
+  jurisdictions: England
+  version: 1
+- id: CP-029
+  name: High rates of psychotropic prescribing to children in foster care
+  definition: Foster children are prescribed psychiatric medication more often than other children, including
+    several drugs at the same time, with weak oversight.
+  areas:
+  - CP
+  typology: Foster care
+  status: verified
+  sources:
+  - title: 'Foster Children: Additional Federal Guidance Could Help States Better Plan for Oversight of
+      Psychotropic Medications Administered by Managed-Care Organizations (GAO-14-651T)'
+    publisher: US Government Accountability Office
+    year: '2014'
+    url: https://www.gao.gov/products/gao-14-651t
+    locator: Summary
+    quote: about 13 percent took three or more psychotropic medications concurrently
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - State Medicaid data show foster children prescribed antipsychotics at several times the rate of other
+    children on Medicaid.
+  cases:
+  - name: GAO review of psychotropic drugs for foster children
+    year: '2014'
+    jurisdiction: US
+    what_happened: GAO reported that foster children in five states were prescribed psychotropic medications
+      at higher rates than non-foster children in Medicaid, and that about 13 percent of those on such
+      drugs took three or more at once.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.gao.gov/products/gao-14-651t
+    source_title: GAO-14-651T
+  data_needed:
+  - Person
+  - PublicBody
+  - Company
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - State Medicaid prescribing data
+  - GAO and HHS OIG reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Children in care have high rates of trauma and mental health need, so higher prescribing can be clinically
+    appropriate.
+  jurisdictions: US
+  version: 1
+- id: CP-030
+  name: Medical emergencies dismissed as 'faking' by untrained staff
+  definition: Staff in a residential or wilderness programme treat a young person's signs of serious illness
+    as manipulation and do not get medical help.
+  areas:
+  - CP
+  typology: Residential and troubled-teen programmes
+  status: verified
+  sources:
+  - title: 'Residential Treatment Programs: Concerns Regarding Abuse and Death in Certain Programs for
+      Troubled Youth (GAO-08-146T)'
+    publisher: US Government Accountability Office
+    year: '2007'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+    locator: Untrained staff
+    quote: Rather than recognizing the signs of dehydration, heat stroke, or illness, staff assumed that
+      a dying teen was in fact attempting to use trickery to get out of the program.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An incident log shows a participant reporting dizziness and vomiting for days, with staff noting he
+    was 'faking'.
+  cases:
+  - name: Arizona boot camp death (GAO-08-146T case)
+    year: '2005'
+    jurisdiction: Arizona, US
+    what_happened: A 14-year-old died of dehydration in 2001 after being forced into desert heat. GAO
+      reports that the programme's founder was convicted in 2005 of felony reckless manslaughter and aggravated
+      assault.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+    source_title: GAO-08-146T
+  data_needed:
+  - Organization
+  - Person
+  - Employment
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - State licensing inspection reports
+  - Coroner and autopsy records
+  - Civil suits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some young people do feign illness; staff must make quick judgements in remote places.
+  jurisdictions: US
+  version: 1
+- id: CP-031
+  name: Food withheld or inadequate nourishment in a programme
+  definition: A programme restricts food as punishment or treatment while requiring hard physical activity.
+  areas:
+  - CP
+  typology: Residential and troubled-teen programmes
+  status: verified
+  sources:
+  - title: 'Residential Treatment Programs: Concerns Regarding Abuse and Death in Certain Programs for
+      Troubled Youth (GAO-08-146T)'
+    publisher: US Government Accountability Office
+    year: '2007'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+    locator: Lack of adequate nourishment
+    quote: One program fed teenagers an apple for breakfast, a carrot for lunch, and a bowl of beans for
+      dinner while requiring extensive physical activity in harsh conditions.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Former participants and menus show calorie restriction used as a consequence.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Licensing inspection reports
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some programmes use simple field diets that are nutritionally adequate; check the quantity and the
+    activity load.
+  jurisdictions: US
+  version: 1
+- id: CP-032
+  name: 'Reckless operations: unscouted terrain, no radios or first aid'
+  definition: A programme takes young people into remote or dangerous settings without scouting the route,
+    communications, medical kit or required staffing.
+  areas:
+  - CP
+  typology: Residential and troubled-teen programmes
+  status: verified
+  sources:
+  - title: 'Residential Treatment Programs: Concerns Regarding Abuse and Death in Certain Programs for
+      Troubled Youth (GAO-08-146T)'
+    publisher: US Government Accountability Office
+    year: '2007'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+    locator: Reckless or negligent operating practices
+    quote: In at least two cases, program staff set out to lead hikes in unfamiliar territory that they
+      had not scouted in advance.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A licence inspection notes that groups carry no medical equipment, against the licence terms.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - Event
+  - Address
+  checkable: records
+  lookup_sources:
+  - State licensing files
+  - Federal land-use permits (programmes on federal land)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Wilderness trips involve inherent risk; an accident does not by itself show negligence.
+  jurisdictions: US
+  version: 1
+- id: CP-033
+  name: Unlicensed programme, or operating outside its licence or accreditation
+  definition: A youth programme operates without a state licence, in a state where it is not licensed,
+    or outside what its licence or accreditation covers.
+  areas:
+  - CP
+  typology: Residential and troubled-teen programmes
+  status: verified
+  sources:
+  - title: 'Residential Treatment Programs: Concerns Regarding Abuse and Death in Certain Programs for
+      Troubled Youth (GAO-08-146T)'
+    publisher: US Government Accountability Office
+    year: '2007'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+    locator: Background; case 8
+    quote: For example, while states often regulate publicly funded programs, a number of states do not
+      license or otherwise regulate private programs.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Residential Treatment Programs: Concerns Regarding Abuse and Death in Certain Programs for
+      Troubled Youth (GAO-08-146T)'
+    publisher: US Government Accountability Office
+    year: '2007'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+    locator: Case 8
+    quote: Although it claimed to be accredited by the Joint Commission on Heath Care Organizations, this
+      accreditation covered only the base program--not the wilderness program or its drug and alcohol
+      component in which the victim participated.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A programme run from one state operates trips in another state where it holds no licence.
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Address
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - State licensing databases
+  - Accreditation body directories
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some states do not require a licence for certain programme types, so being unlicensed may be legal.
+  - Accreditation can lawfully cover only part of an organisation.
+  jurisdictions: US
+  version: 1
+- id: CP-034
+  name: False claims about staff expertise, safety record, services or admissions
+  definition: A programme or its marketing makes claims about staff training, therapy, safety or admissions
+    that are false or misleading.
+  areas:
+  - CP
+  typology: Residential and troubled-teen programmes
+  status: verified
+  sources:
+  - title: 'Residential Treatment Programs: Concerns Regarding Abuse and Death in Certain Programs for
+      Troubled Youth (GAO-08-146T)'
+    publisher: US Government Accountability Office
+    year: '2007'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+    locator: Case 1
+    quote: Although the program brochure claimed that counselors were "highly trained survival experts,"
+      they did not recognize the signs of dehydration when she began complaining of blurred vision, stumbling,
+      and vomiting water 3 days into a hike.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Residential Programs: Selected Cases of Death, Abuse, and Deceptive Marketing (GAO-08-713T)'
+    publisher: US Government Accountability Office
+    year: '2008'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-713T/html/GAOREPORTS-GAO-08-713T.htm
+    locator: Deceptive marketing
+    quote: Deceptive marketing included potential fraud, false statements, and misleading representations
+      related to a range of issues including tax deductions, education, and admissions policies.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A programme marketed as therapeutic has no suicide-prevention plan and an owner without therapy training
+    (GAO-08-146T case 5).
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Professional licence lookups
+  - Archived websites
+  - State consumer protection complaints
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Marketing copy can be out of date rather than deliberately false.
+  - Credential terms vary between states.
+  jurisdictions: US
+  version: 1
+- id: CP-035
+  name: Undisclosed conflict of interest between referral service and programme
+  definition: A 'neutral' referral service or educational consultant sends families to a programme it
+    is tied to, without saying so.
+  areas:
+  - CP
+  typology: Residential and troubled-teen programmes
+  status: verified
+  sources:
+  - title: 'Residential Programs: Selected Cases of Death, Abuse, and Deceptive Marketing (GAO-08-713T)'
+    publisher: US Government Accountability Office
+    year: '2008'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-713T/html/GAOREPORTS-GAO-08-713T.htm
+    locator: Deceptive marketing examples
+    quote: Investigative work revealed that the owner of the referral service is married to the owner
+      of the boot camp, but this relationship was never disclosed during the call, raising the issue of
+      conflict of interest.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Three calls describing different children are all referred to the same boot camp.
+  cases:
+  - name: GAO covert test of referral services (Missouri boot camp)
+    year: '2008'
+    jurisdiction: US
+    what_happened: GAO posed as parents; a referral service recommended the same Missouri boot camp three
+      times and its owner was married to the boot camp's owner, which was not disclosed.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-713T/html/GAOREPORTS-GAO-08-713T.htm
+    source_title: GAO-08-713T
+  data_needed:
+  - Company
+  - Person
+  - Family
+  - Ownership
+  - Directorship
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Marriage and property records
+  - Nonprofit filings (Form 990)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Consultants may favour a programme they know well; a link may be disclosed in writing even if not
+    in a call.
+  jurisdictions: US
+  version: 1
+- id: CP-036
+  name: Restraint and seclusion in youth facilities, including face-down restraint
+  definition: A youth facility uses physical restraint or seclusion, including face-down holds, that oversight
+    bodies have linked to abuse and deaths.
+  areas:
+  - CP
+  typology: Residential and troubled-teen programmes
+  status: verified
+  sources:
+  - title: 'Warehouses of Neglect: How Taxpayers Are Funding Systemic Abuse in Youth Residential Treatment
+      Facilities (press release)'
+    publisher: US Senate Committee on Finance
+    year: '2024'
+    url: https://finance.senate.gov/chairmans-news/wyden-investigation-exposes-systemic-taxpayer-funded-child-abuse-and-neglect-in-youth-residential-treatment-facilities
+    locator: Key findings
+    quote: The use of restraint and seclusion in RTFs allows for unchecked abuse.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Residential Programs: Selected Cases of Death, Abuse, and Deceptive Marketing (GAO-08-713T)'
+    publisher: US Government Accountability Office
+    year: '2008'
+    url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-713T/html/GAOREPORTS-GAO-08-713T.htm
+    locator: Case 3
+    quote: Although the Texas Department of Family and Protective Services alleged that the victim's death
+      was due to physical abuse, the official certificate of death stated that it was an accident and
+      a grand jury declined to press charges against the staff member performing the restraint.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - State incident reports show repeated restraints of the same children, and restraint-related injuries.
+  cases:
+  - name: Oregon wilderness programme restraint death (GAO-08-146T case)
+    year: '2000'
+    jurisdiction: Oregon programme, US
+    what_happened: A 15-year-old was held face down for almost 45 minutes and died of a severed neck artery;
+      the death was ruled a homicide, but a grand jury declined to indict.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+    source_title: GAO-08-146T
+  data_needed:
+  - Organization
+  - Company
+  - Event
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - State licensing incident data
+  - CMS survey reports
+  - Protection and advocacy agency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Restraint is lawful in emergencies to prevent imminent harm, and well-run facilities still record
+    some.
+  jurisdictions: US
+  version: 1
+- id: CP-037
+  name: Profit-driven youth facilities with repeated harm and weak oversight
+  definition: Publicly funded residential treatment facilities run by large operators keep receiving children
+    despite repeated harm that regulators fail to find or fix.
+  areas:
+  - CP
+  typology: Residential and troubled-teen programmes
+  status: verified
+  sources:
+  - title: 'Warehouses of Neglect: How Taxpayers Are Funding Systemic Abuse in Youth Residential Treatment
+      Facilities (press release)'
+    publisher: US Senate Committee on Finance
+    year: '2024'
+    url: https://finance.senate.gov/chairmans-news/wyden-investigation-exposes-systemic-taxpayer-funded-child-abuse-and-neglect-in-youth-residential-treatment-facilities
+    locator: Key findings
+    quote: State and federal oversight authorities fail to effectively identify and address harm to children
+      in RTFs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A facility cited in successive inspections keeps its Medicaid funding and child-welfare placements.
+  cases:
+  - name: Senate Finance Committee investigation of youth residential treatment facilities
+    year: '2024'
+    jurisdiction: US
+    what_happened: The committee examined facilities run by Universal Health Services, Acadia Healthcare,
+      Devereux Advanced Behavioral Health and Vivant Behavioral Healthcare, and reported that children
+      suffer routine harm inside RTFs.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://finance.senate.gov/chairmans-news/wyden-investigation-exposes-systemic-taxpayer-funded-child-abuse-and-neglect-in-youth-residential-treatment-facilities
+    source_title: Senate Finance Committee press release, 12 June 2024
+  data_needed:
+  - Company
+  - Ownership
+  - PublicBody
+  - Contract
+  - Payment
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - CMS inspection reports
+  - State licensing violation data
+  - SEC filings of operators
+  - Medicaid payment data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: The Senate report also found unremediated sexual abuse inside RTFs, which falls in the institutional
+      abuse area.
+    source_url: https://finance.senate.gov/chairmans-news/wyden-investigation-exposes-systemic-taxpayer-funded-child-abuse-and-neglect-in-youth-residential-treatment-facilities
+  innocent_explanations:
+  - High-need children are concentrated in a few facilities, so incident counts can reflect who is placed
+    there.
+  - Few alternative placements exist.
+  jurisdictions: US
+  version: 1
+- id: CP-038
+  name: Prior threats of abduction, hiding the child, or withholding contact
+  definition: A parent has threatened to take the child, has hidden the child before, or has withheld
+    contact from the other parent.
+  areas:
+  - CP
+  typology: Parental abduction
+  status: verified
+  sources:
+  - title: Early Identification of Risk Factors for Parental Abduction
+    publisher: US DOJ Office of Juvenile Justice and Delinquency Prevention
+    year: '2001'
+    url: https://www.ojp.gov/pdffiles1/ojjdp/185026.pdf
+    locator: Profile 1
+    quote: When a parent has made credible threats to abduct a child or has a history of hiding the child,
+      withholding visitation, or snatching the child from the other parent, there is great distrust between
+      the parents and a heightened risk of further custody violation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Custody court records show an earlier unauthorised removal and a recent threat.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - CourtCase
+  - Event
+  checkable: records
+  lookup_sources:
+  - Family court records
+  - Police reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Threats made in anger during separation are common and usually not carried out.
+  - A parent may withhold contact to protect a child from real abuse.
+  jurisdictions: US
+  version: 1
+- id: CP-039
+  name: Parent liquidating assets or cutting local ties
+  definition: A parent sells assets, takes maximum cash from credit cards, borrows, or quits work or housing
+    in ways that suggest they are preparing to leave with the child.
+  areas:
+  - CP
+  typology: Parental abduction
+  status: verified
+  sources:
+  - title: Early Identification of Risk Factors for Parental Abduction
+    publisher: US DOJ Office of Juvenile Justice and Delinquency Prevention
+    year: '2001'
+    url: https://www.ojp.gov/pdffiles1/ojjdp/185026.pdf
+    locator: Profile 1 indicators
+    quote: The parent has liquidated assets, made maximum withdrawals of funds against credit cards, or
+      borrowed money from other sources.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Property records show a quick sale shortly before a custody hearing.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - Property transfer records
+  - Court financial disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Divorce often forces asset sales, job changes and moves.
+  jurisdictions: US
+  version: 1
+- id: CP-040
+  name: Parent with strong ties abroad at the end of a cross-border relationship
+  definition: A parent who is a citizen of another country, with family support there, is separating and
+    idealises the homeland, which OJJDP lists as an abduction risk profile.
+  areas:
+  - CP
+  typology: Parental abduction
+  status: verified
+  sources:
+  - title: Early Identification of Risk Factors for Parental Abduction
+    publisher: US DOJ Office of Juvenile Justice and Delinquency Prevention
+    year: '2001'
+    url: https://www.ojp.gov/pdffiles1/ojjdp/185026.pdf
+    locator: Profile 5
+    quote: Parents who are citizens of another country (or who have dual citizenship with the United States)
+      and have strong ties to their extended family in their country of origin have long been recognized
+      as potential abductors.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A passport application for the child by one parent during a custody dispute.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Address
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Family court records
+  - Passport alert programmes (court orders)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CP
+    reason: Destination-country noncompliance (CP-043) affects whether a child taken abroad is returned.
+    source_url: https://adoption.state.gov/content/dam/NEWIPCAAssets/2025%20Annual%20Report%20on%20International%20Child%20Abduction.pdf
+  innocent_explanations:
+  - Most foreign-born parents never abduct; nationality alone must never be treated as suspicion.
+  - Visiting family abroad is normal.
+  jurisdictions: US
+  version: 1
+- id: CP-041
+  name: Fixed belief of abuse, backed by a support network
+  definition: A parent firmly believes the other parent is abusing the child, believes the authorities
+    will not act, and has supporters willing to help hide the child.
+  areas:
+  - CP
+  typology: Parental abduction
+  status: verified
+  sources:
+  - title: Early Identification of Risk Factors for Parental Abduction
+    publisher: US DOJ Office of Juvenile Justice and Delinquency Prevention
+    year: '2001'
+    url: https://www.ojp.gov/pdffiles1/ojjdp/185026.pdf
+    locator: Profile 2
+    quote: Parents who have the fixed belief that abuse has occurred—and will continue to occur—then “rescue”
+      the child, often with the help of supporters who concur with their beliefs, justify their actions,
+      and often help with the abduction and concealment.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Early Identification of Risk Factors for Parental Abduction
+    publisher: US DOJ Office of Juvenile Justice and Delinquency Prevention
+    year: '2001'
+    url: https://www.ojp.gov/pdffiles1/ojjdp/185026.pdf
+    locator: Risk-factor table, common to all profiles
+    quote: 'Common to all profiles: (1) Parent dismisses value of other parent for child, (2) child is
+      very young or vulnerable to influence, and (3) abductor has family and social support.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Online fundraising or networks offering to shelter a parent and child from a custody order.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Organization
+  - CourtCase
+  - Event
+  checkable: person
+  lookup_sources:
+  - Family court records
+  - Public fundraising pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The abuse allegation may be true; courts sometimes fail to protect children, and a protective parent's
+    fears can be justified.
+  jurisdictions: US
+  version: 1
+- id: CP-042
+  name: Contempt for court orders, or alienation from the legal system
+  definition: A parent has a long record of breaking the law and defying court orders, or feels shut out
+    of the legal system and has a support community elsewhere.
+  areas:
+  - CP
+  typology: Parental abduction
+  status: verified
+  sources:
+  - title: Early Identification of Risk Factors for Parental Abduction
+    publisher: US DOJ Office of Juvenile Justice and Delinquency Prevention
+    year: '2001'
+    url: https://www.ojp.gov/pdffiles1/ojjdp/185026.pdf
+    locator: Profile 4
+    quote: Sociopathic parents are characterized by a long history of flagrant violations of the law and
+      contempt for any authority— including that of the legal system.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Early Identification of Risk Factors for Parental Abduction
+    publisher: US DOJ Office of Juvenile Justice and Delinquency Prevention
+    year: '2001'
+    url: https://www.ojp.gov/pdffiles1/ojjdp/185026.pdf
+    locator: Profile 6
+    quote: Many subgroups of potential abductors feel alienated from the judicial system.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Court records show repeated contempt findings for breaching visitation orders.
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Event
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Criminal and family court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - OJJDP notes that some alienated parents are domestic-violence victims whom courts failed to protect.
+  jurisdictions: US
+  version: 1
+- id: CP-043
+  name: Child taken to a country cited for a pattern of noncompliance on abduction returns
+  definition: A child is taken to a country that the US State Department cites for failing to work with
+    it on returning abducted children.
+  areas:
+  - CP
+  typology: Parental abduction
+  status: verified
+  sources:
+  - title: 2025 Annual Report on International Child Abduction
+    publisher: US Department of State
+    year: '2025'
+    url: https://adoption.state.gov/content/dam/NEWIPCAAssets/2025%20Annual%20Report%20on%20International%20Child%20Abduction.pdf
+    locator: List of countries cited
+    quote: the legal and terminological definitions set forth in the Act
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A return application has been pending for over a year in a country on the noncompliance list.
+  cases:
+  - name: State Department noncompliance citations, calendar year 2024
+    year: '2025'
+    jurisdiction: International
+    what_happened: The 2025 annual report cited 15 countries, including Brazil, India, Egypt, the Republic
+      of Korea and the UAE, for a pattern of noncompliance.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://adoption.state.gov/content/dam/NEWIPCAAssets/2025%20Annual%20Report%20on%20International%20Child%20Abduction.pdf
+    source_title: 2025 Annual Report on International Child Abduction
+  data_needed:
+  - Person
+  - CourtCase
+  - PublicBody
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - State Department annual IPCA report
+  - HCCH INCADAT case law database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Country is listed in the State Department's annual report as demonstrating a pattern of
+      noncompliance
+    threshold_source: https://adoption.state.gov/content/dam/NEWIPCAAssets/2025%20Annual%20Report%20on%20International%20Child%20Abduction.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Courts abroad may lawfully refuse return under treaty exceptions, such as grave risk of harm.
+  jurisdictions: US / international
+  version: 1
+- id: CP-044
+  name: Payment or inducement linked to a birth parent giving up a child
+  definition: Money, gifts or other benefits go to birth parents or intermediaries in connection with
+    a child being given up for adoption.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 1 'Abduction', red boxes 1-3, p.31
+    quote: Sale of children for the purpose of intercountry adoption.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 7 'Consent', red box 4, p.97
+    quote: Consent is not given freely (e.g., due to inducements, pressure from society, the community
+      at large or the family, misrepresentations)
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Summary of the report of the Committee Investigating Intercountry Adoption
+    publisher: Committee Investigating Intercountry Adoption (Netherlands)
+    year: '2021'
+    url: https://bettercarenetwork.org/sites/default/files/2021-06/Summary-of-the-report-of-the-Committee-Investigating-Intercountry-Adoption.pdf
+    locator: p.15
+    quote: 'Examples of illegal activities include: corruption; making it difficult or impossible to establish
+      the origins and identity of adoptees by falsifying documents; deliberately stating inaccurate information,
+      such as age, in documents; causing children to be given up in return for payment or through coercion;
+      child trafficking and kidnapping; baby farming and obscuring a child’s identity (verduistering van
+      staat).'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Pregnant women were offered money to travel abroad and consent to adoptions.
+  cases:
+  - name: United States v. Paul Petersen (Marshall Islands adoption scheme)
+    year: '2020'
+    jurisdiction: Arkansas, US (federal)
+    what_happened: A former Arizona official and adoption attorney was sentenced to 72 months for conspiracy
+      to smuggle illegal aliens for commercial advantage; DOJ said co-conspirators offered women from
+      the Marshall Islands $10,000 each to travel to the US and consent to adoptions.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-wdar/pr/arizona-adoption-attorney-sentenced-over-6-years-prison-alien-smuggling-financial-gain
+    source_title: Arizona adoption attorney sentenced over 6 years (US Attorney, W.D. Arkansas)
+  - name: Dutch Committee Investigating Intercountry Adoption (Joustra committee)
+    year: '2021'
+    jurisdiction: Netherlands; Bangladesh, Brazil, Colombia, Indonesia, Sri Lanka
+    what_happened: The committee found abuses in all five countries examined from 1967 onward, that the
+      Dutch government knew of abuses from the late 1960s, and that two Dutch officials were involved
+      in illegal Brazilian adoptions.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://bettercarenetwork.org/sites/default/files/2021-06/Summary-of-the-report-of-the-Committee-Investigating-Intercountry-Adoption.pdf
+    source_title: Summary of the report of the Committee Investigating Intercountry Adoption
+  data_needed:
+  - Person
+  - Payment
+  - Organization
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Court adoption files
+  - Agency financial statements
+  - Prosecution records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: HCCH and the OPSC define the sale of and traffic in children for adoption; the Petersen case
+      was prosecuted as alien smuggling.
+    source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  innocent_explanations:
+  - Lawful reimbursement of documented pregnancy-related costs is allowed in some jurisdictions; HCCH
+    treats costs and expenses differently from inducements.
+  jurisdictions: International (1993 Hague Convention states)
+  version: 1
+- id: CP-045
+  name: Adoption costs that are unreasonably high or exceed actual costs
+  definition: Adoption agencies or intermediaries charge fees that are unreasonably high, exceed actual
+    costs, or cover services never provided.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 3 'Financial Gain', red box 1, p.49
+    quote: Deriving improper financial or other gain from an activity related to intercountry adoption
+      (HC, Art. 32(1)).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 3, red box 4
+    quote: that are unreasonably high (HC, Art. 32(2) & (3)),
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An agency's fees for one country are several times those charged by other accredited bodies.
+  cases: []
+  data_needed:
+  - Organization
+  - Payment
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Central Authority fee schedules
+  - Agency accounts and nonprofit filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Costs vary between countries because of legal, translation and travel requirements.
+  jurisdictions: International
+  version: 1
+- id: CP-046
+  name: Extra payment to speed up an adoption before the decision
+  definition: Someone asks for, offers or makes an extra payment to speed up an adoption before the adoption
+    decision is made.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 3, red box 5
+    quote: Suggesting, proposing, requesting or making the payment of an additional sum to expedite the
+      adoption process before the adoption decision is made.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Adoptive parents describe an 'expediting fee' paid in cash to an in-country facilitator.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Organization
+  - PublicBody
+  checkable: person
+  lookup_sources:
+  - Adoptive-parent accounts
+  - Agency invoices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: HCCH ties improper financial gain to the sale of children.
+    source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  innocent_explanations:
+  - Some official courier or priority services carry a legitimate published fee.
+  jurisdictions: International
+  version: 1
+- id: CP-047
+  name: Donations or contributions tied to children, institutions, officials or matching
+  definition: Donations or 'cooperation projects' go to childcare institutions, officials or birth families,
+    or affect which country or family is matched with children.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 3, red box 8
+    quote: Contributions, donations or cooperation projects aimed at funding or directly influencing intercountry
+      adoption either generally or for a specific adoption
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 3, orange box 33
+    quote: Reliance and dependency on intercountry adoption for (additional) sources of funding through
+      donations, contributions or cooperation projects.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An orphanage's income depends mainly on donations from adoption agencies whose clients adopt its children.
+  cases: []
+  data_needed:
+  - Organization
+  - Payment
+  - PublicBody
+  - Person
+  - Document
+  checkable: records
+  lookup_sources:
+  - Agency annual reports
+  - Nonprofit filings
+  - Institution accounts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Humanitarian donations to child-care institutions are often given in good faith and kept separate
+    from adoption.
+  jurisdictions: International
+  version: 1
+- id: CP-048
+  name: Cash or unrecorded payments, and pay linked to number of adoptions
+  definition: Adoption payments are made in cash or not recorded, or professionals are paid according
+    to how many adoptions they complete.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 3, orange box 26
+    quote: Costs and fees, contributions and donations made in cash and / or not recorded (and / or not
+      tracked).
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 3, orange box 25
+    quote: Remuneration of professionals is dependent on the number of adoptions finalised.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Adoptive parents told to carry cash for in-country payments without receipts.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Employment
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Agency contracts
+  - Staff pay arrangements (court or regulator records)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - In some countries banking access is limited and small payments in cash are normal.
+  jurisdictions: International
+  version: 1
+- id: CP-049
+  name: Child falsely recorded as an orphan or as having unknown parents
+  definition: A child with known, living parents is recorded as an orphan, abandoned or of unknown parentage
+    so that the child can be adopted.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 8 'Unknown Parents', red box 1, p.107
+    quote: Falsely characterising children as having unknown parents to make them available for adoption.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 8, red box 2
+    quote: Failure to investigate cases of children of allegedly unknown parents by not trying to locate
+      the parents or other family members.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An adoptee's file says 'abandoned', but agency intake records name the mother.
+  cases:
+  - name: South Korea Truth and Reconciliation Commission findings on overseas adoption
+    year: '2025'
+    jurisdiction: South Korea
+    what_happened: On 26 March 2025 the commission found the government responsible for human rights violations
+      in overseas adoptions. Reported practices included falsely documenting children with known parents
+      as abandoned orphans, switching identities and bypassing parental consent; violations were confirmed
+      in 56 complaints.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.pbs.org/wgbh/frontline/article/south-korea-foreign-adoptions-government-fraud-abuse
+    source_title: South Korea's truth commission says government responsible for fraud and abuse in foreign
+      adoptions (PBS Frontline / AP)
+  data_needed:
+  - Person
+  - Family
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Adoption files (adoptee access)
+  - Civil registry records
+  - DNA matching services
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Children are genuinely abandoned, and parents sometimes ask to stay anonymous.
+  jurisdictions: International
+  version: 1
+- id: CP-050
+  name: Child's identity swapped, newly created, or birth simulated in civil records
+  definition: A child's identity is swapped with another child's or newly made up, or a birth is falsely
+    registered, so the child's real origins are hidden.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 4 'Identity', red box 1 sub-items, p.73
+    quote: swapping the identities of children;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 4, red box 1 sub-items
+    quote: simulating births through tampering with civil registry records.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Two adoptees find their files describe each other's early history.
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Family
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Civil registries
+  - Adoption files
+  - DNA testing
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Identity falsification is how sale or abduction of children for adoption is concealed (HCCH
+      FS 5).
+    source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  innocent_explanations:
+  - Clerical errors and lost records happen in overwhelmed systems, especially in wartime or disasters.
+  jurisdictions: International
+  version: 1
+- id: CP-051
+  name: Forged or falsified adoption documents
+  definition: False or altered documents are used in an adoption, for example to create false identities
+    or hide how a child was obtained.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 5 'Documents', red boxes 1-3, p.81
+    quote: to cover up the fact that children were obtained through illicit or illegal means (e.g., fraud,
+      abduction).
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The same notary stamp and wording appear on consent forms from different provinces.
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Organization
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Adoption court files
+  - Civil registry checks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reissued or corrected documents can look inconsistent without being forged.
+  jurisdictions: International
+  version: 1
+- id: CP-052
+  name: Missing, uninformed or coerced consent by birth parents
+  definition: Birth parents' consent is missing, given without counselling, obtained by false promises,
+    given before the birth, given without an interpreter, or relied on after it was withdrawn.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 7 'Consent', red box 3, p.97
+    quote: Providing false advice to the birth parents in order to obtain their consent (e.g., making
+      a false promise that the child will return at some point after receiving an education and medical
+      treatment
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 7, orange box 25
+    quote: Consent given without the support, when needed, of an interpreter in the parents’ native language
+      (with no conflict of interest).
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Birth mothers say they believed the child would return after schooling abroad.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Interviews with birth families
+  - Consent documents in adoption files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Birth parents may later regret a consent that was properly given.
+  - Consent forms may be simple in places with low literacy and still be valid.
+  jurisdictions: International
+  version: 1
+- id: CP-053
+  name: 'Subsidiarity bypassed: children routed abroad before family or domestic options'
+  definition: Children are sent for intercountry adoption without real efforts to return them to their
+    family or find a home in their own country, sometimes through false 'special needs' labels.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 6 'Subsidiarity', red box 4, p.87
+    quote: by falsely declaring children as having “special needs” in order to include them in a fast-track
+      procedure and accelerate the process
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Most children in one institution are labelled 'special needs' and placed abroad within months.
+  cases:
+  - name: South Korea TRC findings on cost-driven overseas adoption policy
+    year: '2025'
+    jurisdiction: South Korea
+    what_happened: The commission identified a cost-driven policy that prioritised overseas adoption as
+      a cheaper alternative, and the delegation of authority to private agencies without adequate oversight.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.asil.org/ILIB/south-korean-truth-and-reconciliation-commission-finds-human-rights-violations-overseas
+    source_title: South Korean TRC finds human rights violations in overseas adoptions (ASIL International
+      Law in Brief)
+  data_needed:
+  - Person
+  - Organization
+  - PublicBody
+  - Document
+  checkable: records
+  lookup_sources:
+  - Central Authority statistics
+  - Institution records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - In some countries domestic adoption is rare and intercountry adoption is the only family option.
+  jurisdictions: International
+  version: 1
+- id: CP-054
+  name: Private or independent adoptions, or unaccredited bodies, outside the Convention
+  definition: Adoptions are arranged privately between parents, institutions or agencies without the Central
+    Authority, or through bodies that are not accredited.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 2 'Circumventing the Convention', red box 5, p.39
+    quote: Private arrangements regarding adoptions between AABs, childcare institutions, and / or persons
+      without the involvement of the Central Authority.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 2, red box 8
+    quote: Removing a child from the State of origin through misuse of domestic adoption, guardianship
+      arrangements, custody orders, or other judicial or administrative processing to circumvent the application
+      of the Convention.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Children leave on guardianship orders and are adopted in the receiving country by facilitators who
+    are not accredited.
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - CourtCase
+  - Document
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - HCCH list of accredited bodies and Central Authorities
+  - Court guardianship records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Adoptions from non-Convention countries follow other lawful routes; relative adoptions may be handled
+    differently.
+  jurisdictions: International
+  version: 1
+- id: CP-055
+  name: Children pre-selected by adoptive parents through photos, visits or voluntourism
+  definition: Prospective adopters pick a child through photo listings, institution visits, hosting programmes
+    or volunteering, instead of a competent authority matching them.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 10 'Matching', red box 2, p.123
+    quote: Children selected or chosen by the PAPs (e.g., by photo listing, visiting a childcare institutions)
+      instead of matched by a competent authority or body;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 2, green box for orange box 19
+    quote: Prohibit “voluntourism” and visits by PAPs and other persons to childcare institutions in the
+      State of origin in order to prevent any pre-identification of children for adoption.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An agency website lets fee-paying families 'reserve' children from photos.
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Agency websites (archived)
+  - Hosting programme listings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some states use regulated photo listings for hard-to-place children.
+  jurisdictions: International
+  version: 1
+- id: CP-056
+  name: Matching done by people with a conflict of interest, or using false information
+  definition: The people deciding which family adopts which child have a stake in the outcome, or matching
+    relies on false or outdated information.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 10, red box 6
+    quote: Matching done by persons who have a conflict of interest.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The director of a children's home also runs the adoption facilitator that places its children.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Directorship
+  - Ownership
+  - Family
+  checkable: lookups
+  lookup_sources:
+  - Company and charity registries
+  - Agency board lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - In small systems the same professionals often fill several roles openly and under supervision.
+  jurisdictions: International
+  version: 1
+- id: CP-057
+  name: Unsuitable adopters not assessed, or assessment misrepresented
+  definition: Prospective adopters' eligibility and suitability are not assessed, or a professional or
+    the adopters misrepresent it.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 9 'PAPs', red box 2, p.115
+    quote: A professional agreeing to and / or knowingly misrepresenting the PAPs’ suitability.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A home study omits an applicant's previous child-protection history.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Home study records (court)
+  - Licensing of home-study providers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Home studies can miss information the applicants hid from everyone.
+  jurisdictions: International
+  version: 1
+- id: CP-058
+  name: Re-homing of adopted children outside official channels
+  definition: Adoptive parents pass an adopted child to other people privately, outside courts and child-welfare
+    oversight.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 2, red box 6
+    quote: Placement of an adopted child by adoptive parents with other parents for the purposes of circumventing
+      the Convention (re-homing), with or without the assistance of AABs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Online group posts offer adopted children to new families with only a notarised power of attorney.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Online forums and groups
+  - Court records of guardianship transfers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Unregulated transfer of children without oversight overlaps with trafficking risk.
+    source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  innocent_explanations:
+  - Adoptions do break down; lawful re-placement through courts or agencies is not re-homing.
+  jurisdictions: International
+  version: 1
+- id: CP-059
+  name: Rushed adoptions during or after disasters and conflict
+  definition: Intercountry adoptions are arranged in a hurry, without proper rules, during or soon after
+    natural disasters, wars or other emergencies.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 2, red box 7; repeated in FS 6 and FS 8
+    quote: Unregulated and premature attempts to organise the intercountry adoption of children during
+      and after emergency situations (e.g., natural disasters, calamities, war).
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Children are flown out after an earthquake before family tracing has been tried.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Central Authority statements
+  - Flight and visa records reported by authorities
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Adoptions already approved before the emergency may lawfully be completed.
+  jurisdictions: International
+  version: 1
+- id: CP-060
+  name: Records of origins not kept, or adoptees refused access
+  definition: Authorities or agencies do not keep information about adoptees' origins, lose records when
+    an agency closes, or refuse adoptees access.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 11 'Origins', red box 5, p.133
+    quote: ensure that the adoptee, or their representative, has access to information about their origins,
+      under appropriate guidance, in so far as is permitted by the law of that State (HC, Art. 30(2)).
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A closed agency's files cannot be traced, and adoptees' requests go unanswered.
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  - PublicBody
+  - Person
+  checkable: records
+  lookup_sources:
+  - Adoptee search organisations
+  - Archives and Central Authority procedures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - National laws may restrict access to protect birth parents' privacy; old records may have been lost
+    to fire or flood.
+  jurisdictions: International
+  version: 1
+- id: CP-061
+  name: Government aware of adoption abuses but slow to act
+  definition: Government bodies knew of abuses in adoptions from particular countries or agencies but
+    did not tighten rules, oversee practice or investigate in time.
+  areas:
+  - CP
+  typology: Illicit intercountry adoption
+  status: verified
+  sources:
+  - title: Summary of the report of the Committee Investigating Intercountry Adoption
+    publisher: Committee Investigating Intercountry Adoption (Netherlands)
+    year: '2021'
+    url: https://bettercarenetwork.org/sites/default/files/2021-06/Summary-of-the-report-of-the-Committee-Investigating-Intercountry-Adoption.pdf
+    locator: p.16-17
+    quote: The Dutch government was aware of adoption abuses as early as the late 1960s.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Toolkit for Preventing and Addressing Illicit Practices in Intercountry Adoption
+    publisher: Hague Conference on Private International Law (HCCH)
+    year: '2023'
+    url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+    locator: FS 1, orange box 8
+    quote: Lack of or inadequate government processes and / or political will to identify, prevent and
+      respond to illicit practices.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Embassy cables raising concerns about an adoption programme are followed by years of continued placements.
+  cases:
+  - name: Dutch Committee Investigating Intercountry Adoption
+    year: '2021'
+    jurisdiction: Netherlands
+    what_happened: The committee found that the government failed to take timely measures, such as tighter
+      legislation, better oversight and investigation of reports, despite being in a position to do so.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://bettercarenetwork.org/sites/default/files/2021-06/Summary-of-the-report-of-the-Committee-Investigating-Intercountry-Adoption.pdf
+    source_title: Summary of the report of the Committee Investigating Intercountry Adoption
+  data_needed:
+  - PublicBody
+  - Document
+  - Event
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Freedom-of-information requests for ministry and embassy files
+  - Parliamentary records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Early reports may have been unverified, and governments may have had little power in the country of
+    origin.
+  jurisdictions: International
+  version: 1
+not_reached:
+- 'Child Welfare Information Gateway HTML page: the sign list did not render; the factsheet PDF at artifacts.childwelfare.gov
+  was used instead.'
+- GAO PDFs on gao.gov returned 403 (Access Denied) to direct download; the govinfo.gov HTML copies of
+  GAO-08-146T and GAO-08-713T were used.
+- NICE CG89 failed through WebFetch but was read through a direct fetch of https://www.nice.org.uk/guidance/cg89/chapter/Recommendations.
+- 'HCCH Toolkit Part II Checklist (pp.143-165) and Part III Model Procedure: the PDF text was extracted,
+  but the checklist items were not read in detail, so further checklist-level indicators may exist.'
+- 'US State Department 2025 IPCA report: the statutory definition and criteria for ''pattern of noncompliance''
+  were not quoted on the page reached; the Goldman Act text (22 U.S.C. 9111 et seq.) was not fetched.'
+- 'M.D. v. Abbott: only the Clearinghouse case summary was read, not the original court opinions or monitors''
+  reports.'
+- South Korea TRC primary decision text not reached; findings come from ASIL and PBS Frontline/AP reporting.
+- CICIG 2010 report on irregular adoptions in Guatemala, Chile's adoption investigations, and the Laming
+  (Victoria Climbié) inquiry were not fetched.
+- Senate Finance Committee full report PDF not read; findings come from the committee's own press release.
+- No US court source was found for family/parental abduction case outcomes; the parental-abduction indicators
+  rest on OJJDP profiles only.
+- The UK Panel's 2021 report 'The Myth of Invisible Men' was not fetched (the male-carer indicator rests
+  on the 2020 annual report).

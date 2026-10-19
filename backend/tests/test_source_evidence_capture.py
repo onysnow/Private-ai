@@ -75,3 +75,13 @@ def test_direct_capture_rejects_blank_source_and_blank_evidence():
     })
     assert blank_evidence.status_code == 400
     assert 'quote, locator, or note' in blank_evidence.json()['detail']
+
+
+@pytest.mark.parametrize('url', ['not a url', 'example.test/page', 'ftp://example.test/file', 'https://', 'https://exa mple.test'])
+def test_a_source_url_must_be_a_web_address(url):
+    client = client_for_test()
+    inv = client.post('/api/investigations', json={'name': 'Links'}).json()['id']
+    reply = client.post('/api/sources', json={'investigation_id': inv, 'title': 'Page', 'url': url})
+    assert reply.status_code == 400
+    assert 'is not a web address' in reply.json()['detail']
+    assert client.post('/api/sources', json={'investigation_id': inv, 'title': 'Page', 'url': '  '}).json()['url'] is None

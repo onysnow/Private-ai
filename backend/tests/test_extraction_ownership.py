@@ -4,14 +4,7 @@ import pytest
 from app.core.config import settings
 from app.db.session import Base, SessionLocal, engine
 from app.models.domain import ExtractionCandidate, Investigation
-from app.services.documents import ingest_document
-
-
-@pytest.fixture(autouse=True)
-def _clean_database():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    yield
+from tests.document_helpers import ingest_document
 
 
 def _ingest(tmp_path, *, local_entities: bool):

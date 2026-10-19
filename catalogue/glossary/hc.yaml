@@ -1,0 +1,347 @@
+area: HC
+terms:
+- term: Never Event
+  definition: A serious incident that is wholly preventable because national safety barriers exist and
+    should have been in place.
+  examples: []
+  source_url: https://www.england.nhs.uk/wp-content/uploads/2020/11/Revised-Never-Events-policy-and-framework-FINAL.pdf
+  cases: []
+  related:
+  - Serious Reportable Event
+  - Serious Incident
+  indicators: []
+  areas:
+  - HC
+- term: Serious Reportable Event (NQF)
+  definition: One of a US list of extremely rare, clearly identifiable medical errors that should never
+    happen, such as wrong-site surgery; often called never events.
+  examples: []
+  source_url: https://ratings.leapfroggroup.org/sites/default/files/2025-03/2025%20Never%20Events%20Fact%20Sheet.pdf
+  cases: []
+  related:
+  - Never Event
+  indicators: []
+  areas:
+  - HC
+- term: Serious Incident (SI)
+  definition: An event in NHS-funded care causing unexpected or avoidable death or serious harm, or with
+    such potential for learning, that it warrants a full investigation; formerly Serious Untoward Incident.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+  cases: []
+  related:
+  - Never Event
+  - High Risk Case Review
+  indicators: []
+  areas:
+  - HC
+- term: Root cause analysis (RCA)
+  definition: A structured review after an adverse event that identifies the underlying causes so systems
+    can be improved.
+  examples: []
+  source_url: https://ratings.leapfroggroup.org/sites/default/files/2025-03/2025%20Never%20Events%20Fact%20Sheet.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Duty of candour
+  definition: A legal duty on health and care providers in England to be open and transparent with patients,
+    especially after a notifiable safety incident.
+  examples: []
+  source_url: https://www.cqc.org.uk/guidance-regulation/providers/regulations-service-providers-and-managers/health-social-care-act/regulation-20
+  cases: []
+  related:
+  - Notifiable safety incident
+  indicators: []
+  areas:
+  - HC
+- term: Hospital Standardised Mortality Ratio (HSMR)
+  definition: A ratio comparing a hospital's actual deaths with the number expected after adjusting for
+    patient mix; high values were a missed warning at Mid Staffordshire.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: MBRRACE-UK
+  definition: 'Mothers and Babies: Reducing Risk through Audits and Confidential Enquiries across the
+    UK, the national audit that publishes perinatal mortality surveillance.'
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: HSIB (Healthcare Safety Investigation Branch)
+  definition: An independent English body set up in 2017 to investigate patient safety incidents, including
+    a special brief for maternity incidents.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Care Quality Commission (CQC)
+  definition: The independent regulator of health and adult social care in England, which inspects providers
+    and can prosecute.
+  examples: []
+  source_url: https://cqc-newsroom.prgloo.com/news/cqc-prosecutes-shrewsbury-and-telford-hospital-nhs-trust-following-two-patient-deaths
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Closed culture
+  definition: In CQC's definition, a poor culture in a care service that can lead to harm, including abuse
+    and other human-rights breaches.
+  examples: []
+  source_url: https://cqc.org.uk/publications/monitoring-mental-health-act/2022-2023/closed-cultures
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Foundation trust (FT) status
+  definition: A form of NHS hospital trust with more financial and managerial independence; seeking it
+    was found to have distracted Mid Staffordshire from care quality.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5a7ba0faed915d13110607c8/0947.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Practising privileges
+  definition: Permission granted by a private hospital for a self-employed consultant to treat patients
+    there.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Multidisciplinary team (MDT) meeting
+  definition: A meeting where specialists from different disciplines, such as surgeons, oncologists, radiologists
+    and pathologists, agree a patient's treatment.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Responsible officer
+  definition: A senior doctor in each UK healthcare organisation responsible for doctors' appraisal and
+    revalidation, who shares concerns between NHS and private sectors.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Clinical indemnity
+  definition: Cover, from an insurer or medical defence organisation, that pays compensation to patients
+    harmed by a clinician's negligence.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Patient recall
+  definition: Contacting and re-examining all patients treated by a practitioner or with a device once
+    it is found unsafe.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5e3947ed40f0b6090e0b446b/issues-raised-by-paterson-independent-inquiry-report-web-accessible.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: National Practitioner Data Bank (NPDB)
+  definition: A US federal database to which hospitals, boards and insurers must report actions such as
+    privilege restrictions and malpractice payments; access is restricted.
+  examples: []
+  source_url: https://www.citizen.org/article/hospitals-drop-the-ball-on-physician-oversight/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: MAUDE
+  definition: The US FDA's public database of medical device adverse-event reports from manufacturers,
+    importers, user facilities and voluntary reporters.
+  examples: []
+  source_url: https://www.fda.gov/medical-devices/mandatory-reporting-requirements-manufacturers-importers-and-device-user-facilities/manufacturer-and-user-facility-device-experience-database-maude
+  cases: []
+  related:
+  - Medical Device Report (MDR)
+  indicators: []
+  areas:
+  - HC
+- term: Medical Device Report (MDR)
+  definition: A report of a device-related death, serious injury or malfunction submitted to the FDA;
+    the FDA says such data cannot establish event rates.
+  examples: []
+  source_url: https://www.fda.gov/medical-devices/mandatory-reporting-requirements-manufacturers-importers-and-device-user-facilities/manufacturer-and-user-facility-device-experience-database-maude
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Alternative Summary Reporting (ASR)
+  definition: A former FDA exemption programme letting some manufacturers report certain device events
+    in summaries outside the public database; FDA ended it and released the data in 2019.
+  examples: []
+  source_url: https://www.fda.gov/news-events/press-announcements/statement-agencys-efforts-increase-transparency-medical-device-reporting
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Field safety notice
+  definition: A notice from a device maker to users about action needed for safety; ICIJ collected these
+    with recalls and alerts across 11 countries.
+  examples: []
+  source_url: https://www.icij.org/investigations/implant-files/algorithms-analysis-and-adverse-events-how-icij-used-machine-learning-to-help-find-medical-device-issues/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Yellow Card scheme
+  definition: The UK system through which clinicians and patients report suspected adverse reactions to
+    medicines and devices; the IMMDS review found gross under-reporting.
+  examples: []
+  source_url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Physician Payments Sunshine Act
+  definition: A US law requiring drug and device makers to declare payments and other transfers of value
+    to physicians and teaching hospitals.
+  examples: []
+  source_url: https://www.immdsreview.org.uk/downloads/IMMDSReview_Web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Official Action Indicated (OAI)
+  definition: The most serious FDA classification of an inspection, used when objectionable conditions
+    are significant enough to warrant regulatory action.
+  examples: []
+  source_url: https://www.aub.edu.lb/SHARP/PublishingImages/Pages/publications/Research-Misconduct-Identified-by-the-US-Food-and-Drug-Administration.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Bioresearch Monitoring (BIMO)
+  definition: The FDA programme that inspects clinical trial sites, sponsors and review boards.
+  examples: []
+  source_url: https://www.aub.edu.lb/SHARP/PublishingImages/Pages/publications/Research-Misconduct-Identified-by-the-US-Food-and-Drug-Administration.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Grooming (clinical context)
+  definition: Behaviours such as gift-giving, special treatment or sharing personal information meant
+    to gain a patient's trust ahead of abuse; FSMB treats them as precursors to misconduct.
+  examples: []
+  source_url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Sexual impropriety and sexual violation
+  definition: 'FSMB''s two categories of physician sexual misconduct: non-contact behaviour that is sexually
+    suggestive or disrespectful of privacy, and physical sexual contact with a patient.'
+  examples: []
+  source_url: https://www.jmronline.org/content/92/2/15
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Practice monitor (versus chaperone)
+  definition: A trained observer who reports to the medical board on a restricted doctor's encounters,
+    unlike a chaperone, which is an informal arrangement usually set up by the doctor.
+  examples: []
+  source_url: https://www.fsmb.org/siteassets/advocacy/policies/report-of-workgroup-on-sexual-misconduct-adopted-version.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Electronic Wait List (EWL)
+  definition: The official VA list of patients waiting to be scheduled for outpatient appointments.
+  examples: []
+  source_url: https://www.vaoig.gov/sites/default/files/reports/2014-08/VAOIG-14-02603-267.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Desired date (VA scheduling)
+  definition: The date a patient wants to be seen, used to measure wait times; schedulers were found to
+    alter it to make waits look shorter.
+  examples: []
+  source_url: https://www.vaoig.gov/sites/default/files/reports/2014-08/VAOIG-14-02603-267.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Hypoxic ischaemic encephalopathy (HIE)
+  definition: Brain injury in a newborn caused by too little oxygen or blood flow; a rise in cases was
+    an early East Kent signal.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: CESDI score
+  definition: A grading method from the Confidential Enquiry into Stillbirths and Deaths in Infancy, used
+    to judge whether different care would have changed an outcome.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/634fb083e90e0731a5423408/reading-the-signals-maternity-and-neonatal-services-in-east-kent_the-report-of-the-independent-investigation_print-ready.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Hiding the truth
+  definition: The Infected Blood Inquiry's term for deliberate concealment and lack of candour, including
+    half-truths and not telling patients about risks, tests or research.
+  examples: []
+  source_url: https://www.infectedbloodinquiry.org.uk/sites/default/files/Volume_1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC
+- term: Supernumerary (labour ward coordinator)
+  definition: Working without their own patient caseload, so the coordinator is free to oversee and support
+    the ward.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/624332fe8fa8f527744f0615/Final-Ockenden-Report-web-accessible.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HC

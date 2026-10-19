@@ -1,0 +1,1653 @@
+{
+  "generated": "2026-10-11",
+  "purpose": "Small real public-record demo investigations for red-flag rules that 1MDB facts cannot trigger.",
+  "quote_convention": "Quotes are verbatim from the PDF text layer (PyMuPDF) with runs of whitespace/line breaks collapsed to single spaces. OCR artifacts are kept as-is and flagged in notes. pdf_page is 1-based PDF page index (not the printed page number).",
+  "coverage_gaps": [
+    "BO-001 ownership loop: no official record with a genuine circular ownership (A->B->...->A) was found in this pass; none of these cases contains one. The Glencore swap in deripaska-en-rusal is cross-holding (Glencore in En+, En+ in Rusal), not a loop.",
+    "No passport numbers appear in these official releases (the FR notice gives DOB, POB, citizenship, registration and tax IDs)."
+  ],
+  "cases": [
+    {
+      "case_id": "us-v-anise-structuring",
+      "title": "United States v. Magdy Fouad Anise - cash structuring across Banco Popular, JP Morgan and Bank of America (2009-2012)",
+      "jurisdiction": "US federal - District of New Jersey",
+      "rules_covered": {
+        "ML-021": "Count Two table lists 138 dated cash deposits by named defendant into 5 named bank accounts; 74 of them are between $9,000 and $9,999, many on consecutive days; Count One shows same-day splits. Indictment states JP Morgan warned him about a 'pattern of cash transactions under $10,000'.",
+        "date-precision-year": "'From in or about 2009 through in or about 2011/2012' allegations alongside exact-day table rows."
+      },
+      "documents": [
+        {
+          "doc_id": "anise-indictment",
+          "title": "United States v. Magdy Fouad Anise, a/k/a \"Michael Anise\" - Indictment (Crim. No. 2:15-cr-00218-WHW, Doc. 29)",
+          "type": "indictment",
+          "date": "2015-05-07",
+          "url": "https://www.justice.gov/usao-nj/file/451941/dl",
+          "resolved_url": "https://www.justice.gov/usao-nj/file/451941/dl",
+          "pages": 15,
+          "sha256": "b9876a347eb7effe6e2f80c1cd19074cd931590c474ebd91019e1a8f5b947dc0",
+          "bytes": 249686,
+          "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/cases/us-v-anise-structuring/anise-indictment-2015.pdf",
+          "court": "U.S. District Court, District of New Jersey",
+          "statutes": "31 U.S.C. 5324(a)(1), (a)(3), (d)(1), (d)(2); 18 U.S.C. 2"
+        }
+      ],
+      "key_facts": [
+        {
+          "doc_id": "anise-indictment",
+          "quote": "Defendant ANISE controlled vanous accounts at Banco Popular, JP Morgan, and Bank of America, including two accounts at Banco Popular ending in 6876 and 0979, two accounts at JP Morgan ending in 6100 and 3770, and one account at Bank of America ending in 2315.",
+          "pdf_page": 1,
+          "locator": "Count One, para. 1(c)",
+          "rules": [
+            "ML-021"
+          ],
+          "note": "'vanous' is the OCR text layer's rendering of 'various'"
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "From in or about 2009 through in or about 2011, defendant ANISE received cash kickbacks from doctors and others in exchange for ref erring his personal-injury clients to them.",
+          "pdf_page": 2,
+          "locator": "Count One, para. 2",
+          "rules": [
+            "date-precision-year"
+          ]
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "From in or about 2009 through in or about 2012, defendant ANISE accumulated approximately $800,000 in cash, including cash from the kickback scheme mentioned above.",
+          "pdf_page": 2,
+          "locator": "Count One, para. 3",
+          "rules": [
+            "ML-021",
+            "date-precision-year"
+          ]
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "In a letter dated on or about April 6, 2010, JP Morgan informed defendant ANISE that a review of his JP Morgan account ending in 6100 showed a pattern of cash transactions under $10,000",
+          "pdf_page": 2,
+          "locator": "Count One, para. 4",
+          "rules": [
+            "ML-021"
+          ]
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "by causing the following structured deposits to be made totaling approximately $38,400 into the following accounts",
+          "pdf_page": 3,
+          "locator": "Count One, para. 5",
+          "rules": [
+            "ML-021"
+          ]
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "2/02/2010 $9,500/$7,800 Banco Popular 0979",
+          "pdf_page": 3,
+          "locator": "Count One, para. 5 table",
+          "rules": [
+            "ML-021"
+          ],
+          "note": "same-day split deposits ($9,500 and $7,800)"
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "did so as part of a pattern of illegal activity involving more than $100,000 in a 12-month period",
+          "pdf_page": 4,
+          "locator": "Count Two, para. 2",
+          "rules": [
+            "ML-021"
+          ]
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "12/08/2009 $9,700 Banco Popular 0979 12/09/2009 $9,500 Banco Popular 0979 12/10/2009 $9,800 Banco Popular 0979 12/11/2009 $9,400 Banco Popular 0979 12/14/2009 $9,700 Banco Popular 0979",
+          "pdf_page": 5,
+          "locator": "Count Two table, first five rows",
+          "rules": [
+            "ML-021"
+          ],
+          "note": "five consecutive business days, each $9,400-$9,800"
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "1/11/2010 $9,800 Banco Popular 0979 1/12/2010 $9,700 Banco Popular 0979 1/13/2010 $9,500 Banco Popular 0979 1/14/2010 $9,600 Banco Popular 0979 1/15/2010 $9,400 Banco Popular 0979",
+          "pdf_page": 5,
+          "locator": "Count Two table",
+          "rules": [
+            "ML-021"
+          ]
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "2/12/2010 $9,500 JP Morgan 6100 2/12/2010 $9,500 Bank of America 2315",
+          "pdf_page": 6,
+          "locator": "Count Two table",
+          "rules": [
+            "ML-021"
+          ],
+          "note": "same-day deposits at two different banks"
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "6/14/2010 $9,850 Bank of America 2315 6/15/2010 $9,850 Banco Popular 0979",
+          "pdf_page": 8,
+          "locator": "Count Two table",
+          "rules": [
+            "ML-021"
+          ]
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "A sum of money equal to at least $795,750 m United States currency",
+          "pdf_page": 13,
+          "locator": "Forfeiture Allegation, para. 2(a)",
+          "rules": [
+            "ML-021"
+          ],
+          "note": "'m' is OCR for 'in'"
+        },
+        {
+          "doc_id": "anise-indictment",
+          "quote": "the property located at 17147 Avenue Le Rivage, Boca Raton, Florida 33496.",
+          "pdf_page": 13,
+          "locator": "Forfeiture Allegation, para. 2(b)",
+          "rules": []
+        }
+      ],
+      "transactions_count_two": [
+        {
+          "date_mdY": "12/08/2009",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "12/08/2009 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/09/2009",
+          "amount_usd": 9500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "12/09/2009 $9,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/10/2009",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "12/10/2009 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/11/2009",
+          "amount_usd": 9400,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "12/11/2009 $9,400 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/14/2009",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "12/14/2009 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/14/2009",
+          "amount_usd": 8000,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 5,
+          "in_9000_9999": false,
+          "quote": "12/14/2009 $8,000 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "12/15/2009",
+          "amount_usd": 7000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": false,
+          "quote": "12/15/2009 $7,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/31/2009",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "12/31/2009 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/06/2010",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "1/06/2010 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/06/2010",
+          "amount_usd": 7000,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 5,
+          "in_9000_9999": false,
+          "quote": "1/06/2010 $7,000 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "1/07/2010",
+          "amount_usd": 9600,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "1/07/2010 $9,600 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/08/2010",
+          "amount_usd": 9000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "1/08/2010 $9,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/11/2010",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "1/11/2010 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/12/2010",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "1/12/2010 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/13/2010",
+          "amount_usd": 9500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "1/13/2010 $9,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/14/2010",
+          "amount_usd": 9600,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "1/14/2010 $9,600 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/15/2010",
+          "amount_usd": 9400,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "1/15/2010 $9,400 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "2/04/2010",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "2/04/2010 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "2/04/2010",
+          "amount_usd": 1500,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 5,
+          "in_9000_9999": false,
+          "quote": "2/04/2010 $1,500 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "2/09/2010",
+          "amount_usd": 9600,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 5,
+          "in_9000_9999": true,
+          "quote": "2/09/2010 $9,600 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "2/10/2010",
+          "amount_usd": 9500,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "2/10/2010 $9,500 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "2/12/2010",
+          "amount_usd": 9500,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "2/12/2010 $9,500 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "2/12/2010",
+          "amount_usd": 9500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "2/12/2010 $9,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "2/14/2010",
+          "amount_usd": 9500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "2/14/2010 $9,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "3/01/2010",
+          "amount_usd": 8000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": false,
+          "quote": "3/01/2010 $8,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "3/02/2010",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/02/2010 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "3/04/2010",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/04/2010 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "3/08/2010",
+          "amount_usd": 9000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/08/2010 $9,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "3/09/2010",
+          "amount_usd": 9400,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/09/2010 $9,400 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "3/09/2010",
+          "amount_usd": 9200,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/09/2010 $9,200 Bank of America 2315"
+        },
+        {
+          "date_mdY": "3/11/2010",
+          "amount_usd": 9000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/11/2010 $9,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "3/11/2010",
+          "amount_usd": 9300,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/11/2010 $9,300 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "3/12/2010",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/12/2010 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "3/12/2010",
+          "amount_usd": 9600,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/12/2010 $9,600 Bank of America 2315"
+        },
+        {
+          "date_mdY": "3/15/2010",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/15/2010 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "3/15/2010",
+          "amount_usd": 9000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/15/2010 $9,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "3/25/2010",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "3/25/2010 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "4/07/2010",
+          "amount_usd": 9500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "4/07/2010 $9,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "4/08/2010",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "4/08/2010 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "4/09/2010",
+          "amount_usd": 9300,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 6,
+          "in_9000_9999": true,
+          "quote": "4/09/2010 $9,300 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "4/12/2010",
+          "amount_usd": 9000,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "4/12/2010 $9,000 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "4/13/2010",
+          "amount_usd": 9400,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "4/13/2010 $9,400 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "4/14/2010",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "4/14/2010 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "4/14/2010",
+          "amount_usd": 9700,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "4/14/2010 $9,700 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "4/29/2010",
+          "amount_usd": 8000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": false,
+          "quote": "4/29/2010 $8,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "5/06/2010",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "5/06/2010 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "5/07/2010",
+          "amount_usd": 9000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "5/07/2010 $9,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "5/10/2010",
+          "amount_usd": 9600,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "5/10/2010 $9,600 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "5/12/2010",
+          "amount_usd": 9600,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "5/12/2010 $9,600 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "5/12/2010",
+          "amount_usd": 9500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "5/12/2010 $9,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "5/13/2010",
+          "amount_usd": 9500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "5/13/2010 $9,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "5/14/2010",
+          "amount_usd": 1000,
+          "bank_account": "JP Morgan 6100",
+          "pdf_page": 7,
+          "in_9000_9999": false,
+          "quote": "5/14/2010 $1,000 JP Morgan 6100"
+        },
+        {
+          "date_mdY": "5/14/2010",
+          "amount_usd": 9100,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "5/14/2010 $9,100 Bank of America 2315"
+        },
+        {
+          "date_mdY": "5/20/2010",
+          "amount_usd": 8500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": false,
+          "quote": "5/20/2010 $8,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "5/24/2010",
+          "amount_usd": 4800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": false,
+          "quote": "5/24/2010 $4,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "6/01/2010",
+          "amount_usd": 9500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "6/01/2010 $9,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "6/08/2010",
+          "amount_usd": 8500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": false,
+          "quote": "6/08/2010 $8,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "6/09/2010",
+          "amount_usd": 9200,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "6/09/2010 $9,200 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "6/10/2010",
+          "amount_usd": 8300,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 7,
+          "in_9000_9999": false,
+          "quote": "6/10/2010 $8,300 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "6/11/2010",
+          "amount_usd": 9700,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 7,
+          "in_9000_9999": true,
+          "quote": "6/11/2010 $9,700 Bank of America 2315"
+        },
+        {
+          "date_mdY": "6/14/2010",
+          "amount_usd": 9600,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "6/14/2010 $9,600 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "6/14/2010",
+          "amount_usd": 9850,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "6/14/2010 $9,850 Bank of America 2315"
+        },
+        {
+          "date_mdY": "6/15/2010",
+          "amount_usd": 9850,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "6/15/2010 $9,850 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "7/06/2010",
+          "amount_usd": 9400,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "7/06/2010 $9,400 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "7/08/2010",
+          "amount_usd": 9500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "7/08/2010 $9,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "7/14/2010",
+          "amount_usd": 9500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "7/14/2010 $9,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "7/15/2010",
+          "amount_usd": 8000,
+          "bank_account": "Banco Popular 6876",
+          "pdf_page": 8,
+          "in_9000_9999": false,
+          "quote": "7/15/2010 $8,000 Banco Popular 6876"
+        },
+        {
+          "date_mdY": "7/15/2010",
+          "amount_usd": 9800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "7/15/2010 $9,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "8/02/2010",
+          "amount_usd": 9600,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "8/02/2010 $9,600 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "8/03/2010",
+          "amount_usd": 9100,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "8/03/2010 $9,100 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "8/04/2010",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "8/04/2010 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "8/11/2010",
+          "amount_usd": 9500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "8/11/2010 $9,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "9/07/2010",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "9/07/2010 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "9/13/2010",
+          "amount_usd": 9400,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "9/13/2010 $9,400 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "9/14/2010",
+          "amount_usd": 5000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": false,
+          "quote": "9/14/2010 $5,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "10/12/2010",
+          "amount_usd": 9500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "10/12/2010 $9,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "10/14/2010",
+          "amount_usd": 5000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": false,
+          "quote": "10/14/2010 $5,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "10/15/2010",
+          "amount_usd": 6000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": false,
+          "quote": "10/15/2010 $6,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "10/21/2010",
+          "amount_usd": 9600,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "10/21/2010 $9,600 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "11/04/2010",
+          "amount_usd": 9500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 8,
+          "in_9000_9999": true,
+          "quote": "11/04/2010 $9,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "11/05/2010",
+          "amount_usd": 2500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "11/05/2010 $2,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "11/08/2010",
+          "amount_usd": 8500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "11/08/2010 $8,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "11/10/2010",
+          "amount_usd": 8500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "11/10/2010 $8,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "11/12/2010",
+          "amount_usd": 8000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "11/12/2010 $8,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "11/12/2010",
+          "amount_usd": 4500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "11/12/2010 $4,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "11/15/2010",
+          "amount_usd": 9700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": true,
+          "quote": "11/15/2010 $9,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "11/16/2010",
+          "amount_usd": 9600,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": true,
+          "quote": "11/16/2010 $9,600 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "11/18/2010",
+          "amount_usd": 8650,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "11/18/2010 $8,650 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/13/2010",
+          "amount_usd": 9500,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": true,
+          "quote": "12/13/2010 $9,500 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/14/2010",
+          "amount_usd": 9200,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": true,
+          "quote": "12/14/2010 $9,200 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "12/16/2010",
+          "amount_usd": 8000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "12/16/2010 $8,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/11/2011",
+          "amount_usd": 8300,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "1/11/2011 $8,300 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/13/2011",
+          "amount_usd": 5000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "1/13/2011 $5,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "1/14/2011",
+          "amount_usd": 6000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "1/14/2011 $6,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "2/09/2011",
+          "amount_usd": 9300,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": true,
+          "quote": "2/09/2011 $9,300 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "2/14/2011",
+          "amount_usd": 4000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "2/14/2011 $4,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "3/03/2011",
+          "amount_usd": 9000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 9,
+          "in_9000_9999": true,
+          "quote": "3/03/2011 $9,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "4/12/2011",
+          "amount_usd": 8700,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "4/12/2011 $8,700 Bank of America 2315"
+        },
+        {
+          "date_mdY": "4/16/2011",
+          "amount_usd": 4000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "4/16/2011 $4,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "5/12/2011",
+          "amount_usd": 1000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 9,
+          "in_9000_9999": false,
+          "quote": "5/12/2011 $1,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "5/13/2011",
+          "amount_usd": 7000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "5/13/2011 $7,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "7/15/2011",
+          "amount_usd": 4800,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "7/15/2011 $4,800 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "8/15/2011",
+          "amount_usd": 6000,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "8/15/2011 $6,000 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "9/23/2011",
+          "amount_usd": 7800,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "9/23/2011 $7,800 Bank of America 2315"
+        },
+        {
+          "date_mdY": "9/27/2011",
+          "amount_usd": 8200,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "9/27/2011 $8,200 Bank of America 2315"
+        },
+        {
+          "date_mdY": "9/29/2011",
+          "amount_usd": 7900,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "9/29/2011 $7,900 Bank of America 2315"
+        },
+        {
+          "date_mdY": "9/30/2011",
+          "amount_usd": 8700,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "9/30/2011 $8,700 Bank of America 2315"
+        },
+        {
+          "date_mdY": "10/03/2011",
+          "amount_usd": 5500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "10/03/2011 $5,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "10/04/2011",
+          "amount_usd": 2200,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "10/04/2011 $2,200 Bank of America 2315"
+        },
+        {
+          "date_mdY": "10/11/2011",
+          "amount_usd": 9200,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 10,
+          "in_9000_9999": true,
+          "quote": "10/11/2011 $9,200 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "10/13/2011",
+          "amount_usd": 7000,
+          "bank_account": "JP Morgan 3770",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "10/13/2011 $7,000 JP Morgan 3770"
+        },
+        {
+          "date_mdY": "10/14/2011",
+          "amount_usd": 7600,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "10/14/2011 $7,600 Bank of America 2315"
+        },
+        {
+          "date_mdY": "10/18/2011",
+          "amount_usd": 9200,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": true,
+          "quote": "10/18/2011 $9,200 Bank of America 2315"
+        },
+        {
+          "date_mdY": "10/26/2011",
+          "amount_usd": 7800,
+          "bank_account": "JP Morgan 3770",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "10/26/2011 $7,800 JP Morgan 3770"
+        },
+        {
+          "date_mdY": "10/26/2011",
+          "amount_usd": 5400,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "10/26/2011 $5,400 Bank of America 2315"
+        },
+        {
+          "date_mdY": "10/28/2011",
+          "amount_usd": 8700,
+          "bank_account": "JP Morgan 3770",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "10/28/2011 $8,700 JP Morgan 3770"
+        },
+        {
+          "date_mdY": "10/28/2011",
+          "amount_usd": 3000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "10/28/2011 $3,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "11/12/2011",
+          "amount_usd": 7500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "11/12/2011 $7,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "11/14/2011",
+          "amount_usd": 8100,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "11/14/2011 $8,100 Bank of America 2315"
+        },
+        {
+          "date_mdY": "11/18/2011",
+          "amount_usd": 7800,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 10,
+          "in_9000_9999": false,
+          "quote": "11/18/2011 $7,800 Bank of America 2315"
+        },
+        {
+          "date_mdY": "11/22/2011",
+          "amount_usd": 7700,
+          "bank_account": "Banco Popular 0979",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "11/22/2011 $7,700 Banco Popular 0979"
+        },
+        {
+          "date_mdY": "11/25/2011",
+          "amount_usd": 8800,
+          "bank_account": "JP Morgan 3770",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "11/25/2011 $8,800 JP Morgan 3770"
+        },
+        {
+          "date_mdY": "11/27/2011",
+          "amount_usd": 4500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "11/27/2011 $4,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "11/28/2011",
+          "amount_usd": 8100,
+          "bank_account": "JP Morgan 3770",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "11/28/2011 $8,100 JP Morgan 3770"
+        },
+        {
+          "date_mdY": "12/19/2011",
+          "amount_usd": 8700,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "12/19/2011 $8,700 Bank of America 2315"
+        },
+        {
+          "date_mdY": "12/20/2011",
+          "amount_usd": 4200,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "12/20/2011 $4,200 Bank of America 2315"
+        },
+        {
+          "date_mdY": "12/22/2011",
+          "amount_usd": 7700,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "12/22/2011 $7,700 Bank of America 2315"
+        },
+        {
+          "date_mdY": "12/27/2011",
+          "amount_usd": 8400,
+          "bank_account": "JP Morgan 3770",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "12/27/2011 $8,400 JP Morgan 3770"
+        },
+        {
+          "date_mdY": "12/27/2011",
+          "amount_usd": 8900,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "12/27/2011 $8,900 Bank of America 2315"
+        },
+        {
+          "date_mdY": "12/30/2011",
+          "amount_usd": 4500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "12/30/2011 $4,500 Bank of America 2315"
+        },
+        {
+          "date_mdY": "1/03/2012",
+          "amount_usd": 7600,
+          "bank_account": "JP Morgan 3770",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "1/03/2012 $7,600 JP Morgan 3770"
+        },
+        {
+          "date_mdY": "1/03/2012",
+          "amount_usd": 1000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "1/03/2012 $1,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "1/17/2012",
+          "amount_usd": 5700,
+          "bank_account": "Banco Popular 6876",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "1/17/2012 $5,700 Banco Popular 6876"
+        },
+        {
+          "date_mdY": "1/23/2012",
+          "amount_usd": 8800,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "1/23/2012 $8,800 Bank of America 2315"
+        },
+        {
+          "date_mdY": "1/26/2012",
+          "amount_usd": 9000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": true,
+          "quote": "1/26/2012 $9,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "1/27/2012",
+          "amount_usd": 5000,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "1/27/2012 $5,000 Bank of America 2315"
+        },
+        {
+          "date_mdY": "1/30/2012",
+          "amount_usd": 7900,
+          "bank_account": "Banco Popular 6876",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "1/30/2012 $7,900 Banco Popular 6876"
+        },
+        {
+          "date_mdY": "1/30/2012",
+          "amount_usd": 500,
+          "bank_account": "Bank of America 2315",
+          "pdf_page": 11,
+          "in_9000_9999": false,
+          "quote": "1/30/2012 $500 Bank of America 2315"
+        }
+      ],
+      "notes": "Single-currency (USD). Table rows parsed from the PDF text layer; each row's 'quote' is verbatim (whitespace-collapsed) from the cited page."
+    },
+    {
+      "case_id": "vekselberg-shell-network",
+      "title": "Viktor Vekselberg - layered Panama/BVI/Bahamas shell companies holding US properties and the yacht Tango; sanctions evasion by Vladimir Voronchenko",
+      "jurisdiction": "US federal - S.D.N.Y. and D.D.C.; OFAC (U.S. Treasury)",
+      "rules_covered": {
+        "BO-002": "Two official 5-layer chains, all 100%: Vekselberg -> Company-2 (BVI) -> Foundation-1 (Panama) -> Company-1 (Panama) -> Medallion, Inc. (Panama) -> Voxi Management Corp. (Bahamas) -> properties; and Vekselberg -> Lamesa Group Incorporated (BVI) -> Lamesa Foundation (Panama) -> Lamesa Group Holding S.A. (Panama) -> Lamesa Holding S.A. (Panama). Company-1/Company-2/Foundation-1 are pseudonymised in the record.",
+        "SANCTIONS": "Vekselberg is an SDN (designated 2018-04-06, E.O. 13662; re-designated 2022-03-11, E.O. 14024); FR notice gives DOB/POB and Renova Group registration/tax IDs.",
+        "BO-032": "Shared nominee directors (Alcides Higuera Gonzalez, Fredis Abdiel Gonzalez) across Arinter and Lamesa Transport; shared address 'Commerce House, 1 Bowring Road, Ramsey, Isle of Man' for the 'Tango' entity and the Jersey account.",
+        "multi-currency": "USD account -> EUR account transfer; 180,000 Euros fees.",
+        "date-precision": "'in or about 2008', 'in July 2018', 'between approximately February 2009 and March 2018'.",
+        "PEP": "Not a PEP on these records: designated for operating in the energy sector, not as a government official (contrast Kerimov in deripaska-en-rusal)."
+      },
+      "documents": [
+        {
+          "doc_id": "vekselberg-complaint",
+          "title": "United States v. 19 Duck Pond Lane, Southampton NY, et al. - Verified Civil Complaint for Forfeiture (S.D.N.Y.), with Exhibit: Indictment United States v. Vladimir Voronchenko, 1:23-cr-00073-MKV",
+          "type": "civil forfeiture complaint (with indictment exhibit)",
+          "date": "2023-02-24",
+          "url": "https://www.justice.gov/usao-sdny/press-release/file/1569761/dl",
+          "resolved_url": "https://www.justice.gov/usao-sdny/press-release/file/1569761/dl",
+          "pages": 42,
+          "sha256": "1c2b36f5a14218cc1844221952f75c64ec6abce7a2869f0de498ae5e4f6d3f19",
+          "bytes": 1332116,
+          "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/cases/vekselberg-shell-network/vekselberg-properties-forfeiture-complaint-2023.pdf",
+          "court": "U.S. District Court, Southern District of New York"
+        },
+        {
+          "doc_id": "tango-affidavit",
+          "title": "In the Matter of the Seizure of the Motor Yacht Tango (IMO 1010703) - Application, Seizure Warrant and Affidavit (D.D.C.)",
+          "type": "seizure warrant and affidavit",
+          "date": "2022-03-25",
+          "url": "https://www.justice.gov/opa/press-release/file/1490356/download",
+          "resolved_url": "https://www.justice.gov/archives/opa/press-release/file/1490356/dl?inline=",
+          "pages": 33,
+          "sha256": "460aa9be82049e6c2e08c876b44572bfae2e314ff922f693216639ead68bce2d",
+          "bytes": 1017111,
+          "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/cases/vekselberg-shell-network/tango-seizure-warrant-affidavit-2022.pdf",
+          "court": "U.S. District Court, District of Columbia",
+          "text_layer_note": "PDF pages 1-3 are form pages with a garbled font encoding; affidavit text (p4 onward) extracts cleanly"
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "title": "Notice of OFAC Sanctions Actions (April 6, 2018 designations), 83 Fed. Reg. 19138-19140, FR Doc. 2018-09147",
+          "type": "Federal Register notice (OFAC SDN designations)",
+          "date": "2018-05-01",
+          "url": "https://www.govinfo.gov/content/pkg/FR-2018-05-01/pdf/2018-09147.pdf",
+          "resolved_url": "https://www.govinfo.gov/content/pkg/FR-2018-05-01/pdf/2018-09147.pdf",
+          "pages": 3,
+          "sha256": "555394c10b5fad2def5d5364a4da63d6affac7303336d5cfc24c6b4181ee253b",
+          "bytes": 217931,
+          "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/cases/vekselberg-shell-network/fr-2018-09147-ofac-sdn-notice.pdf",
+          "issuer": "U.S. Treasury, Office of Foreign Assets Control"
+        }
+      ],
+      "key_facts": [
+        {
+          "doc_id": "vekselberg-complaint",
+          "quote": "Between in or about 2008 and in or about 2017, shell companies beneficially owned and controlled by Viktor Vekselberg, a Russian oligarch, purchased the Defendants-in-rem.",
+          "pdf_page": 2,
+          "locator": "Complaint para. 2",
+          "rules": [
+            "BO-002",
+            "date-precision-year"
+          ]
+        },
+        {
+          "doc_id": "vekselberg-complaint",
+          "quote": "On or about April 6, 2018, OFAC designated Vekselberg as an SDN pursuant to Executive Order No. 13662 for “operating in the energy sector of the Russian Federation economy.”",
+          "pdf_page": 9,
+          "locator": "Complaint para. 24",
+          "rules": [
+            "SANCTIONS"
+          ]
+        },
+        {
+          "doc_id": "vekselberg-complaint",
+          "quote": "And in or about 2017, Voxi, which was wholly owned by Medallion, purchased the Fisher Island Penthouse for approximately $31.2 million.",
+          "pdf_page": 10,
+          "locator": "Complaint para. 28",
+          "rules": [
+            "BO-002",
+            "date-precision-year"
+          ]
+        },
+        {
+          "doc_id": "vekselberg-complaint",
+          "quote": "Medallion was wholly owned by another Panamanian company (“Company-1”), which, in turn, was wholly owned by a Panamanian foundation (“Foundation-1”).",
+          "pdf_page": 10,
+          "locator": "Complaint para. 29",
+          "rules": [
+            "BO-002"
+          ]
+        },
+        {
+          "doc_id": "vekselberg-complaint",
+          "quote": "Foundation-1 was a British Virgin Islands company (“Company-2”), of which Vekselberg was the sole owner.",
+          "pdf_page": 11,
+          "locator": "Complaint para. 29 (cont.)",
+          "rules": [
+            "BO-002"
+          ],
+          "note": "sentence begins on previous page: 'The first and exclusive beneficiary of Foundation-1 was ...'"
+        },
+        {
+          "doc_id": "vekselberg-complaint",
+          "quote": "between approximately February 2009 and March 2018, Medallion and Company-1—both of which were ultimately beneficially owned and controlled by Vekselberg—sent approximately 90 wire transfers totaling approximately $18.5 million to the IOLTA Account.",
+          "pdf_page": 13,
+          "locator": "Complaint para. 36",
+          "rules": [
+            "BO-002",
+            "date-precision-month"
+          ]
+        },
+        {
+          "doc_id": "vekselberg-complaint",
+          "quote": "received international wires from a bank account in the Bahamas held in the name of Smile Holding Ltd., a shell company owned and controlled by Voronchenko",
+          "pdf_page": 14,
+          "locator": "Complaint para. 38",
+          "rules": [
+            "SANCTIONS"
+          ]
+        },
+        {
+          "doc_id": "vekselberg-complaint",
+          "quote": "Voronchenko lived in Park Avenue-1, the Southampton House, and the Fisher Island Apartment.",
+          "pdf_page": 11,
+          "locator": "Complaint para. 31",
+          "rules": [
+            "BO-032"
+          ],
+          "note": "associate resides at addresses owned by the SDN's shell companies"
+        },
+        {
+          "doc_id": "tango-affidavit",
+          "quote": "“Lamesa Holding S.A.” is owned by “Lamesa Group Holding S.A.,” which in turn is 100% owned by “Lamesa Foundation.” All of these entities are registered in Panama. The first beneficiary of “Lamesa Foundation” is “Lamesa Group Incorporated,” registered in the British Virgin Islands. “Lamesa Group Incorporated” is wholly owned by Vekselberg.",
+          "pdf_page": 24,
+          "locator": "Affidavit para. 47",
+          "rules": [
+            "BO-002"
+          ]
+        },
+        {
+          "doc_id": "tango-affidavit",
+          "quote": "Arinter’s corporate records list two individual corporate directors, Panamanian citizens Alcides Higuera Gonzalez and Fredis Abdiel Gonzalez. Arinter’s corporate records list two organizational corporate directors, “A.J.K. Corporate Management Inc.,” a British Virgin Islands corporation, and “RE.A.M. Management Limited,” a Cypriot corporation.",
+          "pdf_page": 23,
+          "locator": "Affidavit para. 46",
+          "rules": [
+            "BO-002",
+            "BO-032"
+          ]
+        },
+        {
+          "doc_id": "tango-affidavit",
+          "quote": "Arinter corporate directors Alcides Higuera and Fredis Gonzalez are also officers of Lamesa Transport LLC (“Lamesa Transport”), a Panamanian corporation.",
+          "pdf_page": 24,
+          "locator": "Affidavit para. 47",
+          "rules": [
+            "BO-032"
+          ],
+          "note": "same two nominee directors across Arinter and Lamesa Transport"
+        },
+        {
+          "doc_id": "tango-affidavit",
+          "quote": "On or about February 10, 2017, Arinter wired Company C, a yacht servicer, $9,274.97 from a Jersey bank account in the name “Tango, Commerce House, 1 Bowring Road, Ramsey, Isle of Man.”",
+          "pdf_page": 26,
+          "locator": "Affidavit para. 50(a)",
+          "rules": [
+            "BO-032"
+          ],
+          "note": "same Isle of Man address also used by the 'Tango' entity in para. 49(c)(i)"
+        },
+        {
+          "doc_id": "tango-affidavit",
+          "quote": "On or about July 18, 2018, “Tango” wired $208,808.20 from its U.S. dollar account to a Euro account in the name of “Tango” held at the same Swiss bank. Using this money, in July 2018, 180,000 Euros in fees were paid to various companies on behalf of the TANGO.",
+          "pdf_page": 28,
+          "locator": "Affidavit para. 55(c)",
+          "rules": [
+            "multi-currency",
+            "date-precision-month",
+            "SANCTIONS"
+          ]
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "22. VEKSELBERG, Viktor Feliksovich, Russia; DOB 14 Apr 1957; POB Drogobych, Lviv region, Ukraine; Gender Male (individual) [UKRAINE–EO13662].",
+          "pdf_page": 2,
+          "locator": "83 FR 19139, Individuals no. 22",
+          "rules": [
+            "SANCTIONS"
+          ]
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "RENOVA GROUP (a.k.a. JOINT-STOCK COMPANY RENOVA GROUP OF COMPANIES; a.k.a. JSC RENOVA GROUP OF COMPANIES), V, 28 Balaklavskiy Prospekt, Moscow 117452, Russia; 40, Malaya Ordynka, Moscow 115184, Russia; Registration ID 1047796880548; Tax ID No. 7727526670; Government Gazette Number 772701001 [UKRAINE–EO13662] (Linked To: VEKSELBERG, Viktor Feliksovich).",
+          "pdf_page": 3,
+          "locator": "83 FR 19140, Entities no. 10",
+          "rules": [
+            "SANCTIONS"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "deripaska-en-rusal",
+      "title": "Oleg Deripaska / En+ / Rusal - OFAC April 2018 designations and the December 2018 restructuring with stated ownership percentages",
+      "jurisdiction": "OFAC / U.S. Treasury (Jersey, BVI, Russia, UK, Hong Kong entities)",
+      "rules_covered": {
+        "SANCTIONS": "SDN entries with DOB, POB, dual citizenship (Russia/Cyprus), addresses and registration IDs for Deripaska, Basic Element, B-Finance, En+, Rusal.",
+        "PEP": "Kerimov designated 'for being an official of the Government of the Russian Federation'; Deripaska designated for acting on behalf of a senior Russian official; Lord Barker, former UK minister.",
+        "BO-032": "Basic Element, En+ and Rusal all at Esplanade 44 / 44 Esplanade, St. Helier JE4 9WG, Jersey; En+ and Rusal share 1 Vasilisy Kozhinoy St., Moscow 121096 (tests address normalisation).",
+        "BO-002": "Ownership with percentages: Deripaska ~70% (to 44.95%) of En+ -> En+ 56.88% of Rusal; En+ -> ESE (wholly owned); Deripaska 0.01% direct in Rusal; Deripaska -> Basic Element / B-Finance -> En+. Only 2-3 layers, so this is a short-chain / indirect-control demo, not a 4-6 layer chain."
+      },
+      "documents": [
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "title": "Notice of OFAC Sanctions Actions (April 6, 2018 designations), 83 Fed. Reg. 19138-19140, FR Doc. 2018-09147",
+          "type": "Federal Register notice (OFAC SDN designations)",
+          "date": "2018-05-01",
+          "url": "https://www.govinfo.gov/content/pkg/FR-2018-05-01/pdf/2018-09147.pdf",
+          "resolved_url": "https://www.govinfo.gov/content/pkg/FR-2018-05-01/pdf/2018-09147.pdf",
+          "pages": 3,
+          "sha256": "555394c10b5fad2def5d5364a4da63d6affac7303336d5cfc24c6b4181ee253b",
+          "bytes": 217931,
+          "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/cases/deripaska-en-rusal/fr-2018-09147-ofac-sdn-notice.pdf",
+          "issuer": "U.S. Treasury, Office of Foreign Assets Control"
+        },
+        {
+          "doc_id": "ofac-delisting-letter",
+          "title": "Treasury letter to Congress: notification of intent to terminate sanctions on En+ Group plc, UC Rusal plc and JSC EuroSibEnergo",
+          "type": "official letter / notification to Congress",
+          "date": "2018-12-19",
+          "url": "https://ofac.treasury.gov/media/16561/download",
+          "resolved_url": "https://ofac.treasury.gov/media/16561/download",
+          "pages": 9,
+          "sha256": "e253132fbf9f6f13f8d6b1dd954291060ca61ab0a0c50c55df1602581a1ea6eb",
+          "bytes": 3904461,
+          "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/cases/deripaska-en-rusal/ofac-en-rusal-delisting-notification-2018-12-19.pdf",
+          "issuer": "U.S. Department of the Treasury"
+        }
+      ],
+      "key_facts": [
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "3. DERIPASKA, Oleg Vladimirovich, Moscow, Russia; 64 Severnaya Street, Oktyabrsky, Khutor, Ust-Labinsky District, Krasnodar Territory 352332, Russia; 5, Belgrave Square, Belgravia, London SW1X 8PH, United Kingdom; DOB 02 Jan 1968; POB Dzerzhinsk, Nizhny Novgorod Region, Russia; citizen Russia; alt. citizen Cyprus; Gender Male (individual)",
+          "pdf_page": 1,
+          "locator": "83 FR 19139, Individuals no. 3",
+          "rules": [
+            "SANCTIONS"
+          ]
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "for having acted or purported to act for or on behalf of, directly or indirectly, a senior official of the of the Government of the Russian Federation.",
+          "pdf_page": 1,
+          "locator": "83 FR 19139, Individuals no. 3",
+          "rules": [
+            "SANCTIONS",
+            "PEP"
+          ],
+          "note": "PEP-associate basis ('of the of the' is verbatim)"
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "8. KERIMOV, Suleiman Abusaidovich",
+          "pdf_page": 2,
+          "locator": "83 FR 19139, Individuals no. 8",
+          "rules": [
+            "SANCTIONS"
+          ]
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "Antibes, France; DOB 12 Mar 1966; POB Derbent, Republic of Dagestan, Russia; citizen Russia; Gender Male (individual) [UKRAINE–EO13661]. Designated pursuant to section 1(a)(ii)(A) of E.O. 13661 for being an official of the Government of the Russian Federation.",
+          "pdf_page": 2,
+          "locator": "83 FR 19139, Individuals no. 8",
+          "rules": [
+            "SANCTIONS",
+            "PEP"
+          ],
+          "note": "designated as a government official -> PEP"
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "BASIC ELEMENT LIMITED (a.k.a. BAZOVY ELEMENT), Esplanade 44, Saint Helier JE4 9WG, Jersey; 30 Rochdelskaya Street, Moscow 123022, Russia; Registration ID 84039",
+          "pdf_page": 2,
+          "locator": "83 FR 19139, Entities no. 2",
+          "rules": [
+            "SANCTIONS",
+            "BO-032"
+          ]
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "B–FINANCE LTD, Vanterpool Plaza, 2nd Floor, Wickhams Cay, Road Town, Tortola, Virgin Islands, British",
+          "pdf_page": 2,
+          "locator": "83 FR 19139, Entities no. 3",
+          "rules": [
+            "SANCTIONS"
+          ]
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "EN+ GROUP PLC, Esplanade 44, Saint Helier JE4 9WG, Jersey; 8 Cleveland Row, London SW1A 1DH, United Kingdom; 1 Vasilisy Kozhinoy St., Moscow 121096, Russia; Registration ID 91061",
+          "pdf_page": 2,
+          "locator": "83 FR 19139, Entities no. 4",
+          "rules": [
+            "SANCTIONS",
+            "BO-032"
+          ]
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "UNITED COMPANY RUSAL PLC, 44 Esplanade, St. Helier JE4 9WG, Jersey; 1 Vasilisy Kozhinoy Str., Moscow 121096, Russia; 11/F Central Twr., 28 Queen’s Rd. C, Central District, Hong Kong; Registration ID 94939",
+          "pdf_page": 3,
+          "locator": "83 FR 19140, Entities no. 14",
+          "rules": [
+            "SANCTIONS",
+            "BO-032"
+          ],
+          "note": "same Jersey address as Basic Element and En+ written differently ('44 Esplanade, St. Helier' vs 'Esplanade 44, Saint Helier'); same Moscow address as En+ ('St.' vs 'Str.')"
+        },
+        {
+          "doc_id": "fr-ofac-2018-09147",
+          "quote": "(Linked To: EN+ GROUP PLC). Designated pursuant to section 1(a)(ii)(C)(2) of E.O. 13661 for being owned or controlled by EN+ GROUP PLC",
+          "pdf_page": 3,
+          "locator": "83 FR 19140, Entities no. 14",
+          "rules": [
+            "BO-002"
+          ]
+        },
+        {
+          "doc_id": "ofac-delisting-letter",
+          "quote": "OF AC also designated Rusal for being owned or controlled by, directly or indirectly, En+; Deripaska has a 0.01 percent direct ownership interest in Rusal",
+          "pdf_page": 2,
+          "locator": "Letter section 1, p. 2",
+          "rules": [
+            "BO-002"
+          ]
+        },
+        {
+          "doc_id": "ofac-delisting-letter",
+          "quote": "OF AC also designated ESE for being owned or controlled by, directly or indirectly, En+ and Deripaska.",
+          "pdf_page": 2,
+          "locator": "Letter section 1, p. 2",
+          "rules": [
+            "BO-002"
+          ]
+        },
+        {
+          "doc_id": "ofac-delisting-letter",
+          "quote": "Deripaska's stake in En+ will fall from approximately 70 percent to 44.95 percent, and his stake cannot be increased.",
+          "pdf_page": 4,
+          "locator": "Letter section 4, p. 4",
+          "rules": [
+            "BO-002"
+          ]
+        },
+        {
+          "doc_id": "ofac-delisting-letter",
+          "quote": "the Swiss company Glencore, or its subsidiary, swaps shares in Rusal for a direct ownership interest in En+.",
+          "pdf_page": 4,
+          "locator": "Letter section 4, p. 4",
+          "rules": [
+            "BO-002"
+          ]
+        },
+        {
+          "doc_id": "ofac-delisting-letter",
+          "quote": "Rusal and En+ agreed that En+, once it is no longer subject to sanctions, shall continue to control Rusal through a 56.88 percent stake",
+          "pdf_page": 6,
+          "locator": "Letter section 4, p. 6",
+          "rules": [
+            "BO-002"
+          ]
+        },
+        {
+          "doc_id": "ofac-delisting-letter",
+          "quote": "The Petitioners, led by Lord Gregory Barker, the former Minister of State for Energy and Climate Change for the United Kingdom,",
+          "pdf_page": 2,
+          "locator": "Letter section 2, p. 2",
+          "rules": [
+            "PEP"
+          ],
+          "note": "former UK minister acting for the sanctioned companies"
+        }
+      ]
+    }
+  ]
+}

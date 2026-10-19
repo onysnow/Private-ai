@@ -21,6 +21,21 @@ def _database_name(url: str) -> str:
     return parsed.path.lstrip("/")
 
 
+def _reset_schema(url: str) -> None:
+    """Start from an empty database. The suite's fixture creates missing tables
+    and clears rows, but a table left by an earlier run keeps its old columns,
+    so a run after a migration would test a schema the app no longer has."""
+    from sqlalchemy import create_engine, text
+
+    engine = create_engine(url)
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("DROP SCHEMA public CASCADE"))
+            conn.execute(text("CREATE SCHEMA public"))
+    finally:
+        engine.dispose()
+
+
 def main() -> int:
     url = os.environ.get("POSTGRES_TEST_URL", "").strip()
     if not url:
@@ -39,6 +54,7 @@ def main() -> int:
         )
         return 2
 
+    _reset_schema(url)
     env = os.environ.copy()
     env["DATABASE_URL"] = url
     env["JW_POSTGRES_GATE"] = "1"

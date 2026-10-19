@@ -1,0 +1,360 @@
+area: CF
+terms:
+- term: Predatory lending
+  definition: Lending practices that impose unfair or abusive terms on borrowers, such as equity stripping,
+    loan flipping and packing.
+  examples: []
+  source_url: https://dfi.wa.gov/financial-education/information/predatory-lending
+  cases: []
+  related:
+  - Equity stripping
+  - Loan flipping
+  - Packing
+  indicators: []
+  areas:
+  - CF
+- term: Equity stripping
+  definition: Lending against home equity regardless of whether the borrower can make the payments.
+  examples: []
+  source_url: https://dfi.wa.gov/financial-education/information/predatory-lending
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Loan flipping
+  definition: Repeatedly refinancing a borrower into new long-term high-cost loans.
+  examples: []
+  source_url: https://dfi.wa.gov/financial-education/information/predatory-lending
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Packing
+  definition: Adding charges for services the borrower did not request or need to a loan.
+  examples: []
+  source_url: https://dfi.wa.gov/financial-education/information/predatory-lending
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Balloon payment
+  definition: A large final payment due at the end of a loan; for high-cost mortgages, a payment more
+    than twice the regular payment is generally banned.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-12/chapter-X/part-1026/subpart-E/section-1026.32
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: High-cost mortgage (HOEPA)
+  definition: A home loan whose rate, points and fees, or prepayment penalties exceed federal triggers,
+    bringing extra protections and restrictions.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-12/chapter-X/part-1026/subpart-E/section-1026.32
+  cases: []
+  related:
+  - APOR
+  indicators: []
+  areas:
+  - CF
+- term: APOR (average prime offer rate)
+  definition: A benchmark rate for prime borrowers that a loan's APR is compared against to decide whether
+    it is high-cost.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-12/chapter-X/part-1026/subpart-E/section-1026.32
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Payday loan rollover
+  definition: Renewing or re-borrowing a short-term loan instead of paying it off, generating new fees.
+  examples: []
+  source_url: https://www.consumerfinance.gov/about-us/newsroom/cfpb-finds-four-out-of-five-payday-loans-are-rolled-over-or-renewed
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: UDAAP
+  definition: Unfair, deceptive, or abusive acts or practices, which federal law bans in consumer finance.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/12/5531
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Redlining
+  definition: Denying equal access to credit, or giving unequal terms, because of the race or ethnicity
+    of an area's residents.
+  examples: []
+  source_url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Reverse redlining
+  definition: Targeting certain borrowers or areas with less advantageous products or services.
+  examples: []
+  source_url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Steering
+  definition: Directing applicants to different, often worse, products or affiliates on a prohibited basis.
+  examples: []
+  source_url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Prohibited basis
+  definition: A characteristic, such as race, national origin or sex, on which lending discrimination
+    is banned.
+  examples: []
+  source_url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: CRA assessment area
+  definition: The geographic area a bank defines as the community it serves for Community Reinvestment
+    Act evaluation.
+  examples: []
+  source_url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: HMDA data
+  definition: Loan-level mortgage application data that lenders report publicly, used to compare lending
+    against peers.
+  examples: []
+  source_url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Dealer markup
+  definition: Extra interest a car dealer adds above the lender's buy rate, kept partly as compensation.
+  examples: []
+  source_url: https://www.consumerfinance.gov/about-us/newsroom/cfpb-and-doj-order-ally-to-pay-80-million-to-consumers-harmed-by-discriminatory-auto-loan-pricing/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Adverse action notice
+  definition: The statement of specific reasons a creditor must give an applicant it turns down, including
+    when it uses complex algorithms.
+  examples: []
+  source_url: https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Fair housing testing
+  definition: Sending matched testers to ask about the same home to see whether some are falsely told
+    it is unavailable.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/24/100.80
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Four-fifths rule
+  definition: Federal rule of thumb that a group's selection rate below 80% of the top group's rate is
+    evidence of adverse impact in hiring.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/29/1607.4
+  cases: []
+  related:
+  - Adverse impact
+  indicators: []
+  areas:
+  - CF
+- term: Regulation F
+  definition: CFPB rules implementing the Fair Debt Collection Practices Act.
+  examples: []
+  source_url: https://www.consumerfinance.gov/rules-policy/regulations/1006/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Time-barred debt
+  definition: A debt for which the statute of limitations has expired, so collectors cannot sue on it.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.26
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Debt buyer
+  definition: A company that buys defaulted debts cheaply and collects or sues on them.
+  examples: []
+  source_url: https://www.consumerfinance.gov/about-us/newsroom/consumer-financial-protection-bureau-settles-lawsuit-debt-collectors-and-debt-buyers-encore-capital-group-midland-funding-midland-credit-management-and-asset-acceptance-capital-corp
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: FAFSA
+  definition: The Free Application for Federal Student Aid, the form students use to apply for federal
+    aid.
+  examples: []
+  source_url: https://www.gao.gov/assets/gao-10-948t.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Cohort default rate
+  definition: The share of a school's federal student loan borrowers who default within a set period;
+    high rates cost the school aid eligibility.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/34/668.206
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: 90/10 rule
+  definition: A for-profit college must get at least 10% of revenue from non-federal sources or lose federal
+    aid after two years.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/34/668.28
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Title IV
+  definition: The federal student aid programmes under the Higher Education Act.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/34/668.28
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Unfair claims settlement practices
+  definition: Insurer claim-handling practices listed in the NAIC model law as unfair when done often
+    enough to be a general business practice.
+  examples: []
+  source_url: https://content.naic.org/sites/default/files/model-law-900.pdf
+  cases: []
+  related:
+  - General business practice
+  indicators: []
+  areas:
+  - CF
+- term: General business practice
+  definition: Conduct committed so frequently that it indicates a pattern, the threshold for NAIC unfair
+    claims violations.
+  examples: []
+  source_url: https://content.naic.org/sites/default/files/model-law-900.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Certification of No Harassment (CONH)
+  definition: NYC programme requiring owners of qualifying buildings to prove no tenant harassment before
+    getting certain building permits.
+  examples: []
+  source_url: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Emergency repair charge
+  definition: A charge a city bills to an owner after doing urgent repairs the owner failed to make.
+  examples: []
+  source_url: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Vacate order
+  definition: A government order requiring occupants to leave a building because conditions are dangerous.
+  examples: []
+  source_url: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Tenant harassment
+  definition: Owner conduct meant to force tenants out or make them give up rights, such as buyout pressure,
+    service cuts and baseless court cases.
+  examples: []
+  source_url: https://www.nyc.gov/site/hpd/services-and-information/tenant-harassment.page
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Buyout offer
+  definition: A payment offered by an owner for a tenant to leave; NYC restricts how such offers are made.
+  examples: []
+  source_url: https://www.nyc.gov/site/hpd/services-and-information/tenant-harassment.page
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Indicators of harm (gambling)
+  definition: The seven categories of customer data UK online gambling operators must monitor to spot
+    gambling harm.
+  examples: []
+  source_url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Chasing losses
+  definition: Gambling more to try to win back money already lost.
+  examples: []
+  source_url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Self-exclusion
+  definition: A customer's request to be barred from gambling with an operator for a set period.
+  examples: []
+  source_url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF
+- term: Social responsibility failures
+  definition: A gambling operator's failure to meet licence duties to protect customers from harm.
+  examples: []
+  source_url: https://www.gamblingcommission.gov.uk/news/article/william-hill-group-businesses-to-pay-record-gbp19-2m-for-failures
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CF

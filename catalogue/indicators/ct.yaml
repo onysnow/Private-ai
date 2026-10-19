@@ -1,0 +1,1332 @@
+key: CT
+name: Price-fixing and market-sharing cartels
+scope: Price fixing, market and customer allocation, and algorithmic rent-setting outside public tenders.
+indicators:
+- id: CT-001
+  name: Competitors' prices identical for long periods
+  definition: Rival sellers charge the same price and keep it that way for a long time, especially where
+    their prices used to differ.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For
+      (An Antitrust Primer)'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.4, 'Bid or Price Patterns', Prices
+    quote: 'Identical prices may indicate a price-fixing conspiracy, especially when: Prices stay identical
+      for long periods of time. Prices previously were different.'
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several suppliers of the same product quote the same unit price month after month, after a period
+    when their prices differed.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Published price lists and archived web pages
+  - Consumer or trade price surveys
+  - Government price statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - In a market for a standard product, competition itself can push prices to the same level.
+  - Firms may lawfully follow a rival's public price without any agreement.
+  - Prices may be regulated, capped or set by a common published index.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-002
+  name: Price increases not explained by costs
+  definition: Rival sellers raise prices, often at the same time, without any rise in their costs that
+    would explain it.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.4, 'Bid or Price Patterns', Prices
+    quote: Price increases do not appear to be supported by increased costs.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several producers announce similar increases in the same week while input costs are flat.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Company price announcements and press releases
+  - Input cost indices (commodity, energy, wages)
+  - Company annual reports showing margins
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Costs that outsiders cannot see may have risen (contracts, insurance, financing).
+  - A rise in demand can raise prices without any cost change.
+  - Firms may independently follow a price leader.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-003
+  name: Discounts disappear across a market
+  definition: Discounts that buyers used to get are withdrawn, especially across several sellers in a
+    market where discounting was normal.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.4, 'Bid or Price Patterns', Prices
+    quote: Discounts are eliminated, especially in a market where discounts historically were given.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.2, 'Price Fixing' (examples of agreements)
+    quote: Eliminate or reduce discounts.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Customers report that every supplier in a region stopped offering volume discounts in the same period.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: person
+  lookup_sources:
+  - Buyers and procurement staff
+  - Historical quotes and invoices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Tight supply or high demand reduces the need to discount.
+  - A firm may cut discounts after independently reviewing its margins.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-004
+  name: Local customers pay more than distant customers
+  definition: Sellers charge higher prices to nearby customers than to customers further away, which the
+    DOJ says may mean local prices are fixed.
+  areas:
+  - CT
+  typology: price fixing / market allocation
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.4, 'Bid or Price Patterns', Prices
+    quote: Vendors are charging higher prices to local customers than to distant customers. This may indicate
+      local prices are fixed.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A regional supplier sells more cheaply to a buyer in another state than to buyers in its own city,
+    despite higher delivery costs.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Invoices or quotes from customers in different locations
+  - Public procurement price records from different areas
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Distant markets may be more competitive, forcing lower prices there.
+  - Volume or contract-length differences between customers.
+  - Introductory pricing to win new territory.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-005
+  name: Talk that a customer or contract 'belongs' to a vendor
+  definition: A salesperson or bidder says a particular customer, contract or territory is someone else's,
+    suggesting competitors have shared out the business.
+  areas:
+  - CT
+  - PP
+  typology: market and customer allocation
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.5, 'Suspicious Statements or Behavior'
+    quote: Statements to the effect that a particular customer or contract “belongs” to a certain vendor.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A supplier declines to quote and tells the buyer it 'isn't our account'.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Note
+  checkable: person
+  lookup_sources:
+  - Buyers, procurement officers, former employees
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: The DOJ primer lists this statement among bid-rigging warning signs as well, so it applies
+      to public tenders too.
+    source_url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+  innocent_explanations:
+  - Loose talk about a long-standing incumbent relationship.
+  - The vendor may lack capacity or interest and phrase its refusal casually.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-006
+  name: Reference to industry-wide or association price schedules
+  definition: A seller points to an industry or trade association price list, or to 'industry pricing',
+    as the basis for its price.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.5, 'Suspicious Statements or Behavior'
+    quote: Any reference to industry-wide or association price schedules.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.2, 'Price Fixing' (examples of agreements)
+    quote: Adhere to a minimum fee or price schedule.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A trade association circulates a 'recommended' fee schedule and members quote from it.
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - Trade association websites, newsletters and member materials
+  - Quotes and sales documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some sectors use lawful published benchmarks or regulated tariffs.
+  - Salespeople may say 'industry rate' loosely to mean the going market price.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-007
+  name: Advance knowledge of competitors' pricing
+  definition: A seller knows what its rivals will charge before that information is public.
+  areas:
+  - CT
+  typology: price fixing / information exchange
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.5, 'Suspicious Statements or Behavior'
+    quote: Any statement indicating advance (non-public) knowledge of competitors’ pricing.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A sales rep tells a customer the exact increase a rival will announce next month.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Customers, former employees, internal emails obtained lawfully
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Information may have come from customers comparing quotes.
+  - Rivals may have already pre-announced prices publicly.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-008
+  name: Statements that competitors discussed or agreed prices
+  definition: Anyone indicates that competing sellers have talked about prices or reached an understanding
+    on them.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.5, 'Suspicious Statements or Behavior'
+    quote: Any statement indicating that vendors have discussed prices among themselves or have reached
+      an understanding about prices.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Price fixing (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/price-fixing
+    locator: Definition
+    quote: Price fixing is an agreement (written, verbal, or inferred from conduct) among competitors
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A former employee describes regular calls between sales heads of rival firms before price changes.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - Document
+  - Associate
+  checkable: person
+  lookup_sources:
+  - Whistleblowers, former employees
+  - Court filings and regulator decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful joint ventures or supply agreements between competitors can involve pricing talks about that
+    specific deal.
+  - Hearsay or misunderstanding of a lawful conversation.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-009
+  name: Competitors stay out of each other's territories
+  definition: Rival firms sell only in their own areas and refuse to sell, or quote deliberately high
+    prices, to customers in areas served by the others.
+  areas:
+  - CT
+  typology: market allocation (territorial)
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.3, 'Market Division'
+    quote: In other schemes, competitors agree to sell only to customers in certain geographic areas and
+      refuse to sell to, or quote intentionally high prices to, customers in geographic areas allocated
+      to conspirator companies.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Market division or customer allocation (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/market-division-or-customer-allocation
+    locator: Main text
+    quote: Plain agreements among competitors to divide sales territories or assign customers are almost
+      always illegal.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'FTC example: two chemical companies where ''one would not sell in North America if the other would
+    not sell in Japan.'''
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Company sales footprints, depot and branch locations
+  - Procurement award data by region
+  - Customer quotes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transport costs, licensing or logistics make distant sales uneconomic.
+  - A firm may independently choose to focus on its home market.
+  - Regulatory or franchise boundaries may restrict where firms operate.
+  jurisdictions: US (DOJ, FTC guidance); general
+  version: 1
+- id: CT-010
+  name: Competitors do not solicit each other's customers
+  definition: Rival firms leave each other's customers (or employees) alone, or each is assigned particular
+    customers or customer types.
+  areas:
+  - CT
+  typology: customer allocation
+  status: verified
+  sources:
+  - title: Market division or customer allocation (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/market-division-or-customer-allocation
+    locator: Main text
+    quote: or agreeing not to solicit one another's customers or employees.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.3, 'Market Division'
+    quote: In such schemes, competing firms allocate specific customers or types of customers, products,
+      or territories among themselves.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sandoz admitted to conspiring to allocate customers for generic drugs (DOJ, 2020).
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - ContractAward
+  - Employment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Customer supplier histories
+  - Procurement and contract award records
+  - Job-move data (for no-poach patterns)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - 'Specialisation: firms may serve different customer types because of their products.'
+  - Customer loyalty and switching costs keep customers with incumbents.
+  - Lawful non-solicit clauses in genuine joint ventures or sale-of-business deals.
+  jurisdictions: US (DOJ, FTC guidance); general
+  version: 1
+- id: CT-011
+  name: Each firm's share of the business is fixed or very stable
+  definition: Competitors appear to divide the available business by set percentages, so market shares
+    barely move over time.
+  areas:
+  - CT
+  typology: market allocation (quota)
+  status: verified
+  sources:
+  - title: Market division or customer allocation (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/market-division-or-customer-allocation
+    locator: Main text
+    quote: Illegal market sharing may involve allocating a specific percentage of available business to
+      each producer,
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Price fixing (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/price-fixing
+    locator: Topics list
+    quote: Production quotas
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Industry sales data show three producers holding near-identical shares year after year despite demand
+    swings.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Industry market-share statistics
+  - Company annual reports
+  - Trade association statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Mature markets with long-term contracts naturally show stable shares.
+  - Capacity limits keep each firm at a similar level.
+  jurisdictions: US (FTC guidance); general
+  version: 1
+- id: CT-012
+  name: Common pricing formula or fixed price differentials
+  definition: Competitors all calculate prices the same way or keep the same gaps between product sizes,
+    types or quantities.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.2, 'Price Fixing' (examples of agreements)
+    quote: Adopt a standard formula for computing prices.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.2, 'Price Fixing' (examples of agreements)
+    quote: Maintain certain price differentials between different types, sizes, or quantities of products.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rival sellers apply the same surcharge formula to every order.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Price lists and rate cards
+  - Customer invoices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Widely used public cost indices or regulated formulas.
+  - Industry-standard accounting conventions.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-013
+  name: Uniform non-price terms (credit, shipping fees, warranties)
+  definition: Competitors line up on the terms around price, such as credit terms, delivery fees, warranties,
+    discount programs or financing rates.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: Price fixing (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/price-fixing
+    locator: Main text
+    quote: such as credit terms, shipping fees, warranties, discount programs, or financing rates.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.2, 'Price Fixing' (examples of agreements)
+    quote: Fix credit terms.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Every supplier in a market introduces the same new fuel or delivery surcharge at the same time.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Terms and conditions pages (current and archived)
+  - Customer contracts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Common terms may come from industry standard contracts or law.
+  - Firms may copy a rival's public terms independently.
+  jurisdictions: US (FTC, DOJ guidance); general
+  version: 1
+- id: CT-014
+  name: Competitors stop advertising prices
+  definition: Rival sellers all stop publishing or advertising their prices, which the DOJ lists as one
+    form a price-fixing agreement can take.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.2, 'Price Fixing' (examples of agreements)
+    quote: Not advertise prices.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Local professional firms all remove fee information from their websites in the same month.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Web archives (e.g. Wayback Machine) of seller sites
+  - Advertising archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Professional or advertising rules may restrict price advertising.
+  - Firms may move to bespoke quoting for business reasons.
+  jurisdictions: US (DOJ guidance)
+  version: 1
+- id: CT-015
+  name: Coordinated cuts in output or capacity
+  definition: Competitors restrict production, sales or capacity together, which raises prices just as
+    direct price fixing does.
+  areas:
+  - CT
+  typology: output restriction
+  status: verified
+  sources:
+  - title: Price fixing (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/price-fixing
+    locator: Main text
+    quote: An agreement to restrict production, sales, or output is just as illegal as direct price fixing
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several producers announce capacity cuts at the same time while demand is steady.
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Industry production statistics
+  - Company earnings calls and annual reports
+  - Plant closure notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Falling demand or rising costs lead each firm to cut output on its own.
+  - Regulatory, environmental or safety shutdowns.
+  jurisdictions: US (FTC guidance); general
+  version: 1
+- id: CT-016
+  name: Competitors discuss sensitive business topics
+  definition: Rival firms discuss topics such as current or future prices, costs, capacity, customers,
+    bids or sales areas, for example at trade association meetings.
+  areas:
+  - CT
+  typology: information exchange
+  status: verified
+  sources:
+  - title: Price fixing (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/price-fixing
+    locator: Topics list
+    quote: 'Antitrust scrutiny may occur when competitors discuss the following topics:'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines on the applicability of Article 101 TFEU to horizontal co-operation agreements (2023/C
+      259/01)
+    publisher: European Commission (Official Journal of the EU)
+    year: '2023'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+    locator: Chapter 6 (information exchange), public announcements
+    quote: While competitors may refer to the rising cost of supplies – as they are public knowledge –
+      they must not publicly evaluate their individual response to these rising costs, as doing so reduces
+      uncertainty regarding their conduct on the market
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Trade association meeting minutes record members discussing next year's price levels.
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Trade association agendas, minutes and newsletters
+  - Conference programmes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Trade associations lawfully discuss standards, safety, regulation and aggregated historical data.
+  - Lawful joint ventures need some information sharing.
+  jurisdictions: US (FTC guidance); EU
+  version: 1
+- id: CT-017
+  name: Public signals about future pricing intentions
+  definition: A firm publicly announces what it intends to do on prices (rather than a firm decision),
+    or invites rivals to end a price war, in a way that can signal to competitors.
+  areas:
+  - CT
+  typology: signalling / concerted practice
+  status: verified
+  sources:
+  - title: Guidelines on the applicability of Article 101 TFEU to horizontal co-operation agreements (2023/C
+      259/01)
+    publisher: European Commission (Official Journal of the EU)
+    year: '2023'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+    locator: para. 400
+    quote: For example, a unilateral public announcement referring to intentions relating to future pricing
+      (as opposed to communicating an actual decision to change prices as of a certain date in the near
+      future) will not commit the undertaking making the announcement vis-à-vis its customers, but may
+      give signals concerning an undertaking’s intended strategy on the market to its competitors.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Price fixing (Guide to Antitrust Laws)
+    publisher: US Federal Trade Commission
+    url: https://www.ftc.gov/advice-guidance/competition-guidance/guide-antitrust-laws/dealings-competitors/price-fixing
+    locator: Main text
+    quote: Invitations to coordinate prices also can raise concerns
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - An executive says on an earnings call that the company would raise prices 'if others do the same'.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Earnings call transcripts
+  - Press releases and trade press interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Listed companies must give investors guidance on expected performance.
+  - Announcing a firm, dated price change to customers is normal business.
+  jurisdictions: EU; US (FTC guidance)
+  version: 1
+- id: CT-018
+  name: Steady publication of information with no benefit to customers, in a concentrated market
+  definition: In a market with few competitors and high entry barriers, firms keep publishing detailed
+    information (such as costs) that does nothing for customers but could help rivals coordinate.
+  areas:
+  - CT
+  typology: signalling / information exchange
+  status: verified
+  sources:
+  - title: Guidelines on the applicability of Article 101 TFEU to horizontal co-operation agreements (2023/C
+      259/01)
+    publisher: European Commission (Official Journal of the EU)
+    year: '2023'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+    locator: para. 400
+    quote: Unilateral public announcements may be indicative of an underlying anti-competitive agreement
+      or concerted practice.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Guidelines example: undertakings that continuously publish information on R&D costs or costs of adapting
+    to environmental requirements in a market with few competitors.'
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Company websites and press statements
+  - Market concentration data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Disclosure may be required by securities or environmental rules.
+  - Firms may publish to inform investors or the public debate.
+  jurisdictions: EU
+  version: 1
+- id: CT-019
+  name: 'Hub-and-spoke: a common supplier, distributor or platform relays information between rivals'
+  definition: Competitors share information indirectly through a common business partner or platform that
+    passes it on, for example to secure certain margins or price levels.
+  areas:
+  - CT
+  typology: hub-and-spoke
+  status: verified
+  sources:
+  - title: Guidelines on the applicability of Article 101 TFEU to horizontal co-operation agreements (2023/C
+      259/01)
+    publisher: European Commission (Official Journal of the EU)
+    year: '2023'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+    locator: para. 402
+    quote: An online platform can also act as a hub where it facilitates, coordinates or enforces information
+      exchanges between business users of the platform, for example, to secure certain margins or price
+      levels.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A manufacturer passes one retailer's planned retail price on to other retailers.
+  cases: []
+  data_needed:
+  - Company
+  - Organization
+  - Contract
+  - Document
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Supplier/distributor contracts
+  - Platform terms of service
+  - Internal emails in court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Suppliers lawfully talk to many customers about their own prices.
+  - Platforms offer pricing tools that may not share rivals' data.
+  jurisdictions: EU; UK
+  version: 1
+- id: CT-020
+  name: Rivals use the same third-party pricing software or common pricing intermediary
+  definition: Competing firms hand pricing decisions to the same algorithm, software vendor or intermediary,
+    which can create a hub-and-spoke structure.
+  areas:
+  - CT
+  typology: algorithmic collusion / hub-and-spoke
+  status: verified
+  sources:
+  - title: 'Algorithms: How they can reduce competition and harm consumers'
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/algorithms-how-they-can-reduce-competition-and-harm-consumers/algorithms-how-they-can-reduce-competition-and-harm-consumers
+    locator: Section 'Algorithmic collusion'
+    quote: Second, where firms use the same algorithmic system to set prices, including by using the same
+      software or services supplied by a third-party, or by delegating their pricing decisions to a common
+      intermediary, this can create a ‘hub-and-spoke’ structure and facilitate information exchange
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Competing landlords in a city all using RealPage revenue management software (alleged in the DOJ's
+    2024 suit).
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Organization
+  - Document
+  checkable: records
+  lookup_sources:
+  - Software vendor client lists and marketing case studies
+  - Job adverts naming pricing software
+  - Court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Off-the-shelf pricing tools are common and can price each client independently.
+  - Small firms adopt third-party tools because they lack in-house capacity, which the CMA notes can lower
+    entry barriers.
+  jurisdictions: UK; US
+  version: 1
+- id: CT-021
+  name: Competitors feed non-public data into a shared pricing tool
+  definition: Rival firms give a common vendor their confidential prices, occupancy or sales data, which
+    is then used to recommend prices to all of them.
+  areas:
+  - CT
+  typology: algorithmic collusion / information exchange
+  status: verified
+  sources:
+  - title: Justice Department Sues RealPage for Algorithmic Pricing Scheme that Harms Millions of American
+      Renters
+    publisher: US Department of Justice, Office of Public Affairs
+    year: '2024'
+    url: https://www.justice.gov/archives/opa/pr/justice-department-sues-realpage-algorithmic-pricing-scheme-harms-millions-american-renters
+    locator: Press release, opening paragraphs
+    quote: RealPage contracts with competing landlords who agree to share with RealPage nonpublic, competitively
+      sensitive information
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - DOJ alleged that landlords' nonpublic data trained software that generated rent recommendations (2024).
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Document
+  - Organization
+  checkable: records
+  lookup_sources:
+  - Vendor contracts and marketing materials
+  - Court complaints and dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Benchmarking services can use aggregated, historical and anonymised data that regulators treat as
+    less strategic.
+  - Firms may share data only for their own analytics without the vendor pooling it.
+  jurisdictions: US
+  version: 1
+- id: CT-022
+  name: Repricing software set so rivals do not undercut each other
+  definition: Sellers configure automated repricing tools to match rather than undercut a named competitor,
+    putting an agreement into effect.
+  areas:
+  - CT
+  typology: algorithmic collusion (explicit agreement)
+  status: verified
+  sources:
+  - title: Online sales of posters and frames (case 50223)
+    publisher: UK Competition and Markets Authority
+    year: '2016'
+    url: https://www.gov.uk/cma-cases/online-sales-of-discretionary-consumer-products
+    locator: Settlement update, 21 July 2016
+    quote: The agreement was implemented using automated repricing software which the parties each configured
+      to give effect to the illegal cartel.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Algorithms: How they can reduce competition and harm consumers'
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/algorithms-how-they-can-reduce-competition-and-harm-consumers/algorithms-how-they-can-reduce-competition-and-harm-consumers
+    locator: Section 'Algorithmic collusion'
+    quote: Even simple pricing algorithms, with access to real-time data on competitors’ prices, could
+      make explicit collusion between firms more stable
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Trod and GB eye agreed not to undercut each other on Amazon UK (CMA, 2016).
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Marketplace price histories
+  - Regulator decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Price-matching a rival's public price is common unilateral behaviour.
+  - Repricing tools often default to matching the lowest visible price.
+  jurisdictions: UK; US
+  version: 1
+- id: CT-023
+  name: Signs of a policing mechanism among competitors
+  definition: There is some way for competitors to check that everyone sticks to an agreed price, share
+    or territory.
+  areas:
+  - CT
+  typology: cartel enforcement
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.2, 'Price Fixing'
+    quote: In many cases, participants in a price-fixing conspiracy also establish some type of policing
+      mechanism to make sure that everyone adheres to the agreement.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines on the applicability of Article 101 TFEU to horizontal co-operation agreements (2023/C
+      259/01)
+    publisher: European Commission (Official Journal of the EU)
+    year: '2023'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+    locator: para. 400
+    quote: The unilateral public announcements may be used to implement or monitor their collusive arrangements.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rivals exchange detailed sales reports through an association that would reveal anyone cutting prices.
+  cases: []
+  data_needed:
+  - Organization
+  - Company
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Former employees
+  - Trade association data-sharing schemes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Market monitoring of public competitor prices is normal business practice.
+  - Aggregated industry statistics serve planning and policy purposes.
+  jurisdictions: US (DOJ guidance)
+  version: 1
+- id: CT-024
+  name: Coordinated passing-on of new cost or regulatory burdens
+  definition: Competitors appear to agree how and when to pass on to customers a new cost, such as the
+    cost of complying with new regulations.
+  areas:
+  - CT
+  typology: price fixing
+  status: verified
+  sources:
+  - title: 'Antitrust: Commission fines truck producers € 2.93 billion for participating in a cartel (IP/16/2582)'
+    publisher: European Commission
+    year: '2016'
+    url: https://ec.europa.eu/commission/presscorner/detail/en/IP_16_2582
+    locator: Press release, opening
+    quote: colluded for 14 years on truck pricing and on passing on the costs of compliance with stricter
+      emission rules.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Guidelines on the applicability of Article 101 TFEU to horizontal co-operation agreements (2023/C
+      259/01)
+    publisher: European Commission (Official Journal of the EU)
+    year: '2023'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52023XC0721(01)
+    locator: Chapter 6, public announcements
+    quote: This means that each competitor has to decide independently what its response will be to the
+      rising cost of supplies.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Truck makers colluded on passing on emission-compliance costs (European Commission, 2016).
+  cases: []
+  data_needed:
+  - Company
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Surcharge announcements
+  - Regulatory change timelines
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - All firms facing the same new cost will raise prices similarly on their own.
+  - Regulations may set effective dates that make increases coincide.
+  jurisdictions: EU
+  version: 1
+- id: CT-025
+  name: 'Market conditions favour collusion: few sellers or a few majors plus a fringe'
+  definition: A market has few sellers, or a small group of major sellers with many small fringe ones,
+    which makes agreement easier.
+  areas:
+  - CT
+  typology: structural condition
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.5, 'Conditions Favorable to Collusion'
+    quote: Collusion is more likely to occur if there are few sellers. The fewer the number of sellers,
+      the easier it is for them to get together and agree on prices, bids, customers, or territories.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - A regional market for ready-mix concrete served by three firms.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Market share and concentration data
+  - Company registries and ownership records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many concentrated markets are competitive; a condition is not evidence of an agreement.
+  - Economies of scale can lead to few sellers.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-026
+  name: 'Market conditions favour collusion: few substitutes, standardised product, repeat purchases'
+  definition: Buyers cannot easily switch to other products, the product is standardised, or purchases
+    repeat regularly, all of which make a common price easier to agree and keep.
+  areas:
+  - CT
+  typology: structural condition
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.5, 'Conditions Favorable to Collusion'
+    quote: The more standardized a product is, the easier it is for competing firms to reach agreement
+      on a common price structure.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.5, 'Conditions Favorable to Collusion'
+    quote: The probability of collusion increases if other products cannot easily be substituted for the
+      product in question or if there are restrictive specifications for the product being procured.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Commodity foods, generic drugs and building materials are standardised products bought repeatedly.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Product specifications
+  - Industry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - These are features of many ordinary markets and show only that collusion would be easier, not that
+    it happened.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-027
+  name: Competitors closely connected through associations, social ties or staff moves
+  definition: People at rival firms know each other well through trade associations, social links, business
+    contacts or moving jobs between the firms.
+  areas:
+  - CT
+  typology: structural condition
+  status: verified
+  sources:
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: US Department of Justice, Antitrust Division
+    year: 2005, revised 2021
+    url: https://www.justice.gov/atr/public/guidelines/211578.pdf
+    locator: p.6, 'Conditions Favorable to Collusion'
+    quote: Collusion is more likely if the competitors know each other well through social connections,
+      trade associations, legitimate business contacts, or shifting employment from one company to another.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Sales directors of rival firms sit together on a trade association board and previously worked at
+    each other's companies.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Organization
+  - Employment
+  - Directorship
+  - Associate
+  - Family
+  checkable: lookups
+  lookup_sources:
+  - Company registries (directors)
+  - Trade association board lists
+  - Professional networking profiles
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Industries are small and staff move between employers routinely.
+  - Trade associations serve lawful purposes such as standards and lobbying.
+  jurisdictions: US (DOJ guidance); general
+  version: 1
+- id: CT-028
+  name: Margins rise after a market widely adopts algorithmic pricing
+  definition: Sellers' margins go up some time after most of a local market starts using pricing algorithms,
+    which research suggests can reflect algorithms learning to coordinate.
+  areas:
+  - CT
+  typology: algorithmic (tacit) collusion
+  status: verified
+  sources:
+  - title: 'Algorithms: How they can reduce competition and harm consumers'
+    publisher: UK Competition and Markets Authority
+    year: '2021'
+    url: https://www.gov.uk/government/publications/algorithms-how-they-can-reduce-competition-and-harm-consumers/algorithms-how-they-can-reduce-competition-and-harm-consumers
+    locator: Section 'Autonomous tacit collusion' (summarising Assad et al. 2020)
+    quote: They estimated that German retail petrol stations increased their margins by around 9 percent
+      after adopting algorithmic pricing, but only where they faced local competition.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Assad et al. (2020) study of German retail petrol stations, as summarised by the CMA.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Public price data (e.g. fuel price transparency feeds)
+  - Vendor adoption announcements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Algorithms may improve demand forecasting and raise margins without coordination.
+  - The CMA notes empirical evidence on real-world algorithmic collusion is scarce; whether this is unlawful
+    without contact between firms is unclear.
+  jurisdictions: UK (CMA research summary); Germany (study)
+  version: 1
+not_reached:
+- 'The web search budget for this run was used up after one query, so the research went no wider than
+  direct fetches of known primary URLs. More indicators may exist in sources not reached: the OECD''s
+  ''Ex officio cartel investigations and the use of screens'' (fetch failed), CMA cartel guidance for
+  businesses (gov.uk URLs tried returned 404), the ACCC cartel guidance (403), and Competition Bureau
+  Canada cartel pages (proxy 502).'
+- 'Pilgrim''s Pride chicken price-fixing plea (DOJ) and the Competition Bureau Canada bread price-fixing
+  outcome: both fetches failed, so neither is included as a case.'
+- 'StarKist canned tuna sentencing (DOJ): the page returned 404 at the URL tried.'
+- 'DOJ/FTC statement of interest on algorithmic collusion (rent-setting cases): fetch failed.'
+- 'US v. Topkins (DOJ, 2015, posters on Amazon Marketplace): the press release confirms the charge and
+  an agreement to plead guilty, but the conviction was not confirmed from a reachable source, so it is
+  left out of cases.'
+- The current status of US v. RealPage (any settlement or judgment after the 2024 complaint) was not checked;
+  it is recorded as allegations only.
+- The FTC quotes come from a fetch tool that shortened long sentences, so they are exact excerpts but
+  some are not full sentences.

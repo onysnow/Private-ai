@@ -1,0 +1,1173 @@
+{
+ "generated": "2026-10-11",
+ "note": "Photos/videos from Wikimedia Commons. upload.wikimedia.org rate-limited (HTTP 429) original-file downloads from this environment, so most photos are Wikimedia standard-size thumbnails: 'url', 'bytes' and 'sha256' describe that rendition. Coordinates from OpenStreetMap Nominatim (ODbL, attribution 'OpenStreetMap contributors').",
+ "photos": [
+  {
+   "id": "equanimity-2014-nieuwe-waterweg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Y_709_%2813272476713%29.jpg/1920px-Y_709_%2813272476713%29.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Y_709_%2813272476713%29.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3420x1928.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Y_709_%2813272476713%29.jpg",
+   "title": "Y 709 (Equanimity) on the Nieuwe Waterweg",
+   "shows": "Superyacht Equanimity (Oceanco yard no. Y709) under way on the Nieuwe Waterweg before delivery; Commons files it in Category:Equanimity (ship, 2014). 'Before' image.",
+   "date_taken": "2014-03-19 09:16",
+   "date_source": "Commons |Date= and original-file EXIF DateTimeOriginal per Commons metadata table",
+   "place": "Nieuwe Waterweg, Netherlands (per Flickr description 'Nieuwe Waterweg 19-3-2014')",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+   "author": "kees torn (Flickr), via Commons",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "SONY",
+    "exif-model": "SLT-A57",
+    "exif-datetimeoriginal": "09:16, 19 March 2014",
+    "exif-datetime": "19:50, 19 March 2014"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 1082,
+   "bytes": 329568,
+   "sha256": "a222b577006b65f7304500f02ab9879d6ed680589ec0e9b61741f2b71725a986",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/equanimity-2014-03-19-nieuwe-waterweg.jpg",
+   "notes": "Flickr-sourced; FlickreviewR passed 2014-06-06."
+  },
+  {
+   "id": "equanimity-2014-nieuwe-waterweg-tug",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Y_709_%26_KRVE_61_%2813267872543%29.jpg/1920px-Y_709_%26_KRVE_61_%2813267872543%29.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Y_709_%26_KRVE_61_%2813267872543%29.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3273x1559.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Y_709_%26_KRVE_61_%2813267872543%29.jpg",
+   "title": "Y 709 & KRVE 61",
+   "shows": "Equanimity (yard no. Y709) with harbour tug KRVE 61 on the Nieuwe Waterweg during delivery/trials period.",
+   "date_taken": "2014-03-19 09:18",
+   "date_source": "Commons |Date= and original-file EXIF DateTimeOriginal per Commons metadata table (Flickr description text says '10-3-2014', inconsistent with EXIF)",
+   "place": "Nieuwe Waterweg, Netherlands",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+   "author": "kees torn (Flickr), via Commons",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "SONY",
+    "exif-model": "SLT-A57",
+    "exif-datetimeoriginal": "09:18, 19 March 2014",
+    "exif-datetime": "13:36, 19 March 2014"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 915,
+   "bytes": 243376,
+   "sha256": "6bd8d878b894225df6f4d1de4b6935a8d49e33b581473f8fa7daef8ca0a2f82e",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/equanimity-2014-03-19-nieuwe-waterweg-tug.jpg",
+   "notes": "Flickr-sourced; FlickreviewR passed."
+  },
+  {
+   "id": "equanimity-2014-villefranche",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/EQUANIMITY_Yacht_at_Villefranche.JPG/1920px-EQUANIMITY_Yacht_at_Villefranche.JPG",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/EQUANIMITY_Yacht_at_Villefranche.JPG",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3840x2880.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:EQUANIMITY_Yacht_at_Villefranche.JPG",
+   "title": "EQUANIMITY Yacht at Villefranche",
+   "shows": "Superyacht Equanimity at anchor (description only says 'Equanimity Yacht').",
+   "date_taken": "2014-09-28 13:41:23",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal",
+   "place": "Villefranche-sur-Mer, France (per file title; no GPS)",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "Abxbay (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "NIKON",
+    "exif-model": "COOLPIX P510",
+    "exif-datetimeoriginal": "13:41, 28 September 2014",
+    "exif-datetime": "13:41, 28 September 2014"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 1440,
+   "bytes": 757180,
+   "sha256": "5ca79307334dd0d8d1948fe5a8c532aa02f503f4ef9c5bb4adde93af3280e733",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/equanimity-2014-09-28-villefranche.jpg",
+   "notes": null
+  },
+  {
+   "id": "equanimity-2018-bali-seized",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Equanimity%2C_the_seized_yacht.jpg/1920px-Equanimity%2C_the_seized_yacht.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Equanimity%2C_the_seized_yacht.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 2530x2052.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Equanimity%2C_the_seized_yacht.jpg",
+   "title": "Equanimity, the seized yacht",
+   "shows": "Equanimity on 15 March 2018, about three weeks after it was seized by Indonesian police with the US DOJ (per uploader's description).",
+   "date_taken": "2018-03-15 12:47:28",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal",
+   "place": "Bali, Indonesia (Commons categories: Ships in Indonesia; exact spot not stated, no GPS)",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "Sabung.hamster aka Everyone Sinks Starco (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "NIKON CORPORATION",
+    "exif-model": "NIKON D3000",
+    "exif-datetimeoriginal": "12:47, 15 March 2018",
+    "exif-datetime": "17:25, 17 March 2018"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 1557,
+   "bytes": 460258,
+   "sha256": "f6f037359ab0bfa56625a244bea9fe2c4c01852bfd615d3a654671d8e70e2f1f",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/equanimity-2018-03-15-bali-seized.jpg",
+   "notes": "Uploader notes a Flickr copy under CC BY-SA 2.0; that Flickr page now shows All Rights Reserved, so rely on the Commons licence."
+  },
+  {
+   "id": "equanimity-2018-benoa-a",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Golden_Princess_-_Tanjung_Benoa%2C_26_Maret_2018_-_A.jpg/1920px-Golden_Princess_-_Tanjung_Benoa%2C_26_Maret_2018_-_A.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Golden_Princess_-_Tanjung_Benoa%2C_26_Maret_2018_-_A.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3795x2540.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Golden_Princess_-_Tanjung_Benoa%2C_26_Maret_2018_-_A.jpg",
+   "title": "Golden Princess - Tanjung Benoa, 26 Maret 2018 - A",
+   "shows": "Cruise ship Golden Princess calling at Tanjung Benoa; per description Jho Low's yacht Equanimity, 'not yet taken by the FBI', is in front.",
+   "date_taken": "2018-03-26 14:22:58",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal",
+   "place": "Tanjung Benoa, Badung, Bali, Indonesia (per description)",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "Sabung.hamster aka Everyone Sinks Starco (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "NIKON CORPORATION",
+    "exif-model": "NIKON D3000",
+    "exif-datetimeoriginal": "14:22, 26 March 2018",
+    "exif-datetime": "22:51, 28 March 2018"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 1285,
+   "bytes": 446715,
+   "sha256": "65de2ed18f1e62656a1870550cf3db1e8e25c573e6d09bc0299111f4f7707ec5",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/equanimity-2018-03-26-benoa-a.jpg",
+   "notes": "Description is in Indonesian; translated here."
+  },
+  {
+   "id": "equanimity-2018-benoa-b",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Golden_Princess_-_Tanjung_Benoa%2C_26_Maret_2018_-_B.jpg/1920px-Golden_Princess_-_Tanjung_Benoa%2C_26_Maret_2018_-_B.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Golden_Princess_-_Tanjung_Benoa%2C_26_Maret_2018_-_B.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 5689x1689.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Golden_Princess_-_Tanjung_Benoa%2C_26_Maret_2018_-_B.jpg",
+   "title": "Golden Princess - Tanjung Benoa, 26 Maret 2018 - B",
+   "shows": "Golden Princess at Tanjung Benoa with Equanimity (dark-hulled superyacht) in the foreground, still blocking per description.",
+   "date_taken": "2018-03-26 14:28:40",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal",
+   "place": "Tanjung Benoa, Badung, Bali, Indonesia (per description)",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "Sabung.hamster aka Everyone Sinks Starco (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "NIKON CORPORATION",
+    "exif-model": "NIKON D3000",
+    "exif-datetimeoriginal": "14:28, 26 March 2018",
+    "exif-datetime": "00:07, 30 March 2018"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 570,
+   "bytes": 248919,
+   "sha256": "6f20961de79c61217654b5cd0a879f20ada82aed7ee510fd8cdc8846616da92a",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/equanimity-2018-03-26-benoa-b.jpg",
+   "notes": "Panoramic 1920x570 rendition."
+  },
+  {
+   "id": "riza-aziz-2014",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Riza_Aziz%2C_Producer_from_Red_Granite_Pictures.jpg/1280px-Riza_Aziz%2C_Producer_from_Red_Granite_Pictures.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Riza_Aziz%2C_Producer_from_Red_Granite_Pictures.jpg",
+   "rendition_note": "Wikimedia standard 1280px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 1728x2592.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Riza_Aziz%2C_Producer_from_Red_Granite_Pictures.jpg",
+   "title": "Riza Aziz, Producer from Red Granite Pictures",
+   "shows": "Riza Aziz (Red Granite Pictures; stepson of Najib Razak) arriving at the 'Dumb and Dumber To' premiere.",
+   "date_taken": "2014-11-03 18:37:29",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal",
+   "place": "Bruin Theatre, Westwood, California, USA (per description)",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "RGMedia LA (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "Canon",
+    "exif-model": "Canon EOS 5D Mark III",
+    "exif-datetimeoriginal": "18:37, 3 November 2014",
+    "exif-datetime": "18:37, 3 November 2014"
+   },
+   "format": "JPEG",
+   "width": 1280,
+   "height": 1920,
+   "bytes": 370829,
+   "sha256": "eb8dc722880b2eb2b6ef686bffa4be97915a41a8fa85246761b9cb78d82a5dd8",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/riza-aziz-2014-11-03.jpg",
+   "notes": "Uploader account name suggests Red Granite-affiliated source; flagged 'Check categories'."
+  },
+  {
+   "id": "mccabe-2016-press-conference",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Andrew_G._McCabe.jpg",
+   "is_original_file": true,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Andrew_G._McCabe.jpg",
+   "rendition_note": null,
+   "source_page": "https://commons.wikimedia.org/wiki/File:Andrew_G._McCabe.jpg",
+   "title": "Andrew G. McCabe",
+   "shows": "FBI Deputy Director Andrew McCabe speaking at the press conference announcing US efforts to recover more than $1 billion in 1MDB-linked assets.",
+   "date_taken": "2016-07-20",
+   "date_source": "Commons |date= (event date); file has no EXIF DateTimeOriginal",
+   "place": "Washington, DC (location not stated on Commons; DOJ press conference)",
+   "licence": "Public domain (PD-USGov, FBI work)",
+   "licence_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov",
+   "author": "U.S. Federal Bureau of Investigation",
+   "attribution_required": false,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-datetime": "17:56, 31 October 2016"
+   },
+   "format": "JPEG",
+   "width": 449,
+   "height": 559,
+   "bytes": 55814,
+   "sha256": "fa112c4c73c9def0c0e38f8fe79f1fce01e3718f4966a76d8495ddfe7181ebbb",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/mccabe-2016-07-20-press-conference.jpg",
+   "notes": "Source: fbi.gov story 'us-seeks-to-recover-1-billion-in-largest-kleptocracy-case-to-date' (fbi.gov returned 403 to us; not fetched). Location 'Washington, DC' is an inference, treat as unverified."
+  },
+  {
+   "id": "najib-razak-2017",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Najib_Razak_in_2017_%28cropped%29.jpg/500px-Najib_Razak_in_2017_%28cropped%29.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Najib_Razak_in_2017_%28cropped%29.jpg",
+   "rendition_note": "Wikimedia standard 500px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 541x621.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Najib_Razak_in_2017_%28cropped%29.jpg",
+   "title": "Najib Razak in 2017 (cropped)",
+   "shows": "Malaysian PM Najib Razak, cropped from a photo of his meeting with US Secretary of State Rex Tillerson.",
+   "date_taken": "2017-08-08 20:02:50",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal",
+   "place": "unknown (not stated; Tillerson visited Kuala Lumpur Aug 2017 but Commons does not state place)",
+   "licence": "Public domain (PD-USGov-DOS)",
+   "licence_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov-DOS",
+   "author": "U.S. Embassy Kuala Lumpur (Flickr usembassykl 36459181515)",
+   "attribution_required": false,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "Canon",
+    "exif-model": "Canon EOS 5D Mark III",
+    "exif-datetimeoriginal": "20:02, 8 August 2017",
+    "exif-datetime": "20:02, 24 August 2021"
+   },
+   "format": "JPEG",
+   "width": 500,
+   "height": 574,
+   "bytes": 36504,
+   "sha256": "8d897ea5197cd7a9de67837dab90f15fa63730071a84b6b944bc75219d8608f2",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/najib-razak-2017-08-08.jpg",
+   "notes": "Cropped derivative of 'Secretary of State Rex Tillerson meet Prime Minister Dato' Sri Mohd Najib Tun Abdul Razak (36459181515).jpg'."
+  },
+  {
+   "id": "usembassy-2019-settlement-graphic",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/The_United_States_Department_of_Justice_has_reached_a_settlement_of_its_civil_forfeiture_cases_against_assets_acquired_by_Low_Taek_Jho%2C_aka_Jho_Low%2C_and_his_family_using_funds_allegedly_misappropriated_from_1Malaysia_Development_Berhad.jpg/960px-The_United_States_Department_of_Justice_has_reached_a_settlement_of_its_civil_forfeiture_cases_against_assets_acquired_by_Low_Taek_Jho%2C_aka_Jho_Low%2C_and_his_family_using_funds_allegedly_misappropriated_from_1Malaysia_Development_Berhad.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/The_United_States_Department_of_Justice_has_reached_a_settlement_of_its_civil_forfeiture_cases_against_assets_acquired_by_Low_Taek_Jho%2C_aka_Jho_Low%2C_and_his_family_using_funds_allegedly_misappropriated_from_1Malaysia_Development_Berhad.jpg",
+   "rendition_note": "Wikimedia standard 960px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 1200x1200.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:The_United_States_Department_of_Justice_has_reached_a_settlement_of_its_civil_forfeiture_cases_against_assets_acquired_by_Low_Taek_Jho%2C_aka_Jho_Low%2C_and_his_family_using_funds_allegedly_misappropriated_from_1Malaysia_Development_Berhad.jpg",
+   "title": "US Embassy KL graphic: DOJ settlement with Jho Low (30 Oct 2019)",
+   "shows": "Text graphic with DOJ seal: settlement concluding the Low civil forfeiture cases; 'largest recovery to date under the Department's Kleptocracy Asset Recovery Initiative'. Not a photograph.",
+   "date_taken": "2019-10-30",
+   "date_source": "Commons |date= (publication date of the Facebook post)",
+   "place": "n/a (graphic)",
+   "licence": "Public domain (PD-USGov)",
+   "licence_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov",
+   "author": "U.S. Embassy Kuala Lumpur",
+   "attribution_required": false,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": null,
+   "format": "JPEG",
+   "width": 960,
+   "height": 960,
+   "bytes": 221289,
+   "sha256": "b0bc523abdc9bc6d2692fadb78ea4133cf423d7cd0653168147f8e31f486e2ef",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/usembassy-kl-2019-10-30-low-settlement.jpg",
+   "notes": "Text graphic, not a photo."
+  },
+  {
+   "id": "usembassy-2020-04-asset-transfer",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/We_are_again_extremely_pleased_to_continue_transferring_assets_back_to_Malaysia_as_part_of_this_Justice_Department_investigation.jpg/960px-We_are_again_extremely_pleased_to_continue_transferring_assets_back_to_Malaysia_as_part_of_this_Justice_Department_investigation.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/We_are_again_extremely_pleased_to_continue_transferring_assets_back_to_Malaysia_as_part_of_this_Justice_Department_investigation.jpg",
+   "rendition_note": "Wikimedia standard 960px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 1200x1200.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:We_are_again_extremely_pleased_to_continue_transferring_assets_back_to_Malaysia_as_part_of_this_Justice_Department_investigation.jpg",
+   "title": "US Embassy KL graphic: Ambassador Lakhdhir statement on asset transfer (15 Apr 2020)",
+   "shows": "Quote card from US Ambassador Kamala Shirin Lakhdhir on transferring 1MDB-linked assets back to Malaysia. Not a photograph.",
+   "date_taken": "2020-04-15",
+   "date_source": "Commons |date=",
+   "place": "n/a (graphic)",
+   "licence": "Public domain (PD-USGov-DOS)",
+   "licence_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov-DOS",
+   "author": "U.S. Embassy Kuala Lumpur",
+   "attribution_required": false,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": null,
+   "format": "JPEG",
+   "width": 960,
+   "height": 960,
+   "bytes": 214908,
+   "sha256": "a362b044dd82f6af6f07a9a41480ac550fd90d53b17dd30e2960a99fff4a3a8f",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/usembassy-kl-2020-04-15-asset-transfer.jpg",
+   "notes": "Text graphic, not a photo."
+  },
+  {
+   "id": "usembassy-2020-05-asset-recovery",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/JUST_RELEASED_-_Another_positive_development_in_the_ongoing_1MDB_Kleptocracy_Asset_Recovery_Initiative_undertaken_by_our_partners_at_The_United_States_Department_of_Justice.jpg/500px-JUST_RELEASED_-_Another_positive_development_in_the_ongoing_1MDB_Kleptocracy_Asset_Recovery_Initiative_undertaken_by_our_partners_at_The_United_States_Department_of_Justice.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/JUST_RELEASED_-_Another_positive_development_in_the_ongoing_1MDB_Kleptocracy_Asset_Recovery_Initiative_undertaken_by_our_partners_at_The_United_States_Department_of_Justice.jpg",
+   "rendition_note": "Wikimedia standard 500px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 720x712.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:JUST_RELEASED_-_Another_positive_development_in_the_ongoing_1MDB_Kleptocracy_Asset_Recovery_Initiative_undertaken_by_our_partners_at_The_United_States_Department_of_Justice.jpg",
+   "title": "US Embassy KL graphic: 1MDB Kleptocracy Asset Recovery update (7 May 2020)",
+   "shows": "Quote card with State Dept seal: '...the United States will have recovered or assisted in the recovery of nearly $1.1 billion in assets associated with the 1MDB international money laundering and bribery scheme.' Not a photograph.",
+   "date_taken": "2020-05-07",
+   "date_source": "Commons |date=",
+   "place": "n/a (graphic)",
+   "licence": "Public domain (PD-USGov-DOS)",
+   "licence_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov-DOS",
+   "author": "U.S. Embassy Kuala Lumpur",
+   "attribution_required": false,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": null,
+   "format": "JPEG",
+   "width": 500,
+   "height": 494,
+   "bytes": 60092,
+   "sha256": "a94c55546a5f57170a9ae083267b4ca368b1e18a2c2a7645cc3d522831159733",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/usembassy-kl-2020-05-07-asset-recovery.jpg",
+   "notes": "Text graphic, not a photo."
+  },
+  {
+   "id": "lermitage-beverly-hills-2015",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/L%27Ermitage_Beverly_Hills_2015.jpg/1920px-L%27Ermitage_Beverly_Hills_2015.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/L%27Ermitage_Beverly_Hills_2015.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3992x2661.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:L%27Ermitage_Beverly_Hills_2015.jpg",
+   "title": "L'Ermitage Beverly Hills 2015",
+   "shows": "L'Ermitage Beverly Hills hotel, 9291 Burton Way: one of the assets named in the July 2016 DOJ forfeiture complaints.",
+   "date_taken": "2015-02-19 09:03",
+   "date_source": "Commons |Date= and original EXIF DateTimeOriginal",
+   "place": "9291 Burton Way, Beverly Hills, California, USA",
+   "licence": "CC BY-SA 3.0 / GFDL (dual)",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+   "author": "Glenn Francis (Toglenn), www.PacificProDigital.com",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "NIKON CORPORATION",
+    "exif-model": "NIKON D300",
+    "exif-datetimeoriginal": "09:03, 19 February 2015",
+    "exif-datetime": "23:23, 5 March 2015"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 1280,
+   "bytes": 575174,
+   "sha256": "948905d7c115f73d3b823b83585ec2bb5045dc3c5e1eef068190f59011b372fd",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/lermitage-beverly-hills-2015-02-19.jpg",
+   "notes": "Uploader's credit template requires specific attribution, see source page."
+  },
+  {
+   "id": "park-lane-hotel-2019",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Park_Lane_Hotel_%2848063998571%29.jpg/1920px-Park_Lane_Hotel_%2848063998571%29.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Park_Lane_Hotel_%2848063998571%29.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3647x2735.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Park_Lane_Hotel_%2848063998571%29.jpg",
+   "title": "Park Lane Hotel (48063998571)",
+   "shows": "Park Lane Hotel, 36 Central Park South, NYC. DOJ sought interests in Symphony CP (Park Lane) LLC.",
+   "date_taken": "2019-06-14 14:49",
+   "date_source": "Commons |Date= and original EXIF DateTimeOriginal (original has GPS 40.765130,-73.975256)",
+   "place": "Central Park South, Midtown Manhattan, New York, USA",
+   "licence": "CC BY 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+   "author": "Ajay Suresh (Flickr), via Commons",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "OLYMPUS IMAGING CORP.",
+    "exif-model": "E-M1",
+    "exif-datetimeoriginal": "14:49, 14 June 2019",
+    "exif-gpslatitude": "40° 45′ 54.47″ N",
+    "exif-gpslongitude": "73° 58′ 30.92″ W",
+    "exif-gpsaltitude": "18 meters above sea level",
+    "exif-datetime": "19:43, 14 June 2019"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 1440,
+   "bytes": 893186,
+   "sha256": "11558451740dfd63c4aaea9ecb64cd5006496f1eea9fe3374a27f0bab59dcf15",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/park-lane-hotel-nyc-2019-06-14.jpg",
+   "notes": null
+  },
+  {
+   "id": "walker-tower",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Walker_Tower.jpg/1920px-Walker_Tower.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Walker_Tower.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3000x4000.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Walker_Tower.jpg",
+   "title": "Walker Tower",
+   "shows": "Walker Tower, 212 West 18th Street, Chelsea, NYC; DOJ forfeiture target 'WALKER TOWER PENTHOUSE' (owned by 212 West 18th Street LLC).",
+   "date_taken": "2024-04-15 13:38 (per original EXIF shown on Commons; wikitext |Date= is empty)",
+   "date_source": "original EXIF DateTimeOriginal per Commons metadata table",
+   "place": "West 18th Street, Chelsea, Manhattan (original EXIF GPS ~40.741508,-73.998833)",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+   "author": "Jim.henderson (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "motorola",
+    "exif-model": "motorola one 5G ace",
+    "exif-datetimeoriginal": "13:38, 15 April 2024",
+    "exif-gpslatitude": "40° 44′ 29.43″ N",
+    "exif-gpslongitude": "73° 59′ 55.8″ W",
+    "exif-gpsaltitude": "23.4 meters below sea level",
+    "exif-datetime": "13:38, 15 April 2024"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 2560,
+   "bytes": 1471914,
+   "sha256": "9602f621d7eb00eee6e5082fccacdb6a9e633cfe34fd8a1730a5bfff3a5fa7c7",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/walker-tower-nyc.jpg",
+   "notes": "EXIF date/camera may belong to a later overwrite of the file; date not independently confirmed. Building exterior only, not the penthouse."
+  },
+  {
+   "id": "bsi-lugano-2013",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/BSI_in_Lugano.jpg/1920px-BSI_in_Lugano.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/BSI_in_Lugano.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3328x3803.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:BSI_in_Lugano.jpg",
+   "title": "BSI in Lugano",
+   "shows": "Head office of Banca della Svizzera Italiana (BSI) at Piazza della Riforma, Lugano. BSI Lugano held accounts used in the scheme (e.g. Aabar-BVI).",
+   "date_taken": "2013-08-25 10:27:21",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal (original has GPS 46.003106,8.952081)",
+   "place": "Piazza della Riforma, Lugano, Switzerland",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "JoachimKohler-HB (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "Canon",
+    "exif-model": "Canon EOS 6D",
+    "exif-datetimeoriginal": "10:27, 25 August 2013",
+    "exif-gpslatitude": "46° 0′ 11.18″ N",
+    "exif-gpslongitude": "8° 57′ 7.49″ E",
+    "exif-gpsaltitude": "286.9 meters above sea level",
+    "exif-datetime": "13:26, 1 December 2018"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 2194,
+   "bytes": 1668349,
+   "sha256": "8ca427ffc5328d7eb68dfa67d7225e2caa54de0a7a269fb9e31e60d7c2c57ec1",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/bsi-lugano-2013-08-25.jpg",
+   "notes": null
+  },
+  {
+   "id": "exchange106-trx-2018",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/The_Exchange_106_Jan_2018.jpg/960px-The_Exchange_106_Jan_2018.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/The_Exchange_106_Jan_2018.jpg",
+   "rendition_note": "Wikimedia standard 960px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 1213x1737.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:The_Exchange_106_Jan_2018.jpg",
+   "title": "The Exchange 106 Jan 2018",
+   "shows": "The Exchange 106 tower under construction at Tun Razak Exchange (TRX), the KL financial district originally developed by 1MDB.",
+   "date_taken": "2018-01-31",
+   "date_source": "Commons |date= (no EXIF date shown on Commons)",
+   "place": "Tun Razak Exchange, Kuala Lumpur, Malaysia",
+   "licence": "CC BY-SA 4.0 (Licensed-FOP: Malaysia freedom of panorama)",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "Mbl2020 (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": null,
+   "format": "JPEG",
+   "width": 960,
+   "height": 1375,
+   "bytes": 177623,
+   "sha256": "f93d1a89f870d30bc10334ec664f69bbc99351f368a01d619f19214324b2904c",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/exchange106-trx-2018-01-31.jpg",
+   "notes": null
+  },
+  {
+   "id": "goldman-200-west-2017",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/200_West_Street_-_Lower_Manhattan.jpg/1920px-200_West_Street_-_Lower_Manhattan.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/200_West_Street_-_Lower_Manhattan.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3500x5000.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:200_West_Street_-_Lower_Manhattan.jpg",
+   "title": "200 West Street - Lower Manhattan",
+   "shows": "200 West Street, Goldman Sachs headquarters, New York (address given in the 2020 Goldman DPA notice clause).",
+   "date_taken": "2017-04-03 15:09:52",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal",
+   "place": "Lower Manhattan, New York (Commons camera location 40.71301,-74.0137)",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "Potro (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "Canon",
+    "exif-model": "Canon EOS 1300D",
+    "exif-datetimeoriginal": "15:09, 3 April 2017",
+    "exif-datetime": "01:50, 15 September 2019"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 2743,
+   "bytes": 1006020,
+   "sha256": "b88f0e5a87bb5bb4dfdfe9a528a965d218e40c3f227d4fe15940f01d0a222505",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/goldman-200-west-street-2017-04-03.jpg",
+   "notes": null
+  },
+  {
+   "id": "rewcastle-brown-ijf17",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Il_pi%C3%B9_grande_caso_di_cleptocrazia_nella_storia_degli_Stati_Uniti_-_The_largest_kleptocracy_case_in_US_history-_my_inside_story_-ijf17_%2833224227254%29.jpg/1280px-Il_pi%C3%B9_grande_caso_di_cleptocrazia_nella_storia_degli_Stati_Uniti_-_The_largest_kleptocracy_case_in_US_history-_my_inside_story_-ijf17_%2833224227254%29.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Il_pi%C3%B9_grande_caso_di_cleptocrazia_nella_storia_degli_Stati_Uniti_-_The_largest_kleptocracy_case_in_US_history-_my_inside_story_-ijf17_%2833224227254%29.jpg",
+   "rendition_note": "Wikimedia standard 1280px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 1333x2000.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Il_pi%C3%B9_grande_caso_di_cleptocrazia_nella_storia_degli_Stati_Uniti_-_The_largest_kleptocracy_case_in_US_history-_my_inside_story_-ijf17_%2833224227254%29.jpg",
+   "title": "The largest kleptocracy case in US history: my inside story #ijf17",
+   "shows": "Journalist Clare Rewcastle Brown (Sarawak Report) speaking at the International Journalism Festival session on the 1MDB case.",
+   "date_taken": "2017-04-16 10:26",
+   "date_source": "Commons |Date= (from Flickr); no EXIF date shown on Commons",
+   "place": "Perugia, Italy (International Journalism Festival; Commons author line 'from Perugia, Italia')",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+   "author": "International Journalism Festival (Flickr), via Commons",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": null,
+   "format": "JPEG",
+   "width": 1280,
+   "height": 1920,
+   "bytes": 307244,
+   "sha256": "5507cbf50087328053f2d9046d3f42ce6007e3801ae616def8522785cafc9428",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/clare-rewcastle-brown-ijf17-2017-04-16.jpg",
+   "notes": "FlickreviewR passed 2018-05-12."
+  },
+  {
+   "id": "placard-2015-edge-protest",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Asking_Questions_About_1MDB_is_Not_A_Crime.jpg/1920px-Asking_Questions_About_1MDB_is_Not_A_Crime.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Asking_Questions_About_1MDB_is_Not_A_Crime.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 6000x4000.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Asking_Questions_About_1MDB_is_Not_A_Crime.jpg",
+   "title": "Asking Questions About 1MDB is Not A Crime",
+   "shows": "Placard at a Malaysian journalists' protest against the suspension of The Edge Financial Daily and for media freedom.",
+   "date_taken": "2015-08-08 11:07:51",
+   "date_source": "Commons |date= and original EXIF DateTimeOriginal",
+   "place": "Malaysia, exact place not stated (likely Kuala Lumpur, unverified)",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "Khairil Yusof (Kaerumy)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "SONY",
+    "exif-model": "ILCE-6000",
+    "exif-datetimeoriginal": "11:07, 8 August 2015",
+    "exif-datetime": "11:07, 8 August 2015"
+   },
+   "format": "JPEG",
+   "width": 1920,
+   "height": 1280,
+   "bytes": 215493,
+   "sha256": "a0f4080c5cc011bbbfeb31123756b79b0f0ecb13c6ceb46d2b24d88ab018efce",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/placard-1mdb-press-freedom-2015-08-08.jpg",
+   "notes": null
+  },
+  {
+   "id": "tommy-thomas-2019",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/02/Tommy_Thomas_2019.jpg",
+   "is_original_file": true,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/0/02/Tommy_Thomas_2019.jpg",
+   "rendition_note": null,
+   "source_page": "https://commons.wikimedia.org/wiki/File:Tommy_Thomas_2019.jpg",
+   "title": "Tommy Thomas 2019",
+   "shows": "Tommy Thomas, Attorney General of Malaysia 2018-2020 (who brought the 1MDB charges against Goldman Sachs in Malaysia).",
+   "date_taken": "2019-05-07 13:15:37",
+   "date_source": "Commons |date= and file EXIF DateTimeOriginal (present in file)",
+   "place": "unknown (not stated)",
+   "licence": "Public domain (PD-USGov-DOS)",
+   "licence_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov-DOS",
+   "author": "US Embassy KL (Flickr usembassykl 46885339155)",
+   "attribution_required": false,
+   "file_exif": {
+    "DateTimeOriginal": "2019:05:07 13:15:37",
+    "GPS": null
+   },
+   "original_exif_per_commons": {
+    "exif-make": "Canon",
+    "exif-model": "Canon EOS 5D Mark III",
+    "exif-datetimeoriginal": "13:15, 7 May 2019",
+    "exif-datetime": "13:49, 8 May 2019"
+   },
+   "format": "JPEG",
+   "width": 518,
+   "height": 654,
+   "bytes": 56922,
+   "sha256": "0b03c56e79d0644fa0d5f2b56380bb710d5640b4c34cef6a1f51955097b5a531",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/tommy-thomas-2019-05-07.jpg",
+   "notes": "Description only says 'Tommy Thomas 2019'; his role is context, not part of the caption."
+  },
+  {
+   "id": "stratton-street-8-2021",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/8_Stratton_Street%2C_Mayfair%2C_June_2021.jpg/1920px-8_Stratton_Street%2C_Mayfair%2C_June_2021.jpg",
+   "is_original_file": false,
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/8_Stratton_Street%2C_Mayfair%2C_June_2021.jpg",
+   "rendition_note": "Wikimedia standard 1920px thumbnail (re-encoded by Wikimedia). upload.wikimedia.org answered HTTP 429 for original files from this environment and its error page says to use standard thumbnail sizes. sha256/bytes refer to this rendition, not the original. Original: 3024x4032.",
+   "source_page": "https://commons.wikimedia.org/wiki/File:8_Stratton_Street%2C_Mayfair%2C_June_2021.jpg",
+   "title": "8 Stratton Street, Mayfair, June 2021",
+   "shows": "8 Stratton Street, Mayfair (listed building 1237151). Context image of the street only: the DOJ filings name the Stratton Street (London) Ltd / Seven Stratton Street / Eight Nine Stratton Street properties but give no house numbers. Do NOT caption as Low's property.",
+   "date_taken": "2021-06-11",
+   "date_source": "Commons |date= (no EXIF date shown on Commons)",
+   "place": "Stratton Street, Mayfair, London W1J, UK",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "author": "No Swan So Fine (Commons user)",
+   "attribution_required": true,
+   "file_exif": {
+    "DateTimeOriginal": null,
+    "GPS": null
+   },
+   "original_exif_per_commons": null,
+   "format": "JPEG",
+   "width": 1920,
+   "height": 2560,
+   "bytes": 1584852,
+   "sha256": "050566b0e3e9b430a64d5ae4d34b335a9b34a941f6bbb45ff65de75e4a63555d",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/photos/stratton-street-8-mayfair-2021-06-11.jpg",
+   "notes": "Street-context only."
+  }
+ ],
+ "videos": [
+  {
+   "id": "najib-arrest-2018-07-03",
+   "title": "Former Malaysian PM Najib Razak arrested",
+   "shows": "News clip on Najib Razak's arrest (3 July 2018) by Malaysia's MACC in the 1MDB/SRC investigation.",
+   "date": "2018-07-03",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/74/Former_Malaysian_PM_Najib_Razak_arrested.webm/Former_Malaysian_PM_Najib_Razak_arrested.webm.360p.mpeg4.mov",
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Former_Malaysian_PM_Najib_Razak_arrested.webm",
+   "original_file_size": "8.97 MB (WebM VP9/Opus, 656x480)",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Former_Malaysian_PM_Najib_Razak_arrested.webm",
+   "author": "ETV Andhra Pradesh (YouTube), via Wikimedia Commons",
+   "licence": "CC BY 3.0 (YouTube CC-BY, Commons licence review template)",
+   "licence_url": "https://creativecommons.org/licenses/by/3.0/",
+   "container": "QuickTime/MPEG-4 (.mov; MPEG-4 Part 2 video + MP3 audio), 492x360",
+   "duration_s": 56.38,
+   "bytes": 6866195,
+   "sha256": "ceb4b2890bb5d7039e76660a38c8e74c413ec3e139b7aa15f6f739959c430fc5",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/video/najib-arrest-2018-07-03-etv-360p.mov",
+   "notes": "No true .mp4 exists on Commons. This is Wikimedia's 360p MPEG-4 transcode in a .mov container (most browsers play it; Firefox may not decode MPEG-4 Part 2). Wikimedia can regenerate transcodes, so the sha256 may change. Re-fetching it for a second hash check got HTTP 429."
+  },
+  {
+   "id": "xiaolin-1mdb-explainer-2021",
+   "title": "【特别篇】真实版华尔街之狼 - 一马基金 1MDB Scandal",
+   "shows": "Mandarin-language explainer video on the 1MDB scandal by YouTuber 小Lin说 (Lindsay Zou). Commentary, not primary footage.",
+   "date": "2021-06-05",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c7/%E3%80%90%E7%89%B9%E5%88%AB%E7%AF%87%E3%80%91%E7%9C%9F%E5%AE%9E%E7%89%88%E5%8D%8E%E5%B0%94%E8%A1%97%E4%B9%8B%E7%8B%BC_-_%E4%B8%80%E9%A9%AC%E5%9F%BA%E9%87%91_1MDB_Scandal.webm/%E3%80%90%E7%89%B9%E5%88%AB%E7%AF%87%E3%80%91%E7%9C%9F%E5%AE%9E%E7%89%88%E5%8D%8E%E5%B0%94%E8%A1%97%E4%B9%8B%E7%8B%BC_-_%E4%B8%80%E9%A9%AC%E5%9F%BA%E9%87%91_1MDB_Scandal.webm.360p.mpeg4.mov",
+   "original_file_url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/%E3%80%90%E7%89%B9%E5%88%AB%E7%AF%87%E3%80%91%E7%9C%9F%E5%AE%9E%E7%89%88%E5%8D%8E%E5%B0%94%E8%A1%97%E4%B9%8B%E7%8B%BC_-_%E4%B8%80%E9%A9%AC%E5%9F%BA%E9%87%91_1MDB_Scandal.webm",
+   "original_file_size": "205.7 MB (WebM AV1/Opus, 1920x1080)",
+   "source_page": "https://commons.wikimedia.org/wiki/File:%E3%80%90%E7%89%B9%E5%88%AB%E7%AF%87%E3%80%91%E7%9C%9F%E5%AE%9E%E7%89%88%E5%8D%8E%E5%B0%94%E8%A1%97%E4%B9%8B%E7%8B%BC_-_%E4%B8%80%E9%A9%AC%E5%9F%BA%E9%87%91_1MDB_Scandal.webm",
+   "author": "小Lin说 (xiao_lin_shuo, YouTube), via Wikimedia Commons",
+   "licence": "CC BY 3.0 (YouTube CC-BY, Commons licence review template)",
+   "licence_url": "https://creativecommons.org/licenses/by/3.0/",
+   "container": "QuickTime/MPEG-4 (.mov; MPEG-4 Part 2 video + MP3 audio), 640x360",
+   "duration_s": 776.16,
+   "bytes": 110075989,
+   "sha256": "2637fc83aaeb17086f7a29d183263d95e9d59aafbac5ca4245653bb712aa4085",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/video/xiaolin-1mdb-scandal-2021-360p.mov",
+   "notes": "110 MB at 360p, under the 300 MB limit. The 205.7 MB original is AV1 WebM. Mandarin audio, about 13 min. Same transcode caveats as above."
+  }
+ ],
+ "audio": [
+  {
+   "id": "wnyc-money-talking-2018-12-21",
+   "title": "Malaysian '1MDB' Scandal And Goldman Sachs",
+   "show": "Money Talking (WNYC Studios)",
+   "date": "2018-12-21",
+   "shows": "Charlie Herman talks to Ben Walsh (Barron's) and Peter Eavis (NYT) about 1MDB and Goldman Sachs after Malaysia's Dec 2018 criminal charges against Goldman.",
+   "url": "https://waaa.wnyc.org/6e587fa5-1787-4893-8e32-8391c7e2b4ee/episodes/58e0a4ec-3e3d-445e-8839-5400253e1f13/audio/128/default.mp3",
+   "url_note": "This WNYC origin URL redirects to a per-session hashed path. The page's own link adds chrt.fm/podtrac tracking redirects in front of this URL. Two fetches gave the same sha256.",
+   "source_page": "https://www.wnyc.org/story/money-talking-1mdb-scandal-malaysia-goldman-sachs/",
+   "licence": "All rights reserved (ID3 comment 'Copyright 2018', WNYC Studios). Freely downloadable podcast, NOT openly licensed: link/stream it, don't re-host it.",
+   "author": "WNYC Studios",
+   "format": "MP3 128 kbps",
+   "duration_s": 460.88,
+   "bytes": 7408138,
+   "sha256": "1c5bd71bb0a251abb42428355108b5cf25ac3ceb0e72b7a48d3c0927380b41b0",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/audio/wnyc-money-talking-1mdb-goldman-2018.mp3",
+   "extracted": false
+  },
+  {
+   "id": "najib-arrest-2018-audio-extract",
+   "title": "Former Malaysian PM Najib Razak arrested (audio track)",
+   "date": "2018-07-03",
+   "shows": "Audio track extracted with ffmpeg (libmp3lame -q:a 4) from the CC BY video najib-arrest-2018-07-03.",
+   "url": null,
+   "url_note": "Derived file with no remote URL. To get it at load time, fetch the video URL and extract the audio track (or use the video's own MP3 audio stream).",
+   "derived_from": "najib-arrest-2018-07-03",
+   "source_page": "https://commons.wikimedia.org/wiki/File:Former_Malaysian_PM_Najib_Razak_arrested.webm",
+   "licence": "CC BY 3.0 (inherits from video)",
+   "licence_url": "https://creativecommons.org/licenses/by/3.0/",
+   "author": "ETV Andhra Pradesh",
+   "format": "MP3",
+   "duration_s": 56.45,
+   "bytes": 772768,
+   "sha256": "6883d4f8c388eafddcc03c4bf9f1496655c61dc4805f5a794611167ca41f5746",
+   "local_path": "/tmp/claude-0/-home-claude/e5f07151-37fa-57c0-94f1-8e2294eb6e3e/scratchpad/1mdb/media/audio/najib-arrest-2018-07-03-etv-extracted.mp3",
+   "extracted": true
+  }
+ ],
+ "places": [
+  {
+   "id": "park-laurel",
+   "name": "Park Laurel Condominium (NYC)",
+   "address_as_stated": "Real Property Located in New York, New York",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.2 of 136 (¶2)",
+   "coords": {
+    "lat": 40.7711181,
+    "lon": -73.9808499,
+    "nominatim_display_name": "15, West 63rd Street, Lincoln Square, Manhattan Community Board 7, Manhattan, New York County, New York, 10023, United States",
+    "nominatim_query": "15 West 63rd Street, New York, NY 10023",
+    "osm": "way/269212558"
+   },
+   "precision": "building",
+   "notes": "The filing gives no street address (residential addresses listed by city only). Geocoded from the building's public address, 15 West 63rd Street, which is NOT in the filing."
+  },
+  {
+   "id": "lermitage",
+   "name": "L'Ermitage hotel, Beverly Hills",
+   "address_as_stated": "the real property commonly known as 9291 Burton Way, Beverly Hills, California 90210",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.2 of 136 (¶4.b)",
+   "coords": {
+    "lat": 34.072644,
+    "lon": -118.395424,
+    "nominatim_display_name": "L'Ermitage Beverly Hills, 9291, Burton Way, Beverly Hills, Los Angeles County, California, 90210, United States",
+    "nominatim_query": "9291 Burton Way, Beverly Hills, California 90210",
+    "osm": "way/425413669"
+   },
+   "precision": "building",
+   "notes": null
+  },
+  {
+   "id": "beverly-hills-residences",
+   "name": "Hillcrest Property 1 & 2 / Laurel Beverly Hills Mansion",
+   "address_as_stated": "real property located in Beverly Hills, California1 owned by 912 North Hillcrest Road (BH), LLC ... 1 Pursuant to L.R. 5.2-1, residential addresses are listed by the city and state only.",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.3 of 136 (¶4.d, fn.1); Laurel BH Mansion & Hillcrest 2 on p.5",
+   "coords": {
+    "lat": 34.0696501,
+    "lon": -118.3963062,
+    "nominatim_display_name": "Beverly Hills, Los Angeles County, California, United States",
+    "nominatim_query": "Beverly Hills, California",
+    "osm": "relation/3503615"
+   },
+   "precision": "city",
+   "notes": "City-level only, on purpose: the filings withhold the residential addresses."
+  },
+  {
+   "id": "park-lane-hotel",
+   "name": "Park Lane Hotel (Symphony CP (Park Lane) LLC)",
+   "address_as_stated": "the real property and appurtenances located at 36 Central Park South, New York, New York, 10019, known as the Park Lane Hotel",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.4 of 136 (¶4.j)",
+   "coords": {
+    "lat": 40.7648557,
+    "lon": -73.9753442,
+    "nominatim_display_name": "Park Lane New York, 36, Central Park South, Manhattan Community Board 5, Manhattan, New York County, New York, 10153, United States",
+    "nominatim_query": "36 Central Park South, New York, NY 10019",
+    "osm": "way/265147726"
+   },
+   "precision": "building",
+   "notes": null
+  },
+  {
+   "id": "walker-tower",
+   "name": "Walker Tower Penthouse",
+   "address_as_stated": "property located in New York, New York owned by 212 West 18th Street LLC (“WALKER TOWER PENTHOUSE”)",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.4 of 136 (¶4.k)",
+   "coords": {
+    "lat": 40.7410427,
+    "lon": -73.9987211,
+    "nominatim_display_name": "Walker Tower, 212, West 18th Street, Chelsea District, Manhattan Community Board 4, Manhattan, New York County, New York, 10011, United States",
+    "nominatim_query": "212 West 18th Street, New York, NY",
+    "osm": "way/264633442"
+   },
+   "precision": "building",
+   "notes": "The address comes from the owning LLC's name, not stated as an address in the filing."
+  },
+  {
+   "id": "qentas-townhouse",
+   "name": "Qentas Townhouse, Belgravia, London",
+   "address_as_stated": "the property located in London, United Kingdom (“U.K.”), SW1W 0JR, owned by Qentas Holdings Limited",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.5 of 136 (¶4.q); 'QENTAS TOWNHOUSE, Belgravia, London' in doj-2019-complaint-london-property.txt PDF p.181",
+   "coords": {
+    "lat": 51.4964441,
+    "lon": -0.1471243,
+    "nominatim_display_name": "SW1W 0JR, City of Westminster, Greater London, England, United Kingdom",
+    "nominatim_query": "SW1W 0JR, London, United Kingdom",
+    "osm": "None/None"
+   },
+   "precision": "postcode",
+   "notes": "Postcode centroid."
+  },
+  {
+   "id": "stratton-street",
+   "name": "Stratton Penthouse / Stratton Flat / Stratton Office Building, Mayfair, London",
+   "address_as_stated": "Real Property in London, United Kingdom owned by Stratton Street (London) Ltd. (“THE STRATTON PENTHOUSE”) ... owned by Seven Stratton Street (London) Ltd. (“STRATTON FLAT”) ... owned by Eight Nine Stratton Street (London) Ltd. (“STRATTON OFFICE BUILDING”)",
+   "document": "scratchpad/1mdb/text/doj-2019-complaint-london-property.txt",
+   "page": "PDF p.5 of 261 (¶5.r-t); purchase details pp.185-189",
+   "coords": {
+    "lat": 51.5074903,
+    "lon": -0.1438759,
+    "nominatim_display_name": "Stratton Street, St. James's, Mayfair, City of Westminster, Greater London, England, W1J 8LL, United Kingdom",
+    "nominatim_query": "Stratton Street, Mayfair, London",
+    "osm": "way/502228875"
+   },
+   "precision": "street",
+   "notes": "Street-level only: no house numbers in the filing. The owners' entity names hint at No. 7 and Nos. 8-9 but the filing doesn't state them."
+  },
+  {
+   "id": "good-star-seychelles",
+   "name": "Good Star Limited registered address (Seychelles)",
+   "address_as_stated": "located at P.O. Box 1239, Offshore Incorporation, Victoria, Mahe, Republic of Seychelles",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.27 of 136 (¶76-77); same text in doj-2017-complaint-equanimity-yacht.txt",
+   "coords": {
+    "lat": -4.6232085,
+    "lon": 55.452359,
+    "nominatim_display_name": "Victoria, Bel Air, Sesel",
+    "nominatim_query": "Victoria, Seychelles",
+    "osm": "node/4547527878"
+   },
+   "precision": "city",
+   "notes": "PO box: geocoded to Victoria (city centroid)."
+  },
+  {
+   "id": "bsi-lugano",
+   "name": "BSI Bank, Lugano",
+   "address_as_stated": "an account at BSI Bank in Lugano, Switzerland maintained by Aabar-BVI",
+   "document": "scratchpad/1mdb/text/doj-2017-complaint-equanimity-yacht.txt",
+   "page": "PDF p.62 of 250",
+   "coords": {
+    "lat": 46.0036289,
+    "lon": 8.9516442,
+    "nominatim_display_name": "Piazza della Riforma, Quartiere Maghetti, Pregassona, Breganzona, Lugano, Circolo di Lugano ovest, Distretto di Lugano, Ticino, 6932, Schweiz/Suisse/Svizzera/Svizra",
+    "nominatim_query": "Piazza della Riforma, Lugano, Switzerland",
+    "osm": "way/304788336"
+   },
+   "precision": "square",
+   "notes": "Geocoded to Piazza della Riforma, where Commons places BSI's head office (photo bsi-lugano-2013). The filing names only the city."
+  },
+  {
+   "id": "bsi-singapore",
+   "name": "BSI Bank, Singapore",
+   "address_as_stated": "an account at BSI Bank in Singapore held in the name of Abu Dhabi Kuwait Malaysia Investment Corp.",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.37 of 136",
+   "coords": {
+    "lat": 1.357107,
+    "lon": 103.8194992,
+    "nominatim_display_name": "Singapore",
+    "nominatim_query": "Singapore",
+    "osm": "relation/536780"
+   },
+   "precision": "country/city",
+   "notes": "City-state centroid. No branch address in the filings."
+  },
+  {
+   "id": "goldman-ny",
+   "name": "Goldman Sachs HQ, New York",
+   "address_as_stated": "Goldman Sachs & Co. LLC, 200 West Street, New York, New York 10282",
+   "document": "scratchpad/1mdb/text/doj-2020-goldman-dpa.txt",
+   "page": "PDF p.22 (notice clause)",
+   "coords": {
+    "lat": 40.7147237,
+    "lon": -74.0144315,
+    "nominatim_display_name": "Goldman Sachs Tower, 200, West Street, Battery Park City, Lower Manhattan, Manhattan, New York County, New York, 10282, United States",
+    "nominatim_query": "200 West Street, New York, NY 10282",
+    "osm": "way/75309475"
+   },
+   "precision": "building",
+   "notes": null
+  },
+  {
+   "id": "goldman-singapore",
+   "name": "Goldman Sachs, Singapore (meeting location)",
+   "address_as_stated": "LOW, NG, Co-Conspirator #1 and others met with bankers from Foreign Financial Institution A in Singapore",
+   "document": "scratchpad/1mdb/text/doj-2018-indictment-low-ng.txt",
+   "page": "PDF p.25",
+   "coords": {
+    "lat": 1.357107,
+    "lon": 103.8194992,
+    "nominatim_display_name": "Singapore",
+    "nominatim_query": "Singapore",
+    "osm": "relation/536780"
+   },
+   "precision": "country/city",
+   "notes": "No Goldman Singapore office address in the filings. City centroid."
+  },
+  {
+   "id": "royale-chulan",
+   "name": "Royale Chulan Hotel, Kuala Lumpur (1MDB board meeting, 18 Sep 2009)",
+   "address_as_stated": "the 1MDB Board of Directors (“Board”) met at the Royale Chulan Hotel in Kuala Lumpur, Malaysia",
+   "document": "scratchpad/1mdb/text/doj-2017-complaint-equanimity-yacht.txt",
+   "page": "PDF p.19 of 250 (also doj-2019-complaint-london-property.txt PDF p.19)",
+   "coords": {
+    "lat": 3.1496976,
+    "lon": 101.7169644,
+    "nominatim_display_name": "Royale Chulan Kuala Lumpur, 5, Jalan Conlay, Bukit Bintang, Kuala Lumpur, 50450, Malaysia",
+    "nominatim_query": "Royale Chulan Kuala Lumpur",
+    "osm": "node/1770397776"
+   },
+   "precision": "building",
+   "notes": null
+  },
+  {
+   "id": "1mdb-hq-menara-imc",
+   "name": "1MDB head office (Menara IMC), Kuala Lumpur",
+   "address_as_stated": null,
+   "document": null,
+   "page": null,
+   "coords": {
+    "lat": 3.155322,
+    "lon": 101.706654,
+    "nominatim_display_name": "Menara IMC, 8, Jalan Sultan Ismail, Kampung Hujung Pasir, Kampung Paya, Kampung Cendana, Kuala Lumpur, 50250, Malaysia",
+    "nominatim_query": "Menara IMC, Jalan Sultan Ismail, Kuala Lumpur",
+    "osm": "way/660114832"
+   },
+   "precision": "building",
+   "notes": "NOT in the filings. The Menara IMC address is from general knowledge and unverified here. Confirm before use."
+  },
+  {
+   "id": "trx",
+   "name": "Tun Razak Exchange (TRX), Kuala Lumpur",
+   "address_as_stated": null,
+   "document": null,
+   "page": null,
+   "coords": {
+    "lat": 3.1427699,
+    "lon": 101.7200049,
+    "nominatim_display_name": "KG20 PY23 Tun Razak Exchange, Jalan Tun Razak, Pinggiran TRX, Maluri, Pudu, Kuala Lumpur, 55100, Malaysia",
+    "nominatim_query": "Tun Razak Exchange, Kuala Lumpur",
+    "osm": "way/760247737"
+   },
+   "precision": "district (point = TRX MRT station)",
+   "notes": "NOT in the filings. TRX was 1MDB's flagship real-estate project (photo exchange106-trx-2018). The point is the MRT station, not a building."
+  },
+  {
+   "id": "abu-dhabi-ipic-aabar",
+   "name": "IPIC / Aabar, Abu Dhabi",
+   "address_as_stated": "IPIC, an investment fund wholly-owned by the government of Abu Dhabi",
+   "document": "scratchpad/1mdb/text/doj-2016-complaint-park-laurel.txt",
+   "page": "PDF p.39 of 136 (¶114)",
+   "coords": {
+    "lat": 24.4538352,
+    "lon": 54.3774014,
+    "nominatim_display_name": "أبو ظبي, أبوظبي, أبو ظبي, الإمارات العربية المتحدة",
+    "nominatim_query": "Abu Dhabi, United Arab Emirates",
+    "osm": "relation/4479763"
+   },
+   "precision": "city",
+   "notes": "City centroid. No street address in the filings."
+  },
+  {
+   "id": "equanimity-benoa",
+   "name": "Equanimity seizure location, Benoa, Bali",
+   "address_as_stated": null,
+   "document": null,
+   "page": null,
+   "coords": {
+    "lat": -8.7424284,
+    "lon": 115.2125353,
+    "nominatim_display_name": "Pelabuhan Benoa, Jalan Dermaga II, Terminal Penumpang Benoa, Pedungan, Denpasar Selatan, Denpasar, Bali, 80222, Indonesia",
+    "nominatim_query": "Pelabuhan Benoa, Bali, Indonesia",
+    "osm": "node/11886302837"
+   },
+   "precision": "port",
+   "notes": "NOT in these filings (the 2018 seizure post-dates the 2017 complaint). Place comes from Commons photo descriptions (Tanjung Benoa, Badung). 'tanjung-benoa' gives the alternative point."
+  },
+  {
+   "id": "equanimity-tanjung-benoa",
+   "name": "Tanjung Benoa, Bali (Equanimity photographed at anchor, 26 Mar 2018)",
+   "address_as_stated": null,
+   "document": null,
+   "page": null,
+   "coords": {
+    "lat": -8.7657398,
+    "lon": 115.2232562,
+    "nominatim_display_name": "Tanjung Benoa, Gang Guntur, Benoa, Kuta Selatan, Badung, Bali, 80362, Indonesia",
+    "nominatim_query": "Tanjung Benoa, Badung, Bali, Indonesia",
+    "osm": "way/165052263"
+   },
+   "precision": "locality",
+   "notes": "From Commons photo descriptions."
+  },
+  {
+   "id": "port-klang",
+   "name": "Port Klang, Selangor (Equanimity after hand-over to Malaysia, 2018)",
+   "address_as_stated": null,
+   "document": null,
+   "page": null,
+   "coords": {
+    "lat": 2.9996963,
+    "lon": 101.3913589,
+    "nominatim_display_name": "KD19 Pelabuhan Klang, Jalan Syahbandar, Bagan Hailam, Pelabuhan Klang, Bandaraya Klang, Klang, Selangor, 42009, Malaysia",
+    "nominatim_query": "Port Klang",
+    "osm": "way/198136704"
+   },
+   "precision": "town (point = Pelabuhan Klang KTM station)",
+   "notes": "NOT in the filings, and I found no Commons photo of Equanimity at Port Klang. Nominatim returned the KD19 Pelabuhan Klang rail station, which stands in for the town only."
+  },
+  {
+   "id": "villefranche",
+   "name": "Villefranche-sur-Mer (Equanimity photographed 28 Sep 2014)",
+   "address_as_stated": null,
+   "document": null,
+   "page": null,
+   "coords": {
+    "lat": 43.7042317,
+    "lon": 7.309969,
+    "nominatim_display_name": "Villefranche-sur-Mer, Nice, Alpes-Maritimes, Provence-Alpes-Côte d'Azur, France métropolitaine, 06230, France",
+    "nominatim_query": "Villefranche-sur-Mer, France",
+    "osm": "relation/174961"
+   },
+   "precision": "town",
+   "notes": "From the Commons photo title."
+  },
+  {
+   "id": "nieuwe-waterweg",
+   "name": "Nieuwe Waterweg, NL (Equanimity pre-delivery, 19 Mar 2014)",
+   "address_as_stated": null,
+   "document": null,
+   "page": null,
+   "coords": {
+    "lat": 51.9717447,
+    "lon": 4.1285773,
+    "nominatim_display_name": "Nieuwe Waterweg, Hoek van Holland, Rotterdam, Zuid-Holland, Nederland",
+    "nominatim_query": "Nieuwe Waterweg, Netherlands",
+    "osm": "relation/19274117"
+   },
+   "precision": "waterway",
+   "notes": "From the Flickr/Commons description."
+  }
+ ],
+ "failed": [
+  {
+   "item": "DOJ 20 Jul 2016 press conference video (Lynch/McCabe)",
+   "reason": "justice.gov/opa/video page only embeds YouTube (youtu.be/NlfB3f4bqck), no direct MP4. curl got a bot interstitial page. Dropped."
+  },
+  {
+   "item": "DOJ Nov 2018 Low/Ng/Leissner charges video",
+   "reason": "No direct-file openly licensed copy found; DOJ uses YouTube."
+  },
+  {
+   "item": "fbi.gov 2016 kleptocracy story (images/video)",
+   "reason": "HTTP 403 to curl. Dropped."
+  },
+  {
+   "item": "archive.org 1MDB video/audio",
+   "reason": "Items found were TV-news captures or re-uploaded copyrighted podcasts/YouTube rips (mirrors, no open licence). Not used."
+  },
+  {
+   "item": "Photos: Park Laurel (15 W 63rd St), Low Taek Jho, Tim Leissner, Roger Ng, Tranquility (post-sale), Equanimity at Port Klang, Bombardier N689WM, the Monet/Van Gogh/Basquiat works, 1MDB office",
+   "reason": "No matching file on Wikimedia Commons (searched Special:Search and categories). Low appears only in the US-Embassy text graphics."
+  },
+  {
+   "item": "Flickr originals",
+   "reason": "Not used. Flickr copy of the seized-yacht photo now shows All Rights Reserved."
+  }
+ ]
+}

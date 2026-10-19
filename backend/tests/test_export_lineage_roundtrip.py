@@ -98,3 +98,37 @@ def test_document_extraction_lineage_round_trips_through_portable_backup(tmp_pat
         assert restored_rejected is not None and restored_rejected.review_status == 'rejected'
         assert restored_rejected.accepted_record_id is None
         assert restored_rejected.reviewer_note == 'Reporter excluded irrelevant note'
+
+
+def test_an_accepted_relationship_proposal_backs_up_and_restores(tmp_path):
+    """Accepting a relationship proposal records a relationship edge as the
+    candidate's accepted record; the backup's lineage check must know that
+    record type, or the investigation cannot be backed up at all."""
+    from app.models.domain import RelationshipEdge
+
+    inv_id = _must(client.post('/api/investigations', json={'name': 'Relationship lineage backup'}))['id']
+    text = 'Alice Example worked for Example Company Inc. in 2024.'
+    doc = _must(client.post('/api/documents/upload', data={'investigation_id': inv_id, 'title': 'Employment filing'},
+                            files={'file': ('employment.txt', text.encode(), 'text/plain')}))
+    candidates = _must(client.get(f"/api/documents/{doc['id']}/candidates", params={'status': 'proposed'}))
+    claim_candidate = next(c for c in candidates if c['candidate_type'] == 'claim')
+    claim = _must(client.post(f"/api/extraction-candidates/{claim_candidate['id']}/review", json={'decision': 'accept'}))['record']
+    alice = _must(client.post('/api/entities', json={'investigation_id': inv_id, 'schema': 'Person', 'caption': 'Alice Example', 'properties': {}}))
+    company = _must(client.post('/api/entities', json={'investigation_id': inv_id, 'schema': 'Organization', 'caption': 'Example Company Inc.', 'properties': {}}))
+    proposal = _must(client.post(f"/api/claims/{claim['id']}/relationship-proposals", json={
+        'schema': 'Employment', 'source_entity_id': alice['id'], 'target_entity_id': company['id'], 'properties': {'role': ['employee']}}))
+    edge = _must(client.post(f"/api/extraction-candidates/{proposal['id']}/review", json={'decision': 'accept'}))['record']
+
+    with SessionLocal() as db:
+        package, manifest = build_investigation_export(db, inv_id, include_documents=True)
+    lineage = manifest['lineage_integrity']
+    assert lineage['valid'] is True, lineage['errors']
+    assert lineage['accepted_record_counts']['relationship'] == 1
+
+    engine = create_engine(f"sqlite:///{tmp_path / 'restored.db'}", connect_args={'check_same_thread': False})
+    Base.metadata.create_all(engine)
+    with sessionmaker(bind=engine, autoflush=False, autocommit=False)() as db:
+        restore_investigation_export(db, package, tmp_path / 'restored-documents')
+        assert db.get(RelationshipEdge, edge['id']) is not None
+        restored = db.scalar(select(ExtractionCandidate).where(ExtractionCandidate.id == proposal['id']))
+        assert (restored.accepted_record_type, restored.accepted_record_id) == ('relationship', edge['id'])

@@ -39,3 +39,26 @@ def test_restore_preview_reports_existing_record_conflicts_without_mutation():
     assert any(c['table'] == 'investigations' and c['id'] == inv['id'] for c in preview['conflicts'])
     assert any(c['table'] == 'sources' and c['id'] == source['id'] for c in preview['conflicts'])
     assert before == after
+
+
+def test_restore_preview_counts_the_document_files_the_backup_could_not_include(tmp_path, monkeypatch):
+    """The manifest lists them as missing_document_files
+    (build_investigation_export); the preview used to read another key and
+    always said none were missing."""
+    from pathlib import Path
+
+    from app.core.config import settings
+    from app.models.domain import Document
+
+    monkeypatch.setattr(settings, 'document_storage_dir', str(tmp_path))
+    inv = _must(client.post('/api/investigations', json={'name': 'Restore preview missing file'}))
+    doc = _must(client.post('/api/documents/upload', data={'investigation_id': inv['id'], 'title': 'Memo'},
+                            files={'file': ('memo.txt', b'The memo.\n', 'text/plain')}))
+    with SessionLocal() as db:
+        Path(db.get(Document, doc['id']).storage_path).unlink()
+        package, manifest = build_investigation_export(db, inv['id'], include_documents=True)
+    assert [row['document_id'] for row in manifest['missing_document_files']] == [doc['id']]
+
+    preview = _must(client.post('/api/backups/preview', files={'file': ('preview.jwbackup.zip', package, 'application/zip')}))
+    assert preview['missing_document_count'] == 1
+    assert 'Backup references 1 document file(s) that were unavailable when exported; metadata/extracted text can still be restored.' in preview['warnings']

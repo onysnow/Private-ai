@@ -1,0 +1,1282 @@
+key: KX
+name: Kidnapping, extortion and protection rackets
+scope: Kidnap for ransom, express and virtual kidnapping, illegal detention by criminals, hijacking, and
+  extortion of businesses and diaspora communities by gangs and cartels.
+indicators:
+- id: KX-001
+  name: Ransom call from an unfamiliar number, often several calls
+  definition: Someone gets one or more calls from an unfamiliar or out-of-area number claiming a relative
+    has been kidnapped and demanding money.
+  areas:
+  - KX
+  typology: Virtual kidnapping
+  status: verified
+  sources:
+  - title: FBI Warns Public of 'Virtual Kidnapping' Extortion Calls
+    publisher: FBI Phoenix
+    year: '2020'
+    url: https://www.fbi.gov/contact-us/field-offices/phoenix/news/press-releases/fbi-warns-public-of-virtual-kidnapping-extortion-calls
+    locator: List of indicators
+    quote: Calls are usually made from an outside area code
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The FBI says calls in Operation Hotel Tango came from Mexican prisons and reached more than 80 victims
+    in four US states.
+  cases:
+  - name: Operation Hotel Tango (FBI Los Angeles)
+    year: '2017'
+    jurisdiction: United States (California, Minnesota, Idaho, Texas)
+    what_happened: The FBI says virtual kidnapping calls placed from Mexican prisons reached more than
+      80 victims, with combined losses above $87,000. The source reports no court outcome.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fbi.gov/news/stories/virtual-kidnapping
+    source_title: Virtual Kidnapping (FBI news story)
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The FBI calls virtual kidnapping 'always an extortion scheme', a deception-based fraud.
+    source_url: https://www.fbi.gov/news/stories/virtual-kidnapping
+  innocent_explanations:
+  - Relatives travelling abroad or using borrowed or foreign phones
+  - Real emergencies reported by hospitals, police or consulates
+  - Ordinary calls from unfamiliar area codes
+  jurisdictions: United States, Mexico
+  version: 1
+- id: KX-002
+  name: Ransom call does not come from the supposed victim's phone
+  definition: The caller claims to hold a relative but is not calling from that person's own phone.
+  areas:
+  - KX
+  typology: Virtual kidnapping
+  status: verified
+  sources:
+  - title: FBI Warns Public of 'Virtual Kidnapping' Extortion Calls
+    publisher: FBI Phoenix
+    year: '2020'
+    url: https://www.fbi.gov/contact-us/field-offices/phoenix/news/press-releases/fbi-warns-public-of-virtual-kidnapping-extortion-calls
+    locator: List of indicators
+    quote: Calls do not come from the kidnapped victim's phone
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Virtual Kidnapping
+    publisher: FBI
+    year: '2017'
+    url: https://www.fbi.gov/news/stories/virtual-kidnapping
+    locator: Indicators
+    quote: Calls do not come from the supposed victim's phone.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A genuinely detained or injured person may have lost their phone
+  - Real kidnappers may also use other phones
+  version: 1
+- id: KX-003
+  name: Caller keeps the target on the line and stops them reaching the 'victim'
+  definition: The caller insists the target stays on the phone and tries to stop them from calling or
+    locating the person said to be kidnapped.
+  areas:
+  - KX
+  typology: Virtual kidnapping
+  status: verified
+  sources:
+  - title: FBI Warns Public of 'Virtual Kidnapping' Extortion Calls
+    publisher: FBI Phoenix
+    year: '2020'
+    url: https://www.fbi.gov/contact-us/field-offices/phoenix/news/press-releases/fbi-warns-public-of-virtual-kidnapping-extortion-calls
+    locator: List of indicators
+    quote: Callers go to great lengths to keep you on the phone
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Virtual Kidnapping
+    publisher: FBI
+    year: '2017'
+    url: https://www.fbi.gov/news/stories/virtual-kidnapping
+    locator: Indicators
+    quote: Callers try to prevent you from contacting the "kidnapped" victim.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Note
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real kidnappers also try to control communication
+  - Some legitimate callers in a crisis ask people to stay on the line
+  version: 1
+- id: KX-004
+  name: Ransom demanded only by wire transfer, often abroad, with the amount dropping fast
+  definition: The caller will accept payment only by wire transfer (the FBI cites transfers to Mexico),
+    and the ransom demand drops quickly when the target hesitates.
+  areas:
+  - KX
+  typology: Virtual kidnapping
+  status: verified
+  sources:
+  - title: FBI Warns Public of 'Virtual Kidnapping' Extortion Calls
+    publisher: FBI Phoenix
+    year: '2020'
+    url: https://www.fbi.gov/contact-us/field-offices/phoenix/news/press-releases/fbi-warns-public-of-virtual-kidnapping-extortion-calls
+    locator: List of indicators
+    quote: Ransom money is only accepted via wire transfer service
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Virtual Kidnapping
+    publisher: FBI
+    year: '2017'
+    url: https://www.fbi.gov/news/stories/virtual-kidnapping
+    locator: Indicators
+    quote: Calls include demands for ransom money to be paid via wire transfer to Mexico; ransom amount
+      demands may drop quickly.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - The FBI says Yanette Rodriguez Acosta collected ransom money from money drops and wired most of it
+    to Mexico. She was indicted in 2017.
+  cases:
+  - name: United States v. Yanette Rodriguez Acosta (Houston)
+    year: '2017'
+    jurisdiction: United States (S.D. Texas)
+    what_happened: A federal grand jury in Houston indicted her on 10 counts, including wire fraud and
+      money laundering, for collecting virtual-kidnapping ransom money and wiring most of it to Mexico.
+      The FBI story does not report a verdict.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fbi.gov/news/stories/virtual-kidnapping
+    source_title: Virtual Kidnapping (FBI news story)
+  data_needed:
+  - Person
+  - Payment
+  - Event
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: The FBI case describes a collector who picked up money drops and wired the funds onward, and
+      who was charged with money laundering.
+    source_url: https://www.fbi.gov/news/stories/virtual-kidnapping
+  innocent_explanations:
+  - Ordinary family remittances to Mexico or elsewhere
+  - Real emergencies abroad that need urgent transfers
+  jurisdictions: United States, Mexico
+  version: 1
+- id: KX-005
+  name: Anonymous threats over encrypted apps demanding lump-sum payments from business owners
+  definition: Local business owners or prominent community members get anonymous calls or encrypted-app
+    messages demanding immediate large payments.
+  areas:
+  - KX
+  typology: Diaspora business extortion
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Overview
+    quote: Extortion events typically begin with anonymous calls or messages over encrypted chat applications
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Government of Canada lists the Bishnoi Gang as a terrorist entity
+    publisher: Public Safety Canada
+    year: '2025'
+    url: https://www.canada.ca/en/public-safety-canada/news/2025/09/government-of-canada-lists-the-bishnoi-gang-as-a-terrorist-entity.html
+    quote: They create a climate of insecurity in these communities by targeting them, their prominent
+      community members, businesses, and cultural figures.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - FINTRAC says police in Brampton, Mississauga and Caledon logged hundreds of extortion cases in 2024
+    and 2025.
+  cases:
+  - name: Bishnoi Gang listed as a terrorist entity
+    year: '2025'
+    jurisdiction: Canada
+    what_happened: The Government of Canada listed the Bishnoi Gang as a terrorist entity. It said the
+      gang 'generates terror through extortion and intimidation' and targets diaspora communities. (A
+      government listing decision; the closest outcome category available.)
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.canada.ca/en/public-safety-canada/news/2025/09/government-of-canada-lists-the-bishnoi-gang-as-a-terrorist-entity.html
+    source_title: Government of Canada lists the Bishnoi Gang as a terrorist entity
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - Note
+  - Address
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Canada listed the Bishnoi Gang, which runs diaspora extortion, as a terrorist entity.
+    source_url: https://www.canada.ca/en/public-safety-canada/news/2025/09/government-of-canada-lists-the-bishnoi-gang-as-a-terrorist-entity.html
+  innocent_explanations:
+  - Hoaxes or copycat messages by people with no capacity to act
+  - Commercial disputes or debt collection carried out aggressively
+  jurisdictions: Canada, India
+  version: 1
+- id: KX-006
+  name: Shootings or arson at homes or storefronts after a payment is refused
+  definition: After an extortion demand is refused, someone fires shots at, or sets fire to, the target's
+    home or business.
+  areas:
+  - KX
+  typology: Diaspora business extortion
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Overview
+    quote: Circumstances escalate to gunfire at homes or storefronts and, in some cases, arson when demands
+      are refused.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Company
+  - Person
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - Police press releases and incident maps
+  - Local news archives
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Unrelated personal disputes or random crime
+  - Accidental fires
+  - Insurance-fraud arson with no extortion demand
+  version: 1
+- id: KX-007
+  name: Person named in adverse media about extortion, arson or shootings
+  definition: A person or customer appears in news reports about extortion, arson, shootings or murders
+    aimed at a community.
+  areas:
+  - KX
+  typology: Diaspora business extortion (perpetrator)
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Financial transaction indicators, indicator 1
+    quote: The customer may be referenced in adverse media reports relating to extortion events targeting
+      South Asian communities
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - News archives
+  - Court records
+  - Police wanted and charge announcements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Mistaken identity or a shared name
+  - Being named as a victim or witness, not a suspect
+  - Charges later withdrawn or an acquittal
+  version: 1
+- id: KX-008
+  name: Aliases, pseudonyms or stage names on accounts
+  definition: A person linked to extortion uses aliases, pseudonyms or rapper-style stage names in their
+    financial or online activity.
+  areas:
+  - KX
+  typology: Diaspora business extortion (perpetrator)
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Financial transaction indicators, indicator 2
+    quote: The customer may use aliases, pseudonyms or “rapper” stage names.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Social media profiles
+  - News archives
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Musicians, artists and creators routinely use stage names
+  - Nicknames and transliteration differences
+  - 'Note: FINTRAC''s profile also gives age, nationality and student status. These describe the cases
+    it saw and are not evidence about any individual.'
+  version: 1
+- id: KX-009
+  name: Unexplained, possibly structured cash deposits that fund quick transfers to third parties
+  definition: Unexplained cash, sometimes split across branches and ATMs, is deposited and then quickly
+    sent by email money transfer to unknown third parties.
+  areas:
+  - KX
+  typology: Extortion proceeds laundering
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Financial transaction indicators, indicator 3
+    quote: The customer will likely conduct unexplained cash deposits, some of which may be structured
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Ownership
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FINTRAC describes structured cash deposits as part of the extortion-proceeds pattern.
+    source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  innocent_explanations:
+  - Cash-based jobs such as tips, gig work or informal trade
+  - Sharing rent or bills among roommates
+  - Saving cash at home and then depositing it
+  jurisdictions: Canada
+  version: 1
+- id: KX-010
+  name: Many-to-one funnelling or flow-through of email money transfers beyond the person's means
+  definition: A person receives and sends an unusual volume or value of email money transfers for their
+    job or student status, with many senders funnelling into one account and money passing straight through.
+  areas:
+  - KX
+  typology: Extortion proceeds collection
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Financial transaction indicators, indicator 4
+    quote: The activity of email money transfers may display many-to-one patterns or funnelling.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FINTRAC describes funnelling and flow-through as signs that an account is used to collect
+      extortion proceeds.
+    source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  innocent_explanations:
+  - Collecting money for group events, rent or shared purchases
+  - Small online selling businesses
+  - Community fundraising
+  jurisdictions: Canada
+  version: 1
+- id: KX-011
+  name: Unusual transfers to persons or companies in jurisdictions linked to the extortion network
+  definition: 'A person sends money through banks or money services businesses to persons or companies
+    abroad that the extortion bulletin links to the network (for Canada: India, especially Haryana and
+    Punjab, the UAE, the UK, and possibly Portugal or Kenya), out of line with their status.'
+  areas:
+  - KX
+  typology: Extortion proceeds movement
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Financial transaction indicators, indicator 5
+    quote: The customer uses money services businesses or banks to transact with persons or companies
+      in
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Overview
+    quote: Typical financial behaviours include cash collection and informal remittance channels to conceal
+      participants,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family remittances and support for relatives abroad
+  - Tuition or living costs paid across borders
+  - Legitimate trade with these countries
+  jurisdictions: Canada, India, UAE, UK
+  version: 1
+- id: KX-012
+  name: Spending in extortion-hit areas with no prior ties
+  definition: A person (in FINTRAC's cases, an international student) pays for lodging, travel, fuel and
+    fast food in areas hit by extortion, far from where they live or study and with no earlier financial
+    links there.
+  areas:
+  - KX
+  typology: Extortion operations (perpetrator travel)
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Financial transaction indicators, indicator 7
+    quote: locations subject to extortion activities
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Address
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Visiting friends or relatives
+  - Short-term work, job hunting or a move
+  - Tourism
+  version: 1
+- id: KX-013
+  name: Victim business owner making unusual large withdrawals or wires, possibly coached
+  definition: A local business owner suddenly makes large cash withdrawals or wires out of line with past
+    behaviour, may seem nervous or coached, cashes in long-term investments, or sends large or repeated
+    wires to new recipients.
+  areas:
+  - KX
+  typology: Extortion victim indicators
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Financial transaction indicators, indicator 8
+    quote: Victims of extortion are likely to be a local business owner.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Overview
+    quote: Victims often face immediate demands for lump sum payments through email money transfer, cheques,
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: FINTRAC describes victims who seem coached, which also fits scam victims.
+    source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  innocent_explanations:
+  - Buying property, a vehicle or inventory
+  - Paying family obligations such as weddings or medical bills
+  - Business restructuring
+  - 'Note: a victim may also be under fraud pressure (romance or investment scams)'
+  jurisdictions: Canada
+  version: 1
+- id: KX-014
+  name: Extortion suspect also shows drug-trade financial indicators
+  definition: A person linked to extortion also shows the financial patterns associated with the illegal
+    narcotics trade.
+  areas:
+  - KX
+  typology: Extortion and drugs overlap
+  status: verified
+  sources:
+  - title: Special Bulletin on extortion directed at Canada's South Asian diaspora (FINTRAC-2026-SB002)
+    publisher: FINTRAC
+    year: '2026'
+    url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+    locator: Financial transaction indicators, indicator 6
+    quote: The customer may display financial indicators associated with the illegal narcotics trade.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FINTRAC links extortion perpetrators to narcotics financial indicators.
+    source_url: https://fintrac-canafe.canada.ca/intel/bulletins/csad-dsac-eng
+  innocent_explanations:
+  - Drug-trade indicators such as cash intensity also match many legitimate cash businesses
+  jurisdictions: Canada
+  version: 1
+- id: KX-015
+  name: Ransom paid into a bank account the kidnappers named
+  definition: Ransom money goes into a bank account chosen by the kidnappers or their negotiator, sometimes
+    as a further payment after the release.
+  areas:
+  - KX
+  typology: Kidnap for ransom money flows
+  status: verified
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    locator: Paragraph 62, p.27
+    quote: ransom payments are deposited in bank accounts designated by the kidnappers
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Emerging Terrorist Financing Risks
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Emerging-Terrorist-Financing-Risks.pdf
+    locator: Kidnapping for ransom, p.19
+    quote: a kidnapping can occur in one jurisdiction and the ransom payment be made in another.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - In FATF's CEC Future case, an extra payment was wired after the release to a bank account named by
+    the negotiator (p.12).
+  cases:
+  - name: CEC Future (vessel hijacking)
+    year: '2011'
+    jurisdiction: Somalia / Denmark
+    what_happened: FATF's typology describes a ransom where an extra payment was wire-transferred after
+      the release to a bank account named by the negotiator. (A case study submitted to an international
+      body's report; it is not a court finding.)
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    source_title: FATF, Organised Maritime Piracy and Related Kidnapping for Ransom, p.12
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: The existing organised crime indicators already cover ransom flows. Check for overlap before
+      merging.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  innocent_explanations:
+  - Legitimate payments to crisis-response or security consultancies
+  - Insurer settlements routed through professional firms
+  jurisdictions: Global
+  version: 1
+- id: KX-016
+  name: Ransom moved through hawala or other informal remittance
+  definition: Ransom money is moved through hawala or other informal value-transfer systems instead of
+    banks.
+  areas:
+  - KX
+  typology: Kidnap for ransom money flows
+  status: verified
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    locator: Paragraph 62, p.27
+    quote: the money flows through alternative remittance systems such as hawalas
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - In FATF's Pompei case, ransom funds went from Somalia via Djibouti to the UAE by hawala, to UAE bank
+    accounts linked to the negotiator (p.13).
+  cases:
+  - name: Pompei (vessel hijacking)
+    year: '2011'
+    jurisdiction: Somalia / Djibouti / UAE
+    what_happened: FATF's typology describes ransom funds moved out of Somalia via Djibouti to the UAE
+      by hawala, into UAE accounts linked to the negotiator. (A case study in an international body's
+      report.)
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    source_title: FATF, Organised Maritime Piracy and Related Kidnapping for Ransom, p.13
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Hawala is a normal and often the only remittance channel for many diaspora communities and fragile
+    states
+  jurisdictions: Somalia, Horn of Africa, Gulf
+  version: 1
+- id: KX-017
+  name: Third-party negotiator or courier handles the ransom and keeps a share
+  definition: An intermediary acts as negotiator or courier for the ransom, may keep a large share, and
+    may not be known to the authorities.
+  areas:
+  - KX
+  typology: Kidnap for ransom intermediaries
+  status: verified
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    locator: Paragraph 62, p.27; KFR Case 1, p.28
+    quote: Third party intermediaries are often employed as negotiators/couriers.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of the Terrorist Organisation ISIL
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-of-the-terrorist-organisation-ISIL.pdf
+    locator: p.18
+    quote: but also to the parties that may mediate such transfers
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Associate
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF notes that terrorist-financing restrictions apply to parties that mediate ransom transfers,
+      not only the payer.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-of-the-terrorist-organisation-ISIL.pdf
+  innocent_explanations:
+  - Licensed crisis-response consultants hired by insurers or employers legitimately negotiate releases
+  - Community or religious mediators acting in good faith
+  jurisdictions: Global
+  version: 1
+- id: KX-018
+  name: Ransom withdrawn at ATMs or deposited into an account under a fictitious name
+  definition: Ransom paid through the banking system is taken out at ATMs or moved into an account opened
+    under a false name.
+  areas:
+  - KX
+  typology: Kidnap for ransom money flows (criminal kidnappers)
+  status: verified
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    locator: KFR Japan case, p.30
+    quote: deposited JPY 7 million (USD 68 000) of the ransom into a bank account under a fictitious name
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases:
+  - name: KFR Japan case (FATF typology)
+    year: '2011'
+    jurisdiction: Japan
+    what_happened: FATF reports that two kidnappers were arrested while withdrawing the ransom at an ATM,
+      and that part of the ransom had been deposited into an account under a fictitious name. The source
+      reports arrest, not a verdict.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    source_title: FATF, Organised Maritime Piracy and Related Kidnapping for Ransom, p.30
+  data_needed:
+  - Payment
+  - Person
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Heavy ATM use is normal for cash-reliant people
+  - Name mismatches often come from transliteration or data-entry errors
+  jurisdictions: Japan
+  version: 1
+- id: KX-019
+  name: Large physical cash ransom moved without a cash declaration or suspicious-transaction report
+  definition: A large sum in physical cash (FATF reports mostly USD 100 notes) is withdrawn and delivered
+    to a drop point, intermediary or third country with no bulk-cash declaration, no report to the financial
+    intelligence unit, and no recorded serial numbers.
+  areas:
+  - KX
+  typology: Kidnap and piracy ransom delivery
+  status: verified
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    locator: Paragraph 25, p.14
+    quote: the trail goes cold if such payments were not previously reported to FIUs
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Emerging Terrorist Financing Risks
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Emerging-Terrorist-Financing-Risks.pdf
+    locator: p.19
+    quote: Following the delivery of a ransom payment in physical cash, cash couriers move the cash to
+      the terrorist group.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - In FATF's Danica White case, cash was carried across borders and delivered to a hotel in Dubai (p.11).
+  cases:
+  - name: Danica White (vessel hijacking)
+    year: '2011'
+    jurisdiction: Somalia / Denmark / UAE
+    what_happened: FATF's typology describes ransom cash carried across borders and delivered to a hotel
+      in Dubai, with no bulk cash declaration and no recorded serial numbers. (A case study in an international
+      body's report.)
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+    source_title: FATF, Organised Maritime Piracy and Related Kidnapping for Ransom, p.11
+  data_needed:
+  - Payment
+  - Person
+  - Event
+  - Address
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Ransom cash delivery for maritime piracy may overlap the existing piracy-financing indicators.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf
+  innocent_explanations:
+  - Lawful cash shipments by banks, currency dealers and humanitarian organisations
+  - Lawful ransom or release payments arranged by insurers where local law permits, which may still not
+    be reported
+  jurisdictions: Global
+  version: 1
+- id: KX-020
+  name: Company ransom payments concealed or booked with vague descriptions
+  definition: A private company pays a ransom in a way that hides it, for example in cash or as a transfer
+    with no reference or a generic label such as 'services' or 'goods'.
+  areas:
+  - KX
+  typology: Kidnap for ransom (corporate payers)
+  status: verified
+  sources:
+  - title: Financing of the Terrorist Organisation ISIL
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-of-the-terrorist-organisation-ISIL.pdf
+    locator: p.18
+    quote: ransom payments often originate from private companies that wish to conceal the transaction
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of the Terrorist Organisation ISIL
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-of-the-terrorist-organisation-ISIL.pdf
+    locator: p.19 (general wire-transfer indicator, not ransom-specific)
+    quote: transactions not listing any reference or using generic terms such as “other”, “services” and
+      “goods”
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF identifies ransoms paid by companies as an ISIL revenue source.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-of-the-terrorist-organisation-ISIL.pdf
+  - target_area: AF
+    reason: Concealed payments mean false bookkeeping entries.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-of-the-terrorist-organisation-ISIL.pdf
+  innocent_explanations:
+  - Generic payment references are common in poorly documented legitimate trade
+  - Security and kidnap-and-ransom insurance costs are lawful business expenses
+  jurisdictions: Iraq, Syria, global
+  version: 1
+- id: KX-021
+  name: Hostages passed between criminal groups and armed groups
+  definition: Criminal groups are hired to hold hostages and negotiate ransoms, or sell hostages on to
+    terrorist groups, and some groups specialise in holding hostages for a long time to raise the price.
+  areas:
+  - KX
+  typology: Kidnap economies (armed groups)
+  status: verified
+  sources:
+  - title: Terrorist Financing in West and Central Africa
+    publisher: FATF / GIABA / GABAC
+    year: '2016'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+    locator: p.19
+    quote: specialise in holding hostages over longer periods of time, negotiating high(er) ransoms
+    quote_verified: true
+    checked: '2026-10-10'
+  examples: []
+  cases:
+  - name: Ansaru cell member, Kogi State (FATF Case Study 3)
+    year: '2016'
+    jurisdiction: Nigeria
+    what_happened: FATF reports that a cell member (named only as Mr L) confessed his group 'was involved
+      in robbery and kidnapping' to raise funds. The source gives no court outcome.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+    source_title: FATF/GIABA/GABAC, Terrorist Financing in West and Central Africa, p.12
+  data_needed:
+  - Organization
+  - Person
+  - Associate
+  - Event
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - UN Security Council sanctions panel reports
+  - Court records
+  - Official inquiries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Kidnapping is listed as an income source for AQIM and Boko Haram.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+  innocent_explanations:
+  - Reporting on hostage transfers is often based on unverified secondary sources
+  jurisdictions: Sahel, Lake Chad basin
+  version: 1
+- id: KX-022
+  name: Ransom paid in kind or by prisoner release
+  definition: A ransom is paid in goods such as cattle, or a kidnapping group seeks the release of its
+    own detained fighters in exchange for hostages.
+  areas:
+  - KX
+  typology: Kidnap economies (armed groups)
+  status: verified
+  sources:
+  - title: Terrorist Financing in West and Central Africa
+    publisher: FATF / GIABA / GABAC
+    year: '2016'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+    locator: p.19
+    quote: has used kidnapping victims as leverage for seeking the release of BH fighters
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - FATF reports that Boko Haram 'demanded 40 heads of cattle for the return of each woman' (p.19).
+  cases: []
+  data_needed:
+  - Event
+  - Organization
+  - PublicBody
+  - Note
+  checkable: lookups
+  lookup_sources:
+  - Government statements
+  - Official inquiries
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Government prisoner releases may be part of lawful amnesty or peace processes
+  jurisdictions: Nigeria, Cameroon
+  version: 1
+- id: KX-023
+  name: Armed or criminal group levies 'taxes' or protection fees on businesses and residents
+  definition: A group forces businesses, professionals or villagers to pay regular 'taxes', levies or
+    'donations' in return for 'protection' or to keep operating.
+  areas:
+  - KX
+  typology: Protection racket / armed-group extortion
+  status: verified
+  sources:
+  - title: Terrorist Financing in West and Central Africa
+    publisher: FATF / GIABA / GABAC
+    year: '2016'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+    locator: p.11
+    quote: '''Taxes'' and fees are paid in return for protection and security.'
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Financing of the Terrorist Organisation ISIL
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-of-the-terrorist-organisation-ISIL.pdf
+    locator: p.12
+    quote: involuntary “donations” purchase momentary safety or temporary continuity of business
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Emerging Terrorist Financing Risks
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Emerging-Terrorist-Financing-Risks.pdf
+    locator: p.18
+    quote: terrorist organisations extort local populations as a way to sustain their activities
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - FATF reports that Boko Haram 'placed compulsory monthly levies on the villagers depending on their
+    level of income' (p.18).
+  - FATF reports that ISIL 'levied a tax of 5 percent on all customer cash withdrawals' (p.13).
+  cases:
+  - name: MUJAO member, Bourem (FATF Case Study 2)
+    year: '2016'
+    jurisdiction: Mali
+    what_happened: FATF reports that a MUJAO member (named only as Mr X) collected funds from residents
+      by force on the group's behalf, and was convicted in 2016.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+    source_title: FATF/GIABA/GABAC, Terrorist Financing in West and Central Africa, p.11
+  - name: Boko Haram farmland seizure and levies (FATF Case Study 17)
+    year: '2015'
+    jurisdiction: Nigeria
+    what_happened: FATF reports that Boko Haram seized village farmland in north-eastern Nigeria and imposed
+      compulsory monthly levies based on income. (A case study in an international body's report.)
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+    source_title: FATF/GIABA/GABAC, Terrorist Financing in West and Central Africa, p.18
+  data_needed:
+  - Organization
+  - Company
+  - Person
+  - Payment
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Official inquiries and UN panel reports
+  - Court records
+  - Local reporting with named evidence
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF describes extortion as a core income source for ISIL, AQIM, Boko Haram and MUJAO.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+  innocent_explanations:
+  - Lawful taxes, licence fees and private security contracts
+  - Community self-help associations collecting voluntary dues
+  jurisdictions: Sahel, Lake Chad basin, Iraq, Syria
+  version: 1
+- id: KX-024
+  name: Transit, road or 'customs' fees charged by a group controlling territory
+  definition: A group charges fees on goods, trucks, drugs or migrants moving through the area it controls.
+  areas:
+  - KX
+  typology: Protection racket / armed-group extortion
+  status: verified
+  sources:
+  - title: Financing of the Terrorist Organisation ISIL
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Financing-of-the-terrorist-organisation-ISIL.pdf
+    locator: p.17
+    quote: a road tax of 200 USD in northern Iraq and an 800 USD “customs” tax on trucks
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Terrorist Financing in West and Central Africa
+    publisher: FATF / GIABA / GABAC
+    year: '2016'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+    locator: pp.21-22
+    quote: fees on those wanting to move drugs through areas they control
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - FATF reports that Somali pirates allegedly paid 'docking fees' and 'taxes' to al-Shabaab (FATF 2011,
+    para 18).
+  cases: []
+  data_needed:
+  - Organization
+  - Payment
+  - Vehicle
+  - Vessel
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - UN panel and monitoring group reports
+  - Trade and logistics records
+  - Official inquiries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FATF reports that groups profit by 'protecting and facilitating established people smuggling
+      networks'.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+  - target_area: OC
+    reason: FATF describes transit fees on drug shipments.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Terrorist-Financing-West-Central-Africa.pdf
+  innocent_explanations:
+  - Lawful customs duties and road tolls
+  - Informal local fees at checkpoints run by recognised authorities
+  jurisdictions: Iraq, Syria, Sahel, Somalia
+  version: 1
+- id: KX-025
+  name: Diaspora families pressed for regular 'contributions' to an armed group
+  definition: An armed or political group extorts set payments from members of a diaspora community abroad.
+  areas:
+  - KX
+  typology: Diaspora extortion (armed groups)
+  status: verified
+  sources:
+  - title: Emerging Terrorist Financing Risks
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Emerging-Terrorist-Financing-Risks.pdf
+    locator: p.18
+    quote: the Liberation Tigers of Tamil Eelam (LTTE) used extortion on members of the Tamil diaspora
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - FATF reports that the PKK 'is known to collect funds from extortion and businesses' (p.18).
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Payment
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - Terrorist listing decisions
+  - Official reports
+  levels:
+    faint: To be set by Ony
+    strong: Average extortion rates for targeted individuals and families were CAD 2,500 to 5,000 in the
+      LTTE case (descriptive figure, not a threshold)
+    textbook: Meets the published definition as worded
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Emerging-Terrorist-Financing-Risks.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF describes diaspora extortion by the LTTE and the PKK.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Emerging-Terrorist-Financing-Risks.pdf
+  - target_area: PP
+    reason: Diaspora collections are often channelled through community bodies (to be confirmed with a
+      source).
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Emerging-Terrorist-Financing-Risks.pdf
+  innocent_explanations:
+  - Voluntary donations to community, religious or humanitarian causes
+  - Remittances to family members in conflict zones
+  jurisdictions: Canada, Europe, global diasporas
+  version: 1
+not_reached:
+- 'UNODC/UNOCT ''Countering Kidnapping and Extortion'' manual: the landing page confirms it is not publicly
+  available, so it would have to be requested from UNODC.'
+- 'FINTRAC Targeted Indicator Profiles (TIP sheets) on extortion: shared only with financial institutions,
+  and the backgrounder lists no indicators.'
+- 'US State Department kidnapping page (travel.state.gov): fetch failed.'
+- 'GCTF Algiers Memorandum on preventing kidnapping for ransom by terrorists: blocked by robots.txt.'
+- 'US Justice Department pages on the Haitian 400 Mawozo gang kidnapping prosecutions: the guessed URLs
+  failed. I did not verify this case, so it is not included.'
+- 'FBI IC3 virtual kidnapping public service announcement: the guessed URL failed.'
+- 'The shared web-search budget ran out after the first fetches, so I could not search for: express kidnapping
+  indicators, Mexico cartel extortion (''cobro de piso''), Haiti (UN Panel of Experts, BINUH), Nigeria
+  and Sahel kidnap economies beyond FATF, Europol and UK National Crime Agency extortion material, FinCEN
+  advisories, hijacking indicators, the outcome of the Yanette Rodriguez Acosta case, and Canadian court
+  outcomes for the diaspora extortion cases. A follow-up run with search could add these.'
+- 'UN Security Council resolution 2133 (2014) on kidnapping for ransom by terrorists: not fetched.'

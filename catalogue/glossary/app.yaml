@@ -1,0 +1,49 @@
+# The app's own names (docs/discovery/indicators.md, "The glossary page"; the
+# names were chosen by Ony, 7-8 October 2026, and are defined in
+# docs/discovery/README.md). Written by hand, not by the research step; each
+# source_url opens the place in the app where the name is used.
+area: APP
+terms:
+- term: Red Flags
+  definition: Patterns from the indicator catalogue found in an investigation's records. Each is a lead,
+    not a finding; its card shows the innocent explanations first, where the pattern was documented,
+    its level (Faint, Strong or Textbook) and how it ranks.
+  source_url: /#red-flags
+  related: [Faint, Strong, Textbook]
+  areas: [APP]
+- term: Faint
+  definition: The first level of a Red Flag. The pattern appears in the records.
+  source_url: /#red-flags
+  related: [Strong, Textbook, Red Flags]
+  areas: [APP]
+- term: Strong
+  definition: The second level of a Red Flag. The pattern looks serious.
+  source_url: /#red-flags
+  related: [Faint, Textbook, Red Flags]
+  areas: [APP]
+- term: Textbook
+  definition: The highest level of a Red Flag. The pattern meets the published definition or threshold.
+    It says the pattern fits the published definition, not that anyone did wrong.
+  source_url: /#red-flags
+  related: [Faint, Strong, Red Flags]
+  areas: [APP]
+- term: Paper Trail
+  definition: The one panel for every source an investigation draws on (your documents, OpenAleph,
+    OpenSanctions, an outside Aleph server, Firecrawl and the free registries), with each source's
+    status, one queue of matches and findings from all of them, records by source, the watchlist and
+    what is sent out to OpenAleph. Being built; until then these sit in the External connectors and
+    OpenAleph corpus panels.
+  source_url: /#connectors
+  related: [Chain of Custody, The Drop]
+  areas: [APP]
+- term: Chain of Custody
+  definition: Following one fact back to the document it came from. "Trace" opens it beside the page
+    as a chain from source to record. It is kept apart from Paper Trail, which covers every source at once.
+  source_url: /
+  related: [Paper Trail]
+  areas: [APP]
+- term: The Drop
+  definition: Where documents are added and read, and the records the app proposes from them are reviewed.
+  source_url: /#document-ingestion
+  related: [Paper Trail]
+  areas: [APP]

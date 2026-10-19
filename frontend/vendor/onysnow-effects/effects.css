@@ -1,0 +1,4020 @@
+/*
+ * The effect system's stylesheet, from onysnow/onysnow-studios src/styles.css (line 183 on:
+ * everything after the site's Tailwind theme and base layer). Changed only so it sits in the
+ * workbench without touching it: the site's colour tokens are read as --fx-* (the workbench
+ * already uses --background, --primary and the rest for its own themes), Tailwind v4's
+ * `@utility image-vignette` is a plain class, and `@layer components` is the native layer
+ * `fx-components`. See ADR-0009 and vendor/onysnow-effects/README.md.
+ */
+
+:root {
+  --fx-background: oklch(0.145 0.011 55);
+  --fx-foreground: oklch(0.94 0.014 78);
+  --fx-card: oklch(0.18 0.012 55);
+  --fx-primary: oklch(0.72 0.14 68);
+  --fx-primary-foreground: oklch(0.14 0.012 55);
+  --fx-muted: oklch(0.22 0.013 55);
+  --fx-muted-foreground: oklch(0.69 0.02 75);
+  --fx-border: oklch(0.35 0.018 55 / 55%);
+  --fx-ring: oklch(0.72 0.14 68);
+  --fx-teal: oklch(0.63 0.105 190);
+  --fx-amber: oklch(0.72 0.14 68);
+  --fx-font-sans: "Manrope", sans-serif;
+  --fx-font-display: var(--display-family, "Jost"), "Futura", sans-serif;
+}
+
+/* The glass shader dims the lights' bokeh by this same shadow: effects/optics/bokeh PHOTO_VIGNETTE. Change both together. */
+.image-vignette {
+  box-shadow: inset 0 0 9rem 1rem oklch(0.08 0.01 55 / 70%);
+}
+
+.gallery-frame {
+  background-color: var(--fx-muted);
+  cursor: zoom-in;
+  transition:
+    filter 0.5s ease,
+    opacity 0.5s ease;
+  animation: frame-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* One after another, in reading order (capped, so a long set does not keep you waiting). */
+  animation-delay: min(calc(var(--i, 0) * 45ms), 900ms);
+}
+/*
+ * On a pane, a card's shadow lies on the glass UNDER the water (Ony,
+ * 2026-10-11: the rain "cut off" round the photographs): the drops sit on
+ * the glass in the print's shadow, darkened, never hidden. Drawn over the
+ * water layer (z -1) the shadow's band erased the drops round every photo.
+ */
+.glass [data-cast]::before {
+  z-index: -2;
+}
+.react-photo-album--button[data-cast] {
+  position: relative;
+  overflow: visible;
+}
+
+/* The print round each gallery photograph (JustifiedGallery LitFrame): its gloss and its shadow. */
+.gallery-lit {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.gallery-frame:hover {
+  filter: brightness(1.12) saturate(1.05);
+}
+@keyframes frame-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-frame {
+    animation: none;
+  }
+}
+
+/* The lightbox's picture springs open from a little smaller. */
+.gallery-lightbox .yarl__slide_image {
+  animation: lightbox-in 0.55s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+}
+@keyframes lightbox-in {
+  from {
+    transform: scale(0.92);
+  }
+  to {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-lightbox .yarl__slide_image {
+    animation: none;
+  }
+}
+
+.yarl__container {
+  background-color: oklch(0.08 0.008 55 / 96%) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Rich text saved from the admin portal */
+.rich-text > * + * {
+  margin-top: 1.25rem;
+}
+.rich-text h2 {
+  font-family: var(--fx-font-display);
+  font-size: 1.875rem;
+  color: var(--fx-foreground);
+  margin-top: 2.5rem;
+}
+.rich-text h3 {
+  font-family: var(--fx-font-display);
+  font-size: 1.5rem;
+  color: var(--fx-foreground);
+  margin-top: 2rem;
+}
+.rich-text ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.rich-text ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.rich-text a {
+  color: var(--fx-primary);
+  text-decoration: underline;
+}
+.rich-text em {
+  font-style: italic;
+}
+.rich-text strong {
+  font-weight: 600;
+}
+
+/* TipTap editor surface */
+.tiptap {
+  min-height: 14rem;
+  outline: none;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--fx-muted-foreground);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ===================== Cursor =====================
+ *
+ * `mix-blend-mode: difference` on a white element inverts whatever sits beneath
+ * it, which is what gives the negative over photographs and the knocked-out
+ * lettering over links — one element, every background.
+ *
+ * The native cursor is hidden by a class the component adds only after it has
+ * confirmed a fine pointer, so touch devices and anyone with reduced motion
+ * keep their own pointer and never meet this at all.
+ */
+/* Another tool in the hand: the camera's ring and dot are put away with it (CustomCursor, held cameraInHand). */
+html[data-other-tool] .custom-cursor {
+  display: none;
+}
+
+.custom-cursor {
+  /*
+   * The ring's diameter, inherited by the aperture.
+   *
+   * Declared HERE and not on the ring, because the blades are the ring's
+   * sibling rather than its child -- setting it on the ring meant the
+   * aperture never saw it and stayed at its own size.
+   */
+  /*
+   * The ring is the lens, and it opens as the flash winds.
+   *
+   * The emitter's bloom widens with the charge -- the shader mixes its spread
+   * toward full at charge squared -- so a fixed ring gets swallowed by its own
+   * light about halfway up the meter. The ring has to open at least as fast
+   * as the thing it is supposed to contain.
+   *
+   * Squared, to match the shader rather than merely to move: a linear ring
+   * against a squared bloom is ahead of the light early and behind it late,
+   * which is worse than not tracking at all because it looks like a mistake
+   * only at full charge.
+   *
+   * The aperture needs no rule of its own. It derives its size from this, so
+   * the blades stay seated on the ring's circle however wide the ring gets --
+   * which is right, because the blades come OUT of the lens.
+   */
+  /*
+   * `--ring-base` is the resting diameter BEFORE the charge opens it. States
+   * below re-point it, and CustomCursor writes it inline when the ring has to
+   * be capped to the size of the control under the pointer. Everything then
+   * goes through the one wind formula, so no state can accidentally opt out
+   * of the charge growth -- which is what the old per-state `--ring-size`
+   * override did over every link on the site.
+   */
+  --ring-base: var(--tune-ring, 30px);
+  --wind-sq: calc(var(--wind, 0) * var(--wind, 0));
+  --ring-size: calc(var(--ring-base) * (1 + var(--wind-sq, 0) * var(--tune-ring-open, 2.4)));
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  /*
+   * `difference`, as it was originally, because that is what the reference
+   * actually does.
+   *
+   * bryanminear's cursor is not black. It INVERTS: dark on his white header,
+   * light over his photographs, always legible and never a chosen colour.
+   * White is difference's identity, so a white ring comes out as a true
+   * inversion of the pixels underneath rather than a tint. Painting it black
+   * instead, which is what I did after taking this out, gets the header right
+   * and then disappears against every dark photograph on the page.
+   *
+   * It comes back off over photographs -- see the media state -- because
+   * inverting somebody's picture is the one place this is genuinely wrong,
+   * and that was the original complaint. Everywhere else it is the effect.
+   */
+  mix-blend-mode: difference;
+  transition: opacity 0.25s ease;
+  will-change: transform;
+}
+
+.custom-cursor__ring,
+.custom-cursor__dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  border-radius: 9999px;
+  translate: -50% -50%;
+  /* White is the identity for `difference`: the result is a true inversion of
+     the pixels underneath rather than a tint. */
+  transition:
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.32s ease,
+    border-color 0.32s ease,
+    opacity 0.2s ease;
+}
+
+/*
+ * `--ring-size` is the one number the ring and the aperture both read.
+ *
+ * They used to be set independently -- the ring hard-coded per state, the iris
+ * derived from `--tune-ring` -- so over a photograph the ring grew to 96px
+ * while the aperture stayed at 33px and the two had visibly nothing to do with
+ * each other. Every state below re-points this variable instead of setting a
+ * width, so the blades follow the ring wherever it goes.
+ */
+.custom-cursor__ring {
+  /* Measured off bryanminear.com: .circle-outer is 30x30, 1px solid #fff. */
+  width: var(--ring-size);
+  height: var(--ring-size);
+  border: var(--tune-ring-width, 1px) solid rgb(255 255 255 / var(--tune-ring-alpha, 1));
+}
+
+/*
+ * The default: a thin ring with a small solid dot at its centre, and nothing
+ * else. Matched to bryanminear.com, which is the reference for this.
+ */
+.custom-cursor__dot {
+  /* Measured: .circle-inner is 6x6, solid white. */
+  width: var(--tune-dot, 6px);
+  height: var(--tune-dot, 6px);
+  background-color: rgb(255 255 255 / var(--tune-dot-alpha, 1));
+}
+
+/* Over a link or button: a filled disc big enough to sit behind a nav item. */
+/*
+ * Over a link: wider, and tinted rather than filled. A solid disc only worked
+ * because it was being inverted; painted straight it simply covers the thing
+ * you are pointing at.
+ */
+/*
+ * The fallback for a clickable thing big enough not to need capping.
+ * CustomCursor overrides this inline with the fitted size whenever the
+ * control's larger axis is under 56px, so the ring hugs a knob instead of
+ * engulfing it -- keep the two numbers in step (LINK_RING).
+ */
+.custom-cursor[data-state="link"] {
+  --ring-base: 56px;
+}
+.custom-cursor[data-state="link"] .custom-cursor__ring {
+  background-color: oklch(1 0 0 / 0.14);
+  border-color: #fff;
+}
+.custom-cursor[data-state="link"] .custom-cursor__dot {
+  opacity: 0;
+}
+/*
+ * ...unless it is lit. Over a link the resting dot hides so it does not sit
+ * on the words, but once the shutter is charging the dot is the pilot light,
+ * the source of everything the glass is doing, and it stays -- otherwise the
+ * lamp over any photograph (they are all links) had no pilot at all.
+ */
+.custom-cursor[data-state="link"][data-pilot] .custom-cursor__dot {
+  opacity: 1;
+}
+
+/*
+ * Over a photograph: a wider ring, and deliberately NOT filled.
+ *
+ * It used to be a solid white disc, which under `difference` inverts every
+ * pixel beneath it — a negative of the photograph following the pointer
+ * around. That is a striking effect on a page of text and an unwelcome one on
+ * somebody's photography, which is the whole point of the site. The outline
+ * still reads on any background because a 1px inversion is legible against
+ * anything, and it leaves the picture alone.
+ */
+/*
+ * Over a photograph, inverting is the one case where this is wrong -- it turns
+ * the follower into a negative of the picture. Composite normally there and
+ * let the white carry it, which the photographs on this site are dark enough
+ * for.
+ */
+/*
+ * Over a photograph: the same ring as everywhere else.
+ *
+ * This used to re-point --ring-size at 96px and switch the blend to normal,
+ * which together turned the small dark ring into a large white one the moment
+ * the pointer crossed onto a picture -- twice reported, and both halves of it
+ * were mine. Neither earned its keep: the size change was there to signal
+ * "this is a photograph" to someone who is already looking at the photograph,
+ * and dropping the blend was to stop a fill inverting somebody's picture, but
+ * the fill had already gone. A 1px ring under `difference` reads against
+ * anything -- dark on a bright frame, bright on a dark one -- which is the
+ * whole reason the reference cursor works.
+ */
+.custom-cursor[data-state="media"] .custom-cursor__ring {
+  background-color: transparent;
+}
+
+.has-custom-cursor,
+.has-custom-cursor * {
+  cursor: none !important;
+}
+
+/* The lightbox opens its own layer above everything; the disc chasing the
+   pointer over it is noise rather than atmosphere. */
+.has-custom-cursor:has(.yarl__container) .custom-cursor {
+  opacity: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-cursor {
+    display: none;
+  }
+}
+
+/* ===================== Glass edges and bokeh =====================
+ *
+ * Both of these live behind or on the frosted bands, and both are built from
+ * the two accent hues the photographs already trade in — warm amber and cool
+ * teal — so the glow reads as part of the same light rather than as UI chrome.
+ */
+
+/*
+ * Bokeh.
+ *
+ * Soft discs of light drifting behind the glass. They are NOT pre-blurred: the
+ * panel's own backdrop-filter does that, which is exactly how a real
+ * out-of-focus highlight forms — a point of light spread by the optics in front
+ * of it. Anything not covered by glass keeps a gentle falloff of its own so the
+ * edges of the field don't show as hard circles.
+ */
+.bokeh-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bokeh {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle closest-side,
+    var(--bokeh-tint) 0%,
+    color-mix(in oklab, var(--bokeh-tint) 45%, transparent) 42%,
+    transparent 72%
+  );
+  opacity: var(--bokeh-alpha, 0.4);
+  will-change: transform;
+  animation: bokeh-drift var(--bokeh-dur, 24s) ease-in-out var(--bokeh-delay, 0s) infinite alternate;
+}
+
+@keyframes bokeh-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(var(--bokeh-dx, 3rem), var(--bokeh-dy, -2rem), 0) scale(1.14);
+  }
+}
+
+/*
+ * Wrapped in @layer components so Tailwind's utilities, which live in a later
+ * layer, still win against it.
+ *
+ * Unlayered CSS beats every layered rule in the cascade, so an unlayered
+ * `.glass { position: relative }` silently overrode `fixed` on the header —
+ * the bar dropped out of fixed positioning into normal flow, and the
+ * photographic band it is supposed to blur ended up behind it in the document
+ * rather than underneath it on screen. Nothing errored; the header just
+ * quietly stopped being a header.
+ */
+@layer fx-components {
+  /* =====================================================================
+   * GLASS
+   *
+   * One definition for every frosted surface on the site: the content bands,
+   * the header, the portfolio filter bar. Previously these were three separate
+   * implementations that had drifted apart, which is why the header and the
+   * bands never quite matched.
+   *
+   * Apply `.glass` for the surface. Add `.glass--bar` for the thin fixed bars,
+   * which need less tint and a shallower bezel. Register the element with
+   * effects/scene/scene.ts to have its rim lit by the cursor.
+   *
+   * Built from how glass actually behaves, per the liquid-glass technique
+   * write-ups: the rim highlight is DIRECTIONAL — its brightness varies with
+   * where the light is relative to each part of the edge — and the sense of
+   * thickness comes from a bezel that bends what is behind it, not from a
+   * drawn border. Doing this properly with SVG displacement maps is possible
+   * but costs a filter pass over a full-width element on every frame, so the
+   * bezel here is a second, stronger backdrop pass masked to the edge band —
+   * cheap, and close enough at this scale.
+   * ===================================================================== */
+
+  .glass {
+    position: relative;
+    /*
+     * The pane's smoky fill, as a property so the liquid glass can read the
+     * same number (effects/adapters/liquid-config, ?try=liquidedge) when its
+     * own background is taken away.
+     */
+    --pane-fill: oklch(0.145 0.011 55 / 30%);
+    background-color: var(--pane-fill);
+    /*
+     * Frost AND bend, in the pane's own backdrop pass.
+     *
+     * The bend used to live on a child layer (.glass__refract) with its own
+     * backdrop-filter, and it never once saw the photograph behind the pane.
+     * A pane with blend-mode children is an isolated group, and an isolated
+     * group is a "backdrop root": a child's backdrop-filter can only see what
+     * is painted INSIDE it -- here, the pane's dark tint. So the refraction
+     * layer bent the tint and painted it, opaque, over the whole pane. Found by
+     * switching layers off one at a time over "What I do": 74 brightness
+     * behind the pane, 18 through it, 56 with the child layers removed. That
+     * is the "background isn't refracted or distorted at all" report, and why
+     * the CSS glass read as smoked plastic rather than glass.
+     *
+     * The pane's OWN backdrop-filter is the one pass that sees the page, so
+     * the bevel map joins the blur here. --glass-bevel is set by <Glass> to
+     * this pane's geometry, and only where url() filters are supported;
+     * elsewhere it is unset and this is the plain frost.
+     */
+    backdrop-filter: blur(30px) saturate(150%) var(--glass-bevel,);
+    /*
+     * Not inherited. Custom properties cascade, so a small pane INSIDE a big
+     * one -- the round toggle in the header -- was picking up the header's
+     * 1440x64 bevel map and bending itself by it. Each pane's own value is
+     * set inline by <Glass>, which beats this.
+     */
+    --glass-bevel: initial; /*
+     * A stacking context of its own, in every mode. Every layer inside a pane
+     * -- the light and grime surface, the lit sides, the liquid render -- uses
+     * a negative z-index to sit under the copy. The backdrop-filter used to be
+     * what made the pane a stacking context; under liquid glass that filter is
+     * switched off, and every one of those layers silently escaped the pane
+     * and painted BEHIND the photograph the pane sits over. The liquid pane
+     * showed the raw photo, and none of its light.
+     */
+    isolation: isolate;
+    /*
+     * Thickness, kept deliberately faint. An earlier version drew it with heavy
+     * inset shadows and the edge read as a painted bevel; the light is what
+     * should reveal the edge, so this only has to hint that there is one.
+     */
+    /*
+     * No inset hairlines: the rim is the arris, reflected and lit by the
+     * glass light pass (effects/optics/edge-side.ts), not a drawn line.
+     */
+    box-shadow: 0 18px 40px -30px oklch(0 0 0 / 0.9);
+  }
+
+  .glass--bar {
+    --pane-fill: oklch(0.145 0.011 55 / 26%);
+    background-color: var(--pane-fill);
+    backdrop-filter: blur(28px) saturate(150%) var(--glass-bevel,);
+    box-shadow: none;
+  }
+
+  /*
+   * The near arris is not drawn. It was a 1 px ring round every pane, and in
+   * the reference photographs nothing on an edge is a line: the eased corner
+   * is a soft band of reflected room and lamp, which the glass light pass
+   * works out (effects/optics/edge-side.ts).
+   */
+
+  /* =====================================================================
+   * Thickness.
+   *
+   * A pane is not a plane. Between its two arrises is the polished side face,
+   * and which of the two side faces you can see depends on where the panel is
+   * relative to your eye: a panel below eye level shows you its top side, one
+   * above shows you its bottom. Scrolling carries a panel from one to the
+   * other, so the thickness opens on one edge as it closes on the other, and
+   * that differential is what reads as depth rather than as a drawn border.
+   *
+   * How wide each shows is sideWidth() / paneFaces() in effects/optics/
+   * edge-side.ts, one model for these layers and the shader: a face shows
+   * only from its own side of the edge, never two opposite ones, and only a
+   * few pixels, seen nearly edge-on from the front.
+   * ===================================================================== */
+  /*
+   * The side faces (<Glass> renders them as siblings AFTER the pane, and
+   * effects/scene/scene places them on its top and bottom edges).
+   *
+   * The window through a side: what is behind the pane, absorbed over the
+   * long path of glass the light crossed -- saturated teal by the near arris,
+   * where the light was guided along the pane, paler aqua further in.
+   * Multiply, because absorption only ever subtracts; the colours are
+   * sideTransmittance() in effects/optics/edge-side.ts, set on the element by
+   * <Glass>, so this and the shader cannot disagree.
+   *
+   * Siblings, not children: a pane is a stacking context, and nothing inside
+   * one can blend with what is behind it -- a multiply child of a pane painted
+   * its colour flat, over a CSS pane and a liquid one alike. A sibling blends
+   * with the pane's finished image, backdrop and all.
+   *
+   * What a side REFLECTS -- the photograph facing it, mirrored and squeezed,
+   * changing along its length -- the glint where the lamp is, and the echo
+   * just inside, are the glass light pass's.
+   */
+  .glass-side {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    /*
+     * Above the pane it belongs to (SIDE_LAYER_Z, written by <Glass> from the
+     * compositor). Liquid glass lifts a pane to z-index 1 (its render is
+     * opaque), and a side left at auto sat underneath it, absorbing nothing
+     * anyone could see.
+     */
+    pointer-events: none;
+    background-repeat: no-repeat;
+    mix-blend-mode: multiply;
+  }
+
+  /*
+   * The lit edge and its bloom (GlassLight draws it; the scene places it over
+   * the pane and its bleed, like the side faces). Above the sides, adding
+   * light the way the surface layer does: the light a lit arris throws comes
+   * off the front corner, so the side's absorption must not darken it.
+   */
+  .glass-glow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    mix-blend-mode: plus-lighter;
+  }
+
+  /*
+   * The far arris: the eased corner between the side and the back face turns
+   * the light passing it away from you, so it is a thin DARKER line, soft
+   * over the corner's radius (farArrisLoss) and centred on the corner.
+   */
+  .glass-side::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: calc(2 * var(--far-arris-span, 4.5px));
+    background-image: var(--far-arris);
+    mix-blend-mode: multiply;
+  }
+
+  .glass-side--top::after {
+    bottom: calc(-1 * var(--far-arris-span, 4.5px));
+  }
+
+  .glass-side--bottom::after {
+    top: calc(-1 * var(--far-arris-span, 4.5px));
+  }
+
+  /* The left and right faces: the same far-arris line, standing upright. */
+  .glass-side--left::after,
+  .glass-side--right::after {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: auto;
+    width: calc(2 * var(--far-arris-span, 4.5px));
+    height: auto;
+  }
+
+  .glass-side--left::after {
+    right: calc(-1 * var(--far-arris-span, 4.5px));
+  }
+
+  .glass-side--right::after {
+    left: calc(-1 * var(--far-arris-span, 4.5px));
+  }
+
+  /*
+   * The room reflection is no longer a CSS layer: the glass light pass draws
+   * it from the room's real brightness and the glass's Fresnel, in both glass
+   * modes (see effects/optics/environment.ts).
+   */
+
+  /*
+   * No per-pane flip any more. It existed to stop five panes showing the same
+   * room the same way up, which was only a problem while each pane held its
+   * own copy. Now that they are windows onto one continuous reflection,
+   * mirroring every other pane would break exactly the continuity that makes
+   * it read as a reflection at all.
+   */
+}
+
+/* ===================== Shutter =====================
+ *
+ * Fired by circling the cursor. A single flash, never a strobe: one rise and
+ * one decay, with a hard floor on how often it can repeat (see
+ * lib/circle-gesture.ts). Suppressed entirely under prefers-reduced-motion,
+ * where a full-screen luminance jump is not a style preference but a hazard.
+ */
+.shutter-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  /*
+   * The whole page, not a pool of light near the pointer.
+   *
+   * This reached `transparent` at 72%, so the corners of a wide screen never
+   * lit at all and the burst read as a spotlight. A discharge this close fills
+   * the room: there is a hot core where it fired and a falloff away from it,
+   * but nothing stays dark. `farthest-corner` sizes the gradient to the
+   * furthest edge whatever the aspect ratio, or wherever in the frame it fired.
+   */
+  background: radial-gradient(
+    circle farthest-corner at var(--flash-x, 50%) var(--flash-y, 50%),
+    oklch(1 0 0) 0%,
+    oklch(1 0 0 / 0.96) 22%,
+    color-mix(in oklab, var(--fx-amber) 34%, oklch(1 0 0)) 55%,
+    color-mix(in oklab, var(--fx-amber) 52%, oklch(1 0 0 / 0.88)) 100%
+  );
+}
+
+.shutter-flash[data-firing] {
+  animation: shutter-fire 0.66s cubic-bezier(0.1, 0.8, 0.2, 1) both;
+}
+
+@keyframes shutter-fire {
+  0% {
+    opacity: 0;
+  }
+  /* Fast rise, slow fall — the shape of a real strobe discharge. */
+  9% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The frame lines that snap in at the corners as the shutter fires. */
+.shutter-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.shutter-frame[data-firing] {
+  animation: shutter-frame 0.75s ease-out both;
+}
+
+.shutter-frame span {
+  position: absolute;
+  width: 3.2rem;
+  height: 3.2rem;
+  border: 1px solid color-mix(in oklab, var(--fx-amber) 85%, transparent);
+}
+
+.shutter-frame span:nth-child(1) {
+  top: 2rem;
+  left: 2rem;
+  border-right: 0;
+  border-bottom: 0;
+}
+.shutter-frame span:nth-child(2) {
+  top: 2rem;
+  right: 2rem;
+  border-left: 0;
+  border-bottom: 0;
+}
+.shutter-frame span:nth-child(3) {
+  bottom: 2rem;
+  left: 2rem;
+  border-right: 0;
+  border-top: 0;
+}
+.shutter-frame span:nth-child(4) {
+  bottom: 2rem;
+  right: 2rem;
+  border-left: 0;
+  border-top: 0;
+}
+
+@keyframes shutter-frame {
+  0% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* ---- Coarse pointers ---- */
+
+/*
+ * The effect layer's biggest cost is not the part that runs JavaScript.
+ *
+ * Every JS piece — the shaders, the cursor, the flare, the shutter — already
+ * checks `(pointer: fine)` and shuts down on a phone. The stylesheet did not
+ * check anything at all: there was not one `(pointer: coarse)` query in it.
+ *
+ * What that left running is the expensive half. Each `.glass` stacks THREE
+ * full-panel `backdrop-filter` passes — the pane's own blur, the bokeh layer
+ * and the refraction — and the home page has six panels, so eighteen
+ * full-width blurs over parallaxing photographs. Behind them sit thirty
+ * permanently-promoted bokeh spans animating `transform` forever, and because
+ * they are behind the glass, every frame of that drift invalidates every blur
+ * above it. A phone renders all of it, continuously, on a page nobody is
+ * touching, and none of it can even be seen without a pointer to light it.
+ *
+ * So: the two decorative passes go entirely, the pane keeps a much cheaper
+ * blur so it still reads as glass, and the drift stops. What remains is a
+ * frosted panel over a photograph, which is the whole idea — the rest was
+ * always a response to a cursor that a phone does not have.
+ */
+@media (pointer: coarse), (hover: none) {
+  .glass {
+    backdrop-filter: blur(12px) saturate(130%);
+  }
+
+  .glass--bar {
+    backdrop-filter: blur(14px) saturate(130%);
+  }
+
+  /* Both of these exist to be lit, and there is nothing here to light them. */
+  .glass > .glass__bokeh,
+  .glass > .glass__refract,
+  .transmitted,
+  .photo-surface {
+    display: none;
+  }
+
+  /*
+   * Thirty layers drifting behind eighteen blurs, invalidating them every
+   * frame. Kept in place, since they are part of the picture, but still.
+   */
+  .bokeh {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+/* ---- The light that gets through ---- */
+
+/*
+ * Light does not arrive from behind a pane of glass clean, and that is the
+ * whole of this layer.
+ *
+ * It sits between the photograph and the pane, so what it lands on is what the
+ * pane is standing over, and it spills past the pane's own edges the way
+ * transmitted light does.
+ *
+ * Two things happen to it on the way through, and both are in register with
+ * what you can see on the face of the glass:
+ *
+ *   SCATTER. The pool is multiplied by the same surface map the grime is drawn
+ *   from, so it is bright where the pane is clear and hazy where it is marked.
+ *   That is the light being "there and not there" -- a dirty window throws a
+ *   mottled patch, not a clean one, and the mottling lines up with the smears.
+ *
+ *   REFRACTION. The mask leaves a gap at the rim and the `.transmitted__rim`
+ *   layer fills it more brightly: light crossing the rounded-over edge is
+ *   thrown sideways and piles up just outside the shadow. It is why a glass of
+ *   water casts a bright line INSIDE its own shadow, and why the edge of this
+ *   reads brighter than its middle rather than fading out.
+ */
+.transmitted {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /*
+   * Gated on the charge, not merely on proximity.
+   *
+   * This was opacity: var(--lit-near, 0) -- pure distance from the pointer,
+   * with no idea whether anything is actually shining. So a soft bright patch
+   * followed the cursor across every photograph and every pane whether or not
+   * the shutter had been wound, which is the standing glow that got reported
+   * three times. Twice I went looking in CursorLight, whose every term is
+   * already multiplied by uCharge, and once in the glass shader, whose canvas
+   * is already opacity: 0 at rest. Both were innocent. It was here, in CSS.
+   *
+   * --wind is the wind-up, published on the root each frame by CustomCursor.
+   * A specular off paper and a pool of transmitted light are both the LIGHT;
+   * with no light there is nothing for them to be.
+   */
+  opacity: calc(var(--lit-near, 0) * var(--wind, 0));
+  transition: opacity 0.4s ease;
+  mix-blend-mode: screen;
+}
+
+.transmitted::before,
+.transmitted::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* The pool itself, mottled by what it passed through. */
+.transmitted::before {
+  background-image: var(--glass-surface, url("/glass-surface.jpg"));
+  background-repeat: repeat;
+  background-position: calc(-1 * var(--surface-x, 0px)) calc(-1 * var(--surface-y, 0px));
+  filter: grayscale(1) brightness(2.1) contrast(1.9);
+  opacity: calc(var(--tune-transmit, 0.34) * var(--wind, 0));
+
+  --pool: radial-gradient(
+    circle var(--tune-transmit-reach, 640px) at var(--lit-x, 50%) var(--lit-y, 50%),
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.5) 42%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  -webkit-mask-image: var(--pool);
+  mask-image: var(--pool);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/*
+ * The caustic: a tighter, brighter core where the bevel has gathered the light
+ * rather than spread it.
+ */
+.transmitted::after {
+  background: radial-gradient(
+    circle var(--tune-transmit-core, 210px) at var(--lit-x, 50%) var(--lit-y, 50%),
+    color-mix(in oklab, var(--fx-amber) 30%, oklch(1 0 0 / 0.5)) 0%,
+    color-mix(in oklab, var(--fx-amber) 55%, oklch(1 0 0 / 0.16)) 40%,
+    transparent 78%
+  );
+  opacity: calc(var(--tune-transmit, 0.34) * 1.5 * var(--wind, 0));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transmitted {
+    display: none;
+  }
+}
+
+/*
+ * A pane the rasterised glass has taken over stops being CSS glass.
+ *
+ * Set by RasterGlass only once a pane's liquidglass instance is actually up,
+ * so a pane whose capture failed keeps its backdrop-filter and still reads as
+ * glass instead of becoming a transparent hole.
+ *
+ * WHY THIS MATTERS MORE THAN IT LOOKS
+ *
+ * Without it the two glass systems run stacked. The CSS blur flattens the
+ * backdrop to an even wash before the shader ever sees it, and since
+ * html-to-image does not reproduce backdrop-filter, the shader refracts the
+ * sharp page and composites it over the blurred one. What you see is mostly
+ * the CSS glass -- which is exactly why the liquid mode felt like the CSS
+ * mode and why its knobs seemed dead.
+ *
+ * The background goes too. It is a translucent fill tuned to sit on top of a
+ * blur; over a refracted backdrop it is a second veil doing the same job
+ * twice. The shader has its own tint and opacity for this -- and with the
+ * blur gone, those two finally have something visible to act on.
+ */
+
+.glass[data-liquid] {
+  /*
+   * ONE property, unprefixed. Do not add `-webkit-backdrop-filter` here.
+   *
+   * Writing both made Lightning CSS collapse the pair and emit ONLY the
+   * -webkit- one, which Chrome ignores in favour of the standard property
+   * that `.glass` still sets -- so the rule compiled away to nothing and the
+   * blur stayed on. It cost a long time to find, because the source file, the
+   * served file and the matched-rule list all looked correct; only the
+   * COMPILED stylesheet showed the missing line. The build adds the prefixes.
+   */
+  backdrop-filter: none;
+  background: transparent;
+}
+
+/* ---- What sits on the glass, and what that throws across it ---- */
+
+/*
+ * Things resting on the pane cast a shadow onto it.
+ *
+ * `--cast-x`, `--cast-y`, `--cast-blur` and `--cast-alpha` are computed per
+ * element in effects/scene/scene.ts, from the light's real position rather than from
+ * a fixed direction. The offset is `gap * lateral / height` and the penumbra is
+ * `lightRadius * gap / distance` -- so the shadow swings around as the cursor
+ * passes, and SHARPENS as the light moves away rather than softening, which is
+ * the way round that every recipe for this gets wrong.
+ *
+ * `--cast-alpha` carries the gate: eased nearness times the shutter's charge
+ * (on the same smoothstep the shader lights with) times the strength knob. So
+ * there is no shadow at all until the light is actually lit -- proximity on
+ * its own used to be enough, which threw shadows from an unlit source -- and
+ * it fades in rather than switching.
+ *
+ * Done with box-shadow and text-shadow on the real elements instead of drawn
+ * on a canvas, which was the first plan. Rounded corners, exact glyph outlines
+ * and correct stacking all come free, and nothing has to be measured per frame
+ * beyond the four numbers above.
+ */
+/*
+ * The card's own clip would eat the shadow its photograph throws.
+ *
+ * A box-shadow paints OUTSIDE the border box, so with a 22px gap and a light
+ * off to one side only a ~19px sliver of it ever escapes from behind the
+ * opaque photograph -- and that sliver falls inside the card's anchor, which
+ * is `overflow: hidden`. Measured: the shadow was rendering correctly and
+ * being clipped to nothing.
+ *
+ * The anchor's clip is redundant anyway. What it is there to contain is the
+ * `scale-110` zoom on hover, and the wrapper span inside it already has
+ * `overflow: hidden` doing exactly that. Opening the anchor lets the shadow
+ * land on the glass without letting the zoom escape.
+ */
+.glass a:has(> span > .photo-surface) {
+  overflow: visible;
+}
+
+/* The photograph's own frame, thrown across the pane under it. */
+span:has(> .photo-surface) {
+  box-shadow: var(--cast-x, 0px) var(--cast-y, 0px) var(--cast-blur, 0px) var(--cast-spread, 0px)
+    rgba(0, 0, 0, var(--cast-alpha, 0));
+}
+
+/*
+ * On a card, the shadow is the card's, in the pane's lowest layer (a
+ * negative z-index in the pane's stacking context, above its own light
+ * layers by document order): under every card, so one card's shadow never
+ * lies across its neighbour's photograph (2h). The photograph's own shadow
+ * is off there.
+ */
+[data-cast] > span:has(> .photo-surface) {
+  box-shadow: none;
+}
+
+[data-cast]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: var(--cast-x, 0px) var(--cast-y, 0px) var(--cast-blur, 0px) var(--cast-spread, 0px)
+    rgba(0, 0, 0, var(--cast-alpha, 0));
+}
+
+/*
+ * Type, the same way.
+ *
+ * Kept well under the photographs': a line of type stands off the glass by a
+ * fraction of what a mounted print does, so its shadow is tighter and fainter.
+ * Anything heavier reads as a drop shadow someone added rather than as light
+ * falling across a surface.
+ */
+.glass h1,
+.glass h2,
+.glass h3,
+.glass h4,
+.glass p,
+.glass blockquote {
+  /*
+   * One shadow for the whole block, under all of it: a drop-shadow of the
+   * block, not a text-shadow. Animated headings are a span per letter, and a
+   * text-shadow is painted per span, before that span's letter and after
+   * the one before it -- so each letter's shadow lay over its neighbour
+   * (Ony, 2026-10-01: "the individual letters shadows go on top of the
+   * other letters"). Same offset, blur and darkness as before.
+   */
+  filter: drop-shadow(
+    var(--cast-x, 0px) var(--cast-y, 0px) var(--cast-blur, 0px)
+      rgba(0, 0, 0, calc(var(--cast-alpha, 0) * 0.55))
+  );
+}
+
+/*
+ * Where the floor light runs (item 52): the type's shadows are worked out per pixel
+ * from its own glyphs (the floor light, effects/optics/casters), each letter
+ * falling away from the lamp wherever the lamp is -- a whole block's shadow
+ * offset one way (above) is wrong for the letters on the lamp's other side.
+ */
+html[data-cast-shadows] .glass h1,
+html[data-cast-shadows] .glass h2,
+html[data-cast-shadows] .glass h3,
+html[data-cast-shadows] .glass h4,
+html[data-cast-shadows] .glass p,
+html[data-cast-shadows] .glass blockquote {
+  filter: none;
+}
+
+/*
+ * The hero's copy and buttons stand above the photograph's floor light, as
+ * the panes do: their shadows fall on the photograph, not over them.
+ */
+html[data-cast-shadows] [data-photo] :is(h1, h2, h3, p, .plastic, a) {
+  position: relative;
+  z-index: 2;
+}
+
+/*
+ * Plastic: the orange buttons.
+ *
+ * A thin sheet of glossy, translucent orange plastic resting on the glass.
+ * What the lamp does to it follows from what it is -- and all of it happens
+ * only with the lamp OVER the button (Ony, 2026-09-29: "the light would only
+ * appear if the cursor is right on top of it"). --lit-over is how squarely
+ * the lamp is over it (effects/adapters/css-vars litOver), times the lamp
+ * being lit at all (--lit-on).
+ *
+ *   SPECULAR. The face is glossy: it mirrors the lamp's bright core as a
+ *   small, sharp highlight exactly where the lamp is over it -- the camera
+ *   looks straight on, so that is where the reflection geometry puts it.
+ *
+ *   LIGHT THROUGH IT, AND THE EDGE'S SHADOW. Coloured plastic is a filter:
+ *   it passes orange. The light through the flat sheet lands behind it as a
+ *   MILD orange glow, a little wider than the button (the lamp is close, so
+ *   the projection is magnified). The rounded edge does not pass it on --
+ *   it bends it away -- so the glow is ringed by the edge's shadow, a thin
+ *   dark line hugging the button, before the orange shows beyond it.
+ *
+ *   THE RIM. The rounded edge facing the lamp catches it as a thin line.
+ */
+.plastic {
+  --plastic-on: calc(var(--lit-over, 0) * var(--lit-on, 0));
+  position: relative;
+  background-image: radial-gradient(
+    circle calc(var(--lamp-core, 16px) * 1.6) at var(--lit-x, -999px) var(--lit-y, -999px),
+    rgb(255 255 255 / calc(0.85 * var(--lit-on, 0))) 0%,
+    rgb(255 255 255 / calc(0.55 * var(--lit-on, 0))) 28%,
+    rgb(255 245 230 / calc(0.14 * var(--lit-on, 0))) 60%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  /*
+   * The edge's shadow: the light the rounded edge bent away, a thin dark line
+   * round it. Then what it gives back under UV (--fluor-face, --fluor-glow,
+   * from its material via the CSS adapter; transparent without UV): a
+   * day-glo pigment glows hard in its own colour, over its face and out
+   * into the air round it.
+   */
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / calc(0.45 * var(--plastic-on))),
+    0 0 5px 1px rgb(0 0 0 / calc(0.35 * var(--plastic-on))),
+    inset 0 0 0 999px var(--fluor-face, transparent),
+    0 0 18px 3px var(--fluor-glow, transparent);
+}
+
+/* The orange light the lamp throws through it, onto what is behind: mild, a little wider than the button. */
+.plastic::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: oklch(0.8 0.17 58);
+  /* The one shadow model: its own standoff, its own growth, no fractions. */
+  transform: translate(var(--cast-x, 0px), var(--cast-y, 0px)) scale(var(--cast-scale, 1));
+  filter: blur(calc(var(--cast-blur, 0px) + 4px));
+  mix-blend-mode: plus-lighter;
+  opacity: calc(var(--plastic-on) * 0.28);
+}
+
+/* The rounded edge facing the lamp catching it: a thin rim, brightest toward the lamp. */
+.plastic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--lit-angle, 180deg),
+    rgb(255 255 255 / calc(0.14 + 0.75 * var(--plastic-on))) 0%,
+    rgb(255 255 255 / 0.06) 40%,
+    transparent 65%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/*
+ * The yellow buttons (components/ui/button variant "frosted"): a <Pane> of
+ * the site's glass, hard-cornered like every pane, its fill tinted a warm
+ * yellow (the pane's --pane-fill), the control filling it. Inline, so it sits
+ * in a row of links as a button does.
+ */
+.glass.glass-button {
+  --pane-fill: oklch(0.86 0.17 90 / 0.82);
+  display: inline-flex;
+  border-radius: 0;
+  vertical-align: middle;
+  /*
+   * Its edge, the same all the way round: a thin bevel lit along the top
+   * and the side faces' tint left out. The panes' side faces (.glass-side)
+   * are drawn for a slab seen from one side -- on a small button they came
+   * out as a green strip down one edge, a grey and a teal line top and
+   * bottom and nothing on the other side (Ony, 2026-10-10).
+   */
+  box-shadow:
+    /* The arris: a hairline of light all round, brighter along the top. */
+    inset 0 0 0 1px rgb(255 248 215 / 0.32),
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    /* The bevel's far side: a faint darker line just inside the bottom and right. */
+    inset -1px -2px 0 -1px rgb(110 70 0 / 0.28),
+    inset 0 0 10px rgb(255 240 170 / 0.25),
+    0 4px 12px -6px rgb(0 0 0 / 0.6);
+}
+/*
+ * Nor the light-on-glass layer's arrises: drawn for a band, they lit only its
+ * top and bottom -- on a button, a bright bar under it and a line over it
+ * and nothing at the ends. Its edge is the even bevel above.
+ */
+.glass.glass-button ~ .glass-side,
+.glass.glass-button ~ .glass-glow,
+.glass.glass-button > .glass__surface {
+  display: none;
+}
+.glass-button__face {
+  position: relative;
+  z-index: 1;
+  border-radius: 0;
+  background: transparent;
+  color: oklch(0.24 0.06 62);
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgb(255 247 210 / 0.55);
+  transition: background-color 0.25s ease;
+}
+.glass-button__face:hover {
+  background-color: rgb(255 248 220 / 0.18);
+}
+.glass-button__face:active {
+  background-color: rgb(120 70 0 / 0.12);
+}
+
+/*
+ * The red room's door in the nav (Ony, 2026-10-10): it arrives after the
+ * flash as the flash's afterimage -- out of a red glow, settling to a nav
+ * item in the safelight's red.
+ */
+.red-room-door {
+  color: oklch(0.66 0.2 27);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-shadow: 0 0 10px oklch(0.6 0.22 27 / 0.55);
+  animation: red-room-door-in 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transition:
+    color 0.2s ease,
+    text-shadow 0.2s ease;
+}
+.red-room-door:hover,
+.red-room-door[aria-pressed="true"] {
+  color: oklch(0.74 0.21 27);
+  text-shadow: 0 0 14px oklch(0.62 0.24 27 / 0.85);
+}
+@keyframes red-room-door-in {
+  0% {
+    opacity: 0;
+    filter: blur(6px);
+    text-shadow: 0 0 28px oklch(0.7 0.24 27 / 1);
+  }
+  40% {
+    opacity: 1;
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .red-room-door {
+    animation: none;
+  }
+}
+
+/*
+ * Dark plastic: the round arrow buttons (2i, Ony 2026-09-30: "these
+ * elements have no shadow or plastic sheen"). Glossy black plastic, opaque:
+ * the same face highlight and rim as the orange, no coloured light through
+ * it -- it throws a shadow instead, by the one shadow model, like a card.
+ */
+.plastic--dark {
+  box-shadow:
+    var(--cast-x, 0px) var(--cast-y, 0px) var(--cast-blur, 0px) var(--cast-spread, 0px)
+      rgb(0 0 0 / var(--cast-alpha, 0)),
+    0 0 0 1px rgb(0 0 0 / calc(0.45 * var(--plastic-on))),
+    0 0 5px 1px rgb(0 0 0 / calc(0.35 * var(--plastic-on)));
+}
+
+.plastic--dark::before {
+  display: none;
+}
+
+/* A card's shadow too: the floor light throws it, on the glass and through it (item 52). */
+html[data-cast-shadows] .glass [data-cast]::before {
+  display: none;
+}
+
+/* Its shadow is the floor light's, through the glass, where that runs (item 52). */
+html[data-cast-shadows] .plastic--dark {
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / calc(0.45 * var(--plastic-on))),
+    0 0 5px 1px rgb(0 0 0 / calc(0.35 * var(--plastic-on)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plastic::before {
+    display: none;
+  }
+}
+
+/*
+ * ?try=shaderplastic (item 18b): on a pane, the glass light pass lights the
+ * plastic from the light list -- the face's highlight and the lamp on the
+ * rim (above it, .glass-glow) and the light through it (under it, the
+ * surface layer). What stays here: the edge's shadow (box-shadow, which
+ * darkens, and that layer only adds) and the rim's resting sheen from the
+ * room.
+ */
+html[data-try~="shaderplastic"] .glass .plastic {
+  background-image: none;
+}
+
+html[data-try~="shaderplastic"] .glass .plastic::before {
+  display: none;
+}
+
+html[data-try~="shaderplastic"] .glass .plastic::after {
+  background: linear-gradient(
+    var(--lit-angle, 180deg),
+    rgb(255 255 255 / 0.14) 0%,
+    rgb(255 255 255 / 0.06) 40%,
+    transparent 65%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  span:has(> .photo-surface),
+  .glass h1,
+  .glass h2,
+  .glass h3,
+  .glass h4,
+  .glass p,
+  .glass blockquote {
+    box-shadow: none;
+    text-shadow: none;
+    filter: none;
+  }
+}
+
+/* ---- Photographic paper ---- */
+
+/*
+ * A photograph is not glass, and this is where that stops being true only in
+ * the comments.
+ *
+ * It rests ON the pane, so it takes none of the bevel, none of the pane's
+ * reflection and none of its grime -- those belong to the sheet underneath it.
+ * What it has instead is the surface of photographic paper, which differs from
+ * glass in every way that matters here:
+ *
+ *   - the gloss is BROAD and SOFT. Glass gives a tight, near-white, almost
+ *     mirror-sharp specular because its surface is optically flat. Paper has a
+ *     coating with structure in it, so the same light spreads into a wide
+ *     lobe with no hard centre.
+ *   - it is WARM. The emulsion and its coating are not neutral, and a
+ *     highlight coming off a print carries that -- which is the one detail
+ *     most fake gloss effects get wrong by reaching for white.
+ *   - it is DIM. Paper reflects a few percent where glass reflects far more,
+ *     so this has to sit well below the pane's own highlight or the
+ *     photographs start looking laminated.
+ */
+.photo-surface {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  /*
+   * Gated on the charge, not merely on proximity.
+   *
+   * This was opacity: var(--lit-near, 0) -- pure distance from the pointer,
+   * with no idea whether anything is actually shining. So a soft bright patch
+   * followed the cursor across every photograph and every pane whether or not
+   * the shutter had been wound, which is the standing glow that got reported
+   * three times. Twice I went looking in CursorLight, whose every term is
+   * already multiplied by uCharge, and once in the glass shader, whose canvas
+   * is already opacity: 0 at rest. Both were innocent. It was here, in CSS.
+   *
+   * --wind is the wind-up, published on the root each frame by CustomCursor.
+   * A specular off paper and a pool of transmitted light are both the LIGHT;
+   * with no light there is nothing for them to be.
+   */
+  opacity: calc(var(--lit-near, 0) * var(--wind, 0));
+  transition: opacity 0.35s ease;
+}
+/* Over its own photograph even where the pane lifts photographs over the rain (z 4, below). */
+.glass .photo-surface {
+  z-index: 5;
+}
+
+/*
+ * The gloss: a hard specular, and a faint wash around it.
+ *
+ * This was one 300px radial gradient at 0.26 alpha with a long soft tail, and
+ * the comment above it said "broad, soft, warm — paper, not glass". That is
+ * backwards, and it is why the prints read as matte card rather than as
+ * photographs.
+ *
+ * A glossy print's surface is a clear dielectric coating over the emulsion.
+ * It is SMOOTH, so its specular lobe is nearly as tight as the pane's: what
+ * you see is a small, hard, near-white image of the source itself, bright
+ * enough to blow out at the centre. The diffuse, scattered part is what
+ * happens BELOW the coating, in the emulsion, and that is faint. A broad soft
+ * lobe on its own is what matte paper does, and matte paper is the one thing
+ * this is not.
+ *
+ * So two terms rather than one, and the split is the whole point:
+ *
+ *   CORE. Small, sharp, essentially white. Held near full alpha out to a
+ *   third of its radius and then dropped hard, which is what makes it read as
+ *   a highlight with an EDGE rather than as a glow. It is barely tinted:
+ *   dielectric reflection carries the source's colour, not the pigment's, so
+ *   warming it toward amber paints the emulsion's colour onto a reflection
+ *   the emulsion had nothing to do with.
+ *
+ *   SHEEN. Wide, and deliberately weak -- an order of magnitude under the
+ *   core. This is the dull part, and it should stay dull; it is there so the
+ *   highlight has something to sit in rather than floating on black.
+ */
+/*
+ * Rebuilt from 50 photographs of developed prints under a lamp (Ony,
+ * 2026-10-11; docs: glossy-prints-v2.md). What a glossy print does:
+ *   - the lamp's reflection is a hard-edged, slightly irregular spot of pure
+ *     white that REPLACES the picture where it lies (not a glow added on it);
+ *   - a thin halo round it lifts the blacks;
+ *   - a faint wide sheen and, away from the lamp, a veil that shows mostly
+ *     on the dark tones (the reflection is added, so only darks can show it);
+ *   - the edges catch a hairline glint.
+ * Where the spot lies is the lamp's mirror point (--gloss-x/y, scene).
+ */
+.photo-surface {
+  --gR: max(var(--tune-paper-core, 26px), var(--gloss-r, 0px));
+  background:
+    radial-gradient(
+      circle var(--tune-paper-reach, 340px) at var(--gloss-x, var(--lit-x, 50%)) var(--gloss-y, var(--lit-y, 50%)),
+      rgba(255, 246, 232, var(--tune-paper-sheen, 0.16)) 0%,
+      rgba(255, 240, 220, calc(var(--tune-paper-sheen, 0.16) * 0.4)) 45%,
+      rgba(255, 255, 255, 0) 85%
+    ),
+    linear-gradient(
+      172deg,
+      rgba(255, 252, 245, calc(var(--tune-paper-sheen, 0.16) * 0.55)) 0%,
+      rgba(255, 252, 245, 0) 60%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 253, 248, 0.3),
+    inset 1px 0 0 rgba(255, 253, 248, 0.12),
+    inset 0 -1px 0 rgba(255, 253, 248, 0.08);
+}
+.photo-surface::before {
+  content: "";
+  position: absolute;
+  left: var(--gloss-x, var(--lit-x, 50%));
+  top: var(--gloss-y, var(--lit-y, 50%));
+  /* The spot is a small image of the lamp: about a third of the reach the halo has. */
+  /* Stretched along the print's slight bend (--bend-a, --bend-k: scene.registerLitSurface). */
+  width: calc(var(--gR) * 0.5 * var(--bend-k, 1.8));
+  height: calc(var(--gR) * 0.42);
+  margin: calc(var(--gR) * -0.21) 0 0 calc(var(--gR) * -0.25 * var(--bend-k, 1.8));
+  transform: rotate(var(--bend-a, 12deg));
+  /* Not a perfect circle: the print is never quite flat. */
+  border-radius: 54% 46% 51% 49% / 47% 54% 46% 53%;
+  /* Brightest where the bend faces the lamp, thinning toward the ends of the bar. */
+  background: linear-gradient(
+    90deg,
+    rgba(255, 254, 250, calc(var(--tune-paper, 0.95) * 0.5)),
+    rgba(255, 254, 250, var(--tune-paper, 0.95)) 28% 72%,
+    rgba(255, 254, 250, calc(var(--tune-paper, 0.95) * 0.5))
+  );
+  box-shadow:
+    0 0 calc(var(--gR) * 0.2) calc(var(--gR) * 0.06) rgba(255, 250, 240, 0.5),
+    0 0 calc(var(--gR) * 0.7) calc(var(--gR) * 0.2) rgba(255, 246, 232, 0.16);
+  filter: blur(0.4px);
+}
+
+/*
+ * The room, far fainter than the pane's and shifted against it.
+ *
+ * A print lying on the glass is a few millimetres nearer the eye, so it sees
+ * the same room from a slightly different place. The reflection in it should
+ * NOT line up with the reflection in the pane around it -- that offset is what
+ * makes it read as resting on the glass rather than as printed into it.
+ *
+ * Same viewport anchoring as the pane's reflection so it stays one continuous
+ * room, with the height difference added on top; and much smaller zoom, so
+ * what it catches is a different fragment again.
+ */
+.photo-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+  /*
+   * The room's lights as light, not as a picture of them (Ony, 2026-10-11:
+   * "reflect the lights from the HDRI ... high contrast spots read as
+   * emissives"): a photograph of the room has only 8 bits, so its lamps top
+   * out at white like everything else. The curve below drops everything but
+   * the brightest of it to black and stretches what is left, so what the
+   * print reflects is the room's lamps and windows, hard and bright, with
+   * the dim room not there at all -- which is how a glossy coating, a few
+   * percent reflective, shows a room: only its sources.
+   */
+  filter: brightness(0.5) contrast(3.2) saturate(1.15);
+  opacity: var(--tune-paper-room, 0.45);
+  background-image: var(--room, url("/rooms/metro.jpg"));
+  background-repeat: no-repeat;
+  /*
+   * The SAME magnification as the pane's room, and the offsets pull rather
+   * than push.
+   *
+   * This was 150vh against the pane's 420vh, which was wrong twice over.
+   *
+   * Physically: a print resting on the glass is a few millimetres nearer the
+   * eye than the pane is. That changes WHERE it sees the room from -- parallax
+   * -- and essentially not at all how big the room looks. Magnification was
+   * the wrong axis to put the difference on; the offset below is the right
+   * one, and it is what makes the two reflections refuse to line up.
+   *
+   * Mechanically: metro.jpg is 1280x346, so at 150vh on a 900px viewport the
+   * layer is 4994x1350 -- and the two trailing terms were POSITIVE, pushing it
+   * right and down. With `no-repeat` that opens a transparent gutter at the
+   * element's top-left and leaves the image's own straight edge sitting in the
+   * frame. On the full-bleed hero that is a hard-edged grey rectangle in the
+   * corner, which is exactly what was reported. Negative offsets can only ever
+   * pull a 14000px-wide layer further across, so no edge can enter the frame.
+   */
+  background-size: auto var(--tune-paper-room-zoom, 420vh);
+  background-position: calc(-1 * var(--surface-x, 0px) + var(--reflect-x, 0) * -1 * 240px - 90px)
+    calc(-1 * var(--surface-y, 0px) + var(--reflect-y, 0) * -1 * 160px - 40px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-surface {
+    display: none;
+  }
+}
+
+/* ---- What the pane has been touched with ---- */
+
+/*
+ * The grime is a layer of the PANE, and that is the whole fix.
+ *
+ * It used to be drawn by the shared light canvas, which is fixed to the
+ * viewport at z-index 9997 -- above everything on the page. The shader masked
+ * it to each pane's footprint correctly, but a footprint includes whatever is
+ * standing inside it, so every smear landed on top of the photographs and the
+ * copy. Those sit ON the glass. Nothing on the surface of a pane can be in
+ * front of the things resting on it.
+ *
+ * Here it is a span inside the pane at a negative z-index: over the bevel and
+ * the reflection, under everything in normal flow. The layering stops being
+ * something to get right and becomes something the document does.
+ *
+ * Three things follow from it being the pane's own layer:
+ *
+ *   - `inset` holds it clear of the side face. The side is a different surface
+ *     at a different angle and gets its own marks; a continuous sheet running
+ *     over the top arris and down the side is the one thing real glass cannot
+ *     do.
+ *   - the texture is positioned in VIEWPORT space, minus the pane's own
+ *     offset, so it is one continuous sheet of dirt across the page rather
+ *     than restarting at every pane -- the same fix the environment
+ *     reflection needed, for the same reason.
+ *   - the rake is a mask centred on the light, so marks only appear where
+ *     something is catching them at a shallow angle. Dust on glass is
+ *     invisible until it is lit, and then it is the most obvious thing there.
+ */
+/*
+ * The side face has its own, at its own scale.
+ *
+ * Seen end-on the same marks are foreshortened into something much finer, and
+ * they belong to a surface the light meets at a completely different angle --
+ * which is also why the side holds a highlight for longer as the light moves
+ * off than the flat face does.
+ */
+/* ---- The eye recovering from the flash ---- */
+
+/*
+ * A flash bleaches photopigment. Three things follow, in this order, and they
+ * are three separate layers because they are three separate mechanisms:
+ *
+ *   1. a POSITIVE afterimage -- the scene still firing, same colours, gone in
+ *      about a third of a second;
+ *   2. a NEGATIVE afterimage -- the complement, desaturated, carried on two
+ *      channels because the fine detail dies well before the coarse shape
+ *      does;
+ *   3. a VEIL -- bleached receptors respond less, so everything looks washed
+ *      out until the pigment regenerates.
+ *
+ * Pigment regeneration is exponential, so every stop below is exp(-t/tau) at a
+ * real time rather than an eased guess: tau is 0.12s for the positive, 0.55s
+ * and 1.1s for the two negative channels, 0.55s for the veil. Percentages are
+ * those times divided by the layer's duration, which is why they are not round
+ * numbers.
+ *
+ * All three are `position: fixed` and none of them move. That is the whole
+ * point: this is on the retina, not on the page, so it stays where you were
+ * looking even as the page scrolls out from under it.
+ *
+ * They sit above the cursor for the same reason -- an afterimage is in front
+ * of everything you can see, including the pointer.
+ */
+.afterimage {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0;
+  overflow: visible;
+  /* The bleach followed the light, which fell off radially from the discharge. */
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/*
+ * What actually bleaches, and therefore what the ghost is made of.
+ *
+ * Bleaching is proportional to the light a receptor caught, so the afterimage
+ * is not a copy of the whole frame -- it is the HIGHLIGHTS of it. The first
+ * version inverted the entire picture, and on a dark photograph that is a
+ * large, flat, bright field: screened over its own source it read as fog, with
+ * no structure you could point at. `brightness()` then `contrast()` crushes
+ * everything below mid-grey to black and leaves the street lights, the wet
+ * road and the skin highlights -- which is what a flash actually burns in.
+ *
+ * Then `hue-rotate(180deg)`, not `invert()`.
+ *
+ * A negative afterimage has two components: a gain change, which reads as
+ * darker where the scene was bright, and a neural complement, which reads as
+ * colour. On a page this dark the gain half is invisible -- there is no
+ * headroom below black -- so the complement is the whole of what you can see,
+ * exactly as it is in a dark room. Amber street lights come back cyan.
+ *
+ * Two copies, not one ramping blur.
+ *
+ * The first version animated `blur()` from 12px to 42px across a 1.5Mpx layer,
+ * which re-rasterises the whole thing every frame: measured against the same
+ * page with the ghosts removed, that cost ~64ms per frame, against ~10ms for
+ * the same blur held still. Holding both filters still and animating only
+ * opacity keeps the work on the compositor, and three layers now cost less
+ * than that one did.
+ *
+ * It is also the better model. Recovery is not one picture going soft; it is
+ * the fine detail dying while the coarse blob hangs on -- so DETAIL runs a
+ * 0.55s time constant and RESIDUE runs 1.1s, and what is left at the end is a
+ * shapeless stain rather than a small sharp picture.
+ */
+.afterimage--negative {
+  z-index: 10000;
+  mix-blend-mode: screen;
+  filter: saturate(2.6) hue-rotate(180deg) brightness(0.92) contrast(2.3) blur(9px);
+}
+
+.afterimage--residue {
+  z-index: 9999;
+  mix-blend-mode: screen;
+  filter: saturate(2) hue-rotate(180deg) brightness(0.86) contrast(2.6) blur(46px);
+}
+
+.afterimage--negative[data-firing],
+.afterimage--residue[data-firing] {
+  will-change: opacity;
+}
+
+.afterimage--negative[data-firing] {
+  animation: afterimage-detail calc(var(--tune-after-dwell, 6.4s) * 0.78) linear both;
+}
+
+/* exp(-t/1.6s), sampled at 0.3 0.9 1.6 2.4 3.2 4.1 over a 5s span. */
+@keyframes afterimage-detail {
+  0% {
+    opacity: 0;
+  }
+  6% {
+    opacity: calc(0.95 * var(--tune-after, 1));
+  }
+  18% {
+    opacity: calc(0.653 * var(--tune-after, 1));
+  }
+  32% {
+    opacity: calc(0.422 * var(--tune-after, 1));
+  }
+  48% {
+    opacity: calc(0.256 * var(--tune-after, 1));
+  }
+  64% {
+    opacity: calc(0.155 * var(--tune-after, 1));
+  }
+  82% {
+    opacity: calc(0.088 * var(--tune-after, 1));
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.afterimage--residue[data-firing] {
+  animation: afterimage-residue calc(var(--tune-after-dwell, 6.4s) * 1.25) linear both;
+}
+
+/* exp(-t/3.2s), sampled at 0.55 1.4 2.4 3.6 5.0 6.5 over an 8s span. */
+@keyframes afterimage-residue {
+  0% {
+    opacity: 0;
+  }
+  6.9% {
+    opacity: calc(0.62 * var(--tune-after, 1));
+  }
+  17.5% {
+    opacity: calc(0.476 * var(--tune-after, 1));
+  }
+  30% {
+    opacity: calc(0.348 * var(--tune-after, 1));
+  }
+  45% {
+    opacity: calc(0.239 * var(--tune-after, 1));
+  }
+  62.5% {
+    opacity: calc(0.154 * var(--tune-after, 1));
+  }
+  81.2% {
+    opacity: calc(0.097 * var(--tune-after, 1));
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/*
+ * The positive afterimage: the same highlights, still firing, still their own
+ * colour. Gone inside half a second -- this is the receptors that have not
+ * stopped responding yet, not the complement that follows.
+ */
+.afterimage--positive {
+  z-index: 10001;
+  mix-blend-mode: screen;
+  filter: saturate(1.4) brightness(1) contrast(2.2) blur(4px);
+}
+
+.afterimage--positive[data-firing] {
+  animation: afterimage-positive 0.42s linear both;
+  will-change: opacity;
+}
+
+@keyframes afterimage-positive {
+  0% {
+    opacity: 0;
+  }
+  14.3% {
+    opacity: calc(0.34 * var(--tune-after, 1));
+  }
+  35.7% {
+    opacity: calc(0.337 * var(--tune-after, 1));
+  }
+  61.9% {
+    opacity: calc(0.135 * var(--tune-after, 1));
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/*
+ * Veiling luminance: not a white flash, a loss of contrast.
+ *
+ * Plain alpha white is exactly right here. Compositing white over the page at
+ * alpha a gives mix(page, white, a), which lifts the blacks and compresses the
+ * range -- which is what bleached receptors do to what you see. Strongest
+ * where the discharge was, because that is where the bleaching was.
+ *
+ * Short, though: tau is 0.3s here against 0.55s and 1.1s for the ghosts. It
+ * has to clear before the complement arrives, because a neutral white veil at
+ * the same level as a coloured ghost simply cancels it -- measured, when the
+ * two overlapped, as a flat grey lift with no hue at all.
+ */
+.afterimage-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle at var(--flash-x, 50%) var(--flash-y, 50%),
+    oklch(1 0 0) 0%,
+    oklch(1 0 0 / 0.58) 38%,
+    oklch(1 0 0 / 0.26) 100%
+  );
+}
+
+.afterimage-veil[data-firing] {
+  animation: afterimage-veil 1.2s linear both;
+}
+
+/* exp(-t/0.3s), sampled at 0.08 0.25 0.45 0.7 1.0 over a 1.2s span. */
+@keyframes afterimage-veil {
+  0% {
+    opacity: 0;
+  }
+  6.7% {
+    opacity: calc(var(--tune-after-veil, 0.34) * 1);
+  }
+  20.8% {
+    opacity: calc(var(--tune-after-veil, 0.34) * 0.567);
+  }
+  37.5% {
+    opacity: calc(var(--tune-after-veil, 0.34) * 0.277);
+  }
+  58.3% {
+    opacity: calc(var(--tune-after-veil, 0.34) * 0.13);
+  }
+  83.3% {
+    opacity: calc(var(--tune-after-veil, 0.34) * 0.049);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- The glass answering the flash ---- */
+
+/*
+ * Glare: a specular band sweeping across the face of the panel.
+ *
+ * Its own layer. The cursor's light lives in the shader now, and this has to
+ * be able to run over a panel the cursor is nowhere near — the flash lights
+ * the whole page at once.
+ */
+.glass > .glass__glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  /* z-index: the compositor's (effects/engine/compositor PANE_LAYERS). */
+  opacity: 0;
+  mix-blend-mode: plus-lighter;
+}
+
+.glass[data-flash] > .glass__glare {
+  animation: glass-glare 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes glass-glare {
+  0% {
+    opacity: 0.85;
+    background: linear-gradient(
+      108deg,
+      transparent 0%,
+      transparent 32%,
+      oklch(1 0 0 / 0.5) 46%,
+      color-mix(in oklab, var(--fx-teal) 60%, oklch(1 0 0)) 52%,
+      transparent 66%,
+      transparent 100%
+    );
+    background-size: 280% 100%;
+    background-position: -60% 0;
+  }
+  100% {
+    opacity: 0;
+    background: linear-gradient(
+      108deg,
+      transparent 0%,
+      transparent 32%,
+      oklch(1 0 0 / 0.5) 46%,
+      color-mix(in oklab, var(--fx-teal) 60%, oklch(1 0 0)) 52%,
+      transparent 66%,
+      transparent 100%
+    );
+    background-size: 280% 100%;
+    background-position: 160% 0;
+  }
+}
+
+/* The rim flaring to full, independent of where the cursor happens to be. */
+.glass[data-flash]::before {
+  animation: rim-flare 1s ease-out both;
+}
+
+@keyframes rim-flare {
+  0% {
+    opacity: 4;
+  }
+  30% {
+    opacity: 2.6;
+  }
+  /* Back to the arris the pane always has, not to nothing. */
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shutter-flash,
+  .shutter-frame,
+  .afterimage,
+  .afterimage-veil {
+    display: none;
+  }
+}
+
+/* ---- Iris ----
+ *
+ * A lens diaphragm: blades whose inner edges form a polygon that shrinks and
+ * rotates as it stops down. This is why out-of-focus highlights in a
+ * photograph are hexagons — the hole is a hexagon. Geometry comes from
+ * lib/iris.ts, redrawn as it closes.
+ *
+ * On its own layer, outside the cursor's `difference` blend. Inside it, white
+ * blades over the warm emitter inverted to blue. Blades are dark metal; the
+ * light comes through the opening.
+ */
+
+/* While winding, the plain ring steps back so the blades are what reads. */
+.custom-cursor[data-winding] .custom-cursor__ring {
+  opacity: 0.35;
+}
+
+/* ---- Winding glow ----
+ *
+ * The ring brightens as a circle is traced, from the first few degrees through
+ * to the shutter firing. This is the hint: someone who starts circling by
+ * chance sees the cursor respond and learns there is something here, without
+ * the page having to tell them.
+ *
+ * Amber, like everything else that glows on this site. Under the cursor's
+ * `difference` blend over a dark page that stays warm.
+ */
+/*
+ * The ring warms as it winds, and that is all.
+ *
+ * It used to carry a 3.4rem amber glow with an INSET glow inside it, which at
+ * full wind filled the ring into a solid disc — and under the old inverting
+ * blend that disc became a hole punched through the photograph. The glow made
+ * sense when the ring WAS the light. It is not any more: there is a shader
+ * emitting and footage flaring, and a second glow drawn in CSS on top of them
+ * only ever competed with both.
+ */
+.custom-cursor__ring {
+}
+
+/* The ring itself thickens and warms as it winds. */
+.custom-cursor[data-winding] .custom-cursor__ring {
+  border-color: color-mix(in oklab, #fff 55%, var(--fx-amber));
+  opacity: 1;
+}
+
+/* ---- Armed ----
+ *
+ * Charge is full and a click will fire. It has to be unmistakable, but it does
+ * not have to shout: this was a 3-4rem amber glow pulsing on a 1.1s loop, and
+ * between the aura and the throb it was the loudest thing on a page whose
+ * subject is photographs.
+ *
+ * A crisp, brighter ring instead. No colour of its own -- the cursor inverts
+ * whatever is beneath it, and painting amber onto that both fights the
+ * inversion and drops the studio's accent on top of somebody's picture. No
+ * animation either; the state is constant, so something that reads instantly
+ * and then holds still says it better than something that keeps moving.
+ */
+.custom-cursor[data-armed] .custom-cursor__ring {
+  border-width: 2px;
+  scale: 1.12;
+}
+
+/*
+ * The aperture is not shown while armed.
+ *
+ * It used to sit visible and closed as a "cocked" state, which meant the
+ * default cursor over a photograph was a ring with a black hexagon parked
+ * inside it. A shutter you can see is a shutter that is doing something: the
+ * blades belong to the firing animation and nothing else, so the only rule
+ * that reveals them is the one on [data-click].
+ */
+
+/* ===================== The light =====================
+ *
+ * Positioned and blended here; everything else about it lives in the shader.
+ *
+ * `plus-lighter` so it ADDS to the page the way light does. The canvas itself
+ * is transparent outside the falloff, and the shader has already tonemapped,
+ * so this only has to place it and let it accumulate.
+ */
+/*
+ * The glass light has no canvas of its own any more: it draws into the shared
+ * WebGL context (effects/engine/gl) and copies each pane's light into that
+ * pane's surface layer (.glass__surface).
+ */
+
+/*
+ * The lens flare footage.
+ *
+ * `screen` rather than `plus-lighter`, because these clips carry no alpha and
+ * screen is what makes a black-background overlay behave: 1-(1-a)(1-b) leaves
+ * the backdrop untouched wherever the clip is black, and lifts it wherever
+ * the clip has light in it. That is the whole reason flare footage is shot on
+ * black and why it needs no transparency channel.
+ *
+ * Above the glass and below the cursor light: the flare is thrown by the lens
+ * you are looking THROUGH, so it sits in front of everything in the scene,
+ * but it cannot be brighter than the source that caused it.
+ */
+/*
+ * The blend belongs HERE, on the container, not on the clips inside it.
+ *
+ * This element is `position: fixed` with a z-index, which makes it a stacking
+ * context -- and a stacking context is an isolation group for blending. So
+ * `mix-blend-mode: screen` on a child screened against THIS element's
+ * contents, which are empty, rather than against the page. Screen against
+ * nothing returns the clip untouched, black background and all, and the
+ * container then composited that over the photographs normally: a black
+ * rectangle darkening everything under it with its edges plainly visible.
+ *
+ * Screen is 1-(1-a)(1-b), so black is the identity and a black-backed overlay
+ * disappears into the page -- but only if it is actually blending with the
+ * page. Moving the mode to the container is what puts the page in its
+ * backdrop.
+ */
+.flare-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+
+.flare-clip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Square and oversized; object-fit does the fitting, so the clip's own
+     aspect can never leave an edge on screen. */
+  object-fit: cover;
+  opacity: 0;
+  /* Composited normally inside the overlay; the overlay does the screening. */
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flare-overlay {
+    display: none;
+  }
+}
+
+/*
+ * Screen, not plus-lighter, and this is why the flare only ever showed itself
+ * over the footer.
+ *
+ * `plus-lighter` is a straight sum that clips. Work it through with the
+ * hexagon's core at 0.90 and the field just outside it at 0.28:
+ *
+ *   over the footer   (backdrop 0.04)  ->  0.94 vs 0.32   contrast 0.620
+ *   over a photograph (backdrop 0.82)  ->  1.00 vs 1.00   contrast 0.000
+ *
+ * Not dimmer over the photograph. GONE -- the core and its surround both hit
+ * the ceiling, so there is no shape left to see. The one place on the site
+ * dark enough for it to survive is the footer, which is exactly where it kept
+ * turning up.
+ *
+ * `screen` is 1-(1-b)(1-s), which approaches white without ever reaching it,
+ * so the same pair lands at 0.112 of contrast over that photograph instead of
+ * nothing. It costs almost nothing where it already worked -- 0.595 against
+ * 0.620 over the footer -- and it is the difference between an effect that
+ * exists on one section and one that exists on the page.
+ */
+.cursor-light {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* ===================== Real refraction =====================
+ *
+ * The bezel band now bends what is behind it through an SVG displacement map
+ * instead of merely brightening it. Brightening was the shortcut that made the
+ * edges look painted rather than like glass.
+ *
+ * The three displacement passes at different scales, recombined one colour
+ * channel each, are chromatic aberration: glass disperses wavelengths by
+ * slightly different amounts, so a real edge fringes faintly into colour. It
+ * is the single strongest cue that something is glass rather than a blur.
+ */
+@layer fx-components {
+  /*
+   * Edge strips sized to the rim, NOT a full-size layer masked down to one.
+   *
+   * A mask hides pixels; it does not stop the filter running. Masking a
+   * full-width, full-height backdrop pass down to a 14px rim meant filtering
+   * the entire panel every frame and discarding almost all of it — with five
+   * glass surfaces, the largest single cost on the page. These are the rim as
+   * geometry, so the filter only touches pixels that are shown.
+   */
+  /*
+   * Bokeh, from whatever is bright behind the pane.
+   *
+   * A blur is not bokeh. Blurring a highlight spreads it AND dims it, which is
+   * why the frosted panels turned street lights into grey smudges — the thing
+   * that makes a defocused point read as bokeh is that it stays bright while
+   * it spreads, because all its light is still there, just distributed over a
+   * disc.
+   *
+   * So this isolates the highlights before spreading them: brightness and
+   * contrast first crush everything that is not near-white down to black, and
+   * only then does the blur run, so what spreads is the point lights and
+   * nothing else. Added with `plus-lighter` over the ordinary frosted pass, so
+   * the discs sit on top of the blur rather than being averaged into it.
+   *
+   * Busy street through a wet window. Give it a photograph with actual point
+   * sources in it and it has something to work with; give it an evenly lit
+   * scene and it correctly does nothing.
+   */
+  .glass > .glass__bokeh {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    /* z-index: the compositor's (effects/engine/compositor PANE_LAYERS). */
+    backdrop-filter: brightness(2.1) contrast(3.2) saturate(1.25) blur(16px);
+    mix-blend-mode: plus-lighter;
+    opacity: 0.6;
+  }
+
+  .glass--bar > .glass__bokeh {
+    backdrop-filter: brightness(1.9) contrast(3) saturate(1.2) blur(9px);
+    opacity: 0.45;
+  }
+
+  /*
+   * ONE layer over the whole pane, not two strips at its edges.
+   *
+   * The displacement map already carries the bevel profile along its height:
+   * it pushes hard at the top, is exactly neutral through the middle, and
+   * pushes the other way at the bottom. Stretched over the whole pane that IS
+   * a bevel — the photograph bends within a band of each edge and is untouched
+   * across the body — and because the profile is continuous there is no strip
+   * boundary to line up or fail to line up with anything.
+   *
+   * Two strips could never show much. They were as tall as the side face,
+   * which is a few pixels, so the bend had nowhere to happen.
+   */
+  /*
+   * Retired, along with the bokeh pass above: both were backdrop-filters on a
+   * CHILD of the pane, and a child of an isolated pane cannot see past it (see
+   * `.glass`). The bokeh sat underneath this layer and was covered by it, so
+   * neither ever showed what it was built to show. The bend now happens in
+   * the pane's own backdrop pass. Kept in the markup, hidden, so nothing that
+   * queries for them breaks.
+   */
+  .glass > .glass__refract,
+  .glass > .glass__bokeh {
+    display: none;
+  }
+
+  .glass > .glass__refract {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    clip-path: inset(0 round var(--pane-radius, 0px));
+    /*
+     * Exactly the band the side face occupies — because they are the same
+     * thing. The bevel IS the pane's thickness seen end-on, so the strip that
+     * bends the photograph and the strip that shows the thickness have to be
+     * one strip. While one was a fixed 22px and the other followed the tilt,
+     * they could not line up at any scroll position, and three edges at three
+     * different depths read as banding rather than as an edge.
+     */
+    pointer-events: none;
+    /* z-index: the compositor's (effects/engine/compositor PANE_LAYERS). */
+    /*
+     * Fallback first. SVG filters in backdrop-filter are Chromium-only —
+     * Safari and Firefox support neither, and would silently render nothing
+     * here. They get a plain lensing pass, which is less convincing but still
+     * reads as an edge rather than as a missing feature.
+     */
+    backdrop-filter: blur(4px) brightness(1.1) saturate(1.35) contrast(1.08);
+  }
+
+  @supports (backdrop-filter: url("#glass-refraction")) {
+    .glass > .glass__refract {
+      backdrop-filter: url("#glass-refraction");
+    }
+  }
+
+  /*
+   * Bars get a shallower bend: the profile is stretched over 64px rather than
+   * a 400px band, so the same map would wrench them.
+   */
+  .glass--bar > .glass__refract {
+    opacity: 0.55;
+  }
+
+  /*
+   * Fresnel.
+   *
+   * Glass is more reflective the more obliquely you look at it — barely
+   * reflective face-on, mirror-like at a grazing angle. On a flat panel the
+   * grazing angles are at the edges, so reflectivity rises toward the rim.
+   * This is why a real pane has bright edges even in flat light, and none of
+   * the other layers modelled it.
+   */
+}
+
+/*
+ * The shadow layer, between the photograph and the glass.
+ *
+ * `multiply` because a shadow is subtraction and nothing else in the effect
+ * layer can subtract — the WebGL passes composite `plus-lighter` and can only
+ * ever add light, which is why the refraction had to move to a backdrop-filter
+ * and why this had to become its own canvas.
+ */
+.cast-shadows {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /*
+   * No z-index. These sit before .glass in the DOM and the pane is z-index
+   * auto, so document order already puts them above the photograph and below
+   * the glass -- which is the whole point. Promoting them to 1 put them ABOVE
+   * the pane, so the multiply darkened the glass and the content sitting on
+   * it rather than the picture behind.
+   */
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/*
+ * The other half of what the grime does. Dirt subtracts and scratches add, so
+ * the darkening pass above cannot carry both — `multiply` has no way to make
+ * anything brighter. This one composites `plus-lighter` and draws only the
+ * scratch highlights.
+ */
+.cast-caustics {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/*
+ * The shutter firing with no flash behind it.
+ *
+ * A camera's blades close on every release whether or not the flash is
+ * charged, so an uncharged click still gets the mechanism — just none of the
+ * light. The inset spread is the blades sweeping shut across the opening; the
+ * scale is the whole assembly taking up the shock.
+ *
+ * Short on purpose. A real leaf shutter at a hand-holdable speed is open for
+ * a few milliseconds, and anything slow enough to watch reads as a UI
+ * animation rather than as a mechanism.
+ */
+/*
+ * The shutter firing with no flash behind it.
+ *
+ * A camera's blades close on every release whether or not the flash is
+ * charged, so an uncharged click gets the mechanism and none of the light.
+ * Hidden at rest -- what you normally see is the ring and the dot.
+ *
+ * Short on purpose. A leaf shutter at a hand-holdable speed is open for a few
+ * milliseconds; anything slow enough to sit and watch stops reading as a
+ * mechanism and starts reading as a UI animation. The close is faster than
+ * the reopen, which is also true of the real thing: a spring drives it shut
+ * and the mechanism lets it back.
+ */
+.custom-cursor__iris {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /*
+   * Flush with the ring, and DERIVED from it rather than a second number to
+   * keep in sync.
+   *
+   * The housing circle in the SVG has radius 46 in a 100-unit viewBox, so it
+   * covers 92% of the element's width. Scaling the element by 100/92 therefore
+   * lands the blades' housing exactly on the ring's own circle -- and because
+   * it reads `--ring-size`, it stays there in every state, including the wider
+   * ring over a photograph and the wider one over a link.
+   */
+  width: calc(var(--ring-size, var(--tune-ring, 30px)) * 100 / 92);
+  height: calc(var(--ring-size, var(--tune-ring, 30px)) * 100 / 92);
+  translate: -50% -50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.custom-cursor__blade {
+  /*
+   * The same colour as the ring, always.
+   *
+   * These were #000 on a layer deliberately kept OUTSIDE the cursor's
+   * `difference` blend, on the reasoning that blades are dark metal and the
+   * light comes through the opening. True of a real shutter and wrong here:
+   * the ring inverts against whatever is behind it, so it reads white on a
+   * dark frame and black on a bright one, while fixed-black blades vanished
+   * completely against anything dark.
+   *
+   * White, inside the same blend as the ring, means both invert by the same
+   * amount against the same backdrop -- so they are the same colour as each
+   * other in every frame, and both are legible in all of them. That is the
+   * property worth having; the metal is not.
+   */
+  fill: #fff;
+  transform-box: view-box;
+  /*
+   * Hinged at its OWN pivot on the housing -- 50,4 is where this blade meets
+   * the barrel -- not scaled about the centre of the iris.
+   *
+   * That one line is the whole difference. Rotate these about `50 50` and
+   * scale them down, which is what every recipe for this does, and at rest
+   * the eight wedges all meet in the middle: a solid disc with no aperture at
+   * all, which then scatters into loose triangles as it "closes". Hinge them
+   * and they sweep across one another, which is what leaves the polygon.
+   */
+  transform-origin: 50px 4px;
+  transform: rotate(-40deg);
+}
+
+@keyframes cursor-iris-snap {
+  0% {
+    transform: rotate(-40deg);
+  }
+  /*
+   * Past zero, so it shuts COMPLETELY. The blades' inner vertices sit a few
+   * pixels off centre, which is what leaves a hexagon of negative space on the
+   * way down rather than a circular pinhole -- but it also means stopping at
+   * zero would leave the hole open. Carrying them past each other closes it.
+   *
+   * That matters more than it sounds: the charge is drawn at the centre of the
+   * cursor, so the hole IS where the light gets out. Blades that never quite
+   * meet would leave it leaking at the moment the shutter is supposed to have
+   * cut it off.
+   */
+  30% {
+    transform: rotate(2deg);
+  }
+  42% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-40deg);
+  }
+}
+
+@keyframes cursor-iris-show {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  55% {
+    opacity: 1;
+  }
+}
+
+.custom-cursor[data-click] .custom-cursor__iris {
+  /*
+ * The shutter fires at a speed you can actually watch.
+ *
+ * All three of these ran at 230ms, which is roughly the real thing -- a leaf
+ * shutter at a slow-ish speed -- and it is too fast to READ. A real shutter
+ * does not have to be legible; this one is the entire feedback for the click,
+ * and at 230ms the blades are open, shut and open again before the eye has
+ * settled on them. It registered as a flicker rather than as an aperture.
+ *
+ * 520ms, on one variable so the three stay locked. They are one event: the
+ * blades sweep, the housing shows for exactly the span they are moving, and
+ * the ring takes the shock. Drifting apart would show immediately -- the ring
+ * recoiling after the blades had already reopened looks like a bug, not like
+ * slow motion.
+ */
+  animation: cursor-iris-show var(--tune-shutter-time, 520ms) linear;
+}
+
+.custom-cursor[data-click] .custom-cursor__blade {
+  animation: cursor-iris-snap var(--tune-shutter-time, 520ms) cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+/* The ring takes the shock of the blades slamming. */
+@keyframes cursor-shutter-ring {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  28% {
+    transform: scale(0.82);
+  }
+}
+
+.custom-cursor[data-click] .custom-cursor__ring {
+  animation: cursor-shutter-ring var(--tune-shutter-time, 520ms) cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.custom-cursor[data-click] .custom-cursor__dot {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-cursor[data-click] .custom-cursor__iris,
+  .custom-cursor[data-click] .custom-cursor__blade,
+  .custom-cursor[data-click] .custom-cursor__ring {
+    animation: none;
+  }
+}
+
+/* ===================== Rasterised glass =====================
+ *
+ * Set on <html> by RasterGlass while ybouane/liquidglass is driving the panes.
+ *
+ * Only what the shader now OWNS is dropped: the blur, the bevel's refraction
+ * and the pane's own surface reflection. Those become two of everything if
+ * both systems paint them — two bevels, two rooms, two blurs stacked over each
+ * other, which does not look like stronger glass, it looks like a mistake.
+ *
+ * What stays is everything the shader knows nothing about: the light pass, the
+ * grime it rakes, the cast shadows, the transmitted pool, the bokeh behind the
+ * pane. Those are this site rather than this library, and they are the reason
+ * the CSS version exists at all.
+ *
+ * The fixed header keeps every bit of the CSS treatment — see the note in
+ * RasterGlass.tsx for why a cached capture is the wrong shape for an element
+ * that has the whole scrolling document behind it.
+ */
+/*
+ * Per pane, and only once that pane's shader is up (`data-liquid`, set by
+ * RasterGlass after its init succeeds). This used to key off the root's
+ * `data-glass="raster"`, which is set before any pane has started: the panes
+ * start one at a time, each after a full capture, so for the first seconds
+ * every pane still waiting had its frost and its tint taken away with
+ * nothing drawn in their place -- clear, unfrosted glass with the light
+ * painted over the sharp photograph (2j). The frost and the background
+ * themselves come off in the `.glass[data-liquid]` rule above.
+ */
+.glass[data-liquid]:not(.glass--bar):not(.glass-toggle) > .glass__refract {
+  display: none;
+}
+
+/*
+ * The library injects its canvas as a child of the pane. It has to sit under
+ * everything resting on the glass -- the photographs and the copy -- for the
+ * same reason the grime did: things standing on a surface cannot have that
+ * surface in front of them.
+ */
+/*
+ * The library's canvas is taken into the compositor's "pane:liquid" slot
+ * (effects/engine/compositor, adopted in RasterGlass), which writes its
+ * z-index with priority over the library's inline -1. That -1 once put the
+ * opaque liquid render ON TOP of the light layer, and a fully charged liquid
+ * pane showed no light at all -- the order is the compositor's now, in one
+ * list, rather than a rule here racing an inline style.
+ */
+
+/*
+ * (The scene's floor is handled in the library now -- see the LOCAL note in
+ * LiquidGlass._prepareSceneCanvas. It reads the page background off the root
+ * instead of upstream's hardcoded white, which is where the problem actually
+ * was; giving the wrapper a background here only ever masked it.)
+ */
+/* ===================== The glass switch, and the hidden routes =====================
+ *
+ * Both live on the header pane, which is why neither uses a portal: a portal
+ * renders at the end of <body>, outside the header's stacking context and
+ * therefore outside the glass. A control that belongs to a sheet of glass
+ * should be ON that glass.
+ */
+
+/*
+ * The switch is a small pane, not a picture of one.
+ *
+ * It carries `.glass`, so in CSS mode it gets the treatment below and in
+ * raster mode the shader takes it over exactly like every other pane on the
+ * page -- the rasteriser selects `.glass` and does not care what the element
+ * is for. Pressing it therefore changes what the button is made of as well as
+ * what the site is made of, which is the most direct way to show a difference
+ * that is hard to put into words.
+ */
+.glass-toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  border: 1px solid oklch(1 0 0 / 0.16);
+  cursor: pointer;
+  flex: none;
+
+  /* The bevel, by the cheapest honest means: a bright arris up top where the
+     light would catch it, and a dark one underneath. */
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.22),
+    inset 0 -1px 0 oklch(0 0 0 / 0.35),
+    0 1px 3px oklch(0 0 0 / 0.4);
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.18s ease;
+}
+
+.glass-toggle:hover {
+  border-color: oklch(1 0 0 / 0.3);
+}
+
+.glass-toggle:active {
+  transform: scale(0.93);
+}
+
+.glass-toggle:focus-visible {
+  outline: 2px solid var(--fx-ring);
+  outline-offset: 3px;
+}
+
+/* Filled in raster, hollow in CSS -- the tell for when the two materials are
+   close enough that the disc alone does not say which is running. */
+.glass-toggle__pip {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid var(--fx-amber);
+  background: transparent;
+  transition:
+    background-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.glass-toggle__pip[data-raster] {
+  background: var(--fx-amber);
+  box-shadow: 0 0 6px var(--fx-amber);
+}
+
+/* ---- The hidden routes ---- */
+
+.dev-nav__trigger {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  color: var(--fx-muted-foreground);
+  transition: color 0.18s ease;
+  flex: none;
+}
+
+.dev-nav__trigger:hover,
+.dev-nav__trigger[aria-expanded="true"] {
+  color: var(--fx-foreground);
+}
+
+.dev-nav__trigger:focus-visible {
+  outline: 2px solid var(--fx-ring);
+  outline-offset: 3px;
+}
+
+/* Three bars, drawn rather than imported, because one glyph is not worth a
+   request and an icon font is not worth a dependency. Bars rather than dots:
+   a hamburger says "this opens a menu" to everyone, which is what it does. */
+/*
+ * Four dots, not three bars. Three bars is the phone menu's icon, and on a
+ * phone both sit in the same header -- two identical hamburgers doing
+ * different things, which the visual check caught at 390px.
+ */
+.dev-nav__dots {
+  width: 0.8rem;
+  height: 0.8rem;
+  background: radial-gradient(circle, currentColor 0 1.6px, transparent 2px) 0 0 / 50% 50%;
+}
+
+.dev-nav__menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 0.75rem);
+  z-index: 50;
+  width: 17rem;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid oklch(1 0 0 / 0.1);
+  box-shadow: 0 18px 40px oklch(0 0 0 / 0.5);
+  animation: dev-nav-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes dev-nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dev-nav__menu {
+    animation: none;
+  }
+}
+
+.dev-nav__item {
+  display: block;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease;
+}
+
+.dev-nav__item:hover,
+.dev-nav__item:focus-visible {
+  background: oklch(1 0 0 / 0.07);
+  outline: none;
+}
+
+.dev-nav__item.is-active .dev-nav__label {
+  color: var(--fx-amber);
+}
+
+.dev-nav__label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--fx-foreground);
+}
+
+.dev-nav__note {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--fx-muted-foreground);
+}
+
+/* ===================== The pane's own surface =====================
+ *
+ * Where the grime actually lives now.
+ *
+ * It used to be drawn by the shared light canvas, which is fixed to the
+ * viewport at z-index 9997 -- above every piece of content on the page. The
+ * shader masked each pane's footprint perfectly correctly, and it did not
+ * matter: a footprint contains whatever is STANDING in it, so every mark
+ * landed on top of the photographs and the copy. Those rest ON the glass.
+ * Nothing on the surface of a pane can be in front of the things lying on it,
+ * and no weighting fixes that -- it was the wrong layer, reported five times.
+ *
+ * This is a canvas inside each pane at z-index -1: above the bevel, the
+ * refraction and the reflection (which sit at -2 and below), and under
+ * everything in normal flow. The layering stops being something to get right
+ * and becomes something the document does.
+ *
+ * It is inset NEGATIVELY by the same bleed the renderer uses, because the rim
+ * bloom genuinely escapes the glass -- that spill above a lit edge is most of
+ * what tells you the edge is bright rather than merely pale -- and clipping it
+ * to the pane would draw a hard line exactly where the glow should be softest.
+ * `.glass` is position: relative with no overflow rule, so it spills.
+ */
+.glass > .glass__surface {
+  position: absolute;
+  inset: -90px;
+  /* z-index: the compositor's (effects/engine/compositor PANE_LAYERS). */
+  width: calc(100% + 180px);
+  height: calc(100% + 180px);
+  pointer-events: none;
+  /* ADDS to the pane the way light does, matching the shared canvas it
+     replaces. The shader has already tonemapped; this only places it. */
+  mix-blend-mode: plus-lighter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass > .glass__surface,
+  .glass-glow,
+  .glass-bloom-received {
+    display: none;
+  }
+}
+
+/* Phones skip the whole effect layer; a canvas per pane is more, not less. */
+@media (pointer: coarse), (hover: none) {
+  .glass > .glass__surface,
+  .glass-glow {
+    display: none;
+  }
+}
+
+/* ===================== The flash-ready lamp =====================
+ *
+ * The dot at the centre of the cursor charges red as the flash winds, the way
+ * the ready lamp on a speedlight does.
+ *
+ * It is deliberately NOT the hexagon. That bloom is the emission -- it grows
+ * until it fills the screen and it is the whole point of firing. This is the
+ * opposite: a small, intense source that says the charge is building and
+ * stays exactly the size it is. Two lights doing the same job at different
+ * scales would just read as one badly-drawn light.
+ *
+ * Composited normally rather than by `difference`, for as long as it is lit.
+ * The dot lives in its own `.custom-cursor` element, so switching its blend
+ * leaves the ring inverting the way it always has -- and without that switch a
+ * red dot inside a difference group comes out teal over anything warm, which
+ * is precisely the colour it must not be.
+ */
+.custom-cursor[data-pilot] {
+  mix-blend-mode: normal;
+  /*
+   * In front of its own light. The lamp canvas (.cursor-light) shares z-index
+   * 9999 with the cursor and comes later in the page, so once the pilot sat
+   * exactly at the lamp's centre the screen-blended white core painted over
+   * it and the red vanished. The red element is the source; its glow goes
+   * round it, not over it. Still under the afterimages (10000+), which come
+   * later in the page.
+   */
+  z-index: 10000;
+}
+
+.custom-cursor[data-pilot] .custom-cursor__dot {
+  /*
+   * Toward a hot red as it fills, never quite to pure red: a real lamp is a
+   * bright element behind a red lens, so its middle reads orange-white while
+   * its edge is saturated.
+   */
+  background-color: color-mix(in oklab, oklch(0.72 0.23 27) calc(var(--wind, 0) * 100%), #fff);
+
+  /*
+   * Two shadows, both tight.
+   *
+   * The inner one is the lens itself blooming; the outer is the small halo a
+   * point source throws. Both scale with the charge, and both stay inside
+   * about 14px -- the moment this spreads further it stops being a lamp and
+   * starts competing with the emitter.
+   */
+  box-shadow:
+    0 0 calc(var(--wind, 0) * 6px) calc(var(--wind, 0) * 1.5px)
+      oklch(0.72 0.23 27 / calc(var(--wind, 0) * 0.95)),
+    0 0 calc(var(--wind, 0) * 14px) calc(var(--wind, 0) * 3px)
+      oklch(0.62 0.21 27 / calc(var(--wind, 0) * 0.45));
+
+  /* Grows a little, but nothing like the ring. A lamp does not open. */
+  width: calc(var(--tune-dot, 6px) * (1 + var(--wind, 0) * 0.5));
+  height: calc(var(--tune-dot, 6px) * (1 + var(--wind, 0) * 0.5));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-cursor[data-pilot] .custom-cursor__dot {
+    box-shadow: none;
+  }
+}
+
+/* ---- The loading screen: the shutter winding ---- */
+
+/*
+ * `--wind` has to be REGISTERED to animate.
+ *
+ * An unregistered custom property is a string as far as the cascade is
+ * concerned, so it animates discretely -- it would jump 0 to 1 with nothing in
+ * between, and everything derived from it would jump too. Declaring its type
+ * makes it a real number the engine can interpolate, which is what turns one
+ * keyframe on one variable into the whole charge sequence.
+ *
+ * Registering it globally is safe for the cursor, which writes it imperatively
+ * every frame with no transition declared: an animation only happens where one
+ * is asked for, and the initial value matches the resting state it already had.
+ */
+@property --wind {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.site-loader {
+  position: fixed;
+  inset: 0;
+  /*
+   * BELOW the effect layer, deliberately.
+   *
+   * The cursor and its light canvases sit at 9997-9999. Putting the loader
+   * above them would leave the panes on it unlit and the pointer invisible --
+   * a picture of the effect instead of the effect. Under them, the real light
+   * falls on the real glass while the page loads behind it.
+   */
+  z-index: 9990;
+  display: grid;
+  place-items: center;
+  background: var(--background, oklch(0.145 0.011 55));
+  opacity: 1;
+  transition: opacity 0.55s ease;
+}
+
+.site-loader[data-state="leaving"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/*
+ * Reduced motion never sees this at all -- SiteLoader returns early and the
+ * page is revealed immediately -- so there is no animation to disable here.
+ */
+
+/*
+ * The backdrop the panes have something to do to.
+ *
+ * Glass is only visible by what it does to what is behind it, so a pane over
+ * a flat colour is invisible no matter how good the shader is. This is the
+ * minimum that gives refraction and blur something to bend: two wide, soft
+ * pools in the site's own palette, so it reads as the room lights rather than
+ * as decoration.
+ */
+.site-loader__field {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 55% at 22% 32%, oklch(0.42 0.09 240 / 0.5), transparent 70%),
+    radial-gradient(60% 50% at 78% 70%, oklch(0.5 0.12 55 / 0.42), transparent 72%);
+}
+
+/*
+ * The carousel across the middle of the screen, behind the pane: the cards
+ * reach past the glass above and below, sharp there and frosted where the
+ * glass covers them.
+ */
+.site-loader__flow {
+  z-index: 1;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 420px;
+  transform: translateY(-50%);
+}
+
+/* The word and the way in, over the photographs, centred on the screen (as the pane is). */
+.site-loader__over {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.site-loader__card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* The word's size (.site-loader__word), so the pane is measured in its ems. */
+  font-size: clamp(1.9rem, 4.6vw, 3.2rem);
+  width: 9.2em;
+  height: calc(1.25em + 3.6rem);
+  transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translate(-50%, calc(-50% + 0.55rem));
+  border-radius: 18px;
+  overflow: hidden;
+  /* Frosted: the photographs and the light behind it softened and lifted. */
+  -webkit-backdrop-filter: blur(16px) saturate(1.5) brightness(1.05);
+  backdrop-filter: blur(16px) saturate(1.5) brightness(1.05);
+  background-color: rgb(255 255 255 / 0.07);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    0 18px 40px -18px rgb(0 0 0 / 0.7);
+}
+/* Long enough for "Loading" through the language sequence; once it is Ready, it closes in round the shorter word (Ony, 2026-10-10). */
+.site-loader[data-state="ready"] .site-loader__card,
+.site-loader[data-state="leaving"] .site-loader__card {
+  width: 6.6em;
+}
+.site-loader__over .site-loader__enter {
+  pointer-events: auto;
+}
+.site-loader__over .site-loader__word {
+  text-shadow:
+    0 2px 18px rgb(0 0 0 / 0.75),
+    0 0 4px rgb(0 0 0 / 0.5);
+}
+
+/* On the home page: a band of its own between the glass sections. */
+.flow-strip {
+  height: 460px;
+  background: var(--fx-background);
+  /*
+   * Above the floor light (z 1): the light and the drops' shadows thrown
+   * through the glass fall on the floor, not across these prints (Ony,
+   * 2026-10-11). The prints have their own light: gloss and cast shadows.
+   */
+  position: relative;
+  z-index: 2;
+}
+
+/* The carousel's cards (MediaFlowCarousel): real photographs, moved by transform. */
+.flow {
+  position: relative;
+  /* Sideways the strip ends at the screen; up and down the cards' shadows fall past it. */
+  overflow-x: clip;
+  overflow-y: visible;
+}
+.flow-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+.flow-card__frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.flow-card__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.site-loader__stage {
+  position: absolute;
+  /*
+   * One pane the screen's full width, centred down it (Ony, 2026-10-01). The
+   * two small panes above it are gone.
+   */
+  inset: 0;
+  display: grid;
+  align-content: center;
+}
+
+.site-loader__pane {
+  position: relative;
+  height: clamp(170px, 30vh, 300px);
+}
+
+/* Full-bleed, like the site's own bands: straight across, no rounded ends. */
+.site-loader__pane--wide {
+  width: 100%;
+  border-radius: 0;
+  /*
+   * Taller than the photographs, so the glass shows above and below them
+   * (Ony, 2026-10-10: "where is the glass behind the images?"): its frost
+   * softens the room's light behind it, a faint pale body, and its long
+   * edges catch the light as two bright lines.
+   */
+  height: clamp(470px, 64vh, 680px);
+  background-color: rgb(255 255 255 / 0.045);
+  border-top: 1px solid rgb(255 255 255 / 0.22);
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 -1px 18px rgb(255 255 255 / 0.05),
+    0 24px 60px -30px rgb(0 0 0 / 0.8);
+}
+
+/*
+ * Centred IN the pane it sits on, not in the viewport: content resting on a
+ * surface, which is what the rest of the site does with type.
+ */
+.site-loader__readout {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.site-loader__word {
+  font-family: var(--fx-font-display, inherit);
+  font-size: clamp(1.9rem, 4.6vw, 3.2rem);
+  letter-spacing: 0.02em;
+  color: oklch(1 0 0 / 0.92);
+}
+
+/*
+ * The way in. Amber, in the site's own eyebrow treatment, because that is
+ * what this page uses for "do this next" everywhere else.
+ */
+/*
+ * Out of flow, so the word stays dead centre on the pane whether or not this
+ * is showing. In flow, its arrival pushed the word 22px up the moment the
+ * page was ready -- exactly the frame you are looking at it.
+ */
+.site-loader__enter {
+  position: absolute;
+  top: calc(50% + 1.6rem);
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: max-content;
+  padding: 8px 4px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  animation: loader-enter-in 0.5s ease both;
+}
+
+.site-loader__enter:focus-visible {
+  outline: 1px solid var(--fx-primary);
+  outline-offset: 6px;
+}
+
+@keyframes loader-enter-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Nothing scrolls sideways.
+ *
+ * The pane light layer sits at `inset: -90px` so a lit edge can throw light
+ * past the pane, and on a full-width band that means 90px beyond the viewport
+ * on each side. The section wrapper's `overflow: hidden` used to absorb that;
+ * moving the clip inward -- so the bloom could escape upward, which it must --
+ * left the overhang contributing to the document's scroll width. Measured:
+ * scrollWidth 1370 against a 1280 viewport, exactly the 90px bleed.
+ *
+ * `clip` rather than `hidden`, and on one axis only. `hidden` would make this
+ * a scroll container, which breaks sticky positioning and scroll restoration;
+ * `clip` does neither. And clipping only x leaves `overflow-y: visible`, so
+ * the vertical spill -- the part that actually had somewhere to go -- is
+ * untouched. There is no page to the left of the left edge, so nothing is
+ * lost horizontally.
+ */
+#main-content {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* The drop page pans its glass both ways (routes/drop): the page may be wider than the window there. */
+html[data-drop-page] #main-content {
+  overflow-x: visible;
+}
+
+/* While the shutter is being wound by a held press: see shutter-charge.ts. */
+html.is-winding,
+html.is-winding * {
+  user-select: none;
+}
+
+/*
+ * A seam band's layers, above the photographs that run on underneath it.
+ * On the children, never the band itself -- see SeamSection in PhotoSection.
+ * Same z for all three; document order keeps the pane on top of its light.
+ *
+ * The last selector is the same fix, applied to the ordinary photo sections:
+ * the pane's light layer sits at inset: -90px, so its bottom bloom spills past
+ * the pane's edge onto the NEXT section's photograph -- which paints later in
+ * document order and covers it, leaving a hard horizontal line. Lifting the
+ * pane above that photograph lets the bleed land on it. The pane is already
+ * its own stacking context (isolation: isolate), so only the pane moves; the
+ * wrapper stays un-z-indexed so the backdrop-filter still sees the photograph
+ * underneath (see SeamSection in PhotoSection).
+ */
+[data-seam] > .bokeh-field,
+[data-seam] > .transmitted,
+[data-seam] > .glass,
+[data-scene-content] > .glass {
+  z-index: 1;
+}
+
+/* A spider's web in the hero's corner (SpiderWebs.tsx, task 75, ?try=webs): in front of the page. */
+.spider-web-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 7000;
+  pointer-events: none;
+}
+
+/* Fireworks over the page (Fireworks.tsx, task 81, ?try=fireworks): light, screened on. */
+.fireworks-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8500;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* Party balloons in the room in front of the page (Balloons.tsx, task 74, ?try=balloons). */
+/*
+ * The plastic buttons' rounded edges, lit by every light (PlasticBevel.tsx).
+ * Under the balloons (they float in front of the page), over the page.
+ */
+.plastic-bevel-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 7900;
+  pointer-events: none;
+}
+
+/* The bevel's own curve mirrors the lights and the scene there: the 1 px drawn rim retires. */
+html[data-plastic-bevel] .plastic::after {
+  display: none;
+}
+
+.balloons-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8000;
+  pointer-events: none;
+}
+
+/* The light through the glass, on the photographs. See FloorLight.tsx. */
+.floor-light {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floor-light {
+    display: none;
+  }
+}
+
+/* The floor light drawn onto what stands above the page's floor canvas (FloorLight, 2m). */
+.floor-received {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* A pane's bloom laid over what stands above the glass's layers (GlassLight, item 51). */
+.glass-bloom-received {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+}
+
+@media (pointer: coarse), (hover: none) {
+  .glass-bloom-received {
+    display: none;
+  }
+}
+
+/*
+ * The light under a pane, drawn inside it: above the glass's own render
+ * (the frost, or the liquid canvas at -3), below its text. See FloorLight.
+ */
+.glass > .glass__under,
+.glass > .glass__rainfall,
+.glass > .glass__water {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* z-index: the compositor's (effects/engine/compositor PANE_LAYERS). */
+  pointer-events: none;
+}
+
+/*
+ * With the copy printed on the glass ("Type on the glass", Ony 2026-10-02),
+ * the rain sits ON the letters: the water layer goes above the pane's
+ * content, and draws the letters itself, bent, wherever it draws water
+ * (effects/engine/type-layer; the water shader's typeAt). It is transparent
+ * everywhere else, so the page's own letters show there.
+ */
+.glass > .glass__water.glass__water--over-type {
+  z-index: 3 !important;
+}
+
+/*
+ * The photographs lying on a pane float over the rain (Ony, 2026-10-10:
+ * "the photos need to always float over the rain"): with the copy printed
+ * on the glass the water layer rises over the pane's content (above), and
+ * it took the photographs under it too. A photograph is a print laid on
+ * the glass, not ink in it: it stays on top.
+ */
+.glass
+  :is(img, video, canvas, .gallery-frame):not(.glass__water):not(.glass__surface):not(
+    .glass__under
+  ):not(.glass__rainfall) {
+  z-index: 4;
+}
+.glass :is(img, video, .gallery-frame):not(.absolute):not(.fixed):not(.sticky) {
+  position: relative;
+}
+/*
+ * A photograph's own z-index only counts inside its nearest stacking
+ * context: a photo card lifted to z 2 for the cast shadows
+ * ([data-photo] a, above) holds its picture at 2 inside the pane, under
+ * the water (3 where it lies over the copy) -- the rain landed on the
+ * home page's photographs (Ony, 2026-10-10). The card carrying a
+ * photograph goes up with it.
+ */
+html .glass :is(a, button, figure, li):has(img, video):not(:has(.glass)) {
+  z-index: 4;
+}
+html .glass :is(a, button, figure, li):has(img, video):not(:has(.glass)):not(.absolute):not(.fixed):not(.sticky) {
+  position: relative;
+}
+
+/*
+ * OFF, by request: the two remaining "flashlight" layers.
+ *
+ * .photo-surface paints a specular pool of the lamp onto every photograph
+ * (a 52px disc at --lit-x/--lit-y) and .transmitted paints a pool of light
+ * behind each pane. Both are fixed-size radial gradients following the
+ * pointer -- results with settings of their own, not light worked out from
+ * the lamp -- and on the parallaxed hero the paper disc lands beside the
+ * cursor rather than under it, because the photograph is transformed and the
+ * gradient is placed in its untransformed box. Reported as the flashlight
+ * that would not go away.
+ *
+ * The code stays (the rules above). The light the lamp throws onto the
+ * photographs is the floor-light pass (FloorLight), which is physical.
+ */
+.transmitted {
+  display: none;
+}
+/*
+ * The photographs' gloss is back ON (Ony, 2026-10-11: "Photos have high
+ * gloss and intense specular highlights correct? so I want to be able to
+ * see that" -- asked for more than once). Not the old flashlight disc
+ * under the cursor: the lamp's mirror image in the print's coating, where
+ * the reflection reaches the eye (--gloss-x/y, effects/adapters/css-vars),
+ * the size of the lamp itself, only while the lamp burns.
+ */
+
+/*
+ * The photographs behind the glass, moved by the viewpoint.
+ *
+ * They sit a gap behind the pane, so as the eye moves (with the pointer, see
+ * effects/optics/viewpoint.ts) they slide under it by gap / (distance + gap)
+ * of the eye's movement -- through the bevel, where you watch it bend them.
+ * Oversized by exactly as much as the largest slide these settings can make
+ * (--view-scale, from oversizeFor), so it never shows an edge. Things
+ * resting ON the glass are in its plane and do not move.
+ */
+.view-shift {
+  transform: translate(var(--view-x, 0px), var(--view-y, 0px)) scale(var(--view-scale, 1));
+}
+
+@media (prefers-reduced-motion: reduce), (max-width: 767px) {
+  .view-shift {
+    transform: none;
+  }
+}
+
+/* ===================== The magnifying glass (items 21, 25e; ?try=magnifier) =====================
+ *
+ * components/site/Magnifier: the lens is the live page through a displacement
+ * map (effects/optics/magnifier). What it shows beyond that is the scene's:
+ * --ring is its ring lamp (the lamp's charge), --lens-room the room's
+ * brightness it mirrors, --lens-rx/ry where in the room it looks. Under the
+ * cursor and the flash, over everything else.
+ */
+.magnifier {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9990;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 0.2s ease;
+}
+
+.magnifier__lens {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  backdrop-filter: url("#magnifier-lens");
+  /*
+   * The ring lamp, seen in the lens's surface where it turns steepest toward
+   * the rim: a bright line round the inside, as bright as the lamp is.
+   */
+  background: radial-gradient(
+    circle closest-side,
+    transparent 86%,
+    rgb(255 244 222 / calc(0.22 * var(--ring, 0))) 95%,
+    rgb(255 250 238 / calc(0.75 * var(--ring, 0))) 99.4%,
+    transparent 100%
+  );
+  box-shadow:
+    inset 0 0 22px rgb(0 0 0 / 0.28),
+    inset 0 0 0 1px rgb(255 255 255 / 0.18);
+}
+
+/*
+ * The room, in the lens's face. A convex surface is a wide-angle mirror, so
+ * it holds the whole room small, and it reflects as glass does: about 4%
+ * straight on, rising steeply toward the rim (Fresnel).
+ */
+.magnifier__lens::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-image: var(--room, url("/rooms/metro.jpg"));
+  background-size: auto 140%;
+  background-position: var(--lens-rx, 50%) var(--lens-ry, 50%);
+  background-repeat: no-repeat;
+  transform: scale(-1, 1);
+  mix-blend-mode: screen;
+  opacity: var(--lens-room, 1);
+  -webkit-mask: radial-gradient(
+    circle closest-side,
+    rgb(0 0 0 / 0.04) 0%,
+    rgb(0 0 0 / 0.06) 55%,
+    rgb(0 0 0 / 0.22) 88%,
+    rgb(0 0 0 / 0.5) 99%,
+    transparent 100%
+  );
+  mask: radial-gradient(
+    circle closest-side,
+    rgb(0 0 0 / 0.04) 0%,
+    rgb(0 0 0 / 0.06) 55%,
+    rgb(0 0 0 / 0.22) 88%,
+    rgb(0 0 0 / 0.5) 99%,
+    transparent 100%
+  );
+}
+
+/*
+ * The brass rim: turned metal, and metal is a coloured mirror -- what it
+ * shows is the room, tinted gold, over the dark of the brass itself. Its
+ * inner edge catches the ring lamp.
+ */
+.magnifier__rim {
+  position: absolute;
+  inset: -11px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle closest-side,
+      transparent 89.5%,
+      rgb(255 236 190 / calc(0.8 * var(--ring, 0))) 90.4%,
+      transparent 93%
+    ),
+    radial-gradient(
+      circle closest-side,
+      transparent 89.5%,
+      rgb(40 26 8 / 0.85) 90%,
+      transparent 91.5%,
+      transparent 97%,
+      rgb(40 26 8 / 0.8) 100%
+    ),
+    linear-gradient(rgb(214 170 88), rgb(214 170 88)),
+    var(--room, url("/rooms/metro.jpg")) var(--lens-rx, 50%) var(--lens-ry, 50%) / auto 100%
+      no-repeat,
+    rgb(74 52 20);
+  background-blend-mode: normal, normal, multiply, normal, normal;
+  -webkit-mask: radial-gradient(circle closest-side, transparent 89.6%, #000 90.2%);
+  mask: radial-gradient(circle closest-side, transparent 89.6%, #000 90.2%);
+}
+
+/*
+ * What the magnifier casts on the page, one per light (the room overhead,
+ * the flash): the rim and the handle's shade, and the patch the lens gathers
+ * the light it passes into. Placed, grown and softened by the one shadow
+ * model; --shade is how much of the page's light the source is, --patch the
+ * patch's size in the rim's footprint, --patch-gain how much it adds.
+ */
+.magnifier-cast {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9989;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  filter: blur(var(--blur, 0px));
+}
+
+.magnifier-cast__shade {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / var(--shade, 0));
+}
+
+.magnifier-cast__handle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 118px;
+  margin-left: -12px;
+  transform-origin: 50% 0;
+  transform: rotate(-45deg) translateY(104px);
+  border-radius: 8px 8px 12px 12px;
+  background: rgb(0 0 0 / var(--shade, 0));
+}
+
+.magnifier-patch {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9989;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  mix-blend-mode: plus-lighter;
+  filter: blur(var(--blur, 0px));
+}
+
+.magnifier-patch::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* The lens's share of the rim's footprint (96 of 107 px), times the patch's. */
+  width: calc(100% * var(--patch, 1) * 96 / 107);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--patch-colour, white);
+}
+
+/* The handle: dark turned wood on a brass ferrule, down and to the right. */
+.magnifier__handle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 118px;
+  margin-left: -12px;
+  transform-origin: 50% 0;
+  transform: rotate(-45deg) translateY(104px);
+  border-radius: 8px 8px 12px 12px;
+  background: linear-gradient(90deg, #1c110a, #4a2c18 30%, #6b4127 48%, #3a2213 70%, #140b06);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.45);
+}
+
+.magnifier__handle::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: -2px;
+  height: 22px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #6e4f1f, #d9b25e 35%, #f6e2a4 48%, #b48633 65%, #5a3f16);
+}
+
+/* ===================== The road flare (items 22, 25e; ?try=flare) =====================
+ * components/site/FlareTorch draws the flare -- tube, smoke, flame, sparks --
+ * on two canvases round the flame; its light on the scene is the light
+ * list's. The first covers (the tube, the smoke's body); the second is light
+ * and is screened onto the page.
+ */
+.fire-torch {
+  /* The burning torch (FireTorch.tsx, task 82): moved to the hand by a transform. */
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 360px;
+  z-index: 9996;
+  pointer-events: none;
+}
+
+.flare-torch {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9991;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.flare-torch--light {
+  z-index: 9992;
+  mix-blend-mode: screen;
+}
+
+/* ===================== Neon (items 23, 25c) =====================
+ * components/site/Neon. One glass tube per word (claude/tools-research.md):
+ * the tube layer is the glass, always there; the gas layer is the discharge,
+ * faded by opacity as the tube flickers (composited, never repainted); the
+ * plumbing is the blacked-out runs between letters and the electrode caps.
+ * --neon-colour is the gas.
+ */
+.neon {
+  position: relative;
+  display: inline-block;
+  font-family: "Tilt Neon", var(--fx-font-display, sans-serif);
+  font-weight: 400;
+  /* Neon lettering is spaced wide: the glow thickens every line at night. */
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  isolation: isolate;
+}
+
+.neon__tube,
+.neon__gas {
+  display: block;
+  white-space: pre;
+}
+
+/* The glass tube: pale glass with the gas colour faint in it, a highlight along its top. */
+.neon__tube {
+  position: relative;
+  z-index: 1;
+  color: color-mix(in oklab, var(--neon-colour) 20%, rgb(214 218 228 / 0.34));
+  text-shadow:
+    0 -0.03em 0 rgb(255 255 255 / 0.22),
+    0 0.03em 0.02em rgb(0 0 0 / 0.35);
+}
+
+/*
+ * The gas, burning: white-hot where the discharge is densest (the middle of
+ * the tube), its colour toward the walls, and the glow it throws into the
+ * air, fading over a hand's width. Static: the flicker is this layer's
+ * opacity, not its styling.
+ */
+.neon__gas {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  color: color-mix(in oklab, var(--neon-colour), white 64%);
+  -webkit-text-stroke: 0.012em color-mix(in oklab, var(--neon-colour), white 20%);
+  text-shadow:
+    0 0 0.01em rgb(255 255 255 / 0.9),
+    0 0 0.04em var(--neon-colour),
+    0 0 0.1em var(--neon-colour),
+    0 0 0.22em color-mix(in srgb, var(--neon-colour) 70%, transparent),
+    0 0 0.45em color-mix(in srgb, var(--neon-colour) 42%, transparent),
+    0 0 0.9em color-mix(in srgb, var(--neon-colour) 22%, transparent);
+  will-change: opacity;
+}
+
+/* The blacked-out runs and the electrodes: under the lit letters, over the wall. */
+.neon__plumbing {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.neon__run {
+  stroke: rgb(18 16 18 / 0.92);
+  stroke-linecap: round;
+}
+
+/* The painted glass still catches the room along its top. */
+.neon__run-glint {
+  stroke: rgb(255 255 255 / 0.14);
+  stroke-linecap: round;
+}
+
+.neon__electrode {
+  fill: rgb(24 22 24);
+  stroke: rgb(120 118 124 / 0.6);
+  stroke-width: 0.8;
+}
+
+.neon__electrode-cap {
+  fill: rgb(70 68 74);
+}
+
+/* The light the lit tube throws onto what it hangs on: a soft wash of its colour. */
+.neon__wash {
+  position: absolute;
+  inset: -45% -12%;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--neon-colour), transparent);
+  opacity: 0.22;
+  filter: blur(18px);
+  mix-blend-mode: screen;
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon__gas {
+    opacity: 1 !important;
+  }
+}
+
+/* ===================== The tool tray (item 25e, ?try=tools) =====================
+ * components/site/ToolTray: pick up one tool, putting down the last. A small
+ * dark glass pill in the corner, out of the way of the photographs.
+ */
+.tool-tray {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 9995;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgb(14 14 16 / 0.55);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.08),
+    0 10px 30px rgb(0 0 0 / 0.4);
+}
+
+.tool-tray__tool {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: rgb(255 255 255 / 0.6);
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.tool-tray__tool:hover {
+  color: rgb(255 255 255 / 0.9);
+}
+
+.tool-tray__tool[aria-pressed="true"] {
+  color: rgb(20 16 10);
+  background: rgb(232 170 80);
+}
+
+.tool-tray__tool:focus-visible {
+  outline: 2px solid rgb(232 170 80);
+  outline-offset: 2px;
+}
+
+/* ===================== The laser beam (item 25d, ?try=laser) =====================
+ * components/site/LaserBeam: a canvas over the page the beam is drawn on,
+ * added light (the canvas composites "lighter" within itself, and screens
+ * onto the page).
+ */
+.laser-beam {
+  position: fixed;
+  inset: 0;
+  z-index: 9992;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* ===================== Glow-in-the-dark paint (item 25) =====================
+ * components/site/GlowPaint: a board coated in phosphor paint. Unlit, the
+ * paint is a pale grey-green film on it; lit, the canvas's glow is added on
+ * top, soft, bleeding a little into the air.
+ */
+.glow-paint {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  touch-action: none;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgb(210 225 205 / 0.07), transparent 60%),
+    rgb(22 24 22 / 0.92);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.06),
+    0 18px 40px rgb(0 0 0 / 0.45);
+}
+
+.glow-paint__light {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+  filter: blur(1.5px) drop-shadow(0 0 6px rgb(120 255 150 / 0.55));
+}
+
+.glow-paint__hint {
+  position: absolute;
+  left: 18px;
+  bottom: 14px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: rgb(200 215 200 / 0.35);
+  pointer-events: none;
+}
+
+/*
+ * The flashlight you hold (item 25i, components/site/Flashlight), seen from
+ * above: a dark anodised body with a knurled grip, a wider head at the end
+ * it points from, and the lit rim of its lens. Pointing straight down, all
+ * that shows is the round tail cap with its rubber switch.
+ */
+.flashlight {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  transform-origin: 0 0;
+  opacity: 0;
+  filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.55));
+}
+.flashlight__tail {
+  flex: none;
+  width: 8px;
+  height: 80%;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(to bottom, #3a3d42, #16181b 60%, #0b0c0e);
+}
+.flashlight__grip {
+  flex: 1;
+  height: 76%;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.07) 0 1px, transparent 1px 4px),
+    linear-gradient(to bottom, #4a4e55, #1c1e22 55%, #0e0f11);
+}
+.flashlight__head {
+  flex: none;
+  width: 22%;
+  min-width: 10px;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #5a5f67, #23262b 55%, #101114);
+}
+.flashlight__lens {
+  flex: none;
+  width: 3px;
+  height: 92%;
+  border-radius: 0 2px 2px 0;
+  background: #f2f8ff;
+  box-shadow:
+    0 0 6px 2px rgb(220 238 255 / 0.9),
+    0 0 18px 6px rgb(200 225 255 / 0.35);
+}
+/* Straight down: only the tail cap shows, round, with its switch. */
+.flashlight[data-down] {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #26282c 0 30%, transparent 32%),
+    radial-gradient(circle at 40% 35%, #5a5f67, #16181b 70%);
+}
+.flashlight[data-down] > * {
+  display: none;
+}
+
+/*
+ * The lens's natural vignetting (?try=vignette, components/site/Vignette):
+ * over the whole picture, under the cursor and its light.
+ */
+.lens-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+}
+
+/*
+ * The lighter tier (item 34, effects/engine/quality): the bokeh layer is a
+ * second full-pane backdrop blur, the costliest thing a pane asks of the
+ * compositor after its own frost.
+ */
+:root[data-quality="lite"] .glass__bokeh {
+  display: none;
+}
+
+/*
+ * Secret 2, the red room (item 39, ?try=redroom; components/site/RedRoom).
+ * The negative under the safelight, with the loupe's hole at --lx/--ly.
+ */
+.red-room {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  --hole: radial-gradient(
+    circle var(--loupe, 84px) at var(--lx, 50%) var(--ly, 50%),
+    transparent calc(100% - 1px),
+    #000 100%
+  );
+  -webkit-mask-image: var(--hole);
+  mask-image: var(--hole);
+}
+.red-room__negative {
+  -webkit-backdrop-filter: grayscale(1) invert(1) brightness(0.5) contrast(1.25);
+  backdrop-filter: grayscale(1) invert(1) brightness(0.5) contrast(1.25);
+}
+.red-room__safelight {
+  /* The safelight: about 630 nm, nothing the paper can see. */
+  background: rgb(255 36 12);
+  mix-blend-mode: multiply;
+}
+.red-room__loupe {
+  position: fixed;
+  /* Above the hanging print, which it looks at too. */
+  z-index: 9003;
+  pointer-events: none;
+  left: calc(var(--lx, 50%) - var(--loupe, 84px));
+  top: calc(var(--ly, 50%) - var(--loupe, 84px));
+  width: calc(2 * var(--loupe, 84px));
+  height: calc(2 * var(--loupe, 84px));
+  border-radius: 50%;
+  border: 3px solid rgb(40 6 4);
+  box-shadow:
+    0 0 0 1px rgb(255 60 30 / 0.35),
+    inset 0 0 18px rgb(0 0 0 / 0.55);
+}
+.red-room__leave {
+  position: fixed;
+  z-index: 9002;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 60 30 / 0.5);
+  background: rgb(20 2 1 / 0.8);
+  color: rgb(255 90 60);
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+/* The print hanging to dry (item 40): a line, a cord, the sheet on its clip. */
+.red-room__line {
+  position: fixed;
+  inset: 0;
+  z-index: 9001;
+  pointer-events: none;
+  background: linear-gradient(rgb(60 8 4), rgb(60 8 4)) 0 95px / 100% 1.5px no-repeat;
+}
+.red-room__cord {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.5px;
+  margin-left: -0.75px;
+  background: rgb(70 10 5);
+  transform-origin: 50% 0;
+}
+.red-room__print {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 0;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  /* The paper itself: white (the loupe shows it as it is). */
+  background: rgb(244 241 234);
+  padding: 10px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.55);
+}
+.red-room__print[data-held] {
+  cursor: grabbing;
+}
+.red-room__print img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  user-select: none;
+}
+/* The print under the safelight: paper white is the safelight's red. */
+.red-room__safe {
+  position: absolute;
+  inset: 0;
+  padding: 10px;
+  background: rgb(150 22 8);
+  --hole: radial-gradient(
+    circle var(--loupe, 84px) at var(--lx, -999px) var(--ly, -999px),
+    transparent calc(100% - 1px),
+    #000 100%
+  );
+  -webkit-mask-image: var(--hole);
+  mask-image: var(--hole);
+}
+.red-room__safe img {
+  filter: grayscale(1) sepia(1) saturate(6) hue-rotate(-38deg) brightness(0.62);
+}
+.red-room__clip {
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  width: 22px;
+  height: 14px;
+  margin-left: -11px;
+  border-radius: 2px;
+  background: rgb(30 4 2);
+}
+
+/*
+ * ---- The page under a black light (components/site/BlackLightScene,
+ * docs/black-light.md) ----
+ */
+
+/* The room, off: near black but for the UV's reach round the hand. */
+.blacklight-room {
+  position: fixed;
+  inset: 0;
+  z-index: 9989;
+  pointer-events: none;
+  background: radial-gradient(
+    circle var(--uv-reach, 560px) at var(--uv-x, -2000px) var(--uv-y, -2000px),
+    rgb(7 4 15 / 0) 0%,
+    rgb(7 4 15 / calc(var(--uv-dark, 0.92) * 0.12)) 50%,
+    rgb(7 4 15 / calc(var(--uv-dark, 0.92) * 0.6)) 85%,
+    rgb(7 4 15 / var(--uv-dark, 0.92)) 100%
+  );
+}
+
+/* The lamp's visible leak: a faint violet (365 nm) or a purple wash (395 nm), falling off with the UV. */
+.blacklight-leak {
+  position: fixed;
+  inset: 0;
+  z-index: 9989;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+  background: radial-gradient(
+    circle var(--uv-reach, 560px) at var(--uv-x, -2000px) var(--uv-y, -2000px),
+    rgb(var(--uv-leak)) 0%,
+    transparent 85%
+  );
+}
+
+/* The photographs as OBA prints: their luminance glowing brightener blue; the darks dark. */
+html[data-uv] img,
+html[data-uv] video {
+  filter: url(#uv-paper);
+}
+
+/*
+ * The photographs' darkening scrims and vignettes are the design's, not
+ * paint on the print: under UV they stand down most of the way, or the
+ * glowing whites come out grey through them (Ony: whites a very light blue).
+ */
+html[data-uv] [data-photo] :is([data-scrim], .image-vignette) {
+  opacity: 0.3;
+}
+
+/* Light type as white ink with brighteners: blue-white, glowing. Not the type on the buttons. */
+html[data-uv]
+  :is(h1, h2, h3, h4, p, li, blockquote, .rich-text, a, label, span):not(.plastic, .plastic *) {
+  /* White ink with brighteners goes a very light blue under UV (Ony's references). */
+  /* OBA glow tokens (docs/research/uv-blacklight.md A): core #D9ECFF, body #8FB8FF, halo #4C63FF. */
+  color: color-mix(in srgb, #d9ecff calc(min(var(--uv-ink, 0.8), 1) * 100%), #1e1f78);
+  text-shadow:
+    0 0 calc(3px * var(--uv-ink, 0.8)) rgb(143 184 255 / calc(0.9 * min(var(--uv-ink, 0.8), 1.2))),
+    0 0 calc(16px * var(--uv-ink, 0.8)) rgb(76 99 255 / calc(0.6 * min(var(--uv-ink, 0.8), 1.2)));
+}
+
+/* The day-glo orange buttons blaze: brighter than reflection alone could make them, and glowing out. */
+html[data-uv] .plastic:not(.plastic--dark) {
+  /* Day-glo orange tokens: body #FF8A1F, core #FFE2B0, halo #FF5A0A. */
+  background-color: #ff8a1f;
+  background-image: radial-gradient(
+    ellipse at 50% 45%,
+    rgb(255 226 176 / calc(0.55 * var(--uv-dayglo, 1))),
+    transparent 70%
+  );
+  box-shadow:
+    inset 0 0 0 999px var(--fluor-face, transparent),
+    0 0 calc(8px * var(--uv-dayglo, 1)) calc(2px * var(--uv-dayglo, 1)) rgb(255 138 31 / 0.85),
+    0 0 calc(44px * var(--uv-dayglo, 1)) calc(10px * var(--uv-dayglo, 1)) rgb(255 90 10 / 0.5);
+}
+
+/*
+ * The drop page (routes/drop): one pane of glass over a photograph, the
+ * whole screen, raining; the readout in a corner of the glass.
+ */
+.drop-page {
+  min-height: 100svh;
+}
+/* A pane bigger than the window, which the camera pans over (routes/drop PANE_SCALE). */
+.drop-page__scene {
+  position: relative;
+  /* 1.8 windows each way: room to roam, a third of the pixels 2.5 cost (the lag, 2026-10-10). */
+  width: 180vw;
+  height: calc(180vh + var(--site-header-h, 64px));
+  overflow: hidden;
+}
+.drop-page__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* The whole window under the header (Ony, 2026-10-10). */
+.drop-page__pane {
+  position: absolute;
+  inset: var(--site-header-h, 64px) 0 0 0;
+  border-radius: 0;
+}
+.drop-page__hud {
+  /* On the screen, not the glass: the camera pans the glass under it. */
+  position: fixed;
+  z-index: 40;
+  left: 16px;
+  top: calc(var(--site-header-h, 64px) + 14px);
+  padding: 10px 14px 12px;
+  border-radius: 12px;
+  background: rgb(10 10 14 / 0.35);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  display: grid;
+  gap: 4px;
+  color: oklch(0.96 0.01 80);
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.6);
+}
+.drop-page__size {
+  font-family: var(--fx-font-display, inherit);
+  font-size: 2rem;
+  line-height: 1;
+}
+.drop-page__size span {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+.drop-page__note {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+.drop-page__buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.drop-page__buttons button {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: inherit;
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}

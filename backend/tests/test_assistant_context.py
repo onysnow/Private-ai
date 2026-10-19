@@ -2,11 +2,7 @@ from fastapi.testclient import TestClient
 from app.db.session import Base, SessionLocal, engine
 from app.main import app
 from app.models.domain import ConnectorFinding
-
-
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+from tests.claim_helpers import post_claim
 
 
 def test_question_context_separates_external_leads_from_factual_citations():
@@ -16,7 +12,7 @@ def test_question_context_separates_external_leads_from_factual_citations():
     entity = client.post('/api/entities', json={'investigation_id': inv['id'], 'schema': 'Person', 'caption': 'Ada North', 'properties': {'name': ['Ada North']}}).json()
     source = client.post('/api/sources', json={'investigation_id': inv['id'], 'title': 'Board minutes', 'source_type': 'minutes', 'url': 'https://example.test/minutes'}).json()
     evidence = client.post('/api/evidence', json={'source_id': source['id'], 'quote': 'Ada North joined the utility board.', 'locator': 'page 7'}).json()
-    claim = client.post('/api/claims', json={'investigation_id': inv['id'], 'text': 'Ada North joined the utility board.', 'status': 'supported', 'confidence': 0.9}).json()
+    claim = post_claim(client, {'investigation_id': inv['id'], 'text': 'Ada North joined the utility board.', 'status': 'supported', 'confidence': 0.9}).json()
     assert client.post(f"/api/claims/{claim['id']}/evidence", json={'evidence_id': evidence['id'], 'stance': 'supports'}).status_code == 200
     with SessionLocal() as db:
         db.add(ConnectorFinding(investigation_id=inv['id'], provider='aleph', provider_record_id='aleph-1', caption='Ada North Holdings', schema='Company', properties={'name': ['Ada North Holdings']}, source_url='https://aleph.example/entities/aleph-1', raw={}, review_status='unreviewed'))

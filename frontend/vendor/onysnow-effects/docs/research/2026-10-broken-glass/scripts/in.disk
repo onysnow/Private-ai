@@ -1,0 +1,30 @@
+# Timing test modelled on the LAMMPS "Peridynamics with LAMMPS" howto example
+# (brittle disk 74 mm dia x 2.5 mm, sc lattice 0.5 mm, horizon 1.5 mm, PMB, rigid sphere at 100 m/s)
+units           si
+boundary        s s s
+atom_style      peri
+atom_modify     map array
+neighbor        0.0010 bin
+lattice         sc 0.0005
+region          target cylinder z 0.0 0.0 0.037 0.0 0.0025 units box
+create_box      1 target
+create_atoms    1 region target
+pair_style      peri/pmb
+pair_coeff      * * 1.6863e22 0.0015001 0.0005 0.25
+set             group all density 2200
+set             group all volume 1.25e-10
+velocity        all set 0.0 0.0 0.0 sum no units box
+fix             F1 all nve
+compute         C1 all damage/atom
+timestep        1.0e-7
+variable        z0 equal 0.0025+0.005+0.00002
+variable        z equal "v_z0 - 100.0*elapsed*dt"
+fix             F2 all indent 1e17 sphere 0.0 0.0 v_z 0.005 units box
+thermo          100
+thermo_style    custom step time cpu
+run             600
+variable        dmg equal c_C1
+compute         dsum all reduce sum c_C1
+thermo_style    custom step time cpu c_dsum
+write_dump all custom dump.final id x y z c_C1 modify sort id
+run 0

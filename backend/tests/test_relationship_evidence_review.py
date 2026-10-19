@@ -2,9 +2,6 @@ from fastapi.testclient import TestClient
 from app.db.session import Base, engine
 from app.main import app
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine); Base.metadata.create_all(bind=engine)
-
 def _relationship(client):
     inv=client.post('/api/investigations',json={'name':'Relationship evidence review'}).json()
     src=client.post('/api/sources',json={'investigation_id':inv['id'],'title':'Filing','source_type':'document'}).json()

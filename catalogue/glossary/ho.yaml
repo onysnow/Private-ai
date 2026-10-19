@@ -1,0 +1,1451 @@
+area: HO
+terms:
+- term: Potentially unlawful death
+  definition: A death the state may have caused or failed to prevent, including deaths in custody and
+    enforced disappearances, which triggers a duty to investigate.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Documents/Publications/MinnesotaProtocol.pdf
+  cases: []
+  related:
+  - Minnesota Protocol
+  - Death in custody
+  indicators: []
+  areas:
+  - HO
+- term: Minnesota Protocol
+  definition: 'The UN guidance (revised 2016) on how to investigate potentially unlawful deaths: promptly,
+    thoroughly, independently and transparently.'
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Documents/Publications/MinnesotaProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Duty to investigate
+  definition: The state's obligation to investigate a death it knows or should know may be unlawful; failing
+    to do so is itself a breach of the right to life (Minnesota Protocol paras. 8(c), 15).
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Documents/Publications/MinnesotaProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Medicolegal death investigation (MDI)
+  definition: The official investigation of deaths that are unattended, unnatural, unexplained or of public
+    health interest, by a coroner or medical examiner office.
+  examples: []
+  source_url: https://www.nist.gov/document/organizational-and-foundational-standard-mdi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Medicolegal death investigator
+  definition: The person who attends the scene for the coroner or medical examiner, documents the body
+    and scene, and works independently of, but with, police.
+  examples: []
+  source_url: https://ojp.gov/pdffiles1/nij/308955.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Coroner (United States)
+  definition: An official, often elected, who decides cause and manner of death and may not be a doctor.
+  examples: []
+  source_url: https://nij.ojp.gov/topics/articles/improving-forensic-death-investigation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Coroner (England and Wales)
+  definition: A judicial officer who must investigate a death if it appears violent or unnatural, the
+    cause is unknown, or it happened in custody or state detention.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2009/25/section/1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Medical examiner (England and Wales)
+  definition: A senior doctor who, since 9 September 2024, reviews the cause of every death not investigated
+    by a coroner.
+  examples: []
+  source_url: https://www.gov.uk/government/news/causes-of-death-to-be-scrutinised-in-revamp-of-death-certificates
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Forensic pathologist
+  definition: A doctor specially trained and certified to perform autopsies to find the cause and manner
+    of death for legal purposes.
+  examples: []
+  source_url: https://www.nist.gov/document/organizational-and-foundational-standard-mdi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Forensic autopsy
+  definition: A full post-mortem examination done for legal purposes; NAME standards list the death types
+    where one must be done.
+  examples: []
+  source_url: https://washoecounty.gov/coroner/faq/when_is_autopsy_performed.php
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Cause of death
+  definition: The disease or injury that started the chain of events leading to death.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Documents/Publications/MinnesotaProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Manner of death
+  definition: The category a certifier assigns (such as natural, accident, suicide, homicide, undetermined);
+    NASEM says homicide here is a medical, not a legal, finding.
+  examples: []
+  source_url: https://www.nationalacademies.org/read/29232/chapter/8
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Undetermined (manner of death)
+  definition: A classification used when the certifier cannot decide the manner; NASEM recommends peer
+    review of such cases.
+  examples: []
+  source_url: https://www.nationalacademies.org/read/29232/chapter/8
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Chain of custody
+  definition: A documented record showing who held each item of evidence, from collection to court, so
+    it can be trusted.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Documents/Publications/MinnesotaProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Scene log
+  definition: A record of every person entering a death scene, with date and time.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Documents/Publications/MinnesotaProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Rigor mortis and livor mortis
+  definition: Stiffening of the body and pooling of blood after death; if they do not fit the account
+    given, the scene may have been changed.
+  examples: []
+  source_url: https://ojp.gov/pdffiles1/nij/308955.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Positive identification
+  definition: Confirming who the dead person is by scientific means (fingerprints, dental, DNA), not by
+    sight alone.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Documents/Publications/MinnesotaProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Inquest
+  definition: A public court hearing led by a coroner, sometimes with a jury, to establish who died and
+    how, when and where.
+  examples: []
+  source_url: https://www.gov.uk/government/speeches/determinations-and-findings-of-the-hillsborough-inquests
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Unlawful killing (inquest conclusion)
+  definition: An inquest finding that a death was caused by a criminal act; it does not name or convict
+    anyone.
+  examples: []
+  source_url: https://www.gov.uk/government/speeches/determinations-and-findings-of-the-hillsborough-inquests
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Accidental death (inquest conclusion)
+  definition: An inquest finding that a death was caused by an accident; Hillsborough's original accidental
+    death verdicts were later overturned.
+  examples: []
+  source_url: https://www.gov.uk/government/speeches/determinations-and-findings-of-the-hillsborough-inquests
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Prevention of Future Deaths (PFD) report
+  definition: A report a coroner must send, under Regulation 28, to bodies that can act when evidence
+    shows a risk of further deaths; recipients must reply within 56 days.
+  examples: []
+  source_url: https://www.judiciary.uk/guidance-and-resources/chapter-16-reports-to-prevent-future-deaths-pfds/
+  cases: []
+  related:
+  - Regulation 28
+  indicators: []
+  areas:
+  - HO
+- term: Cremation Forms B and C
+  definition: 'The former England and Wales cremation certificates: Form B by the attending doctor and
+    Form C, a confirming check by a second doctor, which the Shipman Inquiry found ineffective.'
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5a7b99ae40f0b645ba3c55db/5854.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Death certification
+  definition: The doctor's formal statement of the cause of death, needed to register the death.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/5a7b99ae40f0b645ba3c55db/5854.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Exhumation
+  definition: Digging up a buried body so it can be examined again.
+  examples: []
+  source_url: https://www.cbsnews.com/news/german-nurse-niels-hoegel-life-prison-sentence-murder-serial-killer-patients-overdose/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Second autopsy
+  definition: A further post-mortem by another pathologist, which can find injuries the first missed.
+  examples: []
+  source_url: https://www.propublica.org/article/nopd-officers-convicted-in-handymans-beating-death
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Excited delirium
+  definition: A term used on some death certificates after restraint; NAME no longer endorses it and asks
+    for the underlying cause to be stated.
+  examples: []
+  source_url: https://www.thename.org/assets/docs/PositionPaperUpdates/Excited%20Delirium%20Statement%20March%206%2C%202023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Death in custody
+  definition: A death while held by police, prison or another state body; standards presume state responsibility
+    and require autopsy.
+  examples: []
+  source_url: https://www.nationalacademies.org/read/29232/chapter/8
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Sudden unexpected infant death (SUID) and SIDS
+  definition: Categories for unexplained infant deaths; the CDC SUIDI form standardises scene data to
+    classify them accurately.
+  examples: []
+  source_url: https://Www.Cdc.gov/sids/pdf/SUIDI_instruct_508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Doll reenactment
+  definition: Using a doll at the scene to show how and where an infant was placed and found, part of
+    the CDC infant death protocol.
+  examples: []
+  source_url: https://Www.Cdc.gov/sids/pdf/SUIDI_instruct_508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Public inquiry
+  definition: A formal government-established investigation into events of public concern, such as the
+    Shipman and Thirlwall inquiries.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/thirlwall-inquiry-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Independent panel
+  definition: A non-statutory expert body that reviews documents to establish what happened, as at Gosport
+    and in the Daniel Morgan case.
+  examples: []
+  source_url: https://www.gosportpanel.independent.gov.uk/panel-report/part-four/chapter-12
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Conviction quashed
+  definition: An appeal court sets aside a conviction because it is unsafe.
+  examples: []
+  source_url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2003/1020
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Miscarriage of justice
+  definition: A wrongful conviction recognised by a court, as found in cases linked to Dr Charles Smith.
+  examples: []
+  source_url: https://jaapl.org/content/40/1/81
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Peer review (death investigation)
+  definition: Review of a pathologist's or certifier's case by colleagues, recommended for undetermined
+    and other special cases.
+  examples: []
+  source_url: https://www.nationalacademies.org/read/29232/chapter/8
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Non-suspicious / unexplained death (police categorisation)
+  definition: Police labels that decide how much investigation a death gets; HMICFRS found early non-suspicious
+    labels can cause deaths to be overlooked.
+  examples: []
+  source_url: https://hmicfrs.justiceinspectorates.gov.uk/publication-html/inspection-of-the-metropolitan-police-services-response-to-lessons-from-the-stephen-port-murders/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Institutional corruption
+  definition: The Daniel Morgan Panel's term for an organisation putting its reputation ahead of honesty,
+    as summarised in the IOPC's assessment.
+  examples: []
+  source_url: https://www.policeconduct.gov.uk/sites/default/files/documents/IOPC-assessment-of-the-Daniel-Morgan-report-Aug2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Homicide
+  definition: The killing of one person by another; in England and Wales statistics it covers murder,
+    manslaughter and infanticide.
+  examples: []
+  source_url: https://www.ons.gov.uk/peoplepopulationandcommunity/crimeandjustice/articles/homicideinenglandandwales/yearendingmarch2024/pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Clearance rate
+  definition: The share of crimes police record as solved (cleared) in a period, either by arrest or by
+    exceptional means.
+  examples: []
+  source_url: https://ucr.fbi.gov/crime-in-the-u.s/2016/crime-in-the-u.s.-2016/topic-pages/clearances.pdf
+  cases: []
+  related:
+  - Cleared by arrest
+  - Cleared by exceptional means
+  indicators: []
+  areas:
+  - HO
+- term: Cleared by arrest
+  definition: Under FBI rules, a crime counts as cleared when at least one person has been arrested, charged
+    and turned over to the court for prosecution.
+  examples: []
+  source_url: https://ucr.fbi.gov/crime-in-the-u.s/2016/crime-in-the-u.s.-2016/topic-pages/clearances.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Cleared by exceptional means
+  definition: An FBI clearance without an arrest, allowed only when police have identified the offender,
+    have enough evidence, know where the offender is, and something outside their control stops arrest
+    and prosecution (such as the offender's death).
+  examples: []
+  source_url: https://ucr.fbi.gov/crime-in-the-u.s/2016/crime-in-the-u.s.-2016/topic-pages/clearances.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Uniform Crime Reporting (UCR) / Supplementary Homicide Report
+  definition: The FBI's voluntary national crime statistics programme; police send homicide details to
+    it, which MAP and others analyse.
+  examples: []
+  source_url: https://www.murderdata.org/2020/05/nearly-3000-murders-unreported-by-police.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Murder cluster
+  definition: MAP's grouping of homicides by county or metro area, victim sex and method of killing, used
+    to look for groups with unusually low solve rates.
+  examples: []
+  source_url: http://www.murderdata.org/p/var-divelement-document_30.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Serial murder
+  definition: The unlawful killing of two or more victims by the same offender or offenders in separate
+    events (FBI definition).
+  examples: []
+  source_url: https://www.fbi.gov/stats-services/publications/serial-murder
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Linkage blindness
+  definition: The failure to see that crimes in different places are connected because information is
+    not shared between police agencies.
+  examples: []
+  source_url: https://ojp.gov/ncjrs/virtual-library/abstracts/working-definition-serial-murder-and-reduction-linkage-blindness
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: ViCAP (Violent Criminal Apprehension Program)
+  definition: An FBI database that collects details of violent crimes, missing persons and unidentified
+    remains so analysts can find links between cases in different jurisdictions.
+  examples: []
+  source_url: https://dojmt.gov/wp-content/uploads/2024/09/ViCAP-Brochure.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Highway Serial Killings Initiative
+  definition: An FBI ViCAP project that tracks murders of people found along or near highways, often linked
+    to long-haul truck drivers.
+  examples: []
+  source_url: https://archives.fbi.gov/archives/news/stories/2009/april/highwayserial_040609
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Behavioral Analysis Unit
+  definition: FBI unit that offers crime-scene analysis, offender profiles and case-linkage analysis to
+    police.
+  examples: []
+  source_url: https://www.fbi.gov/stats-services/publications/serial-murder
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: High-risk victim
+  definition: A person whose lifestyle or circumstances (such as sex work or transience) make them more
+    exposed to violence and make series involving them harder to detect.
+  examples: []
+  source_url: https://www.fbi.gov/stats-services/publications/serial-murder
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: NamUs
+  definition: The US National Missing and Unidentified Persons System, a free national database and service
+    that compares missing-person and unidentified-remains cases.
+  examples: []
+  source_url: https://namus.nij.ojp.gov/about
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Unidentified human remains
+  definition: A body or remains that medical examiners or coroners cannot link to a name.
+  examples: []
+  source_url: https://namus.nij.ojp.gov/about
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: NCIC
+  definition: The FBI's National Crime Information Center, a national police database where missing-person
+    and unidentified-remains records can be entered.
+  examples: []
+  source_url: https://nij.ojp.gov/topics/articles/missing-persons-and-unidentified-remains-nations-silent-mass-disaster
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Medical examiner / coroner
+  definition: Officials who investigate deaths and decide cause and manner of death; their rules differ
+    by state.
+  examples: []
+  source_url: https://www.fbi.gov/stats-services/publications/serial-murder
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Cold case
+  definition: A serious crime, missing person or unidentified person case unsolved for at least three
+    years that might be solved with new information or technology.
+  examples: []
+  source_url: https://www.ojp.gov/pdffiles1/nij/252016.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Homicide Index
+  definition: The Home Office's record-level database of every homicide recorded by police in England
+    and Wales.
+  examples: []
+  source_url: https://www.ons.gov.uk/peoplepopulationandcommunity/crimeandjustice/articles/homicideinenglandandwales/yearendingmarch2024/pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Attrition
+  definition: The drop-off in cases at each stage from crime to arrest, prosecution and conviction.
+  examples: []
+  source_url: https://www.unodc.org/documents/data-and-analysis/gsh/2023/GSH23_Chapter_5.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Impunity
+  definition: When killings do not lead to arrest, prosecution or conviction, so offenders go unpunished.
+  examples: []
+  source_url: https://www.unodc.org/documents/data-and-analysis/gsh/2023/GSH23_Chapter_5.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Familial DNA search
+  definition: Searching a state DNA database for close relatives of an unknown offender, allowed in California
+    only for major violent crimes with serious public risk.
+  examples: []
+  source_url: https://www.oag.ca.gov/news/press-releases/californias-familial-dna-search-program-identifies-suspected-grim-sleeper-serial
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Investigative genetic genealogy (IGG)
+  definition: Using family-tree research with DNA from consumer genealogy databases to identify an unknown
+    suspect.
+  examples: []
+  source_url: https://vcdistrictattorney.com/2020/06/june-29-2020-2
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: CODIS
+  definition: The US national DNA database of offender and crime-scene profiles that labs search for matches.
+  examples: []
+  source_url: https://www.murderdata.org/2019/06/chicago-detectives-update-status-of.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Prevention of Future Deaths report
+  definition: A report a coroner in England and Wales sends to organisations when an inquest reveals risks
+    of further deaths, which they must answer.
+  examples: []
+  source_url: https://www.judiciary.uk/prevention-of-future-death-reports/anthony-walgate-gabriel-kovari-daniel-whitworth-and-jack-taylor-prevention-of-future-deaths-report/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Unexplained but not suspicious
+  definition: A police label for a death whose cause is unclear but which is not treated as a crime; the
+    Port coroner said scenes should be treated as suspicious until shown otherwise.
+  examples: []
+  source_url: https://www.judiciary.uk/wp-content/uploads/2022/06/Anthony-Walgate-Gabriel-Kovari-Daniel-Whitworth-and-Jack-Taylor-Prevention-of-future-deaths-report-2022-0017wi.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Commission of inquiry
+  definition: An official public investigation set up by government to find facts and make recommendations,
+    such as British Columbia's Missing Women Commission.
+  examples: []
+  source_url: https://missingwomen.library.uvic.ca/wp-content/uploads/2010/10/Forsaken-ES-web-RGB.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Stay of proceedings
+  definition: A prosecutor's decision to halt a criminal case, as with the 1998 stay of charges against
+    Robert Pickton.
+  examples: []
+  source_url: https://missingwomen.library.uvic.ca/wp-content/uploads/2010/10/Forsaken-ES-web-RGB.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Risk assessment (missing persons)
+  definition: Police judgement of how much danger a missing person is in, which decides how urgently the
+    case is investigated.
+  examples: []
+  source_url: https://www.servingwithpride.ca/_files/ugd/f437fc_b3a2402fa6bd4b839e2f9d15d50df6e6.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Exoneration
+  definition: When a person convicted of a crime is officially cleared, usually after new evidence of
+    innocence.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related:
+  - Exoneree
+  indicators: []
+  areas:
+  - HO
+- term: Exoneree
+  definition: A person convicted of a crime who was later officially declared innocent of it.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Contributing factor
+  definition: A cause the National Registry of Exonerations records as having helped produce a wrong conviction,
+    such as mistaken identification or official misconduct.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Mistaken witness identification (MWID)
+  definition: A witness wrongly identified the convicted person as someone they saw commit the crime.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Deliberate misidentification
+  definition: A witness knowingly names the wrong person as the culprit, usually someone they know and
+    could not have mistaken.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/exonerations_us_1989_2012_full_report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: False confession
+  definition: A statement to police admitting a crime the person did not commit.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Perjury or false accusation
+  definition: Someone other than the accused lied under oath, or made a statement that would be perjury
+    if sworn, accusing the accused.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: False or misleading forensic evidence
+  definition: Expert or forensic evidence that was wrong or presented in a misleading way and may have
+    led to a wrong conclusion.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Official misconduct
+  definition: Police, prosecutors or other officials significantly abused their authority or the court
+    process in a way that contributed to the conviction.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Inadequate (ineffective) legal defence
+  definition: The defence lawyer at trial gave obviously and grossly inadequate representation; US courts
+    assess this as deficient performance (e.g. Hinton v. Alabama).
+  examples: []
+  source_url: https://supreme.justia.com/cases/federal/us/571/263/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Jailhouse informant / in-custody informer
+  definition: A person held in custody with the accused who claims the accused confessed to them about
+    a crime committed outside custody.
+  examples: []
+  source_url: https://www.justice.gc.ca/eng/rp-pr/cj-jp/ccr-rc/pmj-pej/p7.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Exculpatory evidence
+  definition: Evidence that tends to show the accused is not guilty or undermines the case against them.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related:
+  - Brady rule
+  - Impeachment evidence
+  indicators: []
+  areas:
+  - HO
+- term: Brady rule
+  definition: US constitutional rule (Brady v. Maryland, 1963) that prosecutors must disclose evidence
+    favourable to the accused that is material to guilt or punishment.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Materiality
+  definition: Under Brady, hidden evidence counts only if it would likely have changed the trial outcome;
+    ethics and discovery rules require disclosure regardless.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Impeachment evidence
+  definition: Evidence that undermines a prosecution witness's credibility, such as undisclosed deals
+    or earlier contradictory statements.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Substantive evidence of innocence
+  definition: Evidence that by itself helps prove the accused did not commit the crime, such as a witness
+    naming someone else.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Witness tampering
+  definition: An official tricks, persuades or forces a witness to testify falsely against the accused.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Tainted identification
+  definition: An identification produced when an officer directly or indirectly tells the witness whom
+    to pick.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Lineup / photospread (photo array)
+  definition: A procedure where a witness views the suspect among similar-looking fillers, in person or
+    in photographs, to see whether they recognise the culprit.
+  examples: []
+  source_url: https://www.justice.gc.ca/eng/rp-pr/cj-jp/ccr-rc/pmj-pej/sum-som.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Show-up
+  definition: Showing a witness a single suspect rather than a lineup; recommended only when the suspect
+    is caught near the scene shortly after the event.
+  examples: []
+  source_url: https://www.justice.gc.ca/eng/rp-pr/cj-jp/ccr-rc/pmj-pej/sum-som.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Blind (independent) administration
+  definition: A lineup run by an officer who does not know which person is the suspect, so they cannot
+    hint.
+  examples: []
+  source_url: https://www.justice.gc.ca/eng/rp-pr/cj-jp/ccr-rc/pmj-pej/sum-som.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Sequential presentation / relative judgment
+  definition: Showing photos one at a time rather than together, to stop witnesses picking whoever looks
+    most like the culprit compared with the others.
+  examples: []
+  source_url: https://www.justice.gc.ca/eng/rp-pr/cj-jp/ccr-rc/pmj-pej/sum-som.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Estimator and system variables
+  definition: 'Factors affecting eyewitness accuracy: estimator variables are outside the justice system''s
+    control (e.g. cross-racial identification); system variables are controlled by it (e.g. how lineups
+    are run).'
+  examples: []
+  source_url: https://innocenceproject.org/eyewitness-misidentification/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Recantation
+  definition: A witness or victim whose statement helped convict later says they lied or made a mistake.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/RecantationUpdate_5_2013.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Co-defendant confession
+  definition: A confession by someone charged or chargeable with the same crime that also implicates the
+    accused.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Fabricated confession
+  definition: A confession invented by police, typically reported as an unrecorded oral admission, from
+    a person who did not confess.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Mr. Big operation
+  definition: A Canadian undercover technique in which officers recruit a suspect into a fictitious criminal
+    organisation and offer rewards if he admits the crime under investigation.
+  examples: []
+  source_url: https://dpp.gc.ca/eng/pub/is-ip/is-ip-eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Tunnel vision
+  definition: A single-minded, overly narrow focus on one investigative or prosecution theory that distorts
+    how other information is judged.
+  examples: []
+  source_url: https://www.justice.gc.ca/eng/rp-pr/cj-jp/ccr-rc/pmj-pej/p4.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: False guilty plea
+  definition: A guilty plea entered by a factually innocent person, including to a crime that never happened.
+  examples: []
+  source_url: https://dpp.gc.ca/eng/pub/is-ip/is-ip-eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: No-crime case
+  definition: An exoneration where the crime never happened, for example an accident or suicide mistaken
+    for murder.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Shaken baby syndrome (SBS)
+  definition: A medical diagnosis that an infant was injured or killed by violent shaking; the NRE describes
+    it as now highly controversial.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Medicolegal death investigation
+  definition: A formal inquiry into the circumstances of a death, combining investigative information
+    and autopsy findings to set cause and manner of death.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/DeathInvestigationV1-3-6.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Forensic pathology
+  definition: The medical specialty applying pathology to legal questions, chiefly autopsies to find cause
+    of death and help determine manner of death.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/DeathInvestigationV1-3-6.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Cause, manner and time of death
+  definition: Cause is the disease or injury that caused death; manner classifies it (e.g. homicide, suicide,
+    accident); time of death is the estimated time it occurred, which the NRE notes is inexact.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/DeathInvestigationV1-3-6.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Medical examiner vs coroner system
+  definition: The two main US death investigation systems; medical examiners are usually appointed physicians,
+    coroners are often elected and may not be physicians.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/DeathInvestigationV1-3-6.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Contradicted / overstated / vague (death investigation problems)
+  definition: 'NRE''s three categories of flawed pathology evidence: another qualified authority disagreed;
+    the expert overstated what the evidence proves; or the expert gave non-discriminating ''consistent
+    with'' evidence.'
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/DeathInvestigationV1-3-6.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Forensic fraud
+  definition: Deliberate falsification of forensic evidence by an analyst or officer to help convict.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/Updated%20CP_Government_Misconduct_and_Convicting_the_Innocent%20(1).pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Individualization
+  definition: A claim that a piece of evidence came from one specific person or source; the NRC found
+    only nuclear DNA analysis has been rigorously shown able to do this consistently.
+  examples: []
+  source_url: https://www.ojp.gov/pdffiles1/nij/grants/228091.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Foundational validity
+  definition: Proof from empirical studies that a forensic method is repeatable, reproducible and accurate
+    for its intended use.
+  examples: []
+  source_url: https://obamawhitehouse.archives.gov/sites/default/files/microsites/ostp/PCAST/pcast_forensic_science_report_final.pdf
+  cases: []
+  related:
+  - Validity as applied
+  indicators: []
+  areas:
+  - HO
+- term: Validity as applied
+  definition: Evidence that a valid method was reliably applied in the particular case by a competent
+    examiner.
+  examples: []
+  source_url: https://obamawhitehouse.archives.gov/sites/default/files/microsites/ostp/PCAST/pcast_forensic_science_report_final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Contextual bias / confirmation bias
+  definition: Distortion of an examiner's judgment by irrelevant case information, or the tendency to
+    confirm a suspicion held on other grounds.
+  examples: []
+  source_url: https://obamawhitehouse.archives.gov/sites/default/files/microsites/ostp/PCAST/pcast_forensic_science_report_final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Bitemark analysis
+  definition: Comparing marks on skin or objects with a suspect's teeth; PCAST found it far from meeting
+    scientific standards for validity.
+  examples: []
+  source_url: https://obamawhitehouse.archives.gov/sites/default/files/microsites/ostp/PCAST/pcast_forensic_science_report_final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Microscopic hair comparison analysis (MHCA)
+  definition: Comparing hairs under a microscope to say whether they could share a source; an FBI review
+    found erroneous testimony in most inculpatory cases reviewed.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/NREReportMHCAv1.3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Post-conviction DNA testing
+  definition: DNA testing, analysis or interpretation done after conviction that contributes to establishing
+    innocence.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Conviction Integrity Unit (CIU)
+  definition: A unit inside a prosecutor's office that reviews possible wrongful convictions; its help
+    does not necessarily mean the office found innocence.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Innocence organisation
+  definition: An independent, non-government group that works to free wrongly convicted people.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Criminal Cases Review Commission (CCRC)
+  definition: The independent body for England, Wales and Northern Ireland that investigates suspected
+    miscarriages of justice and can refer cases to appeal courts.
+  examples: []
+  source_url: https://ccrc.gov.uk/about-us/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Real possibility test
+  definition: 'The statutory test the CCRC applies: it refers a case only if there is a real possibility
+    the conviction would not be upheld, usually because of new argument or evidence.'
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/1995/35/section/13
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Group exoneration
+  definition: Multiple exonerations linked by a common pattern of systematic misconduct by officials or
+    one official actor.
+  examples: []
+  source_url: https://exonerationregistry.org/sites/exonerationregistry.org/files/documents/2024_Annual_Report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Posthumous exoneration
+  definition: An exoneration granted after the convicted person has died.
+  examples: []
+  source_url: https://www.law.umich.edu/special/exoneration/Pages/glossary.aspx
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Commission of inquiry (Canada)
+  definition: A government-appointed public inquiry, such as the Marshall, Morin and Sophonow inquiries,
+    that examines how a wrongful conviction happened and recommends reforms.
+  examples: []
+  source_url: https://www.justice.gc.ca/eng/rp-pr/cj-jp/ccr-rc/pmj-pej/p3.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Contract killing (hit)
+  definition: A killing in which one person asks or pays another to kill a third person for gain.
+  examples: []
+  source_url: https://globalinitiative.net/wp-content/uploads/2023/04/Rumbi-Matamba-The-business-of-killing-Assassinations-in-SA.-April23-web.pdf
+  cases: []
+  related:
+  - Assassination
+  - Targeted killing
+  indicators: []
+  areas:
+  - HO
+- term: Targeted killing / assassination
+  definition: The deliberate killing of a chosen person, often paid for and carried out by hired gunmen;
+    GI-TOC uses these words interchangeably with 'hit'.
+  examples: []
+  source_url: https://globalinitiative.net/wp-content/uploads/2018/03/The-rule-of-the-gun_Assassination-Witness.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Global Assassination Monitor
+  definition: GI-TOC's database of recorded hits and assassinations, built mainly from media and police
+    reports.
+  examples: []
+  source_url: https://globalinitiative.net/wp-content/uploads/2023/04/Rumbi-Matamba-The-business-of-killing-Assassinations-in-SA.-April23-web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Murder (CPJ definition)
+  definition: The deliberate killing of a specific journalist in revenge for their work; combat and dangerous-assignment
+    deaths are counted separately.
+  examples: []
+  source_url: https://cpj.org/reports/2019/10/getting-away-with-murder-killed-justice/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Unsolved case / impunity
+  definition: A killing where no one has been convicted, even if suspects are known or held.
+  examples: []
+  source_url: https://cpj.org/reports/2019/10/getting-away-with-murder-killed-justice/
+  cases: []
+  related:
+  - Partial impunity
+  indicators: []
+  areas:
+  - HO
+- term: Partial impunity
+  definition: Some but not all suspects have been convicted, or suspects were killed while being arrested.
+  examples: []
+  source_url: https://cpj.org/reports/2019/10/getting-away-with-murder-killed-justice/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Global Impunity Index
+  definition: CPJ's yearly ranking of countries by unsolved journalist murders relative to population,
+    covering countries with five or more unsolved cases over ten years.
+  examples: []
+  source_url: https://cpj.org/reports/2019/10/getting-away-with-murder-killed-justice/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Mastermind (person who commissioned the crime)
+  definition: The person who ordered or paid for a killing, as distinct from the people who carried it
+    out.
+  examples: []
+  source_url: https://globalfreedomofexpression.columbia.edu/cases/mazepa-others-v-russia/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: UNESCO Director-General's Report on the Safety of Journalists and the Issue of Impunity
+  definition: A two-yearly UN report on journalist killings and the judicial follow-up states report to
+    UNESCO.
+  examples: []
+  source_url: https://www.ungeneva.org/en/news-media/news/2024/11/99850/85-cent-journalist-killings-go-unpunished
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Article 2 procedural limb
+  definition: Under the European Convention on Human Rights, the right to life includes a duty to investigate
+    killings effectively; failing to do so is a violation even if the state did not kill.
+  examples: []
+  source_url: https://globalfreedomofexpression.columbia.edu/cases/mazepa-others-v-russia/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: UN Special Rapporteur on extrajudicial, summary or arbitrary executions
+  definition: An independent UN expert who investigates and reports on unlawful killings, such as the
+    2019 inquiry into the killing of Jamal Khashoggi.
+  examples: []
+  source_url: https://news.un.org/en/story/2019/06/1040821
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Land and environmental defender
+  definition: A person who takes peaceful action against unjust, corrupt or damaging use of land, natural
+    resources or the environment.
+  examples: []
+  source_url: https://globalwitness.org/en/campaigns/land-and-environmental-defenders/documenting-killings-and-disappearances-of-land-and-environmental-defenders/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Criminalisation (of defenders)
+  definition: Using lawsuits, arrests or criminal charges to stop people defending land, the environment
+    or rights.
+  examples: []
+  source_url: https://globalwitness.org/documents/20688/Global_Witness_Land_and_Environmental_Defenders_2024_report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Sociopolitical homicide
+  definition: UNODC's category for killings by terrorist groups and targeted assassinations, including
+    of defenders and journalists.
+  examples: []
+  source_url: https://static.poder360.com.br/2023/12/Global_study_on_homicide_2023_web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Organized crime/gang-related homicide
+  definition: A killing committed in the context of organised crime or gang violence, often planned to
+    remove rivals or officials.
+  examples: []
+  source_url: https://igarape.org.br/booklet_3
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Witness protection
+  definition: Measures to keep witnesses safe so they can give evidence; in South Africa it typically
+    ends once the witness has testified.
+  examples: []
+  source_url: https://globalinitiative.net/wp-content/uploads/2018/03/The-rule-of-the-gun_Assassination-Witness.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Femicide (gender-related killing of women and girls)
+  definition: The intentional killing of a woman or girl by a partner or family member, or by someone
+    else where gender-related criteria apply.
+  examples: []
+  source_url: https://www.istat.it/it/files/2018/04/Statistical_framework_femicide_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Intimate partner femicide
+  definition: The killing of a woman by a current or former husband, partner, cohabiting or dating partner.
+  examples: []
+  source_url: https://www.istat.it/it/files/2018/04/Statistical_framework_femicide_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Femicide watch
+  definition: A national body or observatory, urged by the UN Special Rapporteur on violence against women,
+    that publishes yearly femicide data and studies cases to find where protection failed.
+  examples: []
+  source_url: https://amel.org/un-expert-on-violence-against-women-urges-worldwide-adoption-of-femicide-watch-or-gender-related-killings-observatories/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Danger Assessment (DA)
+  definition: Jacquelyn Campbell's 20-item questionnaire, scored with a calendar of past incidents, that
+    estimates a woman's risk of being killed by her partner.
+  examples: []
+  source_url: https://www.tdcaa.com/wp-content/uploads/DAEnglish2010.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Estrangement
+  definition: Separation after living together; in Campbell's study, a strong risk factor, especially
+    from a controlling partner.
+  examples: []
+  source_url: https://www.baylor.edu/content/services/document.php/28840.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Adjusted odds ratio (AOR)
+  definition: A measure of how much more likely an outcome is when a factor is present, after accounting
+    for other factors; an AOR of 5 means about five times the odds.
+  examples: []
+  source_url: https://www.baylor.edu/content/services/document.php/28840.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Non-fatal strangulation
+  definition: Choking or strangling that does not kill; a prior incident sharply raises the odds of a
+    later killing.
+  examples: []
+  source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2573025/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Coercive control
+  definition: A pattern of controlling behaviour, such as isolating, monitoring and restricting money,
+    that may involve no physical violence.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/61e984d5e90e0703805e2a0e/DHRs_Review_2019-2020_Report_Final_Draft.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Eight-stage homicide timeline
+  definition: 'Jane Monckton-Smith''s model of how intimate-partner femicide develops: pre-relationship,
+    early relationship, relationship, trigger, escalation, change in thinking, planning, homicide.'
+  examples: []
+  source_url: https://eprints.glos.ac.uk/6896/1/6896%20Monckton-Smith%20%282019%29%20Intimate%20Partner%20Femicide%20using%20Foucauldian......pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Domestic Homicide Review (DHR)
+  definition: A statutory review in England and Wales of a death of someone aged 16 or over that appears
+    to have resulted from violence, abuse or neglect by a relative, partner or household member.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2004/28/section/9
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: DASH risk assessment
+  definition: The standard checklist UK police and agencies use to assess domestic abuse, stalking and
+    honour-based violence risk.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/575232/HO-Domestic-Homicide-Review-Analysis-161206.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: MARAC
+  definition: 'Multi-Agency Risk Assessment Conference: a meeting where agencies share information and
+    plan safety for high-risk domestic abuse victims.'
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/575232/HO-Domestic-Homicide-Review-Analysis-161206.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Professional curiosity
+  definition: Professionals asking questions and looking beyond what they are told; DHRs often record
+    its absence.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/61e984d5e90e0703805e2a0e/DHRs_Review_2019-2020_Report_Final_Draft.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: Domestic violence fatality review
+  definition: A confidential multi-agency analysis of domestic-violence deaths or near-deaths, done to
+    learn lessons rather than assign blame.
+  examples: []
+  source_url: https://opdv.ny.gov/system/files/documents/2021/07/nys-domestic-violence-fatality-review_0.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO
+- term: IPCC / IOPC
+  definition: The police complaints watchdog for England and Wales (the IPCC, replaced by the IOPC in
+    2018), which investigated police handling of cases such as Clare Wood's.
+  examples: []
+  source_url: https://policeprofessional.com/?p=101643
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HO

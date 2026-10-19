@@ -1,0 +1,4234 @@
+key: BO
+name: Hidden ownership and shell companies
+scope: concealment of beneficial ownership, shell and front companies, nominees, formation agents, company
+  factories, trusts. FATF/Egmont 2018 Annex E is the core list. The repo file docs/discovery/patterns.md
+  already holds 22 indicators with sources; read it, keep what holds, add what is missing.
+indicators:
+- id: BO-001
+  name: Circular ownership
+  definition: A chain of ownership loops back so that a company ends up owning itself, letting a person
+    with a tiny direct stake control it while staying under disclosure thresholds.
+  areas:
+  - BO
+  typology: Ownership-chain manipulation
+  status: verified
+  sources:
+  - title: 'More beneficial ownership loopholes to plug: circular ownership, fragmented control and companies
+      as parties to the trust'
+    publisher: Tax Justice Network (Andres Knobel)
+    year: '2019'
+    url: https://taxjustice.net/2019/09/06/more-beneficial-ownership-loopholes-to-plug-circular-ownership-control-with-little-ownership-and-companies-as-parties-to-the-trust/
+    locator: Section 'Circular ownership'
+    quote: However, she controls company A because there is no other owner. The rest is just a circular
+      ownership structure (company C owns company B. Company B owns company A, and company A owns company
+      C).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Findings, point 4 'Circular control structures'
+    quote: A circular control structure is a group of UK companies that file another UK company as their
+      PSC, with the final company filing the first company in the group as its PSC.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Global Witness found 328 UK companies on the PSC register in circular control structures, although
+    UK corporate law prohibits circular shareholding.
+  cases: []
+  data_needed:
+  - Ownership (owner, asset, percentage, startDate, endDate)
+  - Company (name, jurisdiction, registrationNumber)
+  - Person
+  checkable: records
+  lookup_sources:
+  - Company registry / beneficial ownership register (e.g. UK Companies House PSC data, Open Ownership
+    BODS data)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Group cross-holdings or treasury shares in large corporate groups
+  - Data entry errors in the register
+  - Incomplete or out-of-date ownership records that make a chain look closed
+  jurisdictions: Global; documented in UK PSC data
+  version: 1
+- id: BO-002
+  name: Long or unnecessarily complex ownership chain
+  definition: Several layers of companies, trusts or other vehicles sit between the real person and the
+    asset or bank account, with no business reason for that complexity.
+  areas:
+  - BO
+  typology: Layering of corporate vehicles
+  status: verified
+  sources:
+  - title: 'Concealment of Beneficial Ownership, Annex E: Indicators of concealed beneficial ownership'
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 8, p. 184
+    quote: Complex corporate structures that do not appear to legitimately require that level of complexity
+      or which do not make commercial sense.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'The Puppet Masters: How the Corrupt Use Legal Structures to Hide Stolen Assets and What to
+      Do About It'
+    publisher: World Bank / UNODC Stolen Asset Recovery Initiative (StAR)
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 3.13 'Developing a Nose for Inappropriate Complexity', p. 56
+    quote: Whenever more than three layers of legal entities or arrangements separate the end-user natural
+      persons (substantive beneficial owners) from the immediate ownership or control of a bank account,
+      this test should trigger a particularly steep burden of proof on the part of the potential client
+      to show the legitimacy and necessity of such a complex organization before the bank will consider
+      beginning a relationship.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Exploring UK companies'' legal ownership chains to detect red flags and verify beneficial
+      ownership information: Part 1'
+    publisher: Tax Justice Network
+    year: '2020'
+    url: https://taxjustice.net/2020/07/06/exploring-uk-companies-legal-ownership-chains-to-detect-red-flags-and-verify-beneficial-ownership-information/
+    locator: Summary paragraph
+    quote: Only 5 per cent of UK terminal companies have more than 5 layers, and only 0.5 per cent have
+      more than 10 layers.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 2
+    quote: Layers of ownership can be devised which make it highly unlikely that relationships among various
+      individuals and companies can be discerned, even if one or more of the owners is actually known
+      or discovered.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  - title: Spotting red flags in beneficial ownership datasets
+    publisher: Open Ownership
+    year: '2024'
+    url: https://www.openownership.org/en/blog/spotting-red-flags-in-beneficial-ownership-datasets/
+    locator: List of questions
+    quote: How many entities have complex ownership chains? (defined here as 5+ observable layers of ownership)
+    quote_verified: true
+    licence: CC BY 4.0
+    checked: '2026-10-09'
+  examples:
+  - TJN found two UK companies with 23 layers of intermediary entities; in one, most layers reported their
+    immediate corporate owner as beneficial owner.
+  cases: []
+  data_needed:
+  - Ownership (owner, asset, percentage)
+  - Company (jurisdiction)
+  - LegalEntity
+  - Person
+  checkable: records
+  lookup_sources:
+  - Company registries in each jurisdiction of the chain
+  - Commercial corporate databases (e.g. Orbis)
+  - Open Ownership register
+  levels:
+    faint: More than 3 layers between the natural person and the account or asset (Puppet Masters 'three-layer
+      test')
+    strong: More than 5 layers (only about 5% of UK companies, per TJN 2020; Open Ownership's 'complex
+      chain' definition)
+    textbook: Meets the published definition as worded (complexity with no commercial sense, Annex E 8)
+    threshold_source: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf ; https://taxjustice.net/2020/07/06/exploring-uk-companies-legal-ownership-chains-to-detect-red-flags-and-verify-beneficial-ownership-information/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Listed multinationals and private-equity groups often have many layers for financing, tax and liability
+    reasons
+  - Joint ventures and acquisitions leave legacy holding companies
+  - Regulatory ring-fencing (banks, insurers)
+  jurisdictions: Global
+  version: 1
+- id: BO-003
+  name: Entity or owner in a secrecy, low-tax or high-risk jurisdiction
+  definition: A company, one of its owners, or a layer in its chain is formed in a jurisdiction known
+    for secrecy, low tax, weak anti-money-laundering controls, or no central beneficial ownership register.
+  areas:
+  - BO
+  typology: Offshore secrecy
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, pp. 182-183
+    quote: are incorporated/formed in a jurisdiction that does not require companies to report beneficial
+      owners to a central registry
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: are incorporated/formed in a low-tax jurisdiction or international trade or finance centre
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Findings, point 2
+    quote: In fact, nearly three-quarters (72%) of these foreign corporate PSCs are registered or have
+      a correspondence address in a secrecy jurisdiction.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Using Beneficial Ownership Data for Systematic Risk Assessment in Public Procurement. The Example
+      of 6 European Countries
+    publisher: European Journal on Criminal Policy and Research (Tello Arista, Fazekas, Volkotrub)
+    year: '2026'
+    url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    locator: Results (read through a summarising fetcher; verify wording)
+    quote: foreign BOs are not associated with higher corruption risks in 4 out of 6 countries.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Global Witness limited 'secrecy jurisdiction' to those with a Financial Secrecy Index 2018 score over
+    60.
+  cases: []
+  data_needed:
+  - Company (jurisdiction, country)
+  - Ownership
+  - Person (nationality, country)
+  - Address (country)
+  checkable: lookups
+  lookup_sources:
+  - Tax Justice Network Financial Secrecy Index
+  - FATF high-risk and monitored jurisdictions lists
+  - EU list of non-cooperative tax jurisdictions
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: Global Witness used a Financial Secrecy Index secrecy score over 60 to define a secrecy jurisdiction
+    textbook: Meets the published definition as worded
+    threshold_source: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Common for legitimate cross-border investment funds, shipping, aircraft leasing and holding structures
+  - Owner genuinely lives in that country
+  - Peer-reviewed procurement study found foreign ownership alone was not linked to higher corruption
+    risk in most countries tested; weight this flag down
+  jurisdictions: Global
+  version: 1
+- id: BO-004
+  name: 'Mass nominee: one person directs or owns very many companies'
+  definition: The same director, shareholder or declared beneficial owner appears on a large number of
+    unrelated companies, suggesting a professional nominee who lends a name rather than running anything.
+  areas:
+  - BO
+  typology: Formal nominees
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 10, p. 184
+    quote: formal nominees (formal nominees may be “mass” nominees who are nominated agents for a large
+      number of shell companies)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: where the director, controlling shareholder(s) and/or beneficial owner(s) are listed against
+      the accounts of other legal persons or arrangements, indicating the use of professional nominees
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Findings, point 3
+    quote: Our analysis shows that over 9,000 companies are controlled by individuals who control more
+      than 100 companies.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Using Beneficial Ownership Data for Systematic Risk Assessment in Public Procurement
+    publisher: European Journal on Criminal Policy and Research (Tello Arista, Fazekas, Volkotrub)
+    year: '2026'
+    url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    locator: Results, company frequency of BO (read through a summarising fetcher; verify wording)
+    quote: This is exactly the relationship we find in all countries where such information is reliably
+      available
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'FATF Case Study 81: a Vanuatu-based provider supplied nominee shareholders and directors for about
+    2,000 New Zealand companies.'
+  cases:
+  - name: FATF Case Study 81 (New Zealand nominee directorship provider)
+    year: '2018'
+    jurisdiction: New Zealand / Vanuatu
+    what_happened: A Vanuatu-based trust and company service provider registered about 2,000 New Zealand
+      companies, acted as nominee shareholder and supplied nominee directors; authorities suspect at least
+      73 of the companies facilitated crimes abroad. This is a suspicion stated in an official report,
+      not a court finding.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    source_title: Concealment of Beneficial Ownership (FATF/Egmont), Case Study 81, p. 38
+  data_needed:
+  - Directorship (director, organization, role, startDate)
+  - Ownership (owner, asset)
+  - Person (name, birthDate)
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Company registry officer and PSC data
+  - OpenCorporates
+  - Open Ownership register
+  levels:
+    faint: To be set by Ony
+    strong: Person controls more than 100 companies (Global Witness red-flag cut-off)
+    textbook: Meets the published definition as worded (mass nominee for many shell companies)
+    threshold_source: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Owners who hold many companies were found to be linked to higher corruption risk in government
+      contracting across several European countries.
+    source_url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+  innocent_explanations:
+  - Professional company secretaries and corporate service firms legitimately hold many appointments
+  - Fund managers and special-purpose-vehicle administrators
+  - Large group companies sharing directors
+  - 'Name collisions: different people with the same name'
+  jurisdictions: Global
+  version: 1
+- id: BO-005
+  name: Informal nominee or 'straw man' (family member, associate or person of modest means)
+  definition: A relative, friend, employee or person with no apparent wealth or role is recorded as owner
+    or director while someone else really controls the company.
+  areas:
+  - BO
+  typology: Informal nominees
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 10, p. 184
+    quote: informal nominees, such as children, spouses, relatives or associates who do not appear to
+      be involved in the running of the corporate enterprise.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 7, p. 184
+    quote: family members with no role or involvement in the running of the business are listed as beneficial
+      owners of legal persons or arrangements
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 183
+    quote: demonstrate limited business acumen despite substantial interests in legal persons
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, 'Front Men', p. 61
+    quote: By contrast, a front man is specifically selected, is more likely to be connected to the principal
+      by biographical data than by a contractual paper trail, and usually purports to be the beneficial
+      owner of the corporate vehicle
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - OCCRP reported that the paper owner of two Azerbaijani Laundromat companies was a driver living on
+    the outskirts of Baku.
+  cases:
+  - name: Azerbaijani Laundromat core companies (Hilux Services LP, Polux Management LP)
+    year: '2017'
+    jurisdiction: United Kingdom / Azerbaijan / Estonia
+    what_happened: OCCRP reported that Maharram Ahmadov, on paper the owner of companies that sent millions
+      around the world, is in reality a modest driver; he told reporters people at a Baku bank had made
+      him a director.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.occrp.org/en/project/the-azerbaijani-laundromat/the-core-companies
+    source_title: 'OCCRP, The Azerbaijani Laundromat: The Core Companies'
+  - name: United States v. Richard Gaffey (Panama Papers investigation)
+    year: '2020'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: A US accountant was sentenced to 39 months; DOJ said he falsely claimed a client's
+      elderly mother was the sole beneficial owner of the client's offshore shell companies.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/us-accountant-panama-papers-investigation-sentenced-prison
+    source_title: US DOJ press release, 24 Sept 2020 (quotes read through a summarising fetcher)
+  data_needed:
+  - Person (birthDate, nationality)
+  - Family
+  - Associate
+  - Employment
+  - Ownership
+  - Directorship
+  - Company
+  checkable: person
+  lookup_sources:
+  - Company registry
+  - Social media / professional networks
+  - Property and wealth records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family businesses where relatives genuinely co-own or inherit shares
+  - Succession or estate planning
+  - Spouses holding shares for legitimate tax or legal reasons
+  - A person of modest means who genuinely founded a business
+  jurisdictions: Global
+  version: 1
+- id: BO-006
+  name: Nominee agreements or intermediary staff acting as nominees
+  definition: Records show a written nominee arrangement, or employees of a law firm, accountant or company-service
+    provider sit as directors or shareholders on behalf of an unnamed client.
+  areas:
+  - BO
+  typology: Formal nominees
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 7, p. 184
+    quote: employees of professional intermediary firms acting as nominee directors and shareholders
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 3, nominee services list
+    quote: 'Nominee Stockholders: A beneficial owner may use nominee stockholders to further ensure privacy
+      and anonymity while maintaining control through an irrevocable proxy agreement.'
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples:
+  - Annex E 7 also lists 'agreements for nominee directors and shareholders' found in business records.
+  cases: []
+  data_needed:
+  - Document (nominee agreement, proxy, declaration of trust)
+  - Representation (agent, client)
+  - Directorship
+  - Employment
+  - Company
+  checkable: person
+  lookup_sources:
+  - Leaked or disclosed corporate-service-provider records
+  - Company registry officer lists matched to service-provider staff
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Nominee arrangements are lawful in many jurisdictions, e.g. for publicly traded shares or to meet
+    local-resident-director rules
+  - Privacy for high-profile individuals at personal risk
+  jurisdictions: Global
+  version: 1
+- id: BO-007
+  name: Mass-registration address or 'company factory'
+  definition: The company's registered address is shared with a very large number of other companies,
+    usually a formation agent's or mailbox service's office.
+  areas:
+  - BO
+  typology: Shell company indicators
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 11, p. 185
+    quote: Address of mass registration (usually the address of a TCSP that manages a number of shell
+      companies on behalf of its customers)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: are registered at an address that is also listed against numerous other companies or legal
+      arrangements, indicating the use of a mailbox service
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Findings, point 1, and endnote 5
+    quote: To explore the extent, we examined addresses where more than 100 companies were registered
+      – often a sign that company service providers run a company.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 4
+    quote: Transacting businesses share the same address, provide only a registered agent’s address, or
+      raise other address-related inconsistencies.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples:
+  - 'Global Witness: more than 208,000 UK companies registered at a ''company factory'', defined in its
+    endnote 5 as an address with more than 1,000 companies registered there.'
+  - 'FATF Case Study 81: one Auckland address was the registered office for most of about 2,000 companies.'
+  cases:
+  - name: Leeds business centre, no-PSC companies
+    year: '2018'
+    jurisdiction: United Kingdom
+    what_happened: Global Witness reported a Leeds business centre where 95% of 1,157 registered companies
+      said they had no PSC, and that 761 of them were directed by Marc Feldman, whom it describes as having
+      two convictions for fraud and tax evasion.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    source_title: Global Witness, The Companies We Keep
+  data_needed:
+  - Address (full, postalCode, country)
+  - Company (addressEntity, address)
+  - LegalEntity
+  checkable: lookups
+  lookup_sources:
+  - Company registry bulk data (addresses)
+  - OpenCorporates
+  levels:
+    faint: To be set by Ony
+    strong: 'More than 100 companies at one address (Global Witness: often a sign a company service provider
+      runs it)'
+    textbook: More than 1,000 companies at one address (Global Witness 'company factory' definition)
+    threshold_source: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accountants', lawyers' and registered agents' offices legitimately host many registered offices
+  - Virtual-office and co-working providers
+  - Many small firms use their accountant's address for privacy
+  jurisdictions: Global; quantified in UK
+  version: 1
+- id: BO-008
+  name: Post-box only, unlocatable, or mismatched address
+  definition: The company's only address is a post box, cannot be found on a map, or does not fit the
+    kind of business it claims to be.
+  areas:
+  - BO
+  typology: Shell company indicators
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 12, p. 185
+    quote: Only a post-box address (often used in the absence of professional TCSP services and in conjunction
+      with informal nominees)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: are registered at an address that cannot be located on internet mapping services (such as Google
+      Maps)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: are registered at an address that does not match the profile of the company
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - OCCRP reported that the four Azerbaijani Laundromat companies listed British addresses with Companies
+    House but Baku addresses in their Danske Bank records.
+  cases: []
+  data_needed:
+  - Address (full, country)
+  - Company (address, sector)
+  checkable: lookups
+  lookup_sources:
+  - Mapping services and street imagery
+  - Company registry
+  - Postal address databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Home-based or online businesses using a PO box for privacy
+  - New buildings not yet on maps
+  - Rural addresses that map services handle poorly
+  jurisdictions: Global
+  version: 1
+- id: BO-009
+  name: 'No real operations: no staff, no premises, no taxes'
+  definition: 'The company shows no sign of real business: no employees (or one), no physical presence,
+    and no tax or social-security payments.'
+  areas:
+  - BO
+  typology: Shell company indicators
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicators 13, 15, 16, 17, p. 185
+    quote: No personnel (or only a single person as a staff member)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 16, p. 185
+    quote: Pays no taxes, superannuation, retirement fund contributions or social benefits
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership (main report)
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    locator: Para. 63, p. 29
+    quote: Furthermore, many shell companies do not have a physical presence, and are geographically anchored
+      through the use of TCSPs and nominee directors whose role in the management and direction of the
+      shell company is limited.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'FATF: more than half of its 106 case studies specifically referred to shell companies (para. 62,
+    p. 29).'
+  cases: []
+  data_needed:
+  - Company (sector, address)
+  - Employment
+  - Payment (tax authority as beneficiary)
+  - Document (filed accounts)
+  checkable: lookups
+  lookup_sources:
+  - Filed annual accounts (employee counts, turnover)
+  - Tax and payroll records where available
+  - Site visit or street imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Holding companies and special-purpose vehicles legitimately have no staff
+  - Start-ups before hiring
+  - Dormant companies kept for a future project or to protect a name
+  jurisdictions: Global
+  version: 1
+- id: BO-010
+  name: 'Pass-through account: money flows straight in and out'
+  definition: Funds arrive and leave quickly, the balance stays near zero, and the company does not appear
+    to earn or create anything itself.
+  areas:
+  - BO
+  typology: Transit / layering
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 14, p. 185
+    quote: Exclusively facilitates transit transactions and does not appear to generate wealth or income
+      (transactions appear to flow through the company in a short period of time with little other perceived
+      purpose)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 183
+    quote: maintain a bank balance of close to zero, despite frequent incoming and outgoing transactions
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - OCCRP reported more than EUR 2.5 billion passed through the four Azerbaijani Laundromat core companies
+    in two years.
+  cases:
+  - name: Danske Bank (Estonia non-resident portfolio)
+    year: '2022'
+    jurisdiction: United States (S.D.N.Y.) / Estonia
+    what_happened: Danske Bank pleaded guilty to one count of conspiracy to commit bank fraud and agreed
+      to criminal forfeiture of $2.059 billion; DOJ said high-risk non-resident customers of its Estonian
+      branch moved money including by using shell companies that obscured actual ownership of the funds.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/danske-bank-pleads-guilty-fraud-us-banks-multi-billion-dollar-scheme-access-us-financial
+    source_title: US DOJ press release, 13 Dec 2022 (quotes read through a summarising fetcher)
+  data_needed:
+  - Payment (payer, beneficiary, amount, date)
+  - BankAccount (balance)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bank statements in the case file
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Treasury or cash-pooling accounts in corporate groups
+  - Payment processors and escrow accounts
+  - Trading intermediaries with thin margins
+  jurisdictions: Global
+  version: 1
+- id: BO-011
+  name: Large funding soon after formation, quickly moved on
+  definition: A newly formed company receives large sums soon after it is set up and spends or sends them
+    elsewhere within a short time, with no clear business reason.
+  areas:
+  - BO
+  typology: Shell company indicators
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 183
+    quote: receive large sums of capital funding quickly following incorporation/formation, which is spent
+      or transferred elsewhere in a short period of time without commercial justification
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Company (incorporationDate)
+  - Payment (amount, date)
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Company registry (incorporation date)
+  - Bank records in the case file
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Newly formed acquisition or project vehicles funded and spent on a deal
+  - Start-up funding rounds spent on equipment
+  jurisdictions: Global
+  version: 1
+- id: BO-012
+  name: Very young company wins a large contract or payment
+  definition: A company formed only shortly before it receives a large government contract or payment.
+  areas:
+  - BO
+  - PP
+  typology: Company age risk
+  status: verified
+  sources:
+  - title: Using Beneficial Ownership Data for Systematic Risk Assessment in Public Procurement
+    publisher: European Journal on Criminal Policy and Research (Tello Arista, Fazekas, Volkotrub)
+    year: '2026'
+    url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    locator: Abstract (read through a summarising fetcher; verify wording)
+    quote: company age and political connections - also turn out to be valid.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Tello Arista, Fazekas, Volkotrub: beneficial ownership risk indicators in public procurement'
+    publisher: European Journal on Criminal Policy and Research (Springer)
+    year: '2026'
+    url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    locator: Results, Company Age
+    quote: In Denmark, companies younger than 4 years, i.e., those in the bottom 10% of the company age
+      distribution
+    quote_verified: true
+    licence: Open access, copyright The Author(s) 2026; the page did not name the licence
+    checked: '2026-10-10'
+  examples: []
+  cases: []
+  data_needed:
+  - Company (incorporationDate)
+  - ContractAward (date, amount)
+  - Contract
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Procurement portals / contract registers
+  levels:
+    faint: The company is among the younger firms winning contracts but is not younger than 4 years; no
+      published number marks this lower level
+    strong: The company is younger than 4 years when it wins, and the contract is large relative to its
+      age
+    textbook: The company is younger than 4 years when it wins the contract, putting it in the bottom
+      10% of company ages (Denmark result)
+    threshold_source: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    threshold_note: Applies to government contract winners in the study's countries; the cut-offs are
+      data-driven, so they differ by country. For Slovakia the same paper gives 'less than 2 years' ('For
+      Slovakia, the interval for heightened corruption risks corresponds to less than 2 years'). The paper's
+      theory section also gives 'If a company wins a big procurement contract the same year it was founded,
+      it could signal corruption risks'. The Denmark figure is used because it is stated most directly
+      as a cut-off. The full article text was blocked to direct download and was read through a fetched
+      copy.
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Company age at contract award was validated as a corruption-risk indicator in government contracting.
+    source_url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+  innocent_explanations:
+  - Genuine start-ups and spin-offs
+  - Single-purpose joint ventures formed specifically to bid
+  - Company re-formed after a restructuring
+  jurisdictions: Tested in 6 European countries
+  version: 2
+- id: BO-013
+  name: Dormant then suddenly active (shelf company)
+  definition: A company sits inactive for a long time after formation, then suddenly shows heavy financial
+    activity with no explanation, often after being sold as a ready-made 'shelf' company.
+  areas:
+  - BO
+  typology: Shelf companies
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: have demonstrated a long period of inactivity following incorporation, followed by a sudden
+      and unexplained increase in financial activities
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership (main report)
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    locator: Para. 66, p. 29
+    quote: However, the change of ownership will only be apparent if it is properly recorded in company
+      registries. This is often “overlooked” in cases where shelf companies are used to disguise beneficial
+      ownership.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Global Witness noted that many of the 761 no-PSC companies linked to one Leeds address were dormant.
+  cases: []
+  data_needed:
+  - Company (incorporationDate, status)
+  - Payment (date)
+  - Document (dormant accounts filings)
+  - Ownership (startDate)
+  checkable: lookups
+  lookup_sources:
+  - Company registry filing history (dormant accounts)
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shelf companies are sold legitimately to save formation time
+  - Companies kept dormant to protect a trading name
+  - A long-planned project finally starting
+  jurisdictions: Global
+  version: 1
+- id: BO-014
+  name: Rapid or frequent changes of directors, owners or location
+  definition: Directors or key shareholders resign and are replaced soon after formation, or officers,
+    owners or business location keep changing without a good reason.
+  areas:
+  - BO
+  typology: Ownership churn
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 7, p. 184
+    quote: the resignation and replacement of directors or key shareholders shortly after incorporation
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 7, p. 184
+    quote: officials or board members change frequently without an appropriate rationale.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Using Beneficial Ownership Data for Systematic Risk Assessment in Public Procurement
+    publisher: European Journal on Criminal Policy and Research (Tello Arista, Fazekas, Volkotrub)
+    year: '2026'
+    url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    locator: Results, frequent BO change, tested in Denmark and Estonia (read through a summarising fetcher;
+      verify wording)
+    quote: both countries’ results point to the hypothesized positive relationship.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Annex E 7 also lists: ''the location of the business changes frequently without an apparent business
+    justification''.'
+  cases: []
+  data_needed:
+  - Directorship (startDate, endDate)
+  - Ownership (startDate, endDate)
+  - Company (incorporationDate)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registry filing history
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shelf companies change officers at sale as a matter of course
+  - Start-ups reorganise early
+  - Mergers, acquisitions and refinancing
+  - Moving offices as a business grows
+  jurisdictions: Global
+  version: 1
+- id: BO-015
+  name: Formed and dissolved within a year
+  definition: A company is created and closed down within about a year, which can mean it was used for
+    a single transaction and then discarded.
+  areas:
+  - BO
+  typology: Disposable vehicles
+  status: verified
+  sources:
+  - title: Spotting red flags in beneficial ownership datasets
+    publisher: Open Ownership
+    year: '2024'
+    url: https://www.openownership.org/en/blog/spotting-red-flags-in-beneficial-ownership-datasets/
+    locator: List of questions
+    quote: How many entities were founded and subsequently dissolved within a year?
+    quote_verified: true
+    licence: CC BY 4.0
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Company (incorporationDate, dissolutionDate, status)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  levels:
+    faint: Formed and closed within a short time, but more than one year apart; no published number marks
+      this lower level
+    strong: Formed and dissolved within one year, and also connected to a payment, contract or transaction
+    textbook: Founded and then dissolved within one year (Open Ownership query)
+    threshold_source: https://www.openownership.org/en/blog/spotting-red-flags-in-beneficial-ownership-datasets/
+    threshold_note: The source is a data-analysis query used to screen UK beneficial-ownership data. It
+      is not a legal threshold. The same Open Ownership post defines complex ownership chains as 5 or
+      more observable layers.
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Failed start-ups
+  - Companies formed in error or duplicated
+  - Single-project vehicles closed after completion
+  jurisdictions: Tested on UK data
+  version: 2
+- id: BO-016
+  name: Stakes clustered just under a disclosure threshold
+  definition: Several shareholders each hold slightly less than the percentage that would force them to
+    be named as beneficial owners or trigger extra checks.
+  areas:
+  - BO
+  typology: Threshold avoidance / fragmented ownership
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 183
+    quote: involve multiple shareholders who each hold an ownership interest just below the threshold
+      required to trigger enhanced due diligence measures.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Section 'Thresholds'
+    quote: The result is that deliberate strategies to avoid PSC disclosure may be lost among hundreds
+      of thousands of companies filing that they have no PSC.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: People with significant control (PSCs)
+    publisher: UK Companies House (GOV.UK)
+    year: '2025'
+    url: https://www.gov.uk/guidance/people-with-significant-control-pscs
+    locator: Section 'Identifying your PSC'
+    quote: has more than 25% shares or voting rights in your company
+    quote_verified: true
+    licence: Open Government Licence
+    checked: '2026-10-09'
+  examples:
+  - Four linked holders at 24.9% each of a UK company would each fall under the PSC test.
+  cases: []
+  data_needed:
+  - Ownership (owner, asset, percentage, sharesCount)
+  - Family
+  - Associate
+  - Person
+  checkable: records
+  lookup_sources:
+  - Shareholder registers / annual returns
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (several holders each just below the applicable
+      threshold, e.g. 25% in the UK)
+    threshold_source: https://www.gov.uk/guidance/people-with-significant-control-pscs
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Equal co-founders (e.g. four founders at 25% or five at 20%)
+  - Family members inheriting equal shares
+  - Investment syndicates with equal tickets
+  jurisdictions: Global; UK PSC threshold is more than 25%
+  version: 1
+- id: BO-017
+  name: No beneficial owner declared, or a company named as beneficial owner
+  definition: The register shows no beneficial owner, says the owner is unknown, or lists another company
+    (often foreign) where a real person should be.
+  areas:
+  - BO
+  typology: Register non-disclosure
+  status: verified
+  sources:
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Findings, point 1
+    quote: In total, 335,010 companies have filed statements saying they have no PSC.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Exploring UK companies' legal ownership chains ... Part 1
+    publisher: Tax Justice Network
+    year: '2020'
+    url: https://taxjustice.net/2020/07/06/exploring-uk-companies-legal-ownership-chains-to-detect-red-flags-and-verify-beneficial-ownership-information/
+    locator: Case check of a 23-layer company
+    quote: They reported their immediate legal owner (another company) as the beneficial owner, even though
+      a beneficial must always refer to a natural person.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Using Beneficial Ownership Data for Systematic Risk Assessment in Public Procurement
+    publisher: European Journal on Criminal Policy and Research (Tello Arista, Fazekas, Volkotrub)
+    year: '2026'
+    url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    locator: Results, 'no BO data' (read through a summarising fetcher; verify wording)
+    quote: 'This hypothesized relationship could be identified in 4 out of 6 countries: Latvia, Slovakia,
+      Ukraine, and the UK'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Spotting red flags in beneficial ownership datasets
+    publisher: Open Ownership
+    year: '2024'
+    url: https://www.openownership.org/en/blog/spotting-red-flags-in-beneficial-ownership-datasets/
+    locator: List of questions
+    quote: How many entities declare that they have no beneficial owners or that their beneficial owners
+      are unknown?
+    quote_verified: true
+    licence: CC BY 4.0
+    checked: '2026-10-09'
+  examples:
+  - 'Global Witness: more than 10,000 UK companies declared a foreign company as their beneficial owner,
+    which is unlikely to meet the requirements.'
+  cases:
+  - name: Leeds business centre, no-PSC companies
+    year: '2018'
+    jurisdiction: United Kingdom
+    what_happened: Global Witness reported 761 companies declaring no PSC were directed by one person
+      it describes as previously convicted of fraud and tax evasion; many of the companies were dormant.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    source_title: Global Witness, The Companies We Keep
+  data_needed:
+  - Ownership
+  - Company
+  - LegalEntity
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Beneficial ownership register (e.g. UK PSC, Open Ownership)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Widely held companies where nobody passes the threshold (e.g. five or more equal shareholders)
+  - Listed companies exempt from the register
+  - Filing mistakes; Global Witness reported one cabinet minister's company that wrongly filed 'no PSC',
+    which his spokesman called an accountant's error
+  jurisdictions: Global; quantified in UK
+  version: 1
+- id: BO-018
+  name: Trust or foundation at the top, or unexplained use of express trusts
+  definition: Ownership ends in a trust or private foundation, or a trust is used with no clear reason,
+    so no person appears as owner.
+  areas:
+  - BO
+  typology: Legal arrangements
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 26, p. 187
+    quote: Unexplained use of express trusts, and/or incongruous or unexplained relationships between
+      beneficiaries (or persons who are objects of a power) and the settlor.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: More beneficial ownership loopholes to plug
+    publisher: Tax Justice Network (Andres Knobel)
+    year: '2019'
+    url: https://taxjustice.net/2019/09/06/more-beneficial-ownership-loopholes-to-plug-circular-ownership-control-with-little-ownership-and-companies-as-parties-to-the-trust/
+    locator: Section 'Companies as parties to a trust'
+    quote: The problem is when a party to the trust is in itself a company.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership (main report)
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    locator: Para. 43, p. 22
+    quote: Safeguards usually exist to ensure that a foundation is sufficiently independent from its founder;
+      however, foundations are vulnerable to exploitation for money laundering purposes, particularly
+      when laws allow the founder to exert control over the foundation.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization / LegalEntity (trust, foundation)
+  - Ownership
+  - Representation (trustee, protector)
+  - Family
+  - Document (trust deed)
+  checkable: person
+  lookup_sources:
+  - Trust registers where they exist
+  - Disclosed trust deeds
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Estate and succession planning
+  - Charitable foundations
+  - Employee share trusts and pension trusts
+  - Protection of vulnerable or minor beneficiaries
+  jurisdictions: Global
+  version: 1
+- id: BO-019
+  name: Settlor's wealth does not match what the trust holds
+  definition: The person said to have created and funded a trust does not appear rich enough to have put
+    in the assets the trust holds.
+  areas:
+  - BO
+  typology: Legal arrangements
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 5, p. 183
+    quote: There is a discrepancy between the supposed wealth of the settlor and the object of the settlement.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person (settlor)
+  - Organization / LegalEntity (trust)
+  - Ownership
+  - Document (trust deed, asset valuations)
+  checkable: person
+  lookup_sources:
+  - Property and asset records
+  - Declared income / asset disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Assets grew in value after settlement
+  - Several family members contributed
+  - Inheritance not visible in public records
+  jurisdictions: Global
+  version: 1
+- id: BO-020
+  name: Unusual or very numerous trust beneficiaries or controlling interests
+  definition: A trust or company lists odd classes of beneficiaries, or an unusually large number of beneficiaries
+    and controllers, with no clear link to the settlor.
+  areas:
+  - BO
+  typology: Legal arrangements
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 27, p. 187
+    quote: Unexplained or incongruous classes of beneficiaries in a trust.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: have declared an unusually large number of beneficiaries and other controlling interests
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Organization / LegalEntity (trust)
+  - Ownership
+  - Family
+  - Associate
+  - Person
+  checkable: person
+  lookup_sources:
+  - Trust registers
+  - Trust deeds
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large family trusts covering many descendants
+  - Charitable or employee benefit trusts with broad classes
+  jurisdictions: Global
+  version: 1
+- id: BO-021
+  name: Bearer shares or off-market transfer of shares
+  definition: Ownership rests on bearer share certificates, whoever physically holds them owns the company,
+    or shares change hands in private sales outside any market or register.
+  areas:
+  - BO
+  typology: Bearer instruments
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership (main report)
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    locator: Para. 81, p. 36
+    quote: Bearer shares are company shares that exist in certificate form and are legally owned by the
+      person that has physical possession of the bearer share certificate at any given time.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 186
+    quote: involves the transfer of (bearer) shares in an off-market sale
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Only four of the 106 FATF/Egmont case studies involved bearer shares (para. 83, p. 36).
+  cases: []
+  data_needed:
+  - Ownership (ownershipType, sharesType)
+  - Company (jurisdiction)
+  - Document (share certificates, transfer forms)
+  checkable: records
+  lookup_sources:
+  - Company registry articles / share capital filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legacy structures created before bearer shares were abolished, now immobilised with a custodian
+  - Private share sales between family members
+  jurisdictions: Mostly abolished or immobilised; FATF reported 45 of 50 assessed jurisdictions without
+    them in circulation (2018)
+  version: 1
+- id: BO-022
+  name: Company name mimics a well-known company or a government body
+  definition: A company is registered under a name that copies or closely resembles a famous company or
+    a state entity, so payments to it look legitimate.
+  areas:
+  - BO
+  typology: Look-alike shell companies
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: are registered under a name that appears to mimic the name of other companies, particularly
+      high-profile multinational corporations
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Human Rights Abuses Enabled by Corrupt Senior Foreign Political Figures and their
+      Financial Facilitators (FIN-2018-A003)
+    publisher: FinCEN, US Treasury
+    year: '2018'
+    url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+    locator: p. 4, 'Misappropriation of State Assets'
+    quote: (e.g., through the use of shell companies misleadingly named to give the appearance of being
+      related to the government)
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples:
+  - '1MDB: ''Aabar Investments PJS Limited'', a BVI entity, alleged by DOJ to have been named to look
+    like Abu Dhabi''s Aabar Investments PJS.'
+  cases:
+  - name: Aabar-BVI (1MDB)
+    year: '2025'
+    jurisdiction: United States (C.D. Cal.) / Malaysia / UAE / BVI
+    what_happened: A DOJ civil forfeiture complaint alleges that 'Aabar-BVI was created and named to give
+      the impression that it was associated with Aabar Investments PJS', and that about $1.367 billion
+      of 1MDB bond proceeds were sent to its Swiss account. This is an allegation in a complaint, not
+      a ruling.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/media/1385611/dl
+    source_title: United States v. (in rem), Case 2:25-cv-00474, Verified Complaint for Forfeiture, filed
+      17 Jan 2025, paras 5-6, p. 4
+  - name: United States v. Roger Ng (1MDB)
+    year: '2022'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: A federal jury in Brooklyn convicted former Goldman Sachs managing director Roger Ng
+      for participating in a bribery and money laundering scheme related to 1MDB.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/statement-united-states-attorney-breon-peace-verdict-us-v-roger-ng
+    source_title: US Attorney EDNY statement on the verdict, 8 Apr 2022 (read through a summarising fetcher)
+  data_needed:
+  - Company (name, alias, jurisdiction, incorporationDate)
+  - Payment (beneficiary)
+  - Organization / PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Company registries in several jurisdictions (to find the genuine entity and the look-alike)
+  - OpenCorporates name search
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: FinCEN describes corrupt officials using shell companies named to look government-related
+      to divert state revenue.
+    source_url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  innocent_explanations:
+  - Genuine subsidiaries or regional affiliates using the group name
+  - Coincidental similar names
+  - Franchisees
+  jurisdictions: Global
+  version: 1
+- id: BO-023
+  name: Name or online presence does not fit a real business
+  definition: The company's name says nothing about what it does or claims services it does not provide,
+    and it has no web or social-media presence or uses a free webmail address.
+  areas:
+  - BO
+  typology: Shell company indicators
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: describe themselves as a commercial business but cannot be found on the internet or social
+      business network platforms (such as LinkedIn, XING, etc.)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: use an email address with an unusual domain (such as Hotmail, Gmail, Yahoo, etc.)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 4
+    quote: Goods or services of the company do not match the company’s profile based on information previously
+      provided to the financial institution.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples:
+  - Annex E 4 also lists names 'that indicates that the company performs activities or services that it
+    does not provide'.
+  cases: []
+  data_needed:
+  - Company (name, sector, website, email)
+  - Email
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Web search
+  - Professional networks
+  - Domain registration (WHOIS)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small traditional businesses with no website
+  - Holding companies with abstract names
+  - Sole traders using free email
+  jurisdictions: Global
+  version: 1
+- id: BO-024
+  name: Directors or controllers cannot be reached or play no active role
+  definition: The named director or controlling shareholder cannot be located or contacted, or shows no
+    sign of actually running the company.
+  areas:
+  - BO
+  typology: Nominees
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: where the director or controlling shareholder(s) cannot be located or contacted
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: where the director or controlling shareholder(s) do not appear to have an active role in the
+      company
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - OCCRP reported Metastar employees saying the listed director was 'the boss only on paper'.
+  cases: []
+  data_needed:
+  - Directorship
+  - Person
+  - Address
+  - Document (interview notes, correspondence)
+  checkable: person
+  lookup_sources:
+  - Company registry
+  - Phone and address directories
+  - Direct contact attempts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Non-executive or passive investors
+  - Directors living abroad
+  - Privacy-conscious owners refusing journalists
+  jurisdictions: Global
+  version: 1
+- id: BO-025
+  name: Unexplained account signatories
+  definition: Someone who is not a listed owner signs for the company's bank account, or the company authorises
+    many signatories, with no explanation.
+  areas:
+  - BO
+  typology: Nominee bank signatory
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 185
+    quote: is a large or repeat transaction, and the executing customer is a signatory to the account,
+      but is not listed as having a controlling interest in the company or assets
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: have authorised numerous signatories without sufficient explanation or business justification
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 3
+    quote: 'Nominee Bank Signatory: A nominee appointed as the company fiduciary (such as a lawyer or
+      accountant) can open bank accounts in the name of the shell company.'
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples:
+  - OCCRP reported that a PR manager listed as bank signatory for LCM Alliance LLP was surprised to learn
+    of it.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Representation (agent, client, role)
+  - Ownership
+  - Person
+  checkable: records
+  lookup_sources:
+  - Bank mandates in the case file
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Finance managers and bookkeepers are normal signatories
+  - Large companies authorise many staff to sign
+  jurisdictions: Global
+  version: 1
+- id: BO-026
+  name: Professional intermediary used without need
+  definition: A lawyer, accountant or company-service provider stands between the real owner and every
+    dealing, even for simple banking, or several professionals handle the same transaction without reason.
+  areas:
+  - BO
+  typology: Professional enablers
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 3, p. 181
+    quote: insist on the use of an intermediary (either professional or informal) in all interactions
+      without sufficient justification
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 9, p. 184
+    quote: Simple banking relationships are established using professional intermediaries.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 184
+    quote: appear to engage multiple professionals in the same country to facilitate the same (or closely
+      related) aspects of a transaction without a clear reason for doing so.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Executive Summary (PDF p. 20)
+    quote: in cases where the ownership information was available, the corporate vehicle in question was
+      established or managed by a professional intermediary.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Annex E 4: relationships with ''foreign professional intermediaries in the absence of genuine business
+    transactions in the professional’s country of operation''.'
+  cases:
+  - name: Panama Papers trial (Mossack Fonseca)
+    year: '2024'
+    jurisdiction: Panama
+    what_happened: A Panamanian judge acquitted all 28 people tried over their alleged role in setting
+      up shell companies used in bribery and corruption scandals in Brazil and Germany, including Mossack
+      Fonseca's founders.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://www.icij.org/investigations/panama-papers/panama-papers-trial-concludes-with-all-defendants-absolved-of-money-laundering-charge/
+    source_title: ICIJ, Panama Papers trial concludes with all defendants acquitted of money laundering,
+      28 June 2024
+  data_needed:
+  - Representation (agent, client)
+  - Company
+  - Person
+  - Document (engagement letters, correspondence)
+  checkable: person
+  lookup_sources:
+  - Company registry (formation agent, registered agent)
+  - Leaked offshore records (e.g. ICIJ Offshore Leaks database)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Busy executives and non-resident owners commonly delegate to lawyers
+  - Specialist advice needed for cross-border deals
+  - Elderly or vulnerable clients using representatives
+  jurisdictions: Global
+  version: 1
+- id: BO-027
+  name: Payments to and from professional intermediaries without due cause
+  definition: Frequent payments go to foreign lawyers or service providers, or similar sums move back
+    and forth between a client and an intermediary, with no clear service behind them.
+  areas:
+  - BO
+  typology: Professional enablers
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 186
+    quote: involves the two-way transfer of funds between a client and a professional intermediary for
+      similar sums of money
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 183
+    quote: make frequent payments to foreign professional intermediaries
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, date, purpose)
+  - Representation
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bank records in the case file
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Client funds held in a lawyer's escrow or client account and returned
+  - Retainer payments and refunds
+  jurisdictions: Global
+  version: 1
+- id: BO-028
+  name: Bank accounts abroad or in many jurisdictions without reason
+  definition: The company banks in countries other than where it is registered, or uses many accounts
+    in several countries with no business need.
+  areas:
+  - BO
+  typology: Cross-border account layering
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 183
+    quote: operate using accounts opened in countries other than the country in which the company is registered
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 183
+    quote: are using bank accounts in multiple international jurisdictions without good reason
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The UK-registered Azerbaijani Laundromat companies held accounts at Danske Bank's Estonian branch
+    (OCCRP).
+  cases:
+  - name: Danske Bank (Estonia non-resident portfolio)
+    year: '2022'
+    jurisdiction: United States (S.D.N.Y.) / Estonia
+    what_happened: Danske Bank pleaded guilty to conspiracy to commit bank fraud over its Estonian branch's
+      non-resident customer business; DOJ said those customers used shell companies that obscured actual
+      ownership of the funds.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/danske-bank-pleads-guilty-fraud-us-banks-multi-billion-dollar-scheme-access-us-financial
+    source_title: US DOJ press release, 13 Dec 2022 (quotes read through a summarising fetcher)
+  data_needed:
+  - BankAccount (bankName, country)
+  - Company (jurisdiction)
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Bank records; correspondent banking data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Exporters and importers holding accounts in their trading partners' currencies
+  - Multinational operations
+  - Owner living in a different country from where the company is registered
+  jurisdictions: Global
+  version: 1
+- id: BO-029
+  name: Round-robin or loan-back transfers
+  definition: Money leaves and comes back to the same people or accounts with little loss, often dressed
+    up as invoices going out and 'loans' coming back.
+  areas:
+  - BO
+  typology: Loan-back / round-robin
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 186
+    quote: appears cyclical (outgoing and incoming transactions are similar in size and are sent to, and
+      received from, the same accounts, indicating that outgoing funds are being returned with little
+      loss) (aka “round-robin” transactions)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 18, p. 185
+    quote: The customer is both the ordering and beneficiary customer for multiple outgoing international
+      funds transfers
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership (main report)
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    locator: Para. 97, p. 43
+    quote: A common means of disguising the beneficial owner of wealth and assets is through the use of
+      false loans.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'FATF Case Study 5 (Australia): funds paid as false ''management and consultancy fees'' to New Zealand
+    companies and returned to the suspects as international ''loans'' (p. 71).'
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, payerAccount, beneficiaryAccount, amount, date)
+  - Debt (debtor, creditor, amount)
+  - BankAccount
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Bank records in the case file
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF describes loan-back schemes as reducing taxable income through fake expenses, then returning
+      the money as untaxed 'loans'.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  innocent_explanations:
+  - Intra-group cash pooling and repayments
+  - Refunds of overpayments
+  - Moving own money between own accounts in different banks
+  jurisdictions: Global
+  version: 1
+- id: BO-030
+  name: Loans from private, non-bank lenders without paperwork
+  definition: The company or person is financed by a lender who is not a bank, with no loan agreement,
+    collateral or regular interest payments.
+  areas:
+  - BO
+  typology: False loans
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 21, p. 185
+    quote: Loans are received from private third parties without any supporting loan agreements, collateral,
+      or regular interest repayments
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 20, p. 185
+    quote: Finance is provided by a lender, whether a natural or a legal person, other than a known credit
+      institution, with no logical explanation or commercial justification
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Debt (debtor, creditor, amount, date)
+  - Payment
+  - Document (loan agreement)
+  - Company
+  - Person
+  checkable: records
+  lookup_sources:
+  - Charges / mortgage registers
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family loans are often informal
+  - Shareholder loans to their own company
+  - Seller financing in small business sales
+  jurisdictions: Global
+  version: 1
+- id: BO-031
+  name: Dealings between companies with the same owners or directors, without business reason
+  definition: Two or more legal persons that share directors, shareholders or beneficial owners trade
+    with each other, license to each other, or sell assets at inflated prices, with no clear commercial
+    purpose.
+  areas:
+  - BO
+  - PP
+  typology: Related-party transactions
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 186
+    quote: involves two legal persons with similar or identical directors, shareholders, or beneficial
+      owners
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 7, p. 184
+    quote: inflated asset sales between entities controlled by the same beneficial owner
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 4
+    quote: Multiple high-value payments or transfers between shell companies with no apparent legitimate
+      business purpose.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples:
+  - Annex E 22 also lists 'licensing contracts between corporations owned by the same individual'.
+  cases: []
+  data_needed:
+  - Ownership
+  - Directorship
+  - Payment
+  - Contract
+  - ContractAward
+  - Company
+  checkable: records
+  lookup_sources:
+  - Company registry for both parties
+  levels:
+    faint: Companies that share an owner or a director pay each other. The records cannot show whether
+      there was a business reason; a person decides that.
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Apparently competing bidders that share owners or directors can indicate collusive or sham
+      bidding; Annex E flags transactions between legal persons with identical owners.
+    source_url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+  innocent_explanations:
+  - Normal intra-group trading and transfer pricing
+  - Licensing of brand or IP to group subsidiaries
+  - Family business groups
+  jurisdictions: Global
+  version: 2
+- id: BO-032
+  name: Apparently unrelated parties share an address, phone or email
+  definition: Companies or people that claim no connection use the same address, phone number, email or
+    registered agent.
+  areas:
+  - BO
+  typology: Hidden links
+  status: verified
+  sources:
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 4
+    quote: Transacting businesses share the same address, provide only a registered agent’s address, or
+      raise other address-related inconsistencies.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Red-flag findings
+    quote: 7,848 companies share a beneficial owner, officer or registered postcode with a company suspected
+      of having been involved in money laundering
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 19, p. 185
+    quote: The connections between the parties are questionable, or generate doubts that cannot be sufficiently
+      explained by the client
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'OCCRP: Hilux Services LP and Polux Management LP were registered on the same Glasgow street and listed
+    the same Baku street address in bank records.'
+  cases: []
+  data_needed:
+  - Address
+  - Email
+  - LegalEntity (phone, email, website)
+  - Company
+  - Person
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Company registry
+  - Bank KYC records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shared formation agent or accountant
+  - Same office building
+  - Family-run businesses
+  jurisdictions: Global
+  version: 1
+- id: BO-033
+  name: Payments with no stated purpose, or false or mismatched invoices
+  definition: Payments carry no description or only an invoice number, or invoices are false, duplicated
+    across countries, or do not match purchases and sales.
+  areas:
+  - BO
+  typology: False invoicing
+  status: verified
+  sources:
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 4
+    quote: Payments have no stated purpose, do not reference goods or services, or identify only a contract
+      or invoice number.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 7, p. 184
+    quote: false invoices created for services not carried out
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 7, p. 184
+    quote: double invoicing between jurisdictions
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'FATF Case Study 5: payments falsely described as ''management and consultancy fees'' with no evidence
+    any work was done.'
+  cases: []
+  data_needed:
+  - Payment (purpose, amount, date)
+  - Document (invoices)
+  - Contract
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Annex E lists double invoicing between jurisdictions and purchase/sales invoice discrepancies,
+      classic trade-based laundering techniques.
+    source_url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+  innocent_explanations:
+  - Incomplete bank references or poor bookkeeping
+  - Invoice numbers are the normal reference in many payment systems
+  - Records not yet reviewed
+  jurisdictions: Global
+  version: 1
+- id: BO-034
+  name: Business account used for personal spending or anomalous cash
+  definition: A company account pays for the owner's personal assets or leisure, or moves large amounts
+    of cash out of line with the company's profile.
+  areas:
+  - BO
+  typology: Commingling
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 185
+    quote: is executed from a business account but appears to fund personal purchases, including the purchase
+      of assets or recreational activities that are inconsistent with the company’s profile
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 185
+    quote: is executed from a business account and involves a large sum of cash, either as a deposit or
+      withdrawal, which is anomalous, or inconsistent with the company’s profile
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Filing obligations for reports of transactions in currency
+    publisher: FinCEN, US Treasury (eCFR, 31 CFR 1010.311)
+    year: '2026'
+    url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    locator: 31 CFR 1010.311
+    quote: which involves a transaction in currency of more than $10,000
+    quote_verified: true
+    licence: US federal government work, public domain
+    checked: '2026-10-10'
+  examples: []
+  cases:
+  - name: Teodorin Nguema Obiang Mangue (biens mal acquis)
+    year: '2021'
+    jurisdiction: France
+    what_happened: France's Cour de cassation upheld convictions for embezzling and laundering public
+      funds; Human Rights Watch reports he bought a Paris mansion, cars, art and other luxury goods through
+      a network of companies.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.hrw.org/news/2021/07/28/france-equatorial-guinea-vice-presidents-conviction-upheld
+    source_title: 'Human Rights Watch, France: Equatorial Guinea Vice President''s Conviction Upheld,
+      28 July 2021'
+  data_needed:
+  - Payment (payer, beneficiary, purpose)
+  - BankAccount
+  - Company
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: A business account pays for the owner's personal assets or leisure, or shows cash use that
+      does not fit the company (no published number for this level)
+    strong: Repeated cash deposits or withdrawals from the business account that do not fit its profile,
+      including amounts kept just under $10,000
+    textbook: A business-account cash deposit or withdrawal of more than $10,000 that does not fit the
+      company's profile (the US currency transaction reporting level)
+    threshold_source: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-C/section-1010.311
+    threshold_note: US only. $10,000 is the FinCEN currency transaction report threshold for any cash
+      transaction. It is a reporting line, not a sign of guilt on its own. The anomaly is judged against
+      the company's profile. The personal-spending part of this indicator has no published number. The
+      FATF/Egmont annex gives no figure.
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Owner-managers drawing dividends or director's loans
+  - Legitimate cash-intensive businesses
+  - Expenses later reimbursed
+  jurisdictions: Global
+  version: 2
+- id: BO-035
+  name: Property or assets moved into a company off-market, or cash-bought then pledged
+  definition: Real estate is sold privately from a person to a company, or an asset bought in cash is
+    quickly used as loan collateral, or loans are paid down with large cash sums or settled early at a
+    loss.
+  areas:
+  - BO
+  typology: Real estate and asset concealment
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 186
+    quote: involves the transfer of real property from a natural to a legal person in an off-market sale
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 24, p. 186
+    quote: An asset is purchased with cash and then used as collateral for a loan within a short period
+      of time.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 186
+    quote: a loan or mortgage is paid off ahead of schedule, incurring a loss
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'FATF Case Study 105: OFAC designated shell companies tied to a straw man that were used to hold real
+    estate (p. 170).'
+  cases: []
+  data_needed:
+  - RealEstate
+  - Ownership (startDate)
+  - Payment
+  - Debt
+  - Document (deeds, land registry entries)
+  checkable: lookups
+  lookup_sources:
+  - Land registry
+  - Mortgage / charges registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FinCEN notes real estate can 'clean' large sums in a single transaction and is used by corrupt
+      officials and drug traffickers to hide illicit funds.
+    source_url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  innocent_explanations:
+  - Owners moving property into their own company for tax or liability reasons
+  - Early mortgage repayment from a bonus or inheritance
+  jurisdictions: Global
+  version: 1
+- id: BO-036
+  name: Funds to or from unconnected, low-tax or high-risk countries
+  definition: Money is sent to or received from countries the client has no apparent link to, or from
+    low-tax or high money-laundering-risk jurisdictions.
+  areas:
+  - BO
+  typology: Offshore flows
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 23, p. 186
+    quote: are sent to, or received from, a foreign country when there is no apparent connection between
+      the country and the client
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 182
+    quote: regularly send money to low-tax jurisdictions or international trade or finance centre
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 4
+    quote: Frequent involvement of beneficiaries located in high-risk, offshore financial centers.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment (payerAccount, beneficiaryAccount)
+  - BankAccount (country)
+  - Company (jurisdiction)
+  checkable: lookups
+  lookup_sources:
+  - FATF high-risk jurisdiction lists
+  - Tax Justice Network Financial Secrecy Index
+  - EU list of non-cooperative tax jurisdictions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - International trade and supply chains
+  - Investment funds domiciled in financial centres
+  - Diaspora remittances
+  jurisdictions: Global
+  version: 1
+- id: BO-037
+  name: Concentrated or scattered payment patterns
+  definition: Many transactions go to a few recipients, a few large ones go to a few recipients, or one
+    company pays an unusually large and varied set of beneficiaries.
+  areas:
+  - BO
+  typology: Shell company transaction patterns
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 4, p. 183
+    quote: conduct a large number of transactions with a small number of recipients
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 4
+    quote: An unusually large number and variety of beneficiaries receive wire transfers from one company.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples:
+  - Annex E 4 also lists 'a small number of high-value transactions with a small number of recipients'.
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, date)
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Payroll or supplier runs
+  - Businesses with one main customer or supplier
+  - Payment agents and marketplaces
+  jurisdictions: Global
+  version: 1
+- id: BO-038
+  name: Politically exposed person, or their family or associate, behind the company
+  definition: An owner, director or controller is a senior public official, or a relative or close associate
+    of one.
+  areas:
+  - BO
+  - CO
+  typology: PEP concealment
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 3, p. 181
+    quote: are politically exposed persons, or have familial or professional associations with a person
+      who is politically exposed
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Human Rights Abuses Enabled by Corrupt Senior Foreign Political Figures and their
+      Financial Facilitators (FIN-2018-A003)
+    publisher: FinCEN, US Treasury
+    year: '2018'
+    url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+    locator: p. 4, 'Use of Shell Companies'
+    quote: PEP facilitators commonly use shell companies to obfuscate ownership and mask the true source
+      of the proceeds of corruption.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Red-flag findings
+    quote: 390 companies have company officers or beneficial owners who are politicians elected to national
+      legislatures, either in the UK or in another country
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases:
+  - name: Teodorin Nguema Obiang Mangue (biens mal acquis)
+    year: '2021'
+    jurisdiction: France
+    what_happened: The vice president of Equatorial Guinea and son of its president; France's Cour de
+      cassation upheld convictions for embezzling and laundering public funds, including luxury purchases
+      made through a network of companies.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.hrw.org/news/2021/07/28/france-equatorial-guinea-vice-presidents-conviction-upheld
+    source_title: Human Rights Watch, 28 July 2021
+  - name: FATF Case Study 105 (United States, anonymised)
+    year: '2018'
+    jurisdiction: United States
+    what_happened: OFAC designated a foreign PEP under the Foreign Narcotics Kingpin Designation Act,
+      a straw man acting for the PEP, and shell companies tied to the straw man that held real estate.
+      A designation is an administrative determination, not a criminal conviction.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    source_title: Concealment of Beneficial Ownership (FATF/Egmont), Case Study 105, p. 170
+  data_needed:
+  - Person (position, topics)
+  - Family
+  - Associate
+  - Ownership
+  - Directorship
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - PEP databases (OpenSanctions PEPs, Wikidata, EveryPolitician)
+  - Asset and interest declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: FinCEN says PEP facilitators commonly use shell companies to hide the proceeds of corruption.
+    source_url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  - target_area: OC
+    reason: In FATF Case Study 105 a PEP designated for narcotics trafficking held real estate through
+      a straw man's shell companies.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  innocent_explanations:
+  - FinCEN reminds that the bulk of PEPs are dedicated public servants
+  - Politicians may hold legitimate pre-office businesses
+  - Relatives run their own independent businesses
+  jurisdictions: Global
+  version: 1
+- id: BO-039
+  name: Owner or director with a criminal, disqualification or sanctions history
+  definition: A person behind the company was previously convicted of fraud or serious crime, banned from
+    being a director, or is a designated (sanctioned) person.
+  areas:
+  - BO
+  typology: Prohibited persons using fronts
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 3, p. 181
+    quote: have previously been prohibited from holding a directorship role in a company or operating
+      a Trust and company service provider (TCSP)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 184
+    quote: are designated persons or groups
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Companies We Keep
+    publisher: Global Witness
+    year: '2018'
+    url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+    locator: Red-flag findings
+    quote: 345 companies have a beneficial owner who is a disqualified director
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Annex E 3 also lists persons who 'have previously been convicted for fraud, tax evasion, or serious
+    crimes'.
+  cases: []
+  data_needed:
+  - Person
+  - Sanction (entity, authority, program)
+  - Directorship
+  - Ownership
+  - Document (court records)
+  checkable: lookups
+  lookup_sources:
+  - Sanctions lists (OFAC SDN, UN, EU, UK; OpenSanctions)
+  - Director disqualification registers
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (for sanctions: an exact identity match to a designated
+      person)'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF reports crime groups recruiting informal nominees to set up front companies to get round
+      due diligence, money-laundering controls or sanctions.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  innocent_explanations:
+  - Name collisions with designated or convicted persons
+  - Rehabilitated offenders running lawful businesses after a ban has expired
+  jurisdictions: Global
+  version: 1
+- id: BO-040
+  name: Unexplained power of attorney, representative office, numbered account or digital wallet
+  definition: Control is exercised through a power of attorney or delegation that is not explained, or
+    money moves via a numbered account or digital wallet that hides the holder.
+  areas:
+  - BO
+  typology: Delegated control
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 25, p. 187
+    quote: Unexplained use of powers of attorney or other delegation processes (for example, the use of
+      representative offices).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 186
+    quote: is transacted via a digital wallet.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Annex E 22 also lists a transaction that 'involves a numbered account'.
+  cases: []
+  data_needed:
+  - Representation (agent, client, role)
+  - Document (power of attorney)
+  - BankAccount
+  - CryptoWallet
+  checkable: person
+  lookup_sources:
+  - Notarial records where accessible
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Powers of attorney for elderly, ill or travelling owners
+  - Representative offices are a normal market-entry step
+  - Digital wallets used for ordinary crypto trading
+  jurisdictions: Global
+  version: 1
+- id: BO-041
+  name: Fabricated or contradictory ownership records
+  definition: Ownership records, corporate papers or supporting documents are forged, contradictory, or
+    inconsistent across filings.
+  areas:
+  - BO
+  typology: False documentation
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 7, p. 184
+    quote: fabricated corporate ownership records
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 184
+    quote: provide falsified records or counterfeit documentation
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Exploring UK companies' legal ownership chains ... Part 1
+    publisher: Tax Justice Network
+    year: '2020'
+    url: https://taxjustice.net/2020/07/06/exploring-uk-companies-legal-ownership-chains-to-detect-red-flags-and-verify-beneficial-ownership-information/
+    locator: Summary paragraph
+    quote: We checked the records of one of these 23-layered companies in Companies House and found that
+      they have declared wrong information (entities as beneficial owners) and even contradictory information
+      on the addresses and shareholders (when comparing information available on the accounts, annual
+      returns and other registered data).
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases:
+  - name: United States v. Richard Gaffey (Panama Papers investigation)
+    year: '2020'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: Sentenced to 39 months for wire fraud, tax fraud, money laundering and other charges;
+      DOJ said he falsely named a client's elderly mother as sole beneficial owner of shell companies.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/us-accountant-panama-papers-investigation-sentenced-prison
+    source_title: US DOJ press release, 24 Sept 2020 (quotes read through a summarising fetcher)
+  data_needed:
+  - Document
+  - Ownership
+  - Company
+  - Person
+  checkable: person
+  lookup_sources:
+  - Company registry filing history (compare filings over time)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clerical errors and late updates to registers
+  - Different filings legitimately reflect different dates
+  jurisdictions: Global
+  version: 1
+- id: BO-042
+  name: 'Client behaviour at formation: wants complexity, secrecy or speed without reason'
+  definition: The person setting up companies asks for complex or foreign structures, aggressive tax schemes
+    or short-cuts, yet seems uninterested in or ignorant of the structure they are creating.
+  areas:
+  - BO
+  typology: Client behaviour
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 184
+    quote: request the formation of complex company structures without sufficient business rationale
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 183
+    quote: are interested in foreign company formation, particularly in jurisdictions known to offer low-tax
+      or secrecy incentives, without sufficient commercial explanation
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 6, p. 183
+    quote: appear uninterested in the structure of a company they are establishing
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Annex E 6 also lists clients who 'ask for short-cuts or excessively quick transactions' and who 'appear
+    focused on aggressive tax minimisation strategies'.
+  cases: []
+  data_needed:
+  - Document (correspondence, engagement records)
+  - Representation
+  - Person
+  checkable: person
+  lookup_sources:
+  - Leaked service-provider records
+  - Interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clients relying fully on professional advice
+  - Genuine urgency for a deal
+  - Lawful tax planning
+  jurisdictions: Global
+  version: 1
+- id: BO-043
+  name: Reluctance to identify the beneficial owner or source of funds
+  definition: The client will not, or cannot, explain who really owns the company, where the money comes
+    from, or who they deal with.
+  areas:
+  - BO
+  typology: Client behaviour
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 1, p. 181
+    quote: The client is reluctant to provide personal information.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Potential Money Laundering Risks Related to Shell Companies (FIN-2006-G014)
+    publisher: FinCEN, US Treasury
+    year: '2006'
+    url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+    locator: p. 3
+    quote: An inability to obtain – whether through the Internet, commercial database searches, or direct
+      inquiries to the foreign correspondent bank whose customer is the originator or the beneficiary
+      of the transfer – information necessary to identify originators or beneficiaries of wire transfers.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-09'
+  examples:
+  - Annex E 2 lists reluctance or inability to explain 'the identity of the beneficial owner' and 'their
+    source of wealth/funds'.
+  cases: []
+  data_needed:
+  - Document (correspondence, interview notes)
+  - Person
+  - Company
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate privacy concerns, e.g. risk of kidnapping or harassment
+  - Confidentiality obligations to third parties
+  - People declining to speak to journalists
+  jurisdictions: Global
+  version: 1
+- id: BO-044
+  name: Wealth or activity out of line with the person's or company's profile
+  definition: Declared income does not match assets or lifestyle, transactions do not fit the customer
+    or company profile, or activity seems strange for someone of that age.
+  areas:
+  - BO
+  typology: Profile mismatch
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 3, p. 182
+    quote: have declared income which is inconsistent with their assets, transactions, or lifestyle.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 3, p. 181
+    quote: are conducting transactions which appear strange given an individual’s age (this is particularly
+      relevant for underage customers)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Using Beneficial Ownership Data for Systematic Risk Assessment in Public Procurement
+    publisher: European Journal on Criminal Policy and Research (Tello Arista, Fazekas, Volkotrub)
+    year: '2026'
+    url: https://link.springer.com/article/10.1007/s10610-025-09654-9
+    locator: Results, outlier BO age (read through a summarising fetcher; verify wording)
+    quote: 'We saw such relationships in all the countries where we have the necessary data: Latvia, Slovakia,
+      and the UK.'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Proceeds of Crime Act 2002, section 362B: Requirements for making of unexplained wealth order'
+    publisher: UK Parliament (legislation.gov.uk)
+    year: '2026'
+    url: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+    locator: Section 362B(2)(b); income test at 362B(3)(a)
+    quote: (2) The High Court must be satisfied that there is reasonable cause to believe that— (a) the
+      respondent holds the property, and (b) the value of the property is greater than £50,000.
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-10'
+  examples:
+  - 'Gaffey case: an elderly mother falsely named as owner of offshore shell companies (DOJ, 2020).'
+  cases: []
+  data_needed:
+  - Person (birthDate)
+  - Ownership
+  - Payment
+  - Company (sector)
+  checkable: lookups
+  lookup_sources:
+  - Company registry (owner birth dates)
+  - Asset and income declarations
+  - Property records
+  levels:
+    faint: Declared income does not appear to explain the assets, spending or activity seen (no published
+      number for this level)
+    strong: A person holds property worth more than £50,000 that their known lawful income would not have
+      been enough to buy
+    textbook: 'Meets the UK unexplained wealth order test as worded: property worth more than £50,000,
+      with reasonable grounds to suspect that known lawful income would have been insufficient to obtain
+      it (the respondent must also be a PEP or linked to serious crime)'
+    threshold_source: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+    threshold_note: UK (England and Wales, and Northern Ireland; Scotland has a parallel provision). It
+      is a court-order threshold, not an FIU red flag. The cited FATF/Egmont annex and the Tello Arista/Fazekas
+      study give no number. The 'strange for their age' part has no published figure.
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Inherited wealth
+  - Minors holding shares through family estate planning
+  - Elderly founders who still own their companies
+  jurisdictions: Global
+  version: 2
+- id: BO-045
+  name: 'Front company: real business mixing in outside money'
+  definition: A working business, often cash-heavy like a restaurant or salon, reports income or 'sales'
+    larger than its real trade supports, so illicit money passes as business revenue.
+  areas:
+  - BO
+  typology: Front companies
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership (main report)
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    locator: Para. 68, p. 30
+    quote: Front companies can be exploited to launder the proceeds of crime through the integration of
+      illegitimate funds with legitimate income, often by disguising the illegitimate funds as cash sales
+      made during the course of business.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership (main report)
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+    locator: Para. 69, p. 31
+    quote: Over a quarter of the case studies submitted in support of this report involved the use of
+      front companies.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'FATF Case Study 2 (Australia): a transport company used as a front to disguise proceeds of crime
+    as employee salary payments.'
+  cases: []
+  data_needed:
+  - Company (sector)
+  - Payment
+  - Document (accounts, tax returns)
+  - Employment
+  checkable: person
+  lookup_sources:
+  - Filed accounts
+  - Industry benchmarks for turnover per site
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF reports informal nominees being recruited to set up front companies to get round due
+      diligence, money-laundering controls or sanctions.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  - target_area: OC
+    reason: FATF names cash-handling service businesses as the most common form of front company used
+      to launder criminal proceeds.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  innocent_explanations:
+  - Successful businesses with unusually high sales
+  - Seasonal or event-driven cash peaks
+  jurisdictions: Global
+  version: 1
+- id: BO-046
+  name: Contracts or transactions with terms that make no business sense
+  definition: Agreements between the parties contain terms no normal business would accept, or involve
+    family members, without a legitimate reason.
+  areas:
+  - BO
+  typology: Sham contracts
+  status: verified
+  sources:
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 186
+    quote: includes contractual agreements with terms that do not make business sense for the parties
+      involved
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Concealment of Beneficial Ownership, Annex E
+    publisher: FATF and Egmont Group
+    year: '2018'
+    url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+    locator: Annex E, indicator 22, p. 185
+    quote: is a business transaction that involves family members of one or more of the parties without
+      a legitimate business rationale
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Annex E 22 also lists clauses 'allowing for parties to be shielded from liability but make the majority
+    of profits at the beginning of the deal'.
+  cases: []
+  data_needed:
+  - Contract
+  - Document
+  - Family
+  - Company
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Unusual terms negotiated for genuine commercial reasons
+  - Family businesses dealing with relatives
+  jurisdictions: Global
+  version: 1
+- id: BO-047
+  name: 'Corporate director or corporate general partner: a company, not a person, sits in the management
+    seat'
+  definition: The director, or the managing (general) partner, of the entity is itself another company,
+    so the register names no human being in charge.
+  areas:
+  - BO
+  typology: Layering of corporate vehicles (legal fiction)
+  status: verified
+  sources:
+  - title: 'The Puppet Masters: How the Corrupt Use Legal Structures to Hide Stolen Assets and What to
+      Do About It'
+    publisher: World Bank / UNODC Stolen Asset Recovery Initiative (StAR)
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.5, p. 51
+    quote: This type of tiered approach appeared most commonly in our grand corruption database in situations
+      in which legal entities were listed as (a) the legal shareholders or (b) the directors of companies
+      or (c) both.
+    quote_verified: true
+    licence: (c) IBRD/World Bank 2011, all rights reserved; short quotation
+    checked: '2026-10-09'
+  - title: 'Offshore in the UK: Analysing the use of Scottish Limited Partnerships in corruption and money
+      laundering'
+    publisher: Transparency International UK (with Bellingcat)
+    year: '2017'
+    url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    locator: Section 3, 'No natural persons required', p. 9
+    quote: Section 155 of the Companies Act 2006, commenced in October 2008, required that all UK private
+      and limited companies must have at least one director that is a natural person.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Citibank appointed three Panamanian shelf companies as the board of directors of Trocca Ltd., the
+    company holding Raul Salinas's assets (StAR box 3.3).
+  - Two Belize companies, Advance Developments Limited and Corporate Solutions Limited, were appointed
+    directors or partners of 351 UK companies and LLPs between 2004 and 2016 (TI-UK 2017, p. 14).
+  cases:
+  - name: Raul Salinas / Trocca Ltd. (Citibank private banking)
+    year: '1998'
+    jurisdiction: United States / Mexico
+    what_happened: A U.S. GAO report and Senate PSI hearings described how Citibank set up Trocca Ltd.
+      for Salinas and named three Panamanian shelf companies as its directors and a Cayman shelf company
+      as a principal shareholder, so no document identified Salinas as beneficial owner.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    source_title: The Puppet Masters, box 3.3 (citing GAO/OSI-99-1, October 1998)
+  data_needed:
+  - Company (name, jurisdiction, registrationNumber, legalForm)
+  - LegalEntity
+  - Directorship (director, organization, role, startDate, endDate)
+  - Ownership (owner, asset)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registry (officer and partner lists)
+  - OpenCorporates or similar aggregated registry data
+  - Registry of the corporate director's own jurisdiction
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Group subsidiaries are often managed by the parent company or a group service company.
+  - Investment funds commonly use a corporate general partner.
+  - StAR notes that government-owned structures, family businesses and listed groups use companies as
+    owners and controllers with no real secrecy risk (p. 54).
+  - Corporate directors are lawful in many jurisdictions.
+  jurisdictions: Global; UK requires at least one natural-person director for companies since October
+    2008 (Companies Act 2006 s.155); StAR found 12 of 40 reviewed jurisdictions prohibit corporate directors
+    outright.
+  version: 1
+- id: BO-048
+  name: 'Shadow director: someone outside the formal roles gives the instructions the directors follow'
+  definition: A person who holds no recorded position directs the company in practice, and the named directors
+    habitually act on that person's instructions.
+  areas:
+  - BO
+  typology: Surrogates and informal control
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, footnote 53, p. 59 (quoting Companies (Guernsey) Law 2008, s.132)
+    quote: '''shadow director'', in relation to a company, means a person in accordance with whose directions
+      or instructions the directors of the company are accustomed to act.'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Executive summary, Issue 1, p. 3
+    quote: In cases in which a director is acting as a nominee for another person, that fact should be
+      noted in the registry, along with the name of that “shadow director.”
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Emails show the named director forwarding every decision to an outside person for approval before
+    signing.
+  - A nominee director from a service provider signs documents prepared and sent by someone with no position
+    in the company.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Directorship (director, organization)
+  - Email (sender, recipients, date)
+  - Document
+  - Representation (agent, client)
+  - UnknownLink
+  checkable: person
+  lookup_sources:
+  - Company registry (to confirm the person holds no recorded role)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - 'Directors acting on professional advice: the Guernsey law quoted by StAR says a person is not a shadow
+    director only because the directors follow advice given in a professional capacity.'
+  - A parent company or major investor gives guidance through normal governance channels.
+  - A founder or family elder is consulted informally.
+  jurisdictions: Defined in law in Guernsey and the UK; the concept is recognised in many common-law jurisdictions.
+  version: 1
+- id: BO-049
+  name: The person paying for the company holds only a minor title, or none
+  definition: The person who funds or is said to own the company appears in its records only in a junior
+    role (for example assistant treasurer or account signatory), while others fill the senior posts.
+  areas:
+  - BO
+  typology: Concealment of the corrupt party within the vehicle's structure
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 2, section 2.4, p. 27
+    quote: This authority can be justified to the bank by deceptively listing the corrupt party as a low-level
+      financial employee (see box 2.2).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 2.2, 'Basic Attempt at a Concealment', p. 27
+    quote: Obiang is listed as “assistant treasurer,” but in a letter by his legal counsel to the Senate
+      subcommittee, Nagler conveyed that it was his understanding that Obiang “was the sole owner” of
+      the corporation and was the “sole source of funding for the corporation.”
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The company's money all comes from one person who is listed only as a signatory or junior officer.
+  - An assistant or partner of a public official is named chief executive of a company the official funds.
+  cases:
+  - name: Teodoro Nguema Obiang Mangue / Sweet Pink Inc.
+    year: '2010'
+    jurisdiction: United States
+    what_happened: A U.S. Senate Permanent Subcommittee on Investigations report found that a California
+      company set up by lawyer George Nagler listed Obiang's assistant as CEO, secretary and CFO and Obiang
+      only as assistant treasurer, although Obiang was understood to be its sole owner and funder.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    source_title: The Puppet Masters, box 2.2 (citing U.S. Senate PSI report 'Keeping Foreign Corruption
+      Out of the United States', Feb 2010)
+  data_needed:
+  - Person
+  - Company
+  - Directorship (role)
+  - Employment (role)
+  - Payment (payer, beneficiary, amount)
+  - BankAccount
+  - Representation
+  checkable: records
+  lookup_sources:
+  - Company registry statements of information
+  - Bank account opening records (if obtained)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: In StAR's case the hidden funder was the son of a head of state; a minor title can hide a
+      PEP's control.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - Owners often hand day-to-day management to professional managers.
+  - An investor may fund a company without wanting an executive role.
+  - Titles in small family firms are often informal.
+  jurisdictions: Global
+  version: 1
+- id: BO-050
+  name: Settlor or hidden funder keeps control of the trust (protector, co-trustee or 'economic settlor')
+  definition: The person who set up or paid into a trust keeps the power to steer it, for example as co-trustee
+    or protector able to veto or replace trustees, or funds it without being named in any trust document.
+  areas:
+  - BO
+  typology: Misuse of trusts
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.2, p. 44
+    quote: These modifications make it possible for a settlor not only to be listed as a beneficiary,
+      but also to maintain control over the trust by serving as a co-trustee or protector, with the power
+      to veto trustee decisions or even to replace them.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.2, p. 44
+    quote: The modifications also make it possible for a trust to be created by a settlor but funded by
+      some other party (the “economic settlor”), whose name need not appear on any documents pertaining
+      to the trust.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The trust deed names the settlor as protector with power to remove trustees.
+  - Money flowing into a trust comes from someone who appears nowhere in the deed.
+  cases: []
+  data_needed:
+  - LegalEntity or Organization (the trust; FtM has no dedicated Trust schema, so use legalForm)
+  - Person
+  - Representation (protector or trustee role)
+  - Ownership
+  - Payment (payer into the trust)
+  - Document (trust deed, letter of wishes)
+  checkable: person
+  lookup_sources:
+  - Trust registers where they exist (e.g. EU beneficial-ownership registers for trusts)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Protectors are widely used in legitimate family estate planning; StAR's figure 3.1 shows a lawful
+    structure with a protector committee.
+  - Relatives or employers may fund trusts for family members.
+  - Some jurisdictions allow settlor-retained powers by statute.
+  jurisdictions: StAR found only two of 40 reviewed jurisdictions restrict a settlor's powers in trust
+    administration by statute.
+  version: 1
+- id: BO-051
+  name: Trust contains a 'flee clause' or protector resettlement clause
+  definition: The trust deed requires or lets the trustee or protector move the trust and its assets to
+    another jurisdiction when it is sued or investigated.
+  areas:
+  - BO
+  typology: Misuse of trusts / asset protection against recovery
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Appendix C, trusts, pp. 169-170
+    quote: 'To guard against such possibilities, many trusts were created with specific flee clauses:
+      In the event of litigation against the trust or trustee (typically on behalf of a creditor), a trustee
+      is required to transfer those assets to another jurisdiction.'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Appendix C, trusts, p. 170
+    quote: In many cases, flee clauses have been replaced with Protector Resettlement Clauses, which give
+      the protector power to move assets in a manner that can be implemented more easily and quickly,
+      and may make it easier to defeat Mareva actions.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A trust moved from one island jurisdiction to another shortly after a creditor or prosecutor began
+    action.
+  - The deed lets the protector change governing law and trustee 'upon any threat to the trust fund'.
+  cases: []
+  data_needed:
+  - LegalEntity or Organization (the trust; jurisdiction, with dates)
+  - Document (trust deed)
+  - Representation (trustee, protector)
+  - Person
+  checkable: person
+  lookup_sources:
+  - Court records showing litigation or freezing orders against the trust
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: StAR describes these clauses as built to defeat creditor and court actions, which also defeats
+      confiscation of criminal proceeds.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - Asset-protection planning is lawful in many jurisdictions.
+  - Families in politically unstable countries use migration clauses to guard against expropriation or
+    war.
+  - Standard templates from some providers include such clauses by default.
+  jurisdictions: Offshore trust jurisdictions; StAR names Anguilla, Bermuda, Guernsey and Nevis among
+    laws that make foreign creditors' claims hard to enforce (p. 44, fn. 37).
+  version: 1
+- id: BO-052
+  name: Structure spread across several countries, away from the owner's home country
+  definition: The chain of companies, trusts and accounts is deliberately placed in several jurisdictions,
+    so no single authority can compel all the evidence.
+  areas:
+  - BO
+  typology: Layering of corporate vehicles across jurisdictions ('chaining')
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.5, p. 51
+    quote: Investigations are particularly complicated when such layers are placed strategically in multiple
+      jurisdictions, because no investigating authority will have the legal compulsory power to procure
+      evidence from all parties involved.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.5, p. 52
+    quote: A little more than one-third of the cases we reviewed involved officials using corporate vehicles
+      established under the laws of their primary place of residence.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Consultation Paper on draft RTS under Article 28(1) of Regulation (EU) 2024/1624 (customer
+      due diligence)
+    publisher: EU Anti-Money Laundering Authority (AMLA)
+    year: '2026'
+    url: https://www.amla.europa.eu/document/download/3d430294-5171-455c-b565-a86fc5f3cb1c_en?filename=Consultation%20Paper%20Draft%20RTS%20under%20Article%2028%281%29.pdf
+    locator: Draft RTS Article 12(1), page 17
+    quote: obliged entities shall treat an ownership and control structure as a complex corporate structure
+      where there are three or more layers between the customer and the beneficial owner and, in addition,
+      more than one of the following conditions is met
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-10'
+  examples:
+  - A company in Country B is owned by companies in Countries C and D, which are owned by a trust in Country
+    E (StAR's own illustration, p. 51).
+  - Lazarenko's associates formed vehicles and held proceeds in twelve jurisdictions (StAR p. 52).
+  cases:
+  - name: Pavel Lazarenko (former Prime Minister of Ukraine)
+    year: '2009'
+    jurisdiction: United States (also Switzerland, Ukraine)
+    what_happened: StAR records that twelve jurisdictions were implicated, criminal charges were filed
+      in Ukraine, and criminal convictions were obtained in Switzerland and the United States; the U.S.
+      conviction for money laundering and conspiracy was reviewed in US v. Lazarenko, 564 F.3d 1026 (9th
+      Cir. 2009).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    source_title: The Puppet Masters, section 3.2.5 and box 3.5
+  data_needed:
+  - Company (jurisdiction)
+  - LegalEntity
+  - Ownership (owner, asset, percentage)
+  - Directorship
+  - BankAccount (country)
+  - Address (country)
+  checkable: lookups
+  lookup_sources:
+  - Company registries in each jurisdiction
+  - OpenCorporates
+  - Leak databases (e.g. ICIJ Offshore Leaks)
+  levels:
+    faint: The ownership chain passes through entities in a country other than the owner's home country
+      (no published number for this level)
+    strong: Three or more layers sit between the company and its beneficial owner, and some of them are
+      registered outside the owner's home region
+    textbook: 'Meets the AMLA draft test for a ''complex corporate structure'' as worded: three or more
+      layers between customer and beneficial owner, plus more than one extra condition (for example, entities
+      registered outside the EU, a trust or foundation in a layer, or nominees)'
+    threshold_source: https://www.amla.europa.eu/document/download/3d430294-5171-455c-b565-a86fc5f3cb1c_en?filename=Consultation%20Paper%20Draft%20RTS%20under%20Article%2028%281%29.pdf
+    threshold_note: 'EU, and a draft: the AMLA consultation paper of 9 February 2026 under AMLR Article
+      28(1), which may change before adoption. The test counts layers, not jurisdictions. Being outside
+      the EU is one of the conditions, and it sets no number of jurisdictions. Benchmark from the cited
+      StAR Puppet Masters study: ''A little more than one-third of the cases we reviewed involved officials
+      using corporate vehicles established under the laws of their primary place of residence'', so roughly
+      two-thirds used foreign vehicles.'
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Splitting a structure across jurisdictions is the layering step of laundering; Lazarenko was
+      convicted of money laundering.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - Multinational groups operate in many countries for real business reasons.
+  - Joint ventures often sit in a neutral third jurisdiction (StAR p. 35).
+  - Investment funds and family offices use cross-border structures for tax treaty and regulatory reasons.
+  jurisdictions: Global
+  version: 2
+- id: BO-053
+  name: Company bought through a chain of service providers, or a bank picked for accepting opaque companies
+  definition: The company was formed by one service provider (a 'wholesaler') and sold on through another
+    (a 'retailer'), or the bank was chosen because it accepts bearer-share or similar opaque companies.
+  areas:
+  - BO
+  typology: Misuse of trust and company service providers (TCSPs)
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 4.5, 'Establishing a Legal Entity Involving More Than One TCSP', p. 85
+    quote: It was supplied by a Singaporean service provider (the retailer), but it had been formed for
+      this Singaporean service provider by another service provider (the wholesaler).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 4.5, p. 85
+    quote: The accompanying bank account for Gruppo 20 was in Cyprus, picked on the advice of the first
+      service provider because of this bank’s willingness to accept bearer share companies.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.1, p. 37
+    quote: Service providers may hold a stock of shelf companies, purchased in bulk from a company wholesaler.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A Seychelles company with a nominee director and bearer shares, sold by a Singapore agent, formed
+    by a different agent, and banked in Cyprus (StAR mystery-shopping test, box 4.5).
+  cases: []
+  data_needed:
+  - Company
+  - Representation (agent = service provider, client)
+  - Document (formation and transfer papers)
+  - BankAccount (bank, country)
+  - Address
+  checkable: person
+  lookup_sources:
+  - Company registry (registered agent field)
+  - TCSP licensing registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many offshore jurisdictions require a locally licensed registered agent, so foreign advisers routinely
+    work through one.
+  - White-label company formation is a normal industry model.
+  - Clients often ask advisers to recommend banks.
+  jurisdictions: Global
+  version: 1
+- id: BO-054
+  name: Counterparty company does not exist in any registry
+  definition: A company named on a contract, invoice or payment cannot be found in the registry of the
+    jurisdiction where it claims to be incorporated, or in any registry.
+  areas:
+  - BO
+  typology: Fictitious entities
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.4, p. 49
+    quote: Still others proved to be blatant falsehoods even at the most cursory of checks (for example,
+      several cases involved nonexistent companies that were purportedly incorporated in some jurisdiction
+      but that did not appear—even as shell companies—in any company registry).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, footnote 45, p. 49
+    quote: Although they did not really exist, such “companies” often received government contracts for
+      projects that were (a) vehicles for fraud ... (b) legitimate but never performed ... or (c) legitimate
+      but subcontracted out to others
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A vendor on a government project lists an incorporation number that belongs to no company.
+  - Payments are made to a 'subsidiary' that was never incorporated.
+  cases:
+  - name: Joseph L. Bruno (former New York Senate Majority Leader)
+    year: '2014'
+    jurisdiction: United States
+    what_happened: The 2009 indictment described payments made out to 'Business Consultants, Inc.', a
+      fictional subsidiary that was never formally incorporated (StAR box 3.12). Bruno was convicted in
+      2009, but after appeals a federal jury found him not guilty at retrial in May 2014. The record shows
+      the pattern, not proven wrongdoing.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndny/pr/bruno-acquitted-honest-services-mail-fraud-involving-bribery
+    source_title: U.S. Attorney's Office NDNY, 'Bruno Acquitted of Honest Services Mail Fraud Involving
+      Bribery' (16 May 2014)
+  data_needed:
+  - Company (name, jurisdiction, registrationNumber)
+  - Contract
+  - ContractAward
+  - Payment (beneficiary)
+  - Document (invoice)
+  checkable: lookups
+  lookup_sources:
+  - Company registry of the claimed jurisdiction
+  - OpenCorporates
+  - Business-name (trading name) registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: StAR says such nonexistent 'companies' often received government contracts that were fraudulent,
+      never performed, or subcontracted.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - 'Search errors: transliteration, spelling, a later name change, or a merger.'
+  - Old or dissolved records may be purged or not online.
+  - The business may be a lawful unincorporated trader using a trading name.
+  - Some registries are not searchable online.
+  jurisdictions: Global
+  version: 1
+- id: BO-055
+  name: Trading name, sole proprietorship or alias used as the account holder or vendor
+  definition: Money is received under an unincorporated business name or an alias instead of the person's
+    own name or a registered company, which makes the real person harder to see.
+  areas:
+  - BO
+  typology: Fictitious entities and unincorporated economic organisations
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.4, p. 48
+    quote: The typical purposes of misuse included serving as the name of a business-class bank account
+      (used to launder or store illicit proceeds) or as a name on a contract (for example, listed as a
+      vendor on a government project)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 3.11, 'Laundering Money through a Sole Proprietorship', p. 50 (quoting the UK High Court)
+    quote: Mr. Dariye signed the application form as ‘Ebenezer Retnan’, this name being an alias adopted
+      by him.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A governor opened an account as 'Ebenezer Retnan Ventures', did not register it, and used it to receive
+    state funds (StAR box 3.11).
+  cases:
+  - name: Federal Republic of Nigeria v Joshua Dariye
+    year: '2007'
+    jurisdiction: United Kingdom / Nigeria
+    what_happened: In a civil asset-recovery claim, the UK High Court ordered judgment for Nigeria against
+      the Plateau State governor and his wife (about US$8m with interest). The facts included an unregistered
+      trading-name account opened under an alias and used to receive state funds. This was a civil court
+      judgment, not a criminal conviction.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    source_title: The Puppet Masters, box 3.11 (citing [2007] EWHC 0169 (Ch))
+  data_needed:
+  - Person (name, alias)
+  - Company or LegalEntity (trading name, legalForm)
+  - BankAccount
+  - Payment (payer, beneficiary)
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Business-name / trading-name registers
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: In the Dariye case the alias account was used to receive misappropriated public funds.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - Sole traders lawfully trade under business names, and many jurisdictions do not require registration.
+  - People use stage, professional or anglicised names.
+  - Small firms open business accounts under trading names as normal practice.
+  jurisdictions: Global; StAR notes Nigeria requires business names to be registered (p. 50, fn. 46).
+  version: 1
+- id: BO-056
+  name: Public official's own 'consultancy' receives payments from parties with business before them
+  definition: A company or consultancy owned or controlled by a public official is paid by people or firms
+    who benefit from that official's decisions, often with little or no real work done.
+  areas:
+  - BO
+  typology: Corporate vehicle as conduit for bribes
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 3.2, 'Misusing a Shell Company', p. 35
+    quote: Seminerio used Marc Consultants to solicit and receive payments of hundreds of thousands of
+      dollars from persons and entities, in exchange for which Seminerio took official action for the
+      benefit of those entities
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.1, p. 38
+    quote: In the second case, the recipient of the bribe creates a corporate vehicle to hide the assets
+      and any connection that he may have to them.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The consultancy's bank account uses the official's home address, only the official and spouse can
+    sign, and it pays no employees or payroll (StAR box 3.2).
+  cases:
+  - name: Anthony Seminerio / Marc Consultants
+    year: '2010'
+    jurisdiction: United States (New York)
+    what_happened: The former New York assemblyman was sentenced to six years in prison and ordered to
+      forfeit US$1 million for honest-services fraud. He had used his purported consulting firm to receive
+      corrupt payments; the government said bank records showed it was a shell company.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    source_title: The Puppet Masters, box 3.2 (citing FBI New York press release, 4 Feb 2010)
+  - name: Joseph L. Bruno / Capital Business Consultants LLC
+    year: '2014'
+    jurisdiction: United States (New York)
+    what_happened: The indictment said Bruno's consulting LLC received payments for fictional services.
+      He was convicted in 2009, but after appeals a jury acquitted him at retrial in May 2014, which shows
+      the pattern can appear without a proven crime.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndny/pr/bruno-acquitted-honest-services-mail-fraud-involving-bribery
+    source_title: U.S. Attorney's Office NDNY press release, 16 May 2014
+  data_needed:
+  - Person
+  - Position or Occupancy (the public office)
+  - Company
+  - Ownership
+  - Directorship
+  - BankAccount
+  - Payment (payer, beneficiary, amount, date)
+  - Address
+  checkable: records
+  lookup_sources:
+  - Asset and interest declarations of officials
+  - Company registry
+  - Lobbying and legislative records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: StAR identifies a bribe recipient's own corporate vehicle as one of two typical bribe-payment
+      schemes in its 150 grand-corruption cases.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - Some legislatures allow outside work if it is declared.
+  - The consultancy may do real work for clients with no business before the official.
+  - Payments may predate the person taking office.
+  jurisdictions: Global
+  version: 1
+- id: BO-057
+  name: Official holds a hidden stake in a company that wins public contracts
+  definition: A public official, or someone fronting for them, secretly owns part of a company or partnership
+    that receives contracts the official can influence.
+  areas:
+  - BO
+  typology: Concealed interest in contractor / self-dealing
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.1, p. 38
+    quote: In cases in which the official is given a concealed stake in the venture or the company offering
+      the bribe, these corporate vehicles become the opaque link between the corrupted party and the wealth
+      acquired.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 3.10, p. 49
+    quote: Several months before registration, the partnership was awarded a no-bid contract by DPNR relating
+      to a building-permit request.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A partnership formed by an environmental protection director and associates won a no-bid contract
+    from his own department and was paid without doing the work (StAR box 3.10).
+  cases:
+  - name: Hollis L. Griffin / Elite Technical Services
+    year: '2006'
+    jurisdiction: United States Virgin Islands
+    what_happened: Griffin, a government environmental protection director, and co-conspirators formed
+      a partnership that received a no-bid contract from his department and about US$125,755 without performing
+      it. Griffin and two others pleaded guilty and were sentenced.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    source_title: The Puppet Masters, box 3.10 (citing US v. Hollis L. Griffin and DOJ press releases
+      2006 and 2008)
+  data_needed:
+  - Person
+  - Position or Occupancy
+  - Company
+  - Ownership
+  - Associate
+  - Family
+  - ContractAward (authority, supplier)
+  - Contract
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Procurement and contract-award databases
+  - Company and business-name registries
+  - Officials' asset and interest declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Griffin's partnership received a no-bid award from the official's own department.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - The interest was declared and the official stepped back from the decision.
+  - The stake is held in a blind trust or predates office.
+  - The person is a relative with an independent business, not a front.
+  jurisdictions: Global
+  version: 1
+- id: BO-058
+  name: Suspect gains hidden control of a bank or financial institution
+  definition: A person under suspicion, or a hidden group of related parties, buys control of a bank (sometimes
+    through many small stakes held by apparently unconnected owners) and uses it to move or extract money.
+  areas:
+  - BO
+  typology: Acquisition of financial institutions by criminals
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 3.5, 'Laundering Money through a Front Company', p. 39 (quoting the U.S. District Court,
+      N.D. Cal.)
+    quote: Lazarenko opened his own personal account at EuroFed, and in August 1997, Lazarenko and Kiritchenko
+      purchased a 67 percent interest in the bank.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Offshore in the UK
+    publisher: Transparency International UK
+    year: '2017'
+    url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    locator: 'Case study: The Great Moldovan Bank Robbery, p. 11'
+    quote: In August 2012, the ownership of three leading Moldovan banks was transferred to a number of
+      apparently unconnected individuals and entities with stakes small enough to evade scrutiny or require
+      approval by the Moldovan Central Bank.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 575/2013 (Capital Requirements Regulation)
+    publisher: European Union (EUR-Lex)
+    year: '2013'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32013R0575
+    locator: Article 4(1), point (36) 'qualifying holding'
+    quote: a direct or indirect holding in an undertaking which represents 10 % or more of the capital
+      or of the voting rights
+    quote_verified: true
+    licence: EUR-Lex reuse permitted with acknowledgement (Commission Decision 2011/833/EU)
+    checked: '2026-10-10'
+  examples:
+  - A prime minister facing corruption allegations buys most of an offshore bank and moves about US$70
+    million into accounts there (StAR box 3.5).
+  - Small stakes in three banks bought with money borrowed from UK limited partnerships (TI-UK 2017, p.
+    11).
+  cases:
+  - name: Pavel Lazarenko / European Federal Credit Bank (EuroFed), Antigua
+    year: '2009'
+    jurisdiction: United States / Antigua and Barbuda
+    what_happened: Lazarenko and Kiritchenko bought 67 percent of EuroFed in 1997; Lazarenko was convicted
+      in the United States of money laundering and conspiracy, and the conviction was reviewed in US v.
+      Lazarenko, 564 F.3d 1026 (9th Cir. 2009).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    source_title: The Puppet Masters, box 3.5
+  - name: Moldovan bank theft (Banca de Economii, Banca Sociala, Unibank)
+    year: '2014'
+    jurisdiction: Moldova
+    what_happened: TI-UK, relying on a leaked audit report, reports that a concealed group of related
+      parties took control of three banks through small stakes and drained about US$1 billion by November
+      2014. The ultimate beneficiaries were still unknown at the time of the report.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    source_title: Offshore in the UK (TI-UK 2017), p. 11
+  - name: Vlad Filat (former Prime Minister of Moldova)
+    year: '2016'
+    jurisdiction: Moldova
+    what_happened: TI-UK reports that Filat was sentenced to nine years in prison on corruption charges
+      related to the bank theft.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    source_title: Offshore in the UK (TI-UK 2017), p. 11
+  data_needed:
+  - Organization or Company (the bank)
+  - Ownership (owner, asset, percentage, startDate)
+  - Person
+  - Associate
+  - Debt or Payment (acquisition funding)
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - Banking supervisor licence and shareholder-approval records
+  - Company registry
+  - Court and audit reports
+  levels:
+    faint: Several apparently unconnected parties each buy stakes in a bank, each below 10% (the level
+      that needs supervisory approval)
+    strong: Stakes held by parties who turn out to be linked add up to 10% or more of the bank's capital
+      or votes, without their being declared as acting together
+    textbook: A suspect or hidden group together holds a 'qualifying holding' (10% or more of capital
+      or voting rights) in a bank without notifying the supervisor or getting approval
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32013R0575
+    threshold_note: EU. The 10% qualifying-holding definition is in CRR Article 4(1)(36). CRD Article
+      22(1) adds further notification steps at 20%, 30% and 50% ('would reach or exceed 20 %, 30 % or
+      50 %'). The US (Change in Bank Control Act, generally 10% or 25%) was not checked on the page, so
+      it is not used. The cited StAR (a 67% stake) and TI UK Moldova case give no threshold, only 'small
+      enough to evade scrutiny'.
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Both cases used a controlled bank to move or extract funds; see BO-016 for stakes kept under
+      approval thresholds.
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  innocent_explanations:
+  - Legitimate investors and consortia buy banks with regulator approval.
+  - Many small shareholders in a bank are normal for listed or cooperative banks.
+  - Distressed banks are often sold quickly to new owners.
+  jurisdictions: Global
+  version: 2
+- id: BO-059
+  name: Limited partnership whose partners are all companies, typically in secrecy jurisdictions
+  definition: A limited partnership (such as a Scottish limited partnership) has no human partner, and
+    its general and limited partners are offshore companies, so the register shows no real person.
+  areas:
+  - BO
+  typology: Misuse of limited partnerships (e.g. Scottish limited partnerships)
+  status: verified
+  sources:
+  - title: Offshore in the UK
+    publisher: Transparency International UK (with Bellingcat)
+    year: '2017'
+    url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    locator: Section 3, 'No natural persons required', p. 9
+    quote: Similar to other types of UK limited partnership, partners in SLPs can be natural persons or
+      a ‘body corporate’ in any jurisdiction in the world, and all the partners can be body corporates.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Offshore in the UK
+    publisher: Transparency International UK (with Bellingcat)
+    year: '2017'
+    url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    locator: Key Findings, p. 1
+    quote: 71 per cent of all SLPs registered in 2016 are controlled by companies based in secrecy jurisdictions,
+      hiding who is really behind the partnership.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Economic Crime and Corporate Transparency Act: limited partnerships (factsheet)'
+    publisher: UK Government (Home Office, Department for Business & Trade, Companies House)
+    year: '2024'
+    url: https://www.gov.uk/government/publications/economic-crime-and-corporate-transparency-act-2023-factsheets/economic-crime-and-corporate-transparency-act-limited-partnerships
+    locator: Section 1
+    quote: The government is aware of reports that some limited partnerships (LPs) have been abused –
+      for example in the Azerbaijani laundromat and Danske Bank scandal - and is cracking down on their
+      misuse.
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-09'
+  examples:
+  - Hilux Services LP and Polux Management LP shared the same two BVI corporate partners and an address
+    with over 800 other SLPs (TI-UK p. 13).
+  - All corporate partners of the 113 Laundromat SLPs with a known place of incorporation were in the
+    Marshall Islands, Belize, BVI, Bahamas or Seychelles (TI-UK p. 7).
+  cases:
+  - name: Global Laundromat (113 Scottish limited partnerships)
+    year: '2017'
+    jurisdiction: Russia / Moldova / United Kingdom
+    what_happened: OCCRP and Novaya Gazeta reported that at least US$20.8 billion was moved out of Russia
+      in 2010-2014 through more than 5,000 entities, including 113 SLPs, nearly all controlled by offshore
+      corporate partners.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    source_title: Offshore in the UK (TI-UK 2017), p. 7, citing OCCRP
+  - name: Caviar Diplomacy (Hilux Services LP, Polux Management LP)
+    year: '2017'
+    jurisdiction: Italy / Azerbaijan / United Kingdom
+    what_happened: The European Stability Initiative alleged, citing Milan prosecutor documents, that
+      two SLPs with BVI corporate partners were conduits for EUR 1.89 million in payments to Luca Volontè.
+      At the time of the TI-UK report the matter was still under investigation.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    source_title: Offshore in the UK (TI-UK 2017), p. 13
+  data_needed:
+  - Company (legalForm = limited partnership, jurisdiction, incorporationDate)
+  - LegalEntity (corporate partners)
+  - Directorship (role = general partner) or Ownership (role = limited partner)
+  - Address
+  - Person (PSC, where filed)
+  checkable: lookups
+  lookup_sources:
+  - Companies House (LP registration forms LP5/LP6, SLP PSC filings since 2017)
+  - Registry of the corporate partners' jurisdictions
+  - Tax Justice Network Financial Secrecy Index
+  levels:
+    faint: A corporate partner from abroad sits alongside named individuals.
+    strong: All partners are companies and none is in the country of registration.
+    textbook: All partners are bodies corporate and the general partner is incorporated in a 'secrecy
+      jurisdiction', which TI-UK defines as one scoring 60 or more on the Tax Justice Network Financial
+      Secrecy Index (2015).
+    threshold_source: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: SLPs with offshore corporate partners were used in the Global Laundromat and the Moldovan
+      bank theft.
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  - target_area: CO
+    reason: Two SLPs were alleged conduits for payments to a Council of Europe politician (Caviar Diplomacy).
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  innocent_explanations:
+  - Venture capital and private equity funds widely use LPs with a corporate general partner and foreign
+    investors (UK Government response 2018, para 13).
+  - SLPs were traditionally used for agricultural tenancies.
+  - LPs are used in pension and multi-layered investment structures (UK factsheet section 3).
+  jurisdictions: United Kingdom (Scotland especially); SLPs have legal personality and have filed PSC
+    information since 2017; the Economic Crime and Corporate Transparency Act 2023 tightens LP rules UK-wide.
+    Similar partnership forms exist elsewhere.
+  version: 1
+- id: BO-060
+  name: 'Registered in one country but no footprint there: no accounts, no tax filings, banks abroad'
+  definition: The entity uses the respectable name of its country of registration, but it files no accounts
+    or tax returns there and all its banking runs through foreign accounts.
+  areas:
+  - BO
+  typology: Onshore vehicle used as an offshore front
+  status: verified
+  sources:
+  - title: Offshore in the UK
+    publisher: Transparency International UK
+    year: '2017'
+    url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    locator: Section 3, 'Bank accounts', p. 15
+    quote: What this means is that although their name and country of incorporation may give them the
+      veneer of a UK-regulated entity, their bank account and all of their financial transactions can
+      be run through overseas bank accounts that have few, if any, money laundering checks on their account
+      holders.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Offshore in the UK
+    publisher: Transparency International UK
+    year: '2017'
+    url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    locator: Section 3, 'Reporting requirements', p. 15
+    quote: Unless the general partners of an SLP are a UK limited company, they do not need to send accounts
+      to Companies House.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Limited Partnerships: Reform of Limited Partnership Law - The Government response to the consultation'
+    publisher: UK Department for Business, Energy and Industrial Strategy
+    year: '2018'
+    url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/762849/government-response-limited-partnerships.pdf
+    locator: Para 16, p. 9
+    quote: The Government believes it is vital for LPs registered in the UK under this country’s legal
+      framework to maintain some demonstrable link to the UK.
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-09'
+  examples:
+  - A UK-registered partnership held its accounts only in Latvian banks later sanctioned for money-laundering
+    failings (TI-UK p. 15, Rexlord Systems).
+  cases:
+  - name: Rexlord Systems (SLP) / Oleksandr Onyshchenko gas scheme
+    year: '2016'
+    jurisdiction: Ukraine / Latvia / United Kingdom
+    what_happened: TI-UK reports that Ukraine's National Anti-Corruption Bureau seized the Latvian bank
+      accounts of an SLP connected to MP Oleksandr Onyshchenko, who was alleged to have masterminded a
+      gas-sales scheme.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    source_title: Offshore in the UK (TI-UK 2017), p. 15
+  data_needed:
+  - Company (jurisdiction, address)
+  - BankAccount (bank, country)
+  - Payment
+  - Address
+  - Document (filings)
+  checkable: lookups
+  lookup_sources:
+  - Company registry filing history
+  - Payment or bank records showing account country
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: TI-UK says banking offshore keeps the entity's money away from its home country's anti-money-laundering
+      checks.
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  innocent_explanations:
+  - Funds often register an LP in the UK and run the business from elsewhere (UK Government response 2018,
+    para 13).
+  - Tax-transparent partnerships with non-resident partners lawfully file no domestic tax return.
+  - International traders bank where their customers are.
+  jurisdictions: United Kingdom (limited partnerships); the pattern applies to any onshore registry with
+    light filing duties.
+  version: 1
+- id: BO-061
+  name: Fictitious loans enforced through the courts ('sham litigation')
+  definition: Linked entities record a loan that was never paid out, stage a default, and get a court
+    order making a guarantor pay, so the money leaves with a court order as its paperwork.
+  areas:
+  - BO
+  typology: Sham debt and litigation laundering
+  status: verified
+  sources:
+  - title: Offshore in the UK
+    publisher: Transparency International UK
+    year: '2017'
+    url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    locator: Section 3, 'Separate Legal Personality', p. 8
+    quote: This enables the laundering of significant amounts of money through incurring fake debts and
+      participating in ‘sham litigation’.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Offshore in the UK
+    publisher: Transparency International UK
+    year: '2017'
+    url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    locator: 'Case study: The ''Global Laundromat'', p. 7'
+    quote: These core firms conducted sham business deals, including huge fictitious loans between the
+      core entities, where no money actually changed hands.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A shell creditor sues a shell debtor for a 'defaulted' loan; a court orders the guarantor to pay hundreds
+    of millions, which then move abroad (TI-UK p. 7).
+  cases:
+  - name: Global Laundromat
+    year: '2017'
+    jurisdiction: Russia / Moldova
+    what_happened: OCCRP reporting, summarised by TI-UK, describes fictitious loans between shell companies,
+      staged defaults, and guarantees enforced by Moldovan judges, after which the funds were moved through
+      Moldovan banks.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+    source_title: Offshore in the UK (TI-UK 2017), p. 7
+  data_needed:
+  - Debt (debtor, creditor, amount)
+  - Company
+  - Person (guarantor)
+  - CourtCase
+  - CourtCaseParty
+  - Payment
+  - Contract (loan or guarantee)
+  checkable: lookups
+  lookup_sources:
+  - Court records and judgment databases
+  - Company registries for creditor, debtor and guarantor
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: The court order gives laundered funds a lawful-looking origin (Global Laundromat).
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  - target_area: CO
+    reason: The scheme relied on corrupt judges ordering payment.
+    source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  innocent_explanations:
+  - Genuine commercial loans default and guarantees are lawfully called.
+  - Default judgments are common when debtors do not contest.
+  - Group companies lend to each other for real treasury reasons.
+  jurisdictions: Global; the case involved Russia, Moldova and UK entities.
+  version: 1
+- id: BO-062
+  name: 'Bought track record: ''aged'' shelf company used to qualify for bids, credit or trust'
+  definition: A company bought ready-made with years of history is used to meet age requirements in tenders
+    or lending, although the current owners have no such track record.
+  areas:
+  - BO
+  typology: Shelf companies
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Box 3.4, 'A Typical Advertisement for Shelf Corporations and Aged Corporations', p. 37
+    quote: 7. Ability to secure bids on contracts. Many agencies will only sign contracts with a business
+      that has been in business for at least two years.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.1, pp. 37-38 (quoting U.S. DOJ testimony, 2009)
+    quote: criminals can easily throw investigators off the trail by purchasing shelf companies and then
+      never officially transferring the ownership
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'The Puppet Masters: How the Corrupt Use Legal Structures to Hide Stolen Assets and What to
+      Do About It'
+    publisher: World Bank / UNODC Stolen Asset Recovery Initiative (StAR)
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, Box 3.4 'A Typical Advertisement for Shelf Corporations and Aged Corporations'
+    quote: Often, lenders require a business to have been in existence from six months to two years or
+      more before lending it money 6. Ability to borrow money from banks 7. Ability to secure bids on
+      contracts. Many agencies will only sign contracts with a business that has been in business for
+      at least two years.
+    quote_verified: true
+    licence: Creative Commons Attribution CC BY 3.0 IGO (World Bank open access)
+    checked: '2026-10-10'
+  examples:
+  - Panamanian companies incorporated in 1979 became directors of a company formed nearly 15 years later
+    (StAR box 3.3).
+  cases: []
+  data_needed:
+  - Company (incorporationDate)
+  - Ownership (startDate)
+  - Directorship (startDate)
+  - ContractAward
+  - Document (bid papers claiming experience)
+  checkable: records
+  lookup_sources:
+  - Company registry history (officer and share changes, dormant accounts)
+  levels:
+    faint: A recently bought company has existed for six months or more under earlier owners and is used
+      to get credit (lenders' stated lower age)
+    strong: A recently bought company with about two years of history under earlier owners is used for
+      credit or bids
+    textbook: A company bought ready-made, with at least two years of history that the current owners
+      did not build, is used to meet a contract-bid age requirement
+    threshold_source: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    threshold_note: The numbers come from a company-formation advertisement that the StAR Puppet Masters
+      study (World Bank/UNODC) reproduces as Box 3.4. They are what vendors claim lenders and agencies
+      require, not a regulator's rule. Real tender age rules vary by agency.
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: StAR's quoted advertisement sells aged companies specifically to meet contracting agencies'
+      age requirements.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - Ready-made companies are bought lawfully to save setup time.
+  - Buying a dormant company with its licences is a normal acquisition.
+  - Group restructures reuse old companies.
+  jurisdictions: Global
+  version: 2
+- id: BO-063
+  name: Consultant or subcontractor placed between a company and officials to pass money on
+  definition: A company that wants something from officials hires or creates a consulting firm or subcontractor
+    that receives money and passes it to the officials, giving the payments a business cover.
+  areas:
+  - BO
+  typology: Intermediary used to channel bribes
+  status: verified
+  sources:
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.1, p. 38
+    quote: In one case, the giver of the bribe either creates or contracts with a consulting company to
+      receive and pass on funds to the bribe receiver, thereby obscuring the chain of payment and creating
+      a plausible explanation for the payments.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: The Puppet Masters
+    publisher: World Bank / UNODC StAR
+    year: '2011'
+    url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    locator: Part 3, section 3.2.1, pp. 39-40
+    quote: These transactions are usually small enough not to attract the attention of internal control,
+      management, or shareholders.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - People at IBM's Argentina subsidiary used a subcontractor to pass millions of dollars to directors
+    of a state bank (StAR p. 39).
+  cases:
+  - name: In the Matter of International Business Machines Corp. (IBM Argentina / Banco de la Nación)
+    year: '2000'
+    jurisdiction: United States / Argentina
+    what_happened: IBM accepted a settlement with the U.S. Securities and Exchange Commission over a subsidiary's
+      use of a subcontractor to pass millions of dollars to directors of Banco de la Nación.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+    source_title: The Puppet Masters, p. 39 (citing SEC Administrative Proceeding File No. 3-13097, 21
+      Dec 2000)
+  data_needed:
+  - Company
+  - Contract (subcontract or consultancy agreement)
+  - Payment (payer, beneficiary, purpose)
+  - Person
+  - Position (official)
+  - Representation
+  checkable: records
+  lookup_sources:
+  - Company registry for the intermediary
+  - Procurement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: StAR identifies this as one of two typical bribe-payment schemes in its grand-corruption cases.
+    source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  innocent_explanations:
+  - Subcontracting and local consultants are normal in public contracts.
+  - Consultants provide real services such as permits, translation and local knowledge.
+  - Success fees are common in legitimate deals.
+  jurisdictions: Global
+  version: 1
+not_reached:
+- 'fatf-gafi.org: all PDFs and the FATF glossary are behind a Cloudflare challenge. I used the same Annex
+  E PDF from egmontgroup.org and the full 2018 report from a mirror on the Saudi FIU site (aml.gov.sa).
+  Page numbers come from the report''s own page headers.'
+- justice.gov blocks direct downloads. The Danske, Gaffey, Roger Ng and 2016 1MDB press releases were
+  read only through a summarising fetcher. Their quotes should be checked word for word before the app
+  shows them. The 2025 1MDB forfeiture complaint PDF did download and was read directly.
+- 'Springer article by Tello Arista, Fazekas and Volkotrub (2026): read only through a summarising fetcher,
+  and the last ~5,600 characters were not read. Check the quotes.'
+- 'FinCEN FIN-2018-A003, the PEP facilitator advisory: the red-flag list is an image and did not extract,
+  so it is not covered.'
+- 'Manafort superseding information (D.D.C. 17-cr-201): the plea filing is a scanned image, and NPR is
+  blocked by robots.txt. Left out as a case.'
+- 'Open Contracting Partnership, Red Flags in Public Procurement (2024): not opened. The R032/R033 shared-owner
+  bidder flags from patterns.md were not re-checked.'
+- 'Fazekas & Tóth (2016), on company age: not opened.'
+- 'Transparency International UK, Hiding in Plain Sight (2017): not opened.'
+- 'FATF Guidance on Beneficial Ownership of Legal Persons (R.24, 2023) and Legal Arrangements (R.25, 2024):
+  not reached.'
+- 'FinCEN SAR Activity Review Issue 7 (2004), shell company red flags: not opened.'
+- 'Wolfsberg Group and Egmont FIU typology updates after 2018: not reached.'
+- 'FollowTheMoney explorer: property names are from memory and were not re-checked live, in particular
+  CryptoWallet, RealEstate, Debt and the Ownership.ownershipType/sharesType fields.'
+- 'FATF (2013) ''Money Laundering and Terrorist Financing Vulnerabilities of Legal Professionals'', Method
+  6: Litigation (p. 69) and red flags (pp. 77-82): direct download was blocked by Cloudflare, and WebFetch
+  returned only parts of the PDF without the litigation section. So BO-061 is sourced to TI-UK only.'
+- 'Kroll ''Project Tenor'' audit of the Moldovan banks (candu.md link cited by TI-UK): not opened; the
+  Moldova facts come from TI-UK''s summary.'
+- 'OCCRP Global Laundromat and Grand Theft Moldova investigations: not opened directly; cited only through
+  TI-UK 2017.'
+- 'UK Companies Act 2006 s.251 (UK statutory definition of shadow director): not opened; BO-048 uses the
+  Guernsey definition quoted by StAR.'
+- 'Later outcomes not checked against primary sources: Luca Volontè (Caviar Diplomacy), Ilan Shor (Moldova),
+  and Joshua Dariye''s later criminal proceedings in Nigeria.'
+- FollowTheMoney explorer not re-checked in this run. The schema names used (Company, LegalEntity, Organization,
+  Person, Directorship, Ownership, Representation, Payment, Contract, ContractAward, Address, BankAccount,
+  Debt, CourtCase, CourtCaseParty, Position, Occupancy, Family, Associate, UnknownLink, Document, Email)
+  are standard FtM, but FtM has no dedicated Trust schema.

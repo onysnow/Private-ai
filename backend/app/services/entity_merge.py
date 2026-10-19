@@ -1,10 +1,13 @@
 from __future__ import annotations
+from typing import Any
 
 import hashlib
 import json
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.db.locking import lock_investigation_transaction
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import (
     Entity, Statement, LeadLink, TimelineEvent, ResolutionDecision, StatementAssessment,
     StatementPromotion, EnrichmentSession, CrossProviderDecision, RelationshipEdge,
@@ -28,7 +31,7 @@ REFERENCE_SPECS = (
 )
 
 
-def _latest_same_decision(db: Session, source: Entity, target: Entity):
+def _latest_same_decision(db: Session, source: Entity, target: Entity) -> Any:
     a, b = sorted((source.id, target.id))
     return db.scalars(select(CanonicalResolutionDecision).where(
         CanonicalResolutionDecision.investigation_id == source.investigation_id,
@@ -58,7 +61,10 @@ def preview_entity_merge(db: Session, source: Entity, target: Entity) -> dict:
     for name, model, field_name in REFERENCE_SPECS:
         field = getattr(model, field_name)
         rows = list(db.scalars(select(model).where(field == source.id)).all())
-        ids = sorted(row.id for row in rows)
+        # REFERENCE_SPECS mixes several unrelated model classes in one tuple, so mypy
+        # widens `model` (and thus `rows`) to the shared declarative Base, which has no
+        # `id` attribute of its own -- every concrete model here does declare one.
+        ids = sorted(row.id for row in rows)  # type: ignore[attr-defined]
         refs[name] = {"count": len(ids), "record_ids": ids[:100]}
         digest_rows.append((name, ids))
 
@@ -100,6 +106,16 @@ def preview_entity_merge(db: Session, source: Entity, target: Entity) -> dict:
 
 
 def execute_entity_merge(db: Session, source: Entity, target: Entity, *, preview_digest: str, rationale: str | None = None) -> CanonicalEntityMergeAudit:
+    # Serialize concurrent merges for this investigation before even computing
+    # a preview. Without this, two concurrent requests can both compute the
+    # same pre-merge preview/digest, both pass the staleness check below, and
+    # both run the reference-move loop -- producing two
+    # CanonicalEntityMergeAudit rows for the same merge instead of the second
+    # request failing closed on a stale digest. Same pattern already used by
+    # store_document/extract_document/backup-restore/investigation-delete
+    # (app/db/locking.py); a no-op on SQLite, an advisory xact lock on
+    # PostgreSQL.
+    lock_investigation_transaction(db, source.investigation_id)
     preview = preview_entity_merge(db, source, target)
     if preview["preview_digest"] != preview_digest:
         raise ValueError("Merge preview is stale; generate a fresh preview before executing")
@@ -131,7 +147,11 @@ def execute_entity_merge(db: Session, source: Entity, target: Entity, *, preview
         db.add(audit)
         db.commit()
         db.refresh(audit)
-        return audit
     except Exception:
         db.rollback()
         raise
+    # The merged-away record leaves the OpenAleph collection and its
+    # relationships are re-sent pointing at the record that stays (ADR-0006,
+    # Wave B; app/services/corpus_push.py).
+    request_corpus_sync(db, audit.investigation_id)
+    return audit

@@ -1,0 +1,1033 @@
+area: PP
+terms:
+- term: Bid rigging
+  definition: Competitors secretly agree who will win a public tender and at what price, instead of competing.
+  examples: []
+  source_url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+  cases: []
+  related:
+  - Cover bidding
+  - Bid suppression
+  - Bid rotation
+  indicators: []
+  areas:
+  - PP
+- term: Complementary (cover or courtesy) bidding
+  definition: Firms submit bids meant to lose, too high or with unacceptable terms, so the chosen firm
+    wins and competition looks real.
+  examples: []
+  source_url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+  cases: []
+  related:
+  - Bid rigging
+  indicators: []
+  areas:
+  - PP
+- term: Bid suppression
+  definition: Firms that would normally bid agree not to, or withdraw bids, so a chosen competitor wins.
+  examples: []
+  source_url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Bid rotation
+  definition: Colluding firms all bid but take turns being the lowest bidder.
+  examples: []
+  source_url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Market allocation (market division)
+  definition: Competitors split customers, products or territories among themselves so they do not compete.
+  examples: []
+  source_url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Subcontracting (as bid-rigging pay-off)
+  definition: Firms that agree to lose are rewarded with subcontracts or supply contracts from the winner.
+  examples: []
+  source_url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Collusion
+  definition: Two or more bidders agreeing together to commit fraud in a procurement.
+  examples: []
+  source_url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+  cases: []
+  related:
+  - Bid rigging
+  indicators: []
+  areas:
+  - PP
+- term: Corruption (procurement)
+  definition: Giving anything of value to influence another's actions; in procurement, steering a contract
+    to a favoured bidder without being detected.
+  examples: []
+  source_url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Fraud
+  definition: Knowingly misleading others for personal gain.
+  examples: []
+  source_url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Red flag
+  definition: A warning sign that calls for a closer look; on its own it does not prove mismanagement,
+    fraud or corruption.
+  examples: []
+  source_url: https://redflags-cz.integritywatch.eu/about.php
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Unbalanced bidding
+  definition: Pricing some line items very low and others high, usually because the bidder secretly knows
+    which items will be dropped or increased after award.
+  examples: []
+  source_url: https://guide.iacrc.org/red-flag-unreasonable-low-line-item-bids
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Split purchases
+  definition: Dividing a purchase into smaller pieces, or underestimating its cost, to stay under a threshold
+    that would require stricter procurement.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Rigged specifications
+  definition: Technical requirements written so only a favoured firm can meet them, for example by naming
+    a brand.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Change order
+  definition: A formal change to a contract after award that alters the work or price; abused to raise
+    the price after winning with a low bid.
+  examples: []
+  source_url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Single bidding
+  definition: A competitive tender that receives only one bid; the main proxy used in corruption-risk
+    research.
+  examples: []
+  source_url: https://datafinder.qog.gu.se/dataset/cri
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Corruption Risk Index (CRI)
+  definition: A research measure combining several procurement red flags (single bidding, no call for
+    tender, non-open procedure, tax-haven supplier, etc.) as proxies for high-level corruption, built
+    by Fazekas and colleagues.
+  examples: []
+  source_url: https://datafinder.qog.gu.se/dataset/cri
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Negotiated procedure without prior publication
+  definition: A procurement procedure where the buyer negotiates directly with chosen firms without first
+    advertising; allowed only in limited EU-defined cases.
+  examples: []
+  source_url: https://redflags-cz.integritywatch.eu/about.php
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Framework agreement
+  definition: An umbrella agreement with one or more suppliers setting terms for future orders over a
+    period; long single-supplier frameworks can shut out competition.
+  examples: []
+  source_url: https://redflags-cz.integritywatch.eu/about.php
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Cost estimate (engineer's estimate)
+  definition: The buyer's own estimate of what a contract should cost, used to judge whether bids are
+    reasonable.
+  examples: []
+  source_url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Fictitious contractor (phantom vendor)
+  definition: A company that exists only on paper, used to receive payments or pose as a competing bidder.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Non-profit organisation (NPO)
+  definition: A legal person, arrangement or organisation that mainly raises or gives out funds for charitable,
+    religious, cultural, educational, social or similar 'good works' (FATF definition).
+  examples: []
+  source_url: https://fiu.mongolbank.mn/documents/other2e.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: FATF Recommendation 8
+  definition: The Financial Action Task Force standard requiring countries to protect non-profit organisations
+    from terrorist financing abuse through targeted, risk-based measures.
+  examples: []
+  source_url: https://fiu.mongolbank.mn/documents/other2e.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Diversion of funds
+  definition: An NPO, or someone acting for it, sends funds to a known or suspected terrorist entity.
+  examples: []
+  source_url: https://fiu.mongolbank.mn/documents/other2e.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Abuse of programming
+  definition: Legitimate NPO programmes are manipulated at the point of delivery to support terrorism.
+  examples: []
+  source_url: https://fiu.mongolbank.mn/documents/other2e.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Sham NPO / false representation
+  definition: An organisation or person pretends to be a charity to raise funds or carry out activities
+    that support terrorism.
+  examples: []
+  source_url: https://fiu.mongolbank.mn/documents/other2e.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Risk indicator (FATF)
+  definition: A feature of an NPO's activities that suggests possible terrorism-related abuse but may
+    have other explanations.
+  examples: []
+  source_url: https://fiu.mongolbank.mn/documents/other2e.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Terrorist abuse indicator (FATF)
+  definition: A feature of an NPO's activities directly tied to terrorist activity, strong enough to rule
+    out innocent explanations.
+  examples: []
+  source_url: https://fiu.mongolbank.mn/documents/other2e.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: De-risking (de-banking)
+  definition: A bank closing or refusing accounts for a customer type, such as NPOs, because of perceived
+    risk.
+  examples: []
+  source_url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Structuring
+  definition: Breaking up transactions into smaller amounts to avoid mandatory reporting thresholds.
+  examples: []
+  source_url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Material support (to terrorists)
+  definition: Under U.S. law, providing money or other resources to a designated foreign terrorist organisation;
+    the charge in the Holy Land Foundation case.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/federal-judge-hands-downs-sentences-holy-land-foundation-case
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Zakat committee
+  definition: A local body that collects and distributes Islamic charitable giving; in the HLF case, funds
+    were sent to Hamas-controlled zakat committees.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/federal-judge-hands-downs-sentences-holy-land-foundation-case
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Election forensics
+  definition: Statistical tests on detailed election results that flag anomalies which may suggest fraud;
+    they do not prove fraud.
+  examples: []
+  source_url: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Ballot stuffing
+  definition: Adding fake ballots for one party to the count.
+  examples: []
+  source_url: https://arxiv.org/abs/1201.3087
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Incremental fraud
+  definition: Adding ballots for one party at some rate, or moving votes from others, in a polling unit.
+  examples: []
+  source_url: https://arxiv.org/pdf/1201.3087
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Extreme fraud
+  definition: Reporting full turnout and nearly all votes for one party in a polling unit.
+  examples: []
+  source_url: https://arxiv.org/pdf/1201.3087
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Benford's law second-digit test (2BL)
+  definition: A check of whether the average second digit of vote counts is near the 4.187 Benford's law
+    predicts.
+  examples: []
+  source_url: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Kurtosis
+  definition: How much a distribution is spread into heavy tails compared with a normal curve (normal
+    value 3).
+  examples: []
+  source_url: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Unimodality (dip) test
+  definition: A test of whether a distribution has a single peak; multiple peaks may signal different
+    processes, including manipulation.
+  examples: []
+  source_url: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Absentee / postal ballot
+  definition: A ballot cast by mail instead of in person; collection by third parties is restricted in
+    many places.
+  examples: []
+  source_url: https://www.nbcnews.com/politics/elections/four-people-plead-guilty-north-carolina-ballot-probe-2016-2018-electio-rcna49534
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Election court / corrupt and illegal practices
+  definition: In England and Wales, a special court that hears election petitions and can void an election
+    for corrupt practices (e.g. bribery, undue influence) or illegal practices (e.g. false statements
+    about a candidate).
+  examples: []
+  source_url: https://caselaw.nationalarchives.gov.uk/ewhc/admin/2017/1413
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Contribution in the name of another (straw donor)
+  definition: A political donation made through another person, or reimbursed, so the real donor is hidden;
+    banned under 52 U.S.C. 30122.
+  examples:
+  - Corporation reimbursing employees for their contributions
+  source_url: https://www.fec.gov/updates/contributions-in-the-name-of-another-are-strictly-prohibited/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Conduit
+  definition: A person or entity that passes along someone else's money as their own political contribution.
+  examples: []
+  source_url: https://www.fec.gov/help-candidates-and-committees/foreign-nationals/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Foreign national (U.S. campaign finance)
+  definition: An individual who is not a U.S. citizen and not a lawful permanent resident, or a foreign
+    government, party or foreign-organised entity; banned from U.S. election contributions and spending.
+  examples: []
+  source_url: https://www.fec.gov/help-candidates-and-committees/foreign-nationals/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Knowingly (FEC)
+  definition: Having actual knowledge, awareness of facts showing a substantial probability, or ignoring
+    facts that would make a reasonable person check, that money comes from a prohibited source.
+  examples: []
+  source_url: https://www.fec.gov/help-candidates-and-committees/foreign-nationals/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Substantial assistance
+  definition: Knowingly helping in a significant way to make or receive a prohibited foreign contribution,
+    which is itself a violation.
+  examples: []
+  source_url: https://www.fec.gov/help-candidates-and-committees/foreign-nationals/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Personal use (irrespective test)
+  definition: Using campaign funds for an expense that would exist even if the person were not a candidate;
+    prohibited.
+  examples: []
+  source_url: https://www.fec.gov/help-candidates-and-committees/making-disbursements/personal-use/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Independent expenditure committee (super PAC)
+  definition: A U.S. political committee that spends independently of candidates; it can receive large
+    donations, which made it the target of the Parnas straw donation.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdny/pr/lev-parnas-sentenced-20-months-prison-campaign-finance-wire-fraud-and-false-statements
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Spending limit and spending return (UK)
+  definition: The legal cap on what a registered campaigner may spend, and the report of that spending
+    it must file with the Electoral Commission.
+  examples: []
+  source_url: https://www.electoralcommission.org.uk/media-centre/vote-leave-fined-and-referred-police-breaking-electoral-law
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Common plan (joint spending)
+  definition: Spending by separate campaigners that is actually done together and must be counted toward
+    each other's limits.
+  examples: []
+  source_url: https://www.electoralcommission.org.uk/media-centre/vote-leave-fined-and-referred-police-breaking-electoral-law
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Open Contracting Data Standard (OCDS) / Cardinal
+  definition: OCDS is a standard format for publishing procurement data; Cardinal is the Open Contracting
+    Partnership's tool that calculates red flags from OCDS data.
+  examples: []
+  source_url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Bait and switch
+  definition: A firm wins by promising staff, equipment or facilities it knows it will not provide, then
+    swaps them after signing.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-062
+  indicators: []
+  areas:
+  - PP
+- term: Abnormally low bid (abnormally low tender)
+  definition: A bid priced so low that it is doubtful the supplier can deliver the contract at that price.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-063
+  indicators: []
+  areas:
+  - PP
+- term: Collusive ring
+  definition: A group of companies that secretly work together to rig bids, for example by choosing the
+    winner in advance.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-011
+  - PP-012
+  indicators: []
+  areas:
+  - PP
+- term: Change order (variation order, contract amendment, addendum)
+  definition: A formal change to a signed contract's scope, price or time; the World Bank warns these
+    are often waved through without scrutiny.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-029
+  - PP-066
+  indicators: []
+  areas:
+  - PP
+- term: Fictitious offer
+  definition: A fake competing bid, made in the name of a real company without its knowledge or of a company
+    that does not exist, used to make a purchase look competitive.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-067
+  indicators: []
+  areas:
+  - PP
+- term: Discrepant offers
+  definition: A scheme where staff tell a favoured bidder which items will not be needed, so it can bid
+    very low on them and win.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-065
+  - PP-027
+  indicators: []
+  areas:
+  - PP
+- term: Incompatible grouping
+  definition: Putting unrelated goods or services into one lot that must be bid as a whole, which cuts
+    competition.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-069
+  indicators: []
+  areas:
+  - PP
+- term: Influence peddling
+  definition: Using one's influence to get a contract for someone, often a single-source award at an inflated
+    price to a firm close to an official.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-070
+  indicators: []
+  areas:
+  - PP
+- term: Kickback
+  definition: A bribe agreed in advance where the supplier pays part of what it receives back to the official
+    who helped it, often through inflated invoices.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-075
+  - PP-071
+  indicators: []
+  areas:
+  - PP
+- term: Bribery
+  definition: Offering, giving, asking for or accepting an undue advantage so that a person in power acts,
+    or fails to act, in breach of their duties.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Embezzlement (diversion of assets)
+  definition: Taking for oneself money or property one was trusted to manage.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-079
+  indicators: []
+  areas:
+  - PP
+- term: Economic operator
+  definition: EU procurement term for any person or company that takes part in a tender or carries out
+    a publicly funded contract.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Contracting authority
+  definition: The public body (national, regional or local) that runs the tender and signs the contract.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Negotiated procedure without publication
+  definition: An exceptional EU procedure where the buyer negotiates directly with chosen suppliers without
+    a public notice, allowed only in set cases such as extreme urgency.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-005
+  - PP-073
+  indicators: []
+  areas:
+  - PP
+- term: Irregularity (EU funds)
+  definition: A breach of EU or national law by someone using EU funds that charges, or would charge,
+    an unjustified cost to the EU budget; it is not necessarily deliberate fraud.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Arachne
+  definition: The European Commission's risk-scoring tool that helps national authorities spot high-risk
+    EU-funded projects, beneficiaries and contractors.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Shell (fake) company
+  definition: A company that exists only on paper, usually with no real assets, premises or staff.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-023
+  - PP-067
+  indicators: []
+  areas:
+  - PP
+- term: Administrative resources
+  definition: The staff, money, property, media and other resources a government controls, which incumbents
+    can misuse for campaigning.
+  examples: []
+  source_url: https://www.venice.coe.int/images/GBR_2016_Guidelines_resources_elections.pdf
+  cases: []
+  related:
+  - Misuse of administrative resources
+  indicators: []
+  areas:
+  - PP
+- term: Misuse of administrative resources
+  definition: Using state money, infrastructure or staff for a party's or candidate's campaign.
+  examples:
+  - Public employees doing campaign tasks
+  - Hidden advertising on state TV
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Election fraud
+  definition: Conduct meant to corrupt how ballots are handled, how results are certified or how voters
+    are registered.
+  examples: []
+  source_url: https://www.justice.gov/criminal/file/1029066/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Vote buying
+  definition: Giving or promising money or other benefits to voters so they support a particular party
+    or candidate.
+  examples: []
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Voter intimidation
+  definition: Threats, physical pressure or reprisals aimed at voters, candidates, poll watchers or election
+    officials.
+  examples: []
+  source_url: https://www.justice.gov/criminal/file/1029066/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Patronage
+  definition: Hiring or firing public employees for party-political reasons; DOJ calls a pervasive system
+    a breeding ground for corruption.
+  examples: []
+  source_url: https://www.justice.gov/criminal/file/1029066/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Conduit contribution
+  definition: A political donation passed through other people's names to hide who really gave it.
+  examples: []
+  source_url: https://www.justice.gov/criminal/file/1029066/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Third-party spending
+  definition: Campaign spending by groups other than the party or candidate, which can be used to get
+    around income or spending limits.
+  examples: []
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Dark money
+  definition: Political money that moves through entities, such as US 501(c)(4) groups, that need not
+    disclose their donors.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdoh/pr/former-ohio-house-speaker-sentenced-20-years-prison-leading-racketeering-conspiracy
+  cases: []
+  related:
+  - 501(c)(4)
+  indicators: []
+  areas:
+  - PP
+- term: 501(c)(4)
+  definition: A US tax-exempt 'social welfare' organisation; DOJ said the Householder enterprise exploited
+    the lack of transparency in these entities.
+  examples: []
+  source_url: https://www.justice.gov/usao-sdoh/pr/former-ohio-house-speaker-sentenced-20-years-prison-leading-racketeering-conspiracy
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: In-kind contribution
+  definition: A donation given as goods or services rather than money, such as free services or media
+    discounts.
+  examples: []
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Quid pro quo
+  definition: Something given in exchange for something else; in political finance, a donation given in
+    return for favourable treatment.
+  examples: []
+  source_url: https://www.justiceinitiative.org/uploads/b1c087f5-476e-47d6-9934-58bf84ab6f24/Handbook_in_full.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Anonymous donation
+  definition: A gift whose donor is not identified; many countries ban them or cap the amount.
+  examples: []
+  source_url: https://www.idea.int/sites/default/files/publications/funding-of-political-parties-and-election-campaigns.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Government Defence Integrity Index (GDI)
+  definition: Transparency International's assessment of corruption-risk controls in national defence
+    institutions across political, financial, personnel, operations and procurement risk.
+  examples: []
+  source_url: https://ti-defence.org/gdi/about/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Secret budget (defence)
+  definition: Defence or security spending that is classified and not shown in the public budget.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Off-budget expenditure
+  definition: Military spending that happens outside the approved state budget.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Military-owned business
+  definition: A commercial company in which defence or security institutions hold beneficial ownership.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Offset
+  definition: A side-agreement in an arms deal in which the seller promises investment, work or purchases
+    in the buyer's country.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Agents and intermediaries
+  definition: Middlemen or consultants that companies use in the defence procurement cycle, often paid
+    commission.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Chain of command vs chain of payment
+  definition: Whether the officers who command troops are separate from the system that pays them; when
+    combined, pay can be skimmed.
+  examples: []
+  source_url: https://ti-defence.org/gdi/methodology/the-gdi-indicators/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Certified cost or pricing data
+  definition: Cost facts a US contractor certifies as accurate, complete and current when negotiating
+    a price.
+  examples: []
+  source_url: https://www.acquisition.gov/far/15.407-1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Defective pricing
+  definition: Price inflation caused by cost or pricing data that is inaccurate, incomplete or noncurrent;
+    the US government is entitled to a price reduction.
+  examples: []
+  source_url: https://www.acquisition.gov/far/15.407-1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Labour mischarging / labour substitution
+  definition: Billing staff hours to the wrong contract or billing less-qualified staff at higher rates;
+    listed as a DoD fraud scheme.
+  examples: []
+  source_url: https://www.dodig.mil/Resources/Fraud-Detection-Resources/Fraud-Red-Flags/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Product substitution
+  definition: Delivering goods that differ from the contract specification; listed as a DoD fraud scheme.
+  examples: []
+  source_url: https://www.dodig.mil/Resources/Fraud-Detection-Resources/Fraud-Red-Flags/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Counterfeit (re-marked) part
+  definition: A part altered or marked to look like a genuine or newer part; GAO found parts re-marked
+    to appear authentic.
+  examples: []
+  source_url: https://www.gao.gov/products/gao-12-375
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Progress payment
+  definition: An interim payment to a contractor during a long contract based on costs incurred or work
+    done; misuse is a DoD-listed fraud scheme.
+  examples: []
+  source_url: https://www.dodig.mil/Resources/Fraud-Detection-Resources/Fraud-Red-Flags/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Mandatory disclosure rule
+  definition: US contracting rule under which a contractor can be suspended or debarred for failing to
+    timely disclose credible evidence of fraud, bribery or significant overpayments.
+  examples: []
+  source_url: https://www.acquisition.gov/far/3.1003
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Fraud (Charity Commission definition)
+  definition: Dishonesty by false representation, failing to disclose information or abuse of position,
+    to make a gain or cause a loss.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Restricted funds
+  definition: Charity money given for a specified purpose that may not be used for general costs.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Unrestricted reserves
+  definition: Charity money not tied to a purpose, which still needs proper authorisation to spend.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Segregation of duties
+  definition: Splitting a financial process among different people so no one person controls it start
+    to finish.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Skimming
+  definition: Taking cash before it is recorded, for example from charity collections.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/654821/Chapter3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Excess benefit transaction
+  definition: Under US tax law, a deal in which a tax-exempt organisation gives an insider (disqualified
+    person) more economic value than it receives back.
+  examples: []
+  source_url: https://www.irs.gov/charities-non-profits/charitable-organizations/intermediate-sanctions-excess-benefit-transactions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Fiduciary duty
+  definition: The legal duty of a trustee or director to act in the charity's interest; a New York court
+    found it breached in the Trump Foundation case.
+  examples: []
+  source_url: https://ag.ny.gov/press-release/2019/ag-james-secures-court-order-against-donald-j-trump-trump-children-and-trump
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: ODIHR
+  definition: The OSCE Office for Democratic Institutions and Human Rights, which observes elections and
+    co-wrote the administrative-resources guidelines.
+  examples: []
+  source_url: https://www.venice.coe.int/images/GBR_2016_Guidelines_resources_elections.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Venice Commission
+  definition: The Council of Europe's advisory body on constitutional law, co-author of the 2016 guidelines
+    on misuse of administrative resources.
+  examples: []
+  source_url: https://www.venice.coe.int/images/GBR_2016_Guidelines_resources_elections.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP

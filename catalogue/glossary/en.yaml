@@ -1,0 +1,1032 @@
+area: EN
+terms:
+- term: Environmental crime
+  definition: Criminal offences that harm the environment; FATF focuses on illegal logging, land clearance,
+    mining and waste trafficking, while FinCEN's list also includes wildlife trafficking and illegal fishing.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Conservation crime
+  - Illegal logging
+  - Illegal mining
+  - Waste trafficking
+  - Illegal wildlife trade
+  - IUU fishing
+  indicators: []
+  areas:
+  - EN
+- term: Conservation crime
+  definition: A subset of environmental crime covering illegal acts that harm or threaten nature and natural
+    resources (FinCEN notice, footnote 7).
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2021-11/FinCEN%20Environmental%20Crimes%20Notice%20508%20FINAL.pdf
+  cases: []
+  related:
+  - Environmental crime
+  indicators: []
+  areas:
+  - EN
+- term: Illegal logging
+  definition: Harvesting, processing, transporting, buying or selling timber in breach of national or
+    international law.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Forestry crime
+  - Illegal land clearing
+  - Lacey Act
+  indicators: []
+  areas:
+  - EN
+- term: Illegal land clearing
+  definition: Illegally acquiring and clearing land for farming, building or real estate speculation.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Forestry crime
+  indicators: []
+  areas:
+  - EN
+- term: Forestry crime
+  definition: Umbrella term for crime across the whole forestry supply chain, from harvest and transport
+    to processing and sale, including illegal logging and land clearance.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Illegal logging
+  indicators: []
+  areas:
+  - EN
+- term: Illegal mining
+  definition: Mining done without state permission (no land rights, licence or permits), or with permission
+    obtained through corruption.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Artisanal and small-scale mining
+  - Conflict-affected and high-risk area
+  indicators: []
+  areas:
+  - EN
+- term: Waste trafficking
+  definition: Illegal export or illicit disposal of waste such as electronic waste, plastics and hazardous
+    substances, in breach of waste laws.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Basel Convention
+  - Illegal traffic (Basel)
+  indicators: []
+  areas:
+  - EN
+- term: Illegal wildlife trade (IWT)
+  definition: Any domestic or international trade in wild protected species or their parts that breaks
+    national or international law, including CITES; there is no agreed international definition.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related:
+  - CITES
+  - Wildlife trafficking
+  indicators: []
+  areas:
+  - EN
+- term: Wildlife trafficking
+  definition: 'Another name for illegal wildlife trade: the illicit procurement, transport and distribution
+    of protected animals, parts and derivatives, plus related money laundering.'
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2021-11/FinCEN%20Environmental%20Crimes%20Notice%20508%20FINAL.pdf
+  cases: []
+  related:
+  - Illegal wildlife trade (IWT)
+  indicators: []
+  areas:
+  - EN
+- term: CITES
+  definition: The Convention on International Trade in Endangered Species of Wild Fauna and Flora (in
+    force since 1975), which regulates international trade in over 37,000 species through a permit system.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related:
+  - CITES Appendices
+  - CITES Management Authority
+  indicators: []
+  areas:
+  - EN
+- term: CITES Appendices I, II and III
+  definition: 'The three CITES lists: Appendix I bans commercial international trade (e.g. pangolins),
+    Appendix II allows controlled trade, Appendix III covers species one country asked others to help
+    protect.'
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related:
+  - CITES
+  indicators: []
+  areas:
+  - EN
+- term: CITES Management Authority
+  definition: The national government body that issues CITES permits and certificates; its officials appear
+    in FATF's corruption indicators.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related:
+  - CITES
+  indicators: []
+  areas:
+  - EN
+- term: Captive-bred / pre-Convention fraud
+  definition: Falsely declaring wild-caught animals as bred in captivity, or wildlife as obtained before
+    CITES applied, to make illegal specimens look legal.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related:
+  - CITES
+  indicators: []
+  areas:
+  - EN
+- term: Syndicate
+  definition: In FATF's wildlife report, an organised criminal group, which may be centralised or a loose,
+    flexible network that cooperates per shipment.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Third-party payment
+  definition: A transfer of value between two parties through an intermediary to hide who really benefits.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related:
+  - Middleman transactions
+  indicators: []
+  areas:
+  - EN
+- term: Money or value transfer services (MVTS)
+  definition: Services that take cash or other value and pay a matching sum to a beneficiary elsewhere,
+    by message, transfer or clearing network, sometimes through several intermediaries.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Hawala and other similar service providers (HOSSPs)
+  indicators: []
+  areas:
+  - EN
+- term: Hawala and other similar service providers (HOSSPs)
+  definition: Informal money transmitters that settle through trade, cash or netting over time rather
+    than bank transfers, such as hawala, hundi and fei chien ('flying money').
+  examples:
+  - fei chen
+  - hundi
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related:
+  - MVTS
+  indicators: []
+  areas:
+  - EN
+- term: Front company
+  definition: A company with real business used to mix illegal proceeds or goods with legitimate ones
+    so they look clean.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Shell company
+  - Co-mingling
+  indicators: []
+  areas:
+  - EN
+- term: Shell company
+  definition: A company with no real operations used to hide laundering and the people behind it.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+  cases: []
+  related:
+  - Front company
+  indicators: []
+  areas:
+  - EN
+- term: Co-mingling
+  definition: Mixing illegally sourced goods or money with legitimate goods or money, for example at sawmills
+    or refineries, so the illegal part cannot be told apart.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Front company
+  - Supply chain choke point
+  indicators: []
+  areas:
+  - EN
+- term: Supply chain choke point
+  definition: A processing step, such as a sawmill or metal refinery, where illegally extracted resources
+    enter the legal supply chain.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Refiner
+  - Co-mingling
+  indicators: []
+  areas:
+  - EN
+- term: Trade-based money laundering (TBML) vs trade-based fraud
+  definition: TBML uses trade to clean money; trade-based fraud in environmental crime mainly hides where
+    illegal goods came from, often by routing them through transit countries to mix with legal goods.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related:
+  - Misdeclaration
+  - Transfer pricing
+  indicators: []
+  areas:
+  - EN
+- term: Cover load
+  definition: Legitimate goods (e.g. coffee, tea, beans, used clothing) shipped to hide illegal wildlife
+    products in the same consignment.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related:
+  - Front company
+  indicators: []
+  areas:
+  - EN
+- term: Politically exposed person (PEP)
+  definition: Someone holding a prominent public function, or their family or close associate; FATF flags
+    PEPs with environmental, forestry or mining oversight.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Conflict-affected and high-risk area (CAHRA)
+  definition: An area marked by armed conflict, widespread violence or other risks of harm to people,
+    including political instability, repression or collapse of civil infrastructure.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related:
+  - Red flag location
+  indicators: []
+  areas:
+  - EN
+- term: Red flag location (gold)
+  definition: 'Under OECD guidance, a place of gold origin or transit that triggers enhanced due diligence:
+    a CAHRA, a country whose claimed output exceeds its reserves, or a known transit country.'
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related:
+  - CAHRA
+  indicators: []
+  areas:
+  - EN
+- term: Artisanal and small-scale mining (ASM)
+  definition: Formal or informal mining using simple, labour-intensive, low-capital methods of exploration,
+    extraction, processing and transport.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related:
+  - Illegal mining
+  indicators: []
+  areas:
+  - EN
+- term: Refiner
+  definition: A person or company that purifies gold to commercial quality from doré, alluvial gold, scrap
+    or other gold-bearing material.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related:
+  - Recyclable gold
+  - Supply chain choke point
+  indicators: []
+  areas:
+  - EN
+- term: Recyclable gold
+  definition: Gold that has already been refined (jewellery, investment gold, scrap and manufacturing
+    waste) and is returned to a refiner to be recycled.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related:
+  - Refiner
+  indicators: []
+  areas:
+  - EN
+- term: Basel Convention
+  definition: The international treaty controlling cross-border movements of hazardous and other wastes,
+    especially from developed to developing countries.
+  examples: []
+  source_url: https://www.basel.int/Portals/4/download.aspx?e=UNEP-CHW-IMPL-CONVTEXT-2025.English.pdf
+  cases: []
+  related:
+  - Illegal traffic (Basel)
+  indicators: []
+  areas:
+  - EN
+- term: Illegal traffic (Basel Convention)
+  definition: A cross-border waste shipment made without required notification or consent, with consent
+    obtained by fraud, not materially matching its documents, or ending in deliberate dumping.
+  examples: []
+  source_url: https://www.basel.int/Portals/4/download.aspx?e=UNEP-CHW-IMPL-CONVTEXT-2025.English.pdf
+  cases: []
+  related:
+  - Waste trafficking
+  - Misdeclaration
+  indicators: []
+  areas:
+  - EN
+- term: Misdeclaration (waste)
+  definition: Declaring waste falsely, for example as destined for recovery, as raw material, as non-hazardous,
+    or with a false origin or destination.
+  examples: []
+  source_url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+  cases: []
+  related:
+  - Illegal traffic (Basel)
+  indicators: []
+  areas:
+  - EN
+- term: IUU fishing
+  definition: 'Illegal, unreported and unregulated fishing: fishing that breaks national or regional rules,
+    is not reported or misreported, or happens where no rules apply in ways inconsistent with state duties.'
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+  cases: []
+  related:
+  - Illegal fishing
+  - Unreported fishing
+  - Unregulated fishing
+  indicators: []
+  areas:
+  - EN
+- term: Illegal fishing
+  definition: Fishing in a state's waters without permission or against its laws, or by vessels breaking
+    measures of a regional fisheries body their flag state belongs to.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+  cases: []
+  related:
+  - IUU fishing
+  indicators: []
+  areas:
+  - EN
+- term: Unreported fishing
+  definition: Fishing that is not reported, or is misreported, to the relevant national authority or regional
+    fisheries body.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+  cases: []
+  related:
+  - IUU fishing
+  indicators: []
+  areas:
+  - EN
+- term: Unregulated fishing
+  definition: Fishing by stateless or non-member vessels in a regional fisheries body's area against its
+    measures, or fishing where no conservation rules apply in a way inconsistent with international law.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+  cases: []
+  related:
+  - IUU fishing
+  - Stateless vessel
+  indicators: []
+  areas:
+  - EN
+- term: Fishing vessel (EU IUU Regulation)
+  definition: Any vessel used or intended for commercial fishing, including support, processing, transshipment
+    and carrier vessels but not container ships.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+  cases: []
+  related:
+  - Transshipment
+  indicators: []
+  areas:
+  - EN
+- term: Regional fisheries management organisation (RFMO)
+  definition: An international body that sets conservation and management rules for fish stocks in a region
+    and keeps authorised and IUU vessel lists; referred to as the 'relevant regional fisheries management
+    organisation' in EU law.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+  cases: []
+  related:
+  - IUU vessel list
+  indicators: []
+  areas:
+  - EN
+- term: Stateless vessel
+  definition: A vessel with no nationality under international law; EU law presumes it is engaged in IUU
+    fishing.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+  cases: []
+  related:
+  - Flag hopping
+  indicators: []
+  areas:
+  - EN
+- term: Flag hopping
+  definition: Frequent changes of a vessel's flag state, which FAO says may indicate use in IUU fishing.
+  examples: []
+  source_url: https://www.fao.org/4/y3554e/y3554e01.htm
+  cases: []
+  related:
+  - Flag of convenience
+  - Stateless vessel
+  indicators: []
+  areas:
+  - EN
+- term: Reflagging
+  definition: Registering a vessel under a new flag; FAO notes some owners reflag in countries unable
+    or unwilling to control fishing.
+  examples: []
+  source_url: https://www.fao.org/4/y3554e/y3554e01.htm
+  cases: []
+  related:
+  - Flag hopping
+  indicators: []
+  areas:
+  - EN
+- term: Automatic Identification System (AIS)
+  definition: A radio transponder system broadcasting a vessel's identity and position, used by Global
+    Fishing Watch to track fishing; gaps can mean it was switched off.
+  examples: []
+  source_url: https://globalfishingwatch.org/article/hotspots-of-unseen-fishing-vessels-qa/
+  cases: []
+  related:
+  - AIS disabling event
+  - Dark vessel
+  indicators: []
+  areas:
+  - EN
+- term: AIS disabling event
+  definition: A suspected deliberate switch-off of a vessel's AIS, counted by Global Fishing Watch only
+    more than 50 nautical miles from shore.
+  examples: []
+  source_url: https://globalfishingwatch.org/article/hotspots-of-unseen-fishing-vessels-qa/
+  cases: []
+  related:
+  - AIS
+  indicators: []
+  areas:
+  - EN
+- term: Dark vessel (not publicly tracked)
+  definition: A vessel seen in satellite imagery that does not appear in public AIS data.
+  examples: []
+  source_url: https://www.nature.com/articles/s41586-023-06825-8
+  cases: []
+  related:
+  - AIS
+  indicators: []
+  areas:
+  - EN
+- term: Transshipment
+  definition: Moving catch from a fishing vessel to a carrier vessel; it can be efficient but can let
+    illegally caught fish enter the legitimate market.
+  examples: []
+  source_url: https://www.frontiersin.org/articles/10.3389/fmars.2018.00240/full
+  cases: []
+  related:
+  - Encounter
+  - Loitering
+  indicators: []
+  areas:
+  - EN
+- term: Encounter (vessel)
+  definition: In Global Fishing Watch research, a fishing vessel and carrier staying within 500 m for
+    at least 2 hours at under 2 knots, at least 10 km from an anchorage.
+  examples: []
+  source_url: https://www.frontiersin.org/articles/10.3389/fmars.2018.00240/full
+  cases: []
+  related:
+  - Transshipment
+  - Loitering
+  indicators: []
+  areas:
+  - EN
+- term: Loitering (vessel)
+  definition: A carrier vessel moving at under 2 knots for at least 8 hours at least 20 nautical miles
+    from shore, a sign of possible transshipment.
+  examples: []
+  source_url: https://www.frontiersin.org/articles/10.3389/fmars.2018.00240/full
+  cases: []
+  related:
+  - Encounter
+  indicators: []
+  areas:
+  - EN
+- term: Lacey Act
+  definition: US law banning import, export, transport, sale or purchase of fish, wildlife or plants taken,
+    held, moved or sold in breach of law; used against illegal timber and seafood.
+  examples: []
+  source_url: https://www.fws.gov/law/lacey-act
+  cases: []
+  related:
+  - Illegal logging
+  indicators: []
+  areas:
+  - EN
+- term: Suspicious transaction report (STR / SAR)
+  definition: A report a bank or other obliged business files with the financial intelligence unit about
+    possible money laundering; FinCEN asks US filers to tag environmental crime SARs 'FIN-2021-NTC4'.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2021-11/FinCEN%20Environmental%20Crimes%20Notice%20508%20FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Proceeds of crime
+  definition: Any property obtained directly or indirectly from committing an offence.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Carbon credit (offset)
+  definition: A certificate that stands for one tonne of carbon dioxide (or equivalent) cut or removed,
+    which can be bought to offset emissions.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related:
+  - Emission allowance
+  - Carbon registry
+  indicators: []
+  areas:
+  - EN
+- term: EU Emissions Trading System (EU ETS)
+  definition: The EU's cap-and-trade market, where companies must hold allowances for their emissions
+    and can buy and sell them.
+  examples: []
+  source_url: https://www.europol.europa.eu/media-press/newsroom/news/carbon-credit-fraud-causes-more-5-billion-euros-damage-for-european-taxpayer
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Emission allowance
+  definition: A permit under a cap-and-trade system to emit one tonne of CO2, which can be traded.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Carbon registry
+  definition: An electronic register, like a bank account system, that records who holds which carbon
+    credits or allowances and tracks their transfer and retirement.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Clean Development Mechanism (CDM)
+  definition: A UN scheme under the Kyoto Protocol that issued credits for emission-cutting projects in
+    developing countries.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Additionality
+  definition: The test of whether a project's emission cuts would not have happened without the money
+    from carbon credits.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Double counting / recycled credits
+  definition: Counting or selling the same emission reduction more than once, including putting back on
+    sale credits already surrendered.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Verifier (third-party auditor)
+  definition: An independent firm that checks a project's emission reductions before credits are issued.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Missing Trader Intra-Community (MTIC) / carousel fraud
+  definition: A VAT fraud in which goods or allowances are bought VAT-free from another EU state and resold
+    with VAT, after which the seller disappears without paying the VAT; the goods often go round in circles.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Ponzi scheme
+  definition: A fraud that pays earlier investors with money from new investors instead of real profits.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Phishing
+  definition: Fake emails or websites that trick people into handing over login details or bank information.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: HFC (hydrofluorocarbon)
+  definition: Man-made refrigerant gases with a strong warming effect, being phased down under EU law
+    and the Kigali Amendment.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: HFO (hydrofluoroolefin)
+  definition: Newer refrigerant gases with low warming effect that are less tightly regulated than HFCs.
+  examples: []
+  source_url: https://eia-international.org/news/illegal-smuggling-of-refrigerant-gases-into-europe-continues-as-the-climate-crisis-worsens/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: F-gases (fluorinated greenhouse gases)
+  definition: The group of man-made fluorine gases, including HFCs, that EU Regulation 2024/573 controls.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: HFC quota
+  definition: The amount of HFCs the European Commission lets each producer or importer place on the EU
+    market.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: F-gas Portal
+  definition: The EU's online registry of companies dealing in F-gases; a valid registration works as
+    a licence, and it is connected to customs systems.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Non-refillable (disposable) container
+  definition: A single-use gas cylinder; EU law bans them for F-gases except for lab use.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Dark web
+  definition: Parts of the internet reached only with special software such as Tor, where hidden markets
+    sell illegal goods.
+  examples: []
+  source_url: https://baselgovernance.org/sites/default/files/2021-11/cte_5.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Greenwashing
+  definition: Presenting a company, product or financial product as more sustainable than it is, in ways
+    that may mislead consumers or investors.
+  examples: []
+  source_url: https://www.esma.europa.eu/press-news/esma-news/esas-put-forward-common-understanding-greenwashing-and-warn-risks
+  cases: []
+  related:
+  - Environmental claim
+  indicators: []
+  areas:
+  - EN
+- term: Environmental claim
+  definition: Any voluntary message that says or implies a product, brand or trader is good for, neutral
+    for, or less harmful to the environment, or has improved over time.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related:
+  - Generic environmental claim
+  indicators: []
+  areas:
+  - EN
+- term: Generic environmental claim
+  definition: A broad green claim not on a sustainability label and not explained clearly on the same
+    medium.
+  examples:
+  - eco-friendly
+  - green
+  - sustainable
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Sustainability label
+  definition: A voluntary trust or quality mark that sets a product, process or business apart for its
+    environmental or social features; mandatory labels are excluded.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Certification scheme
+  definition: An independent third-party scheme with public requirements that verifies a product, process
+    or business and allows use of a label.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Recognised excellent environmental performance
+  definition: Performance that meets the EU Ecolabel, an officially recognised ISO 14024 type I ecolabel,
+    or top performance under other EU law.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Green Claims Code
+  definition: UK competition regulator guidance setting six principles that environmental claims must
+    meet under consumer law.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Life cycle
+  definition: All stages of a product's existence, from raw materials and manufacture through transport
+    and use to disposal; claims covering only part can mislead.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/green-claims-code-making-environmental-claims/environmental-claims-on-goods-and-services
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Substantiation
+  definition: The evidence a business holds to prove its claim is true; in the US often competent and
+    reliable scientific evidence.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Green Guides
+  definition: US Federal Trade Commission guidance (16 CFR Part 260) on how environmental marketing claims
+    can avoid being deceptive.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Carbon offset
+  definition: A credit representing an emission reduction or removal elsewhere, bought to balance one's
+    own emissions; it must not be sold twice or represent reductions that would have happened anyway.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  cases: []
+  related:
+  - Carbon neutral claim
+  indicators: []
+  areas:
+  - EN
+- term: Substantial majority (recyclable claims)
+  definition: In the FTC Guides, at least 60 percent of consumers or communities where a product is sold
+    having access to recycling for it.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Net zero pledge
+  definition: A commitment to cut greenhouse gas emissions so that remaining emissions are balanced by
+    removals; UN experts say it needs interim targets, a transition plan and no new fossil fuel supply.
+  examples: []
+  source_url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Scope 1, 2 and 3 emissions
+  definition: A company's direct emissions (1), emissions from the energy it buys (2), and emissions in
+    its wider value chain (3); UN experts say business net-zero targets must cover all three.
+  examples: []
+  source_url: https://www.un.org/sites/un2.un.org/files/high-level_expert_group_n7b.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: ESG
+  definition: Environmental, social and governance factors used in investment decisions; misstating how
+    they are applied has led to SEC penalties.
+  examples: []
+  source_url: https://www.sec.gov/news/press-release/2022-86
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: International humanitarian law (IHL)
+  definition: The rules that limit how wars are fought, protecting civilians, civilian objects and the
+    natural environment; includes the Geneva Conventions, their Protocols and customary rules.
+  examples: []
+  source_url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Customary international humanitarian law
+  definition: IHL rules binding on all parties because of widespread State practice and acceptance, catalogued
+    in the ICRC's 2005 study.
+  examples: []
+  source_url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Additional Protocol I
+  definition: The 1977 treaty adding to the Geneva Conventions for international armed conflicts; Articles
+    35(3) and 55 protect the natural environment.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Widespread, long-term and severe damage
+  definition: The treaty threshold for prohibited environmental damage in war under Protocol I; all three
+    conditions must be met.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related:
+  - Ecocide (popular term, not sourced here)
+  indicators: []
+  areas:
+  - EN
+- term: Military objective / imperative military necessity
+  definition: Parts of nature may be attacked only if they are military objectives, and destroyed only
+    when military necessity demands it.
+  examples: []
+  source_url: https://www.icrc.org/en/doc/assets/files/other/icrc_002_0860.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Works and installations containing dangerous forces
+  definition: Dams, dykes and nuclear power stations, whose attack could release floods or radiation;
+    specially protected in war.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Objects indispensable to the survival of the civilian population
+  definition: Things civilians need to live, such as food, farmland, crops, livestock, drinking water
+    and irrigation works, which may not be attacked to deny them.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Reprisal
+  definition: An otherwise unlawful act taken to force an enemy to stop violating the law; reprisals against
+    the environment are prohibited.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-additional-geneva-conventions-12-august-1949-and
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Pillage
+  definition: Taking property, including natural resources, for private or unlawful gain in armed conflict;
+    prohibited.
+  examples: []
+  source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Environmental modification techniques (ENMOD)
+  definition: Deliberate manipulation of natural processes; the 1976 ENMOD Convention bans hostile use
+    with widespread, long-lasting or severe effects.
+  examples: []
+  source_url: https://disarmament.unoda.org/enmod/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: PERAC draft principles
+  definition: The UN International Law Commission's 2022 principles on protecting the environment before,
+    during and after armed conflict and in occupation.
+  examples: []
+  source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Occupying power
+  definition: A State exercising control over foreign territory in armed conflict; ILC principles require
+    it to use natural resources there sustainably.
+  examples: []
+  source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Remnants of war
+  definition: Toxic or hazardous material left after fighting, such as munitions or contamination, which
+    parties should remove or make harmless.
+  examples: []
+  source_url: https://legal.un.org/ilc/texts/instruments/english/draft_articles/8_7_2022.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN

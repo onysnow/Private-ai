@@ -3,9 +3,22 @@
     "next/core-web-vitals",
     "next/typescript"
   ],
+  "rules": {
+    "@typescript-eslint/explicit-module-boundary-types": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ]
+  },
   "ignorePatterns": [
     ".next",
     "node_modules",
-    "next-env.d.ts"
+    "next-env.d.ts",
+    "lib/generated",
+    "vendor/onysnow-effects"
   ]
 }

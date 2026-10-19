@@ -1,0 +1,467 @@
+area: CP
+terms:
+- term: Child abuse and neglect (US federal minimum definition)
+  definition: Under US federal law, at minimum any recent act or failure to act by a parent or caretaker
+    that results in death, serious physical or emotional harm, sexual abuse or exploitation, or an imminent
+    risk of serious harm.
+  examples: []
+  source_url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+  cases: []
+  related:
+  - CAPTA
+  indicators: []
+  areas:
+  - CP
+- term: CAPTA
+  definition: The Child Abuse Prevention and Treatment Act, the US federal law that sets the minimum definition
+    of child abuse and neglect and funds state child-protection systems.
+  examples: []
+  source_url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: CPS (child protective services)
+  definition: The US state or county agency that receives reports of suspected child abuse or neglect
+    and investigates or assesses them.
+  examples: []
+  source_url: https://www.azcourts.gov/Portals/0/46/Reading%20List/CECANF%20Final%20Report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Mandatory reporter
+  definition: A person, usually a professional such as a teacher or doctor, whom state law requires to
+    report suspected child abuse or neglect.
+  examples: []
+  source_url: https://www.childwelfare.gov/resources/what-child-abuse-and-neglect-recognizing-signs-and-symptoms/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: NCANDS
+  definition: The US National Child Abuse and Neglect Data System, to which states report maltreatment
+    data, including deaths; the CECANF commission considered its fatality counts an undercount.
+  examples: []
+  source_url: https://www.azcourts.gov/Portals/0/46/Reading%20List/CECANF%20Final%20Report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Child Safeguarding Practice Review Panel
+  definition: An independent national panel in England that reviews serious child safeguarding cases and
+    publishes national learning.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: LCSPR (local child safeguarding practice review)
+  definition: A review that local safeguarding partners in England carry out after a serious incident
+    to find lessons for practice.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  cases: []
+  related:
+  - Rapid review
+  indicators: []
+  areas:
+  - CP
+- term: Section 47 enquiry
+  definition: An enquiry that English local authorities must make under section 47 of the Children Act
+    1989 when they believe a child has suffered, or is likely to suffer, significant harm.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1078488/ALH_SH_National_Review_26-5-22.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Strategy discussion
+  definition: A multi-agency discussion held in England when there is reasonable cause to suspect significant
+    harm, to decide whether to start child-protection enquiries.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1078488/ALH_SH_National_Review_26-5-22.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Disguised compliance
+  definition: A term practitioners use when a family appears to cooperate without real change; the Panel
+    warns the term needs careful use and that non-engagement often has underlying causes.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Professional curiosity
+  definition: Practitioners' willingness to question what they are told and look beyond first appearances;
+    case reviews often find it lacking.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Cumulative neglect
+  definition: Harm that builds up over time from repeated, often low-level, failures of care; it is missed
+    when each incident is treated alone.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: SUDI (sudden unexpected death in infancy)
+  definition: The sudden and unexpected death of a baby; the Panel reports it among the main categories
+    of serious incidents involving babies.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Non-accidental injury (NAI)
+  definition: An injury to a child that was caused deliberately rather than by accident.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/984767/The_Child_Safeguarding_Annual_Report_2020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Unsuitable explanation
+  definition: In NICE guidance, an explanation for an injury that is implausible, inadequate or inconsistent
+    with the injury, the child's age or development, or other accounts.
+  examples: []
+  source_url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Not independently mobile
+  definition: A child who cannot yet move about on their own, such as a baby who cannot crawl; NICE treats
+    injuries in such children as a strong alert.
+  examples: []
+  source_url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: '''Consider'' and ''suspect'' (NICE)'
+  definition: 'The two levels NICE uses for alerting features: ''consider'' means maltreatment is one
+    possible explanation, while ''suspect'' indicates stronger evidence of child abuse and neglect.'
+  examples: []
+  source_url: https://www.nice.org.uk/guidance/ng76/chapter/Recommendations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Fabricated or induced illness (FII)
+  definition: A form of maltreatment in which a carer reports, invents or causes illness in a child, so
+    that the child's presentation does not match any recognised clinical picture.
+  examples: []
+  source_url: https://www.nice.org.uk/guidance/cg89/chapter/Recommendations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Unregistered children's home
+  definition: Accommodation for children in care that should be registered with Ofsted but is not, which
+    the Children's Commissioner calls illegal.
+  examples: []
+  source_url: https://assets.childrenscommissioner.gov.uk/wpuploads/2024/12/cco-illegal-childrens-homes.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Deprivation of Liberty order
+  definition: A court order in England authorising restrictions on a child's liberty, often used for children
+    placed in unregistered settings.
+  examples: []
+  source_url: https://assets.childrenscommissioner.gov.uk/wpuploads/2024/12/cco-illegal-childrens-homes.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: NCMEC
+  definition: The US National Center for Missing and Exploited Children, to which state agencies must
+    report children missing from foster care within 24 hours.
+  examples: []
+  source_url: https://oig.hhs.gov/reports/all/2023/state-agencies-did-not-always-ensure-that-children-missing-from-foster-care-were-reported-to-the-national-center-for-missing-and-exploited-children-in-accordance-with-federal-requirements
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: RTF (residential treatment facility)
+  definition: A live-in facility providing mental and behavioural health treatment to young people, often
+    paid for by Medicaid and child-welfare agencies.
+  examples: []
+  source_url: https://finance.senate.gov/chairmans-news/wyden-investigation-exposes-systemic-taxpayer-funded-child-abuse-and-neglect-in-youth-residential-treatment-facilities
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Restraint and seclusion
+  definition: Physically holding a young person to restrict movement (restraint) or confining them alone
+    in a room (seclusion).
+  examples: []
+  source_url: https://finance.senate.gov/chairmans-news/wyden-investigation-exposes-systemic-taxpayer-funded-child-abuse-and-neglect-in-youth-residential-treatment-facilities
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Wilderness therapy programme
+  definition: A private programme for troubled teenagers that uses outdoor expeditions as treatment; GAO
+    reviewed deaths in such programmes.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-146T/html/GAOREPORTS-GAO-08-146T.htm
+  cases: []
+  related:
+  - Boot camp
+  - Troubled-teen industry
+  indicators: []
+  areas:
+  - CP
+- term: Referral service / educational consultant
+  definition: Businesses that advise parents on choosing a residential programme; GAO notes referral services
+    do not charge parents but consultants typically charge thousands of dollars.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/GAOREPORTS-GAO-08-713T/html/GAOREPORTS-GAO-08-713T.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Parental (family) abduction
+  definition: When a parent or family member takes, keeps or hides a child in breach of the other parent's
+    custody or access rights.
+  examples: []
+  source_url: https://www.ojp.gov/pdffiles1/ojjdp/185026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Wrongful removal or retention (1980 Hague Convention)
+  definition: Taking or keeping a child in breach of custody rights under the law of the child's habitual
+    residence, when those rights were actually being exercised.
+  examples: []
+  source_url: https://www.hcch.net/en/instruments/conventions/full-text/?cid=24
+  cases: []
+  related:
+  - Habitual residence
+  indicators: []
+  areas:
+  - CP
+- term: Pattern of noncompliance
+  definition: The US State Department's citation of a country that persistently fails to meet its obligations
+    to resolve international parental child abduction cases, under the Goldman Act of 2014.
+  examples: []
+  source_url: https://adoption.state.gov/content/dam/NEWIPCAAssets/2025%20Annual%20Report%20on%20International%20Child%20Abduction.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: 1993 Hague Adoption Convention
+  definition: The international treaty on protecting children and cooperation in intercountry adoption,
+    which sets safeguards such as consent, adoptability and Central Authority oversight.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Illicit practices in intercountry adoption
+  definition: Practices that lead to a child being adopted without respect for the child's rights, as
+    defined in the HCCH toolkit.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Sale of children
+  definition: Any act or transaction in which a child is transferred by one person or group to another
+    for payment or any other consideration (OPSC Art. 2(a), quoted by HCCH).
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related:
+  - OPSC
+  indicators: []
+  areas:
+  - CP
+- term: OPSC
+  definition: The Optional Protocol to the UN Convention on the Rights of the Child on the sale of children,
+    child prostitution and child pornography.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Central Authority
+  definition: The government body each Hague Convention state designates to carry out and oversee its
+    adoption duties under the treaty.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: AAB (adoption accredited body)
+  definition: A private organisation accredited under the Hague Convention to carry out intercountry adoption
+    work.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: PAPs (prospective adoptive parents)
+  definition: People applying to adopt a child.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: State of origin / receiving State
+  definition: The country the adopted child comes from, and the country the child moves to with the adoptive
+    family.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Subsidiarity principle
+  definition: The rule that a child should be raised by birth or extended family where possible, with
+    intercountry adoption considered only after suitable options in the child's own country.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Adoptability
+  definition: A formal decision that a child can lawfully be adopted, which requires valid consents and
+    knowledge of the child's identity and family situation.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Matching
+  definition: The step in which a competent authority or body chooses a specific adoptive family for a
+    specific child.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Re-homing
+  definition: Adoptive parents placing an adopted child with other people privately to get around the
+    Convention's safeguards.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Voluntourism
+  definition: Short-term volunteering visits to childcare institutions abroad; HCCH recommends banning
+    them partly to stop children being picked out for adoption in advance.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Costs, fees, contributions and donations (adoption)
+  definition: HCCH distinguishes charges for specific services (costs and fees) from state-set or agency-demanded
+    payments (contributions) and voluntary gifts (donations), and warns that the last two can improperly
+    influence adoptions.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Enabling factors
+  definition: Social, economic, legal or institutional weaknesses that make illicit adoption practices
+    easier, as listed in the HCCH fact sheets.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Pattern of illicit practices
+  definition: Repeated abuses of a similar kind over time, usually involving the same actors (HCCH glossary).
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Relinquishment
+  definition: A legal parent's decision, made before an authority, to give up parental rights or consent
+    to adoption.
+  examples: []
+  source_url: https://assets.hcch.net/docs/7aa25208-63fe-41ac-850a-16e732597b88.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP
+- term: Compact of Free Association (Marshall Islands)
+  definition: The US agreement with the Republic of the Marshall Islands; DOJ notes that section 141(b)
+    bars entry under the Compact for travel whose purpose is adoption.
+  examples: []
+  source_url: https://www.justice.gov/usao-wdar/pr/arizona-adoption-attorney-sentenced-over-6-years-prison-alien-smuggling-financial-gain
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CP

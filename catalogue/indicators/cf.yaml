@@ -1,0 +1,2633 @@
+key: CF
+name: Consumer, housing and lending exploitation
+scope: Predatory lending, abusive debt collection, for-profit college fraud, insurers' bad-faith claim
+  denials, landlord harassment and slum conditions, gambling operators exploiting harmed gamblers, and
+  discrimination in lending, housing and hiring (redlining and reverse redlining).
+indicators:
+- id: CF-001
+  name: 'Equity stripping: loan sized to home equity, not ability to repay'
+  definition: A lender makes a home-secured loan based on how much equity the borrower has rather than
+    whether the borrower can afford the payments.
+  areas:
+  - CF
+  typology: Predatory lending
+  status: verified
+  sources:
+  - title: Predatory Lending
+    publisher: Washington State Department of Financial Institutions
+    url: https://dfi.wa.gov/financial-education/information/predatory-lending
+    locator: Equity Stripping
+    quote: The lender makes a loan based upon the equity in your home, whether or not you can make the
+      payments.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Older homeowner with low fixed income and large equity given a refinance whose payments exceed income,
+    followed by default and foreclosure
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Contract
+  - Payment
+  - Address
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - County recorder mortgage and deed records
+  - Foreclosure court dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Borrower had income or assets not visible in public records
+  - Legitimate reverse mortgage or equity-release product designed for borrowers without income
+  - Borrower circumstances changed after origination (job loss, illness)
+  jurisdictions: US (Washington State DFI guidance; general)
+  version: 1
+- id: CF-002
+  name: Bait-and-switch loan terms
+  definition: The borrower is promised one loan type or rate and, without good reason, given a different
+    and worse one at closing.
+  areas:
+  - CF
+  typology: Predatory lending
+  status: verified
+  sources:
+  - title: Predatory Lending
+    publisher: Washington State Department of Financial Institutions
+    url: https://dfi.wa.gov/financial-education/information/predatory-lending
+    locator: Bait-and-switch schemes
+    quote: The lender may promise one type of loan or interest rate but without good reason, give you
+      a different one.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Good-faith estimate quotes a fixed rate; closing documents carry an adjustable rate with higher fees
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Borrower loan estimates and closing disclosures
+  - CFPB complaint database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rate lock expired or market rates moved
+  - Appraisal or credit information changed underwriting
+  - Borrower requested a different product
+  jurisdictions: US
+  version: 1
+- id: CF-003
+  name: 'Loan flipping: repeated refinancing into new high-cost loans'
+  definition: A lender repeatedly refinances a borrower's loan into new long-term high-cost loans, generating
+    fresh fees each time.
+  areas:
+  - CF
+  typology: Predatory lending
+  status: verified
+  sources:
+  - title: Predatory Lending
+    publisher: Washington State Department of Financial Institutions
+    url: https://dfi.wa.gov/financial-education/information/predatory-lending
+    locator: Loan Flipping
+    quote: A lender refinances your loan with a new long-term, high cost loan.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Several refinances of the same property by the same lender within a few years, each recorded as a
+    new mortgage
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Contract
+  - Address
+  - Document
+  checkable: records
+  lookup_sources:
+  - County recorder mortgage records (count refinances per parcel per lender)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Borrower refinanced to capture falling interest rates
+  - Cash-out refinance for genuine home repairs or debt consolidation that lowered total cost
+  jurisdictions: US
+  version: 1
+- id: CF-004
+  name: 'Packing: unrequested add-on charges or insurance'
+  definition: The loan includes charges for services, such as credit insurance, that the borrower did
+    not ask for or need.
+  areas:
+  - CF
+  typology: Predatory lending
+  status: verified
+  sources:
+  - title: Predatory Lending
+    publisher: Washington State Department of Financial Institutions
+    url: https://dfi.wa.gov/financial-education/information/predatory-lending
+    locator: Packing
+    quote: You receive a loan that contains charges for services you did not request or need.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Single-premium credit life insurance financed into the loan balance
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Contract
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Closing disclosures and settlement statements
+  - CFPB complaint database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Borrower knowingly chose optional insurance or services
+  - Charge is required by the investor or by law (e.g., flood insurance in a flood zone)
+  jurisdictions: US
+  version: 1
+- id: CF-005
+  name: Hidden balloon payment
+  definition: A loan presented as affordable turns out at closing to be short-term with a large final
+    payment that forces refinancing; for high-cost mortgages a payment more than twice the regular payment
+    is prohibited.
+  areas:
+  - CF
+  typology: Predatory lending
+  status: verified
+  sources:
+  - title: Predatory Lending
+    publisher: Washington State Department of Financial Institutions
+    url: https://dfi.wa.gov/financial-education/information/predatory-lending
+    locator: Hidden Balloon Payments
+    quote: only to learn at closing that it is a short-term loan that you will have to refinance within
+      a few years.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 12 CFR 1026.32 Requirements for high-cost mortgages
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1026/subpart-E/section-1026.32
+    locator: § 1026.32(d)(1)(i)
+    quote: a payment schedule with a payment that is more than two times a regular periodic payment
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Mortgage with low monthly payments for five years then a lump-sum payoff of most of the principal
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Promissory note and closing disclosure
+  - County recorder mortgage records
+  levels:
+    faint: A balloon feature appears in a consumer loan
+    strong: To be set by Ony
+    textbook: On a high-cost mortgage, any payment more than two times a regular periodic payment (subject
+      to the rule's exceptions)
+    threshold_source: https://www.ecfr.gov/current/title-12/chapter-X/part-1026/subpart-E/section-1026.32
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Bridge loans and some commercial or construction loans are legitimately balloon-structured
+  - Balloon terms clearly disclosed and chosen by an informed borrower expecting a sale
+  jurisdictions: US
+  version: 1
+- id: CF-006
+  name: Loan meets high-cost mortgage (HOEPA) price triggers
+  definition: A home loan's interest rate, points and fees, or prepayment penalties exceed the federal
+    thresholds that classify it as a high-cost mortgage.
+  areas:
+  - CF
+  typology: Predatory lending
+  status: verified
+  sources:
+  - title: 12 CFR 1026.32 Requirements for high-cost mortgages
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1026/subpart-E/section-1026.32
+    locator: § 1026.32(a)(1)(i)(A)
+    quote: 6.5 percentage points for a first-lien transaction, other than as described in paragraph (a)(1)(i)(B)
+      of this section;
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 12 CFR 1026.32 Requirements for high-cost mortgages
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1026/subpart-E/section-1026.32
+    locator: § 1026.32(a)(1)(ii)(A)
+    quote: 5 percent of the total loan amount for a transaction with a loan amount of $20,000 or more;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - HMDA records showing a lender's first-lien loans with rate spreads above 6.5 points concentrated in
+    particular tracts
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - HMDA public loan-level data (rate spread, HOEPA status fields)
+  - Loan documents
+  levels:
+    faint: A lender's loans cluster just below the triggers
+    strong: To be set by Ony
+    textbook: First-lien APR more than 6.5 points above APOR, or points and fees above 5% of a loan of
+      $20,000 or more, or prepayment penalties beyond 36 months or above 2% of the amount prepaid
+    threshold_source: https://www.ecfr.gov/current/title-12/chapter-X/part-1026/subpart-E/section-1026.32
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-cost loans are legal if HOEPA protections and counselling are provided
+  - Small loan amounts or manufactured-housing loans have naturally higher rate spreads
+  - Borrower credit risk justifies pricing
+  jurisdictions: US federal (Regulation Z / HOEPA)
+  version: 1
+- id: CF-007
+  name: 'Reverse redlining: targeting minority or older borrowers with worse products'
+  definition: A lender targets particular communities, such as minority neighbourhoods or older homeowners,
+    with less advantageous loans, for example by advertising in a specific language.
+  areas:
+  - CF
+  typology: Predatory lending; lending discrimination
+  status: verified
+  sources:
+  - title: Identifying and Mitigating Potential Redlining Risks
+    publisher: FDIC
+    url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+    locator: Reverse redlining definition
+    quote: the practice of targeting certain borrowers or areas with less advantageous products or services
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Predatory Lending
+    publisher: Washington State Department of Financial Institutions
+    url: https://dfi.wa.gov/financial-education/information/predatory-lending
+    locator: Targeting
+    quote: They may target minority communities by advertising in a specific language
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Subprime or high-cost loan share far higher in majority-minority tracts than in comparable white tracts
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Address
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - HMDA data with census tract demographics
+  - Lender advertising archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Language-specific marketing that offers the same products and prices to all
+  - Differences explained by credit profiles or loan size
+  - Lender specialises legitimately in a niche product
+  jurisdictions: US
+  version: 1
+- id: CF-008
+  name: 'Payday debt trap: loans repeatedly rolled over or renewed'
+  definition: Short-term loans are routinely rolled over or re-borrowed so that borrowers stay in long
+    sequences of loans and pay fees exceeding what they borrowed.
+  areas:
+  - CF
+  typology: Predatory lending (small-dollar)
+  status: verified
+  sources:
+  - title: CFPB Finds Four Out Of Five Payday Loans Are Rolled Over Or Renewed
+    publisher: CFPB
+    url: https://www.consumerfinance.gov/about-us/newsroom/cfpb-finds-four-out-of-five-payday-loans-are-rolled-over-or-renewed
+    locator: Key findings
+    quote: More than 80 percent of payday loans are rolled over or renewed within two weeks.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: CFPB Finds Four Out Of Five Payday Loans Are Rolled Over Or Renewed
+    publisher: CFPB
+    url: https://www.consumerfinance.gov/about-us/newsroom/cfpb-finds-four-out-of-five-payday-loans-are-rolled-over-or-renewed
+    locator: Key findings
+    quote: Over 60 percent of loans are made to borrowers in the course of loan sequences lasting seven
+      or more loans in a row.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Lender revenue data showing most fee income comes from repeat borrowers
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Contract
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - State payday lending regulator annual reports
+  - Lender filings
+  - CFPB complaint database
+  levels:
+    faint: Borrowers commonly take a new loan within two weeks of repaying
+    strong: Borrowers in sequences of seven or more loans in a row (the CFPB's study measure)
+    textbook: Meets the published definition as worded
+    threshold_source: https://www.consumerfinance.gov/about-us/newsroom/cfpb-finds-four-out-of-five-payday-loans-are-rolled-over-or-renewed
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Borrower uses small loans occasionally for unrelated emergencies
+  - State law caps rollovers and the lender complies
+  jurisdictions: US
+  version: 1
+- id: CF-009
+  name: 'Abusive design: product terms that obscure costs or exploit reliance'
+  definition: A financial product or practice materially interferes with understanding its terms, or takes
+    unreasonable advantage of a consumer's lack of understanding, inability to protect themselves, or
+    reliance on the provider.
+  areas:
+  - CF
+  typology: Unfair, deceptive or abusive acts or practices (UDAAP)
+  status: verified
+  sources:
+  - title: 12 U.S.C. 5531
+    publisher: US Code (Cornell LII)
+    url: https://www.law.cornell.edu/uscode/text/12/5531
+    locator: § 5531(d)(1)
+    quote: materially interferes with the ability of a consumer to understand a term or condition
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 12 U.S.C. 5531
+    publisher: US Code (Cornell LII)
+    url: https://www.law.cornell.edu/uscode/text/12/5531
+    locator: § 5531(c)(1)(A)
+    quote: causes or is likely to cause substantial injury to consumers which is not reasonably avoidable
+      by consumers.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fees disclosed only in fine print after sign-up
+  - Product sold as being in the customer's interest by an adviser paid to sell it
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Document
+  - Note
+  checkable: records
+  lookup_sources:
+  - CFPB enforcement actions and complaint database
+  - Product terms and marketing
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complex products can be genuinely complex and fully disclosed
+  - Customer confusion may come from one poorly trained employee rather than design
+  jurisdictions: US federal
+  version: 1
+- id: CF-010
+  name: Lending market area excludes minority neighbourhoods
+  definition: A lender's defined market or CRA assessment area carves out areas with relatively high minority
+    populations.
+  areas:
+  - CF
+  typology: Redlining
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors (FFIEC Interagency procedures, Dallas Fed summary)
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Redlining risk factors (3rd item)
+    quote: Having credit product markets that exclude geographic areas that have relatively high concentrations
+      of minority residents
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Identifying and Mitigating Potential Redlining Risks
+    publisher: FDIC
+    url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+    locator: Assessment area
+    quote: Pay close attention if the bank's assessment area includes only partial political subdivisions
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Assessment-area map that follows a city's majority-Black neighbourhoods around their edges
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - CRA public evaluations and assessment-area maps
+  - Census tract demographics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Assessment area drawn around branch locations that predate the analysis
+  - Small bank cannot reasonably serve a whole county
+  - Excluded tracts are non-residential
+  jurisdictions: US (FFIEC, FDIC)
+  version: 1
+- id: CF-011
+  name: Branches and loan offices placed to avoid minority areas
+  definition: Most of a lender's branches or loan officers are in predominantly white areas, while minority
+    areas get no branches or only subprime affiliates.
+  areas:
+  - CF
+  typology: Redlining; steering
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Redlining risk factors (6th item); Steering (7th item)
+    quote: Most of the lender's branches are in predominantly white neighborhoods, while branches of its
+      subprime subsidiary…
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Identifying and Mitigating Potential Redlining Risks
+    publisher: FDIC
+    url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+    locator: Branch locations
+    quote: Review marketing, including branching strategies (if used to reach applicants)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Trident Mortgage: DOJ alleged offices concentrated in majority-white areas of the Philadelphia region'
+  cases:
+  - name: United States et al. v. Trident Mortgage Company
+    year: '2022'
+    jurisdiction: US (E.D. Pa.)
+    what_happened: DOJ, CFPB and three state AGs alleged Trident failed to provide mortgage lending services
+      to neighbourhoods of color in the Philadelphia area; Trident agreed to invest over $20 million in
+      those neighbourhoods and pay a $4 million civil money penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edpa/pr/justice-department-consumer-financial-protection-bureau-and-three-state-attorneys
+    source_title: Justice Department, CFPB and Three State Attorneys General ... Trident
+  data_needed:
+  - Company
+  - Address
+  - Employment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - FDIC Summary of Deposits branch locations
+  - NMLS loan officer and branch registry
+  - Census tract demographics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Branch network inherited through acquisitions
+  - Lender operates mainly online or through brokers
+  - Branch decisions driven by deposit markets, not lending
+  jurisdictions: US
+  version: 1
+- id: CF-012
+  name: Low loan applications or originations in minority areas compared with peers
+  definition: A lender receives or makes far fewer loans in minority areas than other lenders in the same
+    market, or the share of minority applicants is much lower than their share of the population.
+  areas:
+  - CF
+  typology: Redlining
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Redlining risk factors (1st item); Marketing (6th item)
+    quote: Significant differences—in number of loans, approval/denial rates for all applicants and denial
+      rates based on…
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: Identifying and Mitigating Potential Redlining Risks
+    publisher: FDIC
+    url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+    locator: Peer comparison
+    quote: compares to data reported by other HMDA reporters operating in the same market
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Lender's share of applications from majority-minority tracts is a fraction of its peers' share in
+    the same metro area
+  cases:
+  - name: United States et al. v. Trident Mortgage Company
+    year: '2022'
+    jurisdiction: US (E.D. Pa.)
+    what_happened: Redlining complaint alleging Trident failed to serve neighbourhoods of color in the
+      Philadelphia metro; settled with over $20 million in investment and a $4 million penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edpa/pr/justice-department-consumer-financial-protection-bureau-and-three-state-attorneys
+  data_needed:
+  - Company
+  - Contract
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - HMDA public data (FFIEC)
+  - Census tract demographics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: Disparity analysis overlaps the existing PM-011 disparities indicator
+    source_url: https://www.fdic.gov/resources/bankers/fair-lending/documents/fdic-redlining-fair-lending-resources-page.pdf
+  innocent_explanations:
+  - Lender specialises in products (jumbo, rural) less demanded in those areas
+  - Small numbers make peer comparisons unstable
+  - Lender entered the market recently
+  jurisdictions: US
+  version: 1
+- id: CF-013
+  name: Marketing that excludes minority media or geographies
+  definition: A lender or housing provider advertises only in media or places that reach non-minority
+    areas, or uses prescreened lists or brokers that leave out protected groups.
+  areas:
+  - CF
+  typology: Redlining; discriminatory advertising
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Marketing risk factors (2nd item; see also items 1, 3-5)
+    quote: Advertising only in media serving nonminority areas
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 24 CFR 100.75 Discriminatory advertisements, statements and notices
+    publisher: HUD (Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/24/100.75
+    locator: § 100.75(c)(3)
+    quote: Selecting media or locations for advertising the sale or rental of dwellings which deny particular
+      segments
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Mortgage mailers sent only to ZIP codes that are majority white
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Address
+  - Event
+  checkable: records
+  lookup_sources:
+  - Ad libraries (e.g., platform ad archives)
+  - Direct-mail samples
+  - HMDA applicant data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Budget limits restrict ads to a few outlets
+  - Media chosen by cost per reach without regard to demographics
+  jurisdictions: US
+  version: 1
+- id: CF-014
+  name: Approval, denial or withdrawal disparities by protected group
+  definition: Applicants from a protected group are denied, withdrawn or left incomplete at substantially
+    higher rates, or processed more slowly.
+  areas:
+  - CF
+  typology: Lending discrimination (underwriting)
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Underwriting risk factors (1st item; see 2nd for withdrawn/incomplete)
+    quote: Substantial disparities among approval/denial rates and processing times for applicants by
+      prohibited basis characteristics
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - HMDA denial rate for Black applicants with similar income several times that for white applicants
+    at the same lender
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - HMDA public data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PM
+    reason: Statistical disparity analysis overlaps PM-011
+    source_url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+  innocent_explanations:
+  - HMDA lacks credit scores and full debt data, so differences may reflect credit risk
+  - Product mix differs between groups
+  jurisdictions: US
+  version: 1
+- id: CF-015
+  name: Discretionary pricing with price disparities by protected group
+  definition: Loan officers, brokers or car dealers have broad discretion to mark up prices and are paid
+    more for higher prices, and protected groups end up paying more.
+  areas:
+  - CF
+  typology: Lending discrimination (pricing)
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Pricing risk factors (4th item; see 1st-2nd on compensation and discretion)
+    quote: Substantial disparities among price quoted or charged to applicants differing by prohibited
+      basis characteristics
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Dealer markups on auto loans higher for minority borrowers
+  - Broker fees higher for Hispanic borrowers
+  cases:
+  - name: Countrywide Financial Corporation lending discrimination settlement
+    year: '2011'
+    jurisdiction: US (DOJ)
+    what_happened: DOJ alleged Countrywide charged more than 200,000 African-American and Hispanic borrowers
+      higher fees and interest rates and steered thousands into subprime mortgages; $335 million settlement.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/justice-department-reaches-335-million-settlement-resolve-allegations-lending-discrimination
+    source_title: Justice Department Reaches $335 Million Settlement to Resolve Allegations of Lending
+      Discrimination by Countrywide
+  - name: Ally Financial and Ally Bank auto loan pricing
+    year: '2013'
+    jurisdiction: US (CFPB, DOJ)
+    what_happened: CFPB and DOJ alleged Ally charged African-American, Hispanic, and Asian and Pacific
+      Islander borrowers higher dealer markups; order required $80 million in damages and an $18 million
+      penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.consumerfinance.gov/about-us/newsroom/cfpb-and-doj-order-ally-to-pay-80-million-to-consumers-harmed-by-discriminatory-auto-loan-pricing/
+    source_title: CFPB and DOJ Order Ally to Pay $80 Million to Consumers Harmed by Discriminatory Auto
+      Loan Pricing
+  data_needed:
+  - Company
+  - Person
+  - Contract
+  - Payment
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - HMDA rate-spread and fee fields
+  - Lender compensation policies
+  - Enforcement orders
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Price differences reflect documented risk factors
+  - Small samples
+  jurisdictions: US
+  version: 1
+- id: CF-016
+  name: Steering into subprime or government-insured loans
+  definition: Protected-group applicants who could qualify for prime or conventional loans are disproportionately
+    placed in subprime, FHA or affiliate products.
+  areas:
+  - CF
+  typology: Lending discrimination (steering)
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Steering risk factors (6th item; see 1st-5th)
+    quote: Loan officers having broad discretion and no guidelines to promote conventional or FHA loans
+      to applicants
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - 'Countrywide: DOJ alleged thousands of African-American and Hispanic borrowers steered into subprime
+    mortgages'
+  cases:
+  - name: Countrywide Financial Corporation lending discrimination settlement
+    year: '2011'
+    jurisdiction: US (DOJ)
+    what_happened: Alleged steering of thousands of African-American and Hispanic borrowers into subprime
+      mortgages; part of $335 million settlement.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/justice-department-reaches-335-million-settlement-resolve-allegations-lending-discrimination
+  data_needed:
+  - Company
+  - Contract
+  - Person
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - HMDA loan type field by applicant race and ethnicity
+  - Corporate structure filings showing subprime affiliates
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - FHA loans may genuinely suit lower down-payment borrowers
+  - Borrower choice after full comparison
+  jurisdictions: US
+  version: 1
+- id: CF-017
+  name: Vague underwriting and undocumented exceptions
+  definition: Underwriting criteria are subjective, exceptions and credit-score overrides are frequent
+    and undocumented, and loan staff are paid on volume.
+  areas:
+  - CF
+  typology: Lending discrimination (underwriting)
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Underwriting risk factors (3rd-7th items)
+    quote: Relatively high percentages of exceptions to underwriting criteria or overrides of credit score
+      cutoffs
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Internal documents showing overrides granted mostly to one group of applicants
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Employment
+  checkable: person
+  lookup_sources:
+  - Internal policies and whistleblower documents
+  - Examination reports where public
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small lenders rely on judgement for thin-file borrowers
+  - Exceptions granted consistently across groups
+  jurisdictions: US
+  version: 1
+- id: CF-018
+  name: 'Overt evidence: biased statements, prohibited criteria or discrimination complaints'
+  definition: Employees make statements showing prejudice or aversion to certain areas, criteria explicitly
+    use protected traits, or customers complain of discrimination.
+  areas:
+  - CF
+  typology: Lending discrimination (overt)
+  status: verified
+  sources:
+  - title: Fair Lending Exam Procedures Risk Factors
+    publisher: Federal Reserve Bank of Dallas
+    url: https://www.newyorkfed.org/medialibrary/media/outreach-and-education/cra/resources/DallasFed-Fair-Lending-Exam-Procedures-Risk-Factors.pdf
+    locator: Overt indicators (5th item; see also 1st-6th and Redlining 5th and 7th)
+    quote: Statements that evidence attitudes based on prejudices or stereotyping
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Internal emails disparaging a neighbourhood's residents
+  - Consumer complaints alleging discrimination
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Employment
+  - Note
+  checkable: person
+  lookup_sources:
+  - CFPB complaint database
+  - Court filings
+  - Former employee interviews
+  levels:
+    faint: A single complaint alleging discrimination
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complaint unfounded or about unrelated service failings
+  - Statement by one employee contrary to policy and acted upon
+  jurisdictions: US
+  version: 1
+- id: CF-019
+  name: Algorithmic credit decisions without specific reasons
+  definition: A creditor uses complex models it cannot explain and so does not give denied applicants
+    the specific reasons the law requires.
+  areas:
+  - CF
+  typology: Algorithmic discrimination
+  status: verified
+  sources:
+  - title: 'Consumer Financial Protection Circular 2022-03: Adverse action notification requirements in
+      connection with credit decisions based on complex algorithms'
+    publisher: CFPB
+    url: https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/
+    locator: Response
+    quote: Yes. ECOA and Regulation B require creditors to provide statements of specific reasons to applicants…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Denial letters citing generic reasons for an AI underwriting model
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - Adverse action notices from applicants
+  - Vendor and model documentation
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Model uses interpretable features and reasons are accurate
+  - Generic wording that nonetheless reflects the true principal reasons
+  jurisdictions: US federal (ECOA / Regulation B)
+  version: 1
+- id: CF-020
+  name: Ad-delivery algorithm skews who sees housing or credit ads
+  definition: A platform's ad targeting or machine-learning delivery shows housing (or credit, job) ads
+    unevenly by protected characteristics.
+  areas:
+  - CF
+  typology: Algorithmic discrimination; discriminatory advertising
+  status: verified
+  sources:
+  - title: Justice Department Secures Groundbreaking Settlement Agreement with Meta Platforms
+    publisher: US Department of Justice
+    url: https://www.justice.gov/opa/pr/justice-department-secures-groundbreaking-settlement-agreement-meta-platforms-formerly-known
+    locator: Allegations
+    quote: Meta's ad delivery system uses machine-learning algorithms that rely in part on FHA-protected
+      characteristics.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Lookalike-audience tools used for rental listings
+  cases:
+  - name: United States v. Meta Platforms, Inc. (housing ads)
+    year: '2022'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: DOJ alleged Meta's housing ad delivery relied in part on FHA-protected characteristics;
+      Meta agreed to stop using its Special Ad Audience tool and build a system to reduce delivery disparities
+      under court oversight.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-secures-groundbreaking-settlement-agreement-meta-platforms-formerly-known
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Platform ad libraries and transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Audience skew from advertiser budget or bidding, not targeting
+  - Ad shown in a market whose user base is itself skewed
+  jurisdictions: US
+  version: 1
+- id: CF-021
+  name: Discriminatory housing advertisements or statements
+  definition: Housing ads, statements to agents, or ad pricing convey a preference for or exclusion of
+    a protected group.
+  areas:
+  - CF
+  typology: Housing discrimination
+  status: verified
+  sources:
+  - title: 24 CFR 100.75 Discriminatory advertisements, statements and notices
+    publisher: HUD (Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/24/100.75
+    locator: § 100.75(c)(1); see (c)(2) and (c)(4)
+    quote: Using words, phrases, photographs, illustrations, symbols or forms which convey that dwellings
+      are available
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rental listing saying 'no Section 8' where source of income is protected locally, or 'ideal for single
+    professionals'
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Address
+  checkable: records
+  lookup_sources:
+  - Listing sites and archives
+  - HUD and state fair housing complaint records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful exemptions (e.g., certain senior housing, owner-occupied small buildings)
+  - Wording describes the property, not the desired tenant
+  jurisdictions: US (Fair Housing Act)
+  version: 1
+- id: CF-022
+  name: Misrepresenting housing availability (testing evidence)
+  definition: A landlord or agent tells some people, including fair housing testers, that a home is taken
+    or withholds information about suitable listings, while offering it to others.
+  areas:
+  - CF
+  typology: Housing discrimination
+  status: verified
+  sources:
+  - title: 24 CFR 100.80 Discriminatory representations on the availability of dwellings
+    publisher: HUD (Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/24/100.80
+    locator: § 100.80(b)(5); see (b)(1)-(6)
+    quote: Providing false or inaccurate information regarding the availability of a dwelling for sale
+      or rental to any person.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Paired testers of different race get different availability answers for the same unit on the same
+    day
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Address
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Fair housing organisation testing reports
+  - HUD complaint records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Unit genuinely rented between calls
+  - Different staff gave inconsistent information
+  jurisdictions: US (Fair Housing Act)
+  version: 1
+- id: CF-023
+  name: Hiring selection rate below four-fifths of the top group
+  definition: An employer's selection rate for a race, sex or ethnic group is under 80 percent of the
+    rate for the group with the highest rate, which federal agencies treat as evidence of adverse impact.
+  areas:
+  - CF
+  typology: Employment discrimination
+  status: verified
+  sources:
+  - title: 29 CFR 1607.4 Information on impact
+    publisher: EEOC et al. (Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/29/1607.4
+    locator: § 1607.4(D)
+    quote: A selection rate for any race, sex, or ethnic group which is less than four-fifths (4/5) (or
+      eighty percent)
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Automated résumé screen passes women at 50% of the rate for men
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Person
+  - Document
+  checkable: records
+  lookup_sources:
+  - EEO-1 reports where released
+  - Applicant flow data from litigation or records requests
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Selection rate for a group less than 80% of the highest group's rate
+    threshold_source: https://www.law.cornell.edu/cfr/text/29/1607.4
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small samples make the ratio unreliable (the rule itself notes this)
+  - Job-related, validated requirement causes the difference
+  jurisdictions: US federal (Uniform Guidelines on Employee Selection Procedures)
+  version: 1
+- id: CF-024
+  name: Debt collector calls exceed frequency limits
+  definition: A debt collector calls a person about a debt more than seven times in seven days, or within
+    seven days after a phone conversation about it.
+  areas:
+  - CF
+  typology: Abusive debt collection
+  status: verified
+  sources:
+  - title: 12 CFR 1006.14 Harassing, oppressive, or abusive conduct
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.14
+    locator: § 1006.14(b)(1); presumption in (b)(2)
+    quote: must not place telephone calls or engage any person in telephone conversation repeatedly or
+      continuously.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Call logs showing a dozen calls a week to one debtor
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Consumer call logs
+  - CFPB complaint database
+  - Court FDCPA filings
+  levels:
+    faint: Repeated calls in a short period
+    strong: To be set by Ony
+    textbook: More than seven calls within seven consecutive days, or a call within seven days after a
+      telephone conversation about the debt
+    threshold_source: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.14
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Calls about different debts or to different numbers
+  - Consumer consented to or requested the calls
+  jurisdictions: US federal (FDCPA / Regulation F)
+  version: 1
+- id: CF-025
+  name: Collector threats, obscene language, debtor lists or advertising debts
+  definition: A collector threatens violence or harm, uses obscene or abusive language, publishes lists
+    of people who allegedly refuse to pay, or advertises a debt for sale to pressure payment.
+  areas:
+  - CF
+  typology: Abusive debt collection
+  status: verified
+  sources:
+  - title: 12 CFR 1006.14 Harassing, oppressive, or abusive conduct
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.14
+    locator: § 1006.14(c); see (d)-(f)
+    quote: use or threaten to use violence or other criminal means to harm the physical person
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Voicemails with threats or profanity
+  - Social media posts naming debtors
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Recordings, voicemails and letters
+  - CFPB complaint database
+  - State AG actions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lists shared lawfully with consumer reporting agencies (an exception in the rule)
+  jurisdictions: US federal
+  version: 1
+- id: CF-026
+  name: Collector hides identity or uses a false business name
+  definition: A collector places calls without meaningfully saying who is calling, or uses a name other
+    than the collector's true business name.
+  areas:
+  - CF
+  typology: Abusive debt collection
+  status: verified
+  sources:
+  - title: 12 CFR 1006.14
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.14
+    locator: § 1006.14(g)
+    quote: place telephone calls without meaningfully disclosing the caller's identity.
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 12 CFR 1006.18 False, deceptive, or misleading representations or means
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.18
+    locator: § 1006.18(c)(4)
+    quote: Use any business, company, or organization name other than the true name of the debt collector's
+      business.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Letters on letterhead of a name not registered with the state collection licensing agency
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - State collection agency licence registries
+  - Secretary of State business registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Shell or fake business names are a fraud-area signal
+    source_url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.18
+  innocent_explanations:
+  - Registered trade name (DBA) used consistently
+  - Caller ID limitations of the phone carrier
+  jurisdictions: US federal
+  version: 1
+- id: CF-027
+  name: False claims about the debt, arrest or legal action
+  definition: A collector misstates the amount or legal status of a debt, implies arrest or jail for non-payment,
+    pretends to be a lawyer, or threatens action it cannot or will not take.
+  areas:
+  - CF
+  typology: Deceptive debt collection
+  status: verified
+  sources:
+  - title: 12 CFR 1006.18
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.18
+    locator: § 1006.18(b)(3); see (b)(1)(iii), (b)(2)(i), (c)(1)-(2)
+    quote: represent or imply that nonpayment of any debt will result in the arrest or imprisonment of
+      any person
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Letters styled as legal notices from a non-existent law firm
+  - Inflated balances with unexplained fees
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Collection letters
+  - State bar attorney lookups
+  - Court dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Amount includes lawful interest and fees allowed by contract
+  - Collector is in fact a law firm and intends to sue
+  jurisdictions: US federal
+  version: 1
+- id: CF-028
+  name: Suing or threatening to sue on time-barred debt
+  definition: A collector sues, or threatens to sue, over a debt whose statute of limitations has expired.
+  areas:
+  - CF
+  typology: Abusive debt collection
+  status: verified
+  sources:
+  - title: 12 CFR 1006.26 Collection of time-barred debts
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.26
+    locator: § 1006.26(b)
+    quote: A debt collector must not bring or threaten to bring a legal action against a consumer to collect
+      a time-barred debt.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Debt-buyer lawsuits filed years after the last payment
+  cases:
+  - name: CFPB v. Encore Capital Group, Midland Funding, Midland Credit Management and Asset Acceptance
+      Capital Corp.
+    year: '2020'
+    jurisdiction: US (S.D. Cal.)
+    what_happened: CFPB alleged the companies violated a 2015 consent order by suing consumers without
+      required documentation and suing on debts whose limitations periods had run; proposed stipulated
+      judgment with a $15 million civil money penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.consumerfinance.gov/about-us/newsroom/consumer-financial-protection-bureau-settles-lawsuit-debt-collectors-and-debt-buyers-encore-capital-group-midland-funding-midland-credit-management-and-asset-acceptance-capital-corp
+  data_needed:
+  - Company
+  - Person
+  - CourtCase
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - State court civil dockets (bulk debt-buyer filings)
+  - State statute of limitations tables
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Limitation period restarted under state law by a payment or acknowledgement
+  - Different state's limitation period applies
+  jurisdictions: US federal
+  version: 1
+- id: CF-029
+  name: Collection lawsuits filed without supporting documentation
+  definition: A debt buyer files suits in bulk without the account documents needed to prove the debt
+    is owed.
+  areas:
+  - CF
+  typology: Abusive debt collection
+  status: verified
+  sources:
+  - title: CFPB settles lawsuit with Encore Capital Group et al.
+    publisher: CFPB
+    url: https://www.consumerfinance.gov/about-us/newsroom/consumer-financial-protection-bureau-settles-lawsuit-debt-collectors-and-debt-buyers-encore-capital-group-midland-funding-midland-credit-management-and-asset-acceptance-capital-corp
+    locator: Press release body
+    quote: violated the consent order by suing consumers without possessing required documentation.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Hundreds of near-identical complaints with no contract attached, mostly ending in default judgments
+  cases:
+  - name: CFPB v. Encore Capital Group et al.
+    year: '2020'
+    jurisdiction: US (S.D. Cal.)
+    what_happened: Alleged suits without required documentation; $15 million penalty in proposed settlement.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.consumerfinance.gov/about-us/newsroom/consumer-financial-protection-bureau-settles-lawsuit-debt-collectors-and-debt-buyers-encore-capital-group-midland-funding-midland-credit-management-and-asset-acceptance-capital-corp
+  data_needed:
+  - Company
+  - CourtCase
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - State court dockets and filed complaints
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Bulk default judgments without proof overlap with court-process abuse
+    source_url: https://www.consumerfinance.gov/about-us/newsroom/consumer-financial-protection-bureau-settles-lawsuit-debt-collectors-and-debt-buyers-encore-capital-group-midland-funding-midland-credit-management-and-asset-acceptance-capital-corp
+  innocent_explanations:
+  - Court rules do not require exhibits at filing
+  - Documents produced later in discovery
+  jurisdictions: US
+  version: 1
+- id: CF-030
+  name: Collector contacts through a channel the consumer refused
+  definition: A collector keeps communicating through a medium, such as email or a workplace phone, after
+    the consumer asked it not to.
+  areas:
+  - CF
+  typology: Abusive debt collection
+  status: verified
+  sources:
+  - title: 12 CFR 1006.14
+    publisher: CFPB (eCFR)
+    url: https://www.ecfr.gov/current/title-12/chapter-X/part-1006/subpart-B/section-1006.14
+    locator: § 1006.14(a); medium rule at § 1006.14(h)
+    quote: must not engage in any conduct the natural consequence of which is to harass, oppress, or abuse
+      any person.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Texts continue after written opt-out
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Consumer correspondence
+  - CFPB complaint database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Single opt-out confirmation or legally required notice (exceptions in the rule)
+  jurisdictions: US federal
+  version: 1
+- id: CF-031
+  name: College staff encourage falsifying financial aid applications
+  definition: Admissions or financial aid staff encourage applicants to give false information on federal
+    aid forms, for example hiding savings.
+  areas:
+  - CF
+  typology: For-profit college fraud
+  status: verified
+  sources:
+  - title: 'For-Profit Colleges: Undercover Testing Finds Colleges Encouraged Fraud and Engaged in Deceptive
+      and Questionable Marketing Practices (GAO-10-948T)'
+    publisher: US Government Accountability Office
+    url: https://www.gao.gov/assets/gao-10-948t.pdf
+    locator: p. 7
+    quote: Four of the 15 colleges we visited encouraged our undercover applicants to falsify their FAFSA
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Applicant told not to report $250,000 in savings (GAO p. 7)
+  cases:
+  - name: GAO undercover testing of 15 for-profit colleges
+    year: '2010'
+    jurisdiction: US
+    what_happened: GAO undercover applicants found 4 of 15 colleges encouraged fraudulent practices and
+      all 15 made deceptive or otherwise questionable statements.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.gao.gov/assets/gao-10-948t.pdf
+    source_title: GAO-10-948T
+  data_needed:
+  - Organization
+  - Person
+  - Employment
+  - Document
+  checkable: person
+  lookup_sources:
+  - Former student and staff interviews
+  - Department of Education program reviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Falsified federal aid forms are fraud against a public programme
+    source_url: https://www.gao.gov/assets/gao-10-948t.pdf
+  innocent_explanations:
+  - Staff gave confused but good-faith advice on what counts as an asset
+  jurisdictions: US
+  version: 1
+- id: CF-032
+  name: Misstated accreditation, credit transfer or licensure eligibility
+  definition: A school misrepresents its accreditation, whether credits transfer, or whether completing
+    a programme qualifies students for a required licence or certification.
+  areas:
+  - CF
+  typology: For-profit college fraud
+  status: verified
+  sources:
+  - title: GAO-10-948T
+    publisher: US GAO
+    url: https://www.gao.gov/assets/gao-10-948t.pdf
+    locator: p. 9
+    quote: Admissions representatives at four colleges either misidentified or failed to identify
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 34 CFR 668.72 Nature of educational program
+    publisher: US Department of Education (Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/34/668.72
+    locator: § 668.72(a); see (b)(1), (c)(2)
+    quote: its institutional, programmatic, or specialized accreditation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Claim of being accredited by the same body that accredits Harvard (GAO p. 9)
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - US Department of Education DAPIP accreditation database
+  - State licensing board programme approvals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accreditation status changed recently
+  - Transfer decisions rest with receiving institutions
+  jurisdictions: US
+  version: 1
+- id: CF-033
+  name: Inflated job placement, salary or employment guarantees
+  definition: A school overstates graduates' job placement or earnings, promises guaranteed employment,
+    or calculates employment rates in ways that inflate them.
+  areas:
+  - CF
+  typology: For-profit college fraud
+  status: pending
+  sources:
+  - title: GAO-10-948T
+    publisher: US GAO
+    url: https://www.gao.gov/assets/gao-10-948t.pdf
+    locator: p. 10
+    quote: At five colleges, our undercover applicants were given potentially deceptive information about
+      prospective salaries
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: 34 CFR 668.74 Employability of graduates
+    publisher: US Department of Education (Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/34/668.74
+    locator: § 668.74
+    quote: Counting individuals as employed who were employed in the field prior to graduation
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - DeVry advertised that 90 percent of graduates seeking jobs found work in their field within six months
+  cases:
+  - name: FTC v. DeVry Education Group
+    year: '2016'
+    jurisdiction: US (FTC)
+    what_happened: FTC alleged DeVry misled students with claims that 90 percent of graduates found jobs
+      in their field and that bachelor's graduates earned 15 percent more; $100 million settlement ($49.4m
+      cash, $50.6m debt forgiveness).
+    outcome: settled
+    outcome_verified: true
+    source_url: https://ftc.gov/news-events/press-releases/2016/12/devry-university-agrees-100-million-settlement-ftc
+    source_title: DeVry University Agrees to $100 Million Settlement with FTC
+  - name: CFPB v. Corinthian Colleges, Inc.
+    year: '2015'
+    jurisdiction: US (federal court)
+    what_happened: Federal court entered a default judgment of more than $530 million in a CFPB suit alleging
+      Corinthian lured students into Genesis loans by advertising bogus job prospects and career services.
+    outcome: fined_by_regulator
+    outcome_verified: false
+    source_url: https://www.consumerfinance.gov/about-us/newsroom/cfpb-wins-default-judgment-against-corinthian-colleges-for-engaging-in-a-predatory-lending-scheme
+  data_needed:
+  - Organization
+  - Document
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - College Scorecard earnings data
+  - Accreditor and state placement-rate reports
+  - School advertising
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Actual employment or licensure pass rates materially lower than those in marketing materials
+      (34 CFR 668.74)
+    threshold_source: https://www.law.cornell.edu/cfr/text/34/668.74
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Placement rates calculated by an accreditor's approved method
+  - Labour market changed after the marketing was published
+  jurisdictions: US
+  version: 1
+- id: CF-034
+  name: Misleading cost, duration or graduation information; aid info withheld until enrolment
+  definition: Recruiters misstate programme cost or length, give incomplete graduation rates, or refuse
+    to let applicants speak to financial aid staff until they enrol.
+  areas:
+  - CF
+  typology: For-profit college fraud
+  status: verified
+  sources:
+  - title: GAO-10-948T
+    publisher: US GAO
+    url: https://www.gao.gov/assets/gao-10-948t.pdf
+    locator: pp. 9-10; cost at p. 11
+    quote: Thirteen colleges did not provide applicants with accurate or complete information about graduation
+      rates
+    quote_verified: true
+    checked: '2026-10-10'
+  - title: GAO-10-948T
+    publisher: US GAO
+    url: https://www.gao.gov/assets/gao-10-948t.pdf
+    locator: p. 11
+    quote: Six colleges in four states told our undercover applicants that they could not speak with financial
+      aid representatives
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Programme length quoted as if students attended 12 months a year
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - IPEDS graduation and price data
+  - College Scorecard
+  - School catalogues
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Tuition changed between quote and enrolment
+  - Recruiter error in one conversation
+  jurisdictions: US
+  version: 1
+- id: CF-035
+  name: High-pressure enrolment tactics and aggressive lead generation
+  definition: Recruiters push applicants to sign enrolment agreements quickly, use high-pressure sales
+    and repeated contact, or require payments before applicants can reflect.
+  areas:
+  - CF
+  typology: For-profit college fraud
+  status: verified
+  sources:
+  - title: GAO-10-948T
+    publisher: US GAO
+    url: https://www.gao.gov/assets/gao-10-948t.pdf
+    locator: p. 12
+    quote: Multiple representatives used high pressure marketing techniques
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Applicant urged to sign enrolment agreement before reviewing financial aid
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Employment
+  - Event
+  checkable: person
+  lookup_sources:
+  - Former recruiter interviews and recruiter pay plans
+  - Student complaints to state AGs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Enrolment deadlines for a fixed start date
+  - Normal follow-up by admissions staff
+  jurisdictions: US
+  version: 1
+- id: CF-036
+  name: School-linked private loans and in-school collection pressure
+  definition: A school steers students into its own or partner private loans and uses aggressive collection
+    tactics on students while they are still enrolled.
+  areas:
+  - CF
+  typology: For-profit college fraud; predatory lending
+  status: pending
+  sources:
+  - title: CFPB Wins Default Judgment Against Corinthian Colleges for Engaging in a Predatory Lending
+      Scheme
+    publisher: CFPB
+    url: https://www.consumerfinance.gov/about-us/newsroom/cfpb-wins-default-judgment-against-corinthian-colleges-for-engaging-in-a-predatory-lending-scheme
+    locator: Press release body
+    quote: used illegal debt collection tactics to strong-arm students into paying back those loans while
+      still in school.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Corinthian 'Genesis loans'
+  - Monthly payments of $20-$150 required once enrolled (GAO p. 13)
+  cases:
+  - name: CFPB v. Corinthian Colleges, Inc.
+    year: '2015'
+    jurisdiction: US (federal court)
+    what_happened: Default judgment over $530 million in CFPB case over Genesis loans and in-school collection
+      tactics.
+    outcome: fined_by_regulator
+    outcome_verified: false
+    source_url: https://www.consumerfinance.gov/about-us/newsroom/cfpb-wins-default-judgment-against-corinthian-colleges-for-engaging-in-a-predatory-lending-scheme
+  data_needed:
+  - Organization
+  - Company
+  - Contract
+  - Payment
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Corporate filings showing lender-school relationships
+  - Student loan agreements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Institutional loans can fill legitimate gaps for students without other credit
+  - Payment plans disclosed and voluntary
+  jurisdictions: US
+  version: 1
+- id: CF-037
+  name: High student loan cohort default rate
+  definition: A large share of a school's former students default on federal loans, enough to threaten
+    its federal aid eligibility.
+  areas:
+  - CF
+  typology: For-profit college fraud (outcome signal)
+  status: verified
+  sources:
+  - title: 34 CFR 668.206 Consequences of cohort default rates
+    publisher: US Department of Education (Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/34/668.206
+    locator: § 668.206(a)(2); 40% in (a)(1)
+    quote: three most recent cohort default rates are each 30 percent or greater
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - School's three-year default rate above 30% in each of three years
+  cases: []
+  data_needed:
+  - Organization
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Federal Student Aid official cohort default rate files
+  levels:
+    faint: To be set by Ony
+    strong: Cohort default rate of 30% or more in any year
+    textbook: Most recent rate greater than 40%, or three most recent rates each 30% or greater (loss
+      of eligibility trigger)
+    threshold_source: https://www.law.cornell.edu/cfr/text/34/668.206
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - School serves very low-income students in weak labour markets
+  - Pandemic pause and forbearance distort rates
+  jurisdictions: US federal
+  version: 1
+- id: CF-038
+  name: Near-total reliance on federal aid revenue (90/10)
+  definition: A for-profit school derives almost all its revenue from federal funds; failing to get at
+    least 10 percent elsewhere for two years ends aid eligibility.
+  areas:
+  - CF
+  typology: For-profit college fraud (financial signal)
+  status: verified
+  sources:
+  - title: 34 CFR 668.28 Non-Federal revenue (90/10)
+    publisher: US Department of Education (Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/34/668.28
+    locator: § 668.28(a)(1)
+    quote: at least 10 percent of its revenue is derived from sources other than Federal funds
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - School's federal-funds share reported at 89-90% year after year
+  cases: []
+  data_needed:
+  - Organization
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Department of Education 90/10 reports
+  - SEC filings of publicly traded education companies
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Less than 10% non-federal revenue; loss of eligibility after two consecutive fiscal years
+    threshold_source: https://www.law.cornell.edu/cfr/text/34/668.28
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Student body is mostly low-income and Pell-eligible
+  - Large share of veterans using GI Bill benefits
+  jurisdictions: US federal
+  version: 1
+- id: CF-039
+  name: Insurer misrepresents policy terms or settles on an altered application
+  definition: An insurer misstates facts or policy provisions to claimants, or settles claims based on
+    an application altered without the insured's knowledge.
+  areas:
+  - CF
+  typology: Insurance bad faith
+  status: verified
+  sources:
+  - title: Unfair Claims Settlement Practices Act (Model Law 900)
+    publisher: NAIC
+    url: https://content.naic.org/sites/default/files/model-law-900.pdf
+    locator: Section 4.A; see 4.I
+    quote: Knowingly misrepresenting to claimants and insureds relevant facts or policy provisions relating
+      to coverages at issue;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Denial letters citing exclusions not in the policy
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - State insurance department market conduct exams
+  - NAIC complaint data
+  levels:
+    faint: Isolated instance
+    strong: To be set by Ony
+    textbook: Committed with such frequency as to indicate a general business practice (NAIC Model 900
+      Section 3)
+    threshold_source: https://content.naic.org/sites/default/files/model-law-900.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Policy language genuinely ambiguous
+  - Adjuster error corrected on review
+  jurisdictions: US (NAIC model adopted by states)
+  version: 1
+- id: CF-040
+  name: 'Insurer delays: slow acknowledgment, decision or forms'
+  definition: An insurer fails to respond promptly to claim communications, to decide coverage in reasonable
+    time, or to supply claim forms, or demands duplicate proofs to stall payment.
+  areas:
+  - CF
+  typology: Insurance bad faith
+  status: verified
+  sources:
+  - title: NAIC Model Law 900
+    publisher: NAIC
+    url: https://content.naic.org/sites/default/files/model-law-900.pdf
+    locator: Section 4.B; see 4.G, 4.K, 4.M
+    quote: Failing to acknowledge with reasonable promptness pertinent communications with respect to
+      claims arising under its policies;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Market conduct exam finding claims left undecided for months
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - State market conduct examination reports
+  - NAIC consumer complaint index
+  levels:
+    faint: Isolated delay
+    strong: To be set by Ony
+    textbook: Claim forms not provided within 15 calendar days of request (Model 900 Section 4.M), committed
+      as a general business practice
+    threshold_source: https://content.naic.org/sites/default/files/model-law-900.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Catastrophe surge (hurricane, wildfire) overwhelms adjusters
+  - Claimant slow to provide information
+  jurisdictions: US
+  version: 1
+- id: CF-041
+  name: Claims denied without reasonable investigation or claim standards
+  definition: An insurer refuses claims without reasonable investigation or lacks reasonable standards
+    for prompt investigation and settlement.
+  areas:
+  - CF
+  typology: Insurance bad faith
+  status: verified
+  sources:
+  - title: NAIC Model Law 900
+    publisher: NAIC
+    url: https://content.naic.org/sites/default/files/model-law-900.pdf
+    locator: Section 4.F; see 4.C
+    quote: Refusing to pay claims without conducting a reasonable investigation;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Automated denial of claims without human file review
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Market conduct exams
+  - Court bad-faith verdicts
+  levels:
+    faint: Isolated instance
+    strong: To be set by Ony
+    textbook: Committed as a general business practice (Model 900 Section 3)
+    threshold_source: https://content.naic.org/sites/default/files/model-law-900.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FR covers policyholder fraud; this is the reverse, insurer conduct
+    source_url: https://content.naic.org/sites/default/files/model-law-900.pdf
+  innocent_explanations:
+  - Claim clearly outside coverage on its face
+  - Fraud indicators justified rapid denial
+  jurisdictions: US
+  version: 1
+- id: CF-042
+  name: Lowball offers forcing claimants to sue
+  definition: An insurer fails to settle in good faith when liability is clear, or offers far less than
+    claimants later recover in court.
+  areas:
+  - CF
+  typology: Insurance bad faith
+  status: verified
+  sources:
+  - title: NAIC Model Law 900
+    publisher: NAIC
+    url: https://content.naic.org/sites/default/files/model-law-900.pdf
+    locator: Section 4.E; see 4.D, 4.H
+    quote: Compelling insureds or beneficiaries to institute suits to recover amounts due under its policies…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Pattern of court awards several times the insurer's final offer
+  cases: []
+  data_needed:
+  - Company
+  - CourtCase
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Court dockets and verdict reporters
+  - Market conduct exams
+  levels:
+    faint: Isolated instance
+    strong: To be set by Ony
+    textbook: Committed as a general business practice (Model 900 Section 3)
+    threshold_source: https://content.naic.org/sites/default/files/model-law-900.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine dispute over value or causation
+  - Jury awards include amounts outside the policy
+  jurisdictions: US
+  version: 1
+- id: CF-043
+  name: Denials or compromise offers without explanation
+  definition: An insurer denies a claim or offers a compromise without promptly giving a reasonable and
+    accurate explanation, or pays without saying which coverage applies.
+  areas:
+  - CF
+  typology: Insurance bad faith
+  status: verified
+  sources:
+  - title: NAIC Model Law 900
+    publisher: NAIC
+    url: https://content.naic.org/sites/default/files/model-law-900.pdf
+    locator: Section 4.J; see 4.L
+    quote: Making claims payments to an insured or beneficiary without indicating the coverage under which
+      each payment is being made;
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Form denial letters with no reason code
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Claimant letters
+  - Market conduct exams
+  levels:
+    faint: Isolated instance
+    strong: To be set by Ony
+    textbook: Committed as a general business practice (Model 900 Section 3)
+    threshold_source: https://content.naic.org/sites/default/files/model-law-900.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Explanation sent separately or by phone
+  jurisdictions: US
+  version: 1
+- id: CF-044
+  name: 'Building distress index: hazardous violations and emergency repair charges per unit'
+  definition: A residential building has unusually many hazardous housing code violations and city emergency
+    repair charges per unit compared with the citywide average.
+  areas:
+  - CF
+  typology: Landlord harassment; slum conditions
+  status: verified
+  sources:
+  - title: Certification of No Harassment Pilot Program rules (28 RCNY Chapter 53)
+    publisher: NYC Department of Housing Preservation and Development
+    url: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+    locator: § 53-03 criterion 1; emergency repair charges at criterion 2
+    quote: the number of open and closed hazardous and immediately hazardous violations
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Building scoring two or more standard deviations above the city average on violations per unit
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Ownership
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - NYC HPD violations and emergency repair open data (or local code enforcement records)
+  - Property ownership records
+  levels:
+    faint: Violations or repair charges per unit above the citywide average (2.5 points in the HPD index)
+    strong: Combined index score of 10 or more
+    textbook: Combined score of 15 or more with no ownership change (10 with one change, 5 with two or
+      more)
+    threshold_source: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Old building stock with genuine repair needs and an owner actively fixing them
+  - Violations reflect tenant-caused damage
+  - Heavy inspection activity after a single complaint campaign
+  jurisdictions: New York City (model for other cities)
+  version: 1
+- id: CF-045
+  name: Frequent ownership changes combined with building distress
+  definition: A distressed building changes hands repeatedly, a combination the NYC harassment rules treat
+    as raising the risk so that a lower distress score qualifies.
+  areas:
+  - CF
+  typology: Landlord harassment
+  status: verified
+  sources:
+  - title: Certification of No Harassment Pilot Program rules
+    publisher: NYC HPD
+    url: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+    locator: § 53-03 (threshold for buildings with two or more ownership changes)
+    quote: a combined score of five or more
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Rent-regulated building sold three times in five years to LLCs with shared addresses
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Ownership
+  - Person
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Deed records (e.g., NYC ACRIS)
+  - Business registries to unmask LLC buyers
+  levels:
+    faint: To be set by Ony
+    strong: One ownership change with combined distress score of 10 or more
+    textbook: Two or more ownership changes in five years with combined distress score of 5 or more
+    threshold_source: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Opaque LLC ownership chains also feature in beneficial-ownership indicators
+    source_url: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+  innocent_explanations:
+  - Internal restructuring between related entities
+  - Estate transfers or refinancing deeds counted as sales
+  jurisdictions: New York City
+  version: 1
+- id: CF-046
+  name: Vacate orders or placement in a city enforcement programme
+  definition: A building has received a full vacate order or been placed in a city alternative enforcement
+    programme for the worst buildings.
+  areas:
+  - CF
+  typology: Slum conditions
+  status: verified
+  sources:
+  - title: Certification of No Harassment Pilot Program rules
+    publisher: NYC HPD
+    url: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+    locator: § 53-02(2)(b); AEP at (c)
+    quote: a full vacate order has been issued by the Department or by the Department of Buildings
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Fire or structural vacate order followed by long vacancy and redevelopment
+  cases: []
+  data_needed:
+  - Address
+  - PublicBody
+  - Document
+  - Event
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - NYC HPD and DOB vacate order data; AEP building lists (or local equivalents)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (any full vacate order within five years qualifies
+      a building)
+    threshold_source: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Vacate order after a fire or disaster the owner did not cause
+  jurisdictions: New York City
+  version: 1
+- id: CF-047
+  name: Prior official finding of tenant harassment at the building
+  definition: A court or housing agency has already found that harassment occurred at the building.
+  areas:
+  - CF
+  typology: Landlord harassment
+  status: verified
+  sources:
+  - title: Certification of No Harassment Pilot Program rules
+    publisher: NYC HPD
+    url: https://www.nyc.gov/assets/hpd/downloads/pdfs/about/conh-pilot-program-bill-adopted-rules.pdf
+    locator: § 53-02(2)(d)
+    quote: a final determination by New York State Homes and Community Renewal or any court having jurisdiction
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Housing court harassment finding against the owner
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Person
+  - CourtCase
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Housing court records
+  - State housing agency decisions
+  - CONH building lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Building has since changed to unrelated ownership
+  jurisdictions: New York City / New York State
+  version: 1
+- id: CF-048
+  name: Buyout pressure, threats and intimidation of tenants
+  definition: An owner repeatedly pushes tenants to leave through buyout offers made with threats, false
+    information or contact at work, late-night calls, or refusing lease renewals.
+  areas:
+  - CF
+  typology: Landlord harassment
+  status: verified
+  sources:
+  - title: Tenant Harassment
+    publisher: NYC Department of Housing Preservation and Development
+    url: https://www.nyc.gov/site/hpd/services-and-information/tenant-harassment.page
+    locator: Examples of harassment (items 1-3, 5, 11)
+    quote: Not offering leases or lease renewals, or repeatedly trying to pay you to move out of your
+      home…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Tenants in rent-regulated units report repeated buyout visits after a building sale
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Address
+  - Event
+  - Document
+  checkable: person
+  lookup_sources:
+  - Tenant interviews
+  - 311 or housing complaint data
+  - Tenant association records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful buyout offers made with written disclosures and accepted voluntarily
+  jurisdictions: New York City
+  version: 1
+- id: CF-049
+  name: Withheld repairs or repeated interruptions of heat, water or power
+  definition: An owner fails to make necessary repairs or provide utilities, or repeatedly interrupts
+    essential services.
+  areas:
+  - CF
+  typology: Landlord harassment; slum conditions
+  status: verified
+  sources:
+  - title: Tenant Harassment
+    publisher: NYC HPD
+    url: https://www.nyc.gov/site/hpd/services-and-information/tenant-harassment.page
+    locator: Examples of harassment (items 7 and 9)
+    quote: Repeated interruptions of essential services, such as heat, water, or electricity.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Heat complaints clustered in winter months at one landlord's buildings
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - 311 heat and hot water complaint data
+  - Housing code violation records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Boiler failure or utility outage outside the owner's control
+  - Planned maintenance with notice
+  jurisdictions: New York City
+  version: 1
+- id: CF-050
+  name: Baseless court cases, unjustified eviction notices or lockouts
+  definition: An owner starts baseless or frivolous court proceedings, serves unjustified eviction notices,
+    or illegally locks tenants out.
+  areas:
+  - CF
+  typology: Landlord harassment
+  status: verified
+  sources:
+  - title: Tenant Harassment
+    publisher: NYC HPD
+    url: https://www.nyc.gov/site/hpd/services-and-information/tenant-harassment.page
+    locator: Examples of harassment (items 4 and 12)
+    quote: Unjustified eviction notices or illegal lockouts.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Many eviction filings by one owner dismissed or withdrawn
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - CourtCase
+  - Address
+  checkable: records
+  lookup_sources:
+  - Housing court eviction filings and dispositions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine non-payment or lease breaches
+  - Filings withdrawn because tenants paid
+  jurisdictions: New York City
+  version: 1
+- id: CF-051
+  name: Construction used to disrupt tenants
+  definition: An owner deliberately causes construction problems, such as after-hours work or blocked
+    entrances, to push tenants out.
+  areas:
+  - CF
+  typology: Landlord harassment
+  status: verified
+  sources:
+  - title: Tenant Harassment
+    publisher: NYC HPD
+    url: https://www.nyc.gov/site/hpd/services-and-information/tenant-harassment.page
+    locator: Examples of harassment (item 8)
+    quote: Deliberately causing construction-related problems for tenants, such as working after hours,
+      blocking entrances,…
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Work permits filed claiming the building is vacant while tenants remain
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Building department permits and complaints
+  - Tenant protection plans
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Necessary renovation with permits and tenant protection measures
+  jurisdictions: New York City
+  version: 1
+- id: CF-052
+  name: Rent overcharging and false statements about unit status
+  definition: An owner overcharges rent on regulated units or gives misleading information about a unit's
+    occupancy status or violations.
+  areas:
+  - CF
+  typology: Landlord harassment
+  status: verified
+  sources:
+  - title: Tenant Harassment
+    publisher: NYC HPD
+    url: https://www.nyc.gov/site/hpd/services-and-information/tenant-harassment.page
+    locator: Examples of harassment (items 6 and 10)
+    quote: Overcharging for a rent-regulated apartment.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Registered rent jumps far beyond allowed increases after vacancy
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources:
+  - State rent registration histories (e.g., DHCR)
+  - Leases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful increases for documented improvements
+  jurisdictions: New York City
+  version: 1
+- id: CF-053
+  name: Gambler spend level or escalation without operator interaction
+  definition: A customer spends high amounts, at set times such as payday, or escalates deposits, and
+    the operator does not intervene.
+  areas:
+  - CF
+  typology: Gambling harm (operator duty)
+  status: pending
+  sources:
+  - title: Customer interaction - formal guidance for remote gambling licensees
+    publisher: UK Gambling Commission
+    url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+    locator: Formal guidance 5.2 (categories a-c)
+    quote: increasing length of sessions or escalation in deposit levels
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - New account deposits large sums within minutes with no checks
+  cases:
+  - name: William Hill Group (WHG (International) Ltd, William Hill Organization Ltd, Mr Green Ltd)
+    year: '2023'
+    jurisdiction: Great Britain
+    what_happened: Gambling Commission found social responsibility and AML failures, including a customer
+      allowed to open an account and spend £23,000 in 20 minutes without checks; record £19.2 million
+      to be paid.
+    outcome: fined_by_regulator
+    outcome_verified: false
+    source_url: https://www.gamblingcommission.gov.uk/news/article/william-hill-group-businesses-to-pay-record-gbp19-2m-for-failures
+    source_title: William Hill Group businesses to pay record £19.2m for failures
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Event
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - Gambling Commission enforcement register
+  - Customer account statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: The same William Hill case found anti-money-laundering failures
+    source_url: https://www.gamblingcommission.gov.uk/news/article/william-hill-group-businesses-to-pay-record-gbp19-2m-for-failures
+  innocent_explanations:
+  - High-net-worth customer with verified affordability
+  - Operator did interact but records were not public
+  jurisdictions: Great Britain
+  version: 1
+- id: CF-054
+  name: Long sessions and overnight gambling
+  definition: A customer gambles for long sessions or overnight, a pattern the regulator links to higher
+    risk of problem gambling.
+  areas:
+  - CF
+  typology: Gambling harm
+  status: verified
+  sources:
+  - title: Customer interaction - formal guidance for remote gambling licensees
+    publisher: UK Gambling Commission
+    url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+    locator: Section 4.4; see 5.2 'a higher percentage of overnight gamblers were found to be problem
+      gamblers'
+    quote: Unmonitored overnight gambling carries an increased risk.
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Customer active 1am-5am for weeks with no operator contact
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  checkable: records
+  lookup_sources:
+  - Account activity data (via subject access request or litigation)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Night-shift worker playing at their normal leisure time
+  jurisdictions: Great Britain
+  version: 1
+- id: CF-055
+  name: Chasing losses and erratic betting
+  definition: A customer chases losses, bets erratically, spreads across many products, places many in-play
+    bets, or stakes heavily after a big win.
+  areas:
+  - CF
+  typology: Gambling harm
+  status: verified
+  sources:
+  - title: Customer interaction - formal guidance
+    publisher: UK Gambling Commission
+    url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+    locator: Formal guidance 5.2 (category d)
+    quote: gambling on multiple products, chasing losses, erratic betting patterns
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Stakes double after each loss within a session
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Account betting histories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Deliberate staking strategy within affordable limits
+  jurisdictions: Great Britain
+  version: 1
+- id: CF-056
+  name: Customer-led signs of distress ignored
+  definition: A customer complains repeatedly about not winning, expresses anger, or asks for bonuses
+    after losses, and the operator responds with incentives rather than intervention.
+  areas:
+  - CF
+  typology: Gambling harm
+  status: verified
+  sources:
+  - title: Customer interaction - formal guidance
+    publisher: UK Gambling Commission
+    url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+    locator: Formal guidance 5.2 (category e)
+    quote: frequent complaints about not winning, expressions of anger, requests for bonuses following
+      losses
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - VIP manager sends free bets after a customer's angry chat messages
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - Live chat and email transcripts
+  - Gambling Commission enforcement decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Single complaint about a disputed bet settlement
+  jurisdictions: Great Britain
+  version: 1
+- id: CF-057
+  name: Repeated changes to limits, time-outs or prior self-exclusion
+  definition: A customer keeps raising deposit limits, repeatedly uses time-outs, or has self-excluded
+    before, yet continues to be served.
+  areas:
+  - CF
+  typology: Gambling harm
+  status: verified
+  sources:
+  - title: Customer interaction - formal guidance
+    publisher: UK Gambling Commission
+    url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+    locator: Formal guidance 5.2 (category f)
+    quote: changing deposit limits, previous self-exclusions, frequent or repeated use of the time out
+      facility
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Customer returns after self-exclusion ends and is immediately offered VIP status
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Event
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - Account tool-usage history
+  - GAMSTOP or equivalent self-exclusion records (with consent)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Customer adjusting limits responsibly as income changes
+  jurisdictions: Great Britain
+  version: 1
+- id: CF-058
+  name: 'Account warning signs: failed deposits and many payment methods'
+  definition: A customer's account shows failed deposits, many payment methods, pre-loaded cards or e-wallets,
+    signs of financial strain.
+  areas:
+  - CF
+  typology: Gambling harm
+  status: verified
+  sources:
+  - title: Customer interaction - formal guidance
+    publisher: UK Gambling Commission
+    url: https://www.gamblingcommission.gov.uk/print/customer-interaction-guidance-for-remote-gambling-licensees-formal-guidance
+    locator: Formal guidance 5.2 (category g)
+    quote: failed deposits, multiple payment methods, pre-loaded cards and e-wallets
+    quote_verified: true
+    checked: '2026-10-10'
+  examples:
+  - Dozens of declined deposits in one night followed by a new card
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Event
+  checkable: records
+  lookup_sources:
+  - Account payment logs
+  - Bank statements (with consent)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Multiple payment methods and pre-loaded cards are also money-laundering risk signals
+    source_url: https://www.gamblingcommission.gov.uk/news/article/william-hill-group-businesses-to-pay-record-gbp19-2m-for-failures
+  innocent_explanations:
+  - Bank fraud controls blocking legitimate deposits
+  - Customer uses e-wallets for privacy
+  jurisdictions: Great Britain
+  version: 1
+not_reached:
+- Web search budget for the run ran out partway through, so later sources were fetched only from URLs
+  already known
+- NY Attorney General press release on the Steven Croman tenant-harassment settlement (ag.ny.gov blocked
+  fetching by robots.txt); only news coverage seen, so the case is not included
+- No insurer bad-faith case (e.g., California DOI v. PacifiCare) could be sourced before the search budget
+  ran out
+- NYC Admin Code 27-2004(a)(48) full statutory definition of harassment not reached (the HPD examples
+  page was used instead)
+- 24 CFR 100.75 on eCFR failed to load; Cornell LII copy used
+- CFPB UDAAP supervisory guidance page failed to load; statute 12 USC 5531 used instead
+- Regulation F sections 1006.6 (inconvenient times and places) and 1006.34 (validation notices) not read
+  in full
+- 'Not sourced: algorithmic or AI tenant-screening harm beyond ad delivery; HUD paired-testing studies
+  (e.g., Housing Discrimination Studies); EEOC AI hiring guidance; state payday-loan regulator data thresholds'
