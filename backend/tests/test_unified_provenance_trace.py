@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from tests.claim_helpers import post_claim
 
 client = TestClient(app)
 
@@ -10,7 +11,7 @@ def test_unified_provenance_trace_connects_claim_evidence_relationship_and_lead(
     company = client.post('/api/entities', json={'investigation_id': inv['id'], 'schema': 'Company', 'caption': 'Example Co', 'properties': {}}).json()
     source = client.post('/api/sources', json={'investigation_id': inv['id'], 'title': 'Board filing', 'url': 'https://example.test/board'}).json()
     evidence = client.post('/api/evidence', json={'source_id': source['id'], 'quote': 'Reporter Person joined the board.', 'locator': 'p. 7'}).json()
-    claim = client.post('/api/claims', json={'investigation_id': inv['id'], 'text': 'Reporter Person served on Example Co board.', 'status': 'supported', 'confidence': 0.8}).json()
+    claim = post_claim(client, {'investigation_id': inv['id'], 'text': 'Reporter Person served on Example Co board.', 'status': 'supported', 'confidence': 0.8}).json()
     link = client.post(f"/api/claims/{claim['id']}/evidence", json={'evidence_id': evidence['id'], 'stance': 'supports', 'note': 'Primary filing'} )
     assert link.status_code == 200, link.text
     rel = client.post('/api/relationships', json={
@@ -70,7 +71,7 @@ def test_unified_provenance_trace_starts_from_source_and_document():
     assert accepted.status_code == 200, accepted.text
     evidence_id = accepted.json()['record']['id']
 
-    claim = client.post('/api/claims', json={
+    claim = post_claim(client, {
         'investigation_id': inv['id'], 'text': 'Jordan Hale served on the committee.',
         'status': 'supported', 'confidence': 0.9,
     }).json()
