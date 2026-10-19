@@ -37,7 +37,8 @@ CHANNELS = ("email", "phone", "webpush")
 MODES = {"email": ("off", "interrupts", "daily"), "phone": ("off", "interrupts"), "webpush": ("off", "interrupts")}
 APP_NAME = "Journalism Workbench"
 SUBJECT = "Journalism Workbench"
-EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+# Dots are excluded from the labels so the pieces cannot overlap (no backtracking blow-up on long input).
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s.]+(?:\.[^@\s.]+)+$")
 NTFY_SCHEMES = ("ntfys", "ntfy")
 DAILY_HOUR_UTC = 7
 
@@ -88,7 +89,7 @@ def save_channel(db: Session, person: str, channel: str, *, mode: str, address: 
     value: dict[str, Any] = {"mode": mode}
     if channel == "email":
         addr = (address or "").strip()
-        if mode != "off" and not EMAIL_RE.match(addr):
+        if mode != "off" and (len(addr) > 254 or not EMAIL_RE.match(addr)):
             raise ValueError("Give your email address first")
         if mode != "off" and not _mail_url_ok(settings.notify_mail_url):
             raise ValueError("This server has no mail account set up (NOTIFY_MAIL_URL in its environment file)")
