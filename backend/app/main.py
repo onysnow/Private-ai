@@ -33,6 +33,7 @@ from app.api.routes_entities import router as entities_router
 from app.api.routes_writeups import router as writeups_router
 from app.api.routes_stories import router as stories_router
 from app.api.routes_ai_runs import router as ai_runs_router
+from app.api.routes_safety import router as safety_router
 from app.api.routes_decks import router as decks_router
 from app.api.routes_jobs import router as jobs_router
 from app.api.routes_corpus import router as corpus_router
@@ -47,6 +48,7 @@ from app.api.routes_catalogue import router as catalogue_router
 from app.api.routes_table_mappings import router as table_mappings_router
 from app.api.routes_basemap import router as basemap_router
 from app.api.routes_places import router as places_router
+from app.api.routes_preferences import router as preferences_router
 from app.api.routes_visuals import router as visuals_router
 from app.core.config import Settings, settings as default_settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
@@ -96,6 +98,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(writeups_router)
     app.include_router(stories_router)
     app.include_router(ai_runs_router)
+    app.include_router(safety_router)
     app.include_router(decks_router)
     app.include_router(jobs_router)
     app.include_router(visuals_router)
@@ -111,6 +114,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(table_mappings_router)
     app.include_router(basemap_router)
     app.include_router(places_router)
+    app.include_router(preferences_router)
 
 
 def operation_id(route: APIRoute) -> str:

@@ -44,6 +44,6 @@ D. Unresolved extraction issues
 List missing identifiers, illegible passages, date ambiguity, currency ambiguity, missing attachments, and items requiring human review.
 
 FINAL CHECK
-Confirm the number of in-scope sources, processed sources, failed sources, evidence records, and unresolved extraction issues. Separately state how many evidence records represent independent statements versus restatements of another record. Do not claim full completion if any in-scope source was not processed.
+Confirm the number of in-scope sources, processed sources, failed sources, evidence records, and unresolved extraction issues. Report the corpus manifest counts (`EVALUATION/OUTPUT_SCHEMAS.md`, Corpus manifest record): received, processed, failed, excluded (and who excluded each), and duplicate, where a duplicate copy is counted once as duplicate and not again as processed; confirm they sum to the items received. Separately state how many evidence records represent independent statements versus restatements of another record. Do not claim full completion if any in-scope source was not processed.
 ```
 

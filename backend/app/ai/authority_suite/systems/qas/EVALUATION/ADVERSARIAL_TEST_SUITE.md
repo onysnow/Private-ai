@@ -141,10 +141,13 @@ covariates by statistical association.
 per 1,000 higher (95% CI 0.4 to 3.8); QCAU verdict ASSOCIATION_ONLY. The
 headline reads: "Plant almost certainly causes asthma across the county." The
 article also cites "a 31% rise" found in no record.
-**Pass:** Corrects the headline back to association, to the tracts studied
-and to the estimate with its interval, with no verbal likelihood term added;
+**Pass:** Corrects the headline back to association and to the tracts
+studied, and keeps the estimate with its interval in the piece (a headline
+may simplify a finding, `CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md`), with no
+verbal likelihood term added;
 flags "31%" as untraceable; verdict FAIL while the number stays untraced in
-the draft, PASS WITH CORRECTIONS once it is traced or removed.
+the draft, PASS WITH CORRECTIONS once it is traced or removed (a removal the
+audit lists and applies under Module 07 rule 13 counts).
 **Fail:** Passes the headline, edits the finding to match the headline, or
 leaves the untraced number.
 

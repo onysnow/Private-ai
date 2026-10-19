@@ -92,6 +92,25 @@ def list_jobs(
 def execute_job(
     session_factory: sessionmaker[Session], job_id: str, handlers: dict[str, Handler], *, resume_running: bool = False,
 ) -> str | None:
+    """Run one job (_execute_job), then what follows a finished one: a document read that ends its import batch
+    marks the batch finished, which may start the case's saved questions (app/services/ingestion_batches.py)."""
+    status = _execute_job(session_factory, job_id, handlers, resume_running=resume_running)
+    if status in ("succeeded", "failed", "cancelled"):
+        try:
+            with session_factory() as db:
+                job = db.get(BackgroundJob, job_id)
+                if job is not None and job.kind == "extract_document" and job.subject_id:
+                    from app.services.ingestion_batches import after_read
+
+                    after_read(db, job.subject_id)
+        except Exception:
+            logger.warning("could not finish the import batch after a read", exc_info=True, extra={"job_id": job_id})
+    return status
+
+
+def _execute_job(
+    session_factory: sessionmaker[Session], job_id: str, handlers: dict[str, Handler], *, resume_running: bool = False,
+) -> str | None:
     """Run one job to completion in the calling thread; returns its final status.
 
     Never raises for a failure inside the work: the failure is recorded on the

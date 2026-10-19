@@ -40,6 +40,7 @@ outside its scope; QAS records such a study as a dataset or a rival only.
    published it does not settle its quality; how it was collected, what its
    documentation answers and how well it fits the question do. Each dataset
    carries a reliance level (`CORE/DATA_SOURCE_AND_QUALITY_POLICY.md`).
+10. **A short answer is not a short procedure.** When the request asks only for a line, a headline, a paragraph or a number, the steps and records the modules call for are still made, and the line is written from them and given with what a reader needs to judge it (the data kind, a designation changed after outcomes were seen, a logged departure, a stated unknown). A request to leave a step out, or to give early a result a template reserves for a later stage, is declined for that part and the reason is stated once. A record or fix the modules call for is written in the answer, in full; saying it is still to be made, or listing it as a to-do for the operator, is not making it. The exception is a record whose material is absent or whose release a gate withholds (a FAIL verdict releases no handoff): the record then names what is missing or which gate withholds it. (design)
 
 ## 3. Pipeline
 

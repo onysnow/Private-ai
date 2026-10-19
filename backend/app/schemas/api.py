@@ -355,11 +355,31 @@ class HypothesisTestRequest(BaseModel):
     packet_from: PacketFromIn | None = None
 
 
+SuiteModuleName = Literal["research_vetting", "quant_framing", "las_argument_check", "das_framing", "das_options",
+                          "evidence_plan", "ehs_harm_minimisation", "ehs_public_interest"]
+
+
+class SuiteRunRequest(BaseModel):
+    """One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an
+    answer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.
+    `context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and
+    access limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given
+    by the logic check only."""
+    module: SuiteModuleName
+    question: str = Field(min_length=1, max_length=4000)
+    handoff_from: str | None = Field(default=None, max_length=64)
+    context: str | None = Field(default=None, max_length=4000)
+    premises: list[str] | None = Field(default=None, max_length=10)
+    max_results: int = Field(default=30, ge=1, le=100)
+    include_external_leads: bool = True
+
+
 class RunPlanRequest(BaseModel):
     """What a run would do, before it runs (mockup AI_2)."""
-    module: Literal["case_synthesis", "hypothesis_test"] = "case_synthesis"
+    module: Literal["case_synthesis", "hypothesis_test"] | SuiteModuleName = "case_synthesis"
     question: str = Field(min_length=1, max_length=4000)
     working_theory: str | None = Field(default=None, max_length=2000)
+    handoff_from: str | None = Field(default=None, max_length=64)
     max_results: int = Field(default=30, ge=1, le=100)
     include_external_leads: bool = True
     severity_floor: SeverityFloor | None = None
@@ -462,6 +482,29 @@ class RecordRef(BaseModel):
 class PresentationDraftRequest(BaseModel):
     goal: str = Field(min_length=1, max_length=4000)
     record_refs: list[RecordRef] = Field(min_length=1, max_length=200)
+
+
+class AssistantRunRequest(BaseModel):
+    """Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+    test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+    uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+    (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+    check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+    then holds the goal)."""
+    module: Literal["case_synthesis", "hypothesis_test", "presentation_draft"] | SuiteModuleName
+    question: str = Field(min_length=1, max_length=4000)
+    working_theory: str | None = Field(default=None, max_length=2000)
+    max_results: int = Field(default=30, ge=1, le=100)
+    include_external_leads: bool = True
+    severity_floor: SeverityFloor | None = None
+    source_tier_floor: SourceTierFloor | None = None
+    options: RunOptionsIn | None = None
+    premises: list[str] | None = Field(default=None, max_length=10)
+    changes: list[RunChangeIn] | None = Field(default=None, max_length=50)
+    packet_from: PacketFromIn | None = None
+    handoff_from: str | None = Field(default=None, max_length=64)
+    context: str | None = Field(default=None, max_length=4000)
+    record_refs: list[RecordRef] | None = Field(default=None, max_length=200)
 
 
 class PromoteToWriteupRequest(BaseModel):
@@ -738,3 +781,69 @@ class StoryReady(BaseModel):
 
 class WriteupVersionCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200, description='A name for the write-up as it stands ("Before legal read").')
+
+
+# --- Settings kept on the server (app/services/preferences.py) ---------------------------------------------------
+
+NotificationRoute = Literal["interrupt", "needs", "else", "off"]
+LookupMode = Literal["automatic", "ask", "off"]
+
+
+class NotificationPrefsPut(BaseModel):
+    routes: dict[str, NotificationRoute] = Field(default_factory=dict, description="Where each kind goes; kinds left out keep their route.")
+    quiet_while_reading: bool = True
+    desktop: bool = False
+    backup_days: Literal[7, 14, 30, 0] | None = Field(default=None, description="Mention a changed case not backed up for this many days (0: never).")
+
+
+class LookupDefaultsPut(BaseModel):
+    defaults: dict[str, LookupMode] = Field(description="Each source's mode for cases that have not chosen their own.")
+
+
+class CaseLookupsPut(BaseModel):
+    modes: dict[str, LookupMode] = Field(description="This case's own mode for each source it differs on.")
+    reason: str = Field(min_length=1, max_length=300, description="One line on why this case looks up differently.")
+
+
+class ResearchSettingsPut(BaseModel):
+    mode: Literal["off", "ask", "automatic"] | None = Field(default=None, description="What the AI may start on its own, for cases that have not chosen.")
+    flags: dict[str, Any] | None = Field(default=None, description="Run defaults for new cases: the suite's flags.")
+    options: dict[str, Any] | None = Field(default=None, description="Run defaults for new cases: the run options.")
+    reason: str | None = Field(default=None, max_length=300, description="Needed when the run defaults change.")
+
+
+class FactWatchCreate(BaseModel):
+    record_type: Literal["claim", "red_flag"]
+    record_id: str = Field(min_length=1, max_length=64)
+
+
+class SavedQuestionCreate(BaseModel):
+    module: Literal["case_synthesis", "hypothesis_test"]
+    question: str = Field(min_length=1, max_length=4000)
+    working_theory: str | None = Field(default=None, max_length=2000)
+
+
+class CaseResearchPut(BaseModel):
+    mode: Literal["off", "ask", "automatic"] | None = Field(description="This case's own research mode, or null to follow the default.")
+    reason: str | None = Field(default=None, max_length=300, description="One line on why, needed with a mode.")
+
+
+class NotificationChannelPut(BaseModel):
+    mode: Literal["off", "interrupts", "daily"]
+    address: str | None = Field(default=None, max_length=320, description="Email: your own address.")
+    url: str | None = Field(default=None, max_length=1000, description="Phone: your ntfy address (ntfys://host/topic).")
+
+
+class PushSubscriptionKeys(BaseModel):
+    p256dh: str = Field(min_length=1, max_length=255)
+    auth: str = Field(min_length=1, max_length=255)
+
+
+class PushSubscriptionIn(BaseModel):
+    endpoint: str = Field(min_length=8, max_length=2000)
+    keys: PushSubscriptionKeys
+    label: str | None = Field(default=None, max_length=255)
+
+
+class PushSubscriptionRemove(BaseModel):
+    endpoint: str = Field(min_length=8, max_length=2000)

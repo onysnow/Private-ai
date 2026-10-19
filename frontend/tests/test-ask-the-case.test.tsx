@@ -6,7 +6,7 @@ import {act, cleanup, render, screen, waitFor, within} from '@testing-library/re
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
-import {BeforeYouRun} from '../features/ai/before-you-run';
+import {BeforeYouRun, askBeforeYouRun} from '../features/ai/before-you-run';
 import {acceptedByAPerson, reviewItems} from '../features/ai/claim-review';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -18,7 +18,8 @@ import {PLAN} from '../test-support/run-plan-fixture';
 const BASE = '/api/investigations/inv-1/assistant';
 const RUN = {run_id: 'run-1', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who controlled Fernhill Ltd?', working_theory: null,
   created_at: '2026-10-12T10:00:00Z', started_at: '2026-10-12T10:00:00Z', finished_at: '2026-10-12T10:01:00Z', candidate_id: 'cand-1', review_status: 'proposed',
-  events: 0, problems: 0, message: null, error: null};
+  events: 0, problems: 0, message: null, error: null,
+  route: {system: 'tas', row: 2, node: 'tas/08', title: 'Case synthesis', modules_in_system: 13, final_audit: {node: 'tas/10', file: '10_FINAL_ACCURACY_AUDIT.md'}}};
 const job = {id: 'job-2', kind: 'ai_reasoning', investigation_id: 'inv-1', subject_type: 'ai_run', subject_id: null, status: 'succeeded', finished: true,
   progress: 100, message: 'Proposed for review', error: null, attempts: 1, runner: 'inline', result: null,
   created_at: '2026-10-12T10:00:00Z', updated_at: '2026-10-12T10:01:00Z', started_at: '2026-10-12T10:00:00Z', finished_at: '2026-10-12T10:01:00Z'};
@@ -69,6 +70,33 @@ describe('Ask the case from elsewhere', () => {
     expect(await screen.findByRole('region', {name: 'Watch the run'})).toBeInTheDocument();
     act(() => useWorkbenchStore.getState().openAskCase('New question'));
     expect(await screen.findByLabelText('Your question')).toHaveValue('New question');
+  });
+});
+
+describe('Run module from the AI drafts panel', () => {
+  it('opens Before you run with the module, question and theory chosen there, and runs nothing', async () => {
+    const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, 'GET /api/investigations/inv-1/ai-runs': {runs: [RUN]}, [`POST ${BASE}/plan`]: PLAN});
+    const tab = document.body.appendChild(Object.assign(document.createElement('a'), {href: '#ai-runs'}));
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    await screen.findByText('Earlier runs');
+    act(() => askBeforeYouRun('inv-1', {module: 'hypothesis_test', question: 'Did Ada act alone?', theory: 'Ada acted alone.', maxResults: 12, includeLeads: true}));
+    expect(await screen.findByRole('heading', {name: /Before you run/})).toBeInTheDocument();
+    expect(window.location.hash).toBe('#ai-runs');
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toMatchObject({module: 'hypothesis_test', question: 'Did Ada act alone?', working_theory: 'Ada acted alone.', max_results: 12}));
+    expect(screen.getByText(/packet up to 30 → 12 records/)).toBeInTheDocument();
+    expect(api.calls(`POST ${BASE}/case-synthesis`)).toHaveLength(0);
+    expect(api.calls(`POST ${BASE}/hypothesis-test`)).toHaveLength(0);
+    tab.remove();
+  });
+
+  it('reads a request from the address once, when it opens on another page', async () => {
+    const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, 'GET /api/investigations/inv-1/ai-runs': {runs: [RUN]}, [`POST ${BASE}/plan`]: PLAN});
+    window.history.replaceState(null, '', '/act/?inv=inv-1&ask=Who%20owns%20Fernhill%3F&module=case_synthesis&leads=off#ai-runs');
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByRole('heading', {name: /Before you run/})).toBeInTheDocument();
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toMatchObject({module: 'case_synthesis', question: 'Who owns Fernhill?', include_external_leads: false}));
+    expect(window.location.search).toBe('?inv=inv-1');
+    expect(window.location.hash).toBe('#ai-runs');
   });
 });
 

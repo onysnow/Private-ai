@@ -33,8 +33,10 @@ export function frostOn(): boolean {
   return a.theme === 'rain-noir' && a.effects === 'full';
 }
 
-export function FrostPanel({as = 'section', className, label, still = false, children}: {
+export function FrostPanel({as = 'section', className, label, still = false, attrs, children}: {
   as?: ElementType; className?: string; label?: string;
+  /** Plain attributes for the element (a data- name, a tabIndex), glass or not. */
+  attrs?: Record<string, string | number>;
   /** A picture of the page (Appearance's before/after): always plain, so it never takes a pane. */
   still?: boolean;
   children: ReactNode;
@@ -58,10 +60,10 @@ export function FrostPanel({as = 'section', className, label, still = false, chi
   }, [plain]);
   if (!glass) {
     const Tag = as;
-    return <Tag className={className} aria-label={label}>{children}</Tag>;
+    return <Tag className={className} aria-label={label} {...attrs}>{children}</Tag>;
   }
   // The pane's own attributes go through `causes`, which Glass puts on the element (as Pane does with its material).
-  const attrs: Record<string, string> = {[MATERIAL_ATTR]: DEFAULT_MATERIAL};
-  if (label) attrs['aria-label'] = label;
-  return <Glass as={as} className={`${className ?? ''} frost-panel`} causes={attrs}>{children}</Glass>;
+  const causes: Record<string, string | number> = {...attrs, [MATERIAL_ATTR]: DEFAULT_MATERIAL};
+  if (label) causes['aria-label'] = label;
+  return <Glass as={as} className={`${className ?? ''} frost-panel`} causes={causes}>{children}</Glass>;
 }

@@ -112,6 +112,29 @@ describe('The Drop', () => {
     expect(screen.getByRole('button', {name: 'a folder'})).toBeInTheDocument();
   });
 
+  it('offers the sample case on an empty Drop only when the sample has documents to bring in', async () => {
+    const empty = {...drop, lanes: [], totals: {...drop.totals, files: 0}, ready_for_you: {}};
+    const sample = {id: 'demo-1', name: 'Demo Investigation', description: null, question: null, is_demo: true, type_areas: null, ai_run_profile: null, created_at: '2026-10-12T00:00:00'};
+    const file = {id: 'f1', investigation_id: 'demo-1', source_id: 's1', filename: 'note.txt', title: 'note', mime_type: 'text/plain', sha256: 'ab'.repeat(32),
+      extraction_status: 'complete', extraction_error: null, extraction_issues: [], created_at: '2026-10-12T00:00:00', chunk_count: 1, candidate_counts: {}, parent_document_id: null};
+    const api = mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': empty, 'GET /api/investigations': [sample], 'GET /api/investigations/demo-1/documents': []});
+    const first = render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    await screen.findByText(/nothing leaves it/);
+    await waitFor(() => expect(api.calls('GET /api/investigations/demo-1/documents')).toHaveLength(1));
+    expect(screen.queryByRole('link', {name: 'Try with the sample case'})).not.toBeInTheDocument();
+    first.unmount();
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': empty, 'GET /api/investigations': [sample], 'GET /api/investigations/demo-1/documents': [file]});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByRole('link', {name: 'Try with the sample case'})).toHaveAttribute('href', '/bring-in?inv=demo-1');
+  });
+
+  it('names the identifier proposals as the mockup does: Emails & phones', async () => {
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': {...drop, ready_for_you: {identifier: 3}}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const ready = await screen.findByRole('region', {name: 'Ready for you'});
+    expect(within(ready).getByRole('link', {name: '3 emails & phones proposed'})).toHaveTextContent('Emails & phones');
+  });
+
   it('reads a failed file again, and sends a second copy to the first', async () => {
     const failed = lane('d4', 'locked.pdf', ['done', 'done', 'stopped', 'stopped', 'skipped', 'waiting', 'waiting'], {retry_job_id: 'j4', note: 'Password-protected'});
     const copy = lane('d5', 'minutes (copy).pdf', ['done', 'done', 'done', 'done', 'skipped', 'done', 'done'], {same_as: 'd1', note: 'Already in the case: same fingerprint'});
@@ -252,6 +275,40 @@ describe('The Drop', () => {
     await screen.findByRole('gridcell', {name: 'long.pdf, Read: done'});
     expect(api.calls('GET /api/investigations/inv-1/drop/stream')).toHaveLength(1);
     expect(screen.getByText('Read cleanly · 42 s')).toBeInTheDocument();
+    // Said once, politely, when the read finishes (research §2: summaries, never every stage).
+    expect(within(screen.getByRole('list', {name: 'What changed on the line'})).getByText('long.pdf read: 12 passages, 3 proposals')).toBeInTheDocument();
+  });
+
+  it('counts a file saved but not read as saved, and says why in words', async () => {
+    const doc = {id: 'd7', investigation_id: 'inv-1', filename: 'scan.pdf', source_id: 'src-1', mime_type: 'application/pdf', sha256: 'cd'.repeat(32),
+      extraction_status: 'failed', extraction_error: 'The file is damaged', extraction_issues: [], created_at: '2026-10-01T00:00:00', chunk_count: 0, candidate_counts: {}};
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': drop,
+      'POST /api/investigations/inv-1/ingestion-batches': {id: 'batch-2', investigation_id: 'inv-1', label: 'scan.pdf', created_by: null,
+        created_at: '2026-10-19T01:00:00', items: [], documents: [], review_order: []},
+      'POST /api/documents/upload': {status: 422, body: {detail: {message: 'Document saved but extraction failed', document: doc, error: 'The file is damaged', job: null}}}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    await screen.findByRole('grid');
+    const input = document.querySelector<HTMLInputElement>('.dp-field input[type="file"]:not([webkitdirectory])')!;
+    fireEvent.change(input, {target: {files: [new File(['%PDF'], 'scan.pdf', {type: 'application/pdf'})]}});
+    await waitFor(() => expect(screen.getByText(/^1 file saved/)).toHaveTextContent('1 file saved. scan.pdf was saved but could not be read: The file is damaged.'));
+    expect(screen.getByText(/^1 file saved/).textContent).not.toMatch(/422|\/api\//);
+  });
+
+  it('opens the file picker with Enter on the drop field, and shows a file\'s receipt while it is pointed at', async () => {
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': drop});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const line = await screen.findByRole('region', {name: 'Digestion line'});
+    const field = screen.getByLabelText(/Drop files here, or paste text/);
+    const input = document.querySelector<HTMLInputElement>('.dp-field input[type="file"]:not([webkitdirectory])')!;
+    const picker = vi.spyOn(input, 'click');
+    fireEvent.keyDown(field, {key: 'Enter'});
+    expect(picker).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('region', {name: 'Read receipt: broken.pdf'})).toBeInTheDocument();
+    const [, minutes] = laneButtons(line);
+    fireEvent.mouseEnter(minutes);
+    expect(screen.getByRole('region', {name: 'Read receipt: minutes.pdf'})).toBeInTheDocument();
+    fireEvent.mouseLeave(within(line).getByRole('grid'));
+    expect(screen.getByRole('region', {name: 'Read receipt: broken.pdf'})).toBeInTheDocument();
   });
 
   it('merges stream messages into the drop as last read', () => {
@@ -284,6 +341,7 @@ describe('The Drop', () => {
     expect(boxDetail(st('inside', 'active', '18 of 23 read'))).toBe('18/23');
     expect(boxDetail(st('inside', 'skipped', 'None'))).toBe('none');
     expect(boxDetail(st('read', 'active', 'OCR, page 12 of 40'))).toBe('OCR, page 12 of 40');
+    expect(boxDetail(st('read', 'stopped', 'The document reader stopped unexpectedly on this file'))).toBe('');  // only its ✕, as the mockup draws it
     const warn = {...lane('w', 'w.pdf', ['done', 'done', 'done', 'done', 'skipped', 'done', 'done']), issues: ['Faint text on 2 regions']};
     expect(problemsFirst([warn, drop.lanes[1]] as never).map(l => l.filename)).toEqual(['broken.pdf', 'w.pdf']);
     const stuck = {...lane('s', 's.pdf', ['done', 'done', 'active', 'waiting', 'skipped', 'waiting', 'waiting']), stalled_minutes: 8};

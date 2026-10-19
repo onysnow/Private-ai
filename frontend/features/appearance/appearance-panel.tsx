@@ -51,6 +51,20 @@ const themeName = (id: ThemeId): string => THEMES.find(t => t.id === id)?.name ?
 /** A theme's name, or the name of your own theme when there is one. */
 export const lookName = (theme: ThemeId, own: string | null): string => customTheme(own)?.name ?? themeName(theme);
 
+/** A theme change as a crossfade of the whole screen (research §04.11 "Motion": 450 ms, Rain Noir 700 ms, a 120 ms
+ *  crossfade under Calm motion or the computer's reduced-motion setting); straight away where the browser has no
+ *  view transitions. `to` is the theme the screen ends in. */
+export function fadeTheme(change: () => void, to: ThemeId): void {
+  const doc = document as Document & {startViewTransition?: (update: () => void) => {finished?: Promise<void>}};
+  if (typeof doc.startViewTransition !== 'function') { change(); return; }
+  let reduced = false;
+  try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* no media queries */ }
+  const root = document.documentElement;
+  root.dataset.themeFade = reduced || currentAppearance().motion === 'calm' ? 'calm' : to === 'rain-noir' ? 'slow' : 'base';
+  const done = () => { delete root.dataset.themeFade; };
+  try { void doc.startViewTransition(change).finished?.then(done, done); } catch { done(); change(); }
+}
+
 /** The bar at the top of every screen while a theme is on trial: Keep it, or go back (Esc). */
 export function TryingBar(): ReactElement | null {
   const {trying, tryingOwn, kept} = useAppearance();
@@ -58,18 +72,18 @@ export function TryingBar(): ReactElement | null {
     if (!trying) return undefined;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || e.defaultPrevented || document.querySelector('[role="dialog"]')) return;
-      tryTheme(null);
+      fadeTheme(() => tryTheme(null), kept.theme);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [trying]);
+  }, [trying, kept.theme]);
   if (!trying) return null;
   const name = lookName(trying, tryingOwn);
   return <div className="ap-trying" role="status">
     <i className="ap-trying-dot" aria-hidden="true"/>
     <span>Trying <b>{name}</b> · nothing is saved until you keep it</span>
     <button type="button" className="ap-btn p" onClick={() => keepAppearance({theme: trying, custom: tryingOwn})}>Keep {name}</button>
-    <button type="button" className="ap-btn" onClick={() => tryTheme(null)}>Go back to {lookName(kept.theme, kept.custom)} <kbd>Esc</kbd></button>
+    <button type="button" className="ap-btn" onClick={() => fadeTheme(() => tryTheme(null), kept.theme)}>Go back to {lookName(kept.theme, kept.custom)} <kbd>Esc</kbd></button>
   </div>;
 }
 
@@ -85,6 +99,9 @@ const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeI
   {id: 'neon', name: 'Neon title on Textbook flags', line: 'Steady only, never flicker', themes: ['rain-noir']},
   {id: 'bloom', name: 'Bloom on the AI run’s lights', line: 'WebGL · Watch the run only · stops if calm', themes: ['rain-noir']},
 ];
+
+/** Whether a theme has any of the named effects (research §04.11: each card's name says "has effects" when it does). */
+const hasEffects = (theme: ThemeId): boolean => NAMED.some(n => n.themes.includes(theme));
 
 /** A format drawn small: where its panels sit. */
 function FormatThumb({id}: {id: Format}): ReactElement {
@@ -195,16 +212,20 @@ export function AppearancePanel(): ReactElement {
             if (at < 0) return;
             const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
             if (step) { e.preventDefault(); cards[(at + step + cards.length) % cards.length].focus(); return; }
-            if ((e.key === 'k' || e.key === 'K') && !e.metaKey && !e.ctrlKey) { e.preventDefault(); keepAppearance({theme: options[at].theme, custom: options[at].own?.id ?? null}); }
+            if ((e.key === 'k' || e.key === 'K') && !e.metaKey && !e.ctrlKey) {
+              e.preventDefault();
+              const pick = options[at];
+              fadeTheme(() => keepAppearance({theme: pick.theme, custom: pick.own?.id ?? null}), pick.theme);
+            }
           }}>
           {options.map(t => {
             const current = keptKey === t.key;
             const card = <button key={t.key} type="button" data-theme={t.theme} role="radio" aria-checked={nowKey === t.key} style={ownStyle(t.own)}
               tabIndex={nowKey === t.key ? 0 : -1}
               className={`ap-card${nowKey === t.key ? ' on' : ''}${tryingKey === t.key ? ' trying' : ''}`}
-              aria-label={`${t.name} theme${t.own ? ' (your own)' : ''}${current ? ', in use' : ''}${tryingKey === t.key ? ', trying' : ''}`}
+              aria-label={`${t.name} theme${t.own ? ' (your own)' : ''}${current ? ', in use' : ''}${tryingKey === t.key ? ', trying' : ''}, lowest contrast ${t.lowest}${hasEffects(t.theme) ? ', has effects' : ''}`}
               onMouseEnter={() => setPointed(t.key)} onFocus={() => setPointed(t.key)} onBlur={() => setPointed(null)}
-              onClick={() => tryTheme(current ? null : t.theme, current ? null : t.own?.id ?? null)}>
+              onClick={() => fadeTheme(() => tryTheme(current ? null : t.theme, current ? null : t.own?.id ?? null), current ? kept.theme : t.theme)}>
               <span className="ap-card-head"><b>{t.name}</b>{current && <span className="ap-tag">Current</span>}{tryingKey === t.key && <span className="ap-tag try">Trying</span>}</span>
               <span className="ap-mood">{t.mood}</span>
               <span className="ap-sw" aria-hidden="true">{t.swatches.map((c, i) => <i key={`${c}${i}`} style={{background: c}}/>)}</span>
@@ -246,7 +267,7 @@ export function AppearancePanel(): ReactElement {
         <div className="ap-seg" role="radiogroup" aria-label="Effects">
           {EFFECTS.map(e => <button key={e.id} type="button" role="radio" aria-checked={now.effects === e.id} className={now.effects === e.id ? 'on' : ''}
             onClick={() => keepAppearance({effects: e.id})}>{e.name}</button>)}
-          <span>{now.effects === 'light' ? 'Light: the same effects, standing still.' : now.effects === 'off' ? 'Off: a plain board.' : 'Full: the theme’s board effects, moving.'}</span>
+          <span>{now.effects === 'light' ? 'Light: the same effects, standing still.' : now.effects === 'off' ? 'Off: a plain board.' : 'Full: the theme’s board effects, moving. On battery they run as Light until the computer is charging.'}</span>
         </div>
         <div className="ap-switches">
           {NAMED.map(n => {

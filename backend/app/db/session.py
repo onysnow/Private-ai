@@ -8,6 +8,7 @@ from sqlalchemy.pool import StaticPool
 from app.core.config import settings
 from app.db import validation as _validation  # noqa: F401 - registers cross-dialect ORM guards
 from app.db import mutation_guard as _mutation_guard  # noqa: F401 - registers PostgreSQL mutation locks
+from app.db import decided_by as _decided_by  # noqa: F401 - stamps who decided and each quote's anchor
 
 class _SerializedCursor(sqlite3.Cursor):
     """A cursor whose every DBAPI call holds its connection's lock.

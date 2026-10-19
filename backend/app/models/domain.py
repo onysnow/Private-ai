@@ -75,6 +75,15 @@ from app.models.patterns import (
     CheckItem,
     PatternFlag,
 )
+from app.models.preferences import (
+    FactWatch,
+    Preference,
+)
+from app.models.platform import (
+    NotificationDelivery,
+    PushSubscription,
+    SavedQuestion,
+)
 from app.models.annotations import (
     Collection,
     CollectionItem,
@@ -89,6 +98,10 @@ from app.models.ai import (
 from app.models.writeups import (
     Writeup,
     WriteupVersion,
+)
+from app.models.safety import (
+    BackupEvent,
+    OutboundRequest,
 )
 from app.models.stories import (
     Story,
@@ -167,8 +180,15 @@ __all__ = [
     "CollectionItem",
     "PatternFlag",
     "CheckItem",
+    "Preference",
+    "FactWatch",
+    "OutboundRequest",
+    "SavedQuestion",
+    "NotificationDelivery",
+    "PushSubscription",
     "AIAnalysisCandidate",
     "AIRunEvent",
+    "BackupEvent",
     "Writeup",
     "WriteupVersion",
     "Story",

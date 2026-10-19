@@ -27,6 +27,8 @@ afterEach(() => {
 const PREVIEW = 'POST /api/backups/preview';
 const RESTORE = 'POST /api/backups/restore';
 const EXPORT = 'GET /api/investigations/inv-1/export';
+const CASES = 'GET /api/investigations';
+const caseRow = (last_backup: unknown) => [{id: 'inv-1', name: 'Harbour land', is_demo: false, created_at: '2026-10-01T00:00:00Z', last_backup}];
 const CONFIRMATION = 'I understand this creates a separate investigation and will not merge with existing records.';
 
 const backupFile = () => new File(['fake-zip-bytes'], 'investigation-inv-1.jwbackup.zip', {type: 'application/zip'});
@@ -96,6 +98,28 @@ describe('BackupPanel download', () => {
   });
 });
 
+describe('BackupPanel last backup', () => {
+  it('says when the case was last backed up, its size and that it carries a checksum', async () => {
+    vi.useFakeTimers({toFake: ['Date']});
+    vi.setSystemTime(new Date('2026-10-19T12:00:00Z'));
+    mockApi({[CASES]: caseRow({at: '2026-10-16T12:00:00Z', bytes: 1_400_000_000, sha256: 'ab', documents_included: true})});
+    wrap(<BackupPanel investigationId="inv-1" onRestored={vi.fn()}/>);
+    expect(await screen.findByText('Last backup 3 days ago')).toBeInTheDocument();
+    expect(screen.getByText('Last backup 3 days ago').parentElement).toHaveTextContent('Last backup 3 days ago · 1.4 GB · ✓ checksum');
+    vi.useRealTimers();
+  });
+
+  it('says when there is none yet, and asks again after a download', async () => {
+    const api = mockApi({[CASES]: caseRow(null), [EXPORT]: () => new Response('zip-bytes', {status: 200, headers: {'content-type': 'application/zip'}})});
+    captureDownload();
+    wrap(<BackupPanel investigationId="inv-1" onRestored={vi.fn()}/>);
+    expect(await screen.findByText('No backup of this case yet')).toBeInTheDocument();
+    api.add({[CASES]: caseRow({at: new Date().toISOString(), bytes: 9, sha256: 'ab', documents_included: true})});
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Download backup'}));
+    expect(await screen.findByText('Last backup just now')).toBeInTheDocument();
+  });
+});
+
 describe('BackupPanel preview and restore', () => {
   it('previews a restorable archive and offers the confirmation checkbox', async () => {
     const api = mockApi({[PREVIEW]: restorablePreview({warnings: ['Backup is 3 days old.']})});
@@ -140,6 +164,7 @@ describe('BackupPanel preview and restore', () => {
 
   it('restores after confirmation and hands the new investigation to the page', async () => {
     const api = mockApi({
+      [CASES]: caseRow(null),
       [PREVIEW]: restorablePreview(),
       [RESTORE]: {investigation_id: 'inv-restored', restored_counts: {entities: 4}, manifest: {format: 'jwbackup', version: 1}},
     });

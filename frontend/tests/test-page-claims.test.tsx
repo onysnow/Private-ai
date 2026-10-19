@@ -78,7 +78,8 @@ function emptyWorkspace(claim: ReturnType<typeof claimFixture>) {
 }
 
 async function bootstrapWithClaimAndEvidence(): Promise<MockApi> {
-  const api = mockApi(pageRoutes({investigations: [investigation], claims: [claimFixture()], evidence: [evidencePoolRow()]}));
+  const api = mockApi({...pageRoutes({investigations: [investigation], claims: [claimFixture()], evidence: [evidencePoolRow()]}),
+    [`GET /api/investigations/${investigation.id}/watches`]: []});
 
   const Home = await importHome();
   render(<Home />);

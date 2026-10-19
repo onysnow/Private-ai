@@ -10,6 +10,8 @@ The "approved" items below may be built straight away.
 4. **Done 12 Oct: The Wire (See)**, built from the approved prototype (https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3) as See's first section: `GET /api/investigations/{id}/wire` (`app/services/wire.py`, groups and layout by networkx) and `features/the-wire/` (the prototype's drawing code ported, scoped to its panel). Changes from the prototype: amounts under a million written in full (9,800 not "10 k"); the time strip spans the case's own dates; the drawer opens the dossier and flags; tags offer Trace. Not yet tested on 1MDB (its records cannot be downloaded in the cloud session).
 5. **Done 12 Oct (data and API): the app-side Authority Suite gaps** — all 25 suite requirements are now recorded (`docs/authority-suite/SUITE_GAPS.md`; details in `MOCKUP_BUILD_LIST.md` §1). Each is shown on screen as its mockup's section is built.
 
+6. **Done 19 Oct (first slice): Keep › Safety & data** (mockup KEEP-safety-and-data, ADR-0015): what lives on this computer and what left it, the outbound log word for word (CSV export), the last backup, the four Keep cards. Open: ADR-0015's five questions for Ony (the log in backups; AI calls as the question or the whole text; which OpenAleph calls to log; the default for outside lookups; when "last backup" is noted), Your safety panel, stray-file cleanup, encrypted backups.
+
 ## Ony's standing requirement for every card
 Wherever a card appears (decision, dashboard widget, flag, timeline row, to-check item), it must:
 - let him infer the most important facts: who, what, how much, when, from where;
@@ -19,6 +21,7 @@ Wherever a card appears (decision, dashboard widget, flag, timeline row, to-chec
 Cards that fail this today: "Keep this passage as evidence?" with no preview, four identical "business reason for the payments" checks, flags with no amounts or dates, and timeline rows with raw ids.
 
 ## Asked for: mockups first
+- **Login and account (19 Oct).** So decisions on this computer carry your name ("Accepted by Ony") rather than "a person": the app stores who decided from the signed-in account (built 19 Oct), but the local owner has no account. Mockups ACCOUNT_1–4 approved 19 Oct (`docs/design/mockups/`); tools researched in `docs/research/accounts-and-locking-tools.md`, waiting on Ony's choice before the ADR.
 - **Bring in › Documents (ingestion page).** Redesign the queue and most of the page:
   - show progress, "stuck" and errors per file;
   - drop the wall of nine OpenAleph buttons on every row;
@@ -41,6 +44,10 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
   - add complementary features for this use;
   - innovate something never done before for investigators;
   - make the designs the best possible UI/UX and visualisation.
+
+- **Done 19 Oct: Settings panes** (Notifications, Outside lookups, AI and research, Connector keys), built from the Settings panes mockup (https://claude.ai/artifact/SEucwaaP2poX283ztjtfLp; HOME_2 drew only their sidebar rows). Ony said to decide on what is best for the app. Calls made: a Textbook Red Flag interrupts by default (once, never repeated, held while reading); outside lookups default to Ask first; research without asking is Off / Ask first only ("Without approval" needs saved questions, not built); no "Test key" (a test would have to send a query): a key's state comes from its last lookup; email and phone notifications are not offered (they would need a mail or push service). Not built: a safety-indicator kind (no data yet), "import finished", "backup reminder" and "connector refreshed" kinds (no records to read them from), per-case research mode.
+- **Done 19 Oct: Platform needs** (docs/project-notes/PLATFORM_NEEDS_PLAN.md, parts 1–7), what the Settings panes left out. A log of every request that leaves the server (`outbound_requests`); a scheduler (every minute, both modes); imports finished and full backups recorded, with inbox rows for them; saved questions, research Without approval (per case too, with a reason); email (Apprise, the server's `NOTIFY_MAIL_URL`), phone (ntfy) and Web Push (`NOTIFY_PUSH_SUBJECT`), off until a reporter turns them on, kind and count only; Check the key with no search; OpenSanctions dataset updates noticed every six hours, and parties re-looked-up in cases set to Automatic. Not built: part 8, safety indicators (needs the SA levels).
+- **Done 19 Oct: issue #41, the forms.** The 20 hand-wired forms are on the shared layer (`lib/forms.ts`): an empty or bad field says what to do under it and sends nothing; a refused save shows under the field or for the form, and the input stays (`docs/frontend/react-hook-form-zod.md`). The connections picker has no typed field and stays as it is.
 
 ## Asked for: demo
 - **The demo is a finished (or nearly finished) investigation.** The human-review decisions should be pre-made by Claude from what is known, so the user sees how the app works past the review step. Today 1MDB has about 15,000 items waiting.

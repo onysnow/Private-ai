@@ -27,6 +27,9 @@ import type {
   AddNoteData,
   AddNoteErrors,
   AddNoteResponses,
+  AddPushSubscriptionData,
+  AddPushSubscriptionErrors,
+  AddPushSubscriptionResponses,
   AddStorySectionData,
   AddStorySectionErrors,
   AddStorySectionResponses,
@@ -57,9 +60,15 @@ import type {
   CapabilitiesData,
   CapabilitiesErrors,
   CapabilitiesResponses,
+  CheckConnectorKeyData,
+  CheckConnectorKeyErrors,
+  CheckConnectorKeyResponses,
   CheckWatchlistNowData,
   CheckWatchlistNowErrors,
   CheckWatchlistNowResponses,
+  ClearCaseLookupsData,
+  ClearCaseLookupsErrors,
+  ClearCaseLookupsResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
@@ -114,6 +123,9 @@ import type {
   CreateTimelineEventEndpointData,
   CreateTimelineEventEndpointErrors,
   CreateTimelineEventEndpointResponses,
+  CreateWatchData,
+  CreateWatchErrors,
+  CreateWatchResponses,
   CreateWriteupEndpointData,
   CreateWriteupEndpointErrors,
   CreateWriteupEndpointResponses,
@@ -141,9 +153,15 @@ import type {
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipErrors,
   DeleteInvestigationMembershipResponses,
+  DeleteSavedQuestionData,
+  DeleteSavedQuestionErrors,
+  DeleteSavedQuestionResponses,
   DeleteStorySectionData,
   DeleteStorySectionErrors,
   DeleteStorySectionResponses,
+  DeleteWatchData,
+  DeleteWatchErrors,
+  DeleteWatchResponses,
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointErrors,
   DeleteWriteupEndpointResponses,
@@ -201,6 +219,9 @@ import type {
   ExportInvestigationData,
   ExportInvestigationErrors,
   ExportInvestigationResponses,
+  ExportOutboundLogData,
+  ExportOutboundLogErrors,
+  ExportOutboundLogResponses,
   ExportWriteupDocxData,
   ExportWriteupDocxErrors,
   ExportWriteupDocxResponses,
@@ -240,6 +261,9 @@ import type {
   GetCaseRecordData,
   GetCaseRecordErrors,
   GetCaseRecordResponses,
+  GetCaseResearchData,
+  GetCaseResearchErrors,
+  GetCaseResearchResponses,
   GetCatalogueMapData,
   GetCatalogueMapErrors,
   GetCatalogueMapResponses,
@@ -327,6 +351,9 @@ import type {
   GetIdentifierTargetsData,
   GetIdentifierTargetsErrors,
   GetIdentifierTargetsResponses,
+  GetInboxData,
+  GetInboxErrors,
+  GetInboxResponses,
   GetIndicatorData,
   GetIndicatorErrors,
   GetIndicatorResponses,
@@ -357,12 +384,18 @@ import type {
   GetLeadData,
   GetLeadErrors,
   GetLeadResponses,
+  GetLookupSettingsData,
+  GetLookupSettingsErrors,
+  GetLookupSettingsResponses,
   GetMappingSchemasData,
   GetMappingSchemasErrors,
   GetMappingSchemasResponses,
   GetNotesData,
   GetNotesErrors,
   GetNotesResponses,
+  GetNotificationPrefsData,
+  GetNotificationPrefsErrors,
+  GetNotificationPrefsResponses,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingErrors,
   GetOpenalephCorpusBindingResponses,
@@ -375,6 +408,9 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewErrors,
   GetOrphanStoragePreviewResponses,
+  GetOutboundLogData,
+  GetOutboundLogErrors,
+  GetOutboundLogResponses,
   GetOwnershipChainData,
   GetOwnershipChainErrors,
   GetOwnershipChainResponses,
@@ -390,6 +426,12 @@ import type {
   GetRedFlagsData,
   GetRedFlagsErrors,
   GetRedFlagsResponses,
+  GetResearchSettingsData,
+  GetResearchSettingsErrors,
+  GetResearchSettingsResponses,
+  GetSafetyAndDataData,
+  GetSafetyAndDataErrors,
+  GetSafetyAndDataResponses,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesErrors,
   GetSameAnswerCandidatesResponses,
@@ -456,6 +498,9 @@ import type {
   InspectBackupData,
   InspectBackupErrors,
   InspectBackupResponses,
+  InvestigationAssistantRunData,
+  InvestigationAssistantRunErrors,
+  InvestigationAssistantRunResponses,
   InvestigationCaseSynthesisData,
   InvestigationCaseSynthesisErrors,
   InvestigationCaseSynthesisResponses,
@@ -477,6 +522,9 @@ import type {
   InvestigationRunProfileData,
   InvestigationRunProfileErrors,
   InvestigationRunProfileResponses,
+  InvestigationSuiteRunData,
+  InvestigationSuiteRunErrors,
+  InvestigationSuiteRunResponses,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogErrors,
   InvestigationVisualCatalogResponses,
@@ -627,6 +675,9 @@ import type {
   ListTermHintsData,
   ListTermHintsErrors,
   ListTermHintsResponses,
+  ListWatchesData,
+  ListWatchesErrors,
+  ListWatchesResponses,
   ListWriteupsEndpointData,
   ListWriteupsEndpointErrors,
   ListWriteupsEndpointResponses,
@@ -705,9 +756,27 @@ import type {
   PruneSecurityAuditData,
   PruneSecurityAuditErrors,
   PruneSecurityAuditResponses,
+  PutCaseLookupsData,
+  PutCaseLookupsErrors,
+  PutCaseLookupsResponses,
+  PutCaseResearchData,
+  PutCaseResearchErrors,
+  PutCaseResearchResponses,
   PutInvestigationMembershipData,
   PutInvestigationMembershipErrors,
   PutInvestigationMembershipResponses,
+  PutLookupDefaultsData,
+  PutLookupDefaultsErrors,
+  PutLookupDefaultsResponses,
+  PutNotificationChannelData,
+  PutNotificationChannelErrors,
+  PutNotificationChannelResponses,
+  PutNotificationPrefsData,
+  PutNotificationPrefsErrors,
+  PutNotificationPrefsResponses,
+  PutResearchSettingsData,
+  PutResearchSettingsErrors,
+  PutResearchSettingsResponses,
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
@@ -732,6 +801,9 @@ import type {
   RemoveNoteData,
   RemoveNoteErrors,
   RemoveNoteResponses,
+  RemovePushSubscriptionData,
+  RemovePushSubscriptionErrors,
+  RemovePushSubscriptionResponses,
   RemoveStoryClaimData,
   RemoveStoryClaimErrors,
   RemoveStoryClaimResponses,
@@ -783,6 +855,9 @@ import type {
   RunRedFlagsData,
   RunRedFlagsErrors,
   RunRedFlagsResponses,
+  RunSavedQuestionData,
+  RunSavedQuestionErrors,
+  RunSavedQuestionResponses,
   RunTableMappingData,
   RunTableMappingErrors,
   RunTableMappingResponses,
@@ -792,6 +867,9 @@ import type {
   SaveInvestigationRunProfileData,
   SaveInvestigationRunProfileErrors,
   SaveInvestigationRunProfileResponses,
+  SaveQuestionData,
+  SaveQuestionErrors,
+  SaveQuestionResponses,
   SearchGlossaryData,
   SearchGlossaryErrors,
   SearchGlossaryResponses,
@@ -804,6 +882,9 @@ import type {
   SeedDemoData,
   SeedDemoErrors,
   SeedDemoResponses,
+  SeeWatchData,
+  SeeWatchErrors,
+  SeeWatchResponses,
   SendCorpusEntitySetData,
   SendCorpusEntitySetErrors,
   SendCorpusEntitySetResponses,
@@ -828,6 +909,9 @@ import type {
   TagARecordData,
   TagARecordErrors,
   TagARecordResponses,
+  TestNotificationChannelData,
+  TestNotificationChannelErrors,
+  TestNotificationChannelResponses,
   UntagARecordData,
   UntagARecordErrors,
   UntagARecordResponses,
@@ -875,6 +959,8 @@ import {
   zAddNoteBody,
   zAddNotePath,
   zAddNoteResponse,
+  zAddPushSubscriptionBody,
+  zAddPushSubscriptionResponse,
   zAddStorySectionBody,
   zAddStorySectionPath,
   zAddStorySectionResponse,
@@ -901,8 +987,12 @@ import {
   zCanonicalEntityResolutionPath,
   zCanonicalEntityResolutionResponse,
   zCapabilitiesResponse,
+  zCheckConnectorKeyPath,
+  zCheckConnectorKeyResponse,
   zCheckWatchlistNowPath,
   zCheckWatchlistNowResponse,
+  zClearCaseLookupsPath,
+  zClearCaseLookupsResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -944,6 +1034,8 @@ import {
   zCreateSourceEndpointResponse,
   zCreateTimelineEventEndpointBody,
   zCreateTimelineEventEndpointResponse,
+  zCreateWatchBody,
+  zCreateWatchResponse,
   zCreateWriteupEndpointBody,
   zCreateWriteupEndpointResponse,
   zDecideCheckBody,
@@ -967,8 +1059,12 @@ import {
   zDeleteDeckEndpointResponse,
   zDeleteInvestigationMembershipPath,
   zDeleteInvestigationMembershipResponse,
+  zDeleteSavedQuestionPath,
+  zDeleteSavedQuestionResponse,
   zDeleteStorySectionPath,
   zDeleteStorySectionResponse,
+  zDeleteWatchPath,
+  zDeleteWatchResponse,
   zDeleteWriteupEndpointPath,
   zDeleteWriteupEndpointResponse,
   zDismissHitPath,
@@ -1015,6 +1111,9 @@ import {
   zExportInvestigationPath,
   zExportInvestigationQuery,
   zExportInvestigationResponse,
+  zExportOutboundLogPath,
+  zExportOutboundLogQuery,
+  zExportOutboundLogResponse,
   zExportWriteupDocxPath,
   zExportWriteupDocxResponse,
   zExternalRelationshipCandidatesPath,
@@ -1039,6 +1138,8 @@ import {
   zGetBasemapTileResponse,
   zGetCaseRecordPath,
   zGetCaseRecordResponse,
+  zGetCaseResearchPath,
+  zGetCaseResearchResponse,
   zGetCatalogueMapResponse,
   zGetChecksPath,
   zGetChecksResponse,
@@ -1098,6 +1199,8 @@ import {
   zGetGlossaryEntryResponse,
   zGetIdentifierTargetsPath,
   zGetIdentifierTargetsResponse,
+  zGetInboxPath,
+  zGetInboxResponse,
   zGetIndicatorPath,
   zGetIndicatorResponse,
   zGetIngestionBatchPath,
@@ -1121,10 +1224,13 @@ import {
   zGetJobEndpointResponse,
   zGetLeadPath,
   zGetLeadResponse,
+  zGetLookupSettingsQuery,
+  zGetLookupSettingsResponse,
   zGetMappingSchemasResponse,
   zGetNotesPath,
   zGetNotesQuery,
   zGetNotesResponse,
+  zGetNotificationPrefsResponse,
   zGetOpenalephCorpusBindingPath,
   zGetOpenalephCorpusBindingResponse,
   zGetOpenalephDocumentReviewStatusPath,
@@ -1132,6 +1238,9 @@ import {
   zGetOpenalephDocumentSyncPath,
   zGetOpenalephDocumentSyncResponse,
   zGetOrphanStoragePreviewResponse,
+  zGetOutboundLogPath,
+  zGetOutboundLogQuery,
+  zGetOutboundLogResponse,
   zGetOwnershipChainPath,
   zGetOwnershipChainResponse,
   zGetPartyYearsPath,
@@ -1143,6 +1252,10 @@ import {
   zGetRecordProvenanceTraceResponse,
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
+  zGetResearchSettingsResponse,
+  zGetSafetyAndDataPath,
+  zGetSafetyAndDataQuery,
+  zGetSafetyAndDataResponse,
   zGetSameAnswerCandidatesPath,
   zGetSameAnswerCandidatesResponse,
   zGetSecurityAlertsQuery,
@@ -1188,6 +1301,9 @@ import {
   zImportOpenalephDocumentEvidenceResponse,
   zInspectBackupBody,
   zInspectBackupResponse,
+  zInvestigationAssistantRunBody,
+  zInvestigationAssistantRunPath,
+  zInvestigationAssistantRunResponse,
   zInvestigationCaseSynthesisBody,
   zInvestigationCaseSynthesisPath,
   zInvestigationCaseSynthesisResponse,
@@ -1207,6 +1323,9 @@ import {
   zInvestigationRunPlanResponse,
   zInvestigationRunProfilePath,
   zInvestigationRunProfileResponse,
+  zInvestigationSuiteRunBody,
+  zInvestigationSuiteRunPath,
+  zInvestigationSuiteRunResponse,
   zInvestigationVisualCatalogPath,
   zInvestigationVisualCatalogResponse,
   zInvestigationVisualPreviewBody,
@@ -1324,6 +1443,8 @@ import {
   zListStoryVersionsPath,
   zListStoryVersionsResponse,
   zListTermHintsResponse,
+  zListWatchesPath,
+  zListWatchesResponse,
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
   zListWriteupsEndpointResponse,
@@ -1388,9 +1509,25 @@ import {
   zPromoteStatementAssessmentResponse,
   zPruneSecurityAuditBody,
   zPruneSecurityAuditResponse,
+  zPutCaseLookupsBody,
+  zPutCaseLookupsPath,
+  zPutCaseLookupsResponse,
+  zPutCaseResearchBody,
+  zPutCaseResearchPath,
+  zPutCaseResearchResponse,
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
   zPutInvestigationMembershipResponse,
+  zPutLookupDefaultsBody,
+  zPutLookupDefaultsQuery,
+  zPutLookupDefaultsResponse,
+  zPutNotificationChannelBody,
+  zPutNotificationChannelPath,
+  zPutNotificationChannelResponse,
+  zPutNotificationPrefsBody,
+  zPutNotificationPrefsResponse,
+  zPutResearchSettingsBody,
+  zPutResearchSettingsResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
   zRecordStoryGateBody,
@@ -1409,6 +1546,8 @@ import {
   zRemoveInvestigationResponse,
   zRemoveNotePath,
   zRemoveNoteResponse,
+  zRemovePushSubscriptionBody,
+  zRemovePushSubscriptionResponse,
   zRemoveStoryClaimPath,
   zRemoveStoryClaimResponse,
   zRemoveTagPath,
@@ -1450,6 +1589,8 @@ import {
   zRotateAppUserTokenResponse,
   zRunRedFlagsPath,
   zRunRedFlagsResponse,
+  zRunSavedQuestionPath,
+  zRunSavedQuestionResponse,
   zRunTableMappingBody,
   zRunTableMappingPath,
   zRunTableMappingResponse,
@@ -1459,6 +1600,9 @@ import {
   zSaveInvestigationRunProfileBody,
   zSaveInvestigationRunProfilePath,
   zSaveInvestigationRunProfileResponse,
+  zSaveQuestionBody,
+  zSaveQuestionPath,
+  zSaveQuestionResponse,
   zSearchGlossaryQuery,
   zSearchGlossaryResponse,
   zSearchInvestigationCorpusPath,
@@ -1467,6 +1611,8 @@ import {
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
   zSeedDemoResponse,
+  zSeeWatchPath,
+  zSeeWatchResponse,
   zSendCorpusEntitySetBody,
   zSendCorpusEntitySetPath,
   zSendCorpusEntitySetResponse,
@@ -1486,6 +1632,8 @@ import {
   zTagARecordBody,
   zTagARecordPath,
   zTagARecordResponse,
+  zTestNotificationChannelPath,
+  zTestNotificationChannelResponse,
   zUntagARecordPath,
   zUntagARecordQuery,
   zUntagARecordResponse,
@@ -5818,6 +5966,82 @@ export const saveInvestigationRunProfile = <
   });
 
 /**
+ * Investigation Assistant Run
+ *
+ * Any AI run, through the one route the suite service gives its module (app/ai/suite.py): TAS, the other six
+ * systems, or the app-local draft. The per-module endpoints below are this same route with the module fixed.
+ * Every answer is a proposal and writes nothing else.
+ */
+export const investigationAssistantRun = <ThrowOnError extends boolean = false>(
+  options: Options<InvestigationAssistantRunData, ThrowOnError>,
+): RequestResult<
+  InvestigationAssistantRunResponses,
+  InvestigationAssistantRunErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    InvestigationAssistantRunResponses,
+    InvestigationAssistantRunErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zInvestigationAssistantRunBody,
+          path: zInvestigationAssistantRunPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationAssistantRunResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/assistant/run',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Investigation Suite Run
+ *
+ * A run of another system of the Authority System Suite -- RAS, QAS, LAS, DAS, EGS or EHS
+ * (app/ai/systems.py) -- through the same citation-validated pipeline as the TAS endpoints, with the same
+ * guarantee: the answer is a proposal and writes nothing else. A run may start from an answer you accepted
+ * (`handoff_from`); what crosses is decided by the suite's INTEROP rules (app/ai/interop.py) and every value held
+ * back is listed in the run record.
+ */
+export const investigationSuiteRun = <ThrowOnError extends boolean = false>(
+  options: Options<InvestigationSuiteRunData, ThrowOnError>,
+): RequestResult<
+  InvestigationSuiteRunResponses,
+  InvestigationSuiteRunErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    InvestigationSuiteRunResponses,
+    InvestigationSuiteRunErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zInvestigationSuiteRunBody,
+          path: zInvestigationSuiteRunPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationSuiteRunResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/assistant/suite-run',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * List Case Records
  */
 export const listCaseRecords = <ThrowOnError extends boolean = false>(
@@ -6763,6 +6987,30 @@ export const getInvestigationGraph = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Inbox
+ */
+export const getInbox = <ThrowOnError extends boolean = false>(
+  options: Options<GetInboxData, ThrowOnError>,
+): RequestResult<GetInboxResponses, GetInboxErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetInboxResponses,
+    GetInboxErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetInboxPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetInboxResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/inbox',
+    ...options,
+  });
+
+/**
  * List Ingestion Batches
  *
  * The investigation's recent bulk imports, newest first, with how many files each saved, found already there, or refused.
@@ -6879,6 +7127,64 @@ export const leadQueue = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Clear Case Lookups
+ */
+export const clearCaseLookups = <ThrowOnError extends boolean = false>(
+  options: Options<ClearCaseLookupsData, ThrowOnError>,
+): RequestResult<
+  ClearCaseLookupsResponses,
+  ClearCaseLookupsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    ClearCaseLookupsResponses,
+    ClearCaseLookupsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zClearCaseLookupsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zClearCaseLookupsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/lookups',
+    ...options,
+  });
+
+/**
+ * Put Case Lookups
+ */
+export const putCaseLookups = <ThrowOnError extends boolean = false>(
+  options: Options<PutCaseLookupsData, ThrowOnError>,
+): RequestResult<PutCaseLookupsResponses, PutCaseLookupsErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    PutCaseLookupsResponses,
+    PutCaseLookupsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutCaseLookupsBody,
+          path: zPutCaseLookupsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutCaseLookupsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/lookups',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Record Marks
  *
  * One record's tags, notes and the collections it is in.
@@ -6992,6 +7298,62 @@ export const addNote = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Outbound Log
+ *
+ * Newest first. Only requests that left this computer, unless `include_local` is true.
+ */
+export const getOutboundLog = <ThrowOnError extends boolean = false>(
+  options: Options<GetOutboundLogData, ThrowOnError>,
+): RequestResult<GetOutboundLogResponses, GetOutboundLogErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetOutboundLogResponses,
+    GetOutboundLogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetOutboundLogPath,
+          query: zGetOutboundLogQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetOutboundLogResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/outbound-log',
+    ...options,
+  });
+
+/**
+ * Export Outbound Log
+ */
+export const exportOutboundLog = <ThrowOnError extends boolean = false>(
+  options: Options<ExportOutboundLogData, ThrowOnError>,
+): RequestResult<
+  ExportOutboundLogResponses,
+  ExportOutboundLogErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ExportOutboundLogResponses,
+    ExportOutboundLogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportOutboundLogPath,
+          query: zExportOutboundLogQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportOutboundLogResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/outbound-log.csv',
+    ...options,
   });
 
 /**
@@ -7283,6 +7645,126 @@ export const listReportingTasks = <ThrowOnError extends boolean = false>(
       await zListReportingTasksResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/reporting-tasks',
     ...options,
+  });
+
+/**
+ * Get Case Research
+ */
+export const getCaseResearch = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaseResearchData, ThrowOnError>,
+): RequestResult<
+  GetCaseResearchResponses,
+  GetCaseResearchErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetCaseResearchResponses,
+    GetCaseResearchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCaseResearchPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCaseResearchResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/research',
+    ...options,
+  });
+
+/**
+ * Put Case Research
+ */
+export const putCaseResearch = <ThrowOnError extends boolean = false>(
+  options: Options<PutCaseResearchData, ThrowOnError>,
+): RequestResult<
+  PutCaseResearchResponses,
+  PutCaseResearchErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutCaseResearchResponses,
+    PutCaseResearchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutCaseResearchBody,
+          path: zPutCaseResearchPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutCaseResearchResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/research',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Safety And Data
+ */
+export const getSafetyAndData = <ThrowOnError extends boolean = false>(
+  options: Options<GetSafetyAndDataData, ThrowOnError>,
+): RequestResult<
+  GetSafetyAndDataResponses,
+  GetSafetyAndDataErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetSafetyAndDataResponses,
+    GetSafetyAndDataErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSafetyAndDataPath,
+          query: zGetSafetyAndDataQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSafetyAndDataResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/safety-and-data',
+    ...options,
+  });
+
+/**
+ * Save Question
+ */
+export const saveQuestion = <ThrowOnError extends boolean = false>(
+  options: Options<SaveQuestionData, ThrowOnError>,
+): RequestResult<SaveQuestionResponses, SaveQuestionErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    SaveQuestionResponses,
+    SaveQuestionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSaveQuestionBody,
+          path: zSaveQuestionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSaveQuestionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/saved-questions',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -8057,6 +8539,31 @@ export const investigationVisualRestyle = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * List Watches
+ */
+export const listWatches = <ThrowOnError extends boolean = false>(
+  options: Options<ListWatchesData, ThrowOnError>,
+): RequestResult<ListWatchesResponses, ListWatchesErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ListWatchesResponses,
+    ListWatchesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListWatchesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListWatchesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/watches',
+    ...options,
   });
 
 /**
@@ -9096,6 +9603,64 @@ export const updateReportingTaskEndpoint = <
   });
 
 /**
+ * Delete Saved Question
+ */
+export const deleteSavedQuestion = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteSavedQuestionData, ThrowOnError>,
+): RequestResult<
+  DeleteSavedQuestionResponses,
+  DeleteSavedQuestionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteSavedQuestionResponses,
+    DeleteSavedQuestionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteSavedQuestionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteSavedQuestionResponse.parseAsync(data),
+    url: '/api/saved-questions/{saved_question_id}',
+    ...options,
+  });
+
+/**
+ * Run Saved Question
+ */
+export const runSavedQuestion = <ThrowOnError extends boolean = false>(
+  options: Options<RunSavedQuestionData, ThrowOnError>,
+): RequestResult<
+  RunSavedQuestionResponses,
+  RunSavedQuestionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    RunSavedQuestionResponses,
+    RunSavedQuestionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRunSavedQuestionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRunSavedQuestionResponse.parseAsync(data),
+    url: '/api/saved-questions/{saved_question_id}/run',
+    ...options,
+  });
+
+/**
  * Search Workbench
  *
  * Search canonical and evidentiary records without conflating external findings with facts.
@@ -9124,6 +9689,37 @@ export const searchWorkbench = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zSearchWorkbenchResponse.parseAsync(data),
     url: '/api/search',
+    ...options,
+  });
+
+/**
+ * Check Connector Key
+ *
+ * Ask the source whether it accepts its key, sending no search (Settings › Connector keys, "Check the key").
+ */
+export const checkConnectorKey = <ThrowOnError extends boolean = false>(
+  options: Options<CheckConnectorKeyData, ThrowOnError>,
+): RequestResult<
+  CheckConnectorKeyResponses,
+  CheckConnectorKeyErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CheckConnectorKeyResponses,
+    CheckConnectorKeyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCheckConnectorKeyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCheckConnectorKeyResponse.parseAsync(data),
+    url: '/api/settings/connectors/{provider}/check',
     ...options,
   });
 
@@ -9182,6 +9778,320 @@ export const saveConnectorCredential = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zSaveConnectorCredentialResponse.parseAsync(data),
     url: '/api/settings/connectors/{provider}/credential',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Lookup Settings
+ */
+export const getLookupSettings = <ThrowOnError extends boolean = false>(
+  options?: Options<GetLookupSettingsData, ThrowOnError>,
+): RequestResult<
+  GetLookupSettingsResponses,
+  GetLookupSettingsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetLookupSettingsResponses,
+    GetLookupSettingsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zGetLookupSettingsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetLookupSettingsResponse.parseAsync(data),
+    url: '/api/settings/lookups',
+    ...options,
+  });
+
+/**
+ * Put Lookup Defaults
+ */
+export const putLookupDefaults = <ThrowOnError extends boolean = false>(
+  options: Options<PutLookupDefaultsData, ThrowOnError>,
+): RequestResult<
+  PutLookupDefaultsResponses,
+  PutLookupDefaultsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutLookupDefaultsResponses,
+    PutLookupDefaultsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutLookupDefaultsBody,
+          path: z.never().optional(),
+          query: zPutLookupDefaultsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutLookupDefaultsResponse.parseAsync(data),
+    url: '/api/settings/lookups',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Notification Prefs
+ */
+export const getNotificationPrefs = <ThrowOnError extends boolean = false>(
+  options?: Options<GetNotificationPrefsData, ThrowOnError>,
+): RequestResult<
+  GetNotificationPrefsResponses,
+  GetNotificationPrefsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetNotificationPrefsResponses,
+    GetNotificationPrefsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetNotificationPrefsResponse.parseAsync(data),
+    url: '/api/settings/notifications',
+    ...options,
+  });
+
+/**
+ * Put Notification Prefs
+ */
+export const putNotificationPrefs = <ThrowOnError extends boolean = false>(
+  options: Options<PutNotificationPrefsData, ThrowOnError>,
+): RequestResult<
+  PutNotificationPrefsResponses,
+  PutNotificationPrefsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutNotificationPrefsResponses,
+    PutNotificationPrefsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutNotificationPrefsBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutNotificationPrefsResponse.parseAsync(data),
+    url: '/api/settings/notifications',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Put Notification Channel
+ */
+export const putNotificationChannel = <ThrowOnError extends boolean = false>(
+  options: Options<PutNotificationChannelData, ThrowOnError>,
+): RequestResult<
+  PutNotificationChannelResponses,
+  PutNotificationChannelErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutNotificationChannelResponses,
+    PutNotificationChannelErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutNotificationChannelBody,
+          path: zPutNotificationChannelPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutNotificationChannelResponse.parseAsync(data),
+    url: '/api/settings/notifications/channels/{channel}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Test Notification Channel
+ */
+export const testNotificationChannel = <ThrowOnError extends boolean = false>(
+  options: Options<TestNotificationChannelData, ThrowOnError>,
+): RequestResult<
+  TestNotificationChannelResponses,
+  TestNotificationChannelErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    TestNotificationChannelResponses,
+    TestNotificationChannelErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zTestNotificationChannelPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zTestNotificationChannelResponse.parseAsync(data),
+    url: '/api/settings/notifications/channels/{channel}/test',
+    ...options,
+  });
+
+/**
+ * Add Push Subscription
+ */
+export const addPushSubscription = <ThrowOnError extends boolean = false>(
+  options: Options<AddPushSubscriptionData, ThrowOnError>,
+): RequestResult<
+  AddPushSubscriptionResponses,
+  AddPushSubscriptionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AddPushSubscriptionResponses,
+    AddPushSubscriptionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddPushSubscriptionBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddPushSubscriptionResponse.parseAsync(data),
+    url: '/api/settings/push-subscriptions',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Remove Push Subscription
+ */
+export const removePushSubscription = <ThrowOnError extends boolean = false>(
+  options: Options<RemovePushSubscriptionData, ThrowOnError>,
+): RequestResult<
+  RemovePushSubscriptionResponses,
+  RemovePushSubscriptionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    RemovePushSubscriptionResponses,
+    RemovePushSubscriptionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zRemovePushSubscriptionBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRemovePushSubscriptionResponse.parseAsync(data),
+    url: '/api/settings/push-subscriptions/remove',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Research Settings
+ */
+export const getResearchSettings = <ThrowOnError extends boolean = false>(
+  options?: Options<GetResearchSettingsData, ThrowOnError>,
+): RequestResult<
+  GetResearchSettingsResponses,
+  GetResearchSettingsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetResearchSettingsResponses,
+    GetResearchSettingsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetResearchSettingsResponse.parseAsync(data),
+    url: '/api/settings/research',
+    ...options,
+  });
+
+/**
+ * Put Research Settings
+ */
+export const putResearchSettings = <ThrowOnError extends boolean = false>(
+  options: Options<PutResearchSettingsData, ThrowOnError>,
+): RequestResult<
+  PutResearchSettingsResponses,
+  PutResearchSettingsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutResearchSettingsResponses,
+    PutResearchSettingsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutResearchSettingsBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutResearchSettingsResponse.parseAsync(data),
+    url: '/api/settings/research',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -9930,6 +10840,84 @@ export const gradeTimelineEventEndpoint = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Create Watch
+ */
+export const createWatch = <ThrowOnError extends boolean = false>(
+  options: Options<CreateWatchData, ThrowOnError>,
+): RequestResult<CreateWatchResponses, CreateWatchErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CreateWatchResponses,
+    CreateWatchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateWatchBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateWatchResponse.parseAsync(data),
+    url: '/api/watches',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Watch
+ */
+export const deleteWatch = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteWatchData, ThrowOnError>,
+): RequestResult<DeleteWatchResponses, DeleteWatchErrors, ThrowOnError> =>
+  (options.client ?? client).delete<
+    DeleteWatchResponses,
+    DeleteWatchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteWatchPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteWatchResponse.parseAsync(data),
+    url: '/api/watches/{fact_watch_id}',
+    ...options,
+  });
+
+/**
+ * See Watch
+ */
+export const seeWatch = <ThrowOnError extends boolean = false>(
+  options: Options<SeeWatchData, ThrowOnError>,
+): RequestResult<SeeWatchResponses, SeeWatchErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    SeeWatchResponses,
+    SeeWatchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zSeeWatchPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zSeeWatchResponse.parseAsync(data),
+    url: '/api/watches/{fact_watch_id}/seen',
+    ...options,
   });
 
 /**

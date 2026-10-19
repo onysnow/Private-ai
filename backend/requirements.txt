@@ -1,8 +1,8 @@
-fastapi==0.141.1
+fastapi==0.143.2
 uvicorn[standard]==0.54.0
-sqlalchemy==2.1.1
+sqlalchemy==2.1.4
 psycopg[binary]==3.3.6
-pydantic-settings==2.15.0
+pydantic-settings==2.16.0
 httpx==0.28.1
 followthemoney==4.11.0
 # XLSX sheets read for spreadsheet mappings (app/services/table_mappings.py; MIT).
@@ -10,9 +10,9 @@ followthemoney==4.11.0
 openpyxl==3.1.5
 # The layout of diagrams sent to OpenAleph (app/services/openaleph_entitysets.py):
 # networkx's spring layout (BSD-3; already installed with followthemoney, pinned
-# because the Workbench imports it), which computes with numpy (BSD-3).
+# because the Workbench imports it; followthemoney 4.11 needs networkx below 3.7), which computes with numpy (BSD-3).
 networkx==3.6.1
-numpy==2.4.6
+numpy==2.5.4
 # The indicator catalogue's YAML files (app/catalogue/; ADR-0007; MIT). Already
 # installed with followthemoney; pinned because the Workbench imports it.
 PyYAML==6.0.3
@@ -34,3 +34,7 @@ procrastinate==3.10.0
 # The self-hosted base map's tiles, read from its PMTiles file (app/services/basemap.py;
 # ADR-0005 line 18; BSD-3).
 pmtiles==3.8.1
+# Notifications outside the app (docs/project-notes/PLATFORM_NEEDS_PLAN.md, part 5): email and ntfy through
+# Apprise (BSD-2-Clause), Web Push with VAPID through pywebpush (MPL-2.0).
+apprise==2.0.1
+pywebpush==2.5.0

@@ -8,6 +8,10 @@ export type Sentence = {from: number; to: number; cited: boolean; claims: string
 
 const WORD = /\w/;
 const END = /[.!?](?=\s|$)/g;
+// Not an end: a full stop after an initial ("M. Ross") or a short title or abbreviation ("Dr.", "e.g."), as the
+// server reads it (app/services/stories.py _END).
+const NOT_END = /(?:^|[^\w])(?:[A-Z]|Mr|Mrs|Ms|Dr|St|No|e\.g|i\.e)$/;
+const notAnEnd = (text: string, at: number) => text[at] === '.' && NOT_END.test(text.slice(Math.max(0, at - 4), at));
 
 /** The sentences in a run of text and citation pieces, each with its document range. */
 export function sentencesOf(pieces: Piece[]): Sentence[] {
@@ -32,6 +36,7 @@ export function sentencesOf(pieces: Piece[]): Sentence[] {
     END.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = END.exec(text))) {
+      if (notAnEnd(text, m.index)) continue;
       const end = m.index + 1;
       const chunk = text.slice(start, end);
       if (!open) open = {from: piece.pos + start, to: piece.pos + end, cited: false, claims: []};

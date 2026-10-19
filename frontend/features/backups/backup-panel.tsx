@@ -5,7 +5,7 @@
 // generated from the API schema (fix 2). The archive goes up as a file and
 // comes down as one, so these three calls use the app's own client with the
 // generated Zod schema for the reply (see checkedReply in lib/api-generated.ts).
-import {useMutation} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ChangeEvent, ReactElement, ReactNode} from 'react';
 
@@ -13,9 +13,11 @@ import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Input} from '@/components/ui/input';
+import {agoText} from '../act/red-flags-board';
 import {errorMessage} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
+import {listInvestigationsOptions, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import type {BackupPreviewOut, BackupRestoreResultOut} from '../../lib/generated/types.gen';
 import {zBackupPreviewOut, zBackupRestoreResultOut} from '../../lib/generated/zod.gen';
 
@@ -26,6 +28,22 @@ type Props = {
   /** Shown under the status line: the page's settings block still lives in this card. */
   children?: ReactNode;
 };
+
+/** What the server keeps about a case's last backup (investigations.last_backup). */
+export type LastBackup = {at: string; bytes: number; sha256: string; documents_included: boolean};
+
+export function lastBackupOf(value: unknown): LastBackup | null {
+  const v = value as Partial<LastBackup> | null | undefined;
+  return v && typeof v.at === 'string' && typeof v.bytes === 'number' ? v as LastBackup : null;
+}
+
+/** "1.4 GB", "820 KB": the archive's size in the units a person reads. */
+export function sizeWords(bytes: number): string {
+  const units = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+  let n = bytes, i = 0;
+  while (n >= 1000 && i < units.length - 1) { n /= 1000; i += 1; }
+  return `${i ? (n < 10 ? n.toFixed(1) : Math.round(n)) : n} ${units[i]}`;
+}
 
 function archiveForm(file: File): FormData {
   const body = new FormData();
@@ -38,6 +56,9 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
   const [preview, setPreview] = useState<BackupPreviewOut | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState('');
+  const queryClient = useQueryClient();
+  const investigations = useQuery({...listInvestigationsOptions(), enabled: Boolean(investigationId)});
+  const last = lastBackupOf(investigations.data?.find(i => i.id === investigationId)?.last_backup);
 
   const download = useMutation({
     mutationFn: (id: string) => api.blob(`/api/investigations/${id}/export?include_documents=true`),
@@ -64,6 +85,7 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       link.remove();
       URL.revokeObjectURL(url);
       setStatus('Backup downloaded.');
+      await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
     } catch (error) {
       setStatus(errorMessage(error, 'Backup download failed'));
     }
@@ -109,6 +131,9 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       <CardDescription>Export FollowTheMoney JSONL, evidence and claim provenance, leads/tasks, timeline, extracted document text, review decisions, and stored source files in one checksum-verified archive.</CardDescription>
     </CardHeader>
     <CardContent>
+      {investigationId && <p className="backup-last" aria-live="polite">{last
+        ? <><b>Last backup {agoText(last.at)}</b> · {sizeWords(last.bytes)} · ✓ checksum{last.documents_included ? '' : ' · without the stored files'}</>
+        : <b>No backup of this case yet</b>}</p>}
       <Button onClick={downloadBackup} disabled={!investigationId}>Download backup</Button>
       <hr/>
       <h4>Restore safely</h4>

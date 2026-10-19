@@ -5,7 +5,7 @@ import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
-import {BeforeYouRun} from '../features/ai/before-you-run';
+import {BeforeYouRun, runTime} from '../features/ai/before-you-run';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -19,7 +19,7 @@ const job = {id: 'job-1', kind: 'ai_reasoning', investigation_id: 'inv-1', subje
 
 const RUN = {run_id: 'job-1', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who controlled Fernhill Ltd?', working_theory: null,
   created_at: '2026-10-12T10:00:00Z', started_at: '2026-10-12T10:00:00Z', finished_at: '2026-10-12T10:01:00Z', candidate_id: 'cand-1', review_status: 'proposed',
-  events: 0, problems: 0, message: null, error: null};
+  events: 0, problems: 0, message: null, error: null, route: {system: 'tas', row: 2, node: 'tas/08', title: 'Case synthesis', modules_in_system: 13, final_audit: {node: 'tas/10', file: '10_FINAL_ACCURACY_AUDIT.md'}}};
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => cleanup());
@@ -69,6 +69,40 @@ describe('BeforeYouRun', () => {
     expect(await screen.findByText('Run record')).toBeInTheDocument();
   });
 
+  it('shows the packet’s first records, the systems not expected as one chip, and past run time in words', async () => {
+    const plan = {...PLAN, packet: {...PLAN.packet, first: [{record_type: 'document', record_id: 'doc-41', title: 'Register extract, 2017'},
+      {record_type: 'evidence', record_id: 'ev-58', title: 'Email, M. Ross'}]}, where: {...PLAN.where, minutes: [0.2, 0.4]}};
+    mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: plan});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    const first = await screen.findByRole('list', {name: 'The first records in the packet'});
+    expect(within(first).getByText('document: Register extract, 2017')).toBeInTheDocument();
+    const region = screen.getByRole('region', {name: 'The plan'});
+    expect(within(region).getByText('QAS · RAS · DAS')).toBeInTheDocument();
+    expect(within(region).getAllByText(/not expected/)).toHaveLength(1);
+    expect(screen.getByText('under a minute on this machine')).toBeInTheDocument();
+    expect(runTime([])).toBe('not measured yet: no run has finished here');
+    expect(runTime([1.2, 3.6])).toBe('about 1–4 min on this machine');
+    expect(runTime([2.1, 1.9])).toBe('about 2 min on this machine');
+  });
+
+  it('counts the records the tier floor leaves out, and says runs make no outside lookups', async () => {
+    const plan = {...PLAN, packet: {...PLAN.packet, below_tier_floor: [{tier: 'E', count: 3}, {tier: 'F', count: 1}]}};
+    mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: plan});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    const region = await screen.findByRole('region', {name: 'The plan'});
+    expect(await within(region).findByText('3 Tier E records left out by the tier floor · leads only')).toBeInTheDocument();
+    expect(within(region).getByText('1 Tier F record left out by the tier floor · leads only')).toBeInTheDocument();
+    const where = screen.getByRole('region', {name: 'Where it runs, what it costs'});
+    expect(within(where).getByText(/Runs make no outside lookups yet/)).toBeInTheDocument();
+    expect(within(where).queryByText(/stop and ask/)).not.toBeInTheDocument();
+  });
+
   it('saves this case’s default only with a reason', async () => {
     const api = mockApi({[`GET ${BASE}/profile`]: PLAN.profile, [`POST ${BASE}/plan`]: PLAN,
       [`PUT ${BASE}/profile`]: {...PLAN.profile, saved: true, reason: 'Named people', saved_at: '2026-10-12T10:00:00Z'}});
@@ -77,7 +111,10 @@ describe('BeforeYouRun', () => {
     await user.type(await screen.findByLabelText('Your question'), 'Who?');
     await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
     await user.click(await screen.findByRole('button', {name: 'Save as this case’s default'}));
-    expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+    await user.click(screen.getByRole('button', {name: 'Save'}));
+    expect(await screen.findByText('Write why first.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Why this case runs with these settings')).toHaveAttribute('aria-invalid', 'true');
+    expect(api.calls(`PUT ${BASE}/profile`)).toHaveLength(0);
     await user.type(screen.getByLabelText('Why this case runs with these settings'), 'Named people');
     await user.click(screen.getByRole('button', {name: 'Save'}));
     await waitFor(() => expect(api.lastBody(`PUT ${BASE}/profile`)).toMatchObject({reason: 'Named people', source_tier_floor: 'D', premises: []}));

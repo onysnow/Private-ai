@@ -84,7 +84,10 @@ describe('RedFlagsPanel', () => {
     wrap(<RedFlagsPanel investigationId="inv-1"/>);
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', {name: 'Not relevant'}));
-    expect(screen.getByRole('button', {name: 'Set aside'})).toBeDisabled();
+    await user.click(screen.getByRole('button', {name: 'Set aside'}));
+    expect(await screen.findByText('Write why first.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Why it is not relevant')).toHaveAttribute('aria-invalid', 'true');
+    expect(api.calls('POST /api/red-flags/f-1/dismiss')).toHaveLength(0);
     await user.type(screen.getByLabelText('Why it is not relevant'), 'Known group structure');
     await user.click(screen.getByRole('button', {name: 'Set aside'}));
     await waitFor(() => expect(api.lastBody('POST /api/red-flags/f-1/dismiss')).toEqual({reason: 'Known group structure'}));
@@ -108,7 +111,13 @@ describe('RedFlagsPanel', () => {
     });
     wrap(<RedFlagsPanel investigationId="inv-1"/>);
     const type = await screen.findByRole('group', {name: 'Type of investigation'});
-    expect(type).toHaveTextContent('TypeHidden ownership and shell companieschosen by the appChange');
+    expect(type).toHaveTextContent('TypeHidden ownership and shell companies— chosen by the appwhy?Change');
+    // "why?" shows the app's reasons without opening the picker.
+    const whyUser = userEvent.setup();
+    await whyUser.click(within(type).getByRole('button', {name: 'why?'}));
+    expect(within(type).getByRole('list', {name: 'Why the app chose this type'})).toHaveTextContent('Hidden ownership and shell companiesCircular ownership (BO-001)');
+    await whyUser.click(within(type).getByRole('button', {name: 'why?'}));
+    expect(within(type).queryByRole('list', {name: 'Why the app chose this type'})).toBeNull();
     const headings = () => screen.getAllByRole('heading').map(h => h.textContent);
     expect(headings()).toEqual(['Red Flags', 'Hidden ownership and shell companies', 'Circular ownership', 'This may also point to', 'Money laundering', 'Circular payments']);
     const user = userEvent.setup();
@@ -128,7 +137,7 @@ describe('RedFlagsPanel', () => {
     await user.click(within(type).getByRole('button', {name: /Money laundering/}));
     await user.click(within(type).getByRole('button', {name: 'Save'}));
     await waitFor(() => expect(api.lastBody('PUT /api/investigations/inv-1/type')).toEqual({areas: ['ML']}));
-    expect(await within(type).findByText('chosen by you')).toBeInTheDocument();
+    expect(await within(type).findByText('— chosen by you')).toBeInTheDocument();
     await waitFor(() => expect(headings()).toEqual(['Red Flags', 'Money laundering', 'Circular payments', 'This may also point to', 'Hidden ownership and shell companies', 'Circular ownership']));
   });
 });

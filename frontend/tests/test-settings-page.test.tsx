@@ -9,7 +9,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
 import type {RouteCall, Routes} from '../test-support/mock-api';
-import {emptyCaseHomeRoutes, investigationRecord, validSettingsStatus} from '../test-support/page-routes';
+import {emptyCaseHomeRoutes, investigationRecord, settingsPaneRoutes, validSettingsStatus} from '../test-support/page-routes';
 
 vi.mock('next/navigation', () => ({useRouter: () => ({push: vi.fn()}), usePathname: () => '/settings'}));
 
@@ -27,7 +27,7 @@ const ONE_MDB = {'GET /api/demo/1mdb': {state: 'idle', not_downloaded: []}, 'GET
 async function renderSettings(routes: Routes, section = 'demo') {
   window.history.replaceState(null, '', `/settings#${section}`);
   // Appearance draws the first case's Case home as a preview.
-  const api = mockApi({...ONE_MDB, ...emptyCaseHomeRoutes('inv-1'), ...routes});
+  const api = mockApi({...ONE_MDB, ...emptyCaseHomeRoutes('inv-1'), ...settingsPaneRoutes(), ...routes});
   vi.resetModules();
   const {default: Settings} = await import('../app/settings/page');
   render(<Settings/>);

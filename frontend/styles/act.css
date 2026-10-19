@@ -3,7 +3,15 @@
    ▮▮▮ Textbook). */
 .rb { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; color: var(--text); font-family: var(--font-ui); }
 .rb-top { display: grid; gap: 8px; }
-.rb-top .rf-type { margin: 0; }
+.rb-top .rf-type { margin: 0; padding: 6px 12px; }
+/* "why?": the app's reasons for the type it chose. */
+.rf-why { position: relative; display: inline-flex; }
+.rf-why-btn { all: unset; cursor: pointer; color: var(--accent-2); text-decoration: underline; text-underline-offset: 3px; font-size: 12.5px; }
+.rf-why-btn:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; border-radius: 3px; }
+.rf-why-list { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; width: min(420px, 80vw); margin: 0; padding: 10px 12px; list-style: none; display: grid; gap: 8px;
+  border-radius: 10px; background: var(--surface-2); box-shadow: 0 12px 30px rgba(0, 0, 0, .35), inset 0 0 0 1px var(--line); font-size: 12.5px; color: var(--text);
+  animation: rb-fade var(--dur-base, 160ms) both; }
+.rf-why-list ul { margin: 2px 0 0; padding-left: 16px; color: var(--text-muted); }
 .rb-coverage { margin: 0; font-size: 12.5px; color: var(--text-muted); }
 .rb-coverage b { color: var(--text); font-family: var(--font-mono); }
 .rb-warn { color: var(--flag-strong); }
@@ -14,7 +22,7 @@
 .rb-chip:disabled { cursor: default; opacity: .5; }
 .rb-chip:focus-visible, .rb-select select:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .rb-select { display: inline-flex; gap: 4px; align-items: center; font-size: 12px; color: var(--text-muted); }
-.rb-select select { width: auto; max-width: 190px; padding: 3px 8px; border-radius: 999px; background: var(--surface-1); color: var(--text); border: 1px solid var(--line); font: inherit; }
+.rb-select select { width: auto; field-sizing: content; max-width: 190px; padding: 3px 8px; border-radius: 999px; background: var(--surface-1); color: var(--text); border: 1px solid var(--line); font: inherit; }
 .rb-count-reset { margin-left: auto; font-size: 12px; color: var(--text-muted); }
 .rb-count-reset b { color: var(--text); font-family: var(--font-mono); }
 .rb-count-reset button { all: unset; cursor: pointer; color: var(--accent-2); }
@@ -32,6 +40,9 @@
   border: 1px solid transparent; animation: rb-in var(--dur-slow, 300ms) both; }
 @keyframes rb-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .rb-row:hover { background: var(--surface-2); }
+@keyframes rb-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rb-slide-down { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes rb-slide-up { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
 .rb-row:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .rb-row.on { background: var(--surface-2); border-color: var(--accent-1); box-shadow: inset 3px 0 var(--accent-1); }
 .rb-rank { font: 600 13px var(--font-mono); color: var(--text-muted); padding-top: 2px; }
@@ -55,13 +66,22 @@
 .rb-carriers > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .rb-carrier { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 2px; width: 62px; text-align: center; }
 .rb-carrier small { font-size: 10.5px; line-height: 1.2; color: var(--text-muted); }
+.rb-shared-row { font-size: 14px; }
+.rb-shared-value { font: 400 14px/1.5 var(--font-read); padding: 6px 10px; border-radius: 8px; border: 1px dashed var(--line); }
+.rb-shared-value small { font: 600 10px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-right: 6px; }
+.rb-shared-value i { color: var(--text-muted); font-size: 12.5px; }
 .rb-ring { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 600 13px var(--font-mono); box-shadow: inset 0 0 0 3px var(--flag-faint); }
 .rb-carrier.rk-strong .rb-ring { box-shadow: inset 0 0 0 3px var(--flag-strong); }
 .rb-carrier.rk-textbook .rb-ring { box-shadow: inset 0 0 0 3px var(--flag-textbook-edge); }
 .rb-carrier.on .rb-ring { background: var(--surface-3); }
 .rb-carrier:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 
-.rb-open { overflow-y: auto; overscroll-behavior: contain; padding: 14px 18px 18px; display: grid; gap: 12px; align-content: start; }
+.rb-open { overflow-y: auto; overscroll-behavior: contain; padding: 14px 18px 18px; display: grid; gap: 12px; align-content: start; outline: none; }
+.rb-open:focus-visible { box-shadow: var(--shadow-panel, none), inset 0 0 0 2px var(--accent-2); }
+/* Selecting a row slides the open flag in along the list's axis; a hover-preview crossfades (160 ms). */
+.rb-open[data-dir='down']:not(.preview) > * { animation: rb-slide-down 220ms ease-out both; }
+.rb-open[data-dir='up']:not(.preview) > * { animation: rb-slide-up 220ms ease-out both; }
+.rb-open.preview > * { animation: rb-fade 160ms ease-out both; }
 .rb-open.level-textbook { box-shadow: var(--shadow-panel, none), inset 0 3px 0 var(--flag-textbook-edge); }
 .rb-open-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center; }
 .rb-mono { font: 500 11.5px var(--font-mono); color: var(--text-muted); }
@@ -78,6 +98,8 @@
 .rb-picture p i { font-style: normal; color: var(--text-muted); }
 .rb-band { fill: color-mix(in srgb, var(--flag-faint) 14%, transparent); }
 .rb-band-label { font: 500 10px var(--font-mono); fill: var(--text-muted); }
+.rb-axis { font: 500 9.5px var(--font-mono); fill: var(--text-muted); }
+.rb-axis-line { stroke: var(--line); }
 .rb-threshold { stroke: var(--flag-strong); stroke-dasharray: 5 4; }
 .rb-threshold-label { font: 600 10px var(--font-mono); fill: var(--flag-strong); }
 .rb-pay circle { fill: var(--surface-1); stroke: var(--status-supported); stroke-width: 1.5; }
@@ -180,5 +202,8 @@
 .rb-pay-focus b { color: var(--text); font-family: var(--font-mono); }
 .rb-pay-word { font: 600 10.5px var(--font-mono); text-transform: uppercase; }
 .rb-pay-word.c-shown { color: var(--status-supported); } .rb-pay-word.c-not_yet_shown { color: var(--status-unshown); } .rb-pay-word.c-disputed { color: var(--status-disputed); }
-@media (prefers-reduced-motion: reduce) { .rb-row, .rb-row.lit, .rb-changed-now { animation: none; } }
-html[data-motion='calm'] .rb-row, html[data-motion='calm'] .rb-row.lit, html[data-motion='calm'] .rb-changed-now { animation: none; }
+/* Reduced motion and Calm: nothing moves; the open flag only crossfades (120 ms). */
+@media (prefers-reduced-motion: reduce) { .rb-row, .rb-row.lit, .rb-changed-now, .rf-why-list { animation: none; }
+  .rb-open[data-dir] > *, .rb-open.preview > * { animation: rb-fade 120ms linear both; } }
+html[data-motion='calm'] .rb-row, html[data-motion='calm'] .rb-row.lit, html[data-motion='calm'] .rb-changed-now, html[data-motion='calm'] .rf-why-list { animation: none; }
+html[data-motion='calm'] .rb-open[data-dir] > *, html[data-motion='calm'] .rb-open.preview > * { animation: rb-fade 120ms linear both; }

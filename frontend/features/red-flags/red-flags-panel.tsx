@@ -10,8 +10,11 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {NeonTitle} from '../effects/board-effects';
 import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
+import {z} from 'zod';
 
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {
   dismissRedFlagMutation, getChecksQueryKey, getRedFlagsQueryKey, listAreasOptions, listLeadsQueryKey, makeLeadFromRedFlagMutation,
   reopenRedFlagMutation, setInvestigationTypeMutation,
@@ -30,14 +33,18 @@ export const LEVEL: Record<string, {name: string; meaning: string}> = {
   textbook: {name: 'Textbook', meaning: 'it meets the published definition or threshold'},
 };
 
+/** onDismiss is asked from a form (why it is set aside) and fails as a rejection, so the form shows why and keeps the reason. */
 export type FlagActions = {onLead: () => Promise<void>; onDismiss: (reason: string) => Promise<void>; onReopen: () => Promise<void>};
+/** Why a flag is set aside, as the backend takes it (FlagDismiss: reason 1–2000): on the card, the drawer and the Act board. */
+export const dismissSchema = z.object({reason: z.string().trim().min(1, 'Write why first.').max(2000, 'Keep the reason under 2,000 characters.')});
+export type DismissValues = z.infer<typeof dismissSchema>;
 const PARTIES_SHOWN = 4;
 const plain = (t: string) => t.replace(/[.;]\s*$/, '');
 
 /** Add to leads, Not relevant (with a reason), Open it again: the same on the card and in the drawer. */
 export function FlagActionsRow({flag, onLead, onDismiss, onReopen}: {flag: RedFlagOut} & FlagActions): ReactElement {
-  const [reason, setReason] = useState('');
   const [asking, setAsking] = useState(false);
+  const form = useZodForm<DismissValues>(dismissSchema, {defaultValues: {reason: ''}, mode: 'onSubmit'});
   return <>
     <div className="rf-actions">
       {flag.status === 'made_lead' ? <span className="sv-muted">In leads</span>
@@ -45,12 +52,17 @@ export function FlagActionsRow({flag, onLead, onDismiss, onReopen}: {flag: RedFl
       {flag.status === 'open' && !asking && <button type="button" className="sv-btn" onClick={() => setAsking(true)}>Not relevant</button>}
       {flag.status === 'dismissed' && <button type="button" className="sv-btn" onClick={onReopen}>Open it again</button>}
     </div>
-    {asking && <form className="sv-new" onSubmit={e => { e.preventDefault(); if (reason.trim()) void onDismiss(reason.trim()).then(() => setAsking(false)); }}>
-      <input aria-label="Why it is not relevant" placeholder="Why it is not relevant" value={reason}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => setReason(e.target.value)}/>
-      <button type="submit" className="sv-btn" disabled={!reason.trim()}>Set aside</button>
+    {asking && <Form {...form}><form className="sv-new" noValidate onSubmit={submitWith(form, async ({reason}) => {
+      await onDismiss(reason);
+      setAsking(false); form.reset();
+    }, 'Could not set it aside')}>
+      <FormField control={form.control} name="reason" render={({field}) => <FormItemBare>
+        <FormControl><input {...field} aria-label="Why it is not relevant" placeholder="Why it is not relevant"/></FormControl>
+        <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+      <FormRootError className="field-msg next-line"/>
+      <button type="submit" className="sv-btn">Set aside</button>
       <button type="button" className="sv-btn" onClick={() => setAsking(false)}>Cancel</button>
-    </form>}
+    </form></Form>}
   </>;
 }
 
@@ -172,6 +184,7 @@ function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () 
 export function InvestigationType({kind, flagsByArea, onSet}: {kind: InvestigationTypeOut; flagsByArea: Record<string, number>;
   onSet: (areas: string[] | null) => Promise<void>}): ReactElement {
   const [editing, setEditing] = useState(false);
+  const [why, setWhy] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
   const [find, setFind] = useState('');
   const all = (useQuery({...listAreasOptions(), enabled: editing}).data ?? []).filter(a => a.indicators > 0 && a.key !== 'SA');
@@ -189,7 +202,13 @@ export function InvestigationType({kind, flagsByArea, onSet}: {kind: Investigati
     return <div className="rf-type" role="group" aria-label="Type of investigation">
       <span className="rf-type-label">Type</span>
       <span className="rf-type-names">{kind.areas.length ? kind.areas.map(a => a.name).join(' · ') : 'Not known yet'}</span>
-      <span className="sv-muted">{kind.set_by === 'app' ? 'chosen by the app' : 'chosen by you'}</span>
+      <span className="sv-muted">{kind.set_by === 'app' ? '— chosen by the app' : '— chosen by you'}</span>
+      {/* "why?": the app's reasons for the areas it chose (research Act §4: the reasons, without opening the picker). */}
+      {kind.set_by === 'app' && kind.areas.length > 0 && <span className="rf-why" onKeyDown={e => { if (e.key === 'Escape' && why) { e.stopPropagation(); setWhy(false); } }}>
+        <button type="button" className="rf-why-btn" aria-expanded={why} aria-controls="rf-why-list" onClick={() => setWhy(w => !w)}>why?</button>
+        {why && <ul id="rf-why-list" className="rf-why-list" aria-label="Why the app chose this type">{kind.areas.map(a => <li key={a.key}><b>{a.name}</b>
+          <ul>{a.reasons.map(r => <li key={r}>{r.replace(/^Red Flag: /, '')}</li>)}</ul></li>)}</ul>}
+      </span>}
       <button type="button" className="sv-btn" onClick={start}>Change</button>
     </div>;
   }
@@ -253,8 +272,9 @@ export function useRedFlags(investigationId: string): RedFlagsState {
   const actionsFor = (f: RedFlagOut): FlagActions => ({
     onLead: () => attempt(async () => { await lead.mutateAsync({path: {flag_id: f.id}}); await Promise.all([
       queryClient.invalidateQueries({queryKey: key}), queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})})]); }, 'Could not add it to leads'),
-    onDismiss: reason => attempt(async () => { queryClient.setQueryData(key, await dismiss.mutateAsync({path: {flag_id: f.id}, body: {reason}}));
-      await queryClient.invalidateQueries({queryKey: checksKey}); }, 'Could not set it aside'),
+    // Not through attempt: the form asking why shows the failure itself, and keeps the reason typed.
+    onDismiss: async reason => { queryClient.setQueryData(key, await dismiss.mutateAsync({path: {flag_id: f.id}, body: {reason}}));
+      setProblem(''); await queryClient.invalidateQueries({queryKey: checksKey}); },
     onReopen: () => attempt(async () => { queryClient.setQueryData(key, await reopen.mutateAsync({path: {flag_id: f.id}}));
       await queryClient.invalidateQueries({queryKey: checksKey}); }, 'Could not open it again'),
   });

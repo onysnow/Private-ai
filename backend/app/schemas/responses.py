@@ -82,6 +82,9 @@ class EvidenceOut(ResponseModel):
     published_on: str | None = None
     retrieved_on: str | None = None
     limitations: list[str] | None = None
+    # Where the quote stands in its document's text, as stored (ADR-0015): passage, offsets, the text either side,
+    # how the words matched, the lines it spans; null for a quote with no document or not found in it.
+    anchor: dict[str, Any] | None = None
 
 
 class EvidencePoolRow(ResponseModel):
@@ -694,6 +697,9 @@ class LineageCandidateOut(ResponseModel):
     reviewer_note: str | None = None
     created_at: Timestamp
     reviewed_at: Timestamp | None = None
+    # Who decided it, as signed in then; null before this was kept or with no account.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
 
 
 class LineageDocumentOut(ResponseModel):
@@ -1672,6 +1678,9 @@ class ClaimEvidenceLinkOut(ResponseModel):
     evidence_id: str
     stance: str  # supports | contradicts | context
     note: str | None = None
+    # Who decided it, as signed in then; null before this was kept, or outside a request.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
     created_at: Timestamp
 
 
@@ -1711,6 +1720,9 @@ class ClaimReviewEventOut(ResponseModel):
     unmet_rules: list[str] | None = None
     reviewer_type: str = "HUMAN"
     suite_changes: dict[str, list[Any]] | None = None
+    # Who decided it, as signed in then; null before this was kept, or outside a request.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
     created_at: Timestamp
 
 
@@ -1875,6 +1887,8 @@ class InvestigationOut(ResponseModel):
     type_areas: list[str] | None = None
     # This case's default AI run settings (null until the reporter saves them).
     ai_run_profile: dict | None = None
+    # The last backup made of this case: {"at", "bytes", "sha256", "documents_included"}; null until one is made.
+    last_backup: dict | None = None
     created_at: Timestamp
 
 
@@ -2683,6 +2697,11 @@ class CustodyCardOut(ResponseModel):
     text: str | None = None
     quote: str | None = None
     page: int | None = None
+    # A passage: the lines of the page, as read, that the quote spans.
+    line_start: int | None = None
+    line_end: int | None = None
+    # A reading by OCR: how legible the page was (Tesseract's mean word confidence, 0-100); null until measured.
+    legibility: float | None = None
 
 
 class CustodySourceOut(ResponseModel):
@@ -2694,10 +2713,24 @@ class CustodySourceOut(ResponseModel):
 
 
 class CustodyAnchorOut(ResponseModel):
-    """Where the quote stands in the passage, found now (character offsets in the passage text)."""
-    start: int
-    end: int
-    exact: bool
+    """Where the quote stands in the passage (ADR-0015): the stored anchor found again, or, for a quote saved before
+    anchors were kept, found now. Offsets are characters in the passage text; null when the quote is not found."""
+    start: int | None = None
+    end: int | None = None
+    exact: bool | None = None
+    match: Literal["exact", "case", "spacing"] | None = None
+    # Characters of the text before and after the quote kept with the anchor (up to 32 each).
+    before: int | None = None
+    after: int | None = None
+    line_start: int | None = None
+    line_end: int | None = None
+    occurrences: int | None = None
+    # held: the stored place still holds the quote; moved: found elsewhere; lost: no longer in the text;
+    # not anchored: nothing stored, looked for now.
+    state: Literal["held", "moved", "lost", "not anchored"]
+    stored: bool
+    anchored_at: str | None = None
+    chunk_id: str | None = None
 
 
 class CustodyRestingOut(ResponseModel):
@@ -2948,6 +2981,8 @@ class AiModuleStatusOut(ResponseModel):
     spec_file: str
     available: bool
     vendored_tas: bool
+    # The suite system the module belongs to (tas, ras, qas, las, das, egs, ehs); null for an app-local module.
+    system: str | None = None
 
 
 class AiControlFlagOut(ResponseModel):
@@ -2961,12 +2996,49 @@ class AiControlSurfaceOut(ResponseModel):
     flags: dict[str, AiControlFlagOut]
 
 
+class AiFinalAuditOut(ResponseModel):
+    node: str  # e.g. tas/10
+    file: str
+
+
+class AiSuiteModuleOut(ResponseModel):
+    module: str
+    title: str
+    node: str
+    available: bool
+
+
+class AiSuiteSystemOut(ResponseModel):
+    """One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+    CHANGELOG numbers them, `latest_change` its newest entry."""
+    system: str
+    name: str
+    kind: str  # authority | support
+    row: int
+    version: str | None
+    latest_change: str | None
+    present: bool
+    module_count: int
+    final_audit: AiFinalAuditOut | None
+    modules: list[AiSuiteModuleOut]
+
+
+class AiNextRunOut(ResponseModel):
+    """A next run the suite service routes an answer to, by what the answer contains."""
+    module: str
+    system: str
+    row: int | None
+    title: str
+    why: str
+
+
 class AiAuthoritySuiteOut(ResponseModel):
     """The vendored Authority System Suite: where it came from and the TAS version the prompts use."""
     present: bool
     source: str | None
     tas_version: str | None
     modules: dict[str, AiModuleStatusOut]
+    systems: list[AiSuiteSystemOut] = []
     control_surface: AiControlSurfaceOut
 
 
@@ -3491,7 +3563,7 @@ class AiAnalysisCandidateSummaryOut(ResponseModel):
     for a human rejection, or null when not rejected."""
     id: str
     investigation_id: str
-    module: str  # case_synthesis | hypothesis_test | presentation_draft
+    module: str  # case_synthesis | hypothesis_test | presentation_draft | a suite module (app/ai/systems.py)
     request: dict[str, Any]
     review_status: str  # proposed | accepted | rejected
     confidence: float
@@ -3545,6 +3617,8 @@ class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
     trace: dict[str, Any] | None
     # Your decisions claim by claim, by claim or hypothesis id (app/ai/reasoning.py review_ai_claim); {} when none.
     claim_reviews: dict[str, AiClaimReviewOut]
+    # Where this answer goes next by what it contains (app/ai/suite.py next_runs); [] for a rejected answer.
+    next_runs: list[AiNextRunOut] = []
     citation_details: list[CitationDetailOut] | None = Field(default=None, exclude_if=_absent_when_none)
     deck_preview: list[DeckSlideOut] | None = Field(default=None, exclude_if=_absent_when_none)
     # A presentation draft's "how we know" line (app/services/presentation.py how_we_know).
@@ -5052,10 +5126,17 @@ class RunPlanTypeCountOut(ResponseModel):
     count: int
 
 
+class RunPlanTierCountOut(ResponseModel):
+    tier: str
+    count: int
+
+
 class RunPlanPacketOut(ResponseModel):
     records: int
     by_type: list[RunPlanTypeCountOut]
     leads_only: int
+    # Records whose source sits below the tier floor, by tier: in the packet, but never counting toward a fact.
+    below_tier_floor: list[RunPlanTierCountOut]
     first: list[RunPlanRecordOut]
 
 
@@ -5142,6 +5223,17 @@ class AiRunEventOut(ResponseModel):
     detail: dict[str, Any] | None
 
 
+class AiRunRouteOut(ResponseModel):
+    """How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+    not know (a run recorded under a name since removed); "app" for the app-local draft."""
+    system: str | None
+    row: int | None
+    node: str | None
+    title: str
+    modules_in_system: int
+    final_audit: AiFinalAuditOut | None
+
+
 class AiRunOut(ResponseModel):
     run_id: str
     status: str
@@ -5158,6 +5250,8 @@ class AiRunOut(ResponseModel):
     problems: int
     message: str | None
     error: str | None
+    route: AiRunRouteOut
+    handoff_from: str | None = None
 
 
 class AiRunsOut(ResponseModel):
@@ -5167,3 +5261,329 @@ class AiRunsOut(ResponseModel):
 class AiRunEventsOut(ResponseModel):
     run: AiRunOut
     events: list[AiRunEventOut]
+
+
+# --- Settings kept on the server (app/services/preferences.py, notifications.py, connector_activity.py) ----------
+
+class NotificationKindOut(ResponseModel):
+    key: str
+    label: str
+    default: str
+    can_interrupt: bool
+    route: str
+
+
+class NotificationChannelOut(ResponseModel):
+    mode: str
+    address: str | None = None
+    url: str | None = None
+
+
+class NotificationServerOut(ResponseModel):
+    """What this server can send outside the app; never its mail account or keys."""
+    email: bool
+    webpush: bool
+    webpush_key: str | None = None
+
+
+class NotificationPrefsOut(ResponseModel):
+    routes: dict[str, str]
+    quiet_while_reading: bool
+    desktop: bool
+    backup_days: int
+    kinds: list[NotificationKindOut]
+    outside: dict[str, NotificationChannelOut]
+    server: NotificationServerOut
+    push_devices: int
+
+
+class InboxRowOut(ResponseModel):
+    key: str
+    kind: str
+    title: str
+    reason: str
+    href: str
+    created_at: Timestamp | None = None
+    level: str | None = None
+    actor: str
+    actor_kind: str
+    route: str
+
+
+class InboxOut(ResponseModel):
+    investigation_id: str
+    interrupt: list[InboxRowOut]
+    needs: list[InboxRowOut]
+    # "else" is a Python keyword; the JSON key stays "else".
+    else_: list[InboxRowOut] = Field(alias="else", serialization_alias="else")
+    week: dict[str, int]
+    quiet_while_reading: bool
+    desktop: bool
+
+
+class FactWatchOut(ResponseModel):
+    id: str
+    investigation_id: str
+    record_type: str
+    record_id: str
+    label: str
+    baseline: str
+    baseline_words: str
+    value: str
+    value_words: str
+    changed: bool
+    created_at: Timestamp
+    seen_at: Timestamp
+
+
+class ConnectorRunLineOut(ResponseModel):
+    id: str
+    provider: str
+    sent: str
+    is_party: bool
+    investigation_id: str
+    case: str
+    status: str
+    results: int
+    at: Timestamp
+
+
+class LookupSourceOut(ResponseModel):
+    key: str
+    label: str
+    kind: str
+    host: str
+    key_saved: bool
+    default: str
+    mode: str | None = None
+    last: ConnectorRunLineOut | None = None
+    cases_this_month: int
+    key_check: KeyCheckOut | None = None
+
+
+class CaseLookupsOut(ResponseModel):
+    investigation_id: str
+    name: str
+    modes: dict[str, str]
+    reason: str | None = None
+    set_at: Timestamp
+
+
+class OutboundLineOut(ResponseModel):
+    """One request that left this computer (app/services/outbound.py)."""
+    id: str
+    at: Timestamp
+    kind: str
+    service: str
+    destination: str
+    sent: str
+    outcome: str
+    investigation_id: str | None = None
+    case: str
+
+
+class LookupSettingsOut(ResponseModel):
+    sources: list[LookupSourceOut]
+    cases: list[CaseLookupsOut]
+    # Everything that left this computer in the last seven days, not only lookups.
+    week: list[OutboundLineOut]
+    can_change_defaults: bool
+
+
+class RunDefaultsCaseOut(ResponseModel):
+    investigation_id: str
+    name: str
+    differs: list[str]
+    reason: str | None = None
+    saved_at: str | None = None
+
+
+class ResearchSettingsOut(ResponseModel):
+    mode: str
+    ai_enabled: bool
+    model: str | None = None
+    settings: list[RunSettingOut]
+    defaults_reason: str | None = None
+    defaults_saved_at: Timestamp | None = None
+    locked: list[RunPlanLockedOut]
+    cases: list[RunDefaultsCaseOut]
+    can_change_defaults: bool
+
+
+class SavedQuestionOut(ResponseModel):
+    id: str
+    investigation_id: str
+    module: str
+    question: str
+    working_theory: str | None = None
+    created_by: str | None = None
+    created_at: Timestamp
+    last_run_id: str | None = None
+    last_run_at: Timestamp | None = None
+
+
+class CaseResearchOut(ResponseModel):
+    investigation_id: str
+    mode: str
+    own: bool
+    reason: str | None = None
+    default: str
+    ai_enabled: bool
+    questions: list[SavedQuestionOut]
+
+
+class NotificationTestOut(ResponseModel):
+    channel: str
+    sent: bool
+
+
+class KeyCheckOut(ResponseModel):
+    """Whether a source accepts its key, learned without a search."""
+    provider: str
+    state: str
+    detail: str
+    credits: int | None = None
+    at: str
+
+
+# --- Keep › Safety & data (mockup KEEP-safety-and-data, ADR-0015) ---
+
+class OutboundEntryOut(ResponseModel):
+    """One request that carried case data to an outside service, as it was sent. `local` is true for a request to a
+    service on this computer: kept so the log is complete, and not counted as leaving."""
+    id: str
+    at: Timestamp
+    service: str
+    destination: str
+    local: bool
+    value_sent: str
+    value_kind: str
+    reason: str
+    actor: str
+    status: str
+    error: str | None
+    run_id: str | None
+    detail: dict[str, Any] | None
+
+
+class OutboundLogOut(ResponseModel):
+    period: str
+    service: str | None
+    total: int
+    entries: list[OutboundEntryOut]
+
+
+class SafetyTotalsOut(ResponseModel):
+    requests_left: int
+    services_reached: int
+    documents_sent_out: int
+    ai_calls_outside: int
+
+
+class SafetyCaseRecordsOut(ResponseModel):
+    records: int
+    claims: int
+    in_backups: bool
+
+
+class SafetyDocumentsOut(ResponseModel):
+    files: int
+    bytes: int
+    in_backups: bool
+
+
+class SafetyBackupsStoreOut(ResponseModel):
+    count: int
+    last: Timestamp | None
+    encrypted: bool
+
+
+class SafetyKeysOut(ResponseModel):
+    set: int
+    total: int
+
+
+class SafetySecurityLogOut(ResponseModel):
+    events: int
+    since: str | None
+    bytes: int
+
+
+class SafetyPrivateAiOut(ResponseModel):
+    enabled: bool
+    provider: str | None
+    model: str | None
+    on_this_computer: bool | None
+    remote_allowed: bool
+
+
+class SafetyStoresOut(ResponseModel):
+    case_records: SafetyCaseRecordsOut
+    documents: SafetyDocumentsOut
+    backups: SafetyBackupsStoreOut
+    service_keys: SafetyKeysOut
+    security_log: SafetySecurityLogOut
+    private_ai: SafetyPrivateAiOut
+
+
+class SafetyServiceOut(ResponseModel):
+    """An outside service the case can reach. `mode` is one of off / on_click / this_computer / automatic / blocked:
+    the app has no "ask first" switch yet (ADR-0015), so a lookup runs only when the reporter starts it (`on_click`).
+    `counted` is false when the app does not log that service's traffic, so the screen never shows a false zero."""
+    key: str
+    label: str
+    role: str
+    host: str
+    mode: str
+    why: str
+    sent: int
+    sends: list[str]
+    last: Timestamp | None
+    counted: bool
+
+
+class SafetyBackupCardOut(ResponseModel):
+    last: Timestamp | None
+    size_bytes: int | None
+    sha256: str | None
+    with_documents: bool | None
+    records: int | None
+    documents: int | None
+
+
+class SafetyAccessCardOut(ResponseModel):
+    refused_24h: int
+
+
+class SafetyHousekeepingCardOut(ResponseModel):
+    stray_files: int
+    stray_bytes: int
+
+
+class SafetyDeleteCardOut(ResponseModel):
+    records: int
+    files: int
+    shared_files: int
+
+
+class SafetyCardsOut(ResponseModel):
+    backup: SafetyBackupCardOut
+    access: SafetyAccessCardOut
+    housekeeping: SafetyHousekeepingCardOut
+    delete: SafetyDeleteCardOut
+
+
+class SafetyInvestigationOut(ResponseModel):
+    id: str
+    name: str
+
+
+class SafetyAndDataOut(ResponseModel):
+    investigation: SafetyInvestigationOut
+    period: str
+    now: Timestamp
+    totals: SafetyTotalsOut
+    stores: SafetyStoresOut
+    services: list[SafetyServiceOut]
+    cards: SafetyCardsOut
+    not_counted: list[str]

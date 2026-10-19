@@ -1,0 +1,72 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="account.css"><style>
+.top{display:flex;justify-content:space-between;align-items:center;padding:20px 32px 6px}
+.crumb{font-size:13px;color:var(--muted)} .crumb b{color:var(--text);font-weight:500}
+h1{font:300 40px/1 'Source Serif 4 Variable';padding:4px 32px 16px}
+.grid{display:grid;grid-template-columns:230px 1fr 380px;gap:18px;padding:0 32px}
+.side{padding:14px 10px}.side p.eyebrow{padding:10px 10px 6px}
+.row{display:flex;justify-content:space-between;padding:7px 10px;border-radius:8px;font-size:13.5px}
+.row span:last-child{font:12px 'IBM Plex Mono';color:var(--amber)}
+.row.cur{background:#2b2116;box-shadow:inset 3px 0 0 var(--amber)}
+.card{padding:16px 18px;margin-bottom:14px}
+.status{display:flex;align-items:center;gap:12px;padding:14px 18px;margin-bottom:14px;border-color:#3d5a4b}
+.status .big{font:300 22px 'Source Serif 4 Variable'}
+.sw{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 0;border-top:1px solid #2b2219}
+.sw:first-of-type{border-top:0}
+.sw b{font-weight:600}.sw small{display:block;color:var(--muted);font-size:12.5px}
+.toggle{width:40px;height:22px;border-radius:11px;background:#3b2f22;position:relative;flex:none}
+.toggle:after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#7a6a57}
+.toggle.on{background:#5a7d69}.toggle.on:after{left:21px;background:#e8f2ec}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex:none}
+.seg span{padding:5px 10px;font:500 12px 'IBM Plex Mono';color:var(--muted)}.seg span.on{background:#3a2c17;color:var(--amber)}
+.case{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--p2);margin-top:8px}
+.lk{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;border:1px solid var(--line);font-size:14px}
+.lk.on{border-color:var(--amber);color:var(--amber)}
+.case small{display:block;color:var(--muted);font-size:12px}
+.lock{padding:0;overflow:hidden}
+.lockscreen{height:300px;background:radial-gradient(400px 220px at 50% 30%,#2a1f14,#100c09);display:grid;place-items:center;text-align:center;border-bottom:1px solid var(--line)}
+.lockscreen .sym{width:54px;height:54px;border-radius:50%;border:1.5px solid var(--amber);display:grid;place-items:center;color:var(--amber);font-size:20px;margin:0 auto 12px}
+.dots{display:flex;gap:10px;justify-content:center;margin:14px 0 8px}.dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--muted)}.dots i.f{background:var(--amber);border-color:var(--amber)}
+.lockcap{padding:14px 18px}
+</style></head><body>
+<div class="top"><div class="crumb">Settings · Your safety · <b>Locking</b></div><span class="chip">Search settings… <span class="key">⌘K</span></span></div>
+<h1>Locking</h1>
+<div class="grid">
+ <div class="panel side">
+  <p class="eyebrow">You</p>
+  <div class="row"><span>Your name</span><span>set</span></div>
+  <div class="row"><span>Appearance</span><span>Case Night</span></div>
+  <div class="row"><span>Notifications</span><span>in app</span></div>
+  <div class="row cur"><span>Your safety</span><span>encrypted</span></div>
+  <p class="eyebrow">Cases</p>
+  <div class="row"><span>New-case setup</span><span></span></div>
+  <div class="row"><span>Outside lookups</span><span>ask</span></div>
+  <p class="eyebrow">This computer</p>
+  <div class="row"><span>People and access</span><span>3</span></div>
+  <div class="row"><span>Backups</span><span>3 days ago</span></div>
+  <div class="row"><span>Security log</span><span></span></div>
+ </div>
+ <div>
+  <div class="panel status"><span style="color:var(--ok);font-size:20px">■</span><div><span class="big">Case data encrypted</span><div class="note">Passphrase set 19 Oct · recovery key checked · database and 86 files</div></div><span style="margin-left:auto;display:flex;gap:8px"><button class="btn">Change passphrase</button><button class="btn">New recovery key</button></span></div>
+  <div class="panel card">
+   <p class="eyebrow">When the app locks</p>
+   <div class="sw"><div><b>When I walk away</b><small>No key or click for this long. Unsaved writing is kept.</small></div><div class="seg"><span>5 min</span><span class="on">10 min</span><span>30 min</span><span>never</span></div></div>
+   <div class="sw"><div><b>When I press Hide screen</b><small>The cover comes down and the app locks behind it.</small></div><span class="toggle on"></span></div>
+   <div class="sw"><div><b>When the laptop sleeps or the lid closes</b><small>Only while the app is open in this browser.</small></div><span class="toggle on"></span></div>
+  </div>
+  <div class="panel card">
+   <p class="eyebrow">Reopening after a lock</p>
+   <div class="sw"><div><b>Quick PIN</b><small>Reopens after an idle lock or Hide screen in the same session. After a restart the passphrase is needed. 3 wrong tries and only the passphrase works.</small></div><span class="toggle on"></span></div>
+   <p class="note" style="margin-top:6px">The PIN is a convenience: it does not protect the files on disk. The passphrase does.</p>
+  </div>
+  <div class="panel card">
+   <p class="eyebrow">Cases locked on their own</p>
+   <div class="case"><span class="lk on">🔒</span><div><b>Kestrel harbour case</b><small>own passphrase · opening the app does not open it · its name shows here only to you</small></div><button class="btn">Change</button></div>
+   <div class="case"><span class="lk">◌</span><div><b>Fernhill planning files</b><small>opens with the app</small></div><button class="btn">Lock this case…</button></div>
+  </div>
+ </div>
+ <div class="panel lock">
+  <div class="lockscreen"><div><div class="sym">◆</div><div class="serif" style="font-size:22px;font-weight:300">Locked</div><div class="note">after 10 min away · your writing is kept</div><div class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div><div class="note">Quick PIN · <span style="color:var(--amber)">use the passphrase instead</span></div></div></div>
+  <div class="lockcap"><p class="eyebrow">What the lock looks like</p><p class="note" style="margin-top:6px">No case name, no names of people, no counts: someone looking over your shoulder sees only that the app is locked. The case title band comes back after unlocking.</p></div>
+ </div>
+</div>
+</body></html>

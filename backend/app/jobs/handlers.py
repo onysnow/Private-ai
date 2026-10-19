@@ -256,6 +256,8 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner)
             if local_text and message:
                 message = f"{message}; OpenAleph found no text, so the text is the Workbench's own reading"
+            # OpenAleph may have read a scan by OCR too: its pages are measured the same way.
+            message = _measure_legibility(db, document_id, report, message or "Document read")
             return _check_watchlist_after_read(db, document_id, message)
 
     report(5, "Reading the document")
@@ -286,11 +288,57 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             sync = sync_document_to_openaleph(db, doc.id)
         except Exception as exc:  # OpenAleph down must not undo a finished read
             db.rollback()
-            return f"Document read; sending it to OpenAleph failed: {type(exc).__name__}: {exc}"
-        if sync.status == "failed":
-            return f"Document read; sending it to OpenAleph failed: {sync.error}"
-        message = "Document read and sent to OpenAleph"
-    return message
+            message = f"Document read; sending it to OpenAleph failed: {type(exc).__name__}: {exc}"
+        else:
+            message = (f"Document read; sending it to OpenAleph failed: {sync.error}" if sync.status == "failed"
+                       else "Document read and sent to OpenAleph")
+    return _measure_legibility(db, document_id, report, message)
+
+
+def _measure_legibility(db: Session, document_id: str, report: Report, message: str) -> str:
+    """After the read, how legible each scanned page was (app/services/legibility.py): pages the Workbench read by
+    OCR, and pages with no text layer of their own, whichever reader read them (OpenAleph does not say which pages
+    it read by OCR). The document is already read and in use; measuring never fails the read, and a stop asked
+    for here stops only the measuring."""
+    from sqlalchemy import select
+
+    from app.jobs.records import JobStopped
+    from app.models.domain import Document, DocumentChunk
+    from app.services.document_reader import measure_legibility, scanned_pages
+
+    doc = db.get(Document, document_id)
+    if doc is None or not settings.enable_pdf_ocr:
+        return message
+    chunks = [c for c in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id)) if c.ocr_legibility is None]
+    try:
+        no_text_layer = set(scanned_pages(doc.storage_path))
+    except Exception:  # a file the page check cannot open: only what the reader marked as OCR is measured
+        no_text_layer = set()
+    scanned = [c for c in chunks if "(OCR)" in (c.locator or "") or (c.page_number or 1) in no_text_layer]
+    pages = sorted({c.page_number or 1 for c in scanned})
+    if not pages:
+        return message
+    measured: dict[int, float | None] = {}
+    try:
+        for number, page in enumerate(pages, 1):
+            report(85 + int(14 * number / len(pages)), f"Read · measuring how legible the scan is · page {number} of {len(pages)}")
+            got, why = measure_legibility(doc.storage_path, [page])
+            if why:
+                return f"{message}; legibility not measured: {why}"
+            measured.update(got)
+    except JobStopped:
+        pass
+    except Exception as exc:
+        logger.warning("measuring legibility failed", exc_info=True, extra={"document_id": document_id})
+        return f"{message}; legibility not measured: {type(exc).__name__}"
+    finally:
+        for chunk in scanned:
+            value = measured.get(chunk.page_number or 1)
+            if value is not None:
+                chunk.ocr_legibility = value
+        db.commit()
+    done = sum(1 for v in measured.values() if v is not None)
+    return f"{message}; legibility measured on {done} of {len(pages)} scanned page{'s' if len(pages) != 1 else ''}"
 
 
 def _check_watchlist_after_read(db: Session, document_id: str, message: str | None) -> str | None:
@@ -395,7 +443,8 @@ def ai_reasoning_job(db: Session, job: BackgroundJob, report: Report) -> dict:
             working_theory=request.get("working_theory"), max_results=request.get("max_results", 30),
             include_external_leads=request.get("include_external_leads", True), control_flags=request.get("control_flags"),
             record_refs=request.get("record_refs"), run_options=request.get("run_options"), premises=request.get("premises"),
-            changes=request.get("changes"), packet_from=request.get("packet_from"), actor_id=request.get("actor_id"), run_id=job.id,
+            changes=request.get("changes"), packet_from=request.get("packet_from"), handoff_from=request.get("handoff_from"),
+            context=request.get("context"), actor_id=request.get("actor_id"), run_id=job.id,
         )
     except Exception as exc:
         described = describe_reasoning_failure(exc)
@@ -410,7 +459,40 @@ def ai_reasoning_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     }
 
 
+OUTSIDE_LOOKUP = "outside_lookup"
+
+
+def outside_lookup_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Settings › Outside lookups set to Automatic: look a newly accepted party up in each such source that has not
+    yet. A source that fails is noted and the others still run; the findings wait in Decide like any lookup's."""
+    import asyncio
+
+    from fastapi import HTTPException
+
+    from app.models.domain import Entity
+    from app.services.connectors import automatic_lookups_due, enrich_entity
+    from app.services.preferences import lookup_mode, provider_label
+
+    entity = db.get(Entity, str(job.subject_id))
+    if entity is None:
+        return {"message": "The party is no longer in the case"}
+    found, failed = 0, []
+    # A re-check after a source updated its data (app/services/source_freshness.py) names its sources; while the
+    # case still allows Automatic for them.
+    recheck = [p for p in (job.payload or {}).get("recheck") or [] if lookup_mode(db, entity.investigation_id, p) == "automatic"]
+    due = recheck or automatic_lookups_due(db, entity)
+    for n, provider in enumerate(due):
+        report(int(100 * n / max(1, len(due))), f"Looking {entity.caption} up in {provider_label(provider)}")
+        try:
+            found += len(asyncio.run(enrich_entity(provider, entity, db)))
+        except HTTPException:
+            failed.append(provider_label(provider))
+    message = f"{found} finding{'s' if found != 1 else ''} for {entity.caption}" + (f"; {', '.join(failed)} did not answer" if failed else "")
+    return {"message": message, "result": {"findings": found, "failed": failed}}
+
+
 HANDLERS: dict[str, Handler] = {
+    OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,
     ANALYZE_DOCUMENT: analyze_document_job,
     FIND_CHILDREN: children_job,
