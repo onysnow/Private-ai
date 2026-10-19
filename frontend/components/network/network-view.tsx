@@ -28,7 +28,7 @@ import '@xyflow/react/dist/style.css';
 import {createContext, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
-import {arrange} from '@/lib/network-arrange';
+import {useArrangement} from '@/lib/use-arrangement';
 import {MAX_RADIUS, dotRadius, partyBox} from '@/lib/network-rules';
 import {KIND_ICON} from './party-icons';
 import type {Arrangement, Guide, Placed} from '@/lib/network-rules';
@@ -211,6 +211,8 @@ type Props = {
 };
 
 const NO_OVERLAYS: NetOverlays = {};
+/** Nothing placed yet (the drawing is being laid out). */
+const NOT_PLACED: Placed = {positions: {}, guides: [], width: 0, height: 0};
 
 export function NetworkView({parties, links, arrangement, focus, onPlaced, onParty, onLink, maxHeight = 720, overlays = NO_OVERLAYS, onPoint}: Props): ReactElement {
   const [hover, setHoverState] = useState<Hover>({party: null, link: null});
@@ -220,12 +222,15 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
     for (const l of links) { out.set(l.from, (out.get(l.from) ?? 0) + 1); out.set(l.to, (out.get(l.to) ?? 0) + 1); }
     return out;
   }, [parties, links]);
-  const placed = useMemo(() => arrange(arrangement, parties, links, {focus}), [arrangement, parties, links, focus]);
-  useEffect(() => { onPlaced?.(placed); }, [placed, onPlaced]);
+  // "Linked groups" is laid out off the page's thread (lib/use-arrangement.ts); until it is, `placed` is null.
+  const {placed: arranged, laying} = useArrangement(arrangement, parties, links, focus ?? null);
+  const placed = arranged ?? NOT_PLACED;
+  useEffect(() => { if (arranged) onPlaced?.(arranged); }, [arranged, onPlaced]);
 
   const {nodes, edges} = useMemo(() => {
     const extent: Node = {id: '__extent', type: 'extent', position: {x: 0, y: 0}, width: placed.width, height: placed.height, zIndex: -1,
       draggable: false, connectable: false, selectable: false, focusable: false, data: {}, style: {pointerEvents: 'none'}};
+    if (!arranged) return {nodes: [] as Node[], edges: [] as Edge<LinkData>[]};
     const nodes: Node[] = [extent, ...parties.map(p => {
       const box = partyBox(p.label);
       const at = placed.positions[p.id];
@@ -263,7 +268,7 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
         data: {link: l, x1: a.x, y1: a.y, x2: b.x, y2: b.y, r1: dotRadius(degree.get(l.from) ?? 0), r2: dotRadius(degree.get(l.to) ?? 0), bend, onLink}};
     });
     return {nodes, edges};
-  }, [parties, links, placed, degree, onParty, onLink]);
+  }, [parties, links, placed, arranged, degree, onParty, onLink]);
 
   // What is lit while a party or link is pointed at here; else a chain
   // being shown; else the party pointed at in another chart.
@@ -303,7 +308,8 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
     <div ref={box} className="net-view" style={{height}} data-testid="network-view" data-arrangement={arrangement}>
       {/* A new arrangement or a new set of links is a new drawing, fitted to the frame anew. */}
       {/* Drawn once the box's width is known, so the first fit is to the box's final height. */}
-      {boxWidth > 0 && <ReactFlow key={`${arrangement}|${focus ?? ''}|${parties.length}|${links.length}`} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} colorMode="dark"
+      {laying && <p className="muted p-4" role="status" aria-busy="true">Laying out the linked groups…</p>}
+      {boxWidth > 0 && arranged && <ReactFlow key={`${arrangement}|${focus ?? ''}|${parties.length}|${links.length}`} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} colorMode="dark"
         fitView fitViewOptions={{padding: 0.06, maxZoom: 1.2}} minZoom={0.15} maxZoom={2}
         nodesDraggable={false} nodesConnectable={false} nodesFocusable={false} edgesFocusable={false} elementsSelectable={false}
         onEdgeMouseEnter={(_event, edge) => setHover({party: null, link: edge.id})} onEdgeMouseLeave={() => setHover({party: null, link: null})}

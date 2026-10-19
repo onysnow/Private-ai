@@ -65,3 +65,17 @@ def test_a_name_inside_a_longer_one_is_still_listed():
     with db:
         row = candidate_entities(db, inv, "Bellcastle Trading", "Company")[0]
         assert row["basis"] == BASIS_WORDS and row["score"] >= 0.5
+
+
+def test_a_name_held_as_an_alias_is_that_record():
+    """A name the investigation holds as a record's alias (or another of its
+    names) is offered as that record, not as a new one."""
+    db = SessionLocal()
+    inv = Investigation(name="Aliases")
+    db.add(inv)
+    db.commit()
+    record = create_entity(db, EntityCreate(investigation_id=inv.id, schema="Person", caption="Teodor Kalinsky Varn",
+                                            properties={"alias": ["Ted Varn"]}))
+    with db:
+        found = candidate_entities(db, inv.id, "Ted Varn", "Person")
+        assert [(row["entity_id"], row["caption"], row["basis"]) for row in found] == [(record.id, "Teodor Kalinsky Varn", BASIS_SAME)]

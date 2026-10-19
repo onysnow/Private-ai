@@ -5,11 +5,11 @@ from typing import Iterable, NamedTuple
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
-from app.models.domain import Document, DocumentChunk, DocumentCorpusSync, ExtractionCandidate, Source, Evidence, Claim, ClaimEvidenceLink, Entity, Statement, Investigation, RelationshipEdge
+from app.models.domain import Document, DocumentChunk, DocumentCorpusSync, ExtractionCandidate, Source, Evidence, Claim, ClaimEvidenceLink, Entity, Statement, Investigation, RelationshipEdge, TableMapping
 from app.services.ftm import make_ftm_entity
 from app.services.identifier_proposals import accept_identifier
 from app.services.security import contained_path, resolve_storage_root
-from app.services.resolution import BASIS_SAME, candidate_entities
+from app.services.resolution import BASIS_SAME, candidate_entities, entity_names
 from app.services.pdf_ocr import extract_pdf_chunks
 from app.services.image_reader import IMAGE_EXTENSIONS, extract_image_chunks
 from app.services.container_readers import CONTAINER_EXTENSIONS, read_container
@@ -241,7 +241,8 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
     ``find_names`` runs the Workbench's own pattern name-finder (when
     ENABLE_LOCAL_ENTITY_SUGGESTIONS is on). The caller turns it off when
     OpenAleph's ftm-analyze has analysed the document: the pattern finder is
-    the fallback only (ADR-0004, decision 5; ADR-0006).
+    the fallback only (ADR-0004, decision 5; ADR-0006). It never runs on a
+    table that already has a column mapping.
 
     Returns None when the document (or its investigation) was deleted before
     this ran. Extraction failures remain a valid committed document state: the
@@ -260,9 +261,17 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
         raise ValueError('Document has already been read')
     doc.extraction_status = 'extracting'
     doc.extraction_error = None
-    # The investigation's records by name: a name it already holds is proposed as that record's kind.
-    existing = {norm_name(row.caption): (row.id, row.schema) for row in db.scalars(select(Entity).where(
-        Entity.investigation_id == doc.investigation_id, Entity.merged_into_entity_id.is_(None)))}
+    # The investigation's records by name (caption, other names and aliases): a name it already
+    # holds is proposed as that record's kind. A caption wins over another record's alias.
+    held = db.scalars(select(Entity).where(Entity.investigation_id == doc.investigation_id, Entity.merged_into_entity_id.is_(None))).all()
+    existing: dict[str, tuple[str, str]] = {norm_name(record.caption): (record.id, record.schema) for record in held}
+    for record in held:
+        for name in entity_names(record)[1:]:
+            existing.setdefault(norm_name(name), (record.id, record.schema))
+    # A table already mapped to records (app/services/table_mappings.py) has its names from its
+    # columns: reading its cells again as running text would only add junk names.
+    mapped = db.scalar(select(TableMapping.id).where(TableMapping.document_id == doc.id).limit(1)) is not None
+    find_names = find_names and not mapped
     try:
         chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
         # One proposal per name (and per claim sentence) in a document, with every place it is
@@ -343,7 +352,9 @@ def serialize_document(db: Session, doc: Document, *, openaleph_ids: dict[str, O
     for c in candidates: counts[c.candidate_type] = counts.get(c.candidate_type,0)+1
     known = openaleph_ids if openaleph_ids is not None else openaleph_document_ids(db, [doc.id])
     ref = known.get(doc.id)
-    return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts,
+    source = db.get(Source, doc.source_id)
+    return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,
+            'title':source.title if source is not None else None,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts,
             'openaleph_document_id':ref.entity_id if ref else None, 'openaleph_schema':ref.schema if ref else None,
             'parent_document_id':doc.parent_document_id}
 

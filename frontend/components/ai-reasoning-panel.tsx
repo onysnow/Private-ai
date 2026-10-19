@@ -15,6 +15,7 @@ import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReaso
 import {ApiPayloadError,isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isBackgroundJob,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
 import {ApiClient,ApiHttpError,errorMessage} from '../lib/api-client';
 import type {ChartRestyleOut} from '../lib/generated/types.gen';
+import {shortStamp} from '../lib/timestamps';
 import {getAiAnalysisCandidateEndpoint,investigationVisualRestyle,listInvestigationAiAnalysisCandidates,presentationStyles,
   promoteAiAnalysisCandidateToDeckEndpoint,promoteAiAnalysisCandidateToWriteupEndpoint,reviewAiAnalysisCandidateEndpoint} from '../lib/generated/sdk.gen';
 import type {ChartRestyleRequest} from '../lib/generated/types.gen';
@@ -317,7 +318,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
           <div className="searchrow"><b>Review queue</b><select aria-label="Queue filter" className="h-8 rounded-md border border-input bg-transparent px-2 text-sm text-foreground" value={filter} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setFilter(e.target.value as typeof filter)}><option value="all">all</option><option value="proposed">proposed</option><option value="accepted">accepted</option><option value="rejected">rejected</option></select><Button size="sm" variant="outline" onClick={()=>void loadQueue()}>Refresh</Button></div>
           {queueStatus&&<p className="muted">{queueStatus}</p>}
           {!queue.length&&!queueStatus&&<p className="muted">No AI analysis candidates yet for this investigation.</p>}
-          {queue.map(c=><div className="candidate" key={c.id} style={selected?.id===c.id?{outline:'2px solid hsl(var(--primary))',outlineOffset:2}:undefined} aria-current={selected?.id===c.id?'true':undefined}><b>{moduleLabel(c.module)}</b> <small>{c.review_status} · {c.checked_citation_count} citation(s) checked · {c.created_at.replace('T',' ').slice(0,16)}</small>
+          {queue.map(c=><div className="candidate" key={c.id} style={selected?.id===c.id?{outline:'2px solid hsl(var(--primary))',outlineOffset:2}:undefined} aria-current={selected?.id===c.id?'true':undefined}><b>{moduleLabel(c.module)}</b> <small>{c.review_status} · {c.checked_citation_count} citation(s) checked · {shortStamp(c.created_at)}</small>
             <div>{asStr(c.request.question??'')||<i>no question recorded</i>}</div>
             {c.reviewer_note&&<small>{c.reviewer_note}</small>}
             <div className="actions"><Button size="sm" variant="outline" onClick={()=>{setReviewStatus('');setNote('');void open(c.id)}}>Open</Button></div>
@@ -372,7 +373,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
             {selected.review_status==='proposed'?<>
               <Textarea className="mt-3" aria-label="Reviewer note" value={note} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setNote(e.target.value)} placeholder="Reviewer note (why this is or is not trustworthy)."/>
               <div className="actions"><Button onClick={()=>void review('accept')}>Accept as trusted analysis</Button><Button variant="outline" onClick={()=>void review('reject')}>Reject</Button></div>
-            </>:<p className="muted">Reviewed {selected.reviewed_at?selected.reviewed_at.replace('T',' ').slice(0,16):''}{selected.reviewer_note?` · ${selected.reviewer_note}`:''}</p>}
+            </>:<p className="muted">Reviewed {selected.reviewed_at?shortStamp(selected.reviewed_at):''}{selected.reviewer_note?` · ${selected.reviewer_note}`:''}</p>}
             {reviewStatus&&<p className="muted" data-testid="ai-review-status">{reviewStatus}</p>}
             {isPresentationDraft&&selected.review_status==='accepted'&&<div className="mt-4 rounded-lg border border-border bg-card p-4" data-testid="promote-panel">
               <div className="text-sm font-semibold text-foreground">Make it a document or a deck</div>

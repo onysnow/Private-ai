@@ -1,19 +1,22 @@
 """A link of one kind between parties that share an owner or a director
 (someone holds an Ownership or Directorship link to both): dealings between
 companies with the same owners or directors (BO-031). A party that itself
-holds the other is not counted: that is a parent dealing with its own company."""
+holds the other is not counted: that is a parent dealing with its own company.
+Only dealings between legal persons count, as the indicator defines them: money
+moved between two bank accounts one person holds is not two parties dealing."""
 
 from __future__ import annotations
 
 from collections import defaultdict
 
+from followthemoney import model
 from pydantic import BaseModel
 
 from app.patterns.detectors import Measure
 from app.patterns.graph import CaseGraph
 
 NAME = "shared_holder_link"
-VERSION = 1
+VERSION = 2  # 2: only dealings between legal persons (not one holder's own bank accounts)
 
 
 class Params(BaseModel):
@@ -23,6 +26,12 @@ class Params(BaseModel):
 
 def needs(p: Params) -> list[str]:
     return [p.link]
+
+
+def _legal_person(graph: CaseGraph, party_id: str) -> bool:
+    party = graph.parties.get(party_id)
+    schema = model.get(party.schema) if party else None
+    return schema is not None and schema.is_a("LegalEntity")
 
 
 def measure(graph: CaseGraph, p: Params) -> list[Measure]:
@@ -38,6 +47,8 @@ def measure(graph: CaseGraph, p: Params) -> list[Measure]:
     for pair, found in dealings.items():
         a, b = sorted(pair)
         if a in holders[b] or b in holders[a]:
+            continue
+        if not (_legal_person(graph, a) and _legal_person(graph, b)):
             continue
         shared = sorted(set(holders[a]) & set(holders[b]))
         if not shared:

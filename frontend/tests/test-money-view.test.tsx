@@ -290,6 +290,15 @@ describe('MoneyView', () => {
     expect(container.querySelectorAll('.mn-band')).toHaveLength(21);
   });
 
+  it('shows a payment made over a span with its end date', async () => {
+    const spanned = {...LEDGER, transactions: LEDGER.transactions.map(t => t.id === 'p5' ? {...t, dateEnd: '2021-06'} : t)};
+    mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': spanned});
+    const {container} = wrap(<MoneyView investigationId="inv-1"/>);
+    await screen.findByText(/each just under the €10,000 line/);
+    const row = [...container.querySelectorAll('tr')].find(r => r.textContent?.includes('Loop Two BV'));
+    expect(row).toHaveTextContent('01 Mar 2021 to Jun 2021');
+  });
+
   it('shows the reason when the ledger cannot be read', async () => {
     mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {status: 500, body: {detail: 'ledger unavailable'}}});
     wrap(<MoneyView investigationId="inv-1"/>);

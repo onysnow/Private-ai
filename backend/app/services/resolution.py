@@ -35,6 +35,21 @@ SIMILAR_NAME = 0.7
 BASIS_SAME, BASIS_SIMILAR, BASIS_WORDS = "same_name", "similar_name", "shared_words"
 
 
+def entity_names(row: Entity) -> list[str]:
+    """Every name a record is held under: its caption first, then its other
+    FtM ``name`` values and its ``alias`` values (a name already held as an
+    alias is that record, not a new one)."""
+    names: list[str] = []
+    seen: set[str] = set()
+    props = row.properties if isinstance(row.properties, dict) else {}
+    for value in [row.caption, *(props.get("name") or []), *(props.get("alias") or [])]:
+        text = str(value or "").strip()
+        if text and _norm(text) not in seen:
+            seen.add(_norm(text))
+            names.append(text)
+    return names
+
+
 def _proxy(schema: Schema, caption: str) -> Any:
     proxy = model.make_entity(schema)
     proxy.id = "candidate"
@@ -58,24 +73,31 @@ def candidate_entities(db: Session, investigation_id: str, caption: str, schema:
     scored: list[dict[str, Any]] = []
     for row in rows:
         row_schema = model.get(row.schema)
-        similarity: float | None = None
+        common: Schema | None = None
         if row_schema is not None:
             try:
                 common = model.common_schema(query_schema, row_schema)
             except InvalidData:
                 continue   # kinds that can never be the same thing
-            if common.matchable and caption.strip() and (row.caption or "").strip():
-                similarity = compare_names(common, _proxy(common, caption), _proxy(common, row.caption))
-        hay = set(_norm(row.caption).split())
-        overlap = len(needle & hay) / max(1, len(needle | hay))
-        same_words = bool(needle) and needle == hay
-        score = max(overlap, similarity or 0.0, 1.0 if same_words else 0.0)
-        if score <= 0:
+        best: dict[str, Any] | None = None
+        for name in entity_names(row):
+            similarity: float | None = None
+            if common is not None and common.matchable and caption.strip():
+                similarity = compare_names(common, _proxy(common, caption), _proxy(common, name))
+            hay = set(_norm(name).split())
+            overlap = len(needle & hay) / max(1, len(needle | hay))
+            same_words = bool(needle) and needle == hay
+            score = max(overlap, similarity or 0.0, 1.0 if same_words else 0.0)
+            if score <= 0 or (best is not None and score <= best["score"]):
+                continue
+            basis = (BASIS_SAME if same_words or (similarity or 0) >= SAME_NAME
+                     else BASIS_SIMILAR if (similarity or 0) >= SIMILAR_NAME else BASIS_WORDS)
+            best = {"score": score, "similarity": similarity, "basis": basis}
+        if best is None:
             continue
-        basis = (BASIS_SAME if same_words or (similarity or 0) >= SAME_NAME
-                 else BASIS_SIMILAR if (similarity or 0) >= SIMILAR_NAME else BASIS_WORDS)
-        scored.append({"entity_id": row.id, "caption": row.caption, "schema": row.schema, "score": round(score, 4),
-                       "name_similarity": None if similarity is None else round(similarity, 4), "basis": basis,
+        scored.append({"entity_id": row.id, "caption": row.caption, "schema": row.schema, "score": round(best["score"], 4),
+                       "name_similarity": None if best["similarity"] is None else round(best["similarity"], 4),
+                       "basis": best["basis"],
                        # How much the record already holds, for the "already in the case" card (reading room).
                        "facts": sum(len(v) for v in (row.properties or {}).values() if isinstance(v, list))})
     return sorted(scored, key=lambda x: x["score"], reverse=True)[:10]

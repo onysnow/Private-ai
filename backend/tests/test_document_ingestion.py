@@ -32,6 +32,15 @@ def test_text_document_ingestion_review_boundary():
     assert statements and statements[0]['dataset'].startswith('document:') and '#lines ' in statements[0]['origin'] or '#line ' in statements[0]['origin']
 
 
+def test_the_title_given_on_upload_is_kept_and_sent_with_the_document():
+    inv=new_inv('Titles')
+    named=client.post('/api/documents/upload', data={'investigation_id':inv,'title':'Board minutes, March'}, files={'file':('scan_0042.txt', b'Minutes.', 'text/plain')}).json()
+    unnamed=client.post('/api/documents/upload', data={'investigation_id':inv}, files={'file':('notes.txt', b'Notes.', 'text/plain')}).json()
+    assert named['title']=='Board minutes, March' and named['filename']=='scan_0042.txt'
+    listed={d['id']: d['title'] for d in client.get(f'/api/investigations/{inv}/documents').json()}
+    assert listed=={named['id']:'Board minutes, March', unnamed['id']:'notes.txt'}
+
+
 def test_evidence_candidate_preserves_locator_and_reject_is_final():
     inv=new_inv('Evidence locator')
     r=client.post('/api/documents/upload', data={'investigation_id':inv}, files={'file':('notes.txt', b'First documented paragraph.\n\nSecond documented paragraph.', 'text/plain')})

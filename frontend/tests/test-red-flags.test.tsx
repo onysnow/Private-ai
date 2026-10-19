@@ -68,6 +68,9 @@ describe('RedFlagsPanel', () => {
     expect(within(drawer).getByText('Applies in the UK only.')).toBeVisible();
     expect(within(drawer).getByRole('link', {name: /FATF and Egmont Group/})).toHaveAttribute('href', 'https://example.test/fatf');
     expect(within(drawer).getByText(/-0.3 rests on a link not yet supported/)).toBeInTheDocument();
+    // A party in the details opens its dossier, as a party does in the network.
+    await user.click(within(drawer).getByRole('button', {name: 'A Ltd'}));
+    expect(useWorkbenchStore.getState().dossier?.entityId).toBe('a');
     await user.click(within(drawer).getByRole('button', {name: 'Close the details'}));
     expect(screen.queryByRole('complementary')).toBeNull();
   });

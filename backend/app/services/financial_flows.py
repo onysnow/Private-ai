@@ -94,6 +94,9 @@ def investigation_financial_ledger(db: Session, investigation_id: str) -> dict[s
         date, date_problem = _single(props.get("date") or props.get("startDate"))
         if date_problem and date_problem != "missing":
             problems.append(f"date {date_problem}")
+        # A payment made over a span (FtM startDate to endDate) keeps its end. More than one end
+        # date gives none; nothing is guessed.
+        date_end, _ = _single(props.get("endDate"))
         if source is None or target is None:
             problems.append("payer or beneficiary entity missing")
 
@@ -111,6 +114,7 @@ def investigation_financial_ledger(db: Session, investigation_id: str) -> dict[s
             "id": row["id"],
             "relationship_id": row["id"],
             "dateTime": date,
+            "dateEnd": date_end if date_end != date else None,
             "from": labels.get(source["id"], source["caption"]) if source else None,
             "to": labels.get(target["id"], target["caption"]) if target else None,
             "from_entity_id": source["id"] if source else None,

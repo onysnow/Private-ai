@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import urlsplit
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -9,13 +11,21 @@ from app.models.domain import Evidence, Source
 # The kinds of source the capture form offers (frontend features/source-capture).
 SOURCE_TYPES = ("web", "document", "interview", "public_record", "social", "other")
 
+
+def is_web_address(text: str) -> bool:
+    """An http or https address with a host, and no spaces in it."""
+    parts = urlsplit(text)
+    return parts.scheme in ("http", "https") and bool(parts.hostname) and not any(c.isspace() for c in text)
+
+
 def create_source(db: Session, payload: dict) -> Source:
     """Persist a new Source from a request payload already known to reference
     a valid, lockable Investigation (the caller handles the investigation-scoped
     lock and the 404 existence check before calling this).
 
     Trims title and url; raises ValueError if title is empty after trimming,
-    mirroring the 400 this previously raised inline in the route handler.
+    mirroring the 400 this previously raised inline in the route handler, or
+    if a url is given that is not a web address (http or https, with a host).
     """
     title = (payload.get("title") or "").strip()
     if not title:
@@ -24,6 +34,8 @@ def create_source(db: Session, payload: dict) -> Source:
     payload["title"] = title
     if payload.get("url") is not None:
         payload["url"] = payload["url"].strip() or None
+    if payload.get("url") is not None and not is_web_address(payload["url"]):
+        raise ValueError(f"“{payload['url']}” is not a web address: give one that starts with http:// or https://")
     row = Source(**payload)
     db.add(row)
     db.commit()

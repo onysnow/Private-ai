@@ -2487,6 +2487,7 @@ export const zDocumentDetailOut = z.object({
   parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+  title: z.string().nullish(),
 });
 
 /**
@@ -2527,6 +2528,7 @@ export const zDocumentOut = z.object({
   parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+  title: z.string().nullish(),
 });
 
 /**
@@ -3569,6 +3571,7 @@ export const zFinancialTransactionOut = z.object({
   amount: z.number(),
   certainty: z.enum(['shown', 'not_yet_shown', 'disputed']),
   currency: z.string(),
+  dateEnd: z.string().nullish(),
   dateTime: z.string().nullish(),
   evidence: z.string().nullish(),
   evidence_count: z.number().int(),
@@ -3944,6 +3947,7 @@ export const zIncompleteTransactionOut = z.object({
   amount: z.number().nullish(),
   certainty: z.enum(['shown', 'not_yet_shown', 'disputed']),
   currency: z.string().nullish(),
+  dateEnd: z.string().nullish(),
   dateTime: z.string().nullish(),
   evidence: z.string().nullish(),
   evidence_count: z.number().int(),
@@ -4007,6 +4011,7 @@ export const zIngestionBatchDocumentOut = z.object({
   parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+  title: z.string().nullish(),
 });
 
 /**
@@ -5071,6 +5076,7 @@ export const zDocumentUploadOut = z.object({
   parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+  title: z.string().nullish(),
 });
 
 /**

@@ -22,6 +22,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {createClaimEndpoint, createClaimReview, linkClaimEvidenceEndpoint} from '../../lib/generated/sdk.gen';
 import type {ClaimOut, ClaimReviewWorkspaceOut, EvidencePoolRow} from '../../lib/generated/types.gen';
+import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 /** The canonical relationships the page still holds, as far as this panel
@@ -247,7 +248,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                 {(event.to_evidence_grade || event.from_evidence_grade) && <span> · {gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
                 <div>{event.rationale}</div>
                 {event.override_reason && <div className="done-overridden">Marked without: {(event.unmet_rules ?? []).join(', ')}. Reason: {event.override_reason}</div>}
-                {event.created_at && <small>{new Date(event.created_at).toLocaleString()}</small>}
+                {event.created_at && <small>{apiTime(event.created_at).toLocaleString()}</small>}
               </div>)}
             </>}
             <h4>Linked evidence</h4>

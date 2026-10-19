@@ -19,6 +19,7 @@ import {attachRelationshipEvidenceEndpoint, createLeadFromRelationshipContext, r
 import type {EvidencePoolRow, GraphOut, RelationshipOut} from '../../lib/generated/types.gen';
 import {isQueryOf} from '../../lib/investigation-queries';
 import {reportPayloadError} from '../../lib/report-error';
+import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {leadQueueKey} from '../leads/leads-panel';
 import {withEnds} from './graph';
@@ -159,7 +160,7 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
       {reviews.length === 0 ? <p className="muted">No relationship-evidence assessments recorded yet.</p> : reviews.map(review => <div className="statement" key={review.id}>
         <b>{review.stance}</b> · evidence {review.evidence_id}
         <div>{review.rationale}</div>
-        <small>{new Date(review.created_at).toLocaleString()}</small>
+        <small>{apiTime(review.created_at).toLocaleString()}</small>
       </div>)}
     </div>}
     {edge.statements.map(st => <div key={st.id}>

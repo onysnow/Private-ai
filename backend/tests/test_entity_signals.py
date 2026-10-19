@@ -60,3 +60,16 @@ def test_an_upload_records_the_signals_and_explains_them(monkeypatch):
     stamp = next(row for row in rows if row["candidate_type"] == "evidence" and row["payload"]["quote"] == "CONFIDENTIAL")
     assert stamp["confidence"] == 0.2
     assert "page number, a stamp or a copyright line" in stamp["explanation"]["confidence"]["basis"]
+
+
+def test_an_upload_proposes_a_name_held_as_an_alias_as_that_record(monkeypatch):
+    monkeypatch.setattr(settings, "enable_local_entity_suggestions", True)
+    inv = client.post("/api/investigations", json={"name": "Alias signals"}).json()["id"]
+    record = client.post("/api/entities", json={"investigation_id": inv, "schema": "Person", "caption": "Teodor Kalinsky Varn",
+                                                "properties": {"alias": ["Ted Varn"]}}).json()
+    doc = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Memo"},
+                      files={"file": ("memo.txt", b"The money was wired by Ted Varn to the harbour.", "text/plain")}).json()
+    rows = client.get(f"/api/documents/{doc['id']}/candidates", params={"explain": "true"}).json()
+    names = {row["payload"]["caption"]: row for row in rows if row["candidate_type"] == "entity"}
+    rationale = names["Ted Varn"]["payload"]["rationale"]
+    assert (rationale["schema_basis"], rationale["existing_entity_id"]) == ("existing_record", record["id"])

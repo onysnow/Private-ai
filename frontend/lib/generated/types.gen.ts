@@ -6160,6 +6160,10 @@ export type DocumentDetailOut = {
    * Source Id
    */
   source_id: string;
+  /**
+   * Title
+   */
+  title?: string | null;
 };
 
 /**
@@ -6318,6 +6322,10 @@ export type DocumentOut = {
    * Source Id
    */
   source_id: string;
+  /**
+   * Title
+   */
+  title?: string | null;
 };
 
 /**
@@ -6459,6 +6467,10 @@ export type DocumentUploadOut = {
    * Source Id
    */
   source_id: string;
+  /**
+   * Title
+   */
+  title?: string | null;
 };
 
 /**
@@ -8976,6 +8988,12 @@ export type FinancialTransactionOut = {
    */
   currency: string;
   /**
+   * Dateend
+   *
+   * The end of a payment made over a span (FtM endDate); dateTime is its start.
+   */
+  dateEnd?: string | null;
+  /**
    * Datetime
    */
   dateTime?: string | null;
@@ -9750,6 +9768,12 @@ export type IncompleteTransactionOut = {
    */
   currency?: string | null;
   /**
+   * Dateend
+   *
+   * The end of a payment made over a span (FtM endDate); dateTime is its start.
+   */
+  dateEnd?: string | null;
+  /**
    * Datetime
    */
   dateTime?: string | null;
@@ -9898,6 +9922,10 @@ export type IngestionBatchDocumentOut = {
    * Source Id
    */
   source_id: string;
+  /**
+   * Title
+   */
+  title?: string | null;
 };
 
 /**

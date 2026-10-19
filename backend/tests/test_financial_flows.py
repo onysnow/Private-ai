@@ -127,6 +127,16 @@ def test_same_caption_entities_are_not_merged_in_the_ledger(env):
     assert froms[0] != froms[1] and all(f.startswith('Acme Ltd (Company ') for f in froms)
 
 
+def test_a_payment_made_over_a_span_keeps_its_end_date(env):
+    client, inv, entity = env
+    a, b = entity('Acme Ltd'), entity('Harbor Trust')
+    _payment(client, inv, a, b, amount='5', currency='USD', startDate='2012-05-29', endDate='2012-12-03')
+    _payment(client, inv, a, b, amount='6', currency='USD', date='2013-01-04')
+    rows = {t['amount']: t for t in _ledger(client, inv)['transactions']}
+    assert (rows[5]['dateTime'], rows[5]['dateEnd']) == ('2012-05-29', '2012-12-03')
+    assert (rows[6]['dateTime'], rows[6]['dateEnd']) == ('2013-01-04', None)
+
+
 def test_ledger_404_for_unknown_investigation(env):
     client, _, _ = env
     assert client.get('/api/investigations/nope/financial-flows').status_code == 404
