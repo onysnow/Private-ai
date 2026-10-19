@@ -38,7 +38,7 @@ def upgrade():
         sa.Column("id", sa.String(), primary_key=True),
         sa.Column("investigation_id", sa.String(), sa.ForeignKey("investigations.id"), nullable=False),
         sa.Column("at", sa.DateTime(), nullable=False),
-        sa.Column("size_bytes", sa.Integer(), nullable=False),
+        sa.Column("size_bytes", sa.BigInteger(), nullable=False),
         sa.Column("sha256", sa.String(length=64), nullable=False),
         sa.Column("with_documents", sa.Boolean(), nullable=False),
         sa.Column("record_total", sa.Integer(), nullable=False),
