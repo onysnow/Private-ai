@@ -132,6 +132,20 @@ describe('AppFrame', () => {
     act(() => useWorkbenchStore.getState().setInvestigationId(''));
   });
 
+  it('ignores unsafe destinations in saved case places', async () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': [
+      {id: 'inv-2', name: 'Example Holdings', description: null, question: null, is_demo: false, type_areas: null, created_at: '2026-10-02T00:00:00'},
+    ]});
+    window.localStorage.setItem('pai:case-places', JSON.stringify({
+      'inv-2': {href: 'javascript:alert(1)', label: 'Cases › Example Holdings › Act'},
+    }));
+    render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
+    fireEvent.keyDown(window, {key: 'o', ctrlKey: true});
+    await userEvent.setup().click(await screen.findByRole('option', {name: /Example Holdings/}));
+    expect(push).toHaveBeenCalledWith('/?inv=inv-2');
+  });
+
   it('opens the left edge on its handle and by the [ key, but not while typing or with single keys off', async () => {
     render(<QueryProvider><AppFrame><input aria-label="Notes"/></AppFrame></QueryProvider>);
     const left = document.getElementById('fr-left')!;
@@ -151,6 +165,7 @@ describe('AppFrame', () => {
   });
 
   it('opens the command palette with ⌘K, offers a search of the case, and goes to a place', async () => {
+    act(() => useWorkbenchStore.getState().setInvestigationId(''));
     render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
     fireEvent.keyDown(window, {key: 'k', metaKey: true});
     const input = await screen.findByRole('combobox', {name: 'Search or command'});
@@ -191,6 +206,21 @@ describe('AppFrame', () => {
     fireEvent.keyDown(window, {key: 'Escape'});
     expect(left).toHaveClass('open');
     expect(window.localStorage.getItem('pai:trail')).toContain('Settings');
+  });
+
+  it('does not render unsafe destinations from the saved place history', async () => {
+    act(() => useWorkbenchStore.getState().setInvestigationId(''));
+    window.localStorage.setItem('pai:trail', JSON.stringify([
+      {href: 'javascript:alert(1)', label: 'Unsafe place'},
+      {href: '//attacker.invalid/path', label: 'External place'},
+      {href: '/act?inv=inv-1#red-flags', label: 'Red Flags'},
+    ]));
+    render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Open steps and pages'}));
+    const left = document.getElementById('fr-left')!;
+    expect(within(left).queryByText('Unsafe place')).not.toBeInTheDocument();
+    expect(within(left).queryByText('External place')).not.toBeInTheDocument();
+    expect(within(left.querySelector('.fr-places')!).getByRole('link', {name: 'Red Flags'})).toHaveAttribute('href', '/act?inv=inv-1#red-flags');
   });
 
   it('switches case with ⌘O, and Hide screen covers everything until asked back', async () => {
