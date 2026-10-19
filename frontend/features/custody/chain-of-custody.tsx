@@ -6,16 +6,20 @@
 // plum an AI step). The seal at the top can be pasted into a write-up's methods note. A detail panel on the
 // right shows the chosen card in full, with Re-check hash; the custody log along the bottom is the same history
 // as a dated list, exportable for an editor or a lawyer. Keys: L shows the log as a plain list, Esc back to the claim.
+// The claim card carries its Done checklist for Supported, from the server (the rules a review to Supported is held
+// to). Scrolling over the log replays it a step at a time, lighting each step's card and wires; the wires draw in
+// from the file to the sentence when the chain opens (drawn at once with reduced motion).
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {useRouter} from 'next/navigation';
 import {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 
 import {StatusChip, type ClaimStatus} from '../../components/status';
+import {useWheelStep} from '../case-home/wheel-step';
 import {errorMessage} from '../../lib/api-client';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {getClaimCustodyChainOptions, listClaimsOptions, recheckHashMutation} from '../../lib/generated/@tanstack/react-query.gen';
-import type {CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
+import type {ClaimDoneOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 const COLUMNS = ['Files', 'Reading', 'Passage', 'Decision', 'The claim'] as const;
@@ -31,6 +35,18 @@ const short = (iso?: string | null) => {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
 };
 const STATUS: Record<string, ClaimStatus> = {supported: 'supported', disputed: 'disputed', rejected: 'ruled_out', ruled_out: 'ruled_out'};
+/** The Done rules' short names on the claim card (the rules themselves, and their full wording, come from the server). */
+const DONE_SHORT: Record<string, string> = {supporting: 'evidence linked for it', says_it: 'quotes say it', locator: 'each says where',
+  file: 'hashes intact', contradictions: 'against answered', not_leads_only: 'not on leads alone', independent: 'independent sources'};
+const DONE_STATE: Record<ClaimDoneOut['rules'][number]['state'], {mark: string; word: string}> = {
+  met: {mark: '✓', word: 'met'}, not_met: {mark: '✕', word: 'not met'}, unknown: {mark: '○', word: 'cannot be checked here'}};
+/** How long the pointer rests on the log before the wheel replays it (as features/case-home/wheel-step.ts). */
+const LOG_DWELL_MS = 220;
+/** Motion off: the person's calm setting or the system's reduced motion. */
+function calmNow(): boolean {
+  if (typeof window === 'undefined') return true;
+  return document.documentElement.dataset.motion === 'calm' || Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+}
 
 /** The seal: one line a write-up's methods note can carry. */
 export function sealLine(c: CustodyChainOut): string {
@@ -93,6 +109,28 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
   const chain = chainQ.data;
   const [picked, setPicked] = useState<string | null>(null);
   const [lit, setLit] = useState<string | null>(null);
+  // The log entry the replay stands on (scrolling over the log, or hovering a row); its card and wires light.
+  const [step, setStep] = useState<number | null>(null);
+  const log = useMemo(() => chain?.log ?? [], [chain]);
+  const stepTo = (i: number) => { setStep(i); setLit(log[i]?.card ?? null); };
+  const wheel = useWheelStep(log.length, step ?? -1, stepTo);
+  // Scrolling over the log moves the replay, not the page (FEATURE_HOME §1 "Scroll-over"): once the pointer has
+  // rested on it (the same dwell as useWheelStep), the wheel is held while there is a step to move to (the first
+  // notch always lands on an entry); at either end
+  // of the log the page scrolls on. React's wheel listener is passive, so this one is attached by hand.
+  const logRef = useRef<HTMLElement | null>(null);
+  const enteredLog = useRef(0);
+  useEffect(() => {
+    const el = logRef.current;
+    if (!el) return;
+    const hold = (e: WheelEvent) => {
+      if (log.length < 2 || Date.now() - enteredLog.current < LOG_DWELL_MS) return;
+      const at = step ?? -1;
+      if (at < 0 || (e.deltaY > 0 && at < log.length - 1) || (e.deltaY < 0 && at > 0)) e.preventDefault();
+    };
+    el.addEventListener('wheel', hold, {passive: false});
+    return () => el.removeEventListener('wheel', hold);
+  }, [log.length, step, chain]);
   const [asList, setAsList] = useState(false);
   const [copied, setCopied] = useState('');
   const recheck = useMutation({...recheckHashMutation()});
@@ -100,7 +138,7 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
   const card = cards.find(c => c.id === picked) ?? cards.find(c => c.kind === 'passage') ?? cards[0];
   /** The file behind a step: any step in a row with a file can re-check it. */
   const fileOf = (c: CustodyCardOut) => chain?.rows.find(r => r.cards.some(x => x.id === c.id))?.cards.find(x => x.kind === 'file')?.document_id ?? null;
-  useEffect(() => { setPicked(null); recheck.reset(); }, [chosen]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setPicked(null); setStep(null); recheck.reset(); }, [chosen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const rootRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
@@ -154,12 +192,15 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
       <div className="cc-main">
         {asList ? <LogList log={chain.log}/> : <Wires chain={chain} picked={card?.id ?? null} lit={lit} fit={fit} breaking={breaks ? card?.id ?? null : null}
           onPick={id => { setPicked(id); setBreaks(false); }} onLight={setLit} onWatch={watchRun}/>}
-        <section className="cc-log" aria-label="Custody log">
+        <section className="cc-log" aria-label="Custody log" title="Scroll over the log to replay it step by step" ref={logRef}
+          onWheel={wheel.onWheel} onPointerEnter={() => { wheel.onPointerEnter(); enteredLog.current = Date.now(); }}
+          onMouseLeave={() => { setStep(null); setLit(null); }}>
           <header><h3>Custody log <small>who held it · what was done · when</small></h3>
             <button type="button" onClick={exportLog}>Export for an editor or lawyer ›</button></header>
           <table>
-            <tbody>{chain.log.map((e, i) => <tr key={i} className={`${lit === e.card ? 'lit' : ''} actor-${e.actor}`}
-              onMouseEnter={() => setLit(e.card)} onMouseLeave={() => setLit(null)} onClick={() => e.card.includes(':') && setPicked(e.card)}>
+            <tbody>{chain.log.map((e, i) => <tr key={i} className={`${lit === e.card ? 'lit' : ''}${step === i ? ' now' : ''} actor-${e.actor}`}
+              aria-current={step === i ? 'step' : undefined}
+              onMouseEnter={() => stepTo(i)} onClick={() => e.card.includes(':') && setPicked(e.card)}>
               <td className="cc-mono">{short(e.when)}</td><td>{e.who}</td><td>{e.what}</td>
             </tr>)}</tbody>
           </table>
@@ -230,37 +271,47 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
   }, [fit, chain]);
   const downstream = new Set(breaking ? chain.rows.filter(r => r.cards.some(c => c.id === breaking)).flatMap(r => r.cards.slice(r.cards.findIndex(c => c.id === breaking))).map(c => c.id) : []);
   const claimStatus = STATUS[chain.claim.status] ?? 'unshown';
+  // The wires draw in from the file to the sentence when a chain opens: motion that explains the direction. With
+  // reduced motion they are drawn at once (the stylesheet holds the same fallback).
+  const [draw] = useState(() => !calmNow());
+  // A step lights the wires on both its sides.
+  const wireLit = (key: string) => Boolean(lit && (key.startsWith(`${lit}>`) || key.endsWith(`>${lit}`)));
   return <div className={`cc-wires${breaking ? ' breaking' : ''}`} ref={box} style={scale < 1 ? {zoom: scale} : undefined}>
-    <svg className="cc-lines" aria-hidden="true">
-      {lines.map(l => <g key={l.key} className={`cc-wire w-${l.style}${lit && l.key.startsWith(lit) ? ' lit' : ''}`}>
+    <svg key={chain.claim.id} className={`cc-lines${draw ? ' draw' : ''}`} aria-hidden="true">
+      {lines.map(l => <g key={l.key} className={`cc-wire w-${l.style}${wireLit(l.key) ? ' lit' : ''}`}>
         <path d={l.d}/>{l.words && <text x={l.x} y={l.y - (l.words.includes(' · ') ? 6 : 0)} textAnchor="middle">
           {l.words.split(' · ').map((w, i) => <tspan key={i} x={l.x} dy={i ? 11 : 0}>{w}</tspan>)}</text>}</g>)}
     </svg>
     {COLUMNS.map((c, i) => <p key={c} className="cc-col" style={{gridColumn: i + 1}}>{c.toUpperCase()}</p>)}
     {chain.rows.map((row, r) => row.cards.map(c => <CardBox key={c.id} card={c} row={r + 2} picked={picked === c.id} lit={lit === c.id} falls={downstream.has(c.id)}
       against={row.stance === 'contradicts'} onPick={() => onPick(c.id)} onLight={onLight}/>))}
-    <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}`} data-card="claim" style={{gridColumn: 5, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
+    <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}${lit === 'claim' ? ' lit' : ''}`} data-card="claim" style={{gridColumn: 5, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
       aria-label={`The claim: ${chain.claim.text}`}>
       <StatusChip status={claimStatus}/>
       <b>{chain.claim.text}</b>
-      <ul>
-        <li>✓ {chain.seal.sources_for} source{chain.seal.sources_for === 1 ? '' : 's'} for it</li>
-        <li>{(() => { const says = chain.rows.filter(r => r.stance === 'supports' && r.cards.some(c => c.kind === 'passage' && c.checks.some(k => k.label === 'says it' && k.ok))).length;
-          return says ? `✓ ${says} source${says === 1 ? '' : 's'} say${says === 1 ? 's' : ''} it` : '○ no passage checked yet'; })()}</li>
-        <li>{chain.seal.hashes_checked === 0 ? '○ no file to hash' : chain.seal.hashes_intact ? '✓ hashes intact' : '✕ a hash does not match'}</li>
-        <li>{(() => { const ag = chain.rows.filter(r => r.stance === 'contradicts'); if (!ag.length) return '✓ nothing against it yet';
-          const answered = ag.filter(r => r.cards.some(c => c.kind === 'decision' && c.title === 'Answered')).length;
-          return `${answered === ag.length ? '✓' : '✕'} ${ag.length} against${answered ? `, ${answered === ag.length ? '' : `${answered} `}answered` : ''}`; })()}</li>
-        <li>{chain.rows.length ? '✓ not AI-only' : '○ nothing behind it'}</li>
-      </ul>
+      <DoneList done={chain.done}/>
     </article>
-    {chain.ai.map((a, i) => <article key={a.id} className="cc-card cc-ai" data-card={`ai:${a.id}`} style={{gridColumn: 5, gridRow: chain.rows.length + 2 + i}} aria-label="AI step">
+    {chain.ai.map((a, i) => <article key={a.id} className={`cc-card cc-ai${lit === `ai:${a.id}` ? ' lit' : ''}`} data-card={`ai:${a.id}`} style={{gridColumn: 5, gridRow: chain.rows.length + 2 + i}} aria-label="AI step">
       <span className="cc-kind">AI</span><b>{AI_MODULE[a.module] ?? a.module} draft quoted this claim</b>
       <small>{short(a.when)} · {a.status === 'accepted' ? 'accepted' : 'not accepted yet'}</small>
       {a.run_id && <button type="button" className="cc-watch" onClick={() => onWatch(a.run_id!)}>Watch the run →</button>}
     </article>)}
     {!chain.rows.length && <p className="cc-muted" style={{gridColumn: '1 / 5', gridRow: 2}}>
       This claim has no evidence linked to it yet, so there is no chain to draw. Link a quote to it in Claims to make it traceable.</p>}
+  </div>;
+}
+
+/** The Done checklist for Supported (server, app/services/claim_done.py): each rule met, not met, or not checkable
+ * here, with what it waits on. Shape and word, never colour alone. */
+function DoneList({done}: {done: ClaimDoneOut}): ReactElement {
+  return <div className="cc-done" aria-label="Done for Supported">
+    <p className="cc-done-head">Done for Supported · <span className={done.met ? 'ok' : 'bad'}>{done.met ? '✓ every rule met' : `${done.left} left`}</span>
+      {done.unknown ? <span className="unknown"> · ○ {done.unknown} not checkable here</span> : null}</p>
+    <ul>{done.rules.map(r => <li key={r.key} className={`done-${r.state}`} title={`${r.label}: ${r.detail}`}
+      aria-label={`${r.label}: ${DONE_STATE[r.state].word}. ${r.detail}`}>
+      <span aria-hidden="true">{DONE_STATE[r.state].mark}</span> {DONE_SHORT[r.key] ?? r.label}
+      {r.state !== 'met' && <small>{r.state === 'not_met' ? 'waits on: ' : ''}{r.detail}</small>}
+    </li>)}</ul>
   </div>;
 }
 

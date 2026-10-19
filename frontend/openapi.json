@@ -12560,6 +12560,9 @@
           "claim": {
             "$ref": "#/components/schemas/CustodyClaimOut"
           },
+          "done": {
+            "$ref": "#/components/schemas/ClaimDoneOut"
+          },
           "log": {
             "items": {
               "$ref": "#/components/schemas/CustodyLogOut"
@@ -12584,6 +12587,7 @@
           "ai",
           "log",
           "seal",
+          "done",
           "checked_at"
         ],
         "title": "CustodyChainOut",

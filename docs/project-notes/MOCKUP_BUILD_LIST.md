@@ -149,9 +149,10 @@ CHECK_2 Chain of Custody (12 Oct: Check › Chain of Custody, `features/custody`
 - [ ] OCR legibility % (not stored by the reader), who decided by name (review events keep only "a person")
 - [x] 17 Oct, checked side by side with the mockup's three rows and an AI draft: seal beside the title, From file → to sentence, Fit; cards as drawn (page picture, ! OCR, PASSAGE · P.3, decision kind as heading, short dates); only the line into the claim labelled; against rows red throughout; AI step under the claim on a "used in" line with Watch the run (opens Act › AI runs › Watch); detail panel with source qualities, file and content checks, anchor (found now), grouped SHA-256, Rests on it, the key
 - [x] "What if this breaks?": the steps after it and the claims, links and open Red Flags resting on the evidence
-- [ ] Scroll-over replay along the log; draw-in motion; line numbers in a passage (not stored); stored anchors (research §3.9, ADR)
+- [x] 19 Oct: scroll-over replay along the log (the wheel over the log steps through its entries, lighting each one's card and the wires on both its sides; hover a row to start there); draw-in motion (the wires reveal from the file to the sentence when a chain opens; drawn at once with reduced motion or Calm)
+- [ ] Line numbers in a passage (not stored); stored anchors (research §3.9, ADR)
 - [x] Decide: "Open the document" opens the reader at the evidence's page; the filters work past the first 200 (the server filters by kind before paging)
-- [ ] Claim card with the Done checklist for Supported (server-enforced rules) in the chain
+- [x] Claim card with the Done checklist for Supported (server-enforced rules) in the chain (19 Oct: `GET /claims/{id}/custody-chain` carries `done`, from the same `done_checks` a review to Supported is held to; each rule ✓ met, ✕ not met with what it waits on, ○ not checkable here)
 
 ## 7. Act — mockups ACT_1 (Red Flags) and ACT_2 (story tree + write-up) (§08)
 

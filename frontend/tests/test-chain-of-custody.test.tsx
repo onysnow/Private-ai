@@ -46,6 +46,14 @@ const CHAIN = {
     {when: '2026-10-10T14:02:00Z', who: 'AI · case synthesis', actor: 'ai', what: 'Quoted the claim in a draft (not accepted yet)', card: 'ai:ai1'},
   ],
   seal: {steps: 7, people: 1, app_services: 2, outside_services: 0, hashes_intact: true, hashes_checked: 1, ai_uses: 1, sources_for: 1, against: 1},
+  done: {claim_id: 'c1', target: 'supported', met: false, left: 1, unknown: 0, rules: [
+    {key: 'supporting', label: 'At least one supporting item is linked', state: 'met', detail: '1 supporting item'},
+    {key: 'says_it', label: 'Every supporting quote says it, in its document', state: 'met', detail: '1 found word for word'},
+    {key: 'locator', label: 'Every supporting item has an exact locator', state: 'not_met', detail: '1 without a page, paragraph or timestamp.'},
+    {key: 'file', label: 'The file behind each item still matches its fingerprint', state: 'met', detail: '1 file checked'},
+    {key: 'contradictions', label: 'Every contradicting item has a written answer', state: 'met', detail: '1 answered'},
+    {key: 'not_leads_only', label: 'Not resting on leads-only sources alone', state: 'met', detail: 'At least one supporting source is above the leads-only tier.'},
+  ]},
   checked_at: '2026-10-12T00:00:00Z',
 };
 const routes = {
@@ -70,7 +78,14 @@ describe('Chain of Custody', () => {
     expect(await screen.findByText(/7 steps · 1 person/)).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /^File: Fernhill_share_transfer_2018\.pdf\. hash passed$/})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /^Passage: .*says it passed$/})).toBeInTheDocument();
-    expect(screen.getByRole('article', {name: `The claim: ${CHAIN.claim.text}`})).toHaveTextContent('✓ 1 against, answered');
+    // The claim card carries the server's Done checklist for Supported: each rule met or not, and what it waits on.
+    const claim = screen.getByRole('article', {name: `The claim: ${CHAIN.claim.text}`});
+    const done = within(claim).getByLabelText('Done for Supported');
+    expect(done).toHaveTextContent('Done for Supported · 1 left');
+    expect(within(done).getByLabelText('Every contradicting item has a written answer: met. 1 answered')).toHaveTextContent('✓ against answered');
+    expect(within(done).getByLabelText('Every supporting item has an exact locator: not met. 1 without a page, paragraph or timestamp.'))
+      .toHaveTextContent('✕ each says wherewaits on: 1 without a page, paragraph or timestamp.');
+    expect(within(done).getAllByRole('listitem')).toHaveLength(6);
     expect(screen.getByRole('article', {name: 'AI step'})).toHaveTextContent('Case synthesis draft quoted this claim');
     // The passage opens first in the detail panel, with its words lit.
     const detail = screen.getByRole('complementary', {name: 'Step 3 of 4: Passage'});
@@ -102,6 +117,51 @@ describe('Chain of Custody', () => {
     fireEvent.keyDown(window, {key: 'l'});
     await user.click(screen.getByRole('button', {name: /^Source: Companies House CS01/}));
     expect(screen.getByRole('complementary', {name: 'Step 1 of 2: Source'})).toHaveTextContent('Answered: filed 14 Dec 2017, before the transfer');
+  });
+
+  it('replays the log as the wheel turns over it, lighting each step\'s card and wires', async () => {
+    mockApi(routes);
+    const {container} = render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+    const log = await screen.findByRole('region', {name: 'Custody log'});
+    fireEvent.pointerEnter(log);
+    const now = vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 1000); // past the dwell
+    try {
+      // The wheel moves the replay, not the page, while there is a step to move to.
+      expect(fireEvent.wheel(log, {deltaY: 100})).toBe(false);
+      const rows = within(log).getAllByRole('row');
+      expect(rows[0]).toHaveAttribute('aria-current', 'step');
+      expect(screen.getByRole('button', {name: /^File: Fernhill/})).toHaveClass('lit');
+      expect(container.querySelectorAll('.cc-wire.lit')).toHaveLength(1); // the file's one wire, into the reading
+      fireEvent.wheel(log, {deltaY: 100});
+      expect(rows[1]).toHaveAttribute('aria-current', 'step');
+      expect(screen.getByRole('button', {name: /^Reading: /})).toHaveClass('lit');
+      expect(container.querySelectorAll('.cc-wire.lit')).toHaveLength(2); // in from the file, out to the passage
+      fireEvent.wheel(log, {deltaY: 100});
+      expect(screen.getByRole('article', {name: 'AI step'})).toHaveClass('lit');
+      // At the end of the log the page scrolls on.
+      expect(fireEvent.wheel(log, {deltaY: 100})).toBe(true);
+      expect(rows[2]).toHaveAttribute('aria-current', 'step');
+      fireEvent.wheel(log, {deltaY: -100});
+      expect(rows[1]).toHaveAttribute('aria-current', 'step');
+      fireEvent.mouseLeave(log);
+      expect(rows[1]).not.toHaveAttribute('aria-current');
+      expect(container.querySelectorAll('.cc-wire.lit')).toHaveLength(0);
+    } finally { now.mockRestore(); }
+  });
+
+  it('draws the wires in when the chain opens, and at once with reduced motion', async () => {
+    mockApi(routes);
+    const first = render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+    await screen.findByRole('region', {name: 'Custody log'});
+    expect(first.container.querySelector('svg.cc-lines')).toHaveClass('draw');
+    first.unmount();
+    const had = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    Object.defineProperty(window, 'matchMedia', {configurable: true, value: (q: string) => ({matches: q.includes('reduce'), media: q})});
+    try {
+      const calm = render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+      await screen.findByRole('region', {name: 'Custody log'});
+      expect(calm.container.querySelector('svg.cc-lines')).not.toHaveClass('draw');
+    } finally { if (had) Object.defineProperty(window, 'matchMedia', had); else delete (window as {matchMedia?: unknown}).matchMedia; }
   });
 
   it('opens the claim another panel asked for, and says when there is nothing to trace', async () => {
