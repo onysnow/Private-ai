@@ -12,6 +12,7 @@ from app.db.session import Base
 from app.models.domain import Investigation, Entity, Source, Evidence, Claim, Document, DocumentChunk
 from app.services.exports import build_investigation_export, inspect_export, restore_investigation_export
 from app.db.session import SessionLocal
+from tests.claim_helpers import post_claim
 
 client = TestClient(app)
 
@@ -33,7 +34,7 @@ def test_investigation_export_contains_ftm_provenance_and_documents(tmp_path):
         "source_type": "filing", "metadata_json": {"filing_date": "2026-09-01"},
     }).json()
     ev = client.post("/api/evidence", json={"source_id": src["id"], "quote": "Verified filing text", "locator": "page 2"}).json()
-    claim = client.post("/api/claims", json={"investigation_id": inv, "text": "Example Energy filed the record", "status": "supported", "confidence": 0.8}).json()
+    claim = post_claim(client, {"investigation_id": inv, "text": "Example Energy filed the record", "status": "supported", "confidence": 0.8}).json()
     link = client.post(f"/api/claims/{claim['id']}/evidence", json={"evidence_id": ev["id"], "stance": "supports"})
     assert link.status_code == 200
     up = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Interview notes"}, files={"file": ("notes.txt", b"Exact interview note.\n", "text/plain")})

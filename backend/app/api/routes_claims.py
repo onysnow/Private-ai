@@ -61,6 +61,12 @@ def list_claim_evidence_endpoint(claim_id: str, db: Session = Depends(get_db)) -
 def create_claim_endpoint(body: ClaimCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
+    if body.status in {"supported", "confirmed"}:
+        # The same rule PATCH holds (services/claims.update_claim): a claim
+        # becomes Supported or Confirmed by a review, so the Done rules run and
+        # the reason is kept on a ClaimReviewEvent.
+        raise HTTPException(400, "Create the claim, then mark it Supported or Confirmed by reviewing it "
+                                 "(POST /api/claims/{id}/reviews), so the Done rules run and the reason is kept")
     try:
         return create_claim(db, body)
     except ValueError as exc:

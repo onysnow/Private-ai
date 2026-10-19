@@ -8,6 +8,7 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests.claim_helpers import post_claim
 
 client = TestClient(app)
 
@@ -68,7 +69,7 @@ def test_chasing_a_missing_value_makes_a_lead_and_other_answers_are_kept():
 
 def test_a_supported_claim_with_nothing_linked_is_a_missing_value():
     inv = _inv("Missing: claim")
-    claim = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "Kestrel SA bought the land", "status": "supported", "confidence": 0.8}))
+    claim = ok(post_claim(client, {"investigation_id": inv, "text": "Kestrel SA bought the land", "status": "supported", "confidence": 0.8}))
     gap = _missing(inv)[("MV-CLM-EV", claim["id"])]
     assert "no supporting evidence" in gap["blocks"]
     feed = ok(client.get(f"/api/investigations/{inv}/decisions"))
