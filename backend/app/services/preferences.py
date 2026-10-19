@@ -64,7 +64,8 @@ def _route_allowed(kind: str, route: str) -> bool:
 
 def notification_prefs(db: Session, person: str) -> dict[str, Any]:
     stored = (row.value if (row := _get(db, "person", person, "notifications")) else {}) or {}
-    chosen = stored.get("routes") if isinstance(stored.get("routes"), dict) else {}
+    raw = stored.get("routes")
+    chosen: dict[str, Any] = raw if isinstance(raw, dict) else {}
     routes = {k["key"]: chosen[k["key"]] if _route_allowed(k["key"], str(chosen.get(k["key"]))) else k["default"]
               for k in NOTIFICATION_KINDS}
     return {
