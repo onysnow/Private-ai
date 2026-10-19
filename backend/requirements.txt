@@ -10,8 +10,8 @@ followthemoney==4.11.0
 openpyxl==3.1.5
 # The layout of diagrams sent to OpenAleph (app/services/openaleph_entitysets.py):
 # networkx's spring layout (BSD-3; already installed with followthemoney, pinned
-# because the Workbench imports it), which computes with numpy (BSD-3).
-networkx==3.7
+# because the Workbench imports it; followthemoney 4.11 needs networkx below 3.7), which computes with numpy (BSD-3).
+networkx==3.6.1
 numpy==2.5.4
 # The indicator catalogue's YAML files (app/catalogue/; ADR-0007; MIT). Already
 # installed with followthemoney; pinned because the Workbench imports it.

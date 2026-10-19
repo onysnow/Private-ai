@@ -332,7 +332,7 @@ def test_the_migration_anchors_the_quotes_already_in_a_case(tmp_path):
     db_path = tmp_path / "before.db"
     env = {**os.environ, "DATABASE_URL": f"sqlite:///{db_path.as_posix()}"}
     backend = Path(__file__).resolve().parents[1]
-    subprocess.run(["alembic", "upgrade", "e8c4a1f7b293"], cwd=backend, env=env, check=True, capture_output=True)
+    subprocess.run(["alembic", "upgrade", "b7d4e2a9c615"], cwd=backend, env=env, check=True, capture_output=True)
     with sqlite3.connect(db_path) as con:
         con.execute("insert into investigations (id, name, is_demo, created_at) values ('i', 'Old', 0, '2026-10-01')")
         con.execute("insert into sources (id, investigation_id, title, source_type, metadata_json, created_at) "
