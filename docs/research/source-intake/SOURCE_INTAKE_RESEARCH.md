@@ -12,6 +12,16 @@ Research dates: first pass 19 Oct 2026; second pass 19 Oct 2026 (same day, deepe
 6. **Keeping AI-made material out cannot rest on a detector.** Off-the-shelf detectors score about chance (AUC ~0.5) on real social-media content; commercial ones stay under 90% accuracy. What works is layers: provenance, then source reputation, then detectors as hints, then a person who records reasons (§9). The suite lists "a named framework for detecting AI-generated sources" as an open item; this is input for that, and the suite change is Ony's call.
 7. **Not everything could be verified.** The research environment could not open web pages directly; official-domain search excerpts filled most platform gaps (§5.2) but are not the pages. What is still unread is listed in §11. One finding changes the plan: YouTube, X and Reddit terms require stored API data to be refreshed or deleted, and X, Meta and YouTube bar automated collection without written permission, which sits against evidence preservation (§5.2, §6).
 
+### Decisions made by Ony
+
+- **19 Oct 2026: no social media account connections.** The app will not connect to, or log in as, a user's social media accounts: no OAuth, no stored credentials, no cookies, no session capture.
+
+What follows from it (consequences to test, not findings):
+- Capture of X, Instagram, Facebook, TikTok and LinkedIn is limited to what each shows to a logged-out visitor. A login wall is recorded as "not seen" (design §13), never "shown". How much of each platform is visible logged-out was not tested; expect partial results on several.
+- Out of scope: Telethon and live Telegram collection (exports only), Instaloader or gallery-dl with cookies, yt-dlp with cookies, Zeeschuimer and 4CAT, Browsertrix logged-in sessions, Instagram Business Discovery, official-API OAuth for the reporter's own accounts.
+- Content that exists only behind a login reaches the case only as files, exports or screenshots the reporter supplies. They are captured as files, with the source recorded as supplied by the reporter.
+- The source-protection risk of tying an account to the reporter, and the logged-in terms exposure (hiQ, Ryanair v. Booking.com), no longer arise from the app itself.
+
 ### What the second pass corrected in the first draft
 
 | First draft said | Checked result |
@@ -75,14 +85,14 @@ Consequences: (a) social posts are already capped by the suite; (b) a "Capture" 
 | Tool | What it does | Licence | Latest | Fit | Caveat |
 |---|---|---|---|---|---|
 | **Bellingcat Auto Archiver** | URL → media (via yt-dlp and other extractors), hashes, screenshots, WACZ, RFC 3161 and OpenTimestamps timestamps; deletion detection (1.2.0); Bluesky, Reddit, LinkedIn extractors | MIT | 1.2.9, 2026-09-01 | **Full** for capture | Extractors break with platform changes; some need logins/cookies. **Its dependencies (PyPI 1.2.9) include `bgutil-ytdlp-pot-provider` (GPL-3), `opentimestamps` (LGPL-3), desktop-automation packages (`pyautogui`, `pyperclip`, `seleniumbase`), cloud clients (`boto3`, Google API, `gspread`), `telethon`, `instaloader`, `python-twitter-v2`, and a pinned `numpy==2.1.3`; it needs Python >=3.10,<3.13 (the backend image is 3.12). Run it as a separate process in its own environment, not imported into the backend** |
-| **browsertrix-crawler / Browsertrix** | Real-browser crawl to WARC/WACZ with logged-in sessions | AGPL-3 | n/a | **Full** for web fidelity | AGPL: separate process only. Heavy |
+| **browsertrix-crawler / Browsertrix** | Real-browser crawl to WARC/WACZ with logged-in sessions | AGPL-3 | n/a | **Full** for web fidelity | AGPL: separate process only. Heavy (its logged-in-session feature is excluded by decision, 19 Oct) |
 | ArchiveBox | Self-hosted archive: HTML, SingleFile, WARC, PDF, screenshot, media | MIT | 0.9.73, 2026-10-06 | Partial | Own UI and DB; weaker on hashing/timestamps |
 | warcio | WARC read/write | Apache-2.0 | 1.8.1, 2026-03-31 | Building block | Write our own WARC |
 | wacz (Python) | WACZ packaging | Apache-2.0 | 0.6.0, 2026-09-10 | Building block | |
 | pywb / ReplayWeb.page | Replay WARC/WACZ | GPL / AGPL-3 | pywb 2.10.0, 2026-09-22 | Viewer | Separate process only |
 | SingleFile | One-file page save (extension) | AGPL-3 | n/a | Manual only | |
 | changedetection.io | Page-change monitor: CSS/XPath/JSON selectors, RSS output, Playwright for JS pages, Docker | Apache-2.0 | 0.60.9, 2026-10-12 | **Good sidecar or model for "changed since capture"** | README promotes a paid hosted service |
-| Zeeschuimer + 4CAT | Browser extension records what you browse (TikTok, Instagram, X, LinkedIn…); 4CAT analyses | **AGPL-3** (both) | n/a | Partial–full for closed platforms | Separate process only. Depends on page structure |
+| Zeeschuimer + 4CAT | Browser extension records what you browse (TikTok, Instagram, X, LinkedIn…); 4CAT analyses | **AGPL-3** (both) | n/a | Partial–full for closed platforms | Separate process only. Depends on page structure **Excluded by decision (19 Oct): it records a logged-in browser session** |
 | Wayback Save Page Now / Perma.cc / archive.today | Third-party archives | Services | n/a | Optional second witness | **Send the URL to a third party.** archive.today has no API; Guardian, NYT, FT and USA Today reportedly block the Wayback Machine [search] |
 | Hunchly | Commercial investigator capture | Proprietary | n/a | Reference design (cited in Ony's research) | Closed |
 | Memento (RFC 7089) | Find archived versions | Spec | n/a | Lookup only | |
@@ -95,7 +105,7 @@ Consequences: (a) social posts are already capped by the suite; (b) a "Capture" 
 |---|---|---|---|
 | **yt-dlp** | Unlicense | 2026.8.19 (2026-08-19) | Its `supportedsites.md` [read] lists extractors for Twitter/X, Instagram (incl. stories), TikTok, Facebook, YouTube, Reddit, Bluesky, VK, Weibo, Rumble, LinkedIn, Substack, Naver, Kakao, Bilibili and Truth Social; **none for Mastodon or Threads**. The list says "Not all sites listed here are guaranteed to work; websites are constantly changing". Listed does not mean working today |
 | gallery-dl | **GPL-2.0-only** | 1.32.17 (2026-10-17) | Separate process only |
-| Instaloader | MIT | 4.15.4 (2026-10-12) | Public profiles; rate-limited |
+| Instaloader | MIT | 4.15.4 (2026-10-12) | Public profiles; rate-limited Excluded for anything needing a login (decision, 19 Oct) |
 | TikTok-Api (unofficial) | MIT | 7.3.3 (2026-04-01) | Fragile |
 | snscrape / twint | n/a | snscrape not updated since 2023 [search] | Treat as dead |
 | Nitter / XCancel | n/a | One vendor guide says both went offline on 25 Aug 2026 [search, single source] | Don't build on it |
@@ -110,7 +120,7 @@ Consequences: (a) social posts are already capped by the suite; (b) a "Capture" 
 | Firecrawl self-host | AGPL-3 (client `firecrawl-py` MIT) | 4.53.0 | Hosted Firecrawl sends URLs to a third party |
 | RSSHub / FreshRSS | AGPL | n/a | Routes break; separate process |
 | Miniflux | Apache-2.0 | n/a | Light feed poller with an API |
-| Telethon | MIT | 1.45.0 (2026-09-10) | Real user account (ban risk); uses a personal login |
+| Telethon | MIT | 1.45.0 (2026-09-10) | Real user account (ban risk); uses a personal login **Excluded by decision (19 Oct): needs a user login.** Telegram stays export-only |
 | atproto (Bluesky) | MIT | 0.0.73 (2026-10-17) | Open firehose/public AppView [memory] |
 | Mastodon.py | MIT | 2.3.3 (2026-10-18) | Per-instance rules |
 | faster-whisper | MIT | 1.2.1 (2025-10-31) | Local transcription |
@@ -170,7 +180,7 @@ Web Annotation selectors for quotes [read, from a copy of the 2017 Recommendatio
 - **Duplicates:** exact SHA-256; MinHash for syndicated copy; pHash for images; DOI for papers.
 - **Monitors surface, people capture.** To respect EGS rule 8, a monitor creates an "at-risk, capture first" queue; bulk capture needs a recorded reason.
 - **robots.txt:** not law in most places; honour it for continuous monitoring; a one-off evidentiary capture of a page the reporter is reading is different. Needs Ony's decision (§12).
-- **Source protection:** anything third-party learns what the reporter is interested in (Wayback SPN, Perma.cc, Event Registry, NewsAPI, hosted Firecrawl, Google APIs, external reverse-image sites): default off, opt-in per item. Polling an account from a newsroom address, or logging in as a person-linked account, reveals interest: neutral egress or Tor for sensitive targets, dedicated accounts, never a personal one. The watchlist and monitor list are themselves sensitive. Subscribing to a newsletter exposes the subscriber and tracking pixels reveal opens: use a dedicated alias and never load remote images.
+- **Source protection:** anything third-party learns what the reporter is interested in (Wayback SPN, Perma.cc, Event Registry, NewsAPI, hosted Firecrawl, Google APIs, external reverse-image sites): default off, opt-in per item. Polling an account from a newsroom address, or logging in as a person-linked account, reveals interest: neutral egress or Tor for sensitive targets. The app does not log in to social media accounts (decided 19 Oct 2026), so no account is tied to the reporter by the app. The watchlist and monitor list are themselves sensitive. Subscribing to a newsletter exposes the subscriber and tracking pixels reveal opens: use a dedicated alias and never load remote images.
 
 ### 5.2 Platform access
 
@@ -230,7 +240,7 @@ Logged-out public access has not been held a CFAA violation (*hiQ*, *Bright Data
 
 ### Questions for counsel
 1. Does *Meta v. Bright Data* (district level, no appeal) support a policy that separates logged-out from logged-in capture?
-2. For logged-in capture, how material are ToS and contract-only theories?
+2. With no logins, what contract or terms exposure remains for logged-out capture and for yt-dlp-style downloading?
 3. Platform retention rules (X: delete or modify on request within 24 hours; YouTube API: refresh or delete within 30 days; Reddit: delete within 48 hours recommended) versus keeping an evidentiary capture: which prevails for a journalist, and does it matter whether the content came through an API or a capture?
 3b. Do X's, Meta's and YouTube's bans on scraping, automated collection and downloading without written permission reach a reporter's manual or tool-assisted capture of a page they are reading?
 4. What happened in X v. CCDH (9th Cir. 24-2643), Ryanair v. Booking.com (3d Cir.) and after the Nov 2024 order in X v. Bright Data?
@@ -373,9 +383,9 @@ Follows the repo's rule: mockups first, Ony approves, then build.
 
 **Phase 1: Links that work** (Ony's design §13 and INTAKE_1). A pasted link is fetched locally (Playwright), saved as HTML/MHTML + screenshot + WARC/WACZ with SHA-256, time, tool and version, headers; text extracted (trafilatura); the page's text read through the existing Drop lanes and the CAPT record fills itself (no hand entry). States "link only" (dead link) and "not seen" (login/paywall); "changed since capture" re-check; failed captures logged as outcomes. Capture precedes quoting. Fixes the backlog item "a web link isn't fetched or archived".
 
-**Phase 2: Media and social posts by link.** Auto Archiver / yt-dlp for single posts and videos; originals + `info.json` kept; platform, post id, account and live status recorded; transcripts through faster-whisper with a segment side table and the flat text for search; a per-platform "works today" health check because extractors break. Unlock the 415 for audio/video.
+**Phase 2: Media and social posts by link.** Auto Archiver / yt-dlp, logged-out and without cookies, for single posts and videos; originals + `info.json` kept; platform, post id, account and live status recorded; transcripts through faster-whisper with a segment side table and the flat text for search; a per-platform "works today" health check because extractors break. Unlock the 415 for audio/video.
 
-**Phase 3: Following.** Monitors (feeds, sitemaps, YouTube feeds, Bluesky, Mastodon, Telegram public, podcasts) with schedule, conditional GET, change detection and version history, duplicate clustering; items surface in an "at-risk, capture first" queue (EGS rule 8); closed platforms by on-demand capture or Zeeschuimer import, no bulk crawling; per-monitor egress policy; encrypted monitor list. Newsletters via a dedicated mailbox into the `.eml` path. Messaging via exports only.
+**Phase 3: Following.** Monitors (feeds, sitemaps, YouTube feeds, Bluesky, Mastodon, Telegram public, podcasts) with schedule, conditional GET, change detection and version history, duplicate clustering; items surface in an "at-risk, capture first" queue (EGS rule 8); closed platforms by a pasted link captured logged-out, or by files, exports and screenshots the reporter supplies; no account logins and no bulk crawling; per-monitor egress policy; encrypted monitor list. Newsletters via a dedicated mailbox into the `.eml` path. Messaging via exports only.
 
 **Phase 4: Authenticity layer.** `authenticity_check` log; local C2PA validation with a supplied trust list; outlet reputation; consented external helpers; optional detectors (text and audio before image); propagation on claims; `role` field; review UI that demands reasons. Needs the suite decision (§9.5).
 
@@ -406,7 +416,7 @@ Follows the repo's rule: mockups first, Ony approves, then build.
 
 ## 12. Questions for Ony
 
-1. **Scope of "follow".** Monitor only open sources and capture closed platforms on demand, or also try bulk collection from X/Instagram/TikTok/Facebook (terms and ban risk, and the suite prefers item-by-item capture)?
+1. **Scope of "follow".** (Decided 19 Oct 2026: no connecting or logging in to social media accounts.) Remaining: monitor only open sources and capture closed platforms on demand, logged-out, or also try bulk logged-out collection from X/Instagram/TikTok/Facebook (terms and ban risk, and the suite prefers item-by-item capture)?
 2. **Third-party archives** (Wayback, Perma.cc) as an optional second witness (leaks the URL), or never?
 3. **Egress:** a neutral/Tor/VPN route per monitor for sensitive targets?
 4. **robots.txt:** honour it for continuous monitoring, but not for one-off evidentiary captures?
