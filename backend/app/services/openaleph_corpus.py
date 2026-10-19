@@ -275,9 +275,10 @@ def sync_document_to_openaleph(
         row.response_json = response if isinstance(response, dict) else {"result": str(response)}
         row.synced_at = utcnow_naive()
         row.error = None
-    except Exception as exc:
+    except Exception:
+        logger.warning("OpenAleph upload of document %s failed", document_id, exc_info=True)
         row.status = "failed"
-        row.error = f"{exc.__class__.__name__}: {exc}"
+        row.error = "OpenAleph did not accept the file; the server log has the reason"
     db.commit(); db.refresh(row)
     return row
 
