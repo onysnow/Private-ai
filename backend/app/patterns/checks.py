@@ -14,6 +14,13 @@ item when the case changes:
   around the first one and the case's parties named in it. A person decides
   whether the passage shows the indicator; the app never decides.
 
+A third kind is added by a person, not called for by the records:
+
+- **money**: a money check (app/services/money_checks.py: grey hole, miracle,
+  black hole, round trip) a person chose to keep in To check from See › Money.
+  It holds the check's numbers as they were when added; a recompute never marks
+  it gone, because no rule asked for it.
+
 Check specs live in catalogue/detection/checks/*.yaml. The words are matched
 in Python, whole words and phrases, ignoring case, so the same search runs on
 SQLite and Postgres."""
@@ -38,6 +45,9 @@ ROOT = Path(__file__).resolve().parents[3] / "catalogue" / "detection" / "checks
 STATUSES = ("open", "shows", "does_not", "unclear")
 # A missing value's answers (app/patterns/missing.py).
 MISSING_STATUSES = ("open", "chasing", "unknowable", "not_needed")
+# The money checks a person can keep in To check, with the line each card reads (mockup SEE_2).
+MONEY_KINDS = {"grey_hole": ("Grey hole", "more out than in"), "miracle": ("Miracle", "out with nothing in"),
+               "black_hole": ("Black hole", "in with nothing out"), "round_trip": ("Round trip", "money back to where it started")}
 EXCERPT = 160  # characters either side of the first word found
 
 
@@ -185,7 +195,9 @@ def recompute(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] |
     for are marked gone (decisions kept), ones that come back lose the mark."""
     wanted = _wanted(db, investigation_id, load() if specs is None else specs)
     now = utcnow_naive()
-    existing = {c.fingerprint: c for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id))}
+    # A money check is kept by a person, not called for by the records: a recompute leaves it as it is.
+    existing = {c.fingerprint: c for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id,
+                                                                              CheckItem.kind != "money"))}
     for fp, fields in wanted.items():
         row = existing.get(fp)
         if row is None:
@@ -198,6 +210,57 @@ def recompute(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] |
         if fp not in wanted and row.gone_at is None:
             row.gone_at = now
     db.commit()
+
+
+def money_fingerprint(currency: str, kind: str, party_id: str, payment_id: str | None = None) -> str:
+    """A money check's identity in To check: the currency, the kind, the party and, for a round trip, the
+    payment that returns (one party can be at the end of more than one trip)."""
+    return _fp("money", currency, kind, party_id, payment_id or "")
+
+
+def _money(amount: float, currency: str) -> str:
+    return f"{amount:,.0f} {currency}"
+
+
+def _money_numbers(kind: str, check: dict[str, Any], currency: str) -> str:
+    """The check's numbers in the words its card uses in See › Money."""
+    if kind == "round_trip":
+        return f"{' → '.join(check['path'])}: {_money(check['gap'], currency)} comes back."
+    if kind == "grey_hole":
+        return (f"{_money(check['amount_in'], currency)} recorded in, {_money(check['amount_out'], currency)} out: "
+                f"{_money(check['gap'], currency)} has no recorded source.")
+    if kind == "miracle":
+        return f"Pays {_money(check['amount_out'], currency)}. Nothing is recorded coming in."
+    return f"Receives {_money(check['amount_in'], currency)}. Nothing is recorded leaving."
+
+
+def add_money_check(db: Session, investigation_id: str, currency: str, kind: str, party_id: str,
+                    payment_id: str | None = None, as_of: int | None = None) -> CheckItem:
+    """Keeps a money check in To check, once. The check is run again here, so only one the case's own
+    ledger finds can be kept, with its numbers as they are now; a second add returns the same item.
+    Raises LookupError when the check finds nothing (the ledger or the year changed)."""
+    from app.services.money_checks import investigation_money_checks
+
+    ledger = next((c for c in investigation_money_checks(db, investigation_id, as_of)["currencies"] if c["currency"] == currency), None)
+    pool = (ledger or {}).get("round_trips" if kind == "round_trip" else "checks", [])
+    check = next((c for c in pool if c["kind"] == kind and c["party_id"] == party_id
+                  and (kind != "round_trip" or c["returning_payment_id"] == payment_id)), None)
+    if check is None:
+        raise LookupError("This check finds nothing now: the ledger or the year has changed")
+    fp = money_fingerprint(currency, kind, party_id, payment_id if kind == "round_trip" else None)
+    row = db.scalar(select(CheckItem).where(CheckItem.investigation_id == investigation_id, CheckItem.fingerprint == fp))
+    if row is not None:
+        return row
+    word, line = MONEY_KINDS[kind]
+    year = f" Up to the end of {as_of}." if as_of is not None else ""
+    row = CheckItem(investigation_id=investigation_id, fingerprint=fp, kind="money", indicator_id=kind, status="open",
+                    question=f"{word} at {check['party']}: {line}", parties=[party_id], terms=[], locator=f"{currency} ledger",
+                    excerpt=f"{_money_numbers(kind, check, currency)}{year} Could be innocent: {check['innocent']}. "
+                            f"Lead idea: {check['lead_idea']}.",
+                    first_seen_at=utcnow_naive())
+    db.add(row)
+    db.commit()
+    return row
 
 
 def decide(db: Session, row: CheckItem, status: str, note: str | None) -> None:
@@ -268,7 +331,8 @@ def items(db: Session, investigation_id: str) -> dict[str, Any]:
     for f in db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id, PatternFlag.gone_at.is_(None))):
         for p in f.parties:
             flags_on_parties.setdefault(p, []).append(f.id)
-    indicator_names = {r.indicator_id: _name(r.indicator_id) for r in rows if r.kind != "missing"}
+    indicator_names = {r.indicator_id: MONEY_KINDS[r.indicator_id][0] if r.kind == "money" and r.indicator_id in MONEY_KINDS
+                       else _name(r.indicator_id) for r in rows if r.kind != "missing"}
     order = {"open": 0, "unclear": 1, "chasing": 1, "shows": 2, "does_not": 3}
     missing = sorted((r for r in rows if r.kind == "missing" and r.gone_at is None), key=lambda r: (order.get(r.status, 9), r.indicator_id, r.first_seen_at))
     rows = [r for r in rows if r.kind != "missing"]

@@ -628,6 +628,15 @@ class CheckDecide(BaseModel):
     note: str | None = Field(default=None, max_length=4000, description="What the person saw; it stays with the item.")
 
 
+class MoneyCheckKeep(BaseModel):
+    """A money check from See › Money to keep in To check; the server runs the check again and keeps it only if it finds it."""
+    currency: str = Field(min_length=1, max_length=16)
+    kind: Literal["grey_hole", "miracle", "black_hole", "round_trip"]
+    party_id: str = Field(min_length=1, max_length=64)
+    returning_payment_id: str | None = Field(default=None, max_length=64, description="A round trip: the payment that returns.")
+    as_of: int | None = Field(default=None, ge=1000, le=9999, description="The year the check was run up to, as on screen.")
+
+
 class FlagInnocent(BaseModel):
     text: str = Field(min_length=1, max_length=2000, description="The innocent explanation, as the catalogue words it.")
     state: Literal["not_looked_at", "ruled_out", "could_apply"]

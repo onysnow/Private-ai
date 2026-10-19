@@ -74,6 +74,20 @@ describe('ToCheckPanel', () => {
     expect(screen.getByText(/: No reason in the annual report/)).toBeInTheDocument();
   });
 
+  it('shows a money check kept from See › Money with its numbers, decided like any item', async () => {
+    const money = {...checklist, id: 'c-3', kind: 'money', indicator_id: 'grey_hole', indicator_name: 'Grey hole', flag_id: null,
+      question: 'Grey hole at Kestrel SA: more out than in', parties: [{id: 'k', name: 'Kestrel SA', schema: 'Company'}], locator: 'EUR ledger',
+      excerpt: '71,400 EUR recorded in, 1,430,000 EUR out: 1,358,600 EUR has no recorded source. Could be innocent: a bank loan.'};
+    mockApi({'GET /api/investigations/inv-1/checks': body([money])});
+    wrap(<ToCheckPanel investigationId="inv-1"/>);
+    const card = await screen.findByRole('article', {name: 'To check: Grey hole at Kestrel SA: more out than in'});
+    expect(within(card).getByText('Money check')).toBeInTheDocument();
+    expect(within(card).getByText('Kept from See › Money · EUR ledger')).toBeInTheDocument();
+    expect(within(card).getByText(/1,358,600 EUR has no recorded source/)).toBeInTheDocument();
+    expect(within(card).queryByRole('button', {name: 'Its Red Flag'})).toBeNull();
+    expect(within(card).getByRole('button', {name: 'Shows it'})).toBeEnabled();
+  });
+
   it('says when there is nothing to check yet', async () => {
     mockApi({'GET /api/investigations/inv-1/checks': body([])});
     wrap(<ToCheckPanel investigationId="inv-1"/>);

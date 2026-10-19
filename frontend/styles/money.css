@@ -40,6 +40,14 @@
 .mn-band.dim { opacity: .18; }
 .mn-band.lit { opacity: 1; filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent-1) 50%, transparent)); }
 .mn-band.traced { stroke: var(--accent-2); stroke-width: 2; stroke-dasharray: none; }
+.mn-band:focus { outline: none; }
+.mn-band:focus-visible { stroke: var(--accent-2); stroke-width: 2.5; }
+/* "others (n)": the smaller flows folded together, named in words; plain grey with a long dash, never a certainty. */
+.mn-others { fill: color-mix(in srgb, var(--text-muted) 16%, transparent); stroke: var(--text-muted); stroke-dasharray: 8 3 1 3; }
+.mn-node.others rect { fill: color-mix(in srgb, var(--text-muted) 45%, transparent); }
+.k-others { background: color-mix(in srgb, var(--text-muted) 16%, transparent); outline: 1px dashed var(--text-muted); }
+.mn-fold { flex-basis: 100%; }
+@media (prefers-reduced-motion: reduce) { .mn-band { transition: none; } }
 .mn-band-label { font: 500 11px var(--font-ui); fill: var(--text); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; pointer-events: none; }
 .mn-node rect { fill: var(--accent-1); }
 .mn-node.ghost rect { stroke: var(--text-muted); stroke-dasharray: 1.5 3; }

@@ -127,11 +127,11 @@ SEE_2 "Where did the money go" (12 Oct: See › Money, `features/money`, loads w
 - [x] Integrity checks panel (backend `money_checks`, per currency, as of the year): grey hole, miracle, black hole, round trip with "none found"; each with could-be-innocent, Make a lead and the lead idea; the same icons on the parties
 - [x] Ledger strip on a time axis (log height, stated), the €10,000 line, Red Flags' structuring bracket (ML-021 now counts euros as well as dollars, per currency); ledger table with status chips and sources; J / K lights the row
 - [x] Ledger certainty is shown / not yet shown / disputed (`certainty` on each payment)
-- [ ] "Add to To check" from a money check (To check holds only an indicator's own questions; needs a backend kind)
+- [x] "Add to To check" from a money check (19 Oct: To check item kind `money` in `check_items`, no new table; `POST /investigations/{id}/checks/money` re-runs the check on the case's own ledger and keeps it once; each money check carries `to_check_id`, so the button reads "In To check ✓"; a recompute never marks it gone; shown in To check and Case home's Next up)
 - [x] 17 Oct, checked side by side with the mockup's own payments: band chips (✓ land price / council minutes p.4, ✓ 3 × €9,800, ○ €42,000 "deposit"), names and marks where the mockup puts them, ghost as a dotted box, scroll replays the flow in date order ("drawn up to May 2019"), named large bars, flag strip above a compact table, How these work
-- [ ] Hover a band lights its ledger rows too
+- [x] Hover a band lights its ledger rows too (19 Oct: every row the band carries, in the table and on the strip; Tab onto a band does the same, Enter traces it; the compact table moves to show a lit row)
 - [ ] The stage header above every screen (title, line, part tabs) is not in the mockups, which show only a breadcrumb; with it Money does not fit 1440×900 as drawn (Ony's call: it changes every screen)
-- [ ] Top 20 flows plus "others (n)" for very large ledgers
+- [x] Top 20 flows plus "others (n)" for very large ledgers (19 Oct, Columns: the 20 largest payer-to-payee flows, the rest in one "others (n)" band that opens out on a click, "Fold to the 20 largest" back; labels and Traced so far count every payment; a crowded column packs its parties. The Flow (Sankey) layout is the shared chart and still draws every flow)
 Timeline and Places: **no mockup in the 16 screens** — the canvas frames 4–13 exist; per Ony's rule, mockups first (backlog items: unreadable axis, raw property names, invented days; base map shipped with the app; dated place events and precision).
 
 ## 6. Check — mockups CHECK_1 (Decide) and CHECK_2 (Chain of Custody) (§06)

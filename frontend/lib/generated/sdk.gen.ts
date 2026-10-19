@@ -471,6 +471,9 @@ import type {
   InvestigationVisualRestyleData,
   InvestigationVisualRestyleErrors,
   InvestigationVisualRestyleResponses,
+  KeepMoneyCheckData,
+  KeepMoneyCheckErrors,
+  KeepMoneyCheckResponses,
   LeadQueueData,
   LeadQueueErrors,
   LeadQueueResponses,
@@ -1173,6 +1176,9 @@ import {
   zInvestigationVisualRestyleBody,
   zInvestigationVisualRestylePath,
   zInvestigationVisualRestyleResponse,
+  zKeepMoneyCheckBody,
+  zKeepMoneyCheckPath,
+  zKeepMoneyCheckResponse,
   zLeadQueuePath,
   zLeadQueueQuery,
   zLeadQueueResponse,
@@ -5691,6 +5697,38 @@ export const getChecks = <ThrowOnError extends boolean = false>(
       await zGetChecksResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/checks',
     ...options,
+  });
+
+/**
+ * Keep Money Check
+ *
+ * Keeps a money check (See › Money) in To check, once; adding it again changes nothing. The check is run
+ * again on this case's own ledger, so only a party it finds now can be kept.
+ */
+export const keepMoneyCheck = <ThrowOnError extends boolean = false>(
+  options: Options<KeepMoneyCheckData, ThrowOnError>,
+): RequestResult<KeepMoneyCheckResponses, KeepMoneyCheckErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    KeepMoneyCheckResponses,
+    KeepMoneyCheckErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zKeepMoneyCheckBody,
+          path: zKeepMoneyCheckPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zKeepMoneyCheckResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/checks/money',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

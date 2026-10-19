@@ -20,8 +20,11 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.models.domain import CheckItem
+from app.patterns.checks import money_fingerprint
 from app.services.financial_flows import investigation_financial_ledger
 
 CHECK_RULE = (
@@ -119,10 +122,19 @@ def investigation_money_checks(db: Session, investigation_id: str, as_of: int | 
     by_currency: dict[str, list[dict]] = defaultdict(list)
     for t in txs:
         by_currency[t["currency"]].append(t)
+    currencies = [_checks_for(c, by_currency[c]) for c in sorted(by_currency, key=lambda c: (-len(by_currency[c]), c))]
+    # Each check says whether a person already keeps it in To check (app/patterns/checks.py, kind "money").
+    kept = dict(db.execute(select(CheckItem.fingerprint, CheckItem.id).where(CheckItem.investigation_id == investigation_id,
+                                                                             CheckItem.kind == "money")).tuples().all())
+    for cur in currencies:
+        for c in cur["checks"]:
+            c["to_check_id"] = kept.get(money_fingerprint(cur["currency"], c["kind"], c["party_id"]))
+        for t in cur["round_trips"]:
+            t["to_check_id"] = kept.get(money_fingerprint(cur["currency"], "round_trip", t["party_id"], t["returning_payment_id"]))
     return {
         "investigation_id": investigation_id,
         "as_of": as_of,
         "ran_at": datetime.now(timezone.utc),
         "rule": CHECK_RULE,
-        "currencies": [_checks_for(c, by_currency[c]) for c in sorted(by_currency, key=lambda c: (-len(by_currency[c]), c))],
+        "currencies": currencies,
     }

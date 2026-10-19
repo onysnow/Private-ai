@@ -5,7 +5,9 @@
 // return arc), Flow (the Sankey) or Ledger (the table). The integrity checks on the right are leads, never
 // findings, each with what could be innocent. The ledger strip at the bottom puts the payments on a time
 // axis with the €10,000 line and brackets from Red Flags (the chart never makes its own verdict).
-// Keys: J / K move the lit row (and its band), L shows the ledger, Esc clears the traced set.
+// Keys: J / K move the lit row (and its band), L shows the ledger, Esc clears the traced set. Pointing at a band
+// (mouse or Tab) lights every ledger row it carries, in the table and on the strip. A very large ledger draws its
+// 20 largest flows and folds the rest into "others (n)", which opens out on a click.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import {useEffect, useMemo, useRef, useState} from 'react';
@@ -15,12 +17,13 @@ import {LevelChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {
-  createLeadEndpointMutation, getInvestigationFinancialFlowsOptions, getInvestigationMoneyChecksOptions, listLeadsQueryKey,
+  createLeadEndpointMutation, getChecksQueryKey, getInvestigationFinancialFlowsOptions, getInvestigationMoneyChecksOptions,
+  getInvestigationMoneyChecksQueryKey, keepMoneyCheckMutation, listLeadsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {CurrencyMoneyChecksOut, FinancialTransactionOut, MoneyCheckOut, RedFlagOut, RoundTripOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
-import {amountText, layout, pathOf, type Certainty, type CheckMark, type Payment} from './money-layout';
+import {amountText, layout, pathOf, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
 
 const FinancialFlowSankey = dynamic(() => import('../../components/charts/financial-flow-sankey').then(m => m.FinancialFlowSankey),
   {ssr: false, loading: () => <p className="mn-muted">Drawing the flow…</p>});
@@ -66,6 +69,8 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   const [traced, setTraced] = useState<string[]>([]);
   const [lit, setLit] = useState<string | null>(null);
   const [row, setRow] = useState(0);
+  const [pointed, setPointed] = useState<string | null>(null); // the band under the pointer or the keyboard focus
+  const [allFlows, setAllFlows] = useState(false); // "others (n)" opened out
 
   const all = useMemo(() => (ledgerQ.data?.transactions ?? [])
     .filter(t => asOf === null || !t.dateTime || Number(t.dateTime.slice(0, 4)) <= asOf), [ledgerQ.data, asOf]);
@@ -109,12 +114,16 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
       if (c.kind === 'grey_hole') ghosts[c.party_id] = c.gap;
     }
     for (const t of cutoff === null ? checks?.round_trips ?? [] : []) marks[t.party_id] = [...(marks[t.party_id] ?? []), 'round_trip'];
-    return layout(payments, currency, {closers: (checks?.round_trips ?? []).map(t => t.returning_payment_id), marks, ghosts});
-  }, [payments, currency, checks, cutoff]);
+    return layout(payments, currency, {closers: (checks?.round_trips ?? []).map(t => t.returning_payment_id), marks, ghosts,
+      top: allFlows ? undefined : TOP_FLOWS});
+  }, [payments, currency, checks, cutoff, allFlows]);
   const tracedSet = new Set(traced);
   const tracedTotal = payments.filter(p => tracedSet.has(p.id));
   const litPayment = lit ? payments.find(p => p.id === lit) : undefined;
-  const litBand = picture?.bands.find(b => litPayment && b.ids.includes(litPayment.id));
+  const pointedBand = pointed ? picture?.bands.find(b => b.key === pointed) : undefined;
+  const litBand = pointedBand ?? picture?.bands.find(b => litPayment && b.ids.includes(litPayment.id));
+  // The ledger rows that light: every payment of the band pointed at, else the row J / K (or the pointer) is on.
+  const litRows = useMemo(() => new Set(pointedBand ? pointedBand.ids : lit ? [lit] : []), [pointedBand, lit]);
   const lightPath = litBand && picture ? pathOf(picture, litBand.key) : null;
   const others = counts.filter(([c]) => c !== currency);
   const flagsOn = (flagsQ.data?.flags ?? []).filter(f => f.status === 'open' && f.links.some(id => allPayments.some(p => p.id === id)));
@@ -156,7 +165,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
       <div className="mn-controls">
         {counts.length > 0 && <div className="mn-tabs" role="tablist" aria-label="Currency">
           {counts.map(([c, n]) => <button key={c} type="button" role="tab" aria-selected={c === currency} className={c === currency ? 'on' : ''}
-            onClick={() => { setChosen(c); setTraced([]); setLit(null); setRow(0); setUpTo(null); }}>{c} · {n}</button>)}
+            onClick={() => { setChosen(c); setTraced([]); setLit(null); setRow(0); setUpTo(null); setPointed(null); setAllFlows(false); }}>{c} · {n}</button>)}
         </div>}
         <div className="mn-seg" role="radiogroup" aria-label="Layout">
           {(['columns', 'flow', 'ledger'] as const).map(v => <button key={v} type="button" role="radio" aria-checked={view === v} className={view === v ? 'on' : ''}
@@ -191,17 +200,21 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
             {picture.bands.map(b => {
               const on = lightPath ? lightPath.has(b.key) : null;
               const isTraced = b.ids.every(id => tracedSet.has(id));
+              const act = () => b.certainty === 'others' ? setAllFlows(true) : b.certainty !== 'worked_out' && toggle(b.ids);
               return <path key={b.key} d={b.d} className={`mn-band mn-${b.certainty}${isTraced ? ' traced' : ''}${on === false ? ' dim' : ''}${on ? ' lit' : ''}`}
                 fill={b.certainty === 'worked_out' ? 'url(#mn-hatch)' : undefined}
-                onMouseEnter={() => setLit(b.ids[0])} onMouseLeave={() => setLit(null)}
-                onClick={() => b.certainty !== 'worked_out' && toggle(b.ids)}>
+                tabIndex={0} role="button" aria-label={bandWords(b, picture)} aria-pressed={b.certainty === 'worked_out' || b.certainty === 'others' ? undefined : isTraced}
+                onMouseEnter={() => setPointed(b.key)} onMouseLeave={() => setPointed(null)}
+                onFocus={() => setPointed(b.key)} onBlur={() => setPointed(null)}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } }}
+                onClick={act}>
                 <title>{bandWords(b, picture)}</title>
               </path>;
             })}
             {picture.returns.map(r => <g key={r.id} className="mn-return">
               <path d={r.d}/><text x={r.labelX} y={r.labelY + 12} textAnchor="middle">↺ {r.label}</text>
             </g>)}
-            {chips(picture.bands, labelBoxes(picture, payments, currency), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h}))).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
+            {chips(picture.bands, labelBoxes(picture, payments, currency), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h})), picture.crowded).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
               <rect x={0} y={-13} width={c.w} height={c.sub ? 34 : 19} rx={5}/>
               <text x={8} y={0}>{c.text}</text>{c.sub && <text x={8} y={15} className="sub">{c.sub}</text>}</g>)}
             {picture.nodes.map(n => {
@@ -213,18 +226,21 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
               const owner = n.ghost ? picture.nodes.find(x => `ghost:${x.id}` === n.id) : undefined;
               const incoming = picture.bands.filter(b => b.toId === n.id && b.certainty !== 'worked_out');
               const purposes = [...new Set(incoming.map(b => payments.find(p => b.ids.includes(p.id))?.purpose).filter(Boolean))];
-              const count = payments.filter(p => p.fromId === n.id).length;
+              const count = n.others ? picture.folded?.payments ?? 0 : payments.filter(p => p.fromId === n.id).length;
               const lines: Array<[string, string]> = // [words, 'sum'] or, in the first column, [name, its sum on the same line]
-                n.ghost
+                n.others ? (first ? [[n.name, `${amountText(n.amountOut, currency)} · ${count} payments`]] : [])
+                : n.ghost
                 ? [[n.name, ''], [`ƒ ${amountText(n.amountOut, currency)} · worked out`, 'sum'], [`= what left ${owner?.name ?? 'it'} minus what came in`, 'sum']]
                 : first ? [[n.name, `${amountText(n.amountOut, currency)} · ${count} payment${count === 1 ? '' : 's'}${n.marks.includes('miracle') && n.h > 24 ? ' · nothing seen coming in' : ''}`]]
+                : last && picture.crowded ? [[n.name, `${amountText(n.amountIn, currency)} in`]] // one line each in a crowded column
                 : last ? [[n.name, ''], [n.marks.includes('black_hole') ? `${amountText(n.amountIn, currency)} in · ${amountText(0, currency)} out`
                     : `${amountText(n.amountIn, currency)}${purposes.length === 1 ? ` · ${purposes[0]}` : ''}`, 'sum']]
                 : [[n.name, ''], [`in ${amountText(n.amountIn, currency)}`, 'sum'], [`out ${amountText(n.amountOut, currency)}`, 'sum']];
               const ly = n.ghost ? n.y + 20 : last || first ? n.y + Math.min(n.h / 2, 14) + (n.h < 30 ? 0 : 0) : n.y + n.h + 16;
               const markAt = (i: number) => first ? {x: n.x - 14 - i * 20, y: n.y + Math.min(n.h / 2, 10)}
+                : last && lines.length === 1 ? {x: lx + lines[0][0].length * 7.4 + lines[0][1].length * 6.6 + 22 + i * 20, y: ly - 4}
                 : last ? {x: lx + lines[1][0].length * 6.6 + 14 + i * 20, y: ly + 10} : {x: n.x + 6 + i * 20, y: n.y - 14};
-              return <g key={n.id} className={`mn-node${n.ghost ? ' ghost' : ''}`}>
+              return <g key={n.id} className={`mn-node${n.ghost ? ' ghost' : ''}${n.others ? ' others' : ''}`}>
                 <rect x={n.x} y={n.y} width={12} height={n.h} rx={2} fill={n.ghost ? 'url(#mn-hatch)' : undefined}/>
                 {n.ghost && <rect x={n.x} y={n.y} width={picture.nodes.find(x => `ghost:${x.id}` === n.id)!.x - n.x} height={n.h} className="mn-ghost-box"/>}
                 {n.marks.map((m, i) => { const at = markAt(i); return <g key={m} className={`mn-mark mn-mark-${m}`} transform={`translate(${at.x} ${at.y})`}>
@@ -239,21 +255,24 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
           </ul>
           <figcaption>
             <span>Scroll over the flow to replay it in date order · drawn up to {drawnTo ? day(drawnTo.slice(0, 7)) : '—'}{upTo !== null && <> · <button type="button" className="mn-link" onClick={() => setUpTo(null)}>all</button></>} · click a band to add it to “Traced so far” · <kbd>L</kbd> list view</span>
-            <span className="mn-key"><i className="k-shown"/>shown <i className="k-unshown"/>not yet shown{payments.some(p => p.certainty === 'disputed') && <><i className="k-disputed"/>disputed</>} <i className="k-worked"/>ƒ worked out</span>
+            <span className="mn-key"><i className="k-shown"/>shown <i className="k-unshown"/>not yet shown{payments.some(p => p.certainty === 'disputed') && <><i className="k-disputed"/>disputed</>} <i className="k-worked"/>ƒ worked out{picture.folded && <> <i className="k-others"/>others, folded</>}</span>
+            {picture.folded && <span className="mn-fold">The {TOP_FLOWS} largest of {picture.flows} flows are drawn; others ({picture.folded.flows}) holds the
+              other {picture.folded.payments} payments, {amountText(picture.folded.amount, currency)}. Totals count every payment. <button type="button" className="mn-link" onClick={() => setAllFlows(true)}>Show all {picture.flows} flows</button></span>}
+            {allFlows && picture.flows > TOP_FLOWS && <span className="mn-fold">All {picture.flows} flows are drawn. <button type="button" className="mn-link" onClick={() => { setAllFlows(false); setPointed(null); }}>Fold to the {TOP_FLOWS} largest</button></span>}
           </figcaption>
         </figure>}
         {view === 'flow' && <div className="mn-figure"><FinancialFlowSankey height={360} transactions={txs.map(t => ({
           id: t.id, dateTime: t.dateTime || '', from: t.from, to: t.to, amount: t.amount, currency: t.currency,
           statedPurpose: t.statedPurpose || undefined, evidence: t.evidence || undefined, status: t.status || undefined, flowType: t.flowType,
         }))}/></div>}
-        {view === 'ledger' && <LedgerTable txs={txs} lit={lit} flagged={flaggedIds} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }} full/>}
+        {view === 'ledger' && <LedgerTable txs={txs} lit={litRows} flagged={flaggedIds} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }} full/>}
 
         <div className="mn-strip">
-          <LedgerStrip txs={txs} currency={currency} lit={lit} flags={structuring}/>
+          <LedgerStrip txs={txs} currency={currency} lit={litRows} flags={structuring}/>
           {view !== 'ledger' && <div className="mn-table-side">
             {[...structuring, ...flagsOn.filter(f => !structuring.includes(f) && f.links.length === 1 && /round/i.test(f.summary))].slice(0, 2).map(f => <p key={f.id} className="mn-flag"><LevelChip level={f.level as 'faint' | 'strong' | 'textbook'}/> <span>{f.summary}</span></p>)}
             {flagsOn.length > 2 && <p className="mn-muted mn-more-flags">{flagsOn.length} open Red Flags touch these payments · <a href="#red-flags" className="mn-link">see them in Act</a></p>}
-            <LedgerTable txs={txs} lit={lit} flagged={flaggedIds} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }}/>
+            <LedgerTable txs={txs} lit={litRows} flagged={flaggedIds} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }}/>
           </div>}
         </div>
         {(ledgerQ.data?.incomplete.length ?? 0) > 0 && <details className="mn-incomplete">
@@ -261,7 +280,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
           <ul>{ledgerQ.data!.incomplete.map(r => <li key={r.id}>{r.from || '?'} → {r.to || '?'}: {r.problems.join('; ')}</li>)}</ul>
         </details>}
       </div>
-      <ChecksPanel investigationId={investigationId} currency={currency} checks={checks} ranAt={checksQ.data?.ran_at}
+      <ChecksPanel investigationId={investigationId} currency={currency} checks={checks} ranAt={checksQ.data?.ran_at} asOf={asOf}
         error={checksQ.isError ? errorMessage(checksQ.error, 'Could not run the checks') : ''}/>
     </div>}
   </section>;
@@ -275,22 +294,25 @@ function labelBoxes(picture: ReturnType<typeof layout>, payments: Payment[], cur
     const count = payments.filter(p => p.fromId === n.id).length;
     const w = first ? n.name.length * 7.4 + (amountText(n.amountOut, currency).length + 14 + String(count).length) * 6.6 + 12 : Math.max(n.name.length * 7.4, 150);
     const y = first || last ? n.y + Math.min(n.h / 2, 14) - 12 : n.y + n.h + 4;
-    return {x: n.x + 18, y: y - 3, w, h: first ? 22 : 46};
+    return {x: n.x + 18, y: y - 3, w, h: first || (last && picture.crowded) ? 22 : 46};
   });
 }
 
 function chips(bands: ReturnType<typeof layout>['bands'], avoid: Array<{x: number; y: number; w: number; h: number}> = [],
-  bars: Array<{x: number; y: number; w: number; h: number}> = []): Array<{key: string; certainty: string; text: string; sub: string | null; x: number; y: number; w: number}> {
+  bars: Array<{x: number; y: number; w: number; h: number}> = [], onlyWhereFree = false): Array<{key: string; certainty: string; text: string; sub: string | null; x: number; y: number; w: number}> {
   const placed: Array<{x: number; y: number; w: number; h: number}> = [...avoid];
-  return bands.filter(b => b.chip.text).sort((a, b) => a.chip.y - b.chip.y).map(b => {
+  // In a crowded picture a chip with no free place is left out (the band still says it in its title and in the list).
+  return bands.filter(b => b.chip.text).sort((a, b) => a.chip.y - b.chip.y).flatMap(b => {
     const w = Math.max(b.chip.text.length, (b.chip.sub ?? '').length) * 6.3 + 16;
     const h = b.chip.sub ? 34 : 19;
     // Try the chip's own place, then rows above it, then to the right; never over a bar or a name.
     const free = (x: number, top: number) => [...placed, ...bars].every(p => !(x < p.x + p.w + 6 && x + w > p.x && top < p.y + p.h && top + h > p.y));
     const spots = [0, -1, -2, 1, -3].flatMap(r => [0, 1, 2].map(s => ({x: b.chip.x + s * 60, top: b.chip.y - 13 + r * (h + 4)})));
-    const at = spots.find(s => free(s.x, s.top)) ?? spots[0];
+    const found = spots.find(s => free(s.x, s.top));
+    if (!found && onlyWhereFree) return [];
+    const at = found ?? spots[0];
     placed.push({x: at.x, y: at.top, w, h});
-    return {key: b.key, certainty: b.certainty, text: b.chip.text, sub: b.chip.sub, x: at.x, y: at.top + 13, w};
+    return [{key: b.key, certainty: b.certainty, text: b.chip.text, sub: b.chip.sub, x: at.x, y: at.top + 13, w}];
   });
 }
 
@@ -299,23 +321,35 @@ function currencyName(c: string): string {
 }
 
 function bandWords(b: ReturnType<typeof layout>['bands'][number], picture: ReturnType<typeof layout>): string {
+  if (b.certainty === 'others') return `${b.label}: the smaller flows, folded together (open to show them all)`;
   const from = picture.nodes.find(n => n.id === b.fromId)?.name; const to = picture.nodes.find(n => n.id === b.toId)?.name;
   const how = b.certainty === 'worked_out' ? 'worked out, not a payment' : CERTAINTY[b.certainty].word.toLowerCase();
   return `${from} to ${to}: ${b.label} (${how})`;
 }
 
+const COMPACT_ROWS = 6;
+
 function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
-  txs: FinancialTransactionOut[]; lit: string | null; flagged: Set<string>; traced: Set<string>; onLight: (id: string, i: number) => void; full?: boolean;
+  txs: FinancialTransactionOut[]; lit: Set<string>; flagged: Set<string>; traced: Set<string>; onLight: (id: string, i: number) => void; full?: boolean;
 }): ReactElement {
-  const shown = full ? txs : txs.slice(0, 6);
+  // The compact table shows six rows and moves only when a lit row is outside them, so the rows a band carries come into view.
+  const [start, setStart] = useState(0);
+  const firstLit = txs.findIndex(t => lit.has(t.id));
+  const want = full || firstLit < 0 || (firstLit >= start && firstLit < start + COMPACT_ROWS) ? start
+    : Math.max(0, Math.min(firstLit, txs.length - COMPACT_ROWS));
+  if (want !== start) setStart(want);
+  const from = full ? 0 : Math.min(want, Math.max(0, txs.length - COMPACT_ROWS));
+  const shown = full ? txs : txs.slice(from, from + COMPACT_ROWS);
+  const hidden = full ? 0 : txs.filter((t, i) => lit.has(t.id) && (i < from || i >= from + COMPACT_ROWS)).length;
   return <div className={`mn-table${full ? ' full' : ''}`}>
     <table aria-label="The ledger, in date order">
       <thead><tr><th scope="col">Date</th><th scope="col">From → to</th><th scope="col" className="num">Amount{txs[0] ? ` · ${txs[0].currency}` : ''}</th><th scope="col">How sure</th><th scope="col">Source</th>
         {full && <th scope="col">Purpose</th>}</tr></thead>
       <tbody>{shown.map((t, i) => {
         const c = CERTAINTY[t.certainty];
-        return <tr key={t.id} className={`${lit === t.id ? 'lit' : ''}${flagged.has(t.id) ? ' flagged' : ''}${traced.has(t.id) ? ' traced' : ''}`} onMouseEnter={() => onLight(t.id, i)}
-          aria-current={lit === t.id ? 'true' : undefined}>
+        const on = lit.has(t.id);
+        return <tr key={t.id} className={`${on ? 'lit' : ''}${flagged.has(t.id) ? ' flagged' : ''}${traced.has(t.id) ? ' traced' : ''}`} onMouseEnter={() => onLight(t.id, from + i)}
+          aria-current={on ? 'true' : undefined}>
           <td>{day(t.dateTime ?? null)}</td><td>{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
           <td><span className={`mn-sure mn-sure-${t.certainty}`}><span aria-hidden="true">{c.mark}</span> {c.word}</span></td>
           <td>{t.locator ?? <span className="mn-muted">none attached</span>}</td>
@@ -323,12 +357,13 @@ function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
         </tr>;
       })}</tbody>
     </table>
-    {!full && txs.length > shown.length && <p className="mn-muted">{txs.length - shown.length} more rows · <kbd>J</kbd> / <kbd>K</kbd> moves the lit row, and the same band lights above</p>}
+    {!full && txs.length > shown.length && <p className="mn-muted">{txs.length - shown.length} more rows{from > 0 ? ` (${from} above)` : ''}
+      {hidden > 0 ? `, ${hidden} of them lit` : ''} · <kbd>J</kbd> / <kbd>K</kbd> moves the lit row, and the same band lights above</p>}
   </div>;
 }
 
 /** Payments on a time axis, height on a log scale (stated on the axis), the reporting line, and Red Flags' brackets. */
-function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[]; currency: string; lit: string | null; flags: RedFlagOut[]}): ReactElement | null {
+function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[]; currency: string; lit: Set<string>; flags: RedFlagOut[]}): ReactElement | null {
   const dated = txs.filter(t => t.dateTime);
   if (!dated.length) return null;
   const W = 420; const H = 150; const L = 8; const B = 20;
@@ -358,18 +393,26 @@ function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[
         return <g key={f.id} className="mn-bracket"><path d={`M${Math.min(...xs) - 4},${top + 8}V${top}H${Math.max(...xs) + 4}V${top + 8}`}/></g>;
       })}
       {dated.map(t => <rect key={t.id} x={x(time(t.dateTime!)) - 3} width={6} y={H - B - h(t.amount)} height={h(t.amount)}
-        className={`mn-bar mn-bar-${t.certainty}${lit === t.id ? ' lit' : ''}`}><title>{day(t.dateTime ?? null)} · {t.from} → {t.to} · {amountText(t.amount, currency)}</title></rect>)}
+        className={`mn-bar mn-bar-${t.certainty}${lit.has(t.id) ? ' lit' : ''}`}><title>{day(t.dateTime ?? null)} · {t.from} → {t.to} · {amountText(t.amount, currency)}</title></rect>)}
       {dated.filter(t => t.amount >= 10 * (line ?? 10000)).map(t => <text key={`v${t.id}`} x={x(time(t.dateTime!)) + 6} y={H - B - h(t.amount) + 8} className="mn-bar-value">{amountText(t.amount, currency)}</text>)}
     </svg>
     <p className="mn-muted mn-axis-note">bar height: amount, log scale (stated on the axis){flags.length ? '' : ` · no structuring flag on these ${currency} payments`}</p>
   </figure>;
 }
 
-function ChecksPanel({investigationId, currency, checks, ranAt, error}: {
-  investigationId: string; currency: string; checks: CurrencyMoneyChecksOut | undefined; ranAt: string | undefined; error: string;
+function ChecksPanel({investigationId, currency, checks, ranAt, asOf, error}: {
+  investigationId: string; currency: string; checks: CurrencyMoneyChecksOut | undefined; ranAt: string | undefined; asOf: number | null; error: string;
 }): ReactElement {
   const queryClient = useQueryClient();
-  const lead = useMutation({...createLeadEndpointMutation(), onSuccess: () => queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path: {investigation_id: investigationId}})})});
+  const path = {investigation_id: investigationId};
+  const lead = useMutation({...createLeadEndpointMutation(), onSuccess: () => queryClient.invalidateQueries({queryKey: listLeadsQueryKey({path})})});
+  // Kept in To check once (POST .../checks/money); the reply is To check's own list, so that panel shows it at once.
+  const keep = useMutation({...keepMoneyCheckMutation(), onSuccess: data => {
+    queryClient.setQueryData(getChecksQueryKey({path}), data);
+    void queryClient.invalidateQueries({queryKey: getInvestigationMoneyChecksQueryKey({path})});
+  }});
+  const [kept, setKept] = useState<Record<string, boolean>>({});
+  const [keepProblem, setKeepProblem] = useState('');
   const [made, setMade] = useState<Record<string, boolean>>({});
   const [more, setMore] = useState(false);
   const [how, setHow] = useState(false);
@@ -385,6 +428,12 @@ function ChecksPanel({investigationId, currency, checks, ranAt, error}: {
       : c.kind === 'miracle' ? `Pays ${amountText(c.amount_out, currency)}. Nothing is recorded coming in.`
       : `Receives ${amountText(c.amount_in, currency)}. Nothing is recorded leaving.`;
     const title = `${k.word}: ${c.party}`;
+    const inToCheck = Boolean(c.to_check_id) || kept[key];
+    const addToCheck = () => keep.mutate({path, body: {currency, kind: c.kind, party_id: c.party_id, as_of: asOf,
+      returning_payment_id: c.kind === 'round_trip' ? c.returning_payment_id : null}}, {
+      onSuccess: () => { setKept(m => ({...m, [key]: true})); setKeepProblem(''); },
+      onError: e => setKeepProblem(errorMessage(e, 'Could not add it to To check')),
+    });
     return <article key={key} className={`mn-check mn-check-${c.kind}`} aria-label={title}>
       <header><span className="mn-check-icon" aria-hidden="true">{k.icon}</span><span><small>{k.word} · {k.line}</small><b>{c.party}</b></span></header>
       <p>{numbers}</p>
@@ -392,7 +441,7 @@ function ChecksPanel({investigationId, currency, checks, ranAt, error}: {
       <div className="mn-check-acts">
         <button type="button" disabled={made[key] || lead.isPending} onClick={() => makeLead(key, `${title} (${currency})`, `${numbers} Could be innocent: ${c.innocent}. Lead idea: ${c.lead_idea}.`)}>
           {made[key] ? 'Lead made ✓' : 'Make a lead'}</button>
-        <button type="button" disabled title="Not built yet: To check holds an indicator's own questions; a check here cannot be added to it yet">Add to To check</button>
+        <button type="button" disabled={inToCheck || keep.isPending} onClick={addToCheck}>{inToCheck ? 'In To check ✓' : 'Add to To check'}</button>
       </div>
       <p className="mn-idea">Lead idea: {c.lead_idea} →</p>
     </article>;
@@ -402,6 +451,7 @@ function ChecksPanel({investigationId, currency, checks, ranAt, error}: {
     <h3>Where money appears or vanishes</h3>
     <p className="mn-muted">Worked out by the app <i>ƒ</i> from the {currencyName(currency).toLowerCase()} ledger only. Each one is a question to chase, not a finding.</p>
     {error && <p className="mn-muted">{error}</p>}
+    {keepProblem && <p className="mn-muted" role="alert">{keepProblem}</p>}
     {!checks && !error && <p className="mn-muted">Running the checks…</p>}
     {checks && <>
       {shown.map((c, i) => card(c, `${c.kind}:${c.party_id}:${i}`))}

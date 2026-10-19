@@ -152,7 +152,7 @@ def _with_parties(question: str, ids: list[str], names: dict[str, tuple[str, str
 
 
 def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
-    from app.patterns.checks import as_question
+    from app.patterns.checks import MONEY_KINDS, as_question
     from app.patterns.engine import _name
 
     rows = list(db.scalars(select(CheckItem).where(CheckItem.investigation_id == inv, CheckItem.status == "open",
@@ -166,8 +166,10 @@ def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
     for r in rows:
         flag = flags.get(r.flag_id) if r.flag_id else None
         level = flag.level if flag else None
-        indicator = _name(r.indicator_id)
-        reason = f"From the {level.capitalize()} Red Flag {indicator}" if level else f"Asked by the indicator {indicator}"
+        money = r.kind == "money"  # a money check a person kept from See › Money
+        indicator = MONEY_KINDS.get(r.indicator_id, (r.indicator_id, ""))[0] if money else _name(r.indicator_id)
+        reason = ("Kept from the money checks" if money else
+                  f"From the {level.capitalize()} Red Flag {indicator}" if level else f"Asked by the indicator {indicator}")
         evidence = None
         if r.document_id:
             evidence = {"document_id": r.document_id, "filename": docs.get(r.document_id, r.document_id), "locator": r.locator,
@@ -175,13 +177,13 @@ def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
         path = f"/api/checks/{r.id}/decide"
         out.append({
             "kind": "to_check", "id": r.id, "question": _with_parties(as_question(r.question), list(r.parties), names) if r.kind == "checklist" else r.question,
-            "actor": "Red Flags", "actor_kind": "app",
+            "actor": "Money checks" if money else "Red Flags", "actor_kind": "app",
             "created_at": r.first_seen_at, "rank": 100 * LEVEL_RANK.get(level or "", 0) + (20 if r.kind == "passage" else 10),
             "reason": reason, "level": level,
             "group": {"key": f"doc:{r.document_id}" if r.document_id else f"flag:{r.flag_id or r.indicator_id}",
                       "label": docs.get(r.document_id, "") if r.document_id else indicator},
             "evidence": evidence, "parties": _parties(list(r.parties), names),
-            "proposal": f"{indicator}: {'a passage that may show it' if r.kind == 'passage' else 'a part the records cannot show'}",
+            "proposal": f"{indicator}: {'a passage that may show it' if r.kind == 'passage' else r.excerpt or '' if money else 'a part the records cannot show'}",
             "consequences": [f"Your answer is kept on the Red Flag {indicator} as what a person found; the flag's level comes from the records and does not change."
                              if flag else "Your answer is kept with this item."],
             "choices": [_choice("yes", "Shows it", path, {"status": "shows"}), _choice("no", "Does not", path, {"status": "does_not"}),
