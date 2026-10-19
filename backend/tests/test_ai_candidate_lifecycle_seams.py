@@ -88,7 +88,9 @@ def test_restore_order_covers_every_investigation_owned_table():
                     # The diagrams, timelines and lists made there (Wave C): made again from the restored records.
                     "openaleph_entity_sets",
                     # A person's watches on a claim or a Red Flag: theirs, not the case's.
-                    "fact_watches"}
+                    "fact_watches",
+                    # What this server sent outside (Settings › Outside lookups, Sent this week): its own log.
+                    "outbound_requests"}
     missing = owned - set(RESTORE_ORDER) - non_portable
     assert not missing, f"investigation-owned tables absent from RESTORE_ORDER: {sorted(missing)}"
     assert "ai_analysis_candidates" in RESTORE_ORDER

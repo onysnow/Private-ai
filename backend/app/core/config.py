@@ -58,6 +58,14 @@ class Settings(BaseSettings):
     firecrawl_search_limit: int = 20
     document_storage_dir: str = "./data/documents"
     connector_credentials_file: str = "./data/secrets/connectors.json"
+    # Notifications outside the app (docs/project-notes/PLATFORM_NEEDS_PLAN.md, part 5). The server's mail account as
+    # an Apprise mailtos:// URL (TLS only), e.g. mailtos://user:password@smtp.example.org?from=workbench@example.org;
+    # empty: no email. Each reporter adds only their own address in Settings.
+    notify_mail_url: str = ""
+    # Web Push (VAPID): the contact the push services see, a mailto: or https: address; empty: no Web Push.
+    notify_push_subject: str = ""
+    # Where the Web Push signing key is kept (made on first use, readable by this server's user only).
+    notify_secrets_file: str = "./data/secrets/notifications.json"
     max_document_bytes: int = 50 * 1024 * 1024
     enable_pdf_ocr: bool = True
     pdf_ocr_language: str = "eng"

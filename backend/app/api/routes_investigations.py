@@ -87,6 +87,7 @@ from app.services.assistant_context import build_question_context
 from app.services.demo_seed import seed_demo_investigation
 from app.services.exports import build_investigation_export, record_backup
 from app.services.financial_flows import investigation_financial_ledger
+from app.services.run_plan import build_run_plan, get_profile as get_run_profile, save_profile as save_run_profile
 from app.services.investigations import (
     create_investigation as _create_investigation,
 )

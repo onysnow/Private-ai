@@ -14,8 +14,13 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {NotificationPrefsOut} from '../../lib/generated/types.gen';
 
+import {OutsideChannels} from './outside-channels';
+
 type Route = 'interrupt' | 'needs' | 'else' | 'off';
 const ROUTE_WORDS: Record<Route, string> = {interrupt: 'Interrupt', needs: 'Needs you', else: 'Everything else', off: 'Off'};
+const BACKUP_DAYS: {days: 7 | 14 | 30 | 0; words: string}[] = [
+  {days: 7, words: 'A week'}, {days: 14, words: 'Two weeks'}, {days: 30, words: 'A month'}, {days: 0, words: 'Never'},
+];
 const BINS: {route: Route; words: string}[] = [
   {route: 'interrupt', words: 'would have interrupted you'}, {route: 'needs', words: 'in Needs you'},
   {route: 'else', words: 'in Everything else'}, {route: 'off', words: 'not shown'},
@@ -40,7 +45,7 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
     onMutate: async ({body}) => {
       const key = getNotificationPrefsQueryKey();
       const before = queryClient.getQueryData<NotificationPrefsOut>(key);
-      if (before) queryClient.setQueryData<NotificationPrefsOut>(key, {...before, ...body, routes: {...before.routes, ...body.routes}});
+      if (before) queryClient.setQueryData<NotificationPrefsOut>(key, {...before, ...body, routes: {...before.routes, ...body.routes}, backup_days: body.backup_days ?? before.backup_days});
       return {before};
     },
     onError: (error, _v, ctx) => {
@@ -59,8 +64,9 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
   if (prefs.isPending) return <p className="st-wait">Reading your notifications…</p>;
   if (prefs.isError) return <p className="st-problem" role="alert">{errorMessage(prefs.error, 'Could not read your notifications.')}</p>;
   const p = prefs.data;
-  const put = (change: Partial<{routes: Record<string, Route>; quiet_while_reading: boolean; desktop: boolean}>) =>
-    save.mutate({body: {routes: change.routes ?? {}, quiet_while_reading: change.quiet_while_reading ?? p.quiet_while_reading, desktop: change.desktop ?? p.desktop}});
+  const put = (change: Partial<{routes: Record<string, Route>; quiet_while_reading: boolean; desktop: boolean; backup_days: 7 | 14 | 30 | 0}>) =>
+    save.mutate({body: {routes: change.routes ?? {}, quiet_while_reading: change.quiet_while_reading ?? p.quiet_while_reading, desktop: change.desktop ?? p.desktop,
+      ...(change.backup_days !== undefined ? {backup_days: change.backup_days} : {})}});
   const week = inbox.data?.week;
   const bins = Object.fromEntries(BINS.map(b => [b.route, 0])) as Record<Route, number>;
   if (week) for (const k of p.kinds) bins[(p.routes[k.key] ?? k.default) as Route] += week[k.key] ?? 0;
@@ -103,8 +109,16 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
             if (on) { const why = await allowDesktop(); if (why) { setProblem(why); return; } }
             put({desktop: on});
           }}/><i aria-hidden="true"/></label>
-        <p className="st-hint">Email and phone are not in the app: they would need a mail or push service, and what changed would leave this computer.</p>
+        <div className="st-route">
+          <span className="st-route-what"><b>Remind me to back up</b><small>When a case has new material and no full backup for this long. Only a backup with the files counts.</small></span>
+          <span className="ap-seg" role="radiogroup" aria-label="Remind me to back up">
+            {BACKUP_DAYS.map(b => <button key={b.days} type="button" role="radio" aria-checked={p.backup_days === b.days} className={p.backup_days === b.days ? 'on' : ''}
+              onClick={() => p.backup_days !== b.days && put({backup_days: b.days})}>{b.words}</button>)}
+          </span>
+        </div>
       </section>
+
+      <OutsideChannels prefs={p}/>
 
       <section className="ap-pane" aria-labelledby="nt-watch">
         <div className="ap-pane-head"><h2 id="nt-watch">Watches on facts</h2><span>told when a fact changes</span></div>

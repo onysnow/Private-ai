@@ -463,13 +463,16 @@ def outside_lookup_job(db: Session, job: BackgroundJob, report: Report) -> dict:
 
     from app.models.domain import Entity
     from app.services.connectors import automatic_lookups_due, enrich_entity
-    from app.services.preferences import provider_label
+    from app.services.preferences import lookup_mode, provider_label
 
     entity = db.get(Entity, str(job.subject_id))
     if entity is None:
         return {"message": "The party is no longer in the case"}
     found, failed = 0, []
-    due = automatic_lookups_due(db, entity)
+    # A re-check after a source updated its data (app/services/source_freshness.py) names its sources; while the
+    # case still allows Automatic for them.
+    recheck = [p for p in (job.payload or {}).get("recheck") or [] if lookup_mode(db, entity.investigation_id, p) == "automatic"]
+    due = recheck or automatic_lookups_due(db, entity)
     for n, provider in enumerate(due):
         report(int(100 * n / max(1, len(due))), f"Looking {entity.caption} up in {provider_label(provider)}")
         try:
