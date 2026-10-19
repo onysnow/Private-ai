@@ -284,7 +284,11 @@ def test_the_corpus_is_searched_with_highlights_and_similar_documents_are_found(
     minutes = _upload(live, inv, "minutes.pdf", _pdf(
         "Board minutes of Kestrelwood Holdings Limited.",
         "Page two: Jonathan Whitaker approved the Zanzibar transfer to Meridian Holdings Ltd."), "application/pdf")
-    other = _upload(live, inv, "note.txt", b"Meridian Holdings Ltd paid Angela Merkel and Jane Doe again.", "text/plain")
+    other = _upload(
+        live, inv, "note.txt",
+        (MEMO + "\n\nThe transfer involved Meridian Holdings Ltd, Angela Merkel, and Jane Doe.").encode(),
+        "text/plain",
+    )
 
     found = client.get(f"/api/investigations/{inv}/corpus/search", params={"q": "Zanzibar"}).json()
     assert found["state"] == "ok", found
