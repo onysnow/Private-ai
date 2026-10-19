@@ -154,11 +154,19 @@ def _suite_verdict(module: SuiteModule, item: dict) -> tuple[str, str]:
     """The verdict and status one part of a suite answer shows in the run record, read from the record's own values;
     a support system's part is never good or bad, since it judges nothing (AGENTS.md [AG-067])."""
     if module.system == "las":
-        verdicts = [str(line.get("validity_verdict") or line.get("inferential_type") or "") for line in item.get("argument_lines") or []
-                    if isinstance(line, dict)]
-        if item.get("formal_fallacy") or "INVALID" in verdicts:
+        # Only a deductive line judged VALID holds if its premises are true; an inductive or abductive line carries a
+        # strength, which the record shows as the model gave it, never as a verdict it did not give.
+        lines = [line for line in item.get("argument_lines") or [] if isinstance(line, dict)]
+        if item.get("formal_fallacy") or any(line.get("validity_verdict") == "INVALID" for line in lines):
             return "INVALID", "bad"
-        return ("VALID", "good") if verdicts and all(v == "VALID" for v in verdicts) else ("HOLDS_IF_PREMISES_TRUE", "partial")
+        if not lines:
+            return "NO_LINES", "neutral"
+        if all(line.get("validity_verdict") == "VALID" for line in lines):
+            return "VALID", "good"
+        if any(line.get("validity_verdict") == "NOT_CLEANLY_FORMALIZABLE" for line in lines):
+            return "NOT_CLEANLY_FORMALIZABLE", "neutral"
+        kinds = sorted({str(line.get("inferential_type") or "") for line in lines if line.get("inferential_type") != "DEDUCTIVE"})
+        return ("_".join(k for k in kinds if k) or "NOT_DEDUCTIVE"), "partial"
     if module.system == "ras":
         return str(item.get("corroboration_verdict") or "UNKNOWN"), "good" if item.get("corroboration_verdict") == "CORROBORATED" else "partial"
     field = {"evidence_plan": "route", "ehs_harm_minimisation": "decision", "das_options": "option_type",
