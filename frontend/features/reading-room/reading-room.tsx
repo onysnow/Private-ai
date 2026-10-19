@@ -437,7 +437,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     const {chunk, start, end, quote} = picked;
     try {
       if (what === 'evidence' || what === 'claim') {
-        const ev = (await createEvidenceEndpoint({body: {source_id: doc.source_id, quote, locator: chunk.locator, document_id: doc.id}, throwOnError: true})).data;
+        const ev = (await createEvidenceEndpoint({body: {source_id: doc.source_id, quote, locator: chunk.locator, ...(isPicture(doc) ? {document_id: doc.id} : {})}, throwOnError: true})).data;
         setClips(cs => [clipOf(chunk, start, end, quote, doc.sha256, ev.id), ...cs]);
         window.dispatchEvent(new Event(SHUTTER_EVENT));
         if (what === 'claim') {
@@ -620,6 +620,11 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
 }
 
 /** The reading room, open while a document is asked for (the workbench store's document). */
+// The backend takes document_id on evidence only for an uploaded picture (it also
+// stores the picture's date). For text the source and the locator already say where
+// the words are, so sending the id made "Keep as evidence" fail with a 400.
+const isPicture = (doc: {mime_type?: string | null}) => (doc.mime_type ?? '').toLowerCase().startsWith('image/');
+
 export function ReadingRoom({investigationId}: {investigationId: string}): ReactElement | null {
   const request = useWorkbenchStore(state => state.document);
   const close = useWorkbenchStore(state => state.closeDocument);
