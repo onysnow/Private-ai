@@ -22,14 +22,20 @@ def _refused(error: str | None) -> bool:
 
 
 def _what_was_sent(db: Session, runs: list[ConnectorRun]) -> dict[str, str]:
-    refs = {r.query[7:] for r in runs if r.query.startswith("entity:")}
-    names: dict[str, str] = {}
+    """A party lookup is shown by the party's name in the run's own case: the same FtM id can stand for a
+    different party in another case, whose name this caller may not be allowed to see."""
+    party_runs = [r for r in runs if r.query.startswith("entity:")]
+    refs = {r.query[7:] for r in party_runs}
+    cases = {r.investigation_id for r in party_runs}
+    names: dict[tuple[str, str], str] = {}
     if refs:
-        for ftm_id, entity_id, caption in db.execute(select(Entity.ftm_id, Entity.id, Entity.caption)
-                                                     .where((Entity.ftm_id.in_(refs)) | (Entity.id.in_(refs)))):
-            names[ftm_id or entity_id] = caption
-            names[entity_id] = caption
-    return {r.id: (names.get(r.query[7:], "a party") if r.query.startswith("entity:") else r.query) for r in runs}
+        for inv, ftm_id, entity_id, caption in db.execute(
+                select(Entity.investigation_id, Entity.ftm_id, Entity.id, Entity.caption)
+                .where(Entity.investigation_id.in_(cases), (Entity.ftm_id.in_(refs)) | (Entity.id.in_(refs)))):
+            names[(inv, ftm_id or entity_id)] = caption
+            names[(inv, entity_id)] = caption
+    return {r.id: (names.get((r.investigation_id, r.query[7:]), "a party") if r.query.startswith("entity:") else r.query)
+            for r in runs}
 
 
 def _run_out(r: ConnectorRun, sent: str, case: str | None) -> dict[str, Any]:

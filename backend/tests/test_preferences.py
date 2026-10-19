@@ -234,3 +234,22 @@ def test_a_cases_own_lookups_travel_in_its_backup(probe):
     _, records = inspect_export(package)
     rows = records["app_preferences"]
     assert [(r["scope"], r["key"], r["value"], r["reason"]) for r in rows] == [("case", "lookups", {"modes": {"probe": "off"}}, "source protection")]
+
+
+def test_a_party_lookup_shows_the_name_from_its_own_case_only():
+    """The same FtM id can be a different party in another case: a run shows only its own case's name for it."""
+    from app.models.domain import ConnectorRun, Entity
+    from app.services.connector_activity import _what_was_sent
+
+    mine, other = _case("Mine"), _case("Someone else's")
+    with SessionLocal() as db:
+        db.add_all([Entity(investigation_id=mine, ftm_id="shared-id", schema="Company", caption="Fernhill Ltd", properties={}),
+                    Entity(investigation_id=other, ftm_id="shared-id", schema="Person", caption="A private name", properties={})])
+        run = ConnectorRun(investigation_id=mine, provider="probe", query="entity:shared-id", status="succeeded")
+        db.add(run)
+        db.commit()
+        assert _what_was_sent(db, [run]) == {run.id: "Fernhill Ltd"}
+        lone = ConnectorRun(investigation_id=mine, provider="probe", query="entity:only-elsewhere", status="succeeded")
+        db.add_all([lone, Entity(investigation_id=other, ftm_id="only-elsewhere", schema="Person", caption="Hidden", properties={})])
+        db.commit()
+        assert _what_was_sent(db, [lone]) == {lone.id: "a party"}

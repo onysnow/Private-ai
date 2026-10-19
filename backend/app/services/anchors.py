@@ -55,8 +55,12 @@ def anchor_document_quotes(db: Session, document: Document, *, only_missing: boo
         if (only_missing and evidence.anchor) or evidence_document_id(db, evidence) != document.id:
             continue
         old = evidence.anchor or {}
+        # The stored place first (same passage, same characters), then the text either side, then anywhere: a
+        # document read again unchanged keeps each quote where it was, even when the words appear twice.
+        held = (f"{old['locator']}@chars:{old['start']}-{old['end']}"
+                if old.get("locator") and isinstance(old.get("start"), int) and isinstance(old.get("end"), int) else None)
         found = find_anchor(chunks, evidence.quote, prefix=old.get("prefix") or "", suffix=old.get("suffix") or "",
-                            locator=None if old else evidence.locator)
+                            locator=held or evidence.locator)
         now = utcnow_naive().isoformat()
         # A quote the new reading no longer holds keeps its old place, marked lost, so it can be checked by a person.
         evidence.anchor = ({**found, "document_id": document.id, "anchored_at": now} if found

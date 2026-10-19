@@ -38,6 +38,12 @@ def _child_measure(path: str, pages: list[int]) -> tuple[dict[int, float | None]
     return measure_pdf_pages(path, pages, settings.pdf_ocr_language, settings.pdf_ocr_dpi)
 
 
+def _child_scanned(path: str) -> list[int]:
+    from app.services.legibility import scanned_pages as find
+
+    return find(path, settings.pdf_ocr_min_native_chars)
+
+
 def _executor() -> ProcessPoolExecutor:
     global _pool
     with _lock:
@@ -74,6 +80,17 @@ def measure_legibility(path: str, pages: list[int]) -> tuple[dict[int, float | N
     except BrokenProcessPool as exc:
         shutdown()
         raise RuntimeError("The document reader stopped unexpectedly while measuring legibility") from exc
+
+
+def scanned_pages(path: str) -> list[int]:
+    """The pages of a file with no text layer of their own (app/services/legibility.py), in a reader process unless disabled."""
+    if not settings.document_read_in_subprocess:
+        return _child_scanned(path)
+    try:
+        return _executor().submit(_child_scanned, path).result()
+    except BrokenProcessPool as exc:
+        shutdown()
+        raise RuntimeError("The document reader stopped unexpectedly while looking for scanned pages") from exc
 
 
 def shutdown() -> None:

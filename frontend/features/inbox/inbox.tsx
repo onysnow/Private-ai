@@ -28,13 +28,25 @@ function readSnoozed(): Record<string, number> {
 }
 
 /** Rows snoozed on this computer, and a way to snooze one more. */
+const SNOOZE_EVENT = 'pai:snoozed';
+
+/** Snoozes on this computer, shared by every place that reads them (the inbox, the bell, the interrupt notice):
+ * a snooze in one is seen by the others at once, and by other tabs through the storage event. */
 export function useSnoozed(): [Record<string, number>, (id: string, ms: number) => void] {
   const [snoozed, setSnoozed] = useState<Record<string, number>>({});
-  useEffect(() => { setSnoozed(readSnoozed()); }, []);
+  useEffect(() => {
+    const read = () => setSnoozed(readSnoozed());
+    read();
+    const onStorage = (e: StorageEvent) => { if (e.key === SNOOZE_KEY) read(); };
+    window.addEventListener(SNOOZE_EVENT, read);
+    window.addEventListener('storage', onStorage);
+    return () => { window.removeEventListener(SNOOZE_EVENT, read); window.removeEventListener('storage', onStorage); };
+  }, []);
   const snooze = useCallback((id: string, ms: number) => {
     const next = {...readSnoozed(), [id]: Date.now() + ms};
     try { window.localStorage.setItem(SNOOZE_KEY, JSON.stringify(next)); } catch { /* private window */ }
     setSnoozed(next);
+    window.dispatchEvent(new Event(SNOOZE_EVENT));
   }, []);
   return [snoozed, snooze];
 }

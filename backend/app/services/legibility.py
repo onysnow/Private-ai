@@ -46,6 +46,29 @@ def mean_word_confidence(tsv: str) -> float | None:
     return round(sum(confs) / len(confs), 1) if confs else None
 
 
+def scanned_pages(path: str, min_native_chars: int = 20) -> list[int]:
+    """The pages that are pictures of text: every page of a picture file, and each PDF page whose own text is too
+    short to be its content or is only a stamp over a scan (the same test the Workbench's reader uses to decide
+    on OCR, app/services/pdf_ocr.py). Other files have none."""
+    import fitz
+
+    from app.services.image_reader import IMAGE_EXTENSIONS
+    from app.services.pdf_ocr import _clean, _scan_with_stamp, strip_page_furniture
+
+    suffix = Path(path).suffix.lower()
+    if suffix in IMAGE_EXTENSIONS:
+        return [1]
+    if suffix != ".pdf":
+        return []
+    out: list[int] = []
+    with fitz.open(path) as doc:
+        for number, page in enumerate(doc, 1):
+            native = _clean(strip_page_furniture(page.get_text("text") or "", number))
+            if len(native) < min_native_chars or _scan_with_stamp(page, native):
+                out.append(number)
+    return out
+
+
 def measure_pdf_pages(path: str, pages: list[int], language: str, dpi: int) -> tuple[dict[int, float | None], str | None]:
     """Each page's legibility, and why none could be measured (None when measuring ran)."""
     import fitz

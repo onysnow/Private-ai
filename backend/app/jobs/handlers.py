@@ -256,6 +256,8 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner)
             if local_text and message:
                 message = f"{message}; OpenAleph found no text, so the text is the Workbench's own reading"
+            # OpenAleph may have read a scan by OCR too: its pages are measured the same way.
+            message = _measure_legibility(db, document_id, report, message or "Document read")
             return _check_watchlist_after_read(db, document_id, message)
 
     report(5, "Reading the document")
@@ -294,19 +296,25 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
 
 
 def _measure_legibility(db: Session, document_id: str, report: Report, message: str) -> str:
-    """After the read, how legible each page read by OCR was (app/services/legibility.py). The document is
-    already read and in use; measuring never fails the read, and a stop asked for here stops only the measuring."""
+    """After the read, how legible each scanned page was (app/services/legibility.py): pages the Workbench read by
+    OCR, and pages with no text layer of their own, whichever reader read them (OpenAleph does not say which pages
+    it read by OCR). The document is already read and in use; measuring never fails the read, and a stop asked
+    for here stops only the measuring."""
     from sqlalchemy import select
 
     from app.jobs.records import JobStopped
     from app.models.domain import Document, DocumentChunk
-    from app.services.document_reader import measure_legibility
+    from app.services.document_reader import measure_legibility, scanned_pages
 
     doc = db.get(Document, document_id)
     if doc is None or not settings.enable_pdf_ocr:
         return message
-    scanned = [c for c in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id, DocumentChunk.locator.contains("(OCR)")))
-               if c.ocr_legibility is None]
+    chunks = [c for c in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id)) if c.ocr_legibility is None]
+    try:
+        no_text_layer = set(scanned_pages(doc.storage_path))
+    except Exception:  # a file the page check cannot open: only what the reader marked as OCR is measured
+        no_text_layer = set()
+    scanned = [c for c in chunks if "(OCR)" in (c.locator or "") or (c.page_number or 1) in no_text_layer]
     pages = sorted({c.page_number or 1 for c in scanned})
     if not pages:
         return message

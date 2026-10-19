@@ -166,4 +166,54 @@ describe('The top-band notice', () => {
     zone.remove();
     expect(await screen.findByRole('alert', {}, {timeout: 3000})).toHaveTextContent('round trip');
   });
+
+  it('is not held by a calm zone kept mounted behind a hidden wrapper', async () => {
+    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+    const wrap = document.createElement('div');
+    wrap.hidden = true;
+    const zone = document.createElement('div');
+    zone.setAttribute('data-calm-zone', '');
+    wrap.appendChild(zone);
+    document.body.appendChild(wrap);
+    render(<QueryProvider><InterruptNotice/></QueryProvider>);
+    expect(await screen.findByRole('alert')).toHaveTextContent('round trip');
+    wrap.remove();
+  });
+
+  it('drops the notice when another case is opened', async () => {
+    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]}),
+      'GET /api/investigations/inv-2/inbox': inbox({investigation_id: 'inv-2'})});
+    render(<QueryProvider><InterruptNotice/></QueryProvider>);
+    expect(await screen.findByRole('alert')).toHaveTextContent('round trip');
+    act(() => { useWorkbenchStore.setState({investigationId: 'inv-2'}); });
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('hears a snooze made in another part of the app', async () => {
+    const {useSnoozed} = await import('../features/inbox/inbox');
+    let snooze: (id: string, ms: number) => void = () => undefined;
+    function Snoozer(): null { snooze = useSnoozed()[1]; return null; }
+    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+    const zone = document.createElement('div');
+    zone.setAttribute('data-calm-zone', '');
+    document.body.appendChild(zone);
+    render(<QueryProvider><Snoozer/><InterruptNotice/></QueryProvider>);
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+    act(() => { snooze('f:f1', 60_000); });
+    zone.remove();
+    await act(async () => { await new Promise(r => setTimeout(r, 2500)); });
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('(control) without the snooze the same notice does show', async () => {
+    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+    const zone = document.createElement('div');
+    zone.setAttribute('data-calm-zone', '');
+    document.body.appendChild(zone);
+    render(<QueryProvider><InterruptNotice/></QueryProvider>);
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+    zone.remove();
+    await act(async () => { await new Promise(r => setTimeout(r, 2500)); });
+    expect(screen.queryByRole('alert')).not.toBeNull();
+  });
 });

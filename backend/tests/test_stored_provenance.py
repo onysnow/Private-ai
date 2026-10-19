@@ -376,3 +376,70 @@ def test_a_viewer_can_download_a_backup_and_it_is_not_recorded(tmp_path):
         data, manifest = build_investigation_export(db, inv, include_documents=True)
         record_backup(db, inv, data, manifest)
         assert db.get(Investigation, inv).last_backup is None
+
+
+def test_a_reread_keeps_each_quote_where_it_was_even_when_the_words_appear_twice(tmp_path):
+    from app.services.anchors import anchor_document_quotes
+
+    same = "Signed by the director on behalf of the company.\n"
+    inv = ok(client.post("/api/investigations", json={"name": "Twice"}))["id"]
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Minutes", source_type="document")
+        db.add(src)
+        db.flush()
+        doc = Document(investigation_id=inv, source_id=src.id, filename="m.pdf", sha256="x", storage_path=str(tmp_path / "m.pdf"),
+                       extraction_status="complete")
+        db.add(doc)
+        db.flush()
+        db.add_all([DocumentChunk(document_id=doc.id, locator="page 1", page_number=1, ordinal=1, text=same),
+                    DocumentChunk(document_id=doc.id, locator="page 2", page_number=2, ordinal=2, text=same)])
+        db.commit()
+        doc_id, src_id = doc.id, src.id
+    ev = ok(client.post("/api/evidence", json={"source_id": src_id, "quote": "Signed by the director", "locator": "page 2@chars:0-22"}))
+    with SessionLocal() as db:
+        assert db.get(Evidence, ev["id"]).anchor["locator"] == "page 2"
+        # Read again: same text, new passages.
+        db.query(DocumentChunk).filter(DocumentChunk.document_id == doc_id).delete()
+        db.add_all([DocumentChunk(document_id=doc_id, locator="page 1", page_number=1, ordinal=1, text=same),
+                    DocumentChunk(document_id=doc_id, locator="page 2", page_number=2, ordinal=2, text=same)])
+        db.flush()
+        anchor_document_quotes(db, db.get(Document, doc_id))
+        db.commit()
+        assert db.get(Evidence, ev["id"]).anchor["locator"] == "page 2"
+
+
+def test_scanned_pages_are_the_ones_with_no_text_layer(tmp_path):
+    import fitz
+
+    from app.services.legibility import scanned_pages
+
+    doc = fitz.open()
+    doc.new_page().insert_text((72, 72), "A page with a real text layer, long enough to count as content.", fontsize=11)
+    picture = fitz.open()
+    p = picture.new_page()
+    p.insert_text((72, 72), "Words in a picture", fontsize=24)
+    scan = doc.new_page()
+    scan.insert_image(scan.rect, pixmap=p.get_pixmap(dpi=100))
+    path = tmp_path / "mixed.pdf"
+    doc.save(path)
+    assert scanned_pages(str(path)) == [2]
+    png = tmp_path / "photo.png"
+    png.write_bytes(p.get_pixmap(dpi=50).tobytes("png"))
+    assert scanned_pages(str(png)) == [1]
+    txt = tmp_path / "note.txt"
+    txt.write_text("text")
+    assert scanned_pages(str(txt)) == []
+
+
+def test_a_page_openaleph_read_is_measured_when_it_has_no_text_layer(tmp_path, monkeypatch):
+    from app.jobs import handlers
+    from app.services import document_reader
+
+    _inv, _src, doc_id = _case_with_page(tmp_path, locator="page 3")   # as OpenAleph names it: no "(OCR)"
+    monkeypatch.setattr(document_reader, "scanned_pages", lambda path: [3])
+    monkeypatch.setattr(document_reader, "measure_legibility", lambda path, pages: ({pages[0]: 88.0}, None))
+    with SessionLocal() as db:
+        message = handlers._measure_legibility(db, doc_id, lambda *_: None, "Read by OpenAleph (4 page(s))")
+    assert message.endswith("legibility measured on 1 of 1 scanned page")
+    with SessionLocal() as db:
+        assert db.query(DocumentChunk).filter(DocumentChunk.document_id == doc_id).one().ocr_legibility == 88.0

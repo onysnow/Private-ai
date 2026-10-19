@@ -163,7 +163,10 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             read_when = job.finished_at if job and job.finished_at else None
             how = READ_METHOD.get(method or "", "read")
             page = chunk.page_number if chunk else None
-            legible = chunk.ocr_legibility if chunk is not None and method == "ocr" else None
+            # Measured only on pages with no text layer, so a figure means the page was read by OCR, by whichever reader.
+            legible = chunk.ocr_legibility if chunk is not None else None
+            if legible is not None:
+                method, how = "ocr", READ_METHOD["ocr"]
             cards.append({"id": f"read:{ev.id}", "kind": "reading", "title": f"Page {page} of {pages}" if page and pages else f"{pages or 'No'} pages read",
                           "lines": [(f"read by {how}" if method else "how it was read is not recorded")
                                     + (f" · {legible:.0f}% legible" if legible is not None else "")],

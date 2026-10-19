@@ -24,7 +24,9 @@ function markShown(keys: string[]): void {
   try { window.localStorage.setItem(SHOWN_KEY, JSON.stringify([...new Set([...readShown(), ...keys])].slice(-500))); } catch { /* private window */ }
 }
 
-const inCalmZone = (): boolean => typeof document !== 'undefined' && Boolean(document.querySelector('[data-calm-zone]'));
+// Only a calm zone on screen holds the notice: a screen kept mounted behind a hidden wrapper (Decide after you leave it) does not.
+const inCalmZone = (): boolean => typeof document !== 'undefined'
+  && [...document.querySelectorAll('[data-calm-zone]')].some(el => !el.closest('[hidden], [aria-hidden="true"], [inert]'));
 
 function tellTheComputer(rows: InboxRowOut[]): void {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted' || !document.hidden) return;
@@ -37,7 +39,10 @@ export function InterruptNotice(): ReactElement | null {
   const inv = useWorkbenchStore(state => state.investigationId);
   const {data} = useInbox();
   const [snoozed] = useSnoozed();
-  const [showing, setShowing] = useState<InboxRowOut[]>([]);
+  // The rows on show belong to the case they were raised in; switching case drops them.
+  const [shownFor, setShownFor] = useState<{inv: string; rows: InboxRowOut[]}>({inv: '', rows: []});
+  const showing = shownFor.inv === inv ? shownFor.rows : [];
+  const setShowing = (rows: InboxRowOut[]) => setShownFor({inv, rows});
   const [calm, setCalm] = useState(false);
   const waiting = (data?.interrupt ?? []).filter(r => !snoozed[r.key]);
   const pendingKeys = waiting.map(r => r.key).join(' ');
