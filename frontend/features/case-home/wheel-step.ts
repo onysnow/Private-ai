@@ -7,6 +7,10 @@ import type {WheelEvent} from 'react';
 
 const DWELL_MS = 220;
 const NOTCH = 60;
+// A wheel reports its distance in pixels, lines or pages (event.deltaMode); a mouse set to lines or a page-mode
+// device would otherwise need a hundred turns to reach one notch.
+const LINE_PX = 16;
+const PAGE_PX = 800;
 
 export function useWheelStep(count: number, index: number, setIndex: (i: number) => void): {onPointerEnter: () => void; onWheel: (event: WheelEvent) => void} {
   const enteredAt = useRef(0);
@@ -14,7 +18,7 @@ export function useWheelStep(count: number, index: number, setIndex: (i: number)
   const onPointerEnter = useCallback(() => { enteredAt.current = Date.now(); carried.current = 0; }, []);
   const onWheel = useCallback((event: WheelEvent) => {
     if (count < 2 || Date.now() - enteredAt.current < DWELL_MS) return;
-    carried.current += event.deltaY;
+    carried.current += event.deltaY * (event.deltaMode === 1 ? LINE_PX : event.deltaMode === 2 ? PAGE_PX : 1);
     if (Math.abs(carried.current) < NOTCH) return;
     const step = carried.current > 0 ? 1 : -1;
     carried.current = 0;

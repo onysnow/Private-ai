@@ -105,8 +105,8 @@ export function IdentifierOwner({candidateId, kind, note, onReviewed, onEntityAc
     </div>}
     {nothingToChoose && <p className="muted">No person, company or organisation can hold it yet: accept one from this document, or add one, first.</p>}
     <div className="flex gap-2 mt-1">
-      <Button size="sm" onClick={() => decide('accept')} disabled={!owner || busy}>Accept</Button>
-      <Button size="sm" variant="outline" onClick={() => decide('reject')} disabled={busy}>Reject</Button>
+      <Button size="sm" data-action="accept" onClick={() => decide('accept')} disabled={!owner || busy}>Accept</Button>
+      <Button size="sm" data-action="reject" variant="outline" onClick={() => decide('reject')} disabled={busy}>Reject</Button>
     </div>
     {status && <p className="muted">{status}</p>}
   </div>;

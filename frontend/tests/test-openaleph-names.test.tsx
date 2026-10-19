@@ -100,6 +100,15 @@ describe('Which entity does this belong to?', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
+  it('marks its Accept and Reject buttons so the A and R keys of the review queue press them', async () => {
+    mockApi({[TARGETS]: targets()});
+    wrap(<IdentifierOwner candidateId="cand-email" kind="email" note="checked" onReviewed={vi.fn()}/>);
+    const box = await screen.findByTestId('owner-cand-email');
+    await within(box).findByText('From this document:');
+    expect(within(box).getByRole('button', {name: 'Accept'})).toHaveAttribute('data-action', 'accept');
+    expect(within(box).getByRole('button', {name: 'Reject'})).toHaveAttribute('data-action', 'reject');
+  });
+
   it('accepts a waiting entity proposal first, then chooses it', async () => {
     const acceptMeridian = 'POST /api/extraction-candidates/cand-meridian/review';
     const api = mockApi({

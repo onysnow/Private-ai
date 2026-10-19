@@ -165,3 +165,38 @@ def test_a_linked_holder_does_not_hide_an_unlinked_pair():
     assert len(got) == 1 and got[0].parties == ["a", "b", "c"]
     assert got[0].facts["no_link"] == "no link in the records joins A and B; A and C"
     assert _shared({"a": "1 Harbour Road", "b": "1 Harbour Rd."}, links=[("a", "b")]) == []
+
+
+def _payment_ring(n: int) -> CaseGraph:
+    """n parties, a payment between every ordered pair: a dense case."""
+    g = CaseGraph()
+    for i in range(n):
+        g.parties[f"p{i}"] = Party(f"p{i}", f"P{i}", "Company", {})
+    for a in range(n):
+        for b in range(n):
+            if a != b:
+                g.links.append(Link(f"l{a}-{b}", "Payment", f"p{a}", f"p{b}", {"amount": ["10"], "currency": ["USD"]}, "supported"))
+    return g
+
+
+def test_the_loop_search_is_bounded_in_a_dense_case_and_says_so():
+    """Ten parties paying each other make over a million loops from ninety links. The search stops, keeps the
+    shortest, and marks each one so the summary can say the list is not complete."""
+    from app.patterns.detectors import cycle
+    import time
+
+    started = time.monotonic()
+    got = cycle.measure(_payment_ring(10), cycle.Params(link="Payment"))
+    assert time.monotonic() - started < 10
+    assert 0 < len(got) <= cycle.MAX_KEPT
+    assert all(m.facts.get("loops_cut_short") is True for m in got)
+    sizes = [len(m.parties) for m in got]
+    assert sizes == sorted(sizes)  # shortest of those searched first
+
+
+def test_a_small_case_lists_every_loop_and_is_not_marked_cut_short():
+    from app.patterns.detectors import cycle
+
+    got = cycle.measure(_payment_ring(3), cycle.Params(link="Payment"))
+    assert len(got) == 5  # three pairs and two directions of the triangle
+    assert not any("loops_cut_short" in m.facts for m in got)

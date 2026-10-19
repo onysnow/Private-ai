@@ -42,6 +42,10 @@ export class ApiClient {
 
   constructor(public baseUrl:string){}
 
+  private basePath():string{
+    try{return new URL(this.baseUrl,'http://placeholder.invalid').pathname.replace(/\/+$/,'')}catch{return ''}
+  }
+
   setAuthToken(token:string):void{this.authToken=token.trim()}
   clearAuthToken():void{this.authToken=''}
   hasAuthToken():boolean{return Boolean(this.authToken)}
@@ -70,7 +74,11 @@ export class ApiClient {
     // its content-type names). It used to be read as text, which changes the
     // bytes of a zip or a PDF. An empty one is left out, as before.
     const bytes=method==='GET'||method==='HEAD'?undefined:await input.blob();
-    return this.request(`${url.pathname}${url.search}`,{method,headers:new Headers(input.headers),rawBody:bytes&&bytes.size?bytes:undefined,signal:input.signal});
+    // The generated client puts the configured base URL, path prefix and all, in front of each path; request() adds
+    // it again, so the prefix comes off here (https://api.example/workbench must not become /workbench/workbench/api/...).
+    const prefix=this.basePath();
+    const pathname=prefix&&(url.pathname===prefix||url.pathname.startsWith(`${prefix}/`))?url.pathname.slice(prefix.length)||'/':url.pathname;
+    return this.request(`${pathname}${url.search}`,{method,headers:new Headers(input.headers),rawBody:bytes&&bytes.size?bytes:undefined,signal:input.signal});
   };
 
   // The raw response, for a body read as it arrives (the AI run's Server-Sent Events, features/ai/run-stream.ts).
