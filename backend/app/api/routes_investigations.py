@@ -45,6 +45,7 @@ from app.schemas.api import (
 from app.services.assistant_context import build_question_context
 from app.services.run_plan import build_run_plan, get_profile as get_run_profile, save_profile as save_run_profile
 from app.services.exports import build_investigation_export
+from app.services.safety import record_backup_event
 from app.services.investigations import (
     create_investigation as _create_investigation,
     lead_queue as _lead_queue,
@@ -387,6 +388,7 @@ def export_investigation(
     inv = manifest["investigation"]
     safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in inv["name"]).strip("_") or "investigation"
     filename = f"{safe_name}.jwbackup.zip"
+    record_backup_event(db, investigation_id, payload, manifest, include_documents)
     return Response(
         content=payload, media_type="application/zip",
         headers={

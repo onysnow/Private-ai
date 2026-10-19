@@ -13,9 +13,39 @@ class ExternalFinding:
     raw: dict = field(default_factory=dict)
 
 
+def host_of(connector: object, fallback: str = "") -> str:
+    """Where a connector's requests go, for anything with `search` (a test double or plug-in may not say)."""
+    return str(getattr(connector, "host", "") or getattr(connector, "base_url", "") or fallback)
+
+
+def will_send(connector: object) -> bool:
+    """Whether a request would actually leave; a connector that does not say is taken to send."""
+    check = getattr(connector, "will_send", None)
+    return bool(check()) if callable(check) else True
+
+
 class Connector(ABC):
+    # True when the provider refuses a request without a key (the request is then never sent).
+    requires_key = False
+
     @abstractmethod
     async def search(self, query: str) -> list[ExternalFinding]: ...
+
+    @property
+    def host(self) -> str:
+        """The address requests go to, for the outbound log (ADR-0015)."""
+        return str(getattr(self, "base_url", "") or "")
+
+    def will_send(self) -> bool:
+        """Whether a request would actually leave: a provider that needs a key sends nothing without one."""
+        return not self.requires_key or bool(getattr(self, "configured", False))
+
+    def request_preview(self, *, query: str | None = None, entity: dict | None = None) -> tuple[str, str]:
+        """What a call sends, word for word, and what kind of value it is (the outbound log, ADR-0015).
+        Must match what `search` / `enrich` put on the wire; providers that send something else override it."""
+        if entity is not None:
+            return self.entity_query(entity), "name and details"
+        return query or "", "search words"
 
     def entity_query(self, entity: dict) -> str:
         """Build a conservative text query from a canonical FtM entity.

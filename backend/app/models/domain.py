@@ -90,6 +90,10 @@ from app.models.writeups import (
     Writeup,
     WriteupVersion,
 )
+from app.models.safety import (
+    BackupEvent,
+    OutboundRequest,
+)
 from app.models.stories import (
     Story,
     StoryClaim,
@@ -169,6 +173,8 @@ __all__ = [
     "CheckItem",
     "AIAnalysisCandidate",
     "AIRunEvent",
+    "OutboundRequest",
+    "BackupEvent",
     "Writeup",
     "WriteupVersion",
     "Story",

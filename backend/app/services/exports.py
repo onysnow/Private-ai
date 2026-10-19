@@ -28,7 +28,7 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
+    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, OutboundRequest,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -45,7 +45,7 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
+        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, OutboundRequest,
     ]
 }
 
@@ -93,6 +93,8 @@ RESTORE_ORDER = [
     "stories", "story_sections", "story_claims",
     # Each AI run's steps as they happened (ADR-0012): the run record travels with the case.
     "ai_run_events",
+    # What left this computer, word for word (ADR-0015): part of the chain of custody, so it travels with the case.
+    "outbound_requests",
 ]
 
 
@@ -160,7 +162,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion,
+        Story, AIRunEvent, WriteupVersion, OutboundRequest,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -210,6 +212,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "case_records": direct["case_records"],
         "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
         "ai_run_events": direct["ai_run_events"],
+        "outbound_requests": direct["outbound_requests"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

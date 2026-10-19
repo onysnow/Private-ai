@@ -39,6 +39,7 @@ from app.core.config import Settings, settings as default_settings
 from app.core.time import utcnow_naive
 from app.models.domain import AIAnalysisCandidate, BackgroundJob
 from app.services.assistant_context import build_question_context, build_selected_record_context
+from app.services.outbound_log import record_outbound
 from app.visuals.spec import DRAWN_KINDS, QUESTIONS, spec_errors
 
 # The chart kinds a draft may order, grouped by the question each answers
@@ -955,7 +956,27 @@ def _run_reasoning_module(
         model_start = rec.emit("CHECK", "model", status="neutral", parent=retrieved, verdict="STARTED",
                                text=f"Model call: {(settings.ai_provider or '').strip()} {getattr(client, 'model', '') or ''}".strip())
         started_at = utcnow_naive()
-        response = coerce_response(client.generate(system_prompt, user_prompt, **generate_kwargs))
+        ai_destination = f"{(settings.ai_provider or '').strip()} {getattr(client, 'model', '') or ''}".strip()
+        ai_on_this_computer = bool(ai_reasoning_status(settings).get("runs_on_this_computer"))
+
+        def log_ai_send(reason: str, extra: str = "", error: Exception | None = None) -> None:
+            # The outbound log (ADR-0015): what went to the model. The exact text (system and user prompt, the packet
+            # included) is in this run's record; the log keeps the question and what went with it.
+            record_outbound(
+                db, investigation_id=investigation_id, service="ai", destination=ai_destination, local=ai_on_this_computer,
+                value_sent=f"{question}{extra}", value_kind="question and case records", reason=reason,
+                status="failed" if error is not None else "sent", error=str(error) if error is not None else None, run_id=rec.run_id,
+                detail={"records": len(packet.get("citations", [])), "external_leads": len(packet.get("external_leads") or []),
+                        "characters_sent": len(system_prompt) + len(user_prompt), "working_theory": bool(working_theory),
+                        "exact_text": "kept with this run (trace.user_prompt)"},
+            )
+
+        try:
+            response = coerce_response(client.generate(system_prompt, user_prompt, **generate_kwargs))
+        except Exception as exc:
+            log_ai_send("AI run", error=exc)
+            raise
+        log_ai_send("AI run")
         seconds = round((utcnow_naive() - started_at).total_seconds(), 1)
         model_end = rec.emit("CHECK", "model", status="bad" if response.truncated else "good", parent=model_start,
                              verdict="TRUNCATED" if response.truncated else "ANSWERED",
@@ -978,7 +999,12 @@ def _run_reasoning_module(
                 chart_retries.append({"attempt": attempt, "removed": (retry_report or {}).get("removed", []), "feedback": feedback})
                 model_end = rec.emit("CHECK", "gate:chart", status="partial", parent=model_end, verdict="RETRY",
                                      text=f"A chart failed the chart check; sent back to the model (attempt {attempt})")
-                response = coerce_response(client.generate(system_prompt, f"{user_prompt}\n\n{feedback}", **generate_kwargs))
+                try:
+                    response = coerce_response(client.generate(system_prompt, f"{user_prompt}\n\n{feedback}", **generate_kwargs))
+                except Exception as exc:
+                    log_ai_send("AI run: chart check retry", extra=" (sent back with the chart errors)", error=exc)
+                    raise
+                log_ai_send("AI run: chart check retry", extra=" (sent back with the chart errors)")
 
     request = {
         "question": question,

@@ -13,7 +13,7 @@ from app.models.domain import (
     RelationshipEdge, Source, Statement, StatementPromotion,
 )
 from app.schemas.api import EntityCreate, EntityUpdate, PropertyConflictDecisionRequest
-from app.services.connectors import persist_connector_findings
+from app.services.connectors import log_connector_send, persist_connector_findings
 from app.services.consolidation import get_enrichment_session_detail
 from app.services.ftm import make_ftm_entity
 from app.services.provenance import entity_statement_history
@@ -180,11 +180,15 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
         db.refresh(run)
         session_run.run_id = run.id
         db.commit()
+        sent_entity = {
+            "id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption,
+            "properties": entity.properties or {},
+        }
+        logged = False
         try:
-            findings = await connector.enrich({
-                "id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption,
-                "properties": entity.properties or {},
-            })
+            findings = await connector.enrich(sent_entity)
+            logged = True
+            log_connector_send(db, connector, provider, entity.investigation_id, run_id=run.id, reason="matched all services", entity=sent_entity)
             rows = persist_connector_findings(db, run, entity.investigation_id, provider, findings)
             for finding_row in rows:
                 link = db.scalar(select(EnrichmentSessionFinding).where(
@@ -200,6 +204,8 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
             total_results += len(rows)
         except Exception as exc:
             failures += 1
+            if not logged:  # a failure after the request went out (saving the findings) is not a second request
+                log_connector_send(db, connector, provider, entity.investigation_id, run_id=run.id, reason="matched all services", entity=sent_entity, error=exc)
             run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive()
             session_run.status = "failed"; session_run.error = str(exc); session_run.finished_at = utcnow_naive()
         db.commit()

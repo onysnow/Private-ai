@@ -23,13 +23,15 @@ from sqlalchemy.orm import Session
 
 from typing import Sequence
 
-from app.connectors.base import ExternalFinding
+from app.connectors.base import ExternalFinding, host_of, will_send
 from app.connectors.registry import registry
 from app.core.time import utcnow_naive
 from app.models.domain import (
     ConnectorFinding, ConnectorRun, Entity, Investigation, Lead, LeadProfile, LeadWorkflowEvent,
 )
+from app.ai.llm_client import is_local_endpoint
 from app.schemas.api import ConnectorSearchRequest
+from app.services.outbound_log import record_outbound
 
 
 def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id: str, provider: str, findings: Sequence[ExternalFinding]) -> list[ConnectorFinding]:
@@ -82,6 +84,33 @@ def _fail_run(db: Session, run_id: str, exc: Exception) -> None:
     db.commit()
 
 
+def log_connector_send(db: Session, connector: Any, provider: str, investigation_id: str, *, run_id: str, reason: str,
+                       query: str | None = None, entity: dict | None = None, error: Exception | None = None) -> None:
+    """Write the outbound log line for one connector call, with exactly the value it sent (ADR-0015). Every connector
+    call is something the reporter clicked; there is no automatic lookup. A provider that needs a key and has none
+    never sends, and an enrichment with nothing to ask sends nothing: both are logged as not sent."""
+    # A connector is anything with search/enrich; one that does not describe its request (a test double, a plug-in)
+    # is logged by its search words, or by the entity's caption.
+    if hasattr(connector, "request_preview"):
+        value, kind = connector.request_preview(query=query, entity=entity)
+    else:
+        value, kind = (query or "", "search words") if entity is None else (str(entity.get("caption") or ""), "name and details")
+    destination = host_of(connector, provider)
+    if not will_send(connector):
+        status, why = "not_sent", "No key is set for this service, so nothing was sent."
+    elif not value.strip():
+        status, why = "not_sent", "There was nothing to ask, so nothing was sent."
+    elif error is not None:
+        status, why = "failed", str(error)
+    else:
+        status, why = "sent", None
+    record_outbound(
+        db, investigation_id=investigation_id, service=provider, destination=destination,
+        local=is_local_endpoint(destination) if destination.startswith("http") else False,
+        value_sent=value, value_kind=kind, reason=reason, status=status, error=why, run_id=run_id,
+    )
+
+
 async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
@@ -93,6 +122,14 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
     run_id = run.id
     try:
         findings = await connector.search(body.query)
+    except Exception as exc:
+        _fail_run(db, run_id, exc)
+        log_connector_send(db, connector, provider, body.investigation_id, run_id=run_id, reason="lookup", query=body.query, error=exc)
+        raise HTTPException(
+            502, f"{provider} connector failed. Details were logged server-side (connector run {run_id})."
+        ) from exc
+    log_connector_send(db, connector, provider, body.investigation_id, run_id=run_id, reason="lookup", query=body.query)
+    try:
         return persist_connector_findings(db, run, body.investigation_id, provider, findings)
     except Exception as exc:
         _fail_run(db, run_id, exc)
@@ -113,14 +150,24 @@ async def enrich_entity(provider: str, entity: Entity, db: Session) -> Any:
     )
     db.add(run); db.commit(); db.refresh(run)
     run_id = run.id
+    sent_entity = {
+        "id": entity.ftm_id,
+        "schema": entity.schema,
+        "caption": entity.caption,
+        "properties": entity.properties or {},
+    }
+    investigation_id = entity.investigation_id
     try:
-        findings = await connector.enrich({
-            "id": entity.ftm_id,
-            "schema": entity.schema,
-            "caption": entity.caption,
-            "properties": entity.properties or {},
-        })
-        return persist_connector_findings(db, run, entity.investigation_id, provider, findings)
+        findings = await connector.enrich(sent_entity)
+    except Exception as exc:
+        _fail_run(db, run_id, exc)
+        log_connector_send(db, connector, provider, investigation_id, run_id=run_id, reason="enrich", entity=sent_entity, error=exc)
+        raise HTTPException(
+            502, f"{provider} enrichment failed. Details were logged server-side (connector run {run_id})."
+        ) from exc
+    log_connector_send(db, connector, provider, investigation_id, run_id=run_id, reason="enrich", entity=sent_entity)
+    try:
+        return persist_connector_findings(db, run, investigation_id, provider, findings)
     except Exception as exc:
         _fail_run(db, run_id, exc)
         # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
