@@ -6160,6 +6160,10 @@ export type DocumentDetailOut = {
    * Source Id
    */
   source_id: string;
+  /**
+   * Title
+   */
+  title?: string | null;
 };
 
 /**
@@ -6318,6 +6322,10 @@ export type DocumentOut = {
    * Source Id
    */
   source_id: string;
+  /**
+   * Title
+   */
+  title?: string | null;
 };
 
 /**
@@ -6459,6 +6467,10 @@ export type DocumentUploadOut = {
    * Source Id
    */
   source_id: string;
+  /**
+   * Title
+   */
+  title?: string | null;
 };
 
 /**
@@ -9910,6 +9922,10 @@ export type IngestionBatchDocumentOut = {
    * Source Id
    */
   source_id: string;
+  /**
+   * Title
+   */
+  title?: string | null;
 };
 
 /**

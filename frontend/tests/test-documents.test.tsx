@@ -96,6 +96,13 @@ describe('DocumentsPanel upload and review', () => {
     expect(screen.getByRole('link', {name: 'Open review queue for this investigation'})).toHaveAttribute('href', '/review?inv=inv-1');
   });
 
+  it('names a document by the title given on upload, with its file name beside it', async () => {
+    await renderWithDocuments([docFixture({title: 'Board minutes, March', filename: 'scan_0042.pdf'}), docFixture({id: 'doc-3', filename: 'notes.txt', title: 'notes.txt'})]);
+    expect(screen.getByText('Board minutes, March')).toBeInTheDocument();
+    expect(screen.getByText('scan_0042.pdf')).toBeInTheDocument();
+    expect(screen.getAllByText('notes.txt')).toHaveLength(1);
+  });
+
   it('uploads a document, reloads the list, and loads its proposals', async () => {
     const api = await renderWithDocuments();
     const uploaded = {...docFixture({id: 'doc-2', filename: 'contract.pdf', chunk_count: 4, candidate_counts: {}}), job: null, openaleph_sync: null};

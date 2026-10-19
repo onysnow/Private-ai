@@ -457,7 +457,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         return <div className="candidate" key={d.id} id={`document-${d.id}`} data-testid={`document-${d.id}`} aria-current={opened === d.id ? 'true' : undefined}
           style={depth ? {marginLeft: `${depth * 1.5}rem`} : undefined}>
           {parent && <div><small>Inside {parent.filename}</small></div>}
-          <b>{d.filename}</b> <small>{d.extraction_status} · {d.chunk_count} chunks · {Object.entries(d.candidate_counts || {}).map(([k, v]) => `${k}: ${v}`).join(' · ')}</small>
+          <b>{d.title || d.filename}</b>{d.title && d.title !== d.filename && <small> {d.filename}</small>} <small>{d.extraction_status} · {d.chunk_count} chunks · {Object.entries(d.candidate_counts || {}).map(([k, v]) => `${k}: ${v}`).join(' · ')}</small>
           {oa && <div>
             <small>OpenAleph: {oa.sync?.status || 'not synchronized'}{oa.sync?.provider_record_id ? ` · provider document ${oa.sync.provider_record_id}` : ''} · {oa.provider_candidate_pending_review} awaiting review · {oa.provider_candidate_accepted} accepted · {oa.provider_candidate_rejected} rejected</small>
             {oa.sync?.error && <div><small>{oa.sync.error}</small></div>}

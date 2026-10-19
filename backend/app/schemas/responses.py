@@ -872,6 +872,8 @@ class DocumentOut(ResponseModel):
     investigation_id: str
     source_id: str
     filename: str
+    # The title the reporter gave it on upload (its Source's title; the file name when none was given).
+    title: str | None = None
     mime_type: str | None = None
     sha256: str
     extraction_status: str

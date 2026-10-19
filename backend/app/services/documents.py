@@ -352,7 +352,9 @@ def serialize_document(db: Session, doc: Document, *, openaleph_ids: dict[str, O
     for c in candidates: counts[c.candidate_type] = counts.get(c.candidate_type,0)+1
     known = openaleph_ids if openaleph_ids is not None else openaleph_document_ids(db, [doc.id])
     ref = known.get(doc.id)
-    return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts,
+    source = db.get(Source, doc.source_id)
+    return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,
+            'title':source.title if source is not None else None,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts,
             'openaleph_document_id':ref.entity_id if ref else None, 'openaleph_schema':ref.schema if ref else None,
             'parent_document_id':doc.parent_document_id}
 

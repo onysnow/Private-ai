@@ -2487,6 +2487,7 @@ export const zDocumentDetailOut = z.object({
   parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+  title: z.string().nullish(),
 });
 
 /**
@@ -2527,6 +2528,7 @@ export const zDocumentOut = z.object({
   parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+  title: z.string().nullish(),
 });
 
 /**
@@ -4009,6 +4011,7 @@ export const zIngestionBatchDocumentOut = z.object({
   parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+  title: z.string().nullish(),
 });
 
 /**
@@ -5073,6 +5076,7 @@ export const zDocumentUploadOut = z.object({
   parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+  title: z.string().nullish(),
 });
 
 /**
