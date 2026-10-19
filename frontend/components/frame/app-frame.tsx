@@ -21,6 +21,7 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {handOffSearch} from '../../lib/search-handoff';
 import {TRAIL_TAIL_EVENT, currentTrailTail} from '../../lib/trail';
 import type {TrailTail} from '../../lib/trail';
+import {customThemes} from '../../lib/custom-theme';
 import {applyAppearance, currentAppearance, keepAppearance, THEMES, tryTheme} from '../../lib/theme';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {listInvestigationsOptions} from '../../lib/generated/@tanstack/react-query.gen';
@@ -185,6 +186,7 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
     STAGES.forEach(s => s.parts.forEach(part => list.push({id: `part-${part.anchor}`, group: 'Go to', label: `${s.name} › ${part.label}`, run: () => go(hrefOfAnchor(part.anchor))})));
     STAGES.forEach(s => list.push({id: `stage-${s.key}`, group: 'Go to', label: s.name, hint: s.line, run: () => go(s.route)}));
     THEMES.forEach(t => list.push({id: `try-${t.id}`, group: 'Appearance', label: `Try the ${t.name} theme`, hint: 'For this session; keep it from the bar', run: () => { tryTheme(t.id); onOpenChange(false); }}));
+    customThemes().forEach(t => list.push({id: `try-own-${t.id}`, group: 'Appearance', label: `Try ${t.name} (your own theme)`, hint: 'For this session; keep it from the bar', run: () => { tryTheme(t.base, t.id); onOpenChange(false); }}));
     list.push({id: 'calm', group: 'Appearance', label: currentAppearance().motion === 'calm' ? 'Turn calm motion off' : 'Turn calm motion on', run: () => { keepAppearance({motion: currentAppearance().motion === 'calm' ? 'normal' : 'calm'}); onOpenChange(false); }});
     list.push({id: 'console', group: 'Go to', label: 'Backend console', run: () => { onOpenChange(false); window.location.href = '/console/'; }});
     return list;

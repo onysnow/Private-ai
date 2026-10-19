@@ -25,3 +25,15 @@ html[data-effects='light'] .board-bokeh .bokeh, html[data-motion='calm'] .board-
 .rain-scene { position: relative; border-radius: 14px; isolation: isolate; }
 .rain-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 14px; z-index: 0; }
 .rain-scene > .rain-pane { position: relative; z-index: 1; }
+
+/* The still "after the rain" frame under Calm motion or reduced motion (rain-pane.tsx): the live water is hidden while
+   its one frame is taken, then the picture stands where the water layer was, under the band's words. */
+.rain-scene[data-still='taking'] .glass__water, .rain-scene[data-still='taking'] .glass__rainfall { visibility: hidden; }
+.rain-still { border-radius: inherit; }
+
+/* Frosted panels (features/effects/frost-panel.tsx): the system's Glass, whose `.glass` rule is the research's blur 30 px
+   and saturate 150%, over the bokeh. Its fill here is the theme's panel colour at 76%, so the words on it keep their
+   contrast over the brightest light behind (tests/test-frost-panel). The pane's side faces and lit edge are placed by
+   the system with transforms, so the board's rise-in animation must not hold them. */
+.ch-mod.frost-panel { --pane-fill: color-mix(in srgb, var(--surface-1) 76%, transparent); background: var(--pane-fill); }
+.ch-col > :is(.glass-side, .glass-glow) { animation: none; }

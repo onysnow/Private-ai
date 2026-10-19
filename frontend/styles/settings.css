@@ -58,8 +58,47 @@
 .ap-marks i { font-style: normal; font: 600 9px/1 var(--font-ui); padding: 3px 4px; border-radius: 4px; border: 1px solid currentColor; }
 .ap-marks .lv-strong { border-color: var(--flag-strong); } .ap-marks .lv-textbook { border-color: var(--flag-textbook-edge); }
 .ap-meta { font: 500 10.5px var(--font-mono); color: var(--text-muted); }
-.ap-own { cursor: default; border-style: dashed; background: transparent; align-items: center; justify-content: center; text-align: center; }
-.ap-own:hover { transform: none; box-shadow: none; }
+.ap-own { border-style: dashed; background: transparent; align-items: center; justify-content: center; text-align: center; }
+.ap-own[aria-expanded='true'] { border-color: var(--accent-1); }
+.ap-own[disabled] { cursor: default; opacity: .6; transform: none; box-shadow: none; }
+/* Your own themes: the card, and Edit / Delete under it (outside the card, which is a radio button). */
+.ap-own-cell { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ap-own-cell > .ap-card { flex: 1; }
+.ap-own-acts { display: flex; gap: 6px; align-items: center; justify-content: flex-end; font-size: 11.5px; color: var(--text-muted); }
+.ap-own-acts > span { margin-right: auto; }
+.ap-own-acts button { all: unset; cursor: pointer; padding: 2px 8px; border-radius: 7px; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.ap-own-acts button:hover { box-shadow: inset 0 0 0 1px var(--accent-1); }
+.ap-own-acts button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+/* The theme maker (features/appearance/theme-maker.tsx). Failing pairs carry ✕ and the word "fails", never colour alone. */
+.ap-maker { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 12px; background: var(--surface-2); border: 1.5px dashed var(--accent-1); }
+.ap-mk-top { display: flex; gap: 10px; flex-wrap: wrap; }
+.ap-mk-field { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; color: var(--text-muted); flex: 1 1 160px; }
+.ap-mk-field select, .ap-mk-field input { box-sizing: border-box; min-height: 34px; padding: 6px 9px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-1); color: var(--text); font: 500 13px var(--font-ui); }
+.ap-mk-field select:focus-visible, .ap-mk-field input:focus-visible, .ap-mk-hex:focus-visible, .ap-mk-row input[type=color]:focus-visible, .ap-mk-link:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+.ap-mk-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 700px) { .ap-mk-groups { grid-template-columns: 1fr; } }
+.ap-mk-group { margin: 0; padding: 6px 8px 8px; border: 1px solid var(--surface-3); border-radius: 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ap-mk-group legend { padding: 0 4px; font: 600 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.ap-mk-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text); }
+.ap-mk-row > span { flex: 1; min-width: 0; }
+.ap-mk-row em { font-style: normal; font-size: 11px; color: var(--status-disputed); }
+.ap-mk-row input[type=color] { flex: 0 0 28px; width: 28px; height: 22px; padding: 0; border: 1px solid var(--line); border-radius: 5px; background: none; cursor: pointer; }
+.ap-mk-hex { all: unset; box-sizing: border-box; width: 76px; padding: 2px 6px; border-radius: 6px; font: 500 11.5px var(--font-mono); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.ap-mk-hex[aria-invalid='true'] { box-shadow: inset 0 0 0 1.5px var(--status-disputed); }
+.ap-mk-row.bad input[type=color] { outline: 1.5px dashed var(--status-disputed); outline-offset: 1px; }
+.ap-mk-check { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: var(--status-supported); }
+.ap-mk-check.bad { color: var(--status-disputed); }
+.ap-mk-link { all: unset; cursor: pointer; margin-left: auto; font-size: 12px; color: var(--accent-2); }
+.ap-mk-pairs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; max-height: 220px; overflow-y: auto; }
+.ap-mk-pairs li { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.ap-mk-pairs li i { font: 700 11px/1 var(--font-ui); font-style: normal; padding: 3px 6px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .12); }
+.ap-mk-pairs li span { flex: 1; min-width: 0; }
+.ap-mk-pairs li small { font: 500 10.5px var(--font-mono); color: var(--text-muted); }
+.ap-mk-pairs li.bad span { color: var(--status-disputed); }
+.ap-mk-problem { margin: 0; padding: 6px 9px; border-radius: 8px; font-size: 12.5px; color: var(--text); border: 1.5px double var(--status-disputed); }
+.ap-mk-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ap-mk-actions small { font-size: 11px; color: var(--text-muted); }
+.ap-btn[aria-disabled='true'] { opacity: .55; }
 .ap-seg { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .ap-seg button { all: unset; cursor: pointer; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px; color: var(--text); }
 .ap-seg button.on { background: var(--accent-1); color: var(--ground); border-color: var(--accent-1); font-weight: 600; }

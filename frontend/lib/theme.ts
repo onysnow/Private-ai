@@ -5,6 +5,8 @@
 // - motion: normal, or calm (every movement becomes a short fade; the operating system's setting also counts).
 // "Try, then keep": a theme can be tried for this session only; nothing changes for good until Keep.
 // Every storage access is wrapped, as in lib/demo-preference.ts: blocked storage falls back to the defaults.
+// A theme of your own (lib/custom-theme) is a built-in theme (`theme`) with your colours on top (`custom`).
+import {BASE_PALETTES, CUSTOM_KEY, customTheme, paletteVars} from './custom-theme';
 
 export type ThemeId = 'case-night' | 'rain-noir' | 'archive' | 'forest-ledger' | 'indigo-clarity';
 export type Effects = 'full' | 'light' | 'off';
@@ -40,8 +42,9 @@ export type NamedEffect = 'bokeh' | 'rain' | 'grain' | 'iris' | 'shutter' | 'neo
 export const NAMED_EFFECTS: NamedEffect[] = ['bokeh', 'rain', 'grain', 'iris', 'shutter', 'neon', 'bloom'];
 /** Neon starts off (research §04.11: "steady only, off by default"). */
 const OFF_AT_FIRST: NamedEffect[] = ['neon'];
-export type Appearance = {theme: ThemeId; effects: Effects; motion: Motion; format: Format; off: NamedEffect[]};
-export const DEFAULT_APPEARANCE: Appearance = {theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon']};
+export type Appearance = {theme: ThemeId; effects: Effects; motion: Motion; format: Format; off: NamedEffect[];
+  /** A theme of your own over `theme` (lib/custom-theme), or null for the built-in theme as it is. */ custom: string | null};
+export const DEFAULT_APPEARANCE: Appearance = {theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], custom: null};
 
 const KEY = 'pai:appearance';
 const TRY_KEY = 'pai:appearance-trying';
@@ -58,8 +61,10 @@ function parse(raw: string | null): Partial<Appearance> {
 }
 
 function valid(a: Partial<Appearance>): Appearance {
+  const own = customTheme(a.custom);
   return {
-    theme: THEMES.some(t => t.id === a.theme) ? a.theme as ThemeId : DEFAULT_APPEARANCE.theme,
+    theme: own ? own.base : THEMES.some(t => t.id === a.theme) ? a.theme as ThemeId : DEFAULT_APPEARANCE.theme,
+    custom: own ? own.id : null,
     effects: a.effects === 'light' || a.effects === 'off' ? a.effects : 'full',
     motion: a.motion === 'calm' ? 'calm' : 'normal',
     format: FORMATS.some(f => f.id === a.format && f.ready) ? a.format as Format : 'board',
@@ -72,20 +77,37 @@ export function keptAppearance(): Appearance {
   try { return valid(parse(window.localStorage.getItem(KEY))); } catch { return DEFAULT_APPEARANCE; }
 }
 
-/** The theme being tried this session, if any. */
-export function tryingTheme(): ThemeId | null {
+/** What is being tried this session, if anything: a built-in theme, or one of your own (stored as "own:<id>"). */
+function tryingRaw(): {theme: ThemeId; custom: string | null} | null {
   try {
     const t = window.sessionStorage.getItem(TRY_KEY);
-    return THEMES.some(x => x.id === t) ? t as ThemeId : null;
+    if (t?.startsWith('own:')) {
+      const own = customTheme(t.slice(4));
+      return own ? {theme: own.base, custom: own.id} : null;
+    }
+    return THEMES.some(x => x.id === t) ? {theme: t as ThemeId, custom: null} : null;
   } catch { return null; }
+}
+
+/** The theme being tried this session, if any (for one of your own, the theme it starts from). */
+export function tryingTheme(): ThemeId | null {
+  return tryingRaw()?.theme ?? null;
+}
+
+/** The theme of your own being tried this session, if one is. */
+export function tryingCustom(): string | null {
+  return tryingRaw()?.custom ?? null;
 }
 
 /** What the screen shows now: the kept appearance, with a theme on trial if one is. */
 export function currentAppearance(): Appearance {
   const kept = keptAppearance();
-  const trying = tryingTheme();
-  return trying ? {...kept, theme: trying} : kept;
+  const trying = tryingRaw();
+  return trying ? {...kept, ...trying} : kept;
 }
+
+/** The variables a theme of your own sets on <html> (here or in the first-paint script), taken off at every change. */
+const OWN_VARS = Object.keys(paletteVars(BASE_PALETTES['case-night']));
 
 export function applyAppearance(a: Appearance = currentAppearance()): void {
   const html = document.documentElement;
@@ -94,6 +116,14 @@ export function applyAppearance(a: Appearance = currentAppearance()): void {
   html.dataset.motion = a.motion;
   html.dataset.format = a.format;
   html.dataset.fxOff = a.off.join(' ');
+  for (const name of OWN_VARS) html.style.removeProperty(name);
+  const own = customTheme(a.custom);
+  if (own) {
+    html.dataset.custom = own.id;
+    for (const [name, value] of Object.entries(paletteVars(own.colours))) html.style.setProperty(name, value);
+  } else {
+    delete html.dataset.custom;
+  }
 }
 
 function changed(): void {
@@ -101,17 +131,20 @@ function changed(): void {
   window.dispatchEvent(new Event(EVENT));
 }
 
+/** Keep a change. Choosing a built-in theme (`theme` without `custom`) leaves any theme of your own. */
 export function keepAppearance(patch: Partial<Appearance>): void {
-  const next = valid({...keptAppearance(), ...patch});
+  const choosing = patch.theme !== undefined || patch.custom !== undefined;
+  const next = valid({...keptAppearance(), ...(patch.theme !== undefined && patch.custom === undefined ? {custom: null} : {}), ...patch});
   try { window.localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* best effort */ }
-  if (patch.theme) { try { window.sessionStorage.removeItem(TRY_KEY); } catch { /* best effort */ } }
+  if (choosing) { try { window.sessionStorage.removeItem(TRY_KEY); } catch { /* best effort */ } }
   changed();
 }
 
-/** Try a theme for this session only; Keep makes it stay, Go back drops it. */
-export function tryTheme(theme: ThemeId | null): void {
+/** Try a theme for this session only (or, with `custom`, one of your own); Keep makes it stay, Go back drops it. */
+export function tryTheme(theme: ThemeId | null, custom: string | null = null): void {
   try {
-    if (theme) window.sessionStorage.setItem(TRY_KEY, theme);
+    if (theme && custom) window.sessionStorage.setItem(TRY_KEY, `own:${custom}`);
+    else if (theme) window.sessionStorage.setItem(TRY_KEY, theme);
     else window.sessionStorage.removeItem(TRY_KEY);
   } catch { /* best effort */ }
   changed();
@@ -123,4 +156,6 @@ export function onAppearanceChange(fn: () => void): () => void {
 }
 
 /** Runs before the first paint (in <head>), so a kept theme never flashes the default. Must stay self-contained. */
-export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var a=JSON.parse(localStorage.getItem('${KEY}')||'{}');var t=sessionStorage.getItem('${TRY_KEY}');var h=document.documentElement;h.dataset.theme=t||a.theme||'case-night';h.dataset.effects=a.effects||'full';h.dataset.motion=a.motion||'normal';h.dataset.format='board';h.dataset.fxOff=(a.off||['neon']).join(' ');}catch(e){}})();`;
+// A theme of your own: its base theme, and the variables stored with it (lib/custom-theme), only values that look like
+// colours. The page's own code checks the theme's contrast again as soon as it runs (applyAppearance).
+export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var a=JSON.parse(localStorage.getItem('${KEY}')||'{}');var t=sessionStorage.getItem('${TRY_KEY}');var h=document.documentElement;var own=t&&t.indexOf('own:')===0?t.slice(4):(t?null:a.custom);h.dataset.theme=(t&&!own?t:a.theme)||'case-night';h.dataset.effects=a.effects||'full';h.dataset.motion=a.motion||'normal';h.dataset.format='board';h.dataset.fxOff=(a.off||['neon']).join(' ');if(own){var l=JSON.parse(localStorage.getItem('${CUSTOM_KEY}')||'[]');for(var i=0;i<l.length;i++){if(l[i]&&l[i].id===own&&l[i].vars){h.dataset.theme=l[i].base;for(var k in l[i].vars){var v=String(l[i].vars[k]);if(/^--[a-z0-9-]+$/.test(k)&&/^[#0-9a-fA-F% .]+$/.test(v))h.style.setProperty(k,v);}}}}}catch(e){}})();`;

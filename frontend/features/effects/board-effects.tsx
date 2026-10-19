@@ -6,15 +6,19 @@
 // never over text that is being read, and each has its own switch in Settings › Appearance;
 // Effects Off turns them all off, Effects Light keeps only the still ones, and Calm motion or
 // the computer's reduced-motion setting stops every moving one.
-// The rain pane is features/effects/rain-pane.tsx (ADR-0009).
+// The rain pane is features/effects/rain-pane.tsx (ADR-0009); the frosted panels are frost-panel.tsx, and the
+// system's GlassLight pass over them is mounted here, once.
 import {useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {BokehField} from '@fx/components/site/BokehField';
 import {CameraIris} from '@fx/components/site/CameraIris';
+import {GlassLight} from '@fx/components/site/GlassLight';
 import {Neon} from '@fx/components/site/Neon';
 
 import {currentAppearance, onAppearanceChange, type NamedEffect} from '../../lib/theme';
+import {frostOn} from './frost-panel';
+import {webglAvailable} from './webgl';
 
 /** Fired by anything that opens a whole-screen feature (the reading room). */
 export const FEATURE_OPEN_EVENT = 'pai:feature-open';
@@ -32,6 +36,20 @@ export function effectOn(name: NamedEffect, moving: boolean): boolean {
   if (a.theme !== 'rain-noir' || a.effects === 'off' || a.off.includes(name)) return false;
   if (moving && (a.effects === 'light' || a.motion === 'calm' || reducedMotion())) return false;
   return true;
+}
+
+/*
+ * GlassLight lights the glass from the site's camera-shutter lamp, which the workbench does not have: its charge
+ * stays at nothing, so the pass draws the panes' resting state (the refracted edges and side faces) once and then
+ * sleeps, waking only when a pane moves.
+ */
+const NO_CHARGE = {current: 0};
+const NO_LAMP = {current: {x: -10000, y: -10000}};
+
+/** Whether the glass light pass runs: frosted panels, WebGL, and no Calm motion or reduced motion (GlassLight's own rule). */
+export function glassLightOn(): boolean {
+  if (!frostOn() || !webglAvailable()) return false;
+  return currentAppearance().motion !== 'calm' && !reducedMotion();
 }
 
 /** Re-renders when the appearance changes anywhere. */
@@ -67,6 +85,7 @@ export function BoardEffects(): ReactElement | null {
   if (!mounted) return null;
   return <>
     {effectOn('bokeh', false) && <BokehField className="board-bokeh"/>}
+    {glassLightOn() && <GlassLight chargeRef={NO_CHARGE} positionRef={NO_LAMP}/>}
     {iris > 0 && <div key={`i${iris}`} className="iris-open" aria-hidden="true" onAnimationEnd={e => { if (e.target === e.currentTarget) setIris(0); }}>
       <CameraIris/></div>}
     {shutter > 0 && <div key={`s${shutter}`} className="shutter-frame" data-firing="" aria-hidden="true" onAnimationEnd={() => setShutter(0)}>

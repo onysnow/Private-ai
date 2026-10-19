@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // Rain Noir's rain pane: the effect system's Pane and WaterDrops over the reporter's own photograph, only
-// with Rain Noir, Effects Full, the Rain switch, a photograph and WebGL; a plain dry band otherwise.
+// with Rain Noir, Effects Full, the Rain switch, a photograph and WebGL; a plain dry band otherwise (Calm motion's
+// still frame is tests/test-rain-still).
 import {cleanup, render, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -37,7 +38,7 @@ describe('rain pane', () => {
     expect(dry.container.querySelector('.rain-scene')).toBeNull();
     dry.unmount();
     photo.value = {name: 'night.jpg', url: 'blob:night'};
-    for (const a of [{theme: 'case-night' as const}, {theme: 'rain-noir' as const, off: ['rain' as const]}, {theme: 'rain-noir' as const, off: [], motion: 'calm' as const}]) {
+    for (const a of [{theme: 'case-night' as const}, {theme: 'rain-noir' as const, off: ['rain' as const]}, {theme: 'rain-noir' as const, off: [], effects: 'light' as const}, {theme: 'rain-noir' as const, effects: 'off' as const}]) {
       keepAppearance(a);
       const r = band();
       await new Promise(res => setTimeout(res, 0));

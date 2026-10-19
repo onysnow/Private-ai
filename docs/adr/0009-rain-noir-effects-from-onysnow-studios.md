@@ -27,7 +27,8 @@ Ony, 12 Oct: "Don't just import the rain and window or glass stuff, import the e
 - New packages: `framer-motion`, `@dimforge/rapier2d-compat` 0.21.0, `html-to-image`.
 - BokehField, CameraIris and Neon are now the system's own components. `board-effects.tsx` only places them.
 - The rain pane is `features/effects/rain-pane.tsx`. The case title band is the system's `Pane`, standing over the reporter's own photograph, and `WaterDrops` rains on it. The engine rains only where a photograph is behind the glass. The photograph is chosen in Settings › Appearance and kept in this browser's IndexedDB, as decoration (innovation 1). The workbench sets the system's `typeOnGlass` to 0, so the water is drawn under the words.
-- Still to do: the frosted panels as the system's `Glass` and `GlassLight`, and the still "after the rain" frame under Calm motion.
+- The frosted panels are the system's `Glass` (`features/effects/frost-panel.tsx`) on the Case home's board modules, at most four at once, in Rain Noir with Effects Full; the system's `GlassLight` is mounted once (`board-effects.tsx`) with no lamp charge, so it draws the resting frame and sleeps; it is off under Calm motion and reduced motion, as the system itself is under reduced motion.
+- Under Calm motion or reduced motion the rain pane shows a still "after the rain" frame: `WaterDrops` with the system's own "After the rain" rain type is drawn once, hidden, its water layer is kept as a picture under the band's words, and `WaterDrops` is unmounted. The system's code is unchanged.
 
 When Ony's separate component library exists, it replaces `frontend/vendor/onysnow-effects`. The workbench reaches the system only through `@fx/` imports in `features/effects/` and `lib/hero-photo.ts`.
 
