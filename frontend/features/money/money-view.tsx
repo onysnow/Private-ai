@@ -215,7 +215,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
             {picture.returns.map(r => <g key={r.id} className="mn-return">
               <path d={r.d}/><text x={r.labelX} y={r.labelY + 12} textAnchor="middle">↺ {r.label}</text>
             </g>)}
-            {chips(picture.bands, labelBoxes(picture, payments, currency), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h})), picture.crowded).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
+            {chips(picture.bands, labelBoxes(picture, payments, currency), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h})), picture.height).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
               <rect x={0} y={-13} width={c.w} height={c.sub ? 34 : 19} rx={5}/>
               <text x={8} y={0}>{c.text}</text>{c.sub && <text x={8} y={15} className="sub">{c.sub}</text>}</g>)}
             {picture.nodes.map(n => {
@@ -301,18 +301,19 @@ function labelBoxes(picture: ReturnType<typeof layout>, payments: Payment[], cur
 }
 
 function chips(bands: ReturnType<typeof layout>['bands'], avoid: Array<{x: number; y: number; w: number; h: number}> = [],
-  bars: Array<{x: number; y: number; w: number; h: number}> = [], onlyWhereFree = false): Array<{key: string; certainty: string; text: string; sub: string | null; x: number; y: number; w: number}> {
+  bars: Array<{x: number; y: number; w: number; h: number}> = [], height = Infinity): Array<{key: string; certainty: string; text: string; sub: string | null; x: number; y: number; w: number}> {
   const placed: Array<{x: number; y: number; w: number; h: number}> = [...avoid];
-  // In a crowded picture a chip with no free place is left out (the band still says it in its title and in the list).
+  // A chip with no free place near its band is left out rather than laid over a name or moved far from its band
+  // (the band still says it in its title and in the list; the mockup's €60,000 band has no chip either).
   return bands.filter(b => b.chip.text).sort((a, b) => a.chip.y - b.chip.y).flatMap(b => {
     const w = Math.max(b.chip.text.length, (b.chip.sub ?? '').length) * 6.3 + 16;
     const h = b.chip.sub ? 34 : 19;
-    // Try the chip's own place, then rows above it, then to the right; never over a bar or a name.
-    const free = (x: number, top: number) => [...placed, ...bars].every(p => !(x < p.x + p.w + 6 && x + w > p.x && top < p.y + p.h && top + h > p.y));
-    const spots = [0, -1, -2, 1, -3].flatMap(r => [0, 1, 2].map(s => ({x: b.chip.x + s * 60, top: b.chip.y - 13 + r * (h + 4)})));
-    const found = spots.find(s => free(s.x, s.top));
-    if (!found && onlyWhereFree) return [];
-    const at = found ?? spots[0];
+    // Try the chip's own place, then the rows next to it, then to the right; never over a bar or a name, and
+    // inside the picture (under the column titles, above its foot), so a chip is never cut off.
+    const free = (x: number, top: number) => top >= 20 && top + h <= height && [...placed, ...bars].every(p => !(x < p.x + p.w + 6 && x + w > p.x && top < p.y + p.h && top + h > p.y));
+    const spots = [0, -1, 1, -2].flatMap(r => [0, 1, 2, 3, -1].map(s => ({x: b.chip.x + s * 60, top: b.chip.y - 13 + r * (h + 4)})));
+    const at = spots.find(s => free(s.x, s.top));
+    if (!at) return [];
     placed.push({x: at.x, y: at.top, w, h});
     return [{key: b.key, certainty: b.certainty, text: b.chip.text, sub: b.chip.sub, x: at.x, y: at.top + 13, w}];
   });

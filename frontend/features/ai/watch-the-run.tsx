@@ -94,6 +94,8 @@ const LANES: Array<{key: string; label: string; system?: boolean; match: (e: Ev)
 // System lanes always drawn, dimmed when empty; the others only when the run holds a step of them.
 const STANDING_LANES = new Set(['tas', 'las', 'das']);
 const WORD: Record<Status, string> = {good: 'verified', partial: 'in between', bad: 'stopped', neutral: 'a finding'};
+/** A count with its word: "2 verified", "1 finding", "3 findings" (the key says "a finding"). */
+const counted = (n: number, s: Status) => `${n} ${s === 'neutral' ? (n === 1 ? 'finding' : 'findings') : WORD[s]}`;
 const STREAM_OVER = 12;
 const isProblem = (e: Ev) => e.status === 'bad' || (e.status === 'partial' && !e.self_reported);
 // A module of RAS, QAS, LAS or DAS is drawn as a chip in that system's column when a record holds one; a module of EGS
@@ -327,7 +329,8 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
     }
     return out;
   }, [otherModules]);
-  const sameQuestion = (runs.data?.runs ?? []).filter(r => run && r.run_id !== run.run_id && r.finished
+  // Runs of the same question by the same module: another system draws another route, so its verdicts do not compare.
+  const sameQuestion = (runs.data?.runs ?? []).filter(r => run && r.run_id !== run.run_id && r.finished && r.module === run.module
     && r.question.trim().toLowerCase() === run.question.trim().toLowerCase());
   // A node's verdict in one run: its worst step (stopped, then in between, then verified, then a finding).
   const RANK: Record<string, number> = {bad: 3, partial: 2, good: 1, neutral: 0};
@@ -348,8 +351,10 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
   // Rain Noir's bloom on the lights (ADR-0013): its own switch in Appearance, never under Calm or reduced motion.
   const [bloom, setBloom] = useState(false);
   useEffect(() => {
+    let motion = currentAppearance().motion;
     const read = () => {
       const a = currentAppearance();
+      if (a.motion !== motion) { motion = a.motion; setCalm(a.motion === 'calm' || Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)); }
       setBloom(a.theme === 'rain-noir' && a.effects === 'full' && a.motion !== 'calm' && !a.off.includes('bloom') && webglAvailable());
     };
     read();
@@ -438,13 +443,18 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
   // A hand-over from an accepted answer: what crossed, and what INTEROP held back (one BLOCK · HELD per field).
   const handedOver = events.filter(e => e.node === 'interop');
   const held = handedOver.filter(e => e.verdict === 'HELD').length;
-  const claim = thought && Array.isArray((candidate.data?.payload as {claims?: unknown[]} | undefined)?.claims)
+  // A case synthesis's claim, with its class and likelihood (RAS answers also hold "claims", without either).
+  const claim = thought && run?.module === 'case_synthesis' && Array.isArray((candidate.data?.payload as {claims?: unknown[]} | undefined)?.claims)
     ? ((candidate.data!.payload as {claims: Array<Record<string, unknown>>}).claims.find(c => c.claim_id === thoughtId))
     : undefined;
   const reviewed = candidate.data && candidate.data.review_status !== 'proposed';
+  // While a replay (or a live run) has not reached the saved answer, or your review of it, they wait unmarked.
+  const reached = (k: string) => visible.some(e => e.node === k);
+  const answerShown = shown >= events.length || reached('candidate');
+  const reviewShown = shown >= events.length || reached('review');
   // An answer the app's checks rejected was never yours to review; one you rejected was.
   const stoppedByChecks = candidate.data?.review_status === 'rejected' && candidate.data.rejection_reason !== 'reviewer';
-  const answerState = !candidate.data ? null : candidate.data.review_status === 'proposed' ? 'waits for you'
+  const answerState = !candidate.data || !answerShown ? null : candidate.data.review_status === 'proposed' || !reviewShown ? 'waits for you'
     : stoppedByChecks ? 'stopped by the checks' : candidate.data.review_status === 'accepted' ? 'you accepted it' : 'you rejected it';
   // The answer's claims as a person decides them one by one; the thought in focus, when it is one of them.
   const items = sample ? [] : reviewItems(candidate.data);
@@ -495,7 +505,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
     // The mark a node shows: its last step's verdict, or the state given (the answer as it stands after your review).
     const markStatus = opts.status ?? t?.last?.status;
     const dim = opts.dim ?? false;
-    const name = `${label}${opts.hint ? ` (${opts.hint})` : ''}${t ? `, ${(['good', 'partial', 'bad', 'neutral'] as Status[]).filter(s => t[s]).map(s => `${t[s]} ${WORD[s]}`).join(', ')}` : ''}${dim ? ', not run in the app' : ''}`;
+    const name = `${label}${opts.hint ? ` (${opts.hint})` : ''}${t ? `, ${(['good', 'partial', 'bad', 'neutral'] as Status[]).filter(s => t[s]).map(s => counted(t[s], s)).join(', ')}` : ''}${dim ? ', not run in the app' : ''}`;
     const onLit = chain.some(e => nodeOf(e) === k);
     const small = shape === 'chip' || shape === 'mini' || shape === 'pill';
     // A pill is as wide as its words (about 5.6 units a letter at this size), never narrower than the band's pills.
@@ -531,7 +541,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
   // Hover words for a node: "TAS · 5 verified · 6 in between · 2 stopped".
   const showTally = (k: string, label: string) => {
     const t = tally[k], p = P[k];
-    const parts = t ? (['good', 'partial', 'bad', 'neutral'] as Status[]).filter(st => t[st]).map(st => `${t[st]} ${WORD[st]}`) : [];
+    const parts = t ? (['good', 'partial', 'bad', 'neutral'] as Status[]).filter(st => t[st]).map(st => counted(t[st], st)) : [];
     setHover({x: p.x, y: p.y - (HALF[k]?.y ?? 16) - 12, text: [label, ...(parts.length ? parts : ['nothing yet'])].join(' · ')});
   };
   const along = (e: ReactKeyboardEvent, k: string) => {
@@ -608,7 +618,12 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
       dur: 450 / speed, status: e.self_reported && e.status !== 'bad' ? 'self' : e.status}];
   }) : [];
 
-  const tickLabels = [0, 0.25, 0.5, 0.75, 1].map(f => ({f, text: t0 ? clock(t0 + span * (win.from + f * (win.to - win.from))) : ''}));
+  const tickLabels = [0, 0.25, 0.5, 0.75, 1].map(f => {
+    const at = span * (win.from + f * (win.to - win.from));
+    // Under ten seconds the clock would repeat itself: the first tick keeps the clock, the rest count seconds from it.
+    const text = !t0 ? '' : span * (win.to - win.from) < 10000 && f > 0 ? `+${(at / 1000).toFixed(at < 1000 ? 2 : 1)} s` : clock(t0 + at);
+    return {f, text};
+  });
   const worst = chain.find(e => e.status === 'bad') ?? chain.find(e => isProblem(e)) ?? thought ?? focused;
   const cap = chain.map(e => (e.detail as {capped_to?: string} | null)?.capped_to).find(Boolean);
   const refsOf = (thought ?? focused)?.refs ?? [];
@@ -669,7 +684,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
       {sameQuestion.length > 0 && <select className="wr-pill wr-compare" aria-label="Compare with another run of this question" value={compareId ?? ''}
         onChange={e => setCompareId(e.target.value || null)}>
         <option value="">Compare…</option>
-        {sameQuestion.map(r => <option key={r.run_id} value={r.run_id}>with {stamp(r.created_at)}{r.problems ? ` · ${r.problems} problems` : ''}</option>)}
+        {sameQuestion.map(r => <option key={r.run_id} value={r.run_id}>with {stamp(r.created_at)}{r.problems ? ` · ${r.problems} problem${r.problems === 1 ? '' : 's'}` : ''}</option>)}
       </select>}
       <button type="button" className="wr-pill" onClick={() => setFull(f => !f)} aria-pressed={full}>Events: {full ? 'full' : 'summary'}</button>
       <button type="button" className={`wr-pill${problems.length ? ' bad' : ''}`} onClick={nextProblem} disabled={!problems.length}>{problems.length} problem{problems.length === 1 ? '' : 's'} <kbd>N</kbd></button>
@@ -761,11 +776,11 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
           {boundaries}
           {node('cp-01', 'CP-01', 'hex', ['right of reply'], {dim: !events.some(e => e.node === 'cp-01')})}
           {node('candidate', 'Candidate', 'cand', [candidateId ? `AIC ${candidateId.slice(0, 8)}` : 'none saved'],
-            {status: candidate.data?.review_status === 'rejected' ? 'bad' : candidate.data?.review_status === 'accepted' ? 'good' : undefined})}
+            {status: !reviewShown ? undefined : candidate.data?.review_status === 'rejected' ? 'bad' : candidate.data?.review_status === 'accepted' ? 'good' : undefined})}
           <g className="wr-tally" transform="translate(914 150)">
-            {(['good', 'partial', 'bad', 'neutral'] as Status[]).map((s, i) => <g key={s} transform={`translate(0 ${i * 16})`}><Mark status={s} x={6} y={0} r={4.5}/><text x={18} y={4}>{counts[s]} {WORD[s]}</text></g>)}
+            {(['good', 'partial', 'bad', 'neutral'] as Status[]).map((s, i) => <g key={s} transform={`translate(0 ${i * 16})`}><Mark status={s} x={6} y={0} r={4.5}/><text x={18} y={4}>{counted(counts[s], s)}</text></g>)}
           </g>
-          {node('review', 'Your review', 'person', [answerState ?? (candidateId ? 'waits for you' : 'nothing to review')], {dim: stoppedByChecks})}
+          {node('review', 'Your review', 'person', [answerState ?? (candidateId && answerShown ? 'waits for you' : candidateId ? 'not reached yet' : 'nothing to review')], {dim: stoppedByChecks})}
           <g className="wr-band support"><rect x={330} y={362} width={340} height={34} rx={17}/>
             <text x={366} y={383} className="dimtext" textAnchor="middle">Support</text>
             {SUPPORT.map(sp => {

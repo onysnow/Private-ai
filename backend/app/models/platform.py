@@ -1,5 +1,4 @@
-"""What the app does on its own and what leaves the computer (docs/project-notes/PLATFORM_NEEDS_PLAN.md): every
-request sent outside, saved questions an AI run can be repeated from, notifications already delivered outside the
+"""What the app does on its own (docs/project-notes/PLATFORM_NEEDS_PLAN.md): saved questions an AI run can be repeated from, notifications already delivered outside the
 app, and the phones a reporter registered for push.
 
 Part of the STRUCT-0024 split; see app/models/base.py.
@@ -13,23 +12,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.time import utcnow_naive
 from app.db.session import Base
 from app.models.base import uid
-
-
-class OutboundRequest(Base):
-    """One request that left this computer: to an outside source, a remote AI model, a mail or push service, or a
-    public download. ``sent`` says in words what went (the search words, "the party's name and details", "the kind
-    of alert only"), never more than was sent."""
-    __tablename__ = "outbound_requests"
-    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
-    at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, index=True)
-    investigation_id: Mapped[str | None] = mapped_column(ForeignKey("investigations.id"), nullable=True, index=True)
-    kind: Mapped[str] = mapped_column(String(32), index=True)  # lookup | ai | mail | push | key_check | source_check | download
-    service: Mapped[str] = mapped_column(String(64))           # opensanctions, anthropic, mail, ntfy, …
-    destination: Mapped[str] = mapped_column(String(255))      # the host it went to
-    sent: Mapped[str] = mapped_column(Text)
-    outcome: Mapped[str] = mapped_column(String(16), default="sent")  # sent | refused | failed
-    detail: Mapped[str | None] = mapped_column(Text, nullable=True)
-    actor: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
 
 class SavedQuestion(Base):

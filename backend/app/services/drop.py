@@ -157,7 +157,8 @@ def drop(db: Session, investigation_id: str, *, now: datetime | None = None) -> 
             # An archive or mailbox holds its text in the files inside it.
             stages.append(_stage("passages", "skipped", "In the files inside") if kids else _stage("passages", "stopped", "No text found"))
         else:
-            stages.append(_stage("passages", "stopped" if status == "failed" else "waiting"))
+            # A file that could not be read stops at Read (mockup INTAKE_1); the stages after it were never reached.
+            stages.append(_stage("passages", "waiting"))
         if kids:
             kids_read = sum(k.extraction_status == "complete" for k in kids)
             kids_failed = sum(k.extraction_status == "failed" for k in kids)

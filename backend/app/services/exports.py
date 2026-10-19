@@ -29,7 +29,7 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion,
+    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -48,7 +48,7 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion,
+        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
     ]
 }
 
@@ -102,6 +102,8 @@ RESTORE_ORDER = [
     # Questions kept to be asked again (Before you run › Save this question); the run they last started is a job on
     # the server that made the backup, so only its id travels.
     "saved_questions",
+    # What left this computer, word for word (ADR-0015): part of the chain of custody, so it travels with the case.
+    "outbound_requests",
 ]
 
 
@@ -169,7 +171,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion,
+        Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -221,6 +223,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
         "ai_run_events": direct["ai_run_events"],
         "saved_questions": direct["saved_questions"],
+        "outbound_requests": direct["outbound_requests"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -716,3 +719,7 @@ def record_backup(db: Session, investigation_id: str, data: bytes, manifest: dic
     inv.last_backup = {"at": manifest["generated_at"], "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(),
                        "documents_included": bool(manifest.get("documents_included")), "encrypted": encrypted}
     db.commit()
+    # The history Keep › Safety & data reads (a row per backup, ADR-0015); never raises.
+    from app.services.safety import record_backup_event
+
+    record_backup_event(db, investigation_id, data, manifest, bool(manifest.get("documents_included")))

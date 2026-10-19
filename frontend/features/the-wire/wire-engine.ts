@@ -6,11 +6,21 @@
 // parties as beads on a line of dates, each hanging the quote that shows it.
 // Also: the lens (L), follow the money (F), accounts rolled into their holders, shell
 // chains as decks, the time strip with Play, and the "Where you've been" trail.
+// From SEE_1 (research §2.2): every link carries its sentence with its certainty glyph
+// (✓ shown, ? not yet shown, ✕ disputed, ƒ worked out), its line style follows the same
+// grammar (solid, dashed, double, dotted; ended links faint), the "How sure" key stays
+// on, a flagged party wears a ring and a badge with its level and count, the active
+// filters show as chips, and the time strip counts the links held in its window.
 //
 // It draws straight into SVG (hundreds of moving parts each frame), so it is plain DOM
 // code mounted by the-wire.tsx; every listener is removed by the returned destroy().
 import type {WireEntityOut, WireLinkOut, WireOut} from '../../lib/generated/types.gen';
 import {onScreen} from '../../lib/on-screen';
+
+/** How sure a link is (the status grammar): read from the case's review advisory by the-wire.tsx. */
+export type LinkSure = 'shown' | 'unshown' | 'disputed' | 'worked';
+/** Per link id: how sure it is, and its end date when the record gives one (an ended link is drawn faint). */
+export type LinkInfo = Record<string, {sure: LinkSure; end: string}>;
 
 export type WireHooks = {
   active: () => boolean;
@@ -22,14 +32,15 @@ export type WireHooks = {
 type Flags = {faint: number; strong: number; textbook: number; items: {level: string; id: string; text: string; flag_id: string}[]};
 type Mode = 'case' | 'party' | 'wire' | 'path';
 type Target = {x: number; y: number; o: number; v: number; a?: number};
-type Strand = {fam: string; s: string; t: string; links: WireLinkOut[]; sum: number; cur: string};
+type Strand = {fam: string; s: string; t: string; links: WireLinkOut[]; sum: number; cur: string; sure: LinkSure | null};
 type Bundle = {key: string; a: string; b: string; links: WireLinkOut[]; strands: Record<string, Strand>};
 type Chain = {id: string; mids: string[]; ends: string[]; open: boolean};
 type NodeEl = {
   id: string; g: SVGGElement; halo: SVGCircleElement; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
-type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; S: Strand; w: number; bend: number; want: boolean; mid?: {x: number; y: number}};
+type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
+  mid?: {x: number; y: number}; q?: number[]; lab: {g: SVGGElement; w: number; t: SVGTextElement; body: SVGTSpanElement; ended: boolean} | null};
 type Box = {x0: number; x1: number; y0: number; y1: number};
 type Pt = {x: number; y: number; in: boolean; d?: number};
 
@@ -45,6 +56,12 @@ const KIND: Record<string, {fill: string; ring: string; name: string}> = {
 const FAM: Record<string, {c: string; n: string}> = {
   owns: {c: '#d4a152', n: 'Owns'}, runs: {c: '#baac91', n: 'Directs or works for'}, money: {c: '#c98a5e', n: 'Paid'}, other: {c: '#927e5d', n: 'Linked, kind not yet known'},
 };
+// The status grammar (02_RULES.md): a shape and a word for each, never colour alone.
+export const SURE: Record<LinkSure, {g: string; n: string; dash: string; rank: number}> = {
+  disputed: {g: '✕', n: 'Disputed', dash: 'none', rank: 0}, unshown: {g: '?', n: 'Not yet shown', dash: '7 5', rank: 1},
+  worked: {g: 'ƒ', n: 'Worked out by the app', dash: '1.5 4', rank: 2}, shown: {g: '✓', n: 'Shown', dash: 'none', rank: 3},
+};
+const DISPUTED = '#FF8070';
 const TERR = ['#2E4D67', '#2f4f44', '#4d3d2c', '#4f3036', '#3d3858', '#3b4f5e', '#55402b', '#2d4a52', '#4a3f55', '#34503c'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -69,9 +86,35 @@ export const tval = (d: string): number | null => {
   return y + ((m || 1) - 1) / 12 + ((dd || 1) - 1) / 365;
 };
 const fmtYM = (t: number): string => { const y = Math.floor(t); return `${MONTHS[Math.min(11, Math.floor((t - y) * 12))]} ${y}`; };
+const monthYear = (d: string): string => { const [y, m] = d.split('-'); return m ? `${MONTHS[+m - 1]} ${y}` : y; };
 
-export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): () => void {
-  const RM = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+/** A strand's sentence, from the fixed link verbs (research §2.2): "owns 60%", "director since 2017",
+ * "paid 29,400 EUR · 3× Feb–Apr 2018", "bid for · 4 Mar 2019". It reads from the strand's first party to its second. */
+export function linkSentence(fam: string, links: WireLinkOut[], ended: string): string {
+  const l0 = links[0];
+  const n = links.length;
+  if (fam === 'money') {
+    const sum = links.reduce((s, l) => s + (l.amount || 0), 0);
+    const ds = links.map(l => l.date).filter(Boolean).sort();
+    const span = !ds.length ? '' : ds[0].slice(0, 7) === ds[ds.length - 1].slice(0, 7) ? monthYear(ds[0])
+      : ds[0].slice(0, 4) === ds[ds.length - 1].slice(0, 4) ? `${MONTHS[+ds[0].slice(5, 7) - 1] ?? ''}–${monthYear(ds[ds.length - 1])}`
+        : `${monthYear(ds[0])}–${monthYear(ds[ds.length - 1])}`;
+    const why = n === 1 && l0.role ? ` “${l0.role.slice(0, 24)}”` : '';
+    return `paid ${sum ? fmtAmt(sum, l0.cur) : 'an amount not stated'}${why}${n > 1 ? ` · ${n}×` : ''}${span ? ` · ${span}` : ''}`;
+  }
+  const many = n > 1 ? ` · ×${n}` : '';
+  const when = ended ? ` · ended ${monthYear(ended)}` : l0.date ? ` since ${l0.date.slice(0, 4)}` : '';
+  if (fam === 'owns') return `${l0.pct ? `owns ${l0.pct.replace(/%$/, '')}%` : l0.role ? l0.role.slice(0, 32) : 'owns'}${when}${many}`;
+  if (fam === 'runs') {
+    const verb = l0.role ? l0.role.slice(0, 32) : l0.schema === 'Directorship' ? 'director' : l0.schema === 'Employment' ? 'works for' : 'member of';
+    return `${verb}${when}${many}`;
+  }
+  return `${l0.role ? l0.role.slice(0, 32) : 'linked'}${l0.date && !ended ? ` · ${fmtDate(l0.date)}` : ended ? ` · ended ${monthYear(ended)}` : ''}${many}`;
+}
+
+export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, info: LinkInfo = {}): () => void {
+  // Calm (Appearance) and the system's reduced motion both stop the camera and the nodes travelling.
+  const RM = () => document.documentElement.dataset.motion === 'calm' || (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
   const q = <T extends Element>(s: string): T => root.querySelector(s) as T;
   const el = <K extends keyof SVGElementTagNameMap>(t: K, a: Record<string, string | number> = {}, p?: Element): SVGElementTagNameMap[K] => {
     const e = document.createElementNS(NS, t);
@@ -100,6 +143,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     return out;
   };
   const nOpen = (f: Flags) => f.faint + f.strong + f.textbook;
+  const sureOf = (l: WireLinkOut): LinkSure | null => info[l.id]?.sure ?? null;
+  const endOf = (l: WireLinkOut): string => info[l.id]?.end ?? '';
   const bkey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 
   let bundles: Record<string, Bundle> = {};
@@ -116,8 +161,11 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
       const key = bkey(a, b);
       const B = bundles[key] || (bundles[key] = {key, a: a < b ? a : b, b: a < b ? b : a, links: [], strands: {}});
       B.links.push(l);
-      const sk = `${l.fam}|${l.fam === 'other' ? '' : `${a}>${b}`}`;
-      const S = B.strands[sk] || (B.strands[sk] = {fam: l.fam, s: a, t: b, links: [], sum: 0, cur: l.cur});
+      // One curve per kind, direction and certainty: a shown payment and an unshown one between the same two
+      // parties are two lines, each with its own style and sentence (SEE_1, Fernhill → Kestrel).
+      const sure = sureOf(l);
+      const sk = `${l.fam}|${l.fam === 'other' ? '' : `${a}>${b}`}|${sure ?? ''}`;
+      const S = B.strands[sk] || (B.strands[sk] = {fam: l.fam, s: a, t: b, links: [], sum: 0, cur: l.cur, sure});
       S.links.push(l);
       if (l.amount) S.sum += l.amount;
       (adj[a] || (adj[a] = new Set())).add(b);
@@ -209,7 +257,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     el('text', {class: 'card-t', x: -52, y: -4}, card);
     el('text', {class: 'card-s', x: -52, y: 14}, card);
     const beads = el('g', {}, card);
-    const flag = el('g', {transform: 'translate(78,-27)'}, card);
+    const flag = el('g', {transform: 'translate(90,-27)'}, card);
+    g.appendChild(halo); // over the card, so its ring round the kind dot shows
     const N: NodeEl = {id, g, halo, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
     on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); onNodeClick(id); });
     on<MouseEvent>(g, 'mouseenter', ev => showTip(ev, id));
@@ -244,17 +293,19 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     const n = nOpen(f);
     if (!n) return;
     const lvl = f.textbook ? 'textbook' : f.strong ? 'strong' : 'faint';
-    const w = 44;
-    const r = el('rect', {x: -w / 2, y: -9, width: w, height: 18, rx: 5}, g);
+    // Level in bars and in its word, then the count (SEE_1 "▮▮▮ TEXTBOOK · 2"); right-aligned on the card's corner.
+    const word = `${lvl.toUpperCase()} · ${n}`;
+    const w = 30 + word.length * 6.4;
+    const r = el('rect', {x: -w, y: -9, width: w, height: 18, rx: 5}, g);
     if (lvl === 'textbook') { r.setAttribute('fill', '#8E2420'); r.setAttribute('stroke', '#FF8070'); } else {
       r.setAttribute('fill', '#1E3448'); r.setAttribute('stroke', lvl === 'strong' ? '#F6966A' : '#E9AFA8');
       if (lvl === 'faint') r.setAttribute('stroke-dasharray', '2.5 2');
     }
     const bars = lvl === 'textbook' ? 3 : lvl === 'strong' ? 2 : 1;
-    for (let i = 0; i < 3; i++) el('rect', {x: -w / 2 + 6 + i * 4, y: 3 - (i + 1) * 3.2, width: 2.6, height: (i + 1) * 3.2 + 2,
+    for (let i = 0; i < 3; i++) el('rect', {x: -w + 6 + i * 4, y: 3 - (i + 1) * 3.2, width: 2.6, height: (i + 1) * 3.2 + 2,
       fill: i < bars ? (lvl === 'textbook' ? '#ffe9e4' : lvl === 'strong' ? '#F6966A' : '#E9AFA8') : 'rgb(245 236 218 / .2)'}, g);
-    const t = el('text', {x: w / 2 - 6, y: 4, 'text-anchor': 'end', class: 'flag-n', fill: lvl === 'textbook' ? '#ffe9e4' : '#F5ECDA'}, g);
-    t.textContent = String(n);
+    const t = el('text', {x: -6, y: 4, 'text-anchor': 'end', class: 'flag-n', fill: lvl === 'textbook' ? '#ffe9e4' : '#F5ECDA'}, g);
+    t.textContent = word;
     const ti = el('title', {}, g);
     ti.textContent = `${n} open Red Flag${n > 1 ? 's' : ''}, the strongest ${lvl}`;
   }
@@ -275,7 +326,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
 
   type PartyInfo = {f: string; cx: number; cy: number; R1: number; RX: number; secLabels: {k: string; a: number; n: string; c: number}[]; more: {p: string; n: number; x: number; y: number}[]};
   let partyInfo: PartyInfo | null = null;
-  let moreEls: {x: number; y: number}[] = [];
+  let moreEls: {x: number; y: number; g: SVGGElement}[] = [];
   function partyTargets(f: string): Record<string, Target> {
     const T: Record<string, Target> = {};
     const cx = E[f].x, cy = E[f].y;
@@ -367,7 +418,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     }
     const T = m === 'case' ? caseTargets() : m === 'path' ? pathTargets(pathIds) : partyTargets(focus);
     for (const id in T) { const N = node[id]; if (!N) continue; N.from = {...N.cur}; N.tgt = T[id]; }
-    tw = {t0: performance.now(), dur: RM ? 1 : opts.slow ? 1500 : 950};
+    tw = {t0: performance.now(), dur: RM() ? 1 : opts.slow ? 1500 : 950};
     let to: {x: number; y: number; k: number};
     if (m === 'case') to = fitBox(Object.values(T).filter(t => t.o), 120);
     else if (m === 'party') to = fitBox(Object.values(T).filter(t => t.v > 0), 40, 1.1);
@@ -375,6 +426,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     else { const [a, b] = wireKey.split('|'); to = {x: (T[a].x + T[b].x) / 2, y: (T[a].y + T[b].y) / 2, k: Math.min(3.2, C.k * 2.2)}; }
     Cto = {...to, from: {...C}};
     if (m !== 'wire') { q('.tw-wire').classList.remove('on'); svg.style.opacity = '1'; }
+    litLink = null;
     drawStatic(); renderChrome(); kick();
   }
   function fitBox(pts: Target[], pad: number, maxK = 1.6): {x: number; y: number; k: number} {
@@ -419,6 +471,11 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     }
     return {x, y, in: false};
   }
+  const endedBy = (links: WireLinkOut[], t: number): string => {
+    const ends = links.map(endOf);
+    if (!ends.every(e => e && (tval(e) ?? Infinity) < t)) return '';
+    return ends.sort()[ends.length - 1];
+  };
   const inRange = (l: WireLinkOut) => { const t = tval(l.date); return t == null || (t >= range[0] - 0.001 && t <= range[1] + 0.001); };
 
   let edgeEls: Record<string, EdgeEl> = {};
@@ -449,8 +506,18 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
       N.g.style.pointerEvents = v === 0 ? 'none' : '';
       if (N.isChain) continue;
       const fl = flagsOf(id);
-      N.halo.style.display = v > 0 && fl.textbook ? '' : 'none';
-      N.halo.setAttribute('r', String(v === 2 ? 52 : 22));
+      // The ring: any open Red Flag, its edge by level (textbook pulses, strong solid, faint dashed).
+      const lvl = fl.textbook ? 'textbook' : fl.strong ? 'strong' : fl.faint ? 'faint' : '';
+      N.halo.style.display = v > 0 && lvl ? '' : 'none';
+      if (lvl && N.halo.dataset.level !== lvl) {
+        N.halo.dataset.level = lvl;
+        N.halo.setAttribute('class', `halo ${lvl}`);
+        N.halo.setAttribute('stroke', lvl === 'textbook' ? '#FF8070' : lvl === 'strong' ? '#F6966A' : '#E9AFA8');
+        N.halo.setAttribute('stroke-dasharray', lvl === 'faint' ? '3 3' : 'none');
+      }
+      // On a card the ring sits round the card's kind dot; on a dot, round the dot.
+      N.halo.setAttribute('r', String(v === 2 && !N.isChain ? 14 * cs : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 5));
+      N.halo.setAttribute('cx', String(v === 2 && !N.isChain ? -70 * cs : 0));
       N.lbl.style.display = 'none';
       if (v === 1 && !(lens.on && mode === 'case' && d.in)) cands.push({id, N, d, pri: fscore(fl) * 10 + deg[id] + (mode === 'case' ? 0 : 100)});
     }
@@ -464,13 +531,26 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
       const dd = `M${a.x},${a.y}Q${mx},${my} ${b.x},${b.y}`;
       R.p.setAttribute('d', dd); R.h.setAttribute('d', dd);
       if (R.u) R.u.setAttribute('d', dd);
+      if (R.d2) R.d2.setAttribute('d', dd);
       const live = R.S.links.some(inRange);
-      R.g.style.opacity = String((live ? 1 : 0.08) * Math.min(na.cur.o, nb.cur.o));
-      if (R.u) R.u.style.display = live ? '' : 'none';
+      // Ended: every record on the strand ended before the window's end. Drawn faint, and its sentence says when.
+      const ended = endedBy(R.S.links, range[1]);
+      R.g.style.opacity = String((live ? (ended ? 0.38 : 1) : 0.08) * Math.min(na.cur.o, nb.cur.o));
+      if (R.u) R.u.style.display = live && !ended ? '' : 'none';
       const sw = R.w / (mode === 'case' ? Math.max(0.7, C.k) : 1);
-      R.p.setAttribute('stroke-width', String(sw));
+      R.p.setAttribute('stroke-width', String(R.d2 ? sw + 3 : sw));
+      if (R.d2) R.d2.setAttribute('stroke-width', String(Math.max(0.8, sw + 0.2)));
+      if (R.lab && R.lab.ended !== Boolean(ended)) {
+        R.lab.ended = Boolean(ended);
+        R.lab.body.textContent = linkSentence(R.S.fam, R.S.links, ended);
+        let w = ((R.S.sure ? 2 : 0) + (R.lab.body.textContent ?? '').length) * 6.3;
+        try { w = R.lab.t.getComputedTextLength() || w; } catch { /* not laid out (tests) */ }
+        R.lab.w = w + 14;
+        sizePill(R.lab.g, R.lab.w);
+      }
       if (R.u) { R.u.setAttribute('stroke-width', String(sw + 1.4)); R.u.style.opacity = mode === 'case' ? '.55' : '1'; }
       R.mid = {x: mx * 0.5 + (a.x + b.x) / 4, y: my * 0.5 + (a.y + b.y) / 4};
+      R.q = [a.x, a.y, mx, my, b.x, b.y];
     }
     terrBoxes = [];
     for (const t of terrEls.slice().sort((a, b) => Number(b.big) - Number(a.big))) {
@@ -484,13 +564,6 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
       t.a.setAttribute('x', String(t.x)); t.a.setAttribute('y', String(wy)); t.a.setAttribute('font-size', String(fs / C.k)); t.a.setAttribute('stroke-width', String(5 / C.k));
       t.b.setAttribute('x', String(t.x)); t.b.setAttribute('y', String(wy + 14 / C.k)); t.b.setAttribute('font-size', String(10 / C.k)); t.b.setAttribute('stroke-width', String(4 / C.k));
     }
-    for (const L of rtEls) {
-      const R = edgeEls[L.k];
-      if (!R || R.g.style.display === 'none') { L.g.style.display = 'none'; continue; }
-      L.g.style.display = '';
-      const a = P[focus], b = P[L.o];
-      L.g.setAttribute('transform', `translate(${a.x * 0.42 + b.x * 0.58},${a.y * 0.42 + b.y * 0.58 - 30})`);
-    }
     cardBoxes = [];
     for (const id in node) {
       const N = node[id];
@@ -499,8 +572,25 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
         cardBoxes.push({x0: s.x - 94 * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - 32 * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
       }
     }
-    // Sector names: the first radius between the focus and its ring that is clear of cards.
-    secBoxes = [];
+    const rtBoxes: Box[] = [];
+    for (const L of rtEls) {
+      const R = edgeEls[L.k];
+      if (!R || R.g.style.display === 'none') { L.g.style.display = 'none'; continue; }
+      L.g.style.display = '';
+      const a = P[focus], b = P[L.o];
+      // Chips keep their size on screen whatever the zoom (at 65% they were too small to read).
+      // Along the line from the focus, clear of the cards where it can be.
+      const w = Number(L.g.querySelector('rect')?.getAttribute('width')) || 150;
+      const at = (f: number) => {
+        const cx = a.x * (1 - f) + b.x * f, cy = a.y * (1 - f) + b.y * f - 30 / C.k, sc = toScreen(cx, cy);
+        return {cx, cy, b: {x0: sc.x - w / 2, x1: sc.x + w / 2, y0: sc.y - 13, y1: sc.y + 13}};
+      };
+      const spot = [0.58, 0.5, 0.42, 0.66, 0.34].map(at).find(o => !overlap(o.b, cardBoxes)) ?? at(0.58);
+      L.g.setAttribute('transform', `translate(${spot.cx},${spot.cy}) scale(${1 / C.k})`);
+      rtBoxes.push(spot.b);
+    }
+    // Sector names: the first radius between the focus and its ring that is clear of cards and chips.
+    secBoxes = rtBoxes;
     for (const S of secEls) {
       let ok: {wx: number; wy: number; b: Box} | null = null;
       for (const f of [0.6, 0.5, 0.7, 0.42, 0.8, 0.34]) {
@@ -511,14 +601,19 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
       S.t.style.display = ok ? '' : 'none';
       if (ok) { S.t.setAttribute('x', String(ok.wx)); S.t.setAttribute('y', String(ok.wy)); S.t.setAttribute('font-size', String(10.5 / C.k)); secBoxes.push(ok.b); }
     }
-    for (const M of moreEls) { const s = toScreen(M.x, M.y); secBoxes.push({x0: s.x - 40 * C.k, x1: s.x + 40 * C.k, y0: s.y - 12 * C.k, y1: s.y + 12 * C.k}); }
+    for (const M of moreEls) {
+      const s = toScreen(M.x, M.y);
+      M.g.setAttribute('transform', `translate(${M.x},${M.y}) scale(${1 / C.k})`);
+      secBoxes.push({x0: s.x - 40, x1: s.x + 40, y0: s.y - 12, y1: s.y + 12});
+    }
     for (const h of hopEls) {
       const R = edgeEls[h.k];
       if (!R || !R.mid) { h.g.style.display = 'none'; continue; }
       h.g.style.display = '';
-      h.g.setAttribute('transform', `translate(${R.mid.x},${R.mid.y - 20})`);
+      h.g.setAttribute('transform', `translate(${R.mid.x},${R.mid.y - 20 / C.k}) scale(${1 / C.k})`);
     }
-    placeLabels(cands);
+    const taken = placeLabels(cands);
+    placeLinkLabels(taken);
     const lensOn = lens.on && mode === 'case';
     q<SVGGElement>('.tw-nodes').style.setProperty('--lo', lensOn ? '.28' : '1');
     q<SVGGElement>('.tw-terr-l').style.opacity = lensOn ? '.3' : '1';
@@ -526,27 +621,82 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     q('.tw-zoom').textContent = `${Math.round(C.k * 100)}%`;
   }
 
-  function placeLabels(cands: {id: string; N: NodeEl; d: Pt; pri: number}[]): void {
+  function placeLabels(cands: {id: string; N: NodeEl; d: Pt; pri: number}[]): Box[] {
     const boxes = terrBoxes.concat(cardBoxes, secBoxes);
     cands.sort((a, b) => b.pri - a.pri);
     const fsS = mode === 'case' ? 12 : 11.5;
     for (const c of cands) {
-      const s = toScreen(c.d.x, c.d.y), off = (4 + Math.sqrt(deg[c.id]) * 2.6) * C.k + fsS + 2;
-      const w = E[c.id].short.length * fsS * 0.56, b = {x0: s.x - w / 2 - 3, x1: s.x + w / 2 + 3, y0: s.y + off - fsS, y1: s.y + off + 3};
-      if (b.x0 < 0 || b.x1 > W || overlap(b, boxes)) continue;
-      boxes.push(b);
+      const s = toScreen(c.d.x, c.d.y), r = (4 + Math.sqrt(deg[c.id]) * 2.6) * C.k, off = r + fsS + 2;
+      const w = E[c.id].short.length * fsS * 0.56;
+      // Under the dot first, then above it, then to its right or left: a party is not left nameless for a near miss.
+      const spots: {dx: number; dy: number; anchor: string}[] = [{dx: 0, dy: off, anchor: 'middle'}, {dx: 0, dy: -r - 6, anchor: 'middle'},
+        {dx: r + 6, dy: fsS * 0.35, anchor: 'start'}, {dx: -r - 6, dy: fsS * 0.35, anchor: 'end'}];
+      const box = (p: typeof spots[number]) => {
+        const x0 = p.anchor === 'middle' ? s.x - w / 2 : p.anchor === 'start' ? s.x + p.dx : s.x + p.dx - w;
+        return {x0: x0 - 3, x1: x0 + w + 3, y0: s.y + p.dy - fsS, y1: s.y + p.dy + 3};
+      };
+      const at = spots.find(p => { const b = box(p); return b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes); });
+      if (!at) continue;
+      boxes.push(box(at));
       c.N.lbl.style.display = '';
-      c.N.lbl.setAttribute('font-size', String(fsS / C.k)); c.N.lbl.setAttribute('stroke-width', String(4 / C.k)); c.N.lbl.setAttribute('y', String(off / C.k - 2 / C.k));
+      c.N.lbl.setAttribute('font-size', String(fsS / C.k)); c.N.lbl.setAttribute('stroke-width', String(4 / C.k));
+      c.N.lbl.setAttribute('x', String(at.dx / C.k)); c.N.lbl.setAttribute('y', String((at.dy - 2) / C.k)); c.N.lbl.setAttribute('text-anchor', at.anchor);
       c.N.lbl.textContent = E[c.id].short;
     }
+    return boxes;
   }
 
+  /* Link sentences: placed by importance (links of the party in the middle, then the least sure, then the
+     biggest money), each kept clear of cards, names and other sentences; one that would overlap is left off
+     and counted under the time strip. Drawn at a constant size on screen whatever the zoom. */
+  let hiddenLabels = 0;
+  function placeLinkLabels(boxes: Box[]): void {
+    const dots: Box[] = [];
+    for (const id in node) {
+      const N = node[id];
+      if (N.cur.v !== 1 || N.cur.o < 0.5) continue;
+      const s = toScreen(N.cur.x, N.cur.y), r = (4 + Math.sqrt(deg[id] || 0) * 2.6) * C.k + 3;
+      dots.push({x0: s.x - r, x1: s.x + r, y0: s.y - r, y1: s.y + r});
+    }
+    const placed = boxes.concat(dots);
+    const order = Object.values(edgeEls).filter(R => R.lab).sort((a, b) => pri(b) - pri(a));
+    let hidden = 0;
+    const top = 120, bottom = H - 112;
+    for (const R of order) {
+      const L = R.lab!;
+      const vis = R.g.style.display !== 'none' && R.q && R.S.links.some(inRange) && (mode !== 'case' || C.k >= 0.32);
+      if (!vis) { L.g.style.display = 'none'; continue; }
+      // The middle of the curve first, then further along it either way.
+      const [ax, ay, mx, my, bx, by] = R.q!;
+      let spot: {x: number; y: number; b: Box} | null = null;
+      for (const t of [0.5, 0.4, 0.6, 0.3, 0.7, 0.22, 0.78, 0.15, 0.85]) {
+        const u = 1 - t, x = u * u * ax + 2 * u * t * mx + t * t * bx, y = u * u * ay + 2 * u * t * my + t * t * by, s = toScreen(x, y);
+        const b = {x0: s.x - L.w / 2 - 2, x1: s.x + L.w / 2 + 2, y0: s.y - 12, y1: s.y + 12};
+        if (b.x0 >= 0 && b.x1 <= W && b.y0 >= top && b.y1 <= bottom && !overlap(b, placed)) { spot = {x, y, b}; break; }
+      }
+      if (!spot) { L.g.style.display = 'none'; hidden++; continue; }
+      placed.push(spot.b);
+      L.g.style.display = '';
+      L.g.style.opacity = R.g.style.opacity;
+      L.g.setAttribute('transform', `translate(${spot.x},${spot.y}) scale(${1 / C.k})`);
+    }
+    if (hidden !== hiddenLabels) { hiddenLabels = hidden; renderCounts(); }
+  }
+  function pri(R: EdgeEl): number {
+    const touches = mode === 'party' && (R.S.s === focus || R.S.t === focus) ? 1e6 : 0;
+    const unsure = R.S.sure ? (3 - SURE[R.S.sure].rank) * 1e4 : 0;
+    return touches + unsure + Math.log10(R.S.sum + 1) * 100 + R.S.links.length;
+  }
+
+  const sizePill = (g: SVGGElement, w: number) => {
+    g.querySelectorAll('rect').forEach((r, i) => { r.setAttribute('x', String(-w / 2 + i * 2.5)); r.setAttribute('width', String(w - i * 5)); });
+  };
   const pathEdge = (s: string, t: string) => pathIds.some((a, i) => i < pathIds.length - 1 && ((a === s && pathIds[i + 1] === t) || (a === t && pathIds[i + 1] === s)));
 
   /* static layers: edges, territories, sector labels, "more" chips */
   function drawStatic(): void {
-    const gE = q<SVGGElement>('.tw-edges');
-    gE.textContent = ''; edgeEls = {}; rtEls = []; hopEls = [];
+    const gE = q<SVGGElement>('.tw-edges'), gLab = q<SVGGElement>('.tw-elabs');
+    gE.textContent = ''; gLab.textContent = ''; edgeEls = {}; rtEls = []; hopEls = [];
     const tgtV = (id: string) => Boolean(node[id]) && node[id].tgt.v > 0;
     for (const key in bundles) {
       const B = bundles[key], strands = Object.values(B.strands);
@@ -563,11 +713,37 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
         const money = S.fam === 'money';
         const w = money && S.sum ? 1.2 + Math.log10(S.sum / 1e6 + 1) * 1.25 : 1.6;
         const isPath = mode === 'path' && want;
-        const p = el('path', {class: 'strand', stroke: isPath ? '#FF8070' : fam.c, 'stroke-opacity': mode === 'case' ? 0.55 : 0.9, 'stroke-dasharray': S.fam === 'other' ? '5 5' : 'none'}, g);
+        // Line style is how sure (dashed not yet shown, double disputed, dotted worked out); colour is the kind.
+        const sure = S.sure ? SURE[S.sure] : null;
+        const p = el('path', {class: `strand${S.sure ? ` s-${S.sure}` : ''}`, stroke: isPath || S.sure === 'disputed' ? DISPUTED : fam.c,
+          'stroke-opacity': mode === 'case' ? 0.55 : 0.9, 'stroke-dasharray': sure?.dash ?? 'none'}, g);
+        const d2 = S.sure === 'disputed' ? el('path', {class: 'strand-core'}, g) : null;
         const u = money ? el('path', {class: 'pulse', stroke: isPath ? '#ffe9e4' : '#ffd9a8', 'stroke-opacity': 0.95}, g) : null;
         const h = el('path', {class: 'hit'}, g);
         const n = strands.length, bend = n === 1 ? 0.25 : (i - (n - 1) / 2) * 1.1 + 0.15;
-        edgeEls[`${key}#${i}`] = {g, p, u, h, S: {...S, s, t}, w, bend, want};
+        // The link's sentence on the line, led by its certainty glyph; the pill's edge follows the line style.
+        let lab: EdgeEl['lab'] = null;
+        if (mode === 'case' || mode === 'party') {
+          const lg = el('g', {class: `elab${S.sure ? ` s-${S.sure}` : ''}`, role: 'button', tabindex: -1}, gLab);
+          el('rect', {y: -10, height: 20, rx: 6}, lg);
+          // Disputed: a double edge, as on its line.
+          if (S.sure === 'disputed') el('rect', {y: -7.5, height: 15, rx: 4, class: 'inner'}, lg);
+          const t = el('text', {y: 4, 'text-anchor': 'middle'}, lg);
+          const words = linkSentence(S.fam, S.links, '');
+          if (sure) { const gl = el('tspan', {class: 'glyph'}, t); gl.textContent = `${sure.g} `; }
+          const body = el('tspan', {}, t);
+          body.textContent = words;
+          let tw = ((sure ? 2 : 0) + words.length) * 6.3;
+          try { tw = t.getComputedTextLength() || tw; } catch { /* not laid out (tests) */ }
+          sizePill(lg, tw + 14);
+          const ti = el('title', {}, lg);
+          ti.textContent = `${E[S.s]?.short ?? ''} ${words}${E[S.t] ? ` ${E[S.t].short}` : ''}${sure ? ` (${sure.n.toLowerCase()})` : ''}`;
+          on<MouseEvent>(lg, 'click', ev => { ev.stopPropagation(); openWire(B.key); });
+          on<MouseEvent>(lg, 'mouseenter', ev => showLinkTip(ev, S));
+          on(lg, 'mouseleave', hideTip);
+          lab = {g: lg, w: tw + 14, t, body, ended: false};
+        }
+        edgeEls[`${key}#${i}`] = {g, p, u, h, d2, S: {...S, s, t}, w, bend, want, lab};
         on<MouseEvent>(h, 'click', ev => { ev.stopPropagation(); openWire(B.key); });
         on<MouseEvent>(h, 'mouseenter', ev => showLinkTip(ev, S));
         on(h, 'mouseleave', hideTip);
@@ -579,15 +755,19 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
         const B = bundles[key];
         if (B.a !== focus && B.b !== focus) continue;
         const st = Object.values(B.strands).filter(s => s.fam === 'money');
-        if (st.length !== 2) continue;
+        if (new Set(st.map(x => x.s)).size !== 2) continue;
         const other = B.a === focus ? B.b : B.a;
         const fl = flagsOf(focus).items.concat(flagsOf(other).items).find(x => x.id === 'ML-023');
         const ki = Object.keys(edgeEls).find(k => k.startsWith(`${key}#`) && edgeEls[k].S.fam === 'money');
         if (!ki) continue;
-        const g = el('g', {}, gE);
-        el('rect', {x: -70, y: -12, width: 140, height: 24, rx: 12, fill: fl ? '#8E2420' : '#1E3448', stroke: '#FF8070'}, g);
+        const g = el('g', {}, gLab);
+        // The flag's own level (it was always written TEXTBOOK); only a textbook flag takes the alarm fill.
+        const r = el('rect', {y: -12, height: 24, rx: 12, fill: fl?.level === 'textbook' ? '#8E2420' : '#1E3448', stroke: fl ? '#FF8070' : '#6F8AA3'}, g);
         const t = el('text', {class: 'round-l', 'text-anchor': 'middle', y: 4}, g);
-        t.textContent = fl ? 'ROUND TRIP · TEXTBOOK' : 'MONEY BOTH WAYS';
+        t.textContent = fl ? `ROUND TRIP · ${fl.level.toUpperCase()}` : 'MONEY BOTH WAYS';
+        let tw = t.textContent.length * 7.4;
+        try { tw = t.getComputedTextLength() || tw; } catch { /* not laid out (tests) */ }
+        r.setAttribute('x', String(-(tw + 24) / 2)); r.setAttribute('width', String(tw + 24));
         rtEls.push({k: ki, g, o: other});
       }
     }
@@ -602,7 +782,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
         const span = years.length ? ` · ${years[0]}${years.length > 1 ? `–${years[years.length - 1]}` : ''}` : '';
         const txt = pay.length ? `${fwd ? 'PAID' : 'WAS PAID BY'} · ${pay.length > 1 ? `${pay.length} PAYMENTS · ` : ''}${fmtAmt(sum, l0.cur).toUpperCase()}${span}`
           : `${(FAM[l0.fam] || FAM.other).n.toUpperCase()}${fwd ? '' : ' (OTHER WAY)'}`;
-        const g = el('g', {}, gE);
+        const g = el('g', {}, gLab);
         const r = el('rect', {y: -11, height: 22, rx: 11, class: 'hop-bg', stroke: '#FF8070'}, g);
         const t = el('text', {class: 'round-l', 'text-anchor': 'middle', y: 4}, g);
         t.textContent = txt;
@@ -651,7 +831,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
         const t = el('text', {'text-anchor': 'middle', y: 4}, g);
         t.textContent = `+${m.n} more`;
         on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); expanded.add(m.p); go('party', {noTrail: true}); });
-        moreEls.push(m);
+        moreEls.push({x: m.x, y: m.y, g});
       }
     }
     chains.forEach(c => { const t = node[c.id]?.dot.querySelector('text'); if (t) t.textContent = c.mids.length > 1 ? `CHAIN OF ${c.mids.length} COMPANIES` : '1 COMPANY BETWEEN'; });
@@ -705,7 +885,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     if (mode !== 'party' || (a !== focus && b !== focus)) focus = a;
     go('wire');
     window.clearTimeout(wireTimer);
-    wireTimer = window.setTimeout(drawWire, RM ? 0 : 420);
+    wireTimer = window.setTimeout(drawWire, RM() ? 0 : 420);
   }
   function drawWire(): void {
     const box = q<HTMLDivElement>('.tw-wire');
@@ -763,7 +943,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
       const ev = l.ev[0];
       const head = l.fam === 'money' ? `${fmtAmt(l.amount, l.cur)} · ${fmtDate(l.date)}`
         : `${fam.n}${l.pct ? ` · ${l.pct}%` : ''}${l.date ? ` · from ${fmtDate(l.date)}` : ''}`;
-      tg.innerHTML = `<b>${esc(head)}</b>${esc((l.role || '').slice(0, 90))}${ev ? `<span class="q">“${esc(ev.q.slice(0, 120))}${ev.q.length > 120 ? '…' : ''}”</span><cite>${esc(ev.doc)}${ev.loc ? ` · ${esc(ev.loc)}` : ''}</cite>` : '<span class="q">No quote shows it yet.</span>'}`;
+      const sure = sureOf(l), end = endOf(l);
+      const chip = sure ? `<span class="sure s-${sure}"><i aria-hidden="true">${SURE[sure].g}</i> ${esc(SURE[sure].n)}</span>` : '';
+      tg.innerHTML = `${chip}<b>${esc(head)}${end ? ` · ended ${esc(fmtDate(end))}` : ''}</b>${esc((l.role || '').slice(0, 90))}${ev ? `<span class="q">“${esc(ev.q.slice(0, 120))}${ev.q.length > 120 ? '…' : ''}”</span><cite>${esc(ev.doc)}${ev.loc ? ` · ${esc(ev.loc)}` : ''}</cite>` : '<span class="q">No quote shows it yet.</span>'}`;
       if (ev?.evidence_id) {
         const tr = document.createElement('button');
         tr.type = 'button'; tr.className = 'trace'; tr.textContent = 'Trace';
@@ -844,6 +1026,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
       li.appendChild(b); ol.appendChild(li);
     });
     q('.tw-blens').setAttribute('aria-pressed', String(lens.on && mode === 'case'));
+    renderActive();
     q('.tw-bpath').setAttribute('aria-pressed', String(mode === 'path'));
   }
 
@@ -900,6 +1083,21 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     tip.classList.add('on');
   }
   const hideTip = () => tip.classList.remove('on');
+  let litLink: string | null = null;
+  function setLitLink(k: string | null): void {
+    if (litLink && edgeEls[litLink]) { edgeEls[litLink].g.classList.remove('lit'); edgeEls[litLink].lab?.g.classList.remove('lit'); }
+    litLink = k && edgeEls[k] ? k : null;
+    if (!litLink) { hideTip(); return; }
+    const R = edgeEls[litLink];
+    R.g.classList.add('lit'); R.lab?.g.classList.add('lit');
+    const words = R.lab?.body.textContent ?? '';
+    const sure = R.S.sure ? SURE[R.S.sure] : null;
+    tip.innerHTML = `<b>${esc(E[R.S.s]?.short ?? '')} ${esc(words)} ${esc(E[R.S.t]?.short ?? '')}</b><span class="m">${sure ? `${esc(sure.g)} ${esc(sure.n)} · ` : ''}Enter opens every record on this link · J / K next, previous</span>`;
+    const r = R.lab?.g.getBoundingClientRect(), box = root.getBoundingClientRect();
+    tip.style.left = `${Math.min(W - 290, Math.max(8, (r ? r.left - box.left : W / 2)))}px`;
+    tip.style.top = `${Math.min(H - 120, (r ? r.bottom - box.top : H / 2) + 8)}px`;
+    tip.classList.add('on');
+  }
 
   /* key */
   (() => {
@@ -910,7 +1108,63 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
     h += '<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="#c98a5e" stroke-width="1.2"/></svg>Thicker line, more money</div>';
     h += '<div class="row"><svg width="30" height="12" aria-hidden="true"><circle cx="5" cy="6" r="4" fill="#393941" stroke="#a8a2b8"/><circle cx="16" cy="6" r="4" fill="#393941" stroke="#a8a2b8"/></svg>Accounts, kept on their holder</div>';
     q('.tw-key-body').innerHTML = h;
+    // How sure: always on (SEE_1). Colour says what a link is; the line and the glyph say how sure.
+    const line = (extra: string, core = '') => `<svg width="34" height="10" aria-hidden="true"><path d="M2 5H32" stroke="#baac91" stroke-width="2" ${extra}/>${core}</svg>`;
+    let k = '<div class="cap">How sure <span>always on</span></div>';
+    k += `<div class="row">${line('')}<b>${SURE.shown.g}</b> shown</div>`;
+    k += `<div class="row">${line(`stroke-dasharray="${SURE.unshown.dash}"`)}<b>${SURE.unshown.g}</b> not yet shown</div>`;
+    k += `<div class="row"><svg width="34" height="10" aria-hidden="true"><path d="M2 5H32" stroke="${DISPUTED}" stroke-width="5"/><path d="M2 5H32" class="core" stroke-width="2"/></svg><b>${SURE.disputed.g}</b> disputed</div>`;
+    k += `<div class="row">${line(`stroke-dasharray="${SURE.worked.dash}" stroke-linecap="round"`)}<b>${SURE.worked.g}</b> worked out by the app</div>`;
+    k += `<div class="row">${line('stroke-opacity=".38"')}ended, drawn faint</div>`;
+    k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><circle cx="17" cy="7" r="5.5" fill="#4e4234" stroke="#d4a152" stroke-width="1.4"/><circle cx="17" cy="7" r="6.6" fill="none" stroke="#F6966A" stroke-width="1.4" transform="scale(1)"/></svg>ring: open Red Flags, the badge their level and count</div>';
+    q('.tw-key-sure').innerHTML = k;
   })();
+
+  /* active filters, as chips (SEE_1 "Active"): each one clears with its ✕ */
+  function renderActive(): void {
+    const box = q<HTMLDivElement>('.tw-active');
+    if (!box) return;
+    const chips: {t: string; clear: () => void}[] = [];
+    if (range[0] > T0 + 0.01 || range[1] < T1 - 0.01) chips.push({t: `Dates ${fmtYM(range[0])} – ${fmtYM(range[1])}`, clear: () => { range[0] = T0; range[1] = T1; drawTime(); render(); }});
+    if (mode === 'party' && E[focus]) chips.push({t: `Around ${E[focus].short}`, clear: () => go('case')});
+    if (mode === 'wire' && bundles[wireKey]) chips.push({t: `One link: ${E[bundles[wireKey].a].short} – ${E[bundles[wireKey].b].short}`, clear: () => go('party', {noTrail: true})});
+    if (mode === 'path' && pathIds.length > 1) chips.push({t: `Following ${E[pathIds[0]].short} → ${E[pathIds[pathIds.length - 1]].short}`, clear: () => { q('.tw-pathbox').classList.remove('on'); go('case'); }});
+    if (lens.on && mode === 'case') chips.push({t: 'Lens', clear: () => toggleLens()});
+    box.textContent = '';
+    if (!chips.length) return;
+    const cap = document.createElement('span');
+    cap.className = 'cap'; cap.textContent = 'Active';
+    box.appendChild(cap);
+    for (const c of chips) {
+      const sp = document.createElement('span'), b = document.createElement('button');
+      sp.className = 'chip'; sp.textContent = `${c.t} `;
+      b.type = 'button'; b.textContent = '✕'; b.setAttribute('aria-label', `Clear: ${c.t}`); b.onclick = c.clear;
+      sp.appendChild(b); box.appendChild(sp);
+    }
+    if (chips.length > 1) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'clear'; b.textContent = 'Clear all';
+      b.onclick = () => { range[0] = T0; range[1] = T1; if (lens.on) lens.on = false; q('.tw-pathbox').classList.remove('on'); drawTime(); go('case'); };
+      box.appendChild(b);
+    }
+  }
+
+  /* the counts under the time strip: what the window holds */
+  let countsText = '';
+  function renderCounts(): void {
+    const all = D.links.filter(l => E[l.s] && E[l.t]);
+    const full = range[0] <= T0 + 0.01 && range[1] >= T1 - 0.01;
+    const undated = all.filter(l => !l.date).length;
+    const held = all.filter(l => l.date && inRange(l)).length + undated;
+    const ended = all.filter(l => inRange(l) && endedBy([l], range[1])).length;
+    const t = `${full ? `Showing all ${all.length} ${all.length === 1 ? 'link' : 'links'}` : `Showing ${held} of ${all.length} links in this window`}`
+      + `${ended ? ` · ${ended} ended, drawn faint` : ''}${undated ? ` · ${undated} undated, always shown` : ''}`
+      + `${hiddenLabels ? ` · ${hiddenLabels} link ${hiddenLabels === 1 ? 'sentence' : 'sentences'} left off where ${hiddenLabels === 1 ? 'it' : 'they'} would overlap: zoom in` : ''}`;
+    if (t === countsText) return;
+    countsText = t;
+    const p = q<HTMLParagraphElement>('.tw-counts');
+    if (p) p.textContent = t;
+  }
 
   /* time strip */
   const tsvg = q<SVGSVGElement>('.tw-tsvg');
@@ -973,6 +1227,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
         if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') { ev.preventDefault(); set(range[i] + (ev.key === 'ArrowRight' ? 0.25 : -0.25)); root.querySelectorAll<SVGGElement>('.handle')[i]?.focus(); }
       });
     }
+    renderCounts(); renderActive();
     const lab = el('text', {x: w, y: -2, 'text-anchor': 'end', class: 'tcap win'}, tsvg);
     lab.textContent = (range[0] <= T0 + 0.01 && range[1] >= T1 - 0.01) ? 'Showing all dates · drag the handles' : `Showing ${fmtYM(range[0])} – ${fmtYM(range[1])}`;
   }
@@ -996,7 +1251,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
   /* ---------- input ---------- */
   let drag: {x: number; y: number; cx: number; cy: number; moved: boolean} | null = null;
   on<PointerEvent>(svg, 'pointerdown', e => {
-    if ((e.target as Element).closest('.node,.hit,.more')) return;
+    if ((e.target as Element).closest('.node,.hit,.more,.elab')) return;
     drag = {x: e.clientX, y: e.clientY, cx: C.x, cy: C.y, moved: false};
     svg.classList.add('drag');
     svg.setPointerCapture?.(e.pointerId);
@@ -1087,7 +1342,16 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
       const rect = node[id].card.querySelector('rect');
       rect?.setAttribute('stroke-width', '3');
       window.setTimeout(() => rect?.setAttribute('stroke-width', '1.4'), 900);
-    } else if (e.key === 'Enter' && mode === 'party' && stepIdx >= 0) { const r = ringOrder(); go('party', {id: r[stepIdx]}); stepIdx = -1; }
+    } else if (e.key === 'Enter' && litLink) { const k = litLink.split('#')[0]; setLitLink(null); openWire(k); }
+    else if (e.key === 'Enter' && mode === 'party' && stepIdx >= 0) { const r = ringOrder(); go('party', {id: r[stepIdx]}); stepIdx = -1; }
+    else if ((e.key === 'j' || e.key === 'J' || e.key === 'k' || e.key === 'K') && (mode === 'party' || mode === 'case')) {
+      // J / K: the next or previous link with its sentence on screen (SEE_1); Enter opens it.
+      const keys = Object.keys(edgeEls).filter(k => edgeEls[k].lab && edgeEls[k].lab!.g.style.display !== 'none').sort((a, b) => pri(edgeEls[b]) - pri(edgeEls[a]));
+      if (!keys.length) return;
+      e.preventDefault();
+      const i = litLink ? keys.indexOf(litLink) : -1;
+      setLitLink(keys[(i + (e.key.toLowerCase() === 'j' ? 1 : -1) + keys.length + (i < 0 && e.key.toLowerCase() === 'k' ? 1 : 0)) % keys.length]);
+    }
   });
   const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(() => {
     const w = root.clientWidth, h = root.clientHeight;
@@ -1114,7 +1378,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks): (
   Object.assign(C, fitBox(Object.values(T).filter(t => t.o), 120));
   mode = 'case';
   drawStatic(); render(); renderChrome(); drawTime();
-  const boot = window.setTimeout(() => { if (focus && deg[focus]) go('party', {id: focus, slow: true}); }, RM ? 0 : 900);
+  const boot = window.setTimeout(() => { if (focus && deg[focus]) go('party', {id: focus, slow: true}); }, RM() ? 0 : 900);
 
   return () => {
     window.clearTimeout(boot); window.clearTimeout(wireTimer);

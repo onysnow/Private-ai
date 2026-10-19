@@ -454,7 +454,9 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
                                        "Creates the claim as Not yet shown, with this passage linked as supporting evidence."),
                                _choice("no", "Not a claim", path, {"decision": "reject"}, REJECTED.format("no claim is made"))]
         elif r.candidate_type == "evidence":
-            item["question"] = "Keep this passage as evidence?"
+            # Named by its document and place, so several in one list can be told apart.
+            where = item["evidence"].get("locator")
+            item["question"] = f"Keep this passage from {docs.get(r.document_id, 'the document')}{f' ({where})' if where else ''} as evidence?"
             item["consequences"] = []
             item["choices"] = [_choice("yes", "Keep it", path, {"decision": "accept"},
                                        "Saves the exact words and where they are as evidence of this document's source."),
@@ -533,7 +535,9 @@ def _ai(db: Session, inv: str) -> list[dict[str, Any]]:
         path = f"/api/ai-analysis-candidates/{r.id}/review"
         claims = len((r.payload or {}).get("claims") or [])
         out.append({
-            "kind": "ai", "id": r.id, "question": f"Accept this {label.get(r.module, r.module).lower()} as checked analysis?",
+            "kind": "ai", "id": r.id, "question": (f"Accept this {label.get(r.module, r.module).lower()} as checked analysis?" if r.module not in SUITE_MODULES
+                         # The suite's titles are not all singular ("Rival explanations", "Options and evidence").
+                         else f"Accept the {SUITE_MODULES[r.module].system.upper()} answer, {label[r.module].lower()}, as checked analysis?"),
             "actor": "AI", "actor_kind": "ai", "created_at": r.created_at, "rank": 80, "level": None,
             "reason": f"AI draft · {r.created_at:%d %b %H:%M}" + (f" · asked: {q[:80]}" if q else ""),
             "group": {"key": "ai", "label": "AI drafts"}, "evidence": None, "parties": [],
@@ -541,7 +545,9 @@ def _ai(db: Session, inv: str) -> list[dict[str, Any]]:
             "consequences": ["Either way it never creates or changes a record; your answer is written into the run record."],
             "choices": [_choice("yes", "Accept", path, {"decision": "accept"}, "Marks the draft as analysis a person checked."),
                         _choice("no", "Reject", path, {"decision": "reject"}, "Marks the draft rejected, with your reason.")],
-            "open": {"href": "/act#ai-reasoning-panel", "label": "Read the whole draft"},
+            # Not sure about the whole answer: decide it claim by claim instead (AI runs › Review).
+            "open": {"href": f"/act?run={(r.trace or {}).get('run_id') or ''}&review={r.id}#ai-runs" if (r.trace or {}).get("run_id")
+                     else "/act#ai-reasoning-panel", "label": "Not sure? Review it claim by claim"},
         })
     return out
 

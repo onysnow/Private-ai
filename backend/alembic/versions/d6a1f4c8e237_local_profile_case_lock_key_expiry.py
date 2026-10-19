@@ -1,13 +1,13 @@
 """your name and the app lock (local_profile), a case locked on its own, and per-person keys that expire (ADR-0016)
 
 Revision ID: d6a1f4c8e237
-Revises: c3f8a2d6e914
+Revises: f1a9c3d7e582
 """
 from alembic import op
 import sqlalchemy as sa
 
 revision = "d6a1f4c8e237"
-down_revision = "c3f8a2d6e914"
+down_revision = "f1a9c3d7e582"
 branch_labels = None
 depends_on = None
 

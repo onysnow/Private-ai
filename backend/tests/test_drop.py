@@ -58,6 +58,8 @@ def test_each_file_is_a_lane_of_seven_stages_with_its_receipt():
     assert {s["key"]: s["state"] for s in lanes["letters.mbox"]["stages"]}["inside"] == "active"
     assert lanes["broken.pdf"]["problem"] is True
     assert {s["key"]: s["detail"] for s in lanes["broken.pdf"]["stages"]}["read"] == "The file is damaged"
+    # It stops at Read; the stages after it were never reached (mockup INTAKE_1: one ✕, then waiting boxes).
+    assert [s["state"] for s in lanes["broken.pdf"]["stages"]] == ["done", "done", "stopped", "waiting", "skipped", "waiting", "waiting"]
     assert {s["key"]: s["state"] for s in lanes["queued.docx"]["stages"]}["read"] == "waiting"
     totals = body["totals"]
     started = totals.pop("started_at")

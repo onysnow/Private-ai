@@ -5131,10 +5131,17 @@ class RunPlanTypeCountOut(ResponseModel):
     count: int
 
 
+class RunPlanTierCountOut(ResponseModel):
+    tier: str
+    count: int
+
+
 class RunPlanPacketOut(ResponseModel):
     records: int
     by_type: list[RunPlanTypeCountOut]
     leads_only: int
+    # Records whose source sits below the tier floor, by tier: in the packet, but never counting toward a fact.
+    below_tier_floor: list[RunPlanTierCountOut]
     first: list[RunPlanRecordOut]
 
 
@@ -5498,3 +5505,146 @@ class DecidersOut(ResponseModel):
     """Who decided what in a case over the last days (mockup ACCOUNT_2): name, or null for "a person"."""
     days: int
     people: list[DeciderOut]
+
+
+# --- Keep › Safety & data (mockup KEEP-safety-and-data, ADR-0015) ---
+
+class OutboundEntryOut(ResponseModel):
+    """One request that carried case data to an outside service, as it was sent. `local` is true for a request to a
+    service on this computer: kept so the log is complete, and not counted as leaving."""
+    id: str
+    at: Timestamp
+    service: str
+    destination: str
+    local: bool
+    value_sent: str
+    value_kind: str
+    reason: str
+    actor: str
+    status: str
+    error: str | None
+    run_id: str | None
+    detail: dict[str, Any] | None
+
+
+class OutboundLogOut(ResponseModel):
+    period: str
+    service: str | None
+    total: int
+    entries: list[OutboundEntryOut]
+
+
+class SafetyTotalsOut(ResponseModel):
+    requests_left: int
+    services_reached: int
+    documents_sent_out: int
+    ai_calls_outside: int
+
+
+class SafetyCaseRecordsOut(ResponseModel):
+    records: int
+    claims: int
+    in_backups: bool
+
+
+class SafetyDocumentsOut(ResponseModel):
+    files: int
+    bytes: int
+    in_backups: bool
+
+
+class SafetyBackupsStoreOut(ResponseModel):
+    count: int
+    last: Timestamp | None
+    encrypted: bool
+
+
+class SafetyKeysOut(ResponseModel):
+    set: int
+    total: int
+
+
+class SafetySecurityLogOut(ResponseModel):
+    events: int
+    since: str | None
+    bytes: int
+
+
+class SafetyPrivateAiOut(ResponseModel):
+    enabled: bool
+    provider: str | None
+    model: str | None
+    on_this_computer: bool | None
+    remote_allowed: bool
+
+
+class SafetyStoresOut(ResponseModel):
+    case_records: SafetyCaseRecordsOut
+    documents: SafetyDocumentsOut
+    backups: SafetyBackupsStoreOut
+    service_keys: SafetyKeysOut
+    security_log: SafetySecurityLogOut
+    private_ai: SafetyPrivateAiOut
+
+
+class SafetyServiceOut(ResponseModel):
+    """An outside service the case can reach. `mode` is one of off / on_click / this_computer / automatic / blocked:
+    the app has no "ask first" switch yet (ADR-0015), so a lookup runs only when the reporter starts it (`on_click`).
+    `counted` is false when the app does not log that service's traffic, so the screen never shows a false zero."""
+    key: str
+    label: str
+    role: str
+    host: str
+    mode: str
+    why: str
+    sent: int
+    sends: list[str]
+    last: Timestamp | None
+    counted: bool
+
+
+class SafetyBackupCardOut(ResponseModel):
+    last: Timestamp | None
+    size_bytes: int | None
+    sha256: str | None
+    with_documents: bool | None
+    records: int | None
+    documents: int | None
+
+
+class SafetyAccessCardOut(ResponseModel):
+    refused_24h: int
+
+
+class SafetyHousekeepingCardOut(ResponseModel):
+    stray_files: int
+    stray_bytes: int
+
+
+class SafetyDeleteCardOut(ResponseModel):
+    records: int
+    files: int
+    shared_files: int
+
+
+class SafetyCardsOut(ResponseModel):
+    backup: SafetyBackupCardOut
+    access: SafetyAccessCardOut
+    housekeeping: SafetyHousekeepingCardOut
+    delete: SafetyDeleteCardOut
+
+
+class SafetyInvestigationOut(ResponseModel):
+    id: str
+    name: str
+
+
+class SafetyAndDataOut(ResponseModel):
+    investigation: SafetyInvestigationOut
+    period: str
+    now: Timestamp
+    totals: SafetyTotalsOut
+    stores: SafetyStoresOut
+    services: list[SafetyServiceOut]
+    cards: SafetyCardsOut
+    not_counted: list[str]

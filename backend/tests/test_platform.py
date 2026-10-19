@@ -60,11 +60,11 @@ def test_a_lookup_is_logged_with_what_was_sent(probe):
     with SessionLocal() as db:
         lines = outbound.recent(db)
     assert [(line["kind"], line["sent"], line["destination"], line["case"]) for line in lines] == [
-        ("lookup", "“Harbour Nominees SA” and its details on record", "probe.example.org", "Kestrel SA"),
-        ("lookup", "“Fernhill Ltd”", "probe.example.org", "Kestrel SA"),
+        ("lookup", "Harbour Nominees SA", "https://probe.example.org", "Kestrel SA"),
+        ("lookup", "Fernhill Ltd", "https://probe.example.org", "Kestrel SA"),
     ]
     week = client.get("/api/settings/lookups").json()["week"]
-    assert week[0]["sent"].startswith("“Harbour Nominees SA”")
+    assert week[0]["sent"].startswith("Harbour Nominees SA")
 
 
 def test_a_failed_lookup_is_logged_and_a_refused_key_says_refused(probe):
@@ -79,25 +79,11 @@ def test_a_failed_lookup_is_logged_and_a_refused_key_says_refused(probe):
 
 def test_the_log_keeps_ninety_days():
     with SessionLocal() as db:
-        db.add(OutboundRequest(kind="download", service="demo case", destination="example.org", sent="x", at=utcnow_naive() - timedelta(days=91)))
-        db.add(OutboundRequest(kind="download", service="demo case", destination="example.org", sent="y"))
+        db.add(OutboundRequest(kind="download", service="demo case", destination="example.org", value_sent="x", at=utcnow_naive() - timedelta(days=91)))
+        db.add(OutboundRequest(kind="download", service="demo case", destination="example.org", value_sent="y"))
         db.commit()
         assert outbound.prune(db) == 1
         assert [r["sent"] for r in outbound.recent(db, days=365)] == ["y"]
-
-
-def test_a_remote_model_call_is_logged_and_a_local_one_is_not(monkeypatch):
-    from app.ai.reasoning import _record_model_call
-
-    inv = _case()
-    with SessionLocal() as db:
-        local = settings.model_copy(update={"ai_provider": "ollama", "ollama_base_url": "http://127.0.0.1:11434", "ollama_model": "qwen2.5"})
-        _record_model_call(db, inv, local, 1200)
-        cloud = settings.model_copy(update={"ai_provider": "anthropic"})
-        _record_model_call(db, inv, cloud, 1200)
-        lines = outbound.recent(db)
-    assert [(r["kind"], r["service"], r["destination"]) for r in lines] == [("ai", "anthropic", "api.anthropic.com")]
-    assert "1,200 characters" in lines[0]["sent"]
 
 
 # --- 2. The scheduler ------------------------------------------------------------------------------------------

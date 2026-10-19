@@ -184,6 +184,7 @@ function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () 
 export function InvestigationType({kind, flagsByArea, onSet}: {kind: InvestigationTypeOut; flagsByArea: Record<string, number>;
   onSet: (areas: string[] | null) => Promise<void>}): ReactElement {
   const [editing, setEditing] = useState(false);
+  const [why, setWhy] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
   const [find, setFind] = useState('');
   const all = (useQuery({...listAreasOptions(), enabled: editing}).data ?? []).filter(a => a.indicators > 0 && a.key !== 'SA');
@@ -201,7 +202,13 @@ export function InvestigationType({kind, flagsByArea, onSet}: {kind: Investigati
     return <div className="rf-type" role="group" aria-label="Type of investigation">
       <span className="rf-type-label">Type</span>
       <span className="rf-type-names">{kind.areas.length ? kind.areas.map(a => a.name).join(' · ') : 'Not known yet'}</span>
-      <span className="sv-muted">{kind.set_by === 'app' ? 'chosen by the app' : 'chosen by you'}</span>
+      <span className="sv-muted">{kind.set_by === 'app' ? '— chosen by the app' : '— chosen by you'}</span>
+      {/* "why?": the app's reasons for the areas it chose (research Act §4: the reasons, without opening the picker). */}
+      {kind.set_by === 'app' && kind.areas.length > 0 && <span className="rf-why" onKeyDown={e => { if (e.key === 'Escape' && why) { e.stopPropagation(); setWhy(false); } }}>
+        <button type="button" className="rf-why-btn" aria-expanded={why} aria-controls="rf-why-list" onClick={() => setWhy(w => !w)}>why?</button>
+        {why && <ul id="rf-why-list" className="rf-why-list" aria-label="Why the app chose this type">{kind.areas.map(a => <li key={a.key}><b>{a.name}</b>
+          <ul>{a.reasons.map(r => <li key={r}>{r.replace(/^Red Flag: /, '')}</li>)}</ul></li>)}</ul>}
+      </span>}
       <button type="button" className="sv-btn" onClick={start}>Change</button>
     </div>;
   }

@@ -13421,6 +13421,71 @@ export type OrphanStoragePreviewOut = {
 };
 
 /**
+ * OutboundEntryOut
+ *
+ * One request that carried case data to an outside service, as it was sent. `local` is true for a request to a
+ * service on this computer: kept so the log is complete, and not counted as leaving.
+ */
+export type OutboundEntryOut = {
+  /**
+   * Actor
+   */
+  actor: string;
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * Destination
+   */
+  destination: string;
+  /**
+   * Detail
+   */
+  detail: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Error
+   */
+  error: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Local
+   */
+  local: boolean;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Run Id
+   */
+  run_id: string | null;
+  /**
+   * Service
+   */
+  service: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Value Kind
+   */
+  value_kind: string;
+  /**
+   * Value Sent
+   */
+  value_sent: string;
+};
+
+/**
  * OutboundLineOut
  *
  * One request that left this computer (app/services/outbound.py).
@@ -13464,6 +13529,28 @@ export type OutboundLineOut = {
    * Service
    */
   service: string;
+};
+
+/**
+ * OutboundLogOut
+ */
+export type OutboundLogOut = {
+  /**
+   * Entries
+   */
+  entries: Array<OutboundEntryOut>;
+  /**
+   * Period
+   */
+  period: string;
+  /**
+   * Service
+   */
+  service: string | null;
+  /**
+   * Total
+   */
+  total: number;
 };
 
 /**
@@ -15811,6 +15898,10 @@ export type RunPlanOut = {
  */
 export type RunPlanPacketOut = {
   /**
+   * Below Tier Floor
+   */
+  below_tier_floor: Array<RunPlanTierCountOut>;
+  /**
    * By Type
    */
   by_type: Array<RunPlanTypeCountOut>;
@@ -15951,6 +16042,20 @@ export type RunPlanSystemOut = {
    * Why
    */
   why: string;
+};
+
+/**
+ * RunPlanTierCountOut
+ */
+export type RunPlanTierCountOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Tier
+   */
+  tier: string;
 };
 
 /**
@@ -16137,6 +16242,326 @@ export type RunSettingValueOut = {
    * Value
    */
   value: string;
+};
+
+/**
+ * SafetyAccessCardOut
+ */
+export type SafetyAccessCardOut = {
+  /**
+   * Refused 24H
+   */
+  refused_24h: number;
+};
+
+/**
+ * SafetyAndDataOut
+ */
+export type SafetyAndDataOut = {
+  cards: SafetyCardsOut;
+  investigation: SafetyInvestigationOut;
+  /**
+   * Not Counted
+   */
+  not_counted: Array<string>;
+  /**
+   * Now
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  now: string;
+  /**
+   * Period
+   */
+  period: string;
+  /**
+   * Services
+   */
+  services: Array<SafetyServiceOut>;
+  stores: SafetyStoresOut;
+  totals: SafetyTotalsOut;
+};
+
+/**
+ * SafetyBackupCardOut
+ */
+export type SafetyBackupCardOut = {
+  /**
+   * Documents
+   */
+  documents: number | null;
+  /**
+   * Last
+   */
+  last: string | null;
+  /**
+   * Records
+   */
+  records: number | null;
+  /**
+   * Sha256
+   */
+  sha256: string | null;
+  /**
+   * Size Bytes
+   */
+  size_bytes: number | null;
+  /**
+   * With Documents
+   */
+  with_documents: boolean | null;
+};
+
+/**
+ * SafetyBackupsStoreOut
+ */
+export type SafetyBackupsStoreOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Encrypted
+   */
+  encrypted: boolean;
+  /**
+   * Last
+   */
+  last: string | null;
+};
+
+/**
+ * SafetyCardsOut
+ */
+export type SafetyCardsOut = {
+  access: SafetyAccessCardOut;
+  backup: SafetyBackupCardOut;
+  delete: SafetyDeleteCardOut;
+  housekeeping: SafetyHousekeepingCardOut;
+};
+
+/**
+ * SafetyCaseRecordsOut
+ */
+export type SafetyCaseRecordsOut = {
+  /**
+   * Claims
+   */
+  claims: number;
+  /**
+   * In Backups
+   */
+  in_backups: boolean;
+  /**
+   * Records
+   */
+  records: number;
+};
+
+/**
+ * SafetyDeleteCardOut
+ */
+export type SafetyDeleteCardOut = {
+  /**
+   * Files
+   */
+  files: number;
+  /**
+   * Records
+   */
+  records: number;
+  /**
+   * Shared Files
+   */
+  shared_files: number;
+};
+
+/**
+ * SafetyDocumentsOut
+ */
+export type SafetyDocumentsOut = {
+  /**
+   * Bytes
+   */
+  bytes: number;
+  /**
+   * Files
+   */
+  files: number;
+  /**
+   * In Backups
+   */
+  in_backups: boolean;
+};
+
+/**
+ * SafetyHousekeepingCardOut
+ */
+export type SafetyHousekeepingCardOut = {
+  /**
+   * Stray Bytes
+   */
+  stray_bytes: number;
+  /**
+   * Stray Files
+   */
+  stray_files: number;
+};
+
+/**
+ * SafetyInvestigationOut
+ */
+export type SafetyInvestigationOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * SafetyKeysOut
+ */
+export type SafetyKeysOut = {
+  /**
+   * Set
+   */
+  set: number;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * SafetyPrivateAiOut
+ */
+export type SafetyPrivateAiOut = {
+  /**
+   * Enabled
+   */
+  enabled: boolean;
+  /**
+   * Model
+   */
+  model: string | null;
+  /**
+   * On This Computer
+   */
+  on_this_computer: boolean | null;
+  /**
+   * Provider
+   */
+  provider: string | null;
+  /**
+   * Remote Allowed
+   */
+  remote_allowed: boolean;
+};
+
+/**
+ * SafetySecurityLogOut
+ */
+export type SafetySecurityLogOut = {
+  /**
+   * Bytes
+   */
+  bytes: number;
+  /**
+   * Events
+   */
+  events: number;
+  /**
+   * Since
+   */
+  since: string | null;
+};
+
+/**
+ * SafetyServiceOut
+ *
+ * An outside service the case can reach. `mode` is one of off / on_click / this_computer / automatic / blocked:
+ * the app has no "ask first" switch yet (ADR-0015), so a lookup runs only when the reporter starts it (`on_click`).
+ * `counted` is false when the app does not log that service's traffic, so the screen never shows a false zero.
+ */
+export type SafetyServiceOut = {
+  /**
+   * Counted
+   */
+  counted: boolean;
+  /**
+   * Host
+   */
+  host: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Last
+   */
+  last: string | null;
+  /**
+   * Mode
+   */
+  mode: string;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Sends
+   */
+  sends: Array<string>;
+  /**
+   * Sent
+   */
+  sent: number;
+  /**
+   * Why
+   */
+  why: string;
+};
+
+/**
+ * SafetyStoresOut
+ */
+export type SafetyStoresOut = {
+  backups: SafetyBackupsStoreOut;
+  case_records: SafetyCaseRecordsOut;
+  documents: SafetyDocumentsOut;
+  private_ai: SafetyPrivateAiOut;
+  security_log: SafetySecurityLogOut;
+  service_keys: SafetyKeysOut;
+};
+
+/**
+ * SafetyTotalsOut
+ */
+export type SafetyTotalsOut = {
+  /**
+   * Ai Calls Outside
+   */
+  ai_calls_outside: number;
+  /**
+   * Documents Sent Out
+   */
+  documents_sent_out: number;
+  /**
+   * Requests Left
+   */
+  requests_left: number;
+  /**
+   * Services Reached
+   */
+  services_reached: number;
 };
 
 /**
@@ -26998,6 +27423,104 @@ export type AddNoteResponses = {
 
 export type AddNoteResponse = AddNoteResponses[keyof AddNoteResponses];
 
+export type GetOutboundLogData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Period
+     */
+    period?: 'today' | '7d' | '30d' | 'all';
+    /**
+     * Service
+     */
+    service?: string | null;
+    /**
+     * Limit
+     */
+    limit?: number;
+    /**
+     * Include Local
+     */
+    include_local?: boolean;
+  };
+  url: '/api/investigations/{investigation_id}/outbound-log';
+};
+
+export type GetOutboundLogErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetOutboundLogError =
+  GetOutboundLogErrors[keyof GetOutboundLogErrors];
+
+export type GetOutboundLogResponses = {
+  /**
+   * Successful Response
+   */
+  200: OutboundLogOut;
+};
+
+export type GetOutboundLogResponse =
+  GetOutboundLogResponses[keyof GetOutboundLogResponses];
+
+export type ExportOutboundLogData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Period
+     */
+    period?: 'today' | '7d' | '30d' | 'all';
+    /**
+     * Service
+     */
+    service?: string | null;
+  };
+  url: '/api/investigations/{investigation_id}/outbound-log.csv';
+};
+
+export type ExportOutboundLogErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExportOutboundLogError =
+  ExportOutboundLogErrors[keyof ExportOutboundLogErrors];
+
+export type ExportOutboundLogResponses = {
+  /**
+   * The whole outbound log as a CSV file, for a source-protection file
+   */
+  200: Blob | File;
+};
+
+export type ExportOutboundLogResponse =
+  ExportOutboundLogResponses[keyof ExportOutboundLogResponses];
+
 export type HowAreTheyConnectedData = {
   body?: never;
   path: {
@@ -27506,6 +28029,47 @@ export type PutCaseResearchResponses = {
 
 export type PutCaseResearchResponse =
   PutCaseResearchResponses[keyof PutCaseResearchResponses];
+
+export type GetSafetyAndDataData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Period
+     */
+    period?: 'today' | '7d' | '30d' | 'all';
+  };
+  url: '/api/investigations/{investigation_id}/safety-and-data';
+};
+
+export type GetSafetyAndDataErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSafetyAndDataError =
+  GetSafetyAndDataErrors[keyof GetSafetyAndDataErrors];
+
+export type GetSafetyAndDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: SafetyAndDataOut;
+};
+
+export type GetSafetyAndDataResponse =
+  GetSafetyAndDataResponses[keyof GetSafetyAndDataResponses];
 
 export type SaveQuestionData = {
   body: SavedQuestionCreate;

@@ -29,6 +29,7 @@ import {agoText} from '../../features/act/red-flags-board';
 import {LevelChip, LEVEL_WORDS} from '../../components/status';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {setSingleKeys, singleKeysOn} from '../../lib/shortcuts';
+import {setTrailTail} from '../../lib/trail';
 import {SuiteCoverage} from '../../features/suite-coverage/suite-coverage';
 import {DemoCasesLoader} from '../../features/demo/demo-cases-loader';
 import {OneMdbLoader} from '../../features/demo/one-mdb-loader';
@@ -254,6 +255,19 @@ function Settings(): ReactElement {
   ];
   const [section, go] = useSection(settingRows.filter(r => !r.href).map(r => r.id), 'appearance');
   const row = settingRows.find(r => r.id === section)!;
+  // The breadcrumb names the section you are in (mockup HOME_2: case › Settings › Appearance).
+  useEffect(() => { setTrailTail([{label: 'Settings', href: '/settings'}, {label: row.label}]); }, [row.label]);
+  useEffect(() => () => setTrailTail([]), []);
+  // ...and the case it was opened from, which this page does not load itself: its name from the case list.
+  const caseId = useWorkbenchStore(state => state.investigationId);
+  useEffect(() => {
+    const inv = new URLSearchParams(window.location.search).get('inv') || caseId;
+    const open = investigationsQuery.data?.find(i => i.id === inv);
+    if (!open) return;
+    const store = useWorkbenchStore.getState();
+    if (store.investigationId !== open.id) store.setInvestigationId(open.id);
+    store.setInvestigationName(open.name);
+  }, [caseId, investigationsQuery.data]);
   const providersQuery = useQuery({...connectorsOptions(), enabled: Boolean(status) && ['lookups', 'keys', 'log'].includes(section)});
   const providers = providersQuery.data?.providers ?? Object.keys(status?.connectors ?? {});
   const card = 'rounded-xl border border-border bg-card p-5';

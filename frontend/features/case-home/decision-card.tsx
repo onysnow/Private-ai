@@ -130,11 +130,13 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
       const choice = item.choices.find(c => keyOf[c.key] === event.key.toLowerCase());
       if (!choice) return;
       event.preventDefault();
+      // The key for No opens the reasons first, as a click does; pressing it again answers No without one.
+      if (choice.key === 'no' && !noOpen && NO_REASONS[item.kind].length) { setNoOpen(true); return; }
       onDecide(choice, note);
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
-  }, [active, item, keyOf, note, onDecide]);
+  }, [active, item, keyOf, note, noOpen, onDecide]);
 
   const ev = item.evidence;
   const inv = useWorkbenchStore(state => state.investigationId);
@@ -144,6 +146,8 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
     {ev?.rows?.length ? <RowCells rows={ev.rows} compact/>
       : ev?.excerpt ? <blockquote className="ch-excerpt"><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></blockquote>
       : <p className="ch-proposal">{item.proposal}</p>}
+    {/* No passage to show here (an AI draft, a missing record): the thing itself is one click away. */}
+    {keys === 'home' && !ev && item.choices.length > 0 && <Link className="ch-source-link" href={caseHref(item.open.href, inv)}>{item.open.label} <span aria-hidden="true">↗</span></Link>}
     {ev && <p className="ch-locator">{[ev.filename, ev.locator, /OCR/i.test(ev.locator ?? '') ? 'scanned, OCR' : null].filter(Boolean).join(' · ')}</p>}
     <PartyChips parties={item.parties}/>
   </>;

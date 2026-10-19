@@ -58,7 +58,7 @@ export function LeadsPanel({investigationId}: Props): ReactElement {
 
   const setLeadStatus = async (id: string, status: string) => {
     try {
-      await updateLeadEndpoint({path: {lead_id: id}, body: {status, note: 'Updated in Next.js workbench'}, throwOnError: true});
+      await updateLeadEndpoint({path: {lead_id: id}, body: {status}, throwOnError: true});
       setProblem('');
       await reloadLeads();
     } catch (error) {
@@ -92,7 +92,7 @@ export function LeadsPanel({investigationId}: Props): ReactElement {
 
   const setTaskStatus = async (id: string, status: 'in_progress' | 'blocked' | 'done') => {
     try {
-      await updateReportingTaskEndpoint({path: {task_id: id}, body: {status, workflow_note: `Task marked ${status} in Next.js workbench`}, throwOnError: true});
+      await updateReportingTaskEndpoint({path: {task_id: id}, body: {status}, throwOnError: true});
       setProblem('');
       await reloadLeads();
     } catch (error) {

@@ -18,6 +18,7 @@ export const PLAN = {
    }
   ],
   "leads_only": 1,
+  "below_tier_floor": [],
   "first": []
  },
  "steps": [

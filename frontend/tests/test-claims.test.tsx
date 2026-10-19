@@ -5,7 +5,7 @@
 // attaching pool evidence, recording a review, and opening a claim on
 // another panel's request through the shared store.
 import {claimDoneFixture} from '../test-support/page-routes';
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -79,13 +79,45 @@ describe('ClaimsPanel', () => {
     expect(await screen.findByText(/robust evidence, high agreement\.$/)).toBeInTheDocument();
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toEqual({status: 'unverified', confidence: 0.4, rationale: 'Two independent filings agree.',
       evidence_grade: 'robust', agreement_grade: 'high'});
-    expect(screen.getByText('unverified · 40% confidence · robust evidence, high agreement')).toBeInTheDocument();
+    expect(screen.getByText('40% confidence · robust evidence, high agreement')).toBeInTheDocument();
     expect(screen.getByText(/not graded → robust evidence, high agreement/)).toBeInTheDocument();
+  });
+
+  it('shows every status in the list as a shape and a word, never colour alone', async () => {
+    await renderPanel({[CLAIMS]: [
+      claimFixture(),
+      claimFixture({id: 'claim-2', text: 'The vendor was paid twice.', status: 'disputed'}),
+      claimFixture({id: 'claim-3', text: 'The board met in May.', status: 'confirmed'}),
+      claimFixture({id: 'claim-4', text: 'The CFO signed alone.', status: 'rejected'}),
+      claimFixture({id: 'claim-5', text: 'Who approved the transfer?', status: 'lead'}),
+    ], 'GET /api/claims/claim-2/review-workspace': workspace(claimFixture({id: 'claim-2', text: 'The vendor was paid twice.', status: 'disputed'}))});
+    const expected: [string, string, string, string][] = [
+      ['The contract was approved on March 3.', 'Unverified', 'unshown', '○'],
+      ['The vendor was paid twice.', 'Disputed', 'disputed', '✕'],
+      ['The board met in May.', 'Confirmed', 'supported', '✓'],
+      ['The CFO signed alone.', 'Rejected', 'ruled_out', '–'],
+      ['Who approved the transfer?', 'Lead', 'unshown', '○'],
+    ];
+    for (const [text, word, shape, mark] of expected) {
+      const row = screen.getByText(text).closest('button')!;
+      // The row's left edge takes the shape (solid, dashed, double, dotted); its chip carries the mark and the word.
+      expect(row).toHaveClass(`cl-${shape}`);
+      const chip = within(row).getByText(word);
+      expect(chip).toHaveClass('st', `st-${shape}`);
+      expect(chip.querySelector('[aria-hidden="true"]')?.textContent).toBe(mark);
+    }
+    // The open claim is marked as the current one in the list.
+    const row = (name: RegExp) => screen.getByRole('button', {name});
+    await userEvent.setup().click(row(/The vendor was paid twice\./));
+    await waitFor(() => expect(row(/The vendor was paid twice\./)).toHaveAttribute('aria-current', 'true'));
+    expect(row(/The contract was approved on March 3\./)).not.toHaveAttribute('aria-current');
+    // The open claim's heading carries the same chip.
+    expect(await screen.findByRole('heading', {name: 'The vendor was paid twice.'})).toBeInTheDocument();
   });
 
   it('lists the claims and disables Add unverified claim until text is entered', async () => {
     await renderPanel();
-    expect(screen.getByText('unverified · 40% confidence')).toBeInTheDocument();
+    expect(screen.getByText('40% confidence')).toBeInTheDocument();
     expect(screen.getByText('Choose a claim to inspect its evidence and verification state.')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Add unverified claim'})).toBeDisabled();
   });
@@ -145,7 +177,8 @@ describe('ClaimsPanel', () => {
     await screen.findByText('Recorded immutable review: confirmed at 90% confidence.');
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toEqual({status: 'confirmed', confidence: 0.4, rationale: 'Board minutes confirm the date directly.'});
     // The reply is what the screen shows now: the list, the history, and no further request.
-    expect(screen.getByText('confirmed · 90% confidence')).toBeInTheDocument();
+    expect(screen.getByText('90% confidence')).toBeInTheDocument();
+    expect(screen.getAllByText('Confirmed')[0]).toHaveClass('st-supported');
     expect(screen.getByText('unverified → confirmed')).toBeInTheDocument();
     expect(screen.getByText('Board minutes confirm the date directly.')).toBeInTheDocument();
     expect(api.calls(CLAIMS)).toHaveLength(1);

@@ -17,19 +17,25 @@ def upgrade():
     op.create_table(
         "outbound_requests",
         sa.Column("id", sa.String(), primary_key=True),
-        sa.Column("at", sa.DateTime(), nullable=False),
         sa.Column("investigation_id", sa.String(), sa.ForeignKey("investigations.id"), nullable=True),
+        sa.Column("at", sa.DateTime(), nullable=False),
         sa.Column("kind", sa.String(length=32), nullable=False),
         sa.Column("service", sa.String(length=64), nullable=False),
         sa.Column("destination", sa.String(length=255), nullable=False),
-        sa.Column("sent", sa.Text(), nullable=False),
-        sa.Column("outcome", sa.String(length=16), nullable=False),
-        sa.Column("detail", sa.Text(), nullable=True),
-        sa.Column("actor", sa.String(length=255), nullable=True),
+        sa.Column("local", sa.Boolean(), nullable=False),
+        sa.Column("value_sent", sa.Text(), nullable=False),
+        sa.Column("value_kind", sa.String(length=64), nullable=False),
+        sa.Column("reason", sa.String(length=64), nullable=False),
+        sa.Column("actor", sa.String(length=255), nullable=False),
+        sa.Column("status", sa.String(length=16), nullable=False),
+        sa.Column("error", sa.Text(), nullable=True),
+        sa.Column("run_id", sa.String(length=64), nullable=True),
+        sa.Column("detail", sa.JSON(), nullable=True),
     )
-    op.create_index("ix_outbound_requests_at", "outbound_requests", ["at"])
     op.create_index("ix_outbound_requests_investigation_id", "outbound_requests", ["investigation_id"])
+    op.create_index("ix_outbound_requests_at", "outbound_requests", ["at"])
     op.create_index("ix_outbound_requests_kind", "outbound_requests", ["kind"])
+    op.create_index("ix_outbound_requests_service", "outbound_requests", ["service"])
     op.create_table(
         "saved_questions",
         sa.Column("id", sa.String(), primary_key=True),

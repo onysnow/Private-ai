@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiReasoningPanel, WritingReport, describeAiStatus} from '../components/ai-reasoning-panel';
+import {askBeforeYouRun} from '../features/ai/before-you-run';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import type {AiReasoningStatus} from '../lib/api-types';
@@ -17,7 +18,10 @@ beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  vi.mocked(askBeforeYouRun).mockClear();
 });
+// "Run module" for case synthesis and theory tests hands over to Before you run (features/ai/before-you-run.tsx).
+vi.mock('../features/ai/before-you-run', () => ({askBeforeYouRun: vi.fn()}));
 
 const readyStatus: AiReasoningStatus = {
   enabled: true,
@@ -147,12 +151,10 @@ describe('AiReasoningPanel', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('runs case synthesis, shows the proposed candidate with its citations, and records an accept', async () => {
+  it('sends case synthesis to Before you run instead of running it, and opens a queued candidate with its citations and records an accept', async () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(jsonResponse({candidates: []})) // initial queue
-      .mockResolvedValueOnce(jsonResponse({candidate_id: 'cand-1', review_status: 'proposed', payload: {}})) // POST case-synthesis
-      .mockResolvedValueOnce(jsonResponse({candidates: [summary()]})) // queue reload
+      .mockResolvedValueOnce(jsonResponse({candidates: [summary()]})) // initial queue
       .mockResolvedValueOnce(jsonResponse(fullCandidate())) // GET candidate
       .mockResolvedValueOnce(jsonResponse({id: 'cand-1', module: 'case_synthesis', review_status: 'accepted', reviewer_note: 'Looks right.', reviewed_at: '2026-09-21T22:05:00'})) // POST review
       .mockResolvedValueOnce(jsonResponse({candidates: [summary({review_status: 'accepted', reviewer_note: 'Looks right.'})]})) // queue reload
@@ -160,14 +162,17 @@ describe('AiReasoningPanel', () => {
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
 
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('What did Ada North sign?');
     const runButton = screen.getByRole('button', {name: 'Run module'});
     expect(runButton).toBeDisabled(); // no question yet
     await user.type(screen.getByLabelText('Question'), 'What did Ada North sign?');
     await user.click(runButton);
+    // Nothing is sent from here: the run opens in Before you run with its module chosen.
+    expect(askBeforeYouRun).toHaveBeenCalledWith('inv-1', {module: 'case_synthesis', question: 'What did Ada North sign?', theory: '', maxResults: 30, includeLeads: true});
+    expect(fetchMock).toHaveBeenCalledTimes(1);
 
+    await user.click(screen.getByRole('button', {name: 'Open'}));
     const detail = await screen.findByTestId('ai-candidate-detail');
-    expect(screen.getByTestId('ai-run-status')).toHaveTextContent('Proposed for review (candidate cand-1). Nothing has been written to the investigation.');
     expect(within(detail).getByText('CLM-0001')).toBeInTheDocument();
     expect(within(detail).getByText(/Supports: evidence:ev-1/)).toBeInTheDocument();
     expect(within(detail).getByText('GAP-0001 · Is there an independent corroborating source? — needs the executed copy (bears on CLM-0001)')).toBeInTheDocument();
@@ -178,22 +183,33 @@ describe('AiReasoningPanel', () => {
     expect(within(detail).getByTestId('ai-trace')).toHaveTextContent('What the model was sent · claude-test');
     expect(within(detail).getByText(/Topic Authority System/)).toBeInTheDocument();
 
-    const runCall = fetchMock.mock.calls[1];
-    expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/case-synthesis');
-    expect(requestMethod(runCall)).toBe('POST');
-    expect(await sentBody(runCall)).toEqual({question: 'What did Ada North sign?', max_results: 30, include_external_leads: true});
-
     await user.type(screen.getByLabelText('Reviewer note'), 'Looks right.');
     await user.click(screen.getByRole('button', {name: 'Accept as trusted analysis'}));
 
     await waitFor(() => expect(screen.getByTestId('ai-review-status')).toHaveTextContent('Recorded: accepted.'));
-    const reviewCall = fetchMock.mock.calls[4];
+    const reviewCall = fetchMock.mock.calls[2];
     expect(requestUrl(reviewCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-1/review');
+    expect(requestMethod(reviewCall)).toBe('POST');
     expect(await sentBody(reviewCall)).toEqual({decision: 'accept', note: 'Looks right.'});
     // Once reviewed, the accept/reject controls are gone.
     expect(screen.queryByRole('button', {name: 'Accept as trusted analysis'})).not.toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(7);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
   });
+
+  // A presentation draft still runs from here (Before you run plans case synthesis and theory tests only).
+  const searchHit = {results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}, kind: 'claim_event'}],
+    query: 'Bellcastle', investigation_id: 'inv-1', total: 1, returned: 1, counts: {claim: 1}, group_counts: {reporting: 1}};
+  const runDraft = async (user: ReturnType<typeof userEvent.setup>) => {
+    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    screen.getByLabelText('Reasoning module').focus();
+    await user.keyboard('{ArrowDown}{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'Presentation draft'}));
+    await user.type(screen.getByLabelText('Goal'), 'Summarize the Bellcastle payment.');
+    await user.type(screen.getByLabelText('Search records to add'), 'Bellcastle');
+    await user.click(within(screen.getByTestId('presentation-record-picker')).getByRole('button', {name: 'Search'}));
+    await user.click(await screen.findByRole('button', {name: 'Add Claim: Meridian paid Bellcastle $2.4M'}));
+    await user.click(screen.getByRole('button', {name: 'Run module'}));
+  };
 
   it('follows a queued run in the background and opens its candidate when the job finishes', async () => {
     const user = userEvent.setup();
@@ -201,21 +217,19 @@ describe('AiReasoningPanel', () => {
       status: 'queued', finished: false, progress: null, message: 'Waiting for the model', error: null, attempts: 0, runner: 'procrastinate', result: null};
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(jsonResponse({candidates: []})) // initial queue
-      .mockResolvedValueOnce(jsonResponse({candidate_id: null, job}, 202)) // POST case-synthesis: queued
+      .mockResolvedValueOnce(jsonResponse(searchHit)) // GET /api/search
+      .mockResolvedValueOnce(jsonResponse({candidate_id: null, job}, 202)) // POST presentation-draft: queued
       .mockResolvedValueOnce(jsonResponse({...job, status: 'succeeded', finished: true, progress: 100, message: 'Proposed for review',
         result: {candidate_id: 'cand-1', review_status: 'proposed', payload: {}}})) // GET job
       .mockResolvedValueOnce(jsonResponse({candidates: [summary()]})) // queue reload
       .mockResolvedValueOnce(jsonResponse(fullCandidate())); // GET candidate
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
-
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
-    await user.type(screen.getByLabelText('Question'), 'What did Ada North sign?');
-    await user.click(screen.getByRole('button', {name: 'Run module'}));
+    await runDraft(user);
 
     await screen.findByTestId('ai-candidate-detail');
     expect(screen.getByTestId('ai-run-status')).toHaveTextContent('Proposed for review (candidate cand-1).');
-    expect(requestUrl(fetchMock.mock.calls[2])).toBe('http://api.test/api/jobs/job-7');
+    expect(requestUrl(fetchMock.mock.calls[3])).toBe('http://api.test/api/jobs/job-7');
   });
 
   it('shows the error a queued run finished with', async () => {
@@ -225,15 +239,13 @@ describe('AiReasoningPanel', () => {
       result: {status_code: 422, detail: {message: 'Model output rejected: none of its quotes could be found in the records it cites.', removed: []}}};
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(jsonResponse({candidates: []}))
+      .mockResolvedValueOnce(jsonResponse(searchHit))
       .mockResolvedValueOnce(jsonResponse({candidate_id: null, job: {...job, status: 'queued', finished: false, result: null}}, 202))
       .mockResolvedValueOnce(jsonResponse(job))
       .mockResolvedValueOnce(jsonResponse({candidates: []}));
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
-
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
-    await user.type(screen.getByLabelText('Question'), 'Who signed?');
-    await user.click(screen.getByRole('button', {name: 'Run module'}));
+    await runDraft(user);
     await waitFor(() => expect(screen.getByTestId('ai-run-status')).toHaveTextContent(/none of its quotes could be found.*422/));
   });
 
@@ -241,27 +253,24 @@ describe('AiReasoningPanel', () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(jsonResponse({candidates: []}))
+      .mockResolvedValueOnce(jsonResponse(searchHit))
       .mockResolvedValueOnce(jsonResponse({detail: {message: 'Model output rejected: referenced evidence not present in the retrieval packet.', invalid_citations: [{record_type: 'evidence', record_id: 'INVENTED'}]}}, 422))
       .mockResolvedValueOnce(jsonResponse({candidates: [summary({review_status: 'rejected', reviewer_note: 'Auto-rejected: model referenced 1 citation(s) absent from the retrieval packet'})]}));
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
-
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
-    await user.type(screen.getByLabelText('Question'), 'Who else signed?');
-    await user.click(screen.getByRole('button', {name: 'Run module'}));
+    await runDraft(user);
 
     await waitFor(() => expect(screen.getByTestId('ai-run-status')).toHaveTextContent(/422/));
     await screen.findByText(/Auto-rejected: model referenced 1 citation/);
     expect(screen.queryByTestId('ai-candidate-detail')).not.toBeInTheDocument();
   });
 
-  it('requires a working theory for a hypothesis test and sends it when present', async () => {
+  it('requires a working theory for a hypothesis test, sends it to Before you run, and reads a tested theory', async () => {
     const user = userEvent.setup();
+    const hyp = {id: 'cand-2', module: 'hypothesis_test', request: {question: 'Did Ada act alone?', working_theory: 'Ada acted alone.'}};
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(jsonResponse({candidates: []}))
-      .mockResolvedValueOnce(jsonResponse({candidate_id: 'cand-2', review_status: 'proposed', payload: {}}))
-      .mockResolvedValueOnce(jsonResponse({candidates: [summary({id: 'cand-2', module: 'hypothesis_test', request: {question: 'Did Ada act alone?', working_theory: 'Ada acted alone.'}})]}))
-      .mockResolvedValueOnce(jsonResponse(fullCandidate({id: 'cand-2', module: 'hypothesis_test', request: {question: 'Did Ada act alone?', working_theory: 'Ada acted alone.'}, payload: {
+      .mockResolvedValueOnce(jsonResponse({candidates: [summary(hyp)]}))
+      .mockResolvedValueOnce(jsonResponse(fullCandidate({...hyp, payload: {
         working_theory: 'Ada acted alone.',
         hypothesis_matrix: [{hypothesis_id: 'HYP-0001', hypothesis: 'Ada acted alone.', supporting_evidence: [{record_type: 'evidence', record_id: 'ev-1'}], contradicting_evidence: [], kind: 'WORKING_THEORY', viable: true, ambiguous_evidence: [], non_diagnostic_evidence: [{record_type: 'evidence', record_id: 'ev-2'}], assumptions: [], falsifiers: ['A co-signature on the filing'], missing_records: [], assessment: 'Viable but untested.', limitations: []}],
         contradiction_log: [{conflict_id: 'CFLT-0001', statement_a: {statement: 'Signed 4 March', evidence: [{record_type: 'evidence', record_id: 'ev-1'}]}, statement_b: {statement: 'Signed 5 March', evidence: [{record_type: 'evidence', record_id: 'ev-3'}]}, same_proposition: true, same_proposition_basis: 'Same agreement, same signature.', conflict_type: 'DIRECT CONTRADICTION', resolution: null, resolving_evidence: [], limitations: []}],
@@ -270,17 +279,9 @@ describe('AiReasoningPanel', () => {
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
 
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
-    // Opened via focus + ArrowDown rather than a click on the trigger: this
-    // suite's earlier tests each mount/unmount an AiReasoningPanel sharing
-    // one jsdom document, and userEvent.click(trigger) reliably fails to
-    // register a Radix Select's opening pointerdown when run after them
-    // (reproduced in isolation -- a plain fireEvent.pointerDown does open
-    // it, so the trigger and component are not at fault; something in
-    // userEvent's own pointer/hover bookkeeping is left in a state that
-    // only affects this file's later tests). Keyboard-triggered opening
-    // sidesteps that pointer-state dependency entirely and is itself a
-    // real, accessible way to operate this control.
+    await screen.findByText('Did Ada act alone?');
+    // Opened via focus + ArrowDown rather than a click on the trigger: userEvent.click(trigger) fails to register a
+    // Radix Select's opening pointerdown after earlier tests in this file; the keyboard is a real, accessible way in.
     const moduleTrigger = screen.getByLabelText('Reasoning module');
     moduleTrigger.focus();
     await user.keyboard('{ArrowDown}');
@@ -288,14 +289,15 @@ describe('AiReasoningPanel', () => {
     await user.type(screen.getByLabelText('Question'), 'Did Ada act alone?');
     await user.click(screen.getByRole('button', {name: 'Run module'}));
     expect(screen.getByTestId('ai-run-status')).toHaveTextContent('A working theory is required for a hypothesis test.');
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(askBeforeYouRun).not.toHaveBeenCalled();
 
     await user.type(screen.getByLabelText('Working theory'), 'Ada acted alone.');
     await user.click(screen.getByRole('button', {name: 'Run module'}));
+    expect(askBeforeYouRun).toHaveBeenCalledWith('inv-1', {module: 'hypothesis_test', question: 'Did Ada act alone?', theory: 'Ada acted alone.', maxResults: 30, includeLeads: true});
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', {name: 'Open'}));
     const detail = await screen.findByTestId('ai-candidate-detail');
-    const runCall = fetchMock.mock.calls[1];
-    expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/hypothesis-test');
-    expect(await sentBody(runCall)).toEqual({question: 'Did Ada act alone?', max_results: 30, include_external_leads: true, working_theory: 'Ada acted alone.'});
     expect(within(detail).getByText('HYP-0001')).toBeInTheDocument();
     expect(within(detail).getByText('Working theory · still viable')).toBeInTheDocument();
     expect(within(detail).getByText(/Fits every hypothesis \(not counted\): evidence:ev-2/)).toBeInTheDocument();
