@@ -223,14 +223,15 @@ _NOT_INVESTIGATION_RECORDS = {
     # A small real demo case (routes_demo.py, app/services/demo_cases.py): one of three fixed names.
     "case_id",
     # Records that live inside an investigation named in the same path, and are looked up through it:
-    # a story section (stories.section_of), an AI run and a thought in it (routes_ai_runs._run_row, run_events).
+    # a story section (stories.section_of), an AI run and a thought in it (routes_ai_runs._run_row, run_events),
+    # a version of the story's write-up (routes_stories._version).
     # Another case's id gives a 404, so the scope check on investigation_id covers them.
-    "section_id", "run_id", "thought_id",
+    "section_id", "run_id", "thought_id", "version_id",
 }
 
 
-# An AI run, a story section and a thought exist only inside one investigation.
-_NESTED_UNDER_INVESTIGATION = {"run_id", "section_id", "thought_id"}
+# An AI run, a story section, a thought and a write-up version exist only inside one investigation.
+_NESTED_UNDER_INVESTIGATION = {"run_id", "section_id", "thought_id", "version_id"}
 
 
 def test_every_record_in_a_path_is_traced_to_its_investigation():

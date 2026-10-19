@@ -2,25 +2,31 @@
 // Act › Story (mockup ACT_2, research Act §7–8, ADR-0010): "what the story needs" beside the write-up.
 // Left: the tree read left to right, thesis (a diamond) → sections → claims → their evidence; a branch is only as
 // strong as its weakest claim (solid when every claim is shown, dashed when one is not yet shown, red when one is
-// disputed); the critical path at the top; the gates under the thesis; L for the tree as an outline. Right: the
-// write-up (TipTap, ADR-0011) with its Cited tab; "Export for publication" stays disabled, saying why, until every
-// sentence has a source. "Ready to run" can be recorded only when every gate has passed.
+// disputed); the critical path at the top; the gates under the thesis; L for the tree as an outline; drag a claim into
+// the text to cite it. Right: the write-up (TipTap, ADR-0011) with its Cited and Notes tabs and its version history;
+// a citation's passage opens beside the text (Esc closes). The Export sheet says what each format holds; the export
+// for publication stays disabled, saying why, until every sentence has a source. "Ready to run" can be recorded only
+// when every gate has passed.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {StatusChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {
-  addStorySectionMutation, getStoryOptions, getStoryQueryKey, markStoryReadyMutation, placeStoryClaimMutation, recordStoryGateMutation,
+  addStorySectionMutation, getNotesOptions, getStoryOptions, getStoryQueryKey, markStoryReadyMutation, placeStoryClaimMutation, recordStoryGateMutation,
   removeStoryClaimMutation, setStoryThesisMutation, startStoryWriteupMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {exportWriteupDocx} from '../../lib/generated/sdk.gen';
 import type {StoryGateOut, StoryOut} from '../../lib/generated/types.gen';
-import type {CitableClaim} from './writeup-editor';
+import type {CitableClaim, DocInfo} from './editor-extensions';
+import {ExportSheet, NotesTab, PassagePane, VersionsPane} from './story-panes';
 
 const WriteupEditor = dynamic(() => import('./writeup-editor').then(m => m.WriteupEditor), {ssr: false, loading: () => <p className="sy-quiet">Opening the write-up…</p>});
+/** The drag type a claim of the tree carries (editor-extensions.ts CLAIM_DRAG; repeated so TipTap loads only with the editor). */
+const CLAIM_DRAG = 'application/x-story-claim';
+type Pane = {kind: 'passage'; claimId: string} | {kind: 'versions'} | null;
 
 const STATE_CHIP = {shown: 'supported', disputed: 'disputed', unshown: 'unshown', ruled_out: 'ruled_out'} as const;
 const GATE_MARK: Record<StoryGateOut['state'], string> = {passed: '✓', open: '○', warning: '!', pending: '○'};
@@ -59,33 +65,42 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   const writeM = useMutation({...startStoryWriteupMutation(), onSuccess: put});
   const story = q.data;
   const [outline, setOutline] = useState(false);
-  const [tab, setTab] = useState<'write' | 'cited'>('write');
-  const [cited, setCited] = useState<string[]>([]);
+  const [tab, setTab] = useState<'write' | 'cited' | 'notes'>('write');
+  const [doc, setDoc] = useState<DocInfo | null>(null);
+  const cited = doc?.cited ?? [];
   const [thesis, setThesis] = useState('');
   const [newSection, setNewSection] = useState('');
   const [lit, setLit] = useState<string | null>(null);
+  const [pane, setPane] = useState<Pane>(null);
+  const [exporting, setExporting] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const problem = [thesisM, sectionM, placeM, removeM, gateM, readyM, writeM].find(m => m.isError)?.error;
+  const notes = useQuery({...getNotesOptions({path, query: {record_type: 'story', record_id: story?.id ?? ''}}), enabled: Boolean(story?.id)});
 
   // Claims of the story, numbered in the tree's order: the numbers on the citation chips.
-  const claims: CitableClaim[] = useMemo(() => (story?.sections ?? []).flatMap(s => s.claims).map((c, i) => ({id: c.id, n: i + 1, text: c.text, state: c.state})), [story]);
+  const claims: CitableClaim[] = useMemo(() => (story?.sections ?? []).flatMap(s => s.claims)
+    .map((c, i) => ({id: c.id, n: i + 1, text: c.text, state: c.state, evidence: c.evidence})), [story]);
   const byId = new Map(claims.map(c => [c.id, c]));
+  const closeExport = useCallback(() => setExporting(false), []);
 
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && pane) { setPane(null); return; }
       const t = e.target;
       if (e.metaKey || e.ctrlKey || e.altKey || (t instanceof Element && t.closest('input, textarea, select, [contenteditable="true"]'))) return;
       if (e.key === 'l' || e.key === 'L') { e.preventDefault(); setOutline(v => !v); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [active]);
+  }, [active, pane]);
 
   if (!investigationId) return <p className="sy-quiet">Open a case first.</p>;
   if (q.isError) return <p role="alert" className="sy-quiet">{errorMessage(q.error, 'Could not read the story')}</p>;
   if (!story) return <div className="ch-skeleton" aria-busy="true" aria-label="Reading the story"/>;
   const c = story.counts;
   const gatesOpen = story.gates.length - story.gates_passed;
+  const ready = Boolean(story.writeup_id) && story.sentences.total > 0 && story.sentences.uncited === 0;
 
   return <section className="sy" aria-label="Story">
     <header className="sy-head">
@@ -104,48 +119,62 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
           <label htmlFor="sy-thesis">Write the one sentence this story says</label>
           <input id="sy-thesis" value={thesis} onChange={e => setThesis(e.target.value)} placeholder="e.g. Kestrel SA ended up with the harbour land through companies that hid who owned them"/>
           <button type="submit" disabled={!thesis.trim()}>Set the thesis</button>
-        </form> : outline ? <Outline story={story}/> : <Tree story={story} lit={lit} setLit={setLit} byId={byId}
+        </form> : outline ? <Outline story={story}/> : <Tree story={story} lit={lit} setLit={setLit} byId={byId} canDrag={Boolean(story.writeup_id)}
           onRemove={(section, claim) => removeM.mutate({path: {...path, section_id: section, claim_id: claim}})}
           onPlace={(section, claim) => placeM.mutate({path: {...path, section_id: section}, body: {claim_id: claim}})}/>}
         {story.thesis && <form className="sy-add" onSubmit={e => { e.preventDefault(); if (newSection.trim()) { sectionM.mutate({path, body: {title: newSection.trim()}}); setNewSection(''); } }}>
           <input aria-label="A new section" value={newSection} onChange={e => setNewSection(e.target.value)} placeholder="+ A section: what the story will say next"/>
           <button type="submit" disabled={!newSection.trim()}>Add section</button></form>}
         <Gates story={story} onGate={(gate, who, on) => gateM.mutate({path, body: {gate, who, on}})} onReady={by => readyM.mutate({path, body: {by}})}/>
+        {/* What opens beside the text lies over the tree's edge, next to the write-up, so the text never moves. */}
+        {pane && <div className="sy-pane-slot">
+          {pane.kind === 'passage' && <PassagePane claim={byId.get(pane.claimId)} onClose={() => setPane(null)}/>}
+          {pane.kind === 'versions' && story.writeup_id && <VersionsPane investigationId={investigationId} writeupId={story.writeup_id}
+            onClose={() => setPane(null)} onRestored={() => setReloadKey(k => k + 1)}/>}
+        </div>}
       </div>
       <div className="sy-right">
         <div className="sy-tabs" role="tablist" aria-label="Write-up">
           <button type="button" role="tab" aria-selected={tab === 'write'} className={tab === 'write' ? 'on' : ''} onClick={() => setTab('write')}>Write-up</button>
           <button type="button" role="tab" aria-selected={tab === 'cited'} className={tab === 'cited' ? 'on' : ''} onClick={() => setTab('cited')}>Cited · {cited.length}</button>
-          <button type="button" role="tab" aria-selected={false} disabled title="Notes are not built yet">Notes</button>
-          <span className="sy-export">
-            <button type="button" disabled={!story.writeup_id || story.sentences.uncited > 0 || story.sentences.total === 0}
-              onClick={() => story.writeup_id && void exportDocx(story.writeup_id)}>Export for publication</button>
+          <button type="button" role="tab" aria-selected={tab === 'notes'} className={tab === 'notes' ? 'on' : ''} disabled={!story.id}
+            title={story.id ? undefined : 'Write the thesis first: notes sit on the story'} onClick={() => setTab('notes')}>Notes{notes.data ? ` · ${notes.data.notes.length}` : ''}</button>
+          <span className={`sy-export${ready ? ' ready' : ''}`}>
+            <button type="button" disabled={!story.writeup_id} aria-haspopup="dialog" onClick={() => setExporting(true)}>Export for publication</button>
             <small>{!story.writeup_id ? 'Start the write-up first' : story.sentences.total === 0 ? 'Nothing written yet'
               : story.sentences.uncited ? `${story.sentences.uncited} sentence${story.sentences.uncited === 1 ? ' needs' : 's need'} a source` : 'every sentence has a source'}</small>
           </span>
         </div>
-        {!story.writeup_id ? <div className="sy-start">
+        {tab === 'notes' && story.id ? <NotesTab investigationId={investigationId} storyId={story.id}/> : !story.writeup_id ? <div className="sy-start">
           <p>No write-up yet.</p>
           <button type="button" className="primary" disabled={!story.thesis} onClick={() => writeM.mutate({path})}>Start the write-up</button>
           {!story.thesis && <small>Write the thesis first: the write-up is told from it.</small>}
-        </div> : <>
-          <div hidden={tab !== 'write'}><WriteupEditor investigationId={investigationId} writeupId={story.writeup_id} claims={claims} onCite={setCited}/></div>
+        </div> : null}
+        {story.writeup_id && <>
+          <div hidden={tab !== 'write'}>
+            <p className="sy-doc-meta">Draft for the editor · {story.version ? <>version “{story.version.name}”</> : 'no named version yet'}
+              <button type="button" className="sy-link" aria-expanded={pane?.kind === 'versions'} onClick={() => setPane(p => (p?.kind === 'versions' ? null : {kind: 'versions'}))}>Version history</button></p>
+            <WriteupEditor investigationId={investigationId} writeupId={story.writeup_id} claims={claims} onDoc={setDoc} reloadKey={reloadKey}
+              onOpenPassage={id => setPane({kind: 'passage', claimId: id})}/>
+          </div>
           {tab === 'cited' && <ol className="sy-cited" aria-label="Cited in the write-up">
             {cited.length ? cited.map(id => byId.get(id)).filter(Boolean).map(cl => <li key={cl!.id}><span className="wu-n">{cl!.n}</span>
               <span>{cl!.text}</span><StatusChip status={STATE_CHIP[cl!.state]}/></li>) : <li className="sy-quiet">Nothing cited yet.</li>}
           </ol>}
           <footer className="sy-foot">
-            <span>Exhibits {cited.length} record{cited.length === 1 ? '' : 's'}</span>
-            <span className="sy-key"><i className="k-uncited"/>no source <i className="k-disputed"/>rests on a disputed claim <i className="k-unshown"/>rests on a claim not yet shown</span>
+            <span><b>Exhibits</b> {cited.length} record{cited.length === 1 ? '' : 's'}</span>
+            <span><b>AI use</b> {doc?.aiDrafted ?? 0} of {doc?.paragraphs ?? 0} paragraph{doc?.paragraphs === 1 ? '' : 's'} drafted with AI</span>
+            <span className="sy-key"><i className="k-uncited"/>no source <i className="k-disputed"/>rests on a disputed claim <i className="k-unshown"/>rests on a claim not yet shown <i className="k-ai"/>AI wording</span>
           </footer>
         </>}
       </div>
     </div>
+    {exporting && <ExportSheet story={story} doc={doc} onClose={closeExport} onExportDocx={() => (story.writeup_id ? exportDocx(story.writeup_id) : Promise.resolve())}/>}
   </section>;
 }
 
-function Tree({story, lit, setLit, byId, onRemove, onPlace}: {
-  story: StoryOut; lit: string | null; setLit: (id: string | null) => void; byId: Map<string, CitableClaim>;
+function Tree({story, lit, setLit, byId, canDrag, onRemove, onPlace}: {
+  story: StoryOut; lit: string | null; setLit: (id: string | null) => void; byId: Map<string, CitableClaim>; canDrag: boolean;
   onRemove: (section: string, claim: string) => void; onPlace: (section: string, claim: string) => void;
 }): ReactElement {
   const box = useRef<HTMLDivElement>(null);
@@ -198,7 +227,9 @@ function Tree({story, lit, setLit, byId, onRemove, onPlace}: {
         <div className="sy-claims">
           {s.claims.map(cl => <article key={cl.id} className={`sy-claim st-${cl.state}${story.critical.some(x => x.claim_id === cl.id) ? ' critical' : ''}`} data-node={`c:${cl.id}`}
             role="treeitem" aria-level={3} aria-selected={lit === cl.id} aria-label={`Claim, ${cl.state === 'shown' ? 'shown' : cl.state === 'disputed' ? 'disputed' : 'not yet shown'}, ${cl.text}`}
-            onMouseEnter={() => setLit(cl.id)} onMouseLeave={() => setLit(null)}>
+            onMouseEnter={() => setLit(cl.id)} onMouseLeave={() => setLit(null)} draggable={canDrag}
+            title={canDrag ? 'Drag into the write-up to cite it there' : undefined}
+            onDragStart={e => { e.dataTransfer.setData(CLAIM_DRAG, cl.id); e.dataTransfer.effectAllowed = 'copy'; }}>
             <span className="sy-claim-top"><StatusChip status={STATE_CHIP[cl.state]}/><span className="wu-n" title="Its number in the write-up">{byId.get(cl.id)?.n}</span>
               {story.critical.some(x => x.claim_id === cl.id) && <span className="sy-cp">Critical path</span>}
               <button type="button" className="sy-x" aria-label={`Take “${cl.text}” out of this section`} onClick={() => onRemove(s.id, cl.id)}>×</button></span>

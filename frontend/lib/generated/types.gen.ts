@@ -3391,7 +3391,8 @@ export type CollectionItemCreate = {
     | 'document'
     | 'lead'
     | 'task'
-    | 'finding';
+    | 'finding'
+    | 'story';
 };
 
 /**
@@ -3427,7 +3428,8 @@ export type CollectionItemOut = {
     | 'document'
     | 'lead'
     | 'task'
-    | 'finding';
+    | 'finding'
+    | 'story';
 };
 
 /**
@@ -10169,6 +10171,10 @@ export type LeadOut = {
    */
   history: Array<LeadWorkflowEventOut>;
   /**
+   * Horizon
+   */
+  horizon?: 'now' | 'next' | 'later' | null;
+  /**
    * Id
    */
   id: string;
@@ -10266,6 +10272,10 @@ export type LeadRowOut = {
    */
   gathering_outcome?: string | null;
   /**
+   * Horizon
+   */
+  horizon?: 'now' | 'next' | 'later' | null;
+  /**
    * Id
    */
   id: string;
@@ -10351,6 +10361,10 @@ export type LeadUpdate = {
    * Gathering Outcome
    */
   gathering_outcome?: string | null;
+  /**
+   * Horizon
+   */
+  horizon?: 'now' | 'next' | 'later' | null;
   /**
    * Next Action
    */
@@ -10877,7 +10891,8 @@ export type MarkedRecordOut = {
     | 'document'
     | 'lead'
     | 'task'
-    | 'finding';
+    | 'finding'
+    | 'story';
 };
 
 /**
@@ -11208,6 +11223,7 @@ export type NoteCreate = {
     | 'lead'
     | 'task'
     | 'finding'
+    | 'story'
     | null;
   /**
    * Text
@@ -11261,6 +11277,7 @@ export type NoteOut = {
     | 'lead'
     | 'task'
     | 'finding'
+    | 'story'
     | null;
   /**
    * Text
@@ -12121,7 +12138,8 @@ export type PeekOut = {
     | 'document'
     | 'lead'
     | 'task'
-    | 'finding';
+    | 'finding'
+    | 'story';
 };
 
 /**
@@ -12780,7 +12798,8 @@ export type RecordMarksOut = {
     | 'document'
     | 'lead'
     | 'task'
-    | 'finding';
+    | 'finding'
+    | 'story';
   /**
    * Tags
    */
@@ -12836,7 +12855,8 @@ export type RecordTagCreate = {
     | 'document'
     | 'lead'
     | 'task'
-    | 'finding';
+    | 'finding'
+    | 'story';
   /**
    * Tag Id
    */
@@ -12872,7 +12892,8 @@ export type RecordTagRowOut = {
     | 'document'
     | 'lead'
     | 'task'
-    | 'finding';
+    | 'finding'
+    | 'story';
   /**
    * Tag Id
    */
@@ -15437,6 +15458,10 @@ export type StoryEvidenceOut = {
    */
   locator?: string | null;
   /**
+   * Quote
+   */
+  quote?: string | null;
+  /**
    * Stance
    */
   stance: string;
@@ -15529,6 +15554,7 @@ export type StoryOut = {
    * Unplaced
    */
   unplaced: Array<StoryUnplacedOut>;
+  version?: WriteupVersionOut | null;
   /**
    * Writeup Id
    */
@@ -17936,6 +17962,104 @@ export type WriteupUpdate = {
 };
 
 /**
+ * WriteupVersionCreate
+ */
+export type WriteupVersionCreate = {
+  /**
+   * Name
+   *
+   * A name for the write-up as it stands ("Before legal read").
+   */
+  name: string;
+};
+
+/**
+ * WriteupVersionDetailOut
+ */
+export type WriteupVersionDetailOut = {
+  /**
+   * Content Json
+   */
+  content_json: {
+    [key: string]: unknown;
+  };
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'named' | 'auto' | 'before_restore';
+  /**
+   * Name
+   */
+  name?: string | null;
+  /**
+   * Word Count
+   */
+  word_count: number;
+  /**
+   * Writeup Id
+   */
+  writeup_id: string;
+};
+
+/**
+ * WriteupVersionOut
+ *
+ * A snapshot of the write-up (app/services/writeup_versions.py).
+ */
+export type WriteupVersionOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'named' | 'auto' | 'before_restore';
+  /**
+   * Name
+   */
+  name?: string | null;
+  /**
+   * Word Count
+   */
+  word_count: number;
+  /**
+   * Writeup Id
+   */
+  writeup_id: string;
+};
+
+/**
+ * WriteupVersionsOut
+ */
+export type WriteupVersionsOut = {
+  /**
+   * Versions
+   */
+  versions: Array<WriteupVersionOut>;
+  /**
+   * Writeup Id
+   */
+  writeup_id?: string | null;
+};
+
+/**
  * WriteupsOut
  */
 export type WriteupsOut = {
@@ -19100,7 +19224,8 @@ export type RemoveCollectionItemData = {
       | 'document'
       | 'lead'
       | 'task'
-      | 'finding';
+      | 'finding'
+      | 'story';
     /**
      * Record Id
      */
@@ -24281,7 +24406,8 @@ export type GetRecordMarksData = {
       | 'document'
       | 'lead'
       | 'task'
-      | 'finding';
+      | 'finding'
+      | 'story';
     /**
      * Record Id
      */
@@ -24378,6 +24504,7 @@ export type GetNotesData = {
       | 'lead'
       | 'task'
       | 'finding'
+      | 'story'
       | null;
     /**
      * Record Id
@@ -24514,7 +24641,8 @@ export type PeekAtRecordData = {
       | 'document'
       | 'lead'
       | 'task'
-      | 'finding';
+      | 'finding'
+      | 'story';
     /**
      * Record Id
      */
@@ -24608,7 +24736,8 @@ export type UntagARecordData = {
       | 'document'
       | 'lead'
       | 'task'
-      | 'finding';
+      | 'finding'
+      | 'story';
     /**
      * Record Id
      */
@@ -25339,6 +25468,158 @@ export type RemoveStoryClaimResponses = {
 
 export type RemoveStoryClaimResponse =
   RemoveStoryClaimResponses[keyof RemoveStoryClaimResponses];
+
+export type ListStoryVersionsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/versions';
+};
+
+export type ListStoryVersionsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListStoryVersionsError =
+  ListStoryVersionsErrors[keyof ListStoryVersionsErrors];
+
+export type ListStoryVersionsResponses = {
+  /**
+   * Successful Response
+   */
+  200: WriteupVersionsOut;
+};
+
+export type ListStoryVersionsResponse =
+  ListStoryVersionsResponses[keyof ListStoryVersionsResponses];
+
+export type NameStoryVersionData = {
+  body: WriteupVersionCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/versions';
+};
+
+export type NameStoryVersionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type NameStoryVersionError =
+  NameStoryVersionErrors[keyof NameStoryVersionErrors];
+
+export type NameStoryVersionResponses = {
+  /**
+   * Successful Response
+   */
+  200: WriteupVersionOut;
+};
+
+export type NameStoryVersionResponse =
+  NameStoryVersionResponses[keyof NameStoryVersionResponses];
+
+export type GetStoryVersionData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Version Id
+     */
+    version_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/versions/{version_id}';
+};
+
+export type GetStoryVersionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetStoryVersionError =
+  GetStoryVersionErrors[keyof GetStoryVersionErrors];
+
+export type GetStoryVersionResponses = {
+  /**
+   * Successful Response
+   */
+  200: WriteupVersionDetailOut;
+};
+
+export type GetStoryVersionResponse =
+  GetStoryVersionResponses[keyof GetStoryVersionResponses];
+
+export type RestoreStoryVersionData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Version Id
+     */
+    version_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/story/versions/{version_id}/restore';
+};
+
+export type RestoreStoryVersionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RestoreStoryVersionError =
+  RestoreStoryVersionErrors[keyof RestoreStoryVersionErrors];
+
+export type RestoreStoryVersionResponses = {
+  /**
+   * Successful Response
+   */
+  200: WriteupOut;
+};
+
+export type RestoreStoryVersionResponse =
+  RestoreStoryVersionResponses[keyof RestoreStoryVersionResponses];
 
 export type StartStoryWriteupData = {
   body?: never;

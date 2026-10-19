@@ -167,8 +167,9 @@ ACT_2 Story (12 Oct: Act › Story, `features/story`; backend `app/services/stor
 - [x] Thesis diamond → sections → claims → evidence tree; branch lines by the weakest claim (solid / dashed / red); critical path banner and marks; L for the outline; put a claim under a section, take it out
 - [x] Gates (every sentence has a source, innocent explanations addressed, single-source statements, right of reply, legal read) with ✓ / ○ / ! and what each waits on; right of reply and legal read recorded by a person; Ready to run refused until every gate passes
 - [x] Write-up editor (TipTap) in the reading face: citation chips (the server's own citation node), ⌘⇧C cites a claim of the story, sentence marks (no source ○ dashed, disputed ! red, not yet shown dotted) worked out from the cited claims, saves on its own, Cited tab, Export for publication disabled with how many sentences need a source
-- [ ] AI-draft marks on paragraphs, Notes tab, version history ("Before legal read"), hover a citation for its quote, click to open the passage beside the text, drag a claim into the text
-- [ ] Leads as Now / Next / Later; Export sheet; evidence pack
+- [x] AI-draft marks on paragraphs, Notes tab, version history ("Before legal read"), hover a citation for its quote, click to open the passage beside the text, drag a claim into the text (19 Oct: `editor-extensions.ts`, `story-panes.tsx`; versions in `writeup_versions`, migration e4c8a1f7b392, in the backup; story notes are notes on record type "story". The AI-draft mark rides a paragraph attribute `aiDraft`, plum until kept: nothing inserts AI text into the story's write-up yet)
+- [x] Leads as Now / Next / Later; Export sheet (19 Oct: `features/leads/leads-horizons.tsx`, `leads.horizon`, Now capped at 5; the Export sheet in `story-panes.tsx`, the .docx still disabled until every sentence has a source)
+- [ ] Evidence pack (shown in the Export sheet as not built yet)
 
 ## 8. The AI — mockups AI_1 (Watch the run) and AI_2 (Before you run) (§09)
 

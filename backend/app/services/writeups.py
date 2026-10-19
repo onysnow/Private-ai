@@ -212,12 +212,18 @@ def create_writeup(db: Session, *, investigation_id: str, title: str, content_js
     return row
 
 
-def update_writeup(db: Session, row: Writeup, data: dict) -> Writeup:
+def update_writeup(db: Session, row: Writeup, data: dict, *, snapshot: bool = True) -> Writeup:
+    """Apply a partial update. A new text first keeps the old one as an automatic version, at most one every few
+    minutes (app/services/writeup_versions.py); `snapshot=False` skips that (a restore keeps its own)."""
     if "status" in data and data["status"] is not None and data["status"] not in WRITEUP_STATUSES:
         raise ValueError(f"status must be one of {sorted(WRITEUP_STATUSES)}")
     if "title" in data and data["title"] is not None:
         row.title = data["title"].strip() or row.title
     if "content_json" in data and data["content_json"] is not None:
+        if snapshot:
+            from app.services.writeup_versions import auto_snapshot_before_save
+
+            auto_snapshot_before_save(db, row, data["content_json"])
         row.content_json = rebuild_chart_blocks(db, row.investigation_id, data["content_json"])
         row.content_text = extract_plain_text(row.content_json)
         row.cited_record_refs = extract_cited_refs(row.content_json)
@@ -238,6 +244,13 @@ def list_writeups(db: Session, investigation_id: str, *, status: str | None = No
 
 
 def delete_writeup(db: Session, row: Writeup) -> None:
+    """The write-up and its versions; a story told in it keeps its tree and loses only the link."""
+    from app.models.domain import Story
+    from app.services.writeup_versions import delete_versions
+
+    delete_versions(db, row)
+    for story in db.scalars(select(Story).where(Story.writeup_id == row.id)):
+        story.writeup_id = None
     db.delete(row)
     db.commit()
 

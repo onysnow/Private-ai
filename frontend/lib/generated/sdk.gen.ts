@@ -405,6 +405,9 @@ import type {
   GetStoryData,
   GetStoryErrors,
   GetStoryResponses,
+  GetStoryVersionData,
+  GetStoryVersionErrors,
+  GetStoryVersionResponses,
   GetSuiteCoverageData,
   GetSuiteCoverageErrors,
   GetSuiteCoverageResponses,
@@ -603,6 +606,9 @@ import type {
   ListSourcesData,
   ListSourcesErrors,
   ListSourcesResponses,
+  ListStoryVersionsData,
+  ListStoryVersionsErrors,
+  ListStoryVersionsResponses,
   ListTermHintsData,
   ListTermHintsErrors,
   ListTermHintsResponses,
@@ -633,6 +639,9 @@ import type {
   MarkStoryReadyData,
   MarkStoryReadyErrors,
   MarkStoryReadyResponses,
+  NameStoryVersionData,
+  NameStoryVersionErrors,
+  NameStoryVersionResponses,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
@@ -726,6 +735,9 @@ import type {
   RestoreBackupData,
   RestoreBackupErrors,
   RestoreBackupResponses,
+  RestoreStoryVersionData,
+  RestoreStoryVersionErrors,
+  RestoreStoryVersionResponses,
   RetryJobEndpointData,
   RetryJobEndpointErrors,
   RetryJobEndpointResponses,
@@ -1125,6 +1137,8 @@ import {
   zGetStandingResponse,
   zGetStoryPath,
   zGetStoryResponse,
+  zGetStoryVersionPath,
+  zGetStoryVersionResponse,
   zGetSuiteCoverageResponse,
   zGetTaggedRecordsPath,
   zGetTaggedRecordsResponse,
@@ -1280,6 +1294,8 @@ import {
   zListSourcesPath,
   zListSourcesQuery,
   zListSourcesResponse,
+  zListStoryVersionsPath,
+  zListStoryVersionsResponse,
   zListTermHintsResponse,
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
@@ -1302,6 +1318,9 @@ import {
   zMarkStoryReadyBody,
   zMarkStoryReadyPath,
   zMarkStoryReadyResponse,
+  zNameStoryVersionBody,
+  zNameStoryVersionPath,
+  zNameStoryVersionResponse,
   zOpenalephIntegrationStatusResponse,
   zPatchClaimSuiteBody,
   zPatchClaimSuitePath,
@@ -1376,6 +1395,8 @@ import {
   zResolveFindingResponse,
   zRestoreBackupBody,
   zRestoreBackupResponse,
+  zRestoreStoryVersionPath,
+  zRestoreStoryVersionResponse,
   zRetryJobEndpointPath,
   zRetryJobEndpointResponse,
   zReviewAiAnalysisCandidateEndpointBody,
@@ -7401,6 +7422,134 @@ export const removeStoryClaim = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zRemoveStoryClaimResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/story/sections/{section_id}/claims/{claim_id}',
+    ...options,
+  });
+
+/**
+ * List Story Versions
+ *
+ * The write-up's versions, newest first: named ones, automatic ones and those kept before a restore.
+ */
+export const listStoryVersions = <ThrowOnError extends boolean = false>(
+  options: Options<ListStoryVersionsData, ThrowOnError>,
+): RequestResult<
+  ListStoryVersionsResponses,
+  ListStoryVersionsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListStoryVersionsResponses,
+    ListStoryVersionsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListStoryVersionsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListStoryVersionsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/versions',
+    ...options,
+  });
+
+/**
+ * Name Story Version
+ *
+ * Keep the write-up as it stands under a name ("Before legal read").
+ */
+export const nameStoryVersion = <ThrowOnError extends boolean = false>(
+  options: Options<NameStoryVersionData, ThrowOnError>,
+): RequestResult<
+  NameStoryVersionResponses,
+  NameStoryVersionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    NameStoryVersionResponses,
+    NameStoryVersionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zNameStoryVersionBody,
+          path: zNameStoryVersionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zNameStoryVersionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/versions',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Story Version
+ *
+ * One version with its text, to read (never to edit).
+ */
+export const getStoryVersion = <ThrowOnError extends boolean = false>(
+  options: Options<GetStoryVersionData, ThrowOnError>,
+): RequestResult<
+  GetStoryVersionResponses,
+  GetStoryVersionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetStoryVersionResponses,
+    GetStoryVersionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetStoryVersionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetStoryVersionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/versions/{version_id}',
+    ...options,
+  });
+
+/**
+ * Restore Story Version
+ *
+ * Put this version's text back. The text it replaces is kept first, as a version of its own.
+ */
+export const restoreStoryVersion = <ThrowOnError extends boolean = false>(
+  options: Options<RestoreStoryVersionData, ThrowOnError>,
+): RequestResult<
+  RestoreStoryVersionResponses,
+  RestoreStoryVersionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    RestoreStoryVersionResponses,
+    RestoreStoryVersionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRestoreStoryVersionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRestoreStoryVersionResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/story/versions/{version_id}/restore',
     ...options,
   });
 

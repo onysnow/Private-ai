@@ -1336,6 +1336,7 @@ export const zCollectionItemCreate = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
 });
 
@@ -1358,6 +1359,7 @@ export const zCollectionItemOut = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
 });
 
@@ -4126,6 +4128,7 @@ export const zLeadRowOut = z.object({
     ),
   detail: z.string().nullish(),
   gathering_outcome: z.string().nullish(),
+  horizon: z.enum(['now', 'next', 'later']).nullish(),
   id: z.string(),
   investigation_id: z.string(),
   provider: z.string().nullish(),
@@ -4148,6 +4151,7 @@ export const zDossierLeadOut = z.object({
 export const zLeadUpdate = z.object({
   detail: z.string().nullish(),
   gathering_outcome: z.string().nullish(),
+  horizon: z.enum(['now', 'next', 'later']).nullish(),
   next_action: z.string().nullish(),
   note: z.string().nullish(),
   owner: z.string().nullish(),
@@ -4392,6 +4396,7 @@ export const zMarkedRecordOut = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
 });
 
@@ -4627,6 +4632,7 @@ export const zNoteCreate = z.object({
       'lead',
       'task',
       'finding',
+      'story',
     ])
     .nullish(),
   text: z.string().min(1).max(20000),
@@ -4658,6 +4664,7 @@ export const zNoteOut = z.object({
       'lead',
       'task',
       'finding',
+      'story',
     ])
     .nullable(),
   text: z.string(),
@@ -5127,6 +5134,7 @@ export const zPeekOut = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
 });
 
@@ -5482,6 +5490,7 @@ export const zRecordTagCreate = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
   tag_id: z.string(),
 });
@@ -5504,6 +5513,7 @@ export const zRecordTagRowOut = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
   tag_id: z.string(),
 });
@@ -6750,6 +6760,7 @@ export const zStoryEvidenceOut = z.object({
   id: z.string(),
   label: z.string(),
   locator: z.string().nullish(),
+  quote: z.string().nullish(),
   stance: z.string(),
 });
 
@@ -6857,25 +6868,6 @@ export const zStoryUnplacedOut = z.object({
   state: z.enum(['shown', 'unshown', 'disputed', 'ruled_out']),
   status: z.string(),
   text: z.string(),
-});
-
-/**
- * StoryOut
- */
-export const zStoryOut = z.object({
-  can_ready: z.boolean(),
-  counts: zStoryCountsOut,
-  critical: z.array(zStoryCriticalOut),
-  gates: z.array(zStoryGateOut),
-  gates_passed: z.number().int(),
-  id: z.string().nullish(),
-  investigation_id: z.string(),
-  ready: zStoryReadyOut.nullish(),
-  sections: z.array(zStorySectionOut),
-  sentences: zStorySentencesOut,
-  thesis: z.string(),
-  unplaced: z.array(zStoryUnplacedOut),
-  writeup_id: z.string().nullish(),
 });
 
 /**
@@ -7064,6 +7056,7 @@ export const zRecordMarksOut = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
   tags: z.array(zTagChipOut),
 });
@@ -7218,6 +7211,7 @@ export const zLeadOut = z.object({
   detail: z.string().nullish(),
   gathering_outcome: z.string().nullish(),
   history: z.array(zLeadWorkflowEventOut),
+  horizon: z.enum(['now', 'next', 'later']).nullish(),
   id: z.string(),
   investigation_id: z.string(),
   kind: z.enum(['connector', 'question']),
@@ -8454,6 +8448,76 @@ export const zWriteupUpdate = z.object({
 });
 
 /**
+ * WriteupVersionCreate
+ */
+export const zWriteupVersionCreate = z.object({
+  name: z.string().min(1).max(200),
+});
+
+/**
+ * WriteupVersionDetailOut
+ */
+export const zWriteupVersionDetailOut = z.object({
+  content_json: z.record(z.unknown()),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  kind: z.enum(['named', 'auto', 'before_restore']),
+  name: z.string().nullish(),
+  word_count: z.number().int(),
+  writeup_id: z.string(),
+});
+
+/**
+ * WriteupVersionOut
+ *
+ * A snapshot of the write-up (app/services/writeup_versions.py).
+ */
+export const zWriteupVersionOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  kind: z.enum(['named', 'auto', 'before_restore']),
+  name: z.string().nullish(),
+  word_count: z.number().int(),
+  writeup_id: z.string(),
+});
+
+/**
+ * StoryOut
+ */
+export const zStoryOut = z.object({
+  can_ready: z.boolean(),
+  counts: zStoryCountsOut,
+  critical: z.array(zStoryCriticalOut),
+  gates: z.array(zStoryGateOut),
+  gates_passed: z.number().int(),
+  id: z.string().nullish(),
+  investigation_id: z.string(),
+  ready: zStoryReadyOut.nullish(),
+  sections: z.array(zStorySectionOut),
+  sentences: zStorySentencesOut,
+  thesis: z.string(),
+  unplaced: z.array(zStoryUnplacedOut),
+  version: zWriteupVersionOut.nullish(),
+  writeup_id: z.string().nullish(),
+});
+
+/**
+ * WriteupVersionsOut
+ */
+export const zWriteupVersionsOut = z.object({
+  versions: z.array(zWriteupVersionOut),
+  writeup_id: z.string().nullish(),
+});
+
+/**
  * WriteupsOut
  */
 export const zWriteupsOut = z.object({
@@ -8779,6 +8843,7 @@ export const zRemoveCollectionItemQuery = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
   record_id: z.string(),
 });
@@ -10281,6 +10346,7 @@ export const zGetRecordMarksQuery = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
   record_id: z.string(),
 });
@@ -10320,6 +10386,7 @@ export const zGetNotesQuery = z.object({
       'lead',
       'task',
       'finding',
+      'story',
     ])
     .nullish(),
   record_id: z.string().nullish(),
@@ -10372,6 +10439,7 @@ export const zPeekAtRecordQuery = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
   record_id: z.string(),
 });
@@ -10407,6 +10475,7 @@ export const zUntagARecordQuery = z.object({
     'lead',
     'task',
     'finding',
+    'story',
   ]),
   record_id: z.string(),
 });
@@ -10623,6 +10692,46 @@ export const zRemoveStoryClaimPath = z.object({
  * Successful Response
  */
 export const zRemoveStoryClaimResponse = zStoryOut;
+
+export const zListStoryVersionsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zListStoryVersionsResponse = zWriteupVersionsOut;
+
+export const zNameStoryVersionBody = zWriteupVersionCreate;
+
+export const zNameStoryVersionPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zNameStoryVersionResponse = zWriteupVersionOut;
+
+export const zGetStoryVersionPath = z.object({
+  investigation_id: z.string(),
+  version_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetStoryVersionResponse = zWriteupVersionDetailOut;
+
+export const zRestoreStoryVersionPath = z.object({
+  investigation_id: z.string(),
+  version_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRestoreStoryVersionResponse = zWriteupOut;
 
 export const zStartStoryWriteupPath = z.object({
   investigation_id: z.string(),

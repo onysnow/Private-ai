@@ -23,6 +23,8 @@ class Lead(Base):
     # What gathering got (the suite's EGS outcome): obtained, refused, not held, no
     # reply or unable to obtain. What was not obtained is itself a finding.
     gathering_outcome: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    # When to chase it (research Act §6, Now / Next / Later): now, next or later; None = in the inbox, not yet placed.
+    horizon: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

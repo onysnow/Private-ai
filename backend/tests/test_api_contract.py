@@ -436,10 +436,13 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
 
     # The case's story with one section (app/services/stories.py, mockup ACT_2).
     story = ok(client.post(f"/api/investigations/{inv}/story/sections", json={"title": "Who bought the land"}))
+    # Its write-up with one named version (app/services/writeup_versions.py).
+    ok(client.post(f"/api/investigations/{inv}/story/writeup"))
+    version = ok(client.post(f"/api/investigations/{inv}/story/versions", json={"name": "Before legal read"}))
 
     return Seeded(
         ids={
-            "section_id": story["sections"][0]["id"], "run_id": draft["job"]["id"],
+            "section_id": story["sections"][0]["id"], "version_id": version["id"], "run_id": draft["job"]["id"],
             "investigation_id": inv, "entity_id": meridian, "claim_id": claim["id"], "lead_id": lead, "relationship_id": relationship,
             "source_id": payment["source"]["id"], "evidence_id": payment["evidence"]["id"], "document_id": document["id"],
             "job_id": document["job"]["id"], "finding_id": company["id"], "session_id": session["id"], "assessment_id": assessment["id"],

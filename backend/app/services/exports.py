@@ -28,7 +28,7 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-    Story, StorySection, StoryClaim, AIRunEvent,
+    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -45,7 +45,7 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, StorySection, StoryClaim, AIRunEvent,
+        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
     ]
 }
 
@@ -87,6 +87,8 @@ RESTORE_ORDER = [
     # Writeups/decks may point at an ai_analysis_candidate (source_ai_candidate_id,
     # nullable) when they were promoted from one, so they must restore after it.
     "writeups", "decks",
+    # A write-up's snapshots (named, automatic, before a restore) after the write-up they belong to.
+    "writeup_versions",
     # What the story needs (ADR-0010): a story may point at its write-up, so after writeups; its claims after claims.
     "stories", "story_sections", "story_claims",
     # Each AI run's steps as they happened (ADR-0012): the run record travels with the case.
@@ -158,7 +160,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent,
+        Story, AIRunEvent, WriteupVersion,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -195,7 +197,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "documents": documents, "investigation_corpus_bindings": corpus_bindings, "document_corpus_syncs": document_syncs, "document_chunks": chunks,
         "extraction_candidates": direct["extraction_candidates"],
         "ai_analysis_candidates": direct["ai_analysis_candidates"],
-        "writeups": direct["writeups"], "decks": direct["decks"],
+        "writeups": direct["writeups"], "decks": direct["decks"], "writeup_versions": direct["writeup_versions"],
         "cross_reference_proposals": direct["cross_reference_proposals"],
         "cross_reference_decisions": direct["cross_reference_decisions"],
         "ingestion_batches": direct["ingestion_batches"], "ingestion_batch_items": batch_items,

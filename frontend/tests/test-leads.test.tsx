@@ -63,6 +63,8 @@ async function renderPanel(leads: unknown[] = [leadFixture()], routes: Record<st
   const api = mockApi({[QUEUE]: leadQueueBody('inv-1', leads), ...routes});
   wrap(<LeadsPanel investigationId="inv-1"/>);
   await screen.findByText('Who approved this contract?');
+  // The status columns (the panel opens on Now / Next / Later; test-leads-horizons.test.tsx covers that view).
+  await userEvent.setup().click(screen.getByRole('button', {name: 'By status'}));
   return api;
 }
 
@@ -135,6 +137,7 @@ describe('LeadsPanel', () => {
     });
     wrap(<><LeadsPanel investigationId="inv-1"/><ClaimsPanel investigationId="inv-1" relationships={[]} onInspectRelationship={vi.fn()}/></>);
     await screen.findByText('Who approved this contract?');
+    await userEvent.setup().click(screen.getByRole('button', {name: 'By status'}));
     await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/claims')).toHaveLength(1));
     const converted = leadFixture({status: 'active'});
     api.add({

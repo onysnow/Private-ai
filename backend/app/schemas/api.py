@@ -101,6 +101,8 @@ class LeadUpdate(BaseModel):
     note: str | None = None
     # What gathering got (app/ai/suite_vocab.py GATHERING_OUTCOMES); null clears it.
     gathering_outcome: str | None = None
+    # When to chase it: now, next or later (Now / Next / Later); null puts it back in the inbox.
+    horizon: Literal["now", "next", "later"] | None = None
 
 
 class LeadLinkCreate(BaseModel):
@@ -572,7 +574,7 @@ class EntitySetSend(BaseModel):
 
 # --- tags, notes and collections (app/services/annotations.py) ----------------
 
-RecordType = Literal["entity", "relationship", "evidence", "source", "claim", "event", "document", "lead", "task", "finding"]
+RecordType = Literal["entity", "relationship", "evidence", "source", "claim", "event", "document", "lead", "task", "finding", "story"]
 
 
 class TagCreate(BaseModel):
@@ -724,3 +726,7 @@ class StoryGateSet(BaseModel):
 
 class StoryReady(BaseModel):
     by: str = Field(min_length=1, max_length=255, description="Who decided it is ready to run.")
+
+
+class WriteupVersionCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200, description='A name for the write-up as it stands ("Before legal read").')

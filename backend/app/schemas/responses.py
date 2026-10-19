@@ -1826,6 +1826,7 @@ class LeadOut(ResponseModel):
     kind: Literal["connector", "question"]
     status: str  # unreviewed | active | blocked | resolved | rejected
     gathering_outcome: str | None = None  # the suite's EGS outcome
+    horizon: Literal["now", "next", "later"] | None = None  # when to chase it; None = in the inbox
     priority: str
     owner: str | None = None
     next_action: str | None = None
@@ -2464,6 +2465,7 @@ class LeadRowOut(ResponseModel):
     provider_record_id: str | None = None
     status: str
     gathering_outcome: str | None = None
+    horizon: Literal["now", "next", "later"] | None = None  # when to chase it; None = in the inbox
     created_at: Timestamp
 
 
@@ -2762,11 +2764,31 @@ class HashRecheckOut(ResponseModel):
     checked_at: Timestamp
 
 
+class WriteupVersionOut(ResponseModel):
+    """A snapshot of the write-up (app/services/writeup_versions.py)."""
+    id: str
+    writeup_id: str
+    name: str | None = None
+    kind: Literal["named", "auto", "before_restore"]
+    word_count: int
+    created_at: Timestamp
+
+
+class WriteupVersionDetailOut(WriteupVersionOut):
+    content_json: dict[str, Any]
+
+
+class WriteupVersionsOut(ResponseModel):
+    writeup_id: str | None = None
+    versions: list[WriteupVersionOut]
+
+
 class StoryEvidenceOut(ResponseModel):
     id: str
     stance: str
     label: str
     locator: str | None = None
+    quote: str | None = None  # the passage's own words (shown on a citation's hover, and beside the text)
 
 
 class StoryClaimOut(ResponseModel):
@@ -2839,6 +2861,8 @@ class StoryOut(ResponseModel):
     ready: StoryReadyOut | None = None
     can_ready: bool
     unplaced: list[StoryUnplacedOut]
+    version: WriteupVersionOut | None = None  # the write-up's newest named version ("Before legal read")
+
 
 
 # --- Settings, credentials and the security audit ------------------------------------------
@@ -3975,7 +3999,7 @@ class DocumentTranslationOut(ResponseModel):
 
 # --- tags, notes and collections (app/services/annotations.py) ----------------
 
-AnnotatedRecordType = Literal["entity", "relationship", "evidence", "source", "claim", "event", "document", "lead", "task", "finding"]
+AnnotatedRecordType = Literal["entity", "relationship", "evidence", "source", "claim", "event", "document", "lead", "task", "finding", "story"]
 
 
 class TagOut(ResponseModel):

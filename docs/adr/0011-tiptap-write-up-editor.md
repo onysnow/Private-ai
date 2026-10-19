@@ -18,6 +18,12 @@ changes. The citation is a TipTap inline atom node with the same type and attrib
 marks (no source, rests on a disputed claim, AI draft) are decorations worked out in the browser from the cited claims'
 statuses, never stored in the text.
 
+**Amended 2026-10-19.** The AI-draft mark is the one mark that is stored: whether a paragraph came from an AI draft
+cannot be worked out afterwards, so a paragraph carries `attrs.aiDraft` (the day, YYYY-MM-DD) and `attrs.aiKept`
+(a person kept it). It is drawn plum, with its "AI draft · date" tag and Keep · Undo, until kept; kept paragraphs
+still count as drafted with AI for the AI-use note. The server ignores both attributes. Nothing inserts AI text into
+the story's write-up yet (AI drafts are promoted into write-ups of their own).
+
 ## Consequences
 
 Four packages (MIT). The editor is loaded only on the Story screen.

@@ -13,7 +13,7 @@ to walk the ProseMirror tree themselves.
 """
 
 from datetime import datetime
-from sqlalchemy import String, Text, DateTime, ForeignKey, JSON
+from sqlalchemy import String, Text, DateTime, ForeignKey, Integer, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.time import utcnow_naive
 from app.db.session import Base
@@ -48,3 +48,22 @@ class Writeup(Base):
     created_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive)
+
+
+WRITEUP_VERSION_KINDS = {"named", "auto", "before_restore"}
+
+
+class WriteupVersion(Base):
+    """A snapshot of a write-up's text (research Act §8, mockup ACT_2 'version "before legal read"'): named by a
+    person, taken on its own while they write (at most one every few minutes), or taken just before an older
+    version is restored, so a restore can itself be undone. Read-only once taken."""
+    __tablename__ = "writeup_versions"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
+    writeup_id: Mapped[str] = mapped_column(ForeignKey("writeups.id"), index=True)
+    # A person's name for it ("Before legal read"); None for an automatic one.
+    name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    kind: Mapped[str] = mapped_column(String(16), default="auto")
+    content_json: Mapped[dict] = mapped_column(JSON, default=dict)
+    word_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, index=True)

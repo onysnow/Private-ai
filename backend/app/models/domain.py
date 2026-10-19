@@ -88,6 +88,7 @@ from app.models.ai import (
 )
 from app.models.writeups import (
     Writeup,
+    WriteupVersion,
 )
 from app.models.stories import (
     Story,
@@ -169,6 +170,7 @@ __all__ = [
     "AIAnalysisCandidate",
     "AIRunEvent",
     "Writeup",
+    "WriteupVersion",
     "Story",
     "StoryClaim",
     "StorySection",

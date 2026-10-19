@@ -5797,7 +5797,8 @@
               "document",
               "lead",
               "task",
-              "finding"
+              "finding",
+              "story"
             ],
             "title": "Record Type",
             "type": "string"
@@ -5846,7 +5847,8 @@
               "document",
               "lead",
               "task",
-              "finding"
+              "finding",
+              "story"
             ],
             "title": "Record Type",
             "type": "string"
@@ -21822,6 +21824,22 @@
             "title": "History",
             "type": "array"
           },
+          "horizon": {
+            "anyOf": [
+              {
+                "enum": [
+                  "now",
+                  "next",
+                  "later"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -21994,6 +22012,22 @@
             ],
             "title": "Gathering Outcome"
           },
+          "horizon": {
+            "anyOf": [
+              {
+                "enum": [
+                  "now",
+                  "next",
+                  "later"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -22137,6 +22171,22 @@
               }
             ],
             "title": "Gathering Outcome"
+          },
+          "horizon": {
+            "anyOf": [
+              {
+                "enum": [
+                  "now",
+                  "next",
+                  "later"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon"
           },
           "next_action": {
             "anyOf": [
@@ -22997,7 +23047,8 @@
               "document",
               "lead",
               "task",
-              "finding"
+              "finding",
+              "story"
             ],
             "title": "Record Type",
             "type": "string"
@@ -23523,7 +23574,8 @@
                   "document",
                   "lead",
                   "task",
-                  "finding"
+                  "finding",
+                  "story"
                 ],
                 "type": "string"
               },
@@ -23616,7 +23668,8 @@
                   "document",
                   "lead",
                   "task",
-                  "finding"
+                  "finding",
+                  "story"
                 ],
                 "type": "string"
               },
@@ -24936,7 +24989,8 @@
               "document",
               "lead",
               "task",
-              "finding"
+              "finding",
+              "story"
             ],
             "title": "Record Type",
             "type": "string"
@@ -26026,7 +26080,8 @@
               "document",
               "lead",
               "task",
-              "finding"
+              "finding",
+              "story"
             ],
             "title": "Record Type",
             "type": "string"
@@ -26103,7 +26158,8 @@
               "document",
               "lead",
               "task",
-              "finding"
+              "finding",
+              "story"
             ],
             "title": "Record Type",
             "type": "string"
@@ -26146,7 +26202,8 @@
               "document",
               "lead",
               "task",
-              "finding"
+              "finding",
+              "story"
             ],
             "title": "Record Type",
             "type": "string"
@@ -30466,6 +30523,17 @@
             ],
             "title": "Locator"
           },
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
           "stance": {
             "title": "Stance",
             "type": "string"
@@ -30628,6 +30696,16 @@
             },
             "title": "Unplaced",
             "type": "array"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WriteupVersionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "writeup_id": {
             "anyOf": [
@@ -34773,6 +34851,158 @@
         "title": "WriteupUpdate",
         "type": "object"
       },
+      "WriteupVersionCreate": {
+        "properties": {
+          "name": {
+            "description": "A name for the write-up as it stands (\"Before legal read\").",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "WriteupVersionCreate",
+        "type": "object"
+      },
+      "WriteupVersionDetailOut": {
+        "properties": {
+          "content_json": {
+            "additionalProperties": true,
+            "title": "Content Json",
+            "type": "object"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "named",
+              "auto",
+              "before_restore"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          },
+          "writeup_id": {
+            "title": "Writeup Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "writeup_id",
+          "kind",
+          "word_count",
+          "created_at",
+          "content_json"
+        ],
+        "title": "WriteupVersionDetailOut",
+        "type": "object"
+      },
+      "WriteupVersionOut": {
+        "description": "A snapshot of the write-up (app/services/writeup_versions.py).",
+        "properties": {
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "named",
+              "auto",
+              "before_restore"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          },
+          "writeup_id": {
+            "title": "Writeup Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "writeup_id",
+          "kind",
+          "word_count",
+          "created_at"
+        ],
+        "title": "WriteupVersionOut",
+        "type": "object"
+      },
+      "WriteupVersionsOut": {
+        "properties": {
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/WriteupVersionOut"
+            },
+            "title": "Versions",
+            "type": "array"
+          },
+          "writeup_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Writeup Id"
+          }
+        },
+        "required": [
+          "versions"
+        ],
+        "title": "WriteupVersionsOut",
+        "type": "object"
+      },
       "WriteupsOut": {
         "properties": {
           "writeups": {
@@ -36645,7 +36875,8 @@
                 "document",
                 "lead",
                 "task",
-                "finding"
+                "finding",
+                "story"
               ],
               "title": "Record Type",
               "type": "string"
@@ -51827,7 +52058,8 @@
                 "document",
                 "lead",
                 "task",
-                "finding"
+                "finding",
+                "story"
               ],
               "title": "Record Type",
               "type": "string"
@@ -51977,7 +52209,8 @@
                     "document",
                     "lead",
                     "task",
-                    "finding"
+                    "finding",
+                    "story"
                   ],
                   "type": "string"
                 },
@@ -52207,7 +52440,8 @@
                 "document",
                 "lead",
                 "task",
-                "finding"
+                "finding",
+                "story"
               ],
               "title": "Record Type",
               "type": "string"
@@ -52345,7 +52579,8 @@
                 "document",
                 "lead",
                 "task",
-                "finding"
+                "finding",
+                "story"
               ],
               "title": "Record Type",
               "type": "string"
@@ -53513,6 +53748,232 @@
           }
         },
         "summary": "Remove Story Claim"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/versions": {
+      "get": {
+        "description": "The write-up's versions, newest first: named ones, automatic ones and those kept before a restore.",
+        "operationId": "list_story_versions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupVersionsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Story Versions"
+      },
+      "post": {
+        "description": "Keep the write-up as it stands under a name (\"Before legal read\").",
+        "operationId": "name_story_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WriteupVersionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupVersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Name Story Version"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/versions/{version_id}": {
+      "get": {
+        "description": "One version with its text, to read (never to edit).",
+        "operationId": "get_story_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupVersionDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Story Version"
+      }
+    },
+    "/api/investigations/{investigation_id}/story/versions/{version_id}/restore": {
+      "post": {
+        "description": "Put this version's text back. The text it replaces is kept first, as a version of its own.",
+        "operationId": "restore_story_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Restore Story Version"
       }
     },
     "/api/investigations/{investigation_id}/story/writeup": {
