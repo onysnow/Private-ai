@@ -730,3 +730,36 @@ class StoryReady(BaseModel):
 
 class WriteupVersionCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200, description='A name for the write-up as it stands ("Before legal read").')
+
+
+# --- Settings kept on the server (app/services/preferences.py) ---------------------------------------------------
+
+NotificationRoute = Literal["interrupt", "needs", "else", "off"]
+LookupMode = Literal["automatic", "ask", "off"]
+
+
+class NotificationPrefsPut(BaseModel):
+    routes: dict[str, NotificationRoute] = Field(default_factory=dict, description="Where each kind goes; kinds left out keep their route.")
+    quiet_while_reading: bool = True
+    desktop: bool = False
+
+
+class LookupDefaultsPut(BaseModel):
+    defaults: dict[str, LookupMode] = Field(description="Each source's mode for cases that have not chosen their own.")
+
+
+class CaseLookupsPut(BaseModel):
+    modes: dict[str, LookupMode] = Field(description="This case's own mode for each source it differs on.")
+    reason: str = Field(min_length=1, max_length=300, description="One line on why this case looks up differently.")
+
+
+class ResearchSettingsPut(BaseModel):
+    mode: Literal["off", "ask"] | None = Field(default=None, description="What the AI may start on its own.")
+    flags: dict[str, Any] | None = Field(default=None, description="Run defaults for new cases: the suite's flags.")
+    options: dict[str, Any] | None = Field(default=None, description="Run defaults for new cases: the run options.")
+    reason: str | None = Field(default=None, max_length=300, description="Needed when the run defaults change.")
+
+
+class FactWatchCreate(BaseModel):
+    record_type: Literal["claim", "red_flag"]
+    record_id: str = Field(min_length=1, max_length=64)

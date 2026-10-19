@@ -5146,3 +5146,118 @@ class AiRunsOut(ResponseModel):
 class AiRunEventsOut(ResponseModel):
     run: AiRunOut
     events: list[AiRunEventOut]
+
+
+# --- Settings kept on the server (app/services/preferences.py, notifications.py, connector_activity.py) ----------
+
+class NotificationKindOut(ResponseModel):
+    key: str
+    label: str
+    default: str
+    can_interrupt: bool
+    route: str
+
+
+class NotificationPrefsOut(ResponseModel):
+    routes: dict[str, str]
+    quiet_while_reading: bool
+    desktop: bool
+    kinds: list[NotificationKindOut]
+
+
+class InboxRowOut(ResponseModel):
+    key: str
+    kind: str
+    title: str
+    reason: str
+    href: str
+    created_at: Timestamp | None = None
+    level: str | None = None
+    actor: str
+    actor_kind: str
+    route: str
+
+
+class InboxOut(ResponseModel):
+    investigation_id: str
+    interrupt: list[InboxRowOut]
+    needs: list[InboxRowOut]
+    # "else" is a Python keyword; the JSON key stays "else".
+    else_: list[InboxRowOut] = Field(alias="else", serialization_alias="else")
+    week: dict[str, int]
+    quiet_while_reading: bool
+    desktop: bool
+
+
+class FactWatchOut(ResponseModel):
+    id: str
+    investigation_id: str
+    record_type: str
+    record_id: str
+    label: str
+    baseline: str
+    baseline_words: str
+    value: str
+    value_words: str
+    changed: bool
+    created_at: Timestamp
+    seen_at: Timestamp
+
+
+class ConnectorRunLineOut(ResponseModel):
+    id: str
+    provider: str
+    sent: str
+    is_party: bool
+    investigation_id: str
+    case: str
+    status: str
+    results: int
+    at: Timestamp
+
+
+class LookupSourceOut(ResponseModel):
+    key: str
+    label: str
+    kind: str
+    host: str
+    key_saved: bool
+    default: str
+    mode: str | None = None
+    last: ConnectorRunLineOut | None = None
+    cases_this_month: int
+
+
+class CaseLookupsOut(ResponseModel):
+    investigation_id: str
+    name: str
+    modes: dict[str, str]
+    reason: str | None = None
+    set_at: Timestamp
+
+
+class LookupSettingsOut(ResponseModel):
+    sources: list[LookupSourceOut]
+    cases: list[CaseLookupsOut]
+    week: list[ConnectorRunLineOut]
+    can_change_defaults: bool
+
+
+class RunDefaultsCaseOut(ResponseModel):
+    investigation_id: str
+    name: str
+    differs: list[str]
+    reason: str | None = None
+    saved_at: str | None = None
+
+
+class ResearchSettingsOut(ResponseModel):
+    mode: str
+    ai_enabled: bool
+    model: str | None = None
+    settings: list[RunSettingOut]
+    defaults_reason: str | None = None
+    defaults_saved_at: Timestamp | None = None
+    locked: list[RunPlanLockedOut]
+    cases: list[RunDefaultsCaseOut]
+    can_change_defaults: bool

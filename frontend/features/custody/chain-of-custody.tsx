@@ -170,7 +170,7 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
     : !claims.data?.length ? 'No claim yet. A Chain of Custody starts from a claim: add one in Claims.'
     : chainQ.isError ? errorMessage(chainQ.error, 'Could not trace this claim') : chainQ.isPending ? 'Tracing the claim…' : '';
 
-  return <section className="cc" aria-label="Chain of Custody" ref={rootRef}>
+  return <section className="cc" data-calm-zone="" aria-label="Chain of Custody" ref={rootRef}>
     <header className="cc-head">
       <h2>How this fact got here</h2>
       {chain && <p className="cc-seal"><button type="button" className="cc-seal-btn" onClick={() => void copySeal()}

@@ -25,6 +25,7 @@ import {
   canonicalEntityResolution,
   capabilities,
   checkWatchlistNow,
+  clearCaseLookups,
   connectors,
   connectorSearch,
   convertLeadEndpoint,
@@ -43,6 +44,7 @@ import {
   createReportingTaskEndpoint,
   createSourceEndpoint,
   createTimelineEventEndpoint,
+  createWatch,
   createWriteupEndpoint,
   decideCheck,
   decideCrossProviderCluster,
@@ -53,6 +55,7 @@ import {
   deleteDeckEndpoint,
   deleteInvestigationMembership,
   deleteStorySection,
+  deleteWatch,
   deleteWriteupEndpoint,
   dismissHit,
   dismissRedFlag,
@@ -114,6 +117,7 @@ import {
   getExtractionOpenalephMatches,
   getGlossaryEntry,
   getIdentifierTargets,
+  getInbox,
   getIndicator,
   getIngestionBatch,
   getInvestigationFinancialFlows,
@@ -124,8 +128,10 @@ import {
   getInvestigationType,
   getJobEndpoint,
   getLead,
+  getLookupSettings,
   getMappingSchemas,
   getNotes,
+  getNotificationPrefs,
   getOpenalephCorpusBinding,
   getOpenalephDocumentReviewStatus,
   getOpenalephDocumentSync,
@@ -135,6 +141,7 @@ import {
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
+  getResearchSettings,
   getSameAnswerCandidates,
   getSecurityAlerts,
   getSecurityAudit,
@@ -214,6 +221,7 @@ import {
   listSources,
   listStoryVersions,
   listTermHints,
+  listWatches,
   listWriteupsEndpoint,
   load1Mdb,
   loadDemoCase,
@@ -241,7 +249,11 @@ import {
   promoteExternalRelationship,
   promoteStatementAssessment,
   pruneSecurityAudit,
+  putCaseLookups,
   putInvestigationMembership,
+  putLookupDefaults,
+  putNotificationPrefs,
+  putResearchSettings,
   recheckHash,
   recordStoryGate,
   refreshOpenalephDocumentReview,
@@ -273,6 +285,7 @@ import {
   searchInvestigationCorpus,
   searchWorkbench,
   seedDemo,
+  seeWatch,
   sendCorpusEntitySet,
   setInvestigationType,
   setStoryThesis,
@@ -341,6 +354,9 @@ import type {
   CheckWatchlistNowData,
   CheckWatchlistNowError,
   CheckWatchlistNowResponse,
+  ClearCaseLookupsData,
+  ClearCaseLookupsError,
+  ClearCaseLookupsResponse,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchError,
@@ -395,6 +411,9 @@ import type {
   CreateTimelineEventEndpointData,
   CreateTimelineEventEndpointError,
   CreateTimelineEventEndpointResponse,
+  CreateWatchData,
+  CreateWatchError,
+  CreateWatchResponse,
   CreateWriteupEndpointData,
   CreateWriteupEndpointError,
   CreateWriteupEndpointResponse,
@@ -425,6 +444,9 @@ import type {
   DeleteStorySectionData,
   DeleteStorySectionError,
   DeleteStorySectionResponse,
+  DeleteWatchData,
+  DeleteWatchError,
+  DeleteWatchResponse,
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointError,
   DeleteWriteupEndpointResponse,
@@ -608,6 +630,9 @@ import type {
   GetIdentifierTargetsData,
   GetIdentifierTargetsError,
   GetIdentifierTargetsResponse,
+  GetInboxData,
+  GetInboxError,
+  GetInboxResponse,
   GetIndicatorData,
   GetIndicatorError,
   GetIndicatorResponse,
@@ -638,12 +663,18 @@ import type {
   GetLeadData,
   GetLeadError,
   GetLeadResponse,
+  GetLookupSettingsData,
+  GetLookupSettingsError,
+  GetLookupSettingsResponse,
   GetMappingSchemasData,
   GetMappingSchemasError,
   GetMappingSchemasResponse,
   GetNotesData,
   GetNotesError,
   GetNotesResponse,
+  GetNotificationPrefsData,
+  GetNotificationPrefsError,
+  GetNotificationPrefsResponse,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingError,
   GetOpenalephCorpusBindingResponse,
@@ -671,6 +702,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsError,
   GetRedFlagsResponse,
+  GetResearchSettingsData,
+  GetResearchSettingsError,
+  GetResearchSettingsResponse,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesError,
   GetSameAnswerCandidatesResponse,
@@ -908,6 +942,9 @@ import type {
   ListTermHintsData,
   ListTermHintsError,
   ListTermHintsResponse,
+  ListWatchesData,
+  ListWatchesError,
+  ListWatchesResponse,
   ListWriteupsEndpointData,
   ListWriteupsEndpointError,
   ListWriteupsEndpointResponse,
@@ -985,9 +1022,21 @@ import type {
   PruneSecurityAuditData,
   PruneSecurityAuditError,
   PruneSecurityAuditResponse,
+  PutCaseLookupsData,
+  PutCaseLookupsError,
+  PutCaseLookupsResponse,
   PutInvestigationMembershipData,
   PutInvestigationMembershipError,
   PutInvestigationMembershipResponse,
+  PutLookupDefaultsData,
+  PutLookupDefaultsError,
+  PutLookupDefaultsResponse,
+  PutNotificationPrefsData,
+  PutNotificationPrefsError,
+  PutNotificationPrefsResponse,
+  PutResearchSettingsData,
+  PutResearchSettingsError,
+  PutResearchSettingsResponse,
   RecheckHashData,
   RecheckHashError,
   RecheckHashResponse,
@@ -1081,6 +1130,9 @@ import type {
   SeedDemoData,
   SeedDemoError,
   SeedDemoResponse,
+  SeeWatchData,
+  SeeWatchError,
+  SeeWatchResponse,
   SendCorpusEntitySetData,
   SendCorpusEntitySetError,
   SendCorpusEntitySetResponse,
@@ -6659,6 +6711,31 @@ export const getInvestigationGraphOptions = (
     queryKey: getInvestigationGraphQueryKey(options),
   });
 
+export const getInboxQueryKey = (options: Options<GetInboxData>) =>
+  createQueryKey('getInbox', options);
+
+/**
+ * Get Inbox
+ */
+export const getInboxOptions = (options: Options<GetInboxData>) =>
+  queryOptions<
+    GetInboxResponse,
+    GetInboxError,
+    GetInboxResponse,
+    ReturnType<typeof getInboxQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInbox({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInboxQueryKey(options),
+  });
+
 export const listIngestionBatchesQueryKey = (
   options: Options<ListIngestionBatchesData>,
 ) => createQueryKey('listIngestionBatches', options);
@@ -6866,6 +6943,60 @@ export const leadQueueInfiniteOptions = (options: Options<LeadQueueData>) => {
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Clear Case Lookups
+ */
+export const clearCaseLookupsMutation = (
+  options?: Partial<Options<ClearCaseLookupsData>>,
+): UseMutationOptions<
+  ClearCaseLookupsResponse,
+  ClearCaseLookupsError,
+  Options<ClearCaseLookupsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ClearCaseLookupsResponse,
+    ClearCaseLookupsError,
+    Options<ClearCaseLookupsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await clearCaseLookups({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Put Case Lookups
+ */
+export const putCaseLookupsMutation = (
+  options?: Partial<Options<PutCaseLookupsData>>,
+): UseMutationOptions<
+  PutCaseLookupsResponse,
+  PutCaseLookupsError,
+  Options<PutCaseLookupsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutCaseLookupsResponse,
+    PutCaseLookupsError,
+    Options<PutCaseLookupsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putCaseLookups({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const getRecordMarksQueryKey = (options: Options<GetRecordMarksData>) =>
@@ -8224,6 +8355,31 @@ export const investigationVisualRestyleMutation = (
   return mutationOptions;
 };
 
+export const listWatchesQueryKey = (options: Options<ListWatchesData>) =>
+  createQueryKey('listWatches', options);
+
+/**
+ * List Watches
+ */
+export const listWatchesOptions = (options: Options<ListWatchesData>) =>
+  queryOptions<
+    ListWatchesResponse,
+    ListWatchesError,
+    ListWatchesResponse,
+    ReturnType<typeof listWatchesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listWatches({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listWatchesQueryKey(options),
+  });
+
 export const getWatchlistQueryKey = (options: Options<GetWatchlistData>) =>
   createQueryKey('getWatchlist', options);
 
@@ -9246,6 +9402,171 @@ export const saveConnectorCredentialMutation = (
   return mutationOptions;
 };
 
+export const getLookupSettingsQueryKey = (
+  options?: Options<GetLookupSettingsData>,
+) => createQueryKey('getLookupSettings', options);
+
+/**
+ * Get Lookup Settings
+ */
+export const getLookupSettingsOptions = (
+  options?: Options<GetLookupSettingsData>,
+) =>
+  queryOptions<
+    GetLookupSettingsResponse,
+    GetLookupSettingsError,
+    GetLookupSettingsResponse,
+    ReturnType<typeof getLookupSettingsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getLookupSettings({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getLookupSettingsQueryKey(options),
+  });
+
+/**
+ * Put Lookup Defaults
+ */
+export const putLookupDefaultsMutation = (
+  options?: Partial<Options<PutLookupDefaultsData>>,
+): UseMutationOptions<
+  PutLookupDefaultsResponse,
+  PutLookupDefaultsError,
+  Options<PutLookupDefaultsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutLookupDefaultsResponse,
+    PutLookupDefaultsError,
+    Options<PutLookupDefaultsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putLookupDefaults({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getNotificationPrefsQueryKey = (
+  options?: Options<GetNotificationPrefsData>,
+) => createQueryKey('getNotificationPrefs', options);
+
+/**
+ * Get Notification Prefs
+ */
+export const getNotificationPrefsOptions = (
+  options?: Options<GetNotificationPrefsData>,
+) =>
+  queryOptions<
+    GetNotificationPrefsResponse,
+    GetNotificationPrefsError,
+    GetNotificationPrefsResponse,
+    ReturnType<typeof getNotificationPrefsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getNotificationPrefs({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getNotificationPrefsQueryKey(options),
+  });
+
+/**
+ * Put Notification Prefs
+ */
+export const putNotificationPrefsMutation = (
+  options?: Partial<Options<PutNotificationPrefsData>>,
+): UseMutationOptions<
+  PutNotificationPrefsResponse,
+  PutNotificationPrefsError,
+  Options<PutNotificationPrefsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutNotificationPrefsResponse,
+    PutNotificationPrefsError,
+    Options<PutNotificationPrefsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putNotificationPrefs({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getResearchSettingsQueryKey = (
+  options?: Options<GetResearchSettingsData>,
+) => createQueryKey('getResearchSettings', options);
+
+/**
+ * Get Research Settings
+ */
+export const getResearchSettingsOptions = (
+  options?: Options<GetResearchSettingsData>,
+) =>
+  queryOptions<
+    GetResearchSettingsResponse,
+    GetResearchSettingsError,
+    GetResearchSettingsResponse,
+    ReturnType<typeof getResearchSettingsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getResearchSettings({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getResearchSettingsQueryKey(options),
+  });
+
+/**
+ * Put Research Settings
+ */
+export const putResearchSettingsMutation = (
+  options?: Partial<Options<PutResearchSettingsData>>,
+): UseMutationOptions<
+  PutResearchSettingsResponse,
+  PutResearchSettingsError,
+  Options<PutResearchSettingsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutResearchSettingsResponse,
+    PutResearchSettingsError,
+    Options<PutResearchSettingsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putResearchSettings({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getSecurityAlertsQueryKey = (
   options?: Options<GetSecurityAlertsData>,
 ) => createQueryKey('getSecurityAlerts', options);
@@ -9954,6 +10275,87 @@ export const gradeTimelineEventEndpointMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await gradeTimelineEventEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Create Watch
+ */
+export const createWatchMutation = (
+  options?: Partial<Options<CreateWatchData>>,
+): UseMutationOptions<
+  CreateWatchResponse,
+  CreateWatchError,
+  Options<CreateWatchData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateWatchResponse,
+    CreateWatchError,
+    Options<CreateWatchData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createWatch({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete Watch
+ */
+export const deleteWatchMutation = (
+  options?: Partial<Options<DeleteWatchData>>,
+): UseMutationOptions<
+  DeleteWatchResponse,
+  DeleteWatchError,
+  Options<DeleteWatchData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteWatchResponse,
+    DeleteWatchError,
+    Options<DeleteWatchData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteWatch({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * See Watch
+ */
+export const seeWatchMutation = (
+  options?: Partial<Options<SeeWatchData>>,
+): UseMutationOptions<
+  SeeWatchResponse,
+  SeeWatchError,
+  Options<SeeWatchData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SeeWatchResponse,
+    SeeWatchError,
+    Options<SeeWatchData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await seeWatch({
         ...options,
         ...fnOptions,
         throwOnError: true,

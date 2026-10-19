@@ -75,6 +75,10 @@ from app.models.patterns import (
     CheckItem,
     PatternFlag,
 )
+from app.models.preferences import (
+    FactWatch,
+    Preference,
+)
 from app.models.annotations import (
     Collection,
     CollectionItem,
@@ -167,6 +171,8 @@ __all__ = [
     "CollectionItem",
     "PatternFlag",
     "CheckItem",
+    "Preference",
+    "FactWatch",
     "AIAnalysisCandidate",
     "AIRunEvent",
     "Writeup",

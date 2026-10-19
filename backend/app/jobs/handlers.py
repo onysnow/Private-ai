@@ -410,7 +410,37 @@ def ai_reasoning_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     }
 
 
+OUTSIDE_LOOKUP = "outside_lookup"
+
+
+def outside_lookup_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Settings › Outside lookups set to Automatic: look a newly accepted party up in each such source that has not
+    yet. A source that fails is noted and the others still run; the findings wait in Decide like any lookup's."""
+    import asyncio
+
+    from fastapi import HTTPException
+
+    from app.models.domain import Entity
+    from app.services.connectors import automatic_lookups_due, enrich_entity
+    from app.services.preferences import provider_label
+
+    entity = db.get(Entity, str(job.subject_id))
+    if entity is None:
+        return {"message": "The party is no longer in the case"}
+    found, failed = 0, []
+    due = automatic_lookups_due(db, entity)
+    for n, provider in enumerate(due):
+        report(int(100 * n / max(1, len(due))), f"Looking {entity.caption} up in {provider_label(provider)}")
+        try:
+            found += len(asyncio.run(enrich_entity(provider, entity, db)))
+        except HTTPException:
+            failed.append(provider_label(provider))
+    message = f"{found} finding{'s' if found != 1 else ''} for {entity.caption}" + (f"; {', '.join(failed)} did not answer" if failed else "")
+    return {"message": message, "result": {"findings": found, "failed": failed}}
+
+
 HANDLERS: dict[str, Handler] = {
+    OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,
     ANALYZE_DOCUMENT: analyze_document_job,
     FIND_CHILDREN: children_job,

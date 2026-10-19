@@ -4,14 +4,15 @@ app/services/documents.py; this module just wires 404s and the
 review-validation ValueError to HTTP status codes.
 """
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
 from app.core.authorization import scope_for_request
 from app.db.session import get_db
-from app.models.domain import ExtractionCandidate
+from app.models.domain import Entity, ExtractionCandidate
 from app.schemas.api import ExtractionCandidateReviewRequest
+from app.services.connectors import queue_automatic_lookups
 from app.services.documents import preview_entity_candidate_matches, review_candidate, serialize_extraction_lineage
 from app.services.extraction_explanations import explain_extraction_candidate
 from app.schemas.responses import EntityMatchPreviewOut, SameAnswerOut, OpenAlephMatchesOut, ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut, IdentifierTargetsOut
@@ -91,11 +92,18 @@ def get_extraction_candidate_explanation(candidate_id: str, db: Session = Depend
 
 
 @router.post("/extraction-candidates/{candidate_id}/review", response_model=ExtractionReviewOut)
-def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateReviewRequest, db: Session = Depends(get_db)) -> Any:
+def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateReviewRequest, request: Request,
+                                background: BackgroundTasks, db: Session = Depends(get_db)) -> Any:
     row = db.get(ExtractionCandidate, candidate_id)
     if row is None:
         raise HTTPException(404, "Extraction candidate not found")
     try:
-        return review_candidate(db, row, **body.model_dump())
+        result = review_candidate(db, row, **body.model_dump())
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+    # A party accepted into the case is looked up in the sources set to Automatic (Settings › Outside lookups).
+    if row.accepted_record_type == "entity" and row.accepted_record_id:
+        entity = db.get(Entity, row.accepted_record_id)
+        if entity is not None:
+            queue_automatic_lookups(db, entity, request, background)
+    return result

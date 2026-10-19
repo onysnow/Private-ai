@@ -26,6 +26,7 @@ import {applyAppearance, currentAppearance, keepAppearance, THEMES, tryTheme} fr
 import {singleKeysOn} from '../../lib/shortcuts';
 import {listInvestigationsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {Inbox, useNeedsYouCount} from '../../features/inbox/inbox';
+import {InterruptNotice} from '../../features/inbox/interrupt-notice';
 import {NewCaseSetup} from '../../features/new-case/new-case-setup';
 
 /** Any screen can ask the frame to open the case switcher. */
@@ -438,6 +439,7 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
       </DialogContent>
     </Dialog>
     <Inbox open={inbox} onClose={closeInbox}/>
+    <InterruptNotice/>
     {hidden && <HiddenCover onShow={() => setHidden(false)}/>}
   </div>;
 }

@@ -84,15 +84,30 @@ def get_profile(db: Session, investigation_id: str) -> dict:
     if inv is None:
         raise LookupError("Investigation not found")
     stored = inv.ai_run_profile or {}
+    # A case that has not saved its own starts from the defaults in Settings › AI and research, if any were set.
+    start = stored or _new_case_defaults(db)
     return {
         "name": f"{inv.name} default",
-        "flags": normalize_control_flags(stored.get("flags")),
-        "options": normalize_run_options(stored.get("options")),
+        "flags": normalize_control_flags(start.get("flags")),
+        "options": normalize_run_options(start.get("options")),
         "premises": normalize_premises(stored.get("premises")),
         "reason": stored.get("reason"),
         "saved_at": stored.get("saved_at"),
         "saved": bool(stored),
     }
+
+
+def _new_case_defaults(db: Session) -> dict:
+    """Settings › AI and research's defaults for new cases, or nothing when they no longer fit the suite's table."""
+    from app.services.preferences import run_profile_defaults
+
+    value, _ = run_profile_defaults(db)
+    try:
+        normalize_control_flags(value.get("flags"))
+        normalize_run_options(value.get("options"))
+    except ReasoningInputError:
+        return {}
+    return value
 
 
 def save_profile(db: Session, investigation_id: str, *, flags: dict | None, options: dict | None,

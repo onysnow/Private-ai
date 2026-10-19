@@ -750,6 +750,29 @@ export const zCaseLeadCountsOut = z.object({
 });
 
 /**
+ * CaseLookupsOut
+ */
+export const zCaseLookupsOut = z.object({
+  investigation_id: z.string(),
+  modes: z.record(z.string()),
+  name: z.string(),
+  reason: z.string().nullish(),
+  set_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * CaseLookupsPut
+ */
+export const zCaseLookupsPut = z.object({
+  modes: z.record(z.enum(['automatic', 'ask', 'off'])),
+  reason: z.string().min(1).max(300),
+});
+
+/**
  * CaseMoneyOut
  *
  * Money traced, counted once where it starts (payments whose payer received
@@ -1573,6 +1596,25 @@ export const zConnectorFindingOut = z.object({
   run_id: z.string().nullish(),
   schema: z.string().nullish(),
   source_url: z.string().nullish(),
+});
+
+/**
+ * ConnectorRunLineOut
+ */
+export const zConnectorRunLineOut = z.object({
+  at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  case: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  is_party: z.boolean(),
+  provider: z.string(),
+  results: z.number().int(),
+  sent: z.string(),
+  status: z.string(),
 });
 
 /**
@@ -3562,6 +3604,40 @@ export const zExtractionReviewOut = z.object({
 });
 
 /**
+ * FactWatchCreate
+ */
+export const zFactWatchCreate = z.object({
+  record_id: z.string().min(1).max(64),
+  record_type: z.enum(['claim', 'red_flag']),
+});
+
+/**
+ * FactWatchOut
+ */
+export const zFactWatchOut = z.object({
+  baseline: z.string(),
+  baseline_words: z.string(),
+  changed: z.boolean(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  investigation_id: z.string(),
+  label: z.string(),
+  record_id: z.string(),
+  record_type: z.string(),
+  seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  value: z.string(),
+  value_words: z.string(),
+});
+
+/**
  * FinancialTransactionOut
  *
  * One Payment edge the ledger could read in full. Keys follow the
@@ -3935,6 +4011,40 @@ export const zIdentityMergeAuditOut = z.object({
   resolution_decision_id: z.string().nullish(),
   source_entity_id: z.string(),
   target_entity_id: z.string(),
+});
+
+/**
+ * InboxRowOut
+ */
+export const zInboxRowOut = z.object({
+  actor: z.string(),
+  actor_kind: z.string(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  href: z.string(),
+  key: z.string(),
+  kind: z.string(),
+  level: z.string().nullish(),
+  reason: z.string(),
+  route: z.string(),
+  title: z.string(),
+});
+
+/**
+ * InboxOut
+ */
+export const zInboxOut = z.object({
+  desktop: z.boolean(),
+  else: z.array(zInboxRowOut),
+  interrupt: z.array(zInboxRowOut),
+  investigation_id: z.string(),
+  needs: z.array(zInboxRowOut),
+  quiet_while_reading: z.boolean(),
+  week: z.record(z.number().int()),
 });
 
 /**
@@ -4402,6 +4512,38 @@ export const zExtractionLineageLookupOut = z.object({
 });
 
 /**
+ * LookupDefaultsPut
+ */
+export const zLookupDefaultsPut = z.object({
+  defaults: z.record(z.enum(['automatic', 'ask', 'off'])),
+});
+
+/**
+ * LookupSourceOut
+ */
+export const zLookupSourceOut = z.object({
+  cases_this_month: z.number().int(),
+  default: z.string(),
+  host: z.string(),
+  key: z.string(),
+  key_saved: z.boolean(),
+  kind: z.string(),
+  label: z.string(),
+  last: zConnectorRunLineOut.nullish(),
+  mode: z.string().nullish(),
+});
+
+/**
+ * LookupSettingsOut
+ */
+export const zLookupSettingsOut = z.object({
+  can_change_defaults: z.boolean(),
+  cases: z.array(zCaseLookupsOut),
+  sources: z.array(zLookupSourceOut),
+  week: z.array(zConnectorRunLineOut),
+});
+
+/**
  * MappedEntityOut
  *
  * One entity or link a previewed row makes; a link names its two ends.
@@ -4805,6 +4947,36 @@ export const zNoteUpdate = z.object({
 export const zNotesOut = z.object({
   investigation_id: z.string(),
   notes: z.array(zNoteOut),
+});
+
+/**
+ * NotificationKindOut
+ */
+export const zNotificationKindOut = z.object({
+  can_interrupt: z.boolean(),
+  default: z.string(),
+  key: z.string(),
+  label: z.string(),
+  route: z.string(),
+});
+
+/**
+ * NotificationPrefsOut
+ */
+export const zNotificationPrefsOut = z.object({
+  desktop: z.boolean(),
+  kinds: z.array(zNotificationKindOut),
+  quiet_while_reading: z.boolean(),
+  routes: z.record(z.string()),
+});
+
+/**
+ * NotificationPrefsPut
+ */
+export const zNotificationPrefsPut = z.object({
+  desktop: z.boolean().optional().default(false),
+  quiet_while_reading: z.boolean().optional().default(true),
+  routes: z.record(z.enum(['interrupt', 'needs', 'else', 'off'])).optional(),
 });
 
 /**
@@ -5861,6 +6033,16 @@ export const zReportingTaskUpdate = z.object({
 });
 
 /**
+ * ResearchSettingsPut
+ */
+export const zResearchSettingsPut = z.object({
+  flags: z.record(z.unknown()).nullish(),
+  mode: z.enum(['off', 'ask']).nullish(),
+  options: z.record(z.unknown()).nullish(),
+  reason: z.string().max(300).nullish(),
+});
+
+/**
  * ResolutionDecisionOut
  *
  * A reporter's identity decision on a finding, as stored.
@@ -6005,6 +6187,17 @@ export const zRunChangeIn = z.object({
   at: z.string().max(40),
   kind: z.enum(['SETTING', 'FLAG']).optional().default('SETTING'),
   text: z.string().max(300),
+});
+
+/**
+ * RunDefaultsCaseOut
+ */
+export const zRunDefaultsCaseOut = z.object({
+  differs: z.array(z.string()),
+  investigation_id: z.string(),
+  name: z.string(),
+  reason: z.string().nullish(),
+  saved_at: z.string().nullish(),
 });
 
 /**
@@ -6213,6 +6406,26 @@ export const zRunSettingOut = z.object({
   label: z.string(),
   source: z.string(),
   suite_default: z.string(),
+});
+
+/**
+ * ResearchSettingsOut
+ */
+export const zResearchSettingsOut = z.object({
+  ai_enabled: z.boolean(),
+  can_change_defaults: z.boolean(),
+  cases: z.array(zRunDefaultsCaseOut),
+  defaults_reason: z.string().nullish(),
+  defaults_saved_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  locked: z.array(zRunPlanLockedOut),
+  mode: z.string(),
+  model: z.string().nullish(),
+  settings: z.array(zRunSettingOut),
 });
 
 /**
@@ -10466,6 +10679,15 @@ export const zGetInvestigationGraphQuery = z.object({
  */
 export const zGetInvestigationGraphResponse = zGraphOut;
 
+export const zGetInboxPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetInboxResponse = zInboxOut;
+
 export const zListIngestionBatchesPath = z.object({
   investigation_id: z.string(),
 });
@@ -10519,6 +10741,26 @@ export const zLeadQueueQuery = z.object({
  * Successful Response
  */
 export const zLeadQueueResponse = zLeadQueueOut;
+
+export const zClearCaseLookupsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zClearCaseLookupsResponse = zLookupSettingsOut;
+
+export const zPutCaseLookupsBody = zCaseLookupsPut;
+
+export const zPutCaseLookupsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPutCaseLookupsResponse = zLookupSettingsOut;
 
 export const zGetRecordMarksPath = z.object({
   investigation_id: z.string(),
@@ -11020,6 +11262,17 @@ export const zInvestigationVisualRestylePath = z.object({
  */
 export const zInvestigationVisualRestyleResponse = zChartRestyleOut;
 
+export const zListWatchesPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response List Watches
+ *
+ * Successful Response
+ */
+export const zListWatchesResponse = z.array(zFactWatchOut);
+
 export const zGetWatchlistPath = z.object({
   investigation_id: z.string(),
 });
@@ -11409,6 +11662,50 @@ export const zSaveConnectorCredentialPath = z.object({
  */
 export const zSaveConnectorCredentialResponse = zConnectorCredentialSavedOut;
 
+export const zGetLookupSettingsQuery = z.object({
+  investigation_id: z.string().nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetLookupSettingsResponse = zLookupSettingsOut;
+
+export const zPutLookupDefaultsBody = zLookupDefaultsPut;
+
+export const zPutLookupDefaultsQuery = z.object({
+  investigation_id: z.string().nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPutLookupDefaultsResponse = zLookupSettingsOut;
+
+/**
+ * Successful Response
+ */
+export const zGetNotificationPrefsResponse = zNotificationPrefsOut;
+
+export const zPutNotificationPrefsBody = zNotificationPrefsPut;
+
+/**
+ * Successful Response
+ */
+export const zPutNotificationPrefsResponse = zNotificationPrefsOut;
+
+/**
+ * Successful Response
+ */
+export const zGetResearchSettingsResponse = zResearchSettingsOut;
+
+export const zPutResearchSettingsBody = zResearchSettingsPut;
+
+/**
+ * Successful Response
+ */
+export const zPutResearchSettingsResponse = zResearchSettingsOut;
+
 export const zGetSecurityAlertsQuery = z.object({
   window_hours: z.number().gt(0).lte(720).optional().default(24),
   max_examples: z.number().int().gte(0).lte(100).optional().default(10),
@@ -11621,6 +11918,31 @@ export const zGradeTimelineEventEndpointPath = z.object({
  * Successful Response
  */
 export const zGradeTimelineEventEndpointResponse = zTimelineEventRowOut;
+
+export const zCreateWatchBody = zFactWatchCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateWatchResponse = zFactWatchOut;
+
+export const zDeleteWatchPath = z.object({
+  fact_watch_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteWatchResponse = z.void();
+
+export const zSeeWatchPath = z.object({
+  fact_watch_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSeeWatchResponse = zFactWatchOut;
 
 export const zDismissHitPath = z.object({
   hit_id: z.string(),

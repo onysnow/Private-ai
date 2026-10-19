@@ -1761,6 +1761,56 @@ export type CaseLeadCountsOut = {
 };
 
 /**
+ * CaseLookupsOut
+ */
+export type CaseLookupsOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Modes
+   */
+  modes: {
+    [key: string]: string;
+  };
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Set At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  set_at: string;
+};
+
+/**
+ * CaseLookupsPut
+ */
+export type CaseLookupsPut = {
+  /**
+   * Modes
+   *
+   * This case's own mode for each source it differs on.
+   */
+  modes: {
+    [key: string]: 'automatic' | 'ask' | 'off';
+  };
+  /**
+   * Reason
+   *
+   * One line on why this case looks up differently.
+   */
+  reason: string;
+};
+
+/**
  * CaseMoneyOut
  *
  * Money traced, counted once where it starts (payments whose payer received
@@ -3866,6 +3916,50 @@ export type ConnectorFindingOut = {
    * Source Url
    */
   source_url?: string | null;
+};
+
+/**
+ * ConnectorRunLineOut
+ */
+export type ConnectorRunLineOut = {
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * Case
+   */
+  case: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Is Party
+   */
+  is_party: boolean;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Results
+   */
+  results: number;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Status
+   */
+  status: string;
 };
 
 /**
@@ -8906,6 +9000,78 @@ export type ExtractionReviewOut = {
 };
 
 /**
+ * FactWatchCreate
+ */
+export type FactWatchCreate = {
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: 'claim' | 'red_flag';
+};
+
+/**
+ * FactWatchOut
+ */
+export type FactWatchOut = {
+  /**
+   * Baseline
+   */
+  baseline: string;
+  /**
+   * Baseline Words
+   */
+  baseline_words: string;
+  /**
+   * Changed
+   */
+  changed: boolean;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  seen_at: string;
+  /**
+   * Value
+   */
+  value: string;
+  /**
+   * Value Words
+   */
+  value_words: string;
+};
+
+/**
  * FigureItemOut
  */
 export type FigureItemOut = {
@@ -9746,6 +9912,88 @@ export type IdentityMergeAuditOut = {
    * Target Entity Id
    */
   target_entity_id: string;
+};
+
+/**
+ * InboxOut
+ */
+export type InboxOut = {
+  /**
+   * Desktop
+   */
+  desktop: boolean;
+  /**
+   * Else
+   */
+  else: Array<InboxRowOut>;
+  /**
+   * Interrupt
+   */
+  interrupt: Array<InboxRowOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Needs
+   */
+  needs: Array<InboxRowOut>;
+  /**
+   * Quiet While Reading
+   */
+  quiet_while_reading: boolean;
+  /**
+   * Week
+   */
+  week: {
+    [key: string]: number;
+  };
+};
+
+/**
+ * InboxRowOut
+ */
+export type InboxRowOut = {
+  /**
+   * Actor
+   */
+  actor: string;
+  /**
+   * Actor Kind
+   */
+  actor_kind: string;
+  /**
+   * Created At
+   */
+  created_at?: string | null;
+  /**
+   * Href
+   */
+  href: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Level
+   */
+  level?: string | null;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Route
+   */
+  route: string;
+  /**
+   * Title
+   */
+  title: string;
 };
 
 /**
@@ -10931,6 +11179,81 @@ export type LineageSourceOut = {
 };
 
 /**
+ * LookupDefaultsPut
+ */
+export type LookupDefaultsPut = {
+  /**
+   * Defaults
+   *
+   * Each source's mode for cases that have not chosen their own.
+   */
+  defaults: {
+    [key: string]: 'automatic' | 'ask' | 'off';
+  };
+};
+
+/**
+ * LookupSettingsOut
+ */
+export type LookupSettingsOut = {
+  /**
+   * Can Change Defaults
+   */
+  can_change_defaults: boolean;
+  /**
+   * Cases
+   */
+  cases: Array<CaseLookupsOut>;
+  /**
+   * Sources
+   */
+  sources: Array<LookupSourceOut>;
+  /**
+   * Week
+   */
+  week: Array<ConnectorRunLineOut>;
+};
+
+/**
+ * LookupSourceOut
+ */
+export type LookupSourceOut = {
+  /**
+   * Cases This Month
+   */
+  cases_this_month: number;
+  /**
+   * Default
+   */
+  default: string;
+  /**
+   * Host
+   */
+  host: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Key Saved
+   */
+  key_saved: boolean;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Label
+   */
+  label: string;
+  last?: ConnectorRunLineOut | null;
+  /**
+   * Mode
+   */
+  mode?: string | null;
+};
+
+/**
  * MappedEntityIn
  */
 export type MappedEntityIn = {
@@ -11605,6 +11928,78 @@ export type NotesOut = {
    * Notes
    */
   notes: Array<NoteOut>;
+};
+
+/**
+ * NotificationKindOut
+ */
+export type NotificationKindOut = {
+  /**
+   * Can Interrupt
+   */
+  can_interrupt: boolean;
+  /**
+   * Default
+   */
+  default: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Route
+   */
+  route: string;
+};
+
+/**
+ * NotificationPrefsOut
+ */
+export type NotificationPrefsOut = {
+  /**
+   * Desktop
+   */
+  desktop: boolean;
+  /**
+   * Kinds
+   */
+  kinds: Array<NotificationKindOut>;
+  /**
+   * Quiet While Reading
+   */
+  quiet_while_reading: boolean;
+  /**
+   * Routes
+   */
+  routes: {
+    [key: string]: string;
+  };
+};
+
+/**
+ * NotificationPrefsPut
+ */
+export type NotificationPrefsPut = {
+  /**
+   * Desktop
+   */
+  desktop?: boolean;
+  /**
+   * Quiet While Reading
+   */
+  quiet_while_reading?: boolean;
+  /**
+   * Routes
+   *
+   * Where each kind goes; kinds left out keep their route.
+   */
+  routes?: {
+    [key: string]: 'interrupt' | 'needs' | 'else' | 'off';
+  };
 };
 
 /**
@@ -13973,6 +14368,82 @@ export type ReportingTaskUpdate = {
 };
 
 /**
+ * ResearchSettingsOut
+ */
+export type ResearchSettingsOut = {
+  /**
+   * Ai Enabled
+   */
+  ai_enabled: boolean;
+  /**
+   * Can Change Defaults
+   */
+  can_change_defaults: boolean;
+  /**
+   * Cases
+   */
+  cases: Array<RunDefaultsCaseOut>;
+  /**
+   * Defaults Reason
+   */
+  defaults_reason?: string | null;
+  /**
+   * Defaults Saved At
+   */
+  defaults_saved_at?: string | null;
+  /**
+   * Locked
+   */
+  locked: Array<RunPlanLockedOut>;
+  /**
+   * Mode
+   */
+  mode: string;
+  /**
+   * Model
+   */
+  model?: string | null;
+  /**
+   * Settings
+   */
+  settings: Array<RunSettingOut>;
+};
+
+/**
+ * ResearchSettingsPut
+ */
+export type ResearchSettingsPut = {
+  /**
+   * Flags
+   *
+   * Run defaults for new cases: the suite's flags.
+   */
+  flags?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Mode
+   *
+   * What the AI may start on its own.
+   */
+  mode?: 'off' | 'ask' | null;
+  /**
+   * Options
+   *
+   * Run defaults for new cases: the run options.
+   */
+  options?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Reason
+   *
+   * Needed when the run defaults change.
+   */
+  reason?: string | null;
+};
+
+/**
  * ResolutionDecisionOut
  *
  * A reporter's identity decision on a finding, as stored.
@@ -14170,6 +14641,32 @@ export type RunChangeIn = {
    * Text
    */
   text: string;
+};
+
+/**
+ * RunDefaultsCaseOut
+ */
+export type RunDefaultsCaseOut = {
+  /**
+   * Differs
+   */
+  differs: Array<string>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Saved At
+   */
+  saved_at?: string | null;
 };
 
 /**
@@ -24742,6 +25239,40 @@ export type GetInvestigationGraphResponses = {
 export type GetInvestigationGraphResponse =
   GetInvestigationGraphResponses[keyof GetInvestigationGraphResponses];
 
+export type GetInboxData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/inbox';
+};
+
+export type GetInboxErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetInboxError = GetInboxErrors[keyof GetInboxErrors];
+
+export type GetInboxResponses = {
+  /**
+   * Successful Response
+   */
+  200: InboxOut;
+};
+
+export type GetInboxResponse = GetInboxResponses[keyof GetInboxResponses];
+
 export type ListIngestionBatchesData = {
   body?: never;
   path: {
@@ -24917,6 +25448,78 @@ export type LeadQueueResponses = {
 };
 
 export type LeadQueueResponse = LeadQueueResponses[keyof LeadQueueResponses];
+
+export type ClearCaseLookupsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/lookups';
+};
+
+export type ClearCaseLookupsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ClearCaseLookupsError =
+  ClearCaseLookupsErrors[keyof ClearCaseLookupsErrors];
+
+export type ClearCaseLookupsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LookupSettingsOut;
+};
+
+export type ClearCaseLookupsResponse =
+  ClearCaseLookupsResponses[keyof ClearCaseLookupsResponses];
+
+export type PutCaseLookupsData = {
+  body: CaseLookupsPut;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/lookups';
+};
+
+export type PutCaseLookupsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutCaseLookupsError =
+  PutCaseLookupsErrors[keyof PutCaseLookupsErrors];
+
+export type PutCaseLookupsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LookupSettingsOut;
+};
+
+export type PutCaseLookupsResponse =
+  PutCaseLookupsResponses[keyof PutCaseLookupsResponses];
 
 export type GetRecordMarksData = {
   body?: never;
@@ -26500,6 +27103,43 @@ export type InvestigationVisualRestyleResponses = {
 export type InvestigationVisualRestyleResponse =
   InvestigationVisualRestyleResponses[keyof InvestigationVisualRestyleResponses];
 
+export type ListWatchesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/watches';
+};
+
+export type ListWatchesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListWatchesError = ListWatchesErrors[keyof ListWatchesErrors];
+
+export type ListWatchesResponses = {
+  /**
+   * Response List Watches
+   *
+   * Successful Response
+   */
+  200: Array<FactWatchOut>;
+};
+
+export type ListWatchesResponse =
+  ListWatchesResponses[keyof ListWatchesResponses];
+
 export type GetWatchlistData = {
   body?: never;
   path: {
@@ -27894,6 +28534,202 @@ export type SaveConnectorCredentialResponses = {
 export type SaveConnectorCredentialResponse =
   SaveConnectorCredentialResponses[keyof SaveConnectorCredentialResponses];
 
+export type GetLookupSettingsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Investigation Id
+     */
+    investigation_id?: string | null;
+  };
+  url: '/api/settings/lookups';
+};
+
+export type GetLookupSettingsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetLookupSettingsError =
+  GetLookupSettingsErrors[keyof GetLookupSettingsErrors];
+
+export type GetLookupSettingsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LookupSettingsOut;
+};
+
+export type GetLookupSettingsResponse =
+  GetLookupSettingsResponses[keyof GetLookupSettingsResponses];
+
+export type PutLookupDefaultsData = {
+  body: LookupDefaultsPut;
+  path?: never;
+  query?: {
+    /**
+     * Investigation Id
+     */
+    investigation_id?: string | null;
+  };
+  url: '/api/settings/lookups';
+};
+
+export type PutLookupDefaultsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutLookupDefaultsError =
+  PutLookupDefaultsErrors[keyof PutLookupDefaultsErrors];
+
+export type PutLookupDefaultsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LookupSettingsOut;
+};
+
+export type PutLookupDefaultsResponse =
+  PutLookupDefaultsResponses[keyof PutLookupDefaultsResponses];
+
+export type GetNotificationPrefsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/settings/notifications';
+};
+
+export type GetNotificationPrefsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetNotificationPrefsError =
+  GetNotificationPrefsErrors[keyof GetNotificationPrefsErrors];
+
+export type GetNotificationPrefsResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type GetNotificationPrefsResponse =
+  GetNotificationPrefsResponses[keyof GetNotificationPrefsResponses];
+
+export type PutNotificationPrefsData = {
+  body: NotificationPrefsPut;
+  path?: never;
+  query?: never;
+  url: '/api/settings/notifications';
+};
+
+export type PutNotificationPrefsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutNotificationPrefsError =
+  PutNotificationPrefsErrors[keyof PutNotificationPrefsErrors];
+
+export type PutNotificationPrefsResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type PutNotificationPrefsResponse =
+  PutNotificationPrefsResponses[keyof PutNotificationPrefsResponses];
+
+export type GetResearchSettingsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/settings/research';
+};
+
+export type GetResearchSettingsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetResearchSettingsError =
+  GetResearchSettingsErrors[keyof GetResearchSettingsErrors];
+
+export type GetResearchSettingsResponses = {
+  /**
+   * Successful Response
+   */
+  200: ResearchSettingsOut;
+};
+
+export type GetResearchSettingsResponse =
+  GetResearchSettingsResponses[keyof GetResearchSettingsResponses];
+
+export type PutResearchSettingsData = {
+  body: ResearchSettingsPut;
+  path?: never;
+  query?: never;
+  url: '/api/settings/research';
+};
+
+export type PutResearchSettingsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutResearchSettingsError =
+  PutResearchSettingsErrors[keyof PutResearchSettingsErrors];
+
+export type PutResearchSettingsResponses = {
+  /**
+   * Successful Response
+   */
+  200: ResearchSettingsOut;
+};
+
+export type PutResearchSettingsResponse =
+  PutResearchSettingsResponses[keyof PutResearchSettingsResponses];
+
 export type GetSecurityAlertsData = {
   body?: never;
   path?: never;
@@ -28741,6 +29577,105 @@ export type GradeTimelineEventEndpointResponses = {
 
 export type GradeTimelineEventEndpointResponse =
   GradeTimelineEventEndpointResponses[keyof GradeTimelineEventEndpointResponses];
+
+export type CreateWatchData = {
+  body: FactWatchCreate;
+  path?: never;
+  query?: never;
+  url: '/api/watches';
+};
+
+export type CreateWatchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateWatchError = CreateWatchErrors[keyof CreateWatchErrors];
+
+export type CreateWatchResponses = {
+  /**
+   * Successful Response
+   */
+  200: FactWatchOut;
+};
+
+export type CreateWatchResponse =
+  CreateWatchResponses[keyof CreateWatchResponses];
+
+export type DeleteWatchData = {
+  body?: never;
+  path: {
+    /**
+     * Fact Watch Id
+     */
+    fact_watch_id: string;
+  };
+  query?: never;
+  url: '/api/watches/{fact_watch_id}';
+};
+
+export type DeleteWatchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteWatchError = DeleteWatchErrors[keyof DeleteWatchErrors];
+
+export type DeleteWatchResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteWatchResponse =
+  DeleteWatchResponses[keyof DeleteWatchResponses];
+
+export type SeeWatchData = {
+  body?: never;
+  path: {
+    /**
+     * Fact Watch Id
+     */
+    fact_watch_id: string;
+  };
+  query?: never;
+  url: '/api/watches/{fact_watch_id}/seen';
+};
+
+export type SeeWatchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SeeWatchError = SeeWatchErrors[keyof SeeWatchErrors];
+
+export type SeeWatchResponses = {
+  /**
+   * Successful Response
+   */
+  200: FactWatchOut;
+};
+
+export type SeeWatchResponse = SeeWatchResponses[keyof SeeWatchResponses];
 
 export type DismissHitData = {
   body?: never;

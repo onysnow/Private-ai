@@ -5,7 +5,7 @@ import {useEffect, useRef, useState} from 'react';
 import Link from 'next/link';
 import {api, API} from '../../lib/api-instance';
 import {ApiHttpError, errorMessage} from '../../lib/api-client';
-import {connectorsOptions, listInvestigationsOptions, listInvestigationsQueryKey, settingsStatusOptions, settingsStatusQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {connectorsOptions, getLookupSettingsOptions, getNotificationPrefsOptions, getResearchSettingsOptions, listInvestigationsOptions, listInvestigationsQueryKey, settingsStatusOptions, settingsStatusQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {investigationDeletionPreview, removeInvestigation, seedDemo as seedDemoInvestigation} from '../../lib/generated/sdk.gen';
 import type {InvestigationDeletionPreview, SettingsStatusOut} from '../../lib/generated/types.gen';
 import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
@@ -14,8 +14,11 @@ import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-pa
 import {AppearancePanel, lookName, useAppearance} from '../../features/appearance/appearance-panel';
 import {KeptLine, SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
 import {HIDE_SCREEN_EVENT, NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
-import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
 import {SecurityPanel} from '../../features/security/security-panel';
+import {KeysPane} from '../../features/settings/keys-pane';
+import {LookupsPane} from '../../features/settings/lookups-pane';
+import {NotificationsPane} from '../../features/settings/notifications-pane';
+import {ResearchPane} from '../../features/settings/research-pane';
 import {BackupPanel} from '../../features/backups/backup-panel';
 import {LevelChip, LEVEL_WORDS} from '../../components/status';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -204,15 +207,26 @@ function Settings(): ReactElement {
   const connectors = Object.values(status?.connectors ?? {});
   const theme = look.trying ? lookName(look.trying, look.tryingOwn) : lookName(look.kept.theme, look.kept.custom);
   const inv = useWorkbenchStore(state => state.investigationId) || cases[0]?.id || '';
+  const caseName = cases.find(c => c.id === inv)?.name ?? '';
+  // The sidebar's values, from the settings themselves.
+  const notes = useQuery({...getNotificationPrefsOptions(), enabled: Boolean(status)}).data;
+  const looks = useQuery({...getLookupSettingsOptions({query: inv ? {investigation_id: inv} : {}}), enabled: Boolean(status)}).data;
+  const research = useQuery({...getResearchSettingsOptions(), enabled: Boolean(status)}).data;
+  const lookupModes = [...new Set((looks?.sources ?? []).map(src => src.mode ?? src.default))];
+  const lookupValue = !looks ? '' : lookupModes.length === 1 ? ({automatic: 'automatic', ask: 'ask', off: 'off'} as Record<string, string>)[lookupModes[0]] ?? '' : 'mixed';
+  const researchValue = !research ? '' : !research.ai_enabled ? 'no model' : research.mode === 'ask' ? 'ask first' : 'off';
   const settingRows: SettingRow[] = [
     {group: 'You', id: 'appearance', stored: 'this browser on this device', leaves: 'nothing', label: 'Appearance', value: theme, words: 'theme colour color dark effects motion format fonts',
       note: 'Appearance is yours alone: it is saved on this device and never changes what a teammate sees.'},
-    {group: 'You', id: 'notifications', stored: 'the server on this computer; snoozes in this browser', leaves: 'nothing', label: 'Notifications', value: 'in app', words: 'inbox bell snooze'},
+    {group: 'You', id: 'notifications', stored: 'the server on this computer, for you alone; snoozes in this browser', leaves: 'nothing', label: 'Notifications', value: notes ? (notes.desktop ? 'in app + desktop' : 'in app') : '', words: 'inbox bell snooze alerts interrupt watch desktop',
+      note: 'Notifications are yours alone: a teammate keeps their own routes.'},
     {group: 'You', id: 'keyboard', stored: 'this browser on this device', leaves: 'nothing', label: 'Keyboard', value: keysOn ? 'on' : 'off', words: 'keys shortcuts single-key'},
     {group: 'You', id: 'safety', stored: 'nothing is stored', leaves: 'nothing', label: 'Your safety', value: '', words: 'hide screen cover'},
     {group: 'Cases', id: 'new-case', stored: 'the server on this computer', leaves: 'nothing', label: 'New-case setup', value: '', words: 'start create'},
-    {group: 'Cases', id: 'lookups', stored: 'the server on this computer', leaves: 'the name or number you look up, to the service you choose, only when you ask', label: 'Outside lookups', value: 'ask', words: 'connectors aleph opensanctions search outside'},
-    {group: 'Cases', id: 'ai', stored: 'the server’s settings file', leaves: 'nothing with a local model; the passages you ask about, if a remote model is set', label: 'AI and research', value: status?.ai?.enabled ? 'ask first' : status ? 'off' : '', words: 'private ai model ollama'},
+    {group: 'Cases', id: 'lookups', stored: 'the server on this computer; a case can differ', leaves: 'a party’s name, to that source only, as each source’s mode says', label: 'Outside lookups', value: lookupValue, words: 'connectors aleph opensanctions firecrawl search outside automatic',
+      note: 'Each lookup leaves a trace on that site: the name you asked about, from this computer’s address.'},
+    {group: 'Cases', id: 'ai', stored: 'the server on this computer; the model in its environment file', leaves: 'nothing with a local model; the passages you ask about, if a remote model is set', label: 'AI and research', value: researchValue, words: 'private ai model ollama research automation run defaults',
+      note: 'These are the defaults a new case starts with. A case changes its own in Before you run.'},
     {group: 'Cases', id: 'levels', stored: 'the catalogue that ships with the app', leaves: 'nothing', label: 'Red Flag levels', value: '', words: 'faint strong textbook'},
     {group: 'Cases', id: 'demo', stored: 'the server on this computer; hiding is per browser', leaves: 'loading a real case fetches its public pages from their publishers', label: 'Demo case', value: demoInv ? (hideDemo ? 'hidden' : 'shown') : 'none', words: 'sample seed delete 1mdb'},
     {group: 'This computer', id: 'access', stored: 'the token is held in this browser’s memory only', leaves: 'nothing', label: 'Access and token', value: state === 'local' ? 'local' : state === 'authenticated' ? 'token' : state === 'needs_token' ? 'token needed'
@@ -230,11 +244,10 @@ function Settings(): ReactElement {
 
   const sections: Record<string, ReactElement> = {
     appearance: <AppearancePanel/>,
-    notifications: <div className={card}>
-      <p className="text-sm">Notifications stay inside the app: the bell counts what needs you, and its inbox lists that first, then everything else from this week. Nothing is sent by email or to your phone.</p>
-      <p className="mt-2 text-sm text-muted-foreground">Any row can be snoozed on this computer for a day or a week; it comes back by itself.</p>
-      <button type="button" className="ap-btn mt-4" onClick={() => window.dispatchEvent(new Event(OPEN_INBOX_EVENT))}>Open the inbox</button>
-    </div>,
+    notifications: <>
+      <NotificationsPane investigationId={inv} caseName={caseName}/>
+      <button type="button" className="ap-btn st-open-inbox" onClick={() => window.dispatchEvent(new Event(OPEN_INBOX_EVENT))}>Open the inbox</button>
+    </>,
     keyboard: <div className={card}>
       <label className="ap-switch"><span><b>Single-key shortcuts</b><small>[ opens the steps, ] the tools, ? the list of keys. They never fire while you type.</small></span>
         <input type="checkbox" role="switch" checked={keysOn} onChange={e => { setSingleKeys(e.target.checked); setKeysOn(e.target.checked); }}/><i aria-hidden="true"/></label>
@@ -248,29 +261,20 @@ function Settings(): ReactElement {
       <p className="text-sm">A new case starts with its name and the question it answers, what kind of case it is, and what you have so far. The same setup opens from the case switcher (⌘O).</p>
       <button type="button" className="ap-btn p mt-4" onClick={() => window.dispatchEvent(new Event(NEW_CASE_EVENT))}>Start a new case</button>
     </div>,
-    lookups: inv ? <div className={card}>
-      <p className="mb-3 text-sm text-muted-foreground">Nothing is looked up outside without you: a name goes to an outside source only when you ask here or on a record.</p>
-      <ConnectorsPanel investigationId={inv} providers={providers}/>
-    </div> : <p className="text-sm text-muted-foreground">Open or start a case to look names up outside.</p>,
-    ai: <div className="rounded-xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
-          Private AI
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{describeAiStatus(status?.ai)}</p>
-        {status?.ai?.model && (
-          <p className="mt-2 text-sm">
-            Model: <code>{status.ai.model}</code>{whereModelRuns(status.ai)}
-            {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}
-          </p>
-        )}
-        {status?.ai?.authority_suite?.present && (
-          <p className="mt-2 text-sm" data-testid="authority-suite">
-            Rules the AI works under: the Authority System Suite{status.ai.authority_suite.source ? <> (<code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code>)</> : null}, TAS v{status.ai.authority_suite.tas_version ?? '?'}.
-            Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.
-          </p>
-        )}
-        {status?.ai?.authority_suite?.present && <SuiteCoverage/>}
-      </div>,
+    lookups: <LookupsPane investigationId={inv} caseName={caseName} providers={providers}/>,
+    ai: <ResearchPane
+      model={<>
+        <p className="st-line">{describeAiStatus(status?.ai)}</p>
+        {status?.ai?.model && <p className="st-line">Model: <code>{status.ai.model}</code>{whereModelRuns(status.ai)}
+          {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}</p>}
+      </>}
+      rules={status?.ai?.authority_suite?.present ? <>
+        <p className="st-line" data-testid="authority-suite">
+          Rules the AI works under: the Authority System Suite{status.ai.authority_suite.source ? <> (<code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code>)</> : null}, TAS v{status.ai.authority_suite.tas_version ?? '?'}.
+          Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.
+        </p>
+        <SuiteCoverage/>
+      </> : <p className="st-hint">The Authority System Suite is not in this build.</p>}/>,
     levels: <div className={card}>
       <p className="text-sm">Every Red Flag has three levels. The rules that set them are written down per indicator, with the numbers they come from.</p>
       <dl className="st-levels">{(['faint', 'strong', 'textbook'] as const).map(l => <div key={l}><dt><LevelChip level={l}/></dt><dd>{LEVEL_WORDS[l].meaning}</dd></div>)}</dl>
@@ -441,7 +445,7 @@ function Settings(): ReactElement {
           )}
         </div>
       </div>,
-    keys: status ? <SecurityPanel settingsStatus={status} providers={providers} part="keys"/> : <p className="text-sm text-muted-foreground">Checking…</p>,
+    keys: <KeysPane/>,
     backups: inv ? <div className={card}><BackupPanel investigationId={inv} onRestored={async id => {
       useWorkbenchStore.getState().setInvestigationId(id);
       await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});

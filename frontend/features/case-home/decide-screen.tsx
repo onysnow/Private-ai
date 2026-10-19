@@ -139,7 +139,7 @@ export function DecideScreen({investigationId, investigationName, active = true,
   const batch = all.held?.batch ? all.decided.filter(d => d.batch === all.held?.batch && d.state === 'held') : [];
   const kinds = Object.keys(KIND_LABEL) as DecisionKind[];
 
-  return <div className="dc" aria-label="Decide">
+  return <div className="dc" data-calm-zone="" aria-label="Decide">
     <aside className="dc-queue" aria-label="To decide">
       <h1>To decide</h1>
       <p className="ch-quiet">{investigationName ? `${investigationName} · ` : ''}only you can decide these</p>

@@ -154,6 +154,12 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
     unknown = [name for name in providers if registry.get(name) is None]
     if unknown:
         raise ValueError(f"Unknown connectors: {', '.join(unknown)}")
+    from app.services.preferences import lookup_modes, provider_label
+
+    off = [p for p, mode in lookup_modes(db, entity.investigation_id, providers).items() if mode == "off"]
+    if off:
+        raise ValueError(f"Outside lookups to {', '.join(provider_label(p) for p in off)} are off for this case. "
+                         "Change it in Settings › Outside lookups.")
 
     session = EnrichmentSession(
         investigation_id=entity.investigation_id, entity_id=entity.id, providers=providers, status="running",

@@ -60,6 +60,9 @@ import type {
   CheckWatchlistNowData,
   CheckWatchlistNowErrors,
   CheckWatchlistNowResponses,
+  ClearCaseLookupsData,
+  ClearCaseLookupsErrors,
+  ClearCaseLookupsResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
@@ -114,6 +117,9 @@ import type {
   CreateTimelineEventEndpointData,
   CreateTimelineEventEndpointErrors,
   CreateTimelineEventEndpointResponses,
+  CreateWatchData,
+  CreateWatchErrors,
+  CreateWatchResponses,
   CreateWriteupEndpointData,
   CreateWriteupEndpointErrors,
   CreateWriteupEndpointResponses,
@@ -144,6 +150,9 @@ import type {
   DeleteStorySectionData,
   DeleteStorySectionErrors,
   DeleteStorySectionResponses,
+  DeleteWatchData,
+  DeleteWatchErrors,
+  DeleteWatchResponses,
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointErrors,
   DeleteWriteupEndpointResponses,
@@ -327,6 +336,9 @@ import type {
   GetIdentifierTargetsData,
   GetIdentifierTargetsErrors,
   GetIdentifierTargetsResponses,
+  GetInboxData,
+  GetInboxErrors,
+  GetInboxResponses,
   GetIndicatorData,
   GetIndicatorErrors,
   GetIndicatorResponses,
@@ -357,12 +369,18 @@ import type {
   GetLeadData,
   GetLeadErrors,
   GetLeadResponses,
+  GetLookupSettingsData,
+  GetLookupSettingsErrors,
+  GetLookupSettingsResponses,
   GetMappingSchemasData,
   GetMappingSchemasErrors,
   GetMappingSchemasResponses,
   GetNotesData,
   GetNotesErrors,
   GetNotesResponses,
+  GetNotificationPrefsData,
+  GetNotificationPrefsErrors,
+  GetNotificationPrefsResponses,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingErrors,
   GetOpenalephCorpusBindingResponses,
@@ -390,6 +408,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsErrors,
   GetRedFlagsResponses,
+  GetResearchSettingsData,
+  GetResearchSettingsErrors,
+  GetResearchSettingsResponses,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesErrors,
   GetSameAnswerCandidatesResponses,
@@ -627,6 +648,9 @@ import type {
   ListTermHintsData,
   ListTermHintsErrors,
   ListTermHintsResponses,
+  ListWatchesData,
+  ListWatchesErrors,
+  ListWatchesResponses,
   ListWriteupsEndpointData,
   ListWriteupsEndpointErrors,
   ListWriteupsEndpointResponses,
@@ -705,9 +729,21 @@ import type {
   PruneSecurityAuditData,
   PruneSecurityAuditErrors,
   PruneSecurityAuditResponses,
+  PutCaseLookupsData,
+  PutCaseLookupsErrors,
+  PutCaseLookupsResponses,
   PutInvestigationMembershipData,
   PutInvestigationMembershipErrors,
   PutInvestigationMembershipResponses,
+  PutLookupDefaultsData,
+  PutLookupDefaultsErrors,
+  PutLookupDefaultsResponses,
+  PutNotificationPrefsData,
+  PutNotificationPrefsErrors,
+  PutNotificationPrefsResponses,
+  PutResearchSettingsData,
+  PutResearchSettingsErrors,
+  PutResearchSettingsResponses,
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
@@ -801,6 +837,9 @@ import type {
   SeedDemoData,
   SeedDemoErrors,
   SeedDemoResponses,
+  SeeWatchData,
+  SeeWatchErrors,
+  SeeWatchResponses,
   SendCorpusEntitySetData,
   SendCorpusEntitySetErrors,
   SendCorpusEntitySetResponses,
@@ -900,6 +939,8 @@ import {
   zCapabilitiesResponse,
   zCheckWatchlistNowPath,
   zCheckWatchlistNowResponse,
+  zClearCaseLookupsPath,
+  zClearCaseLookupsResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -941,6 +982,8 @@ import {
   zCreateSourceEndpointResponse,
   zCreateTimelineEventEndpointBody,
   zCreateTimelineEventEndpointResponse,
+  zCreateWatchBody,
+  zCreateWatchResponse,
   zCreateWriteupEndpointBody,
   zCreateWriteupEndpointResponse,
   zDecideCheckBody,
@@ -966,6 +1009,8 @@ import {
   zDeleteInvestigationMembershipResponse,
   zDeleteStorySectionPath,
   zDeleteStorySectionResponse,
+  zDeleteWatchPath,
+  zDeleteWatchResponse,
   zDeleteWriteupEndpointPath,
   zDeleteWriteupEndpointResponse,
   zDismissHitPath,
@@ -1095,6 +1140,8 @@ import {
   zGetGlossaryEntryResponse,
   zGetIdentifierTargetsPath,
   zGetIdentifierTargetsResponse,
+  zGetInboxPath,
+  zGetInboxResponse,
   zGetIndicatorPath,
   zGetIndicatorResponse,
   zGetIngestionBatchPath,
@@ -1118,10 +1165,13 @@ import {
   zGetJobEndpointResponse,
   zGetLeadPath,
   zGetLeadResponse,
+  zGetLookupSettingsQuery,
+  zGetLookupSettingsResponse,
   zGetMappingSchemasResponse,
   zGetNotesPath,
   zGetNotesQuery,
   zGetNotesResponse,
+  zGetNotificationPrefsResponse,
   zGetOpenalephCorpusBindingPath,
   zGetOpenalephCorpusBindingResponse,
   zGetOpenalephDocumentReviewStatusPath,
@@ -1140,6 +1190,7 @@ import {
   zGetRecordProvenanceTraceResponse,
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
+  zGetResearchSettingsResponse,
   zGetSameAnswerCandidatesPath,
   zGetSameAnswerCandidatesResponse,
   zGetSecurityAlertsQuery,
@@ -1321,6 +1372,8 @@ import {
   zListStoryVersionsPath,
   zListStoryVersionsResponse,
   zListTermHintsResponse,
+  zListWatchesPath,
+  zListWatchesResponse,
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
   zListWriteupsEndpointResponse,
@@ -1385,9 +1438,19 @@ import {
   zPromoteStatementAssessmentResponse,
   zPruneSecurityAuditBody,
   zPruneSecurityAuditResponse,
+  zPutCaseLookupsBody,
+  zPutCaseLookupsPath,
+  zPutCaseLookupsResponse,
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
   zPutInvestigationMembershipResponse,
+  zPutLookupDefaultsBody,
+  zPutLookupDefaultsQuery,
+  zPutLookupDefaultsResponse,
+  zPutNotificationPrefsBody,
+  zPutNotificationPrefsResponse,
+  zPutResearchSettingsBody,
+  zPutResearchSettingsResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
   zRecordStoryGateBody,
@@ -1461,6 +1524,8 @@ import {
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
   zSeedDemoResponse,
+  zSeeWatchPath,
+  zSeeWatchResponse,
   zSendCorpusEntitySetBody,
   zSendCorpusEntitySetPath,
   zSendCorpusEntitySetResponse,
@@ -6721,6 +6786,30 @@ export const getInvestigationGraph = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Inbox
+ */
+export const getInbox = <ThrowOnError extends boolean = false>(
+  options: Options<GetInboxData, ThrowOnError>,
+): RequestResult<GetInboxResponses, GetInboxErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetInboxResponses,
+    GetInboxErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetInboxPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetInboxResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/inbox',
+    ...options,
+  });
+
+/**
  * List Ingestion Batches
  *
  * The investigation's recent bulk imports, newest first, with how many files each saved, found already there, or refused.
@@ -6834,6 +6923,64 @@ export const leadQueue = <ThrowOnError extends boolean = false>(
       await zLeadQueueResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/leads/queue',
     ...options,
+  });
+
+/**
+ * Clear Case Lookups
+ */
+export const clearCaseLookups = <ThrowOnError extends boolean = false>(
+  options: Options<ClearCaseLookupsData, ThrowOnError>,
+): RequestResult<
+  ClearCaseLookupsResponses,
+  ClearCaseLookupsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    ClearCaseLookupsResponses,
+    ClearCaseLookupsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zClearCaseLookupsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zClearCaseLookupsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/lookups',
+    ...options,
+  });
+
+/**
+ * Put Case Lookups
+ */
+export const putCaseLookups = <ThrowOnError extends boolean = false>(
+  options: Options<PutCaseLookupsData, ThrowOnError>,
+): RequestResult<PutCaseLookupsResponses, PutCaseLookupsErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    PutCaseLookupsResponses,
+    PutCaseLookupsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutCaseLookupsBody,
+          path: zPutCaseLookupsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutCaseLookupsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/lookups',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -8018,6 +8165,31 @@ export const investigationVisualRestyle = <
   });
 
 /**
+ * List Watches
+ */
+export const listWatches = <ThrowOnError extends boolean = false>(
+  options: Options<ListWatchesData, ThrowOnError>,
+): RequestResult<ListWatchesResponses, ListWatchesErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ListWatchesResponses,
+    ListWatchesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListWatchesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListWatchesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/watches',
+    ...options,
+  });
+
+/**
  * Get Watchlist
  *
  * The watched names and the documents each was found in.
@@ -9147,6 +9319,192 @@ export const saveConnectorCredential = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Lookup Settings
+ */
+export const getLookupSettings = <ThrowOnError extends boolean = false>(
+  options?: Options<GetLookupSettingsData, ThrowOnError>,
+): RequestResult<
+  GetLookupSettingsResponses,
+  GetLookupSettingsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetLookupSettingsResponses,
+    GetLookupSettingsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zGetLookupSettingsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetLookupSettingsResponse.parseAsync(data),
+    url: '/api/settings/lookups',
+    ...options,
+  });
+
+/**
+ * Put Lookup Defaults
+ */
+export const putLookupDefaults = <ThrowOnError extends boolean = false>(
+  options: Options<PutLookupDefaultsData, ThrowOnError>,
+): RequestResult<
+  PutLookupDefaultsResponses,
+  PutLookupDefaultsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutLookupDefaultsResponses,
+    PutLookupDefaultsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutLookupDefaultsBody,
+          path: z.never().optional(),
+          query: zPutLookupDefaultsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutLookupDefaultsResponse.parseAsync(data),
+    url: '/api/settings/lookups',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Notification Prefs
+ */
+export const getNotificationPrefs = <ThrowOnError extends boolean = false>(
+  options?: Options<GetNotificationPrefsData, ThrowOnError>,
+): RequestResult<
+  GetNotificationPrefsResponses,
+  GetNotificationPrefsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetNotificationPrefsResponses,
+    GetNotificationPrefsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetNotificationPrefsResponse.parseAsync(data),
+    url: '/api/settings/notifications',
+    ...options,
+  });
+
+/**
+ * Put Notification Prefs
+ */
+export const putNotificationPrefs = <ThrowOnError extends boolean = false>(
+  options: Options<PutNotificationPrefsData, ThrowOnError>,
+): RequestResult<
+  PutNotificationPrefsResponses,
+  PutNotificationPrefsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutNotificationPrefsResponses,
+    PutNotificationPrefsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutNotificationPrefsBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutNotificationPrefsResponse.parseAsync(data),
+    url: '/api/settings/notifications',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Research Settings
+ */
+export const getResearchSettings = <ThrowOnError extends boolean = false>(
+  options?: Options<GetResearchSettingsData, ThrowOnError>,
+): RequestResult<
+  GetResearchSettingsResponses,
+  GetResearchSettingsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetResearchSettingsResponses,
+    GetResearchSettingsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetResearchSettingsResponse.parseAsync(data),
+    url: '/api/settings/research',
+    ...options,
+  });
+
+/**
+ * Put Research Settings
+ */
+export const putResearchSettings = <ThrowOnError extends boolean = false>(
+  options: Options<PutResearchSettingsData, ThrowOnError>,
+): RequestResult<
+  PutResearchSettingsResponses,
+  PutResearchSettingsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutResearchSettingsResponses,
+    PutResearchSettingsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutResearchSettingsBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutResearchSettingsResponse.parseAsync(data),
+    url: '/api/settings/research',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Security Alerts
  *
  * Recent denial events (access_denied / auth_rate_limited / browser_write_denied /
@@ -9887,6 +10245,84 @@ export const gradeTimelineEventEndpoint = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Create Watch
+ */
+export const createWatch = <ThrowOnError extends boolean = false>(
+  options: Options<CreateWatchData, ThrowOnError>,
+): RequestResult<CreateWatchResponses, CreateWatchErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CreateWatchResponses,
+    CreateWatchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateWatchBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateWatchResponse.parseAsync(data),
+    url: '/api/watches',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Watch
+ */
+export const deleteWatch = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteWatchData, ThrowOnError>,
+): RequestResult<DeleteWatchResponses, DeleteWatchErrors, ThrowOnError> =>
+  (options.client ?? client).delete<
+    DeleteWatchResponses,
+    DeleteWatchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteWatchPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteWatchResponse.parseAsync(data),
+    url: '/api/watches/{fact_watch_id}',
+    ...options,
+  });
+
+/**
+ * See Watch
+ */
+export const seeWatch = <ThrowOnError extends boolean = false>(
+  options: Options<SeeWatchData, ThrowOnError>,
+): RequestResult<SeeWatchResponses, SeeWatchErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    SeeWatchResponses,
+    SeeWatchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zSeeWatchPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zSeeWatchResponse.parseAsync(data),
+    url: '/api/watches/{fact_watch_id}/seen',
+    ...options,
   });
 
 /**

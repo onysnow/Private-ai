@@ -2960,6 +2960,80 @@
         "title": "CaseLeadCountsOut",
         "type": "object"
       },
+      "CaseLookupsOut": {
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "modes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Modes",
+            "type": "object"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "set_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Set At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "name",
+          "modes",
+          "set_at"
+        ],
+        "title": "CaseLookupsOut",
+        "type": "object"
+      },
+      "CaseLookupsPut": {
+        "properties": {
+          "modes": {
+            "additionalProperties": {
+              "enum": [
+                "automatic",
+                "ask",
+                "off"
+              ],
+              "type": "string"
+            },
+            "description": "This case's own mode for each source it differs on.",
+            "title": "Modes",
+            "type": "object"
+          },
+          "reason": {
+            "description": "One line on why this case looks up differently.",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "modes",
+          "reason"
+        ],
+        "title": "CaseLookupsPut",
+        "type": "object"
+      },
       "CaseMoneyOut": {
         "description": "Money traced, counted once where it starts (payments whose payer received\nnothing in the case), and how many payments carry it.",
         "properties": {
@@ -6495,6 +6569,61 @@
           "created_at"
         ],
         "title": "ConnectorFindingOut",
+        "type": "object"
+      },
+      "ConnectorRunLineOut": {
+        "properties": {
+          "at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "At",
+            "type": "string"
+          },
+          "case": {
+            "title": "Case",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "is_party": {
+            "title": "Is Party",
+            "type": "boolean"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "results": {
+            "title": "Results",
+            "type": "integer"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "sent",
+          "is_party",
+          "investigation_id",
+          "case",
+          "status",
+          "results",
+          "at"
+        ],
+        "title": "ConnectorRunLineOut",
         "type": "object"
       },
       "ConnectorRunOut": {
@@ -19568,6 +19697,102 @@
         "title": "ExtractionReviewOut",
         "type": "object"
       },
+      "FactWatchCreate": {
+        "properties": {
+          "record_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "enum": [
+              "claim",
+              "red_flag"
+            ],
+            "title": "Record Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id"
+        ],
+        "title": "FactWatchCreate",
+        "type": "object"
+      },
+      "FactWatchOut": {
+        "properties": {
+          "baseline": {
+            "title": "Baseline",
+            "type": "string"
+          },
+          "baseline_words": {
+            "title": "Baseline Words",
+            "type": "string"
+          },
+          "changed": {
+            "title": "Changed",
+            "type": "boolean"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Seen At",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          },
+          "value_words": {
+            "title": "Value Words",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "record_type",
+          "record_id",
+          "label",
+          "baseline",
+          "baseline_words",
+          "value",
+          "value_words",
+          "changed",
+          "created_at",
+          "seen_at"
+        ],
+        "title": "FactWatchOut",
+        "type": "object"
+      },
       "FigureItemOut": {
         "properties": {
           "evidence": {
@@ -20925,6 +21150,133 @@
           "created_at"
         ],
         "title": "IdentityMergeAuditOut",
+        "type": "object"
+      },
+      "InboxOut": {
+        "properties": {
+          "desktop": {
+            "title": "Desktop",
+            "type": "boolean"
+          },
+          "else": {
+            "items": {
+              "$ref": "#/components/schemas/InboxRowOut"
+            },
+            "title": "Else",
+            "type": "array"
+          },
+          "interrupt": {
+            "items": {
+              "$ref": "#/components/schemas/InboxRowOut"
+            },
+            "title": "Interrupt",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "needs": {
+            "items": {
+              "$ref": "#/components/schemas/InboxRowOut"
+            },
+            "title": "Needs",
+            "type": "array"
+          },
+          "quiet_while_reading": {
+            "title": "Quiet While Reading",
+            "type": "boolean"
+          },
+          "week": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Week",
+            "type": "object"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "interrupt",
+          "needs",
+          "else",
+          "week",
+          "quiet_while_reading",
+          "desktop"
+        ],
+        "title": "InboxOut",
+        "type": "object"
+      },
+      "InboxRowOut": {
+        "properties": {
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "actor_kind": {
+            "title": "Actor Kind",
+            "type": "string"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "route": {
+            "title": "Route",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "title",
+          "reason",
+          "href",
+          "actor",
+          "actor_kind",
+          "route"
+        ],
+        "title": "InboxRowOut",
         "type": "object"
       },
       "IncompleteTransactionOut": {
@@ -23089,6 +23441,129 @@
         "title": "LineageSourceOut",
         "type": "object"
       },
+      "LookupDefaultsPut": {
+        "properties": {
+          "defaults": {
+            "additionalProperties": {
+              "enum": [
+                "automatic",
+                "ask",
+                "off"
+              ],
+              "type": "string"
+            },
+            "description": "Each source's mode for cases that have not chosen their own.",
+            "title": "Defaults",
+            "type": "object"
+          }
+        },
+        "required": [
+          "defaults"
+        ],
+        "title": "LookupDefaultsPut",
+        "type": "object"
+      },
+      "LookupSettingsOut": {
+        "properties": {
+          "can_change_defaults": {
+            "title": "Can Change Defaults",
+            "type": "boolean"
+          },
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/CaseLookupsOut"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/LookupSourceOut"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "week": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRunLineOut"
+            },
+            "title": "Week",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sources",
+          "cases",
+          "week",
+          "can_change_defaults"
+        ],
+        "title": "LookupSettingsOut",
+        "type": "object"
+      },
+      "LookupSourceOut": {
+        "properties": {
+          "cases_this_month": {
+            "title": "Cases This Month",
+            "type": "integer"
+          },
+          "default": {
+            "title": "Default",
+            "type": "string"
+          },
+          "host": {
+            "title": "Host",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "key_saved": {
+            "title": "Key Saved",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "last": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConnectorRunLineOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "kind",
+          "host",
+          "key_saved",
+          "default",
+          "cases_this_month"
+        ],
+        "title": "LookupSourceOut",
+        "type": "object"
+      },
       "MappedEntityIn": {
         "additionalProperties": false,
         "properties": {
@@ -24188,6 +24663,103 @@
           "notes"
         ],
         "title": "NotesOut",
+        "type": "object"
+      },
+      "NotificationKindOut": {
+        "properties": {
+          "can_interrupt": {
+            "title": "Can Interrupt",
+            "type": "boolean"
+          },
+          "default": {
+            "title": "Default",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "route": {
+            "title": "Route",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "default",
+          "can_interrupt",
+          "route"
+        ],
+        "title": "NotificationKindOut",
+        "type": "object"
+      },
+      "NotificationPrefsOut": {
+        "properties": {
+          "desktop": {
+            "title": "Desktop",
+            "type": "boolean"
+          },
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationKindOut"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
+          "quiet_while_reading": {
+            "title": "Quiet While Reading",
+            "type": "boolean"
+          },
+          "routes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Routes",
+            "type": "object"
+          }
+        },
+        "required": [
+          "routes",
+          "quiet_while_reading",
+          "desktop",
+          "kinds"
+        ],
+        "title": "NotificationPrefsOut",
+        "type": "object"
+      },
+      "NotificationPrefsPut": {
+        "properties": {
+          "desktop": {
+            "default": false,
+            "title": "Desktop",
+            "type": "boolean"
+          },
+          "quiet_while_reading": {
+            "default": true,
+            "title": "Quiet While Reading",
+            "type": "boolean"
+          },
+          "routes": {
+            "additionalProperties": {
+              "enum": [
+                "interrupt",
+                "needs",
+                "else",
+                "off"
+              ],
+              "type": "string"
+            },
+            "description": "Where each kind goes; kinds left out keep their route.",
+            "title": "Routes",
+            "type": "object"
+          }
+        },
+        "title": "NotificationPrefsPut",
         "type": "object"
       },
       "OcrRuntimeStatusOut": {
@@ -28016,6 +28588,149 @@
         "title": "ReportingTaskUpdate",
         "type": "object"
       },
+      "ResearchSettingsOut": {
+        "properties": {
+          "ai_enabled": {
+            "title": "Ai Enabled",
+            "type": "boolean"
+          },
+          "can_change_defaults": {
+            "title": "Can Change Defaults",
+            "type": "boolean"
+          },
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/RunDefaultsCaseOut"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "defaults_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Defaults Reason"
+          },
+          "defaults_saved_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Defaults Saved At"
+          },
+          "locked": {
+            "items": {
+              "$ref": "#/components/schemas/RunPlanLockedOut"
+            },
+            "title": "Locked",
+            "type": "array"
+          },
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/RunSettingOut"
+            },
+            "title": "Settings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mode",
+          "ai_enabled",
+          "settings",
+          "locked",
+          "cases",
+          "can_change_defaults"
+        ],
+        "title": "ResearchSettingsOut",
+        "type": "object"
+      },
+      "ResearchSettingsPut": {
+        "properties": {
+          "flags": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Run defaults for new cases: the suite's flags.",
+            "title": "Flags"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "off",
+                  "ask"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the AI may start on its own.",
+            "title": "Mode"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Run defaults for new cases: the run options.",
+            "title": "Options"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Needed when the run defaults change.",
+            "title": "Reason"
+          }
+        },
+        "title": "ResearchSettingsPut",
+        "type": "object"
+      },
       "ResolutionDecisionOut": {
         "description": "A reporter's identity decision on a finding, as stored.",
         "properties": {
@@ -28358,6 +29073,54 @@
           "text"
         ],
         "title": "RunChangeIn",
+        "type": "object"
+      },
+      "RunDefaultsCaseOut": {
+        "properties": {
+          "differs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Differs",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "saved_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saved At"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "name",
+          "differs"
+        ],
+        "title": "RunDefaultsCaseOut",
         "type": "object"
       },
       "RunOptionsIn": {
@@ -52514,6 +53277,55 @@
         "summary": "Get Investigation Graph"
       }
     },
+    "/api/investigations/{investigation_id}/inbox": {
+      "get": {
+        "operationId": "get_inbox",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Inbox"
+      }
+    },
     "/api/investigations/{investigation_id}/ingestion-batches": {
       "get": {
         "description": "The investigation's recent bulk imports, newest first, with how many files each saved, found already there, or refused.",
@@ -52846,6 +53658,112 @@
           }
         },
         "summary": "Lead Queue"
+      }
+    },
+    "/api/investigations/{investigation_id}/lookups": {
+      "delete": {
+        "operationId": "clear_case_lookups",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Clear Case Lookups"
+      },
+      "put": {
+        "operationId": "put_case_lookups",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseLookupsPut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Put Case Lookups"
       }
     },
     "/api/investigations/{investigation_id}/marks": {
@@ -55373,6 +56291,59 @@
         "summary": "Investigation Visual Restyle"
       }
     },
+    "/api/investigations/{investigation_id}/watches": {
+      "get": {
+        "operationId": "list_watches",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FactWatchOut"
+                  },
+                  "title": "Response List Watches",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Watches"
+      }
+    },
     "/api/investigations/{investigation_id}/watchlist": {
       "get": {
         "description": "The watched names and the documents each was found in.",
@@ -57571,6 +58542,294 @@
         "summary": "Save Connector Credential"
       }
     },
+    "/api/settings/lookups": {
+      "get": {
+        "operationId": "get_lookup_settings",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "investigation_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Investigation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Lookup Settings"
+      },
+      "put": {
+        "operationId": "put_lookup_defaults",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "investigation_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Investigation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupDefaultsPut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Put Lookup Defaults"
+      }
+    },
+    "/api/settings/notifications": {
+      "get": {
+        "operationId": "get_notification_prefs",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPrefsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Notification Prefs"
+      },
+      "put": {
+        "operationId": "put_notification_prefs",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPrefsPut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPrefsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Put Notification Prefs"
+      }
+    },
+    "/api/settings/research": {
+      "get": {
+        "operationId": "get_research_settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Research Settings"
+      },
+      "put": {
+        "operationId": "put_research_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResearchSettingsPut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Put Research Settings"
+      }
+    },
     "/api/settings/security/alerts": {
       "get": {
         "description": "Recent denial events (access_denied / auth_rate_limited / browser_write_denied /\nrequest_rejected) as counts, busiest remote hosts and latest examples -- STRUCT-0035.\n\nLocal-only: this aggregates denial events (including remote IPs) across every\ninvestigation and actor on the server, not just the caller's own scope.",
@@ -58859,6 +60118,145 @@
           }
         },
         "summary": "Grade Timeline Event Endpoint"
+      }
+    },
+    "/api/watches": {
+      "post": {
+        "operationId": "create_watch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FactWatchCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactWatchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Create Watch"
+      }
+    },
+    "/api/watches/{fact_watch_id}": {
+      "delete": {
+        "operationId": "delete_watch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fact_watch_id",
+            "required": true,
+            "schema": {
+              "title": "Fact Watch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Delete Watch"
+      }
+    },
+    "/api/watches/{fact_watch_id}/seen": {
+      "post": {
+        "operationId": "see_watch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fact_watch_id",
+            "required": true,
+            "schema": {
+              "title": "Fact Watch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactWatchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "See Watch"
       }
     },
     "/api/watchlist-hits/{hit_id}/dismiss": {

@@ -617,7 +617,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   }, [chunks, find]);
 
   const title = (doc?.filename ?? '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
-  return <div ref={roomRef} className="rr" role="dialog" aria-modal="true" aria-label={`Reading room: ${doc?.filename ?? 'document'}`}>
+  return <div ref={roomRef} className="rr" data-calm-zone="" role="dialog" aria-modal="true" aria-label={`Reading room: ${doc?.filename ?? 'document'}`}>
     <header className="rr-top">
       <nav className="rr-crumbs" aria-label="You are here"><span>{caseName}</span><span>Bring in</span><span>Reading room</span><b>{doc?.filename ?? 'Opening…'}</b></nav>
       <div role="tablist" aria-label="How to read it" className="rr-tabs">
