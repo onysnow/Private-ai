@@ -5,13 +5,15 @@
 // type the backend accepts as a record_ref, and keep the picked set visible
 // as removable chips. Only what is picked here can be cited by the draft.
 import {useState} from 'react';
-import type {FormEvent, ReactElement} from 'react';
+import type {ReactElement} from 'react';
 import {Check, Plus, Search, X} from 'lucide-react';
+import {z} from 'zod';
 
-import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {searchWorkbench} from '../../lib/generated/sdk.gen';
 import type {SearchHitOut} from '../../lib/generated/types.gen';
 import {Button} from '@/components/ui/button';
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 
 // app/services/assistant_context.py SELECTABLE_RECORD_TYPES. Search calls a
@@ -27,32 +29,36 @@ const keyOf = (r: {record_type: string, record_id: string}) => `${r.record_type}
 // Search titles a claim hit just "Claim"; its snippet is the claim itself.
 const hitLabel = (hit: SearchHitOut) => (hit.type === 'claim' && hit.snippet ? hit.snippet : hit.title);
 
+// What to search for (GET /api/search takes any q of one character or more).
+const searchSchema = z.object({query: z.string().trim().min(1, 'Type something to search for.')});
+type SearchValues = z.infer<typeof searchSchema>;
+
 type Props = {investigationId: string, selected: SelectedRef[], onChange: (next: SelectedRef[]) => void, disabled?: boolean};
 
 export function RecordPicker({investigationId, selected, onChange, disabled}: Props): ReactElement {
-  const [query, setQuery] = useState('');
+  const form = useZodForm<SearchValues>(searchSchema, {defaultValues: {query: ''}, mode: 'onSubmit'});
   const [results, setResults] = useState<SearchHitOut[]>([]);
   const [status, setStatus] = useState('');
   const [searching, setSearching] = useState(false);
   const picked = new Set(selected.map(keyOf));
 
-  const search = async (e?: FormEvent) => {
-    e?.preventDefault();
-    if (!investigationId || !query.trim()) return;
+  // An empty search is refused under the field; a failed one shows under the row, the words typed kept.
+  const search = submitWith(form, async ({query}) => {
+    if (!investigationId) return;
     setSearching(true);
     setStatus('');
     try {
-      const body = (await searchWorkbench({query: {q: query.trim(), investigation_id: investigationId, limit: 25}, throwOnError: true})).data;
+      const body = (await searchWorkbench({query: {q: query, investigation_id: investigationId, limit: 25}, throwOnError: true})).data;
       const hits = body.results.filter(r => SELECTABLE_SEARCH_TYPES.has(r.type));
       setResults(hits);
       if (!hits.length) setStatus('No matching claims, evidence, entities, leads, tasks, sources, documents or relationships.');
     } catch (error) {
       setResults([]);
-      setStatus(errorMessage(error, 'Search failed'));
+      throw error;
     } finally {
       setSearching(false);
     }
-  };
+  }, 'Search failed', {q: 'query'});
 
   const toggle = (hit: SearchHitOut) => {
     const ref = {record_type: toRecordType(hit.type), record_id: hit.id, label: hitLabel(hit)};
@@ -69,13 +75,16 @@ export function RecordPicker({investigationId, selected, onChange, disabled}: Pr
 
   return <div className="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]" data-testid="presentation-record-picker">
     <div className="min-w-0">
-      <form onSubmit={search} className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden/>
-          <Input aria-label="Search records to add" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search claims, evidence, entities, leads, tasks…" disabled={disabled} className="pl-8"/>
-        </div>
-        <Button type="submit" size="sm" variant="outline" disabled={disabled || searching || !query.trim()}>{searching ? 'Searching…' : 'Search'}</Button>
-      </form>
+      <Form {...form}><form onSubmit={search} className="flex flex-wrap gap-2" noValidate>
+        <FormField control={form.control} name="query" render={({field}) => <FormItemBare>
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden/>
+            <FormControl><Input {...field} aria-label="Search records to add" placeholder="Search claims, evidence, entities, leads, tasks…" disabled={disabled} className="pl-8"/></FormControl>
+          </div>
+          <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+        <FormRootError className="field-msg next-line"/>
+        <Button type="submit" size="sm" variant="outline" disabled={disabled || searching}>{searching ? 'Searching…' : 'Search'}</Button>
+      </form></Form>
       {status && <p className="mt-2 text-sm text-muted-foreground">{status}</p>}
       {results.length > 0 && <>
         <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
