@@ -107,7 +107,8 @@ describe('Learn › Red Flags catalogue', () => {
 
     // The indicator page.
     const page = await screen.findByRole('region', {name: 'Indicator BO-007'});
-    expect(within(page).getByRole('heading', {level: 2, name: "Mass-registration address, or 'company factory'"})).toBeInTheDocument();
+    // The region shows while the page is still a skeleton, so wait for the heading rather than reading it at once.
+    expect(await within(page).findByRole('heading', {level: 2, name: "Mass-registration address, or 'company factory'"})).toBeInTheDocument();
     expect(page).toHaveTextContent('✓ Verified');
     expect(page).toHaveTextContent('In this case: BO-007 fires on Harbour Nominees.');
     const ladder = within(page).getByRole('list', {name: 'Levels'});
