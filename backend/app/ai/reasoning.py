@@ -31,6 +31,8 @@ from app.ai.chart_check import (
 )
 from app.ai.governor import governor
 from app.ai.interop import hand_over, prompt_view
+from app.ai.suite import APP_MODULES_ROOT, ROUTES, SUITE_ROOT, TAS_ROOT, route as suite_route
+from app.ai.suite import next_runs, systems_status, vendored_commit
 from app.ai.systems import SUITE_MODULES, check_shape, check_values, framing_text, run_checks, walk
 from app.ai.run_events import RunRecorder, instructions_in_packet, record_suite_thoughts, record_thoughts, run_events
 from app.ai.quote_check import check_presentation_quotes, prompt_record_texts
@@ -55,15 +57,11 @@ CHART_SCHEMA_KINDS = "|".join(dict.fromkeys(k.value for q in QUESTIONS.values() 
 # prompts are built from TAS, the suite's investigative system; the other
 # systems (RAS, QAS, LAS, DAS, EGS, EHS) are kept so the hand-offs TAS names
 # in INTEROP.md resolve. See authority_suite/README_VENDORING.md to update it.
-SUITE_ROOT = Path(__file__).resolve().parent / "authority_suite"
-TAS_ROOT = SUITE_ROOT / "systems" / "tas"
-# App-local reasoning module content -- not part of the vendored suite,
-# not numbered or governed by TAS's CONTROL_SURFACE. See PRESENTATION_DRAFT.md
-# for why this is kept separate rather than added to TAS: it serves a
-# workflow (evidence + goal -> brief/deck) that TAS itself doesn't define,
-# and formalizing it into TAS proper, if that ever happens, is a decision
-# for the suite's own owner, not something this app does on its own.
-APP_MODULES_ROOT = Path(__file__).resolve().parent / "presentation_modules"
+# SUITE_ROOT, TAS_ROOT and APP_MODULES_ROOT come from app/ai/suite.py, the one front door to the suite.
+# presentation_draft is app-local -- not part of the vendored suite, not numbered or governed by TAS's
+# CONTROL_SURFACE. See PRESENTATION_DRAFT.md for why this is kept separate rather than added to TAS: it serves a
+# workflow (evidence + goal -> brief/deck) that TAS itself doesn't define, and formalizing it into TAS proper, if
+# that ever happens, is a decision for the suite's own owner, not something this app does on its own.
 
 # STRUCT-0025: tests/test_authority_suite_drift.py verifies every path below
 # still resolves inside the vendored suite. If you update the vendored copy
@@ -71,11 +69,9 @@ APP_MODULES_ROOT = Path(__file__).resolve().parent / "presentation_modules"
 # request time with a FileNotFoundError. That drift test only covers
 # TAS_MODULES below; an app-local module's file moving is caught the plain
 # way, by _read() raising when the path doesn't exist.
-MODULE_FILES = {
-    "case_synthesis": TAS_ROOT / "PROMPT_MODULES" / "08_CASE_SYNTHESIS.md",
-    "hypothesis_test": TAS_ROOT / "PROMPT_MODULES" / "06_HYPOTHESIS_AND_CONTRADICTION_TESTING.md",
-    "presentation_draft": APP_MODULES_ROOT / "PRESENTATION_DRAFT.md",
-}
+# Every module's first prompt file, from the suite service's routes; a module of two files (LAS 01+02, QAS 01+03,
+# RAS 03+04) sends both, in order (build_system_prompt).
+MODULE_FILES = {key: r.files[0] for key, r in ROUTES.items()}
 
 # Which modules are vendored TAS content (the suite copy) vs. this app's
 # own prompt content. Drives build_system_prompt()'s framing text and
@@ -83,10 +79,6 @@ MODULE_FILES = {
 # path reporting -- a module outside the suite was never meant to resolve
 # relative to SUITE_ROOT.
 TAS_MODULES = {"case_synthesis", "hypothesis_test"}
-
-# The suite's other systems (app/ai/systems.py): each module's first file is its MODULE_FILES entry; a module of
-# two (LAS 01+02, QAS 01+03, RAS 03+04) sends both, in order (build_system_prompt).
-MODULE_FILES.update({key: m.files[0] for key, m in SUITE_MODULES.items()})
 
 # The JSON contract each module's model call must return. Kept separate from
 # TAS's own markdown-table module text (which describes *what* belongs in each
@@ -857,19 +849,8 @@ def run_reasoning_module(db: Session, *, investigation_id: str, run_id: str | No
     return candidate
 
 
-MODULE_TITLES = {"case_synthesis": "Case synthesis", "hypothesis_test": "Theory test", "presentation_draft": "Draft",
-                 **{key: m.title for key, m in SUITE_MODULES.items()}}
-MODULE_NODES = {"case_synthesis": "tas/08", "hypothesis_test": "tas/06", "presentation_draft": "app/draft",
-                **{key: m.node for key, m in SUITE_MODULES.items()}}
-# Why the router sends a run to each system: the trigger table's own condition (AGENTS.md).
-ROUTER_REASONS = {
-    "ras": "the answer characterizes published research on a general question",
-    "qas": "the answer tests a theory or explanation against data",
-    "las": "the answer states conclusions beyond what a source directly says",
-    "das": "the answer structures a choice between options",
-    "egs": "the answer plans how to obtain evidence",
-    "ehs": "the answer prepares material for publication that could cause harm",
-}
+MODULE_TITLES = {key: r.title for key, r in ROUTES.items()}
+MODULE_NODES = {key: r.node for key, r in ROUTES.items()}
 
 
 def resolve_handoff(db: Session, *, investigation_id: str, module: str, handoff_from: str | None) -> tuple[AIAnalysisCandidate | None, dict | None]:
@@ -1003,20 +984,14 @@ def _run_reasoning_module(
     for c in (changes or [])[:50]:
         rec.emit("SETTING", "controls", system="umbrella", status="neutral", parent=start, rule="echo",
                  verdict=str(c.get("kind", "SETTING"))[:16], text=f"{str(c.get('at', ''))[:40]} {str(c.get('text', ''))[:300]}")
-    if suite_module is not None:
-        route = rec.emit("ROUTE", "router", system=suite_module.system, status="good", parent=start,
-                         rule=f"AGENTS.md trigger table row {suite_module.router_row}",
-                         text=f"{suite_module.system.upper()}: {ROUTER_REASONS[suite_module.system]}")
-        for path in suite_module.files:
-            rec.emit("LOAD", suite_module.node, system=suite_module.system, status="good" if path.exists() else "bad",
-                     parent=route, rule="AG-050", text=f"Loaded {path.name}")
-    else:
-        route = rec.emit("ROUTE", "router", system="tas" if is_tas else "app", status="good", parent=start,
-                         rule="AGENTS.md trigger table row 2" if is_tas else None,
-                         text="TAS: the answer states facts about real people, firms and documents" if is_tas
-                         else "App module: a draft from the records you picked")
-        rec.emit("LOAD", MODULE_NODES.get(module, module), system="tas" if is_tas else "app", status="good" if MODULE_FILES[module].exists() else "bad",
-                 parent=route, rule="AG-050", text=f"Loaded {MODULE_FILES[module].name}")
+    # Routed by the suite service (app/ai/suite.py): one route per module, the same for every system.
+    routed = suite_route(module)
+    route = rec.emit("ROUTE", "router", system=routed.system, status="good", parent=start, rule=routed.rule,
+                     text=(f"{routed.system.upper()}: {routed.reason}" if routed.row else "App module: a draft from the records you picked"),
+                     detail={"system": routed.system, "row": routed.row, "module": module})
+    for path in routed.files:
+        rec.emit("LOAD", routed.node, system=routed.system, status="good" if path.exists() else "bad",
+                 parent=route, rule="AG-050", text=f"Loaded {path.name}")
     if handoff is not None:
         handed = rec.emit("CHECK", "interop", system="umbrella", status="good", parent=route, rule="INTEROP.md",
                           refs=[{"record_type": "ai_analysis_candidate", "record_id": handoff["from"]["candidate_id"]}],
@@ -1463,6 +1438,8 @@ def serialize_ai_analysis_candidate(candidate: AIAnalysisCandidate, *, include_p
         row["checked_citation_ids"] = candidate.checked_citation_ids or []
         row["trace"] = candidate.trace
         row["claim_reviews"] = candidate.claim_reviews or {}
+        # Where this answer goes next by what it contains (the suite service's routing).
+        row["next_runs"] = next_runs(candidate.module, candidate.payload) if candidate.review_status != "rejected" else []
     return row
 
 
@@ -1509,14 +1486,9 @@ def _vendored_tas_version() -> str | None:
     return None
 
 
-@lru_cache(maxsize=1)
 def _vendored_suite_commit() -> str | None:
-    """'onysnow/Authority-System-Suite@b1c71e8', from authority_suite/VENDORED_FROM."""
-    marker = SUITE_ROOT / "VENDORED_FROM"
-    if not marker.exists():
-        return None
-    first = marker.read_text(encoding="utf-8").splitlines()[:1]
-    return first[0].strip() or None if first else None
+    """'onysnow/Authority-System-Suite@<commit>', from authority_suite/VENDORED_FROM (app/ai/suite.py)."""
+    return vendored_commit()
 
 
 def ai_reasoning_status(settings: Settings = default_settings) -> dict:
@@ -1567,6 +1539,8 @@ def ai_reasoning_status(settings: Settings = default_settings) -> dict:
             "source": _vendored_suite_commit(),
             "tas_version": _vendored_tas_version(),
             "modules": modules,
+            # Every system of the suite: its trigger-table row, kind, version and the modules the app runs from it.
+            "systems": systems_status(),
             "control_surface": {
                 "spec_file": str(CONTROL_SURFACE_FILE.relative_to(SUITE_ROOT)),
                 "available": CONTROL_SURFACE_FILE.exists(),

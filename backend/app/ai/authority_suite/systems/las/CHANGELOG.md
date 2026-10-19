@@ -2,6 +2,10 @@
 
 *Logic Authority System (LAS)*
 
+## 2026-10-18 — DIR-0052: Module 06 rule 5 (T-0378)
+
+Module 06 rule 5 says 'does not survive' is a finding about the argument, not its conclusion: the conclusion is not called false or contradicted on unverified figures. Closes the doctrine-arm FAIL of L27 in the full-suite run (RUN-0049). The maintainer's approval: DIR-0052.
+
 ## 2026-10-10 — DIR-0044: the restating-a-finding section's last sentence
 
 Under DIR-0044, `CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md`'s "Restating a finding" section ends "in both studies the exaggeration was in the restatement, not in the result it restated", where it said "the restatement is where accuracy is lost", which claimed more than the two studies show (AUDIT_QAS_2026-10-10 UNSOURCED-4, AUDIT_EHS_2026-10-10 UNSOURCED-5). The same words in every system (audit check 65).

@@ -456,6 +456,9 @@ import type {
   InspectBackupData,
   InspectBackupErrors,
   InspectBackupResponses,
+  InvestigationAssistantRunData,
+  InvestigationAssistantRunErrors,
+  InvestigationAssistantRunResponses,
   InvestigationCaseSynthesisData,
   InvestigationCaseSynthesisErrors,
   InvestigationCaseSynthesisResponses,
@@ -1191,6 +1194,9 @@ import {
   zImportOpenalephDocumentEvidenceResponse,
   zInspectBackupBody,
   zInspectBackupResponse,
+  zInvestigationAssistantRunBody,
+  zInvestigationAssistantRunPath,
+  zInvestigationAssistantRunResponse,
   zInvestigationCaseSynthesisBody,
   zInvestigationCaseSynthesisPath,
   zInvestigationCaseSynthesisResponse,
@@ -5816,6 +5822,43 @@ export const saveInvestigationRunProfile = <
     responseValidator: async (data) =>
       await zSaveInvestigationRunProfileResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/profile',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Investigation Assistant Run
+ *
+ * Any AI run, through the one route the suite service gives its module (app/ai/suite.py): TAS, the other six
+ * systems, or the app-local draft. The per-module endpoints below are this same route with the module fixed.
+ * Every answer is a proposal and writes nothing else.
+ */
+export const investigationAssistantRun = <ThrowOnError extends boolean = false>(
+  options: Options<InvestigationAssistantRunData, ThrowOnError>,
+): RequestResult<
+  InvestigationAssistantRunResponses,
+  InvestigationAssistantRunErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    InvestigationAssistantRunResponses,
+    InvestigationAssistantRunErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zInvestigationAssistantRunBody,
+          path: zInvestigationAssistantRunPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationAssistantRunResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/assistant/run',
     ...options,
     headers: {
       'Content-Type': 'application/json',

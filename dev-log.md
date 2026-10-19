@@ -2631,3 +2631,23 @@ the vendored text by a new drift test, and the suite defects they reported were 
 Tests: `test_suite_systems.py` (12, new), drift tests (2 new), and the AI, plan, claim-review, guard and migration
 tests pass; mypy and ruff clean. Frontend: client regenerated, tsc clean, vitest 1307 passed. No screen for
 starting a suite run: mockup first.
+
+## 2026-10-19 (cont.): the suite at its newest version, behind one service
+
+Ony: use the most recent version of the suite, and have one service handle all of it and route everything.
+
+- Vendored copy b1c71e8 → d2b2186 (the suite's `main`, 51 commits; 21 files in `systems/`, root documents
+  unchanged). The old copy was first checked byte for byte against b1c71e8. Upstream changes the app sends as
+  prompts: TAS 08 rules 8, 9 and new 11; QAS 01; DAS 01; EHS 01. `SUITE_GAPS.md` regenerated (it names the commit).
+  New suite conflict for Ony: TAS 08 rule 8 now says one source is never corroboration, Standard §4.3 still lets
+  one Tier A source carry it (SUITE_SYSTEMS_IN_APP.md item 11).
+- `app/ai/suite.py`: the one front door. Every module's route (system, trigger-table row, files), each system's
+  version, and `next_runs` (an answer routed onward by what it contains). reasoning.py's MODULE_FILES, titles,
+  nodes and run-record ROUTE/LOAD steps, the plan, and the settings status all read from it; the two code paths
+  for routing a TAS run and a suite run are now one.
+- `POST .../assistant/run` runs any module; the per-module endpoints are that route with the module fixed.
+  Candidates carry `next_runs`; settings status carries `authority_suite.systems`.
+
+Tests: `test_suite_service.py` (5, new: routes against AGENTS.md's table, the pipeline reading from the service,
+status, the one endpoint and its refusals, next runs) plus the suite, AI, guard and migration tests pass; mypy and
+ruff clean; vitest 1307 passed, tsc clean.

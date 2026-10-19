@@ -2963,12 +2963,42 @@ class AiControlSurfaceOut(ResponseModel):
     flags: dict[str, AiControlFlagOut]
 
 
+class AiSuiteModuleOut(ResponseModel):
+    module: str
+    title: str
+    node: str
+    available: bool
+
+
+class AiSuiteSystemOut(ResponseModel):
+    """One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+    CHANGELOG numbers them, `latest_change` its newest entry."""
+    system: str
+    name: str
+    kind: str  # authority | support
+    row: int
+    version: str | None
+    latest_change: str | None
+    present: bool
+    modules: list[AiSuiteModuleOut]
+
+
+class AiNextRunOut(ResponseModel):
+    """A next run the suite service routes an answer to, by what the answer contains."""
+    module: str
+    system: str
+    row: int | None
+    title: str
+    why: str
+
+
 class AiAuthoritySuiteOut(ResponseModel):
     """The vendored Authority System Suite: where it came from and the TAS version the prompts use."""
     present: bool
     source: str | None
     tas_version: str | None
     modules: dict[str, AiModuleStatusOut]
+    systems: list[AiSuiteSystemOut] = []
     control_surface: AiControlSurfaceOut
 
 
@@ -3547,6 +3577,8 @@ class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
     trace: dict[str, Any] | None
     # Your decisions claim by claim, by claim or hypothesis id (app/ai/reasoning.py review_ai_claim); {} when none.
     claim_reviews: dict[str, AiClaimReviewOut]
+    # Where this answer goes next by what it contains (app/ai/suite.py next_runs); [] for a rejected answer.
+    next_runs: list[AiNextRunOut] = []
     citation_details: list[CitationDetailOut] | None = Field(default=None, exclude_if=_absent_when_none)
     deck_preview: list[DeckSlideOut] | None = Field(default=None, exclude_if=_absent_when_none)
     # A presentation draft's "how we know" line (app/services/presentation.py how_we_know).

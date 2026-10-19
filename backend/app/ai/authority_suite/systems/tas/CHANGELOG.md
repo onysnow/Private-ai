@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-18 — DIR-0052: Modules 07 rule 6, 08 rules 8, 9, 11 and item 11, and 13 rule 1 (T-0378)
+
+Module 07 rule 6 now marks each planned acquisition KNOWN TO EXIST or BELIEVED TO EXIST with the reason. Module 08 rule 8 says one source is not corroboration; rule 9's statement is written as a headed note before the report with its unaddressed part carried into section 11 (item 11 reworded to match); new rule 11 keeps an unsourced characterisation in background text out of the ratings. Module 13 rule 1 forbids naming the elements a rule of that kind usually has when no text was supplied. Each closes a doctrine-arm FAIL of the full-suite run (A02, A40, A49, A63; RUN-0049). The maintainer's approval: DIR-0052.
+
+## 2026-10-12 — DIR-0050: Module 02 rule 7 names the negative-search label (T-0376)
+
+`PROMPT_MODULES/02_SOURCE_VERIFICATION.md` rule 7 now labels a no-result search NEGATIVE SEARCH RESULT (Standard §4.8) and requires the Policy §4 retrieval log whether the search was run or supplied. Module 02's verdict list never offered the label, so the doctrine arm of gate case A58 answered UNRESOLVED on both fixtures (RUN-0011, T-0376). The maintainer's approval: DIR-0050.
+
+## 2026-10-12 — DIR-0049: Module 01's final check reports the corpus manifest counts (T-0376)
+
+`PROMPT_MODULES/01_EVIDENCE_EXTRACTION.md` FINAL CHECK now asks for the Corpus manifest record's counts — received, processed, failed, excluded with who excluded each, duplicate counted once and not again as processed — and that they sum to the items received. The fields were defined in `EVALUATION/OUTPUT_SCHEMAS.md` but no module asked for them, so the gate case A61 could not be passed by following the module (RUN-0011, T-0376). The maintainer's approval: DIR-0049.
+
 ## 2026-10-10 — DIR-0044: the restating-a-finding section's last sentence
 
 Under DIR-0044, `CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md`'s "Restating a finding" section ends "in both studies the exaggeration was in the restatement, not in the result it restated", where it said "the restatement is where accuracy is lost", which claimed more than the two studies show (AUDIT_QAS_2026-10-10 UNSOURCED-4, AUDIT_EHS_2026-10-10 UNSOURCED-5). The same words in every system (audit check 65).
