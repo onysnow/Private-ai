@@ -43,34 +43,26 @@ class AlephConnector(Connector):
         )
 
     async def search(self, query: str) -> list[ExternalFinding]:
+        """Search Aleph's JSON API. Any failure raises; nothing is invented.
+
+        An earlier version fell back to the HTML /search page and reported "found
+        something" whenever that page loaded, which made a rate-limited or
+        unauthorised API look like a hit. An empty result list is a real answer;
+        a network error, an error status or a non-JSON reply is a failure the
+        connector run records.
+        """
         headers = self._headers()
         async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
-            try:
-                resp = await client.get(
-                    f"{self.base_url}/api/2/search",
-                    params={"q": query},
-                    headers=headers,
-                )
-                if resp.is_success and "json" in resp.headers.get("content-type", ""):
-                    payload = resp.json()
-                    items = payload.get("results") or payload.get("entities") or []
-                    if isinstance(items, list) and items:
-                        return [self._parse_result(item) for item in items]
-            except (httpx.HTTPError, ValueError, TypeError):
-                pass
-
             resp = await client.get(
-                f"{self.base_url}/search", params={"q": query}, headers=headers
+                f"{self.base_url}/api/2/search",
+                params={"q": query},
+                headers=headers,
             )
             resp.raise_for_status()
-            return [
-                ExternalFinding(
-                    provider="aleph",
-                    record_id=f"search:{query}",
-                    caption=f"Aleph search: {query}",
-                    schema=None,
-                    url=str(resp.url),
-                    properties={"http_status": [str(resp.status_code)]},
-                    raw={"fallback": True, "query": query},
-                )
-            ]
+            if "json" not in resp.headers.get("content-type", ""):
+                raise ValueError("Aleph did not return JSON")
+            payload = resp.json()
+            items = payload.get("results") or payload.get("entities") or []
+            if not isinstance(items, list):
+                raise ValueError("Aleph returned an unexpected result shape")
+            return [self._parse_result(item) for item in items]

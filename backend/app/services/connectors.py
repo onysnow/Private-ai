@@ -65,6 +65,23 @@ def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id:
     return rows
 
 
+def _fail_run(db: Session, run_id: str, exc: Exception) -> None:
+    """Mark a run failed after an error, even when the error left the session unusable.
+
+    A failed flush (for example a value longer than its column) poisons the
+    session. Committing it here would save the half-built rows and raise again,
+    leaving the run stuck at "running". Roll back first, then reload the run.
+    """
+    db.rollback()
+    run = db.get(ConnectorRun, run_id)
+    if run is None:
+        return
+    run.status = "failed"
+    run.error = str(exc)[:2000]
+    run.finished_at = utcnow_naive()
+    db.commit()
+
+
 async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
@@ -73,15 +90,16 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
         raise HTTPException(404, "Connector not found")
     run = ConnectorRun(investigation_id=body.investigation_id, provider=provider, query=body.query)
     db.add(run); db.commit(); db.refresh(run)
+    run_id = run.id
     try:
         findings = await connector.search(body.query)
         return persist_connector_findings(db, run, body.investigation_id, provider, findings)
     except Exception as exc:
-        run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive(); db.commit()
+        _fail_run(db, run_id, exc)
         # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
         # echoed into the client-facing response (STRUCT-0028).
         raise HTTPException(
-            502, f"{provider} connector failed. Details were logged server-side (connector run {run.id})."
+            502, f"{provider} connector failed. Details were logged server-side (connector run {run_id})."
         ) from exc
 
 
@@ -94,6 +112,7 @@ async def enrich_entity(provider: str, entity: Entity, db: Session) -> Any:
         investigation_id=entity.investigation_id, provider=provider, query=query_label,
     )
     db.add(run); db.commit(); db.refresh(run)
+    run_id = run.id
     try:
         findings = await connector.enrich({
             "id": entity.ftm_id,
@@ -103,9 +122,9 @@ async def enrich_entity(provider: str, entity: Entity, db: Session) -> Any:
         })
         return persist_connector_findings(db, run, entity.investigation_id, provider, findings)
     except Exception as exc:
-        run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive(); db.commit()
+        _fail_run(db, run_id, exc)
         # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
         # echoed into the client-facing response (STRUCT-0028).
         raise HTTPException(
-            502, f"{provider} enrichment failed. Details were logged server-side (connector run {run.id})."
+            502, f"{provider} enrichment failed. Details were logged server-side (connector run {run_id})."
         ) from exc

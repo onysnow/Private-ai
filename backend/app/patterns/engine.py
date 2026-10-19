@@ -123,6 +123,19 @@ def _fingerprint(indicator_id: str, parties: list[str], links: list[str]) -> str
     return hashlib.sha256(raw.encode()).hexdigest()[:32]
 
 
+class _Crashed(str):
+    """A rule that raised instead of answering; its earlier flags are kept."""
+
+
+def _run_spec(spec: Any, graph: Any) -> Any:
+    """Run one detection rule. A rule that raises is reported as unable to run,
+    so one bad amount or date cannot take every other flag in the case with it."""
+    try:
+        return detection.run(spec, graph)
+    except Exception as exc:  # noqa: BLE001 - isolate each rule from the others
+        return _Crashed(f"This rule failed on this case ({exc.__class__.__name__}); the other rules still ran.")
+
+
 def recompute(db: Session, investigation_id: str) -> list[dict[str, str]]:
     """Runs every detection spec (catalogue/detection/) on the case and keeps the
     flags; returns the specs that could not run, each with its reason."""
@@ -132,9 +145,12 @@ def recompute(db: Session, investigation_id: str) -> list[dict[str, str]]:
     existing = {f.fingerprint: f for f in db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id))}
     seen: set[str] = set()
     cannot: list[dict[str, str]] = []
+    crashed: set[str] = set()
     for spec in detection.load():
-        results = detection.run(spec, graph)
+        results = _run_spec(spec, graph)
         if isinstance(results, str):
+            if isinstance(results, _Crashed):
+                crashed.add(spec.indicator)
             cannot.append({"indicator_id": spec.indicator, "name": _name(spec.indicator), "reason": results})
             continue
         family = spec.family_module()
@@ -152,7 +168,7 @@ def recompute(db: Session, investigation_id: str) -> list[dict[str, str]]:
             row.rule_version, row.level, row.parties, row.links, row.facts = spec.version, res.level, res.parties, res.links, facts
             row.last_seen_at, row.gone_at = now, None
     for fp, row in existing.items():
-        if fp not in seen and row.gone_at is None:
+        if fp not in seen and row.gone_at is None and row.indicator_id not in crashed:
             row.gone_at = now
     _rank([r for r in existing.values() if r.gone_at is None])
     db.commit()
@@ -243,7 +259,7 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
             # A reader without write access sees the flags as last computed.
             graph = case_graph.build(db, investigation_id)
             cannot = [{"indicator_id": s.indicator, "name": _name(s.indicator), "reason": r}
-                      for s in detection.load() if isinstance(r := detection.run(s, graph), str)]
+                      for s in detection.load() if isinstance(r := _run_spec(s, graph), str)]
     rows = list(db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id)))
     party_ids = {p for r in rows for p in r.parties}
     names = {e.id: (e.caption or e.id, e.schema) for e in db.scalars(select(Entity).where(Entity.id.in_(party_ids)))} if party_ids else {}

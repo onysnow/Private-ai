@@ -5,6 +5,7 @@ the default, whether it is documented in the example file."""
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,14 @@ def _read_env_file(path: Path | None) -> dict[str, str]:
         k, _, v = line.partition("=")
         out[k.strip().upper()] = v.strip().strip("'\"")
     return out
+
+
+_URL_PASSWORD = re.compile(r"(://[^:/@\s]+:)[^@\s]+(@)")
+
+
+def _redact_urls(text: str) -> str:
+    """Hide the password in a URL such as postgresql://user:pw@host/db."""
+    return _URL_PASSWORD.sub(r"\1••••••\2", text) if isinstance(text, str) else text
 
 
 def _mask(value: Any) -> str:
@@ -53,8 +62,8 @@ def effective_config(settings: BaseSettings, *, env_file: Path | None, example_f
         else:
             source = "default"
         rows.append({
-            "name": key, "field": name, "value": _mask(value) if secret else _plain(value), "secret": secret, "source": source,
-            "default": "(secret)" if (secret and default) else _plain(default), "is_default": value == field.default,
+            "name": key, "field": name, "value": _mask(value) if secret else _redact_urls(_plain(value)), "secret": secret, "source": source,
+            "default": "(secret)" if (secret and default) else _redact_urls(_plain(default)), "is_default": value == field.default,
             "documented": (key in documented) if example_file else None, "mutable": name in mutable,
             "type": getattr(field.annotation, "__name__", str(field.annotation)), "description": field.description,
         })

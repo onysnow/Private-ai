@@ -190,8 +190,17 @@ LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "host.docker.internal"}
 def is_local_endpoint(base_url: str) -> bool:
     from urllib.parse import urlsplit
 
+    import ipaddress
+
     host = (urlsplit(base_url).hostname or "").lower()
-    return host in LOCAL_HOSTS or host.startswith("127.")
+    if host in LOCAL_HOSTS:
+        return True
+    try:
+        # A literal address must really be loopback; a name such as
+        # "127.0.0.1.evil.com" is not an address and is not local.
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
 
 
 class OllamaLLMClient(LLMClient):

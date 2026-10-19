@@ -25,11 +25,42 @@ from app.services.evidence import create_evidence
 from app.services.sources import create_source, list_source_evidence
 
 
-def _same_through_model(model: Any, raw: Any) -> None:
-    unfiltered = jsonable_encoder(raw)
+def _without(value: Any, hidden: tuple[str, ...]) -> Any:
+    if isinstance(value, dict):
+        return {k: _without(v, hidden) for k, v in value.items() if k not in hidden}
+    if isinstance(value, list):
+        return [_without(v, hidden) for v in value]
+    return value
+
+
+def _first_difference(a: Any, b: Any, path: str = "") -> str:
+    """Where two replies first differ (a key one lacks, or a changed value)."""
+    if isinstance(a, dict) and isinstance(b, dict):
+        for key in sorted(set(a) | set(b)):
+            if key not in b:
+                return f"{path}/{key} is dropped by the model"
+            if key not in a:
+                return f"{path}/{key} is added by the model"
+            found = _first_difference(a[key], b[key], f"{path}/{key}")
+            if found:
+                return found
+        return ""
+    if isinstance(a, list) and isinstance(b, list):
+        for i, (x, y) in enumerate(zip(a, b)):
+            found = _first_difference(x, y, f"{path}[{i}]")
+            if found:
+                return found
+        return "" if len(a) == len(b) else f"{path} length {len(a)} vs {len(b)}"
+    return "" if a == b else f"{path}: {a!r} became {b!r}"
+
+
+def _same_through_model(model: Any, raw: Any, *, hidden: tuple[str, ...] = ()) -> None:
+    """``hidden`` names stored columns a model leaves out on purpose (listed at the
+    call, with the reason), so an accidental drop still fails here."""
+    unfiltered = _without(jsonable_encoder(raw), hidden)
     adapter = TypeAdapter(model)
     filtered = adapter.dump_python(adapter.validate_python(raw), mode="json")
-    assert filtered == unfiltered, f"{model} changes the reply"
+    assert filtered == unfiltered, f"{model} changes the reply: {_first_difference(unfiltered, filtered)}"
 
 
 @pytest.fixture()
@@ -895,8 +926,9 @@ def test_investigation_replies(demo):
     db, _inv, _doc, _candidates, _accepted = demo
     rows = list_investigations(db, AuthorizationScope(actor_id="local"))
     assert rows
-    _same_through_model(list[r.InvestigationOut], rows)
-    _same_through_model(r.InvestigationOut, create_investigation(db, InvestigationCreate(name="Second case", description="with a description")))
+    # ai_run_profile is a stored blob read through its own route (GET .../ai/run-profile), not part of the case record.
+    _same_through_model(list[r.InvestigationOut], rows, hidden=("ai_run_profile",))
+    _same_through_model(r.InvestigationOut, create_investigation(db, InvestigationCreate(name="Second case", description="with a description")), hidden=("ai_run_profile",))
 
 
 def test_settings_and_security_replies(demo, tmp_path, monkeypatch):

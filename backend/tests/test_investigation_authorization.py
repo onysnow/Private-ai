@@ -229,6 +229,10 @@ _NOT_INVESTIGATION_RECORDS = {
 }
 
 
+# An AI run, a story section and a thought exist only inside one investigation.
+_NESTED_UNDER_INVESTIGATION = {"run_id", "section_id", "thought_id"}
+
+
 def test_every_record_in_a_path_is_traced_to_its_investigation():
     """A route that takes a record id the scope check cannot trace would let a
     reporter limited to one investigation read another's record (the gap the
@@ -240,7 +244,17 @@ def test_every_record_in_a_path_is_traced_to_its_investigation():
     from app.main import app
 
     source = inspect.getsource(authorization._resource_investigation_id)
-    params = {name for path in app.openapi()["paths"] if path.startswith("/api/") and not path.startswith("/api/console/")
-              for name in re.findall(r"{(\w+)}", path)}
+    paths = [path for path in app.openapi()["paths"] if path.startswith("/api/") and not path.startswith("/api/console/")]
+    params = {name for path in paths for name in re.findall(r"{(\w+)}", path)}
     untraced = {name for name in params - _NOT_INVESTIGATION_RECORDS if f'"{name}"' not in source}
+    # Records that only exist inside one investigation are reached through it
+    # (/investigations/{investigation_id}/...), which the router check authorizes,
+    # and each route looks the record up within that investigation (_run_row,
+    # section_of). The guarantee holds only while the path stays nested, so it is
+    # checked here rather than assumed.
+    nested = {name for name in untraced if name in _NESTED_UNDER_INVESTIGATION}
+    for path in paths:
+        for name in nested & set(re.findall(r"{(\w+)}", path)):
+            assert "{investigation_id}" in path, f"{path}: {name} must stay nested under {{investigation_id}}"
+    untraced -= nested
     assert not untraced, f"path parameters the investigation scope cannot trace: {sorted(untraced)}"

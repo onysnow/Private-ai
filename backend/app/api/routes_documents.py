@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
 from app.api.dependencies import authorize_request_resource, read_upload_limited
-from app.core.authorization import scope_for_request
+from app.core.authorization import require_scope_investigation, scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
 from app.jobs.handlers import ANALYZE_DOCUMENT, EXTRACT_DOCUMENT, FIND_CHILDREN
@@ -301,6 +301,10 @@ async def upload_document(
     (GET /api/jobs/{id}). In developer mode (SQLite) the job runs before the
     reply, off the event loop, so the answer is the read document as before.
     """
+    # investigation_id is a form field, not a path id, so the router's read check
+    # does not see it; without this a caller could learn what another case holds
+    # (a duplicate upload answers with that case's document record).
+    require_scope_investigation(scope_for_request(request), investigation_id)
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     try:
