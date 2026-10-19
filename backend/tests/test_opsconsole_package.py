@@ -26,6 +26,7 @@ from opsconsole import Check, CheckResult, ConsoleConfig, Probe, TablePolicy, Te
 from opsconsole.adapters.auth_policies import LoopbackOnly
 from opsconsole.adapters.jsonl_log import JsonlLogSource
 from opsconsole.adapters.static_users import StaticUsers
+from opsconsole.core import sqlscreen
 from opsconsole.protocols import LogFilter, RoleRecord, RunHandle, UserRecord
 
 
@@ -33,6 +34,15 @@ from opsconsole.protocols import LogFilter, RoleRecord, RunHandle, UserRecord
 
 class Base(DeclarativeBase):
     pass
+
+
+def test_sql_comment_scanning_is_linear_and_preserves_quoted_comment_markers() -> None:
+    statement = """SELECT '/* keep */', $$ -- keep $$, "/* quoted */" /* outer /* nested */ end */ -- gone
+    FROM books"""
+    expected = 'SELECT \'/* keep */\', $$ -- keep $$, "/* quoted */"   \n    FROM books'
+    assert sqlscreen.clean(statement) == expected
+    with pytest.raises(ValueError, match="unterminated comment"):
+        sqlscreen.clean("SELECT 1 /* unclosed")
 
 
 class Author(Base):
@@ -228,7 +238,7 @@ def test_health_board_merges_builtin_and_host_tiles_and_isolates_failures(host: 
     tiles = {t["id"]: t for t in board["tiles"]}
     assert {"database", "server", "console", "tests", "checks", "host_ok", "host_bad"} <= set(tiles)
     assert tiles["database"]["state"] == "ok" and "sqlite" in tiles["database"]["headline"]
-    assert tiles["host_bad"]["state"] == "error" and "tile exploded" in tiles["host_bad"]["headline"]
+    assert tiles["host_bad"]["state"] == "error" and "server log" in tiles["host_bad"]["headline"]
     assert tiles["host_ok"]["state"] == "ok" and board["overall"] == "error"
     assert client.get("/api/console/health", params={"tiles": "server"}).json()["tiles"][0]["id"] == "server"
     srv = client.get("/api/console/health/server").json()
@@ -449,8 +459,9 @@ def test_api_routes_traffic_send_probes_collections(host: Any) -> None:
     assert recent and all(r["route"] == "/ping" for r in recent)
 
     assert client.post("/api/console/api/send", json={"method": "GET", "path": "ping"}).json()["error"]["code"] == "bad_path"
-    sent = client.post("/api/console/api/send", json={"method": "GET", "path": "/ping"})
-    assert sent.status_code == 502 and sent.json()["error"]["code"] == "self_unreachable", "TestClient has no live socket; the real server answers itself"
+    assert client.post("/api/console/api/send", json={"method": "GET", "path": "//attacker.invalid/ping"}).json()["error"]["code"] == "bad_path"
+    sent = client.post("/api/console/api/send", json={"method": "GET", "path": "/ping", "headers": {"host": "attacker.invalid"}})
+    assert sent.status_code == 200, "replayed requests run inside the app and cannot be redirected by the Host header"
     assert client.post("/api/console/api/send", json={"method": "GET", "path": "/ping", "act_as": "u1"}).json()["error"]["code"] == "act_as_unsupported"
 
     run = client.post("/api/console/api/probes/run").json()
@@ -478,7 +489,7 @@ def test_api_send_respects_console_writes_policy_and_is_always_audited(host: Any
     client, _, _ = host
     before = client.get("/api/console/activity", params={"section": "api"}).json()["items"]
     sent = client.post("/api/console/api/send", json={"method": "GET", "path": "/ping"})
-    assert sent.status_code == 502  # self_unreachable under TestClient, but it got past auth
+    assert sent.status_code == 200
     after = client.get("/api/console/activity", params={"section": "api"}).json()["items"]
     assert len(after) == len(before) + 1
     assert after[0]["action"] == "send" and after[0]["note"] == "GET /ping"
