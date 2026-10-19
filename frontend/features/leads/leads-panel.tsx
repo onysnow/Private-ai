@@ -5,11 +5,15 @@
 // and their reply checks are generated from the API schema (fix 2). The
 // board itself (components/leads-kanban-board.tsx) only draws and reports
 // what the reporter did; this panel loads the queue and makes the changes.
+// It opens on the leads by when to chase them (Now / Next / Later,
+// leads-horizons.tsx, research Act §6); "By status" is the status columns.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {LeadsKanbanBoard} from '../../components/leads-kanban-board';
+import {LeadsHorizons} from './leads-horizons';
+import type {Horizon} from './leads-horizons';
 import type {LeadCard, LeadLinkCard, TaskCard} from '../../components/leads-kanban-board';
 import {errorMessage} from '../../lib/api-client';
 import {leadQueueOptions, leadQueueQueryKey, listClaimsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
@@ -32,6 +36,7 @@ export function LeadsPanel({investigationId}: Props): ReactElement {
   const [leadPriority, setLeadPriority] = useState('normal');
   const [leadOwner, setLeadOwner] = useState('');
   const [problem, setProblem] = useState('');
+  const [view, setView] = useState<'horizons' | 'status'>('horizons');
 
   const queue = useQuery({...leadQueueOptions({path: {investigation_id: investigationId}, query: {unresolved_only: false}}), enabled: Boolean(investigationId)});
   const leads: LeadOut[] = queue.data?.items ?? [];
@@ -58,6 +63,16 @@ export function LeadsPanel({investigationId}: Props): ReactElement {
       await reloadLeads();
     } catch (error) {
       setProblem(errorMessage(error, 'Could not change the lead'));
+    }
+  };
+
+  const setLeadHorizon = async (id: string, horizon: Horizon | null) => {
+    try {
+      await updateLeadEndpoint({path: {lead_id: id}, body: {horizon}, throwOnError: true});
+      setProblem('');
+      await reloadLeads();
+    } catch (error) {
+      setProblem(errorMessage(error, 'Could not move the lead'));
     }
   };
 
@@ -100,8 +115,14 @@ export function LeadsPanel({investigationId}: Props): ReactElement {
 
   const trouble = problem || (queue.isError ? errorMessage(queue.error, 'Could not load the leads') : '');
 
+  const viewSwitch = <div className="flex gap-1 text-sm" role="group" aria-label="Show the leads">
+    {([['horizons', 'Now / Next / Later'], ['status', 'By status']] as const).map(([id, label]) => <button key={id} type="button" aria-pressed={view === id}
+      className={`rounded-md border px-2.5 py-1 ${view === id ? 'bg-muted font-medium' : 'text-muted-foreground'}`} onClick={() => setView(id)}>{label}</button>)}
+  </div>;
+
   return <LeadsKanbanBoard
-    leads={leads} problem={trouble}
+    leads={leads} problem={trouble} viewSwitch={viewSwitch}
+    board={view === 'horizons' ? <LeadsHorizons leads={leads} onMove={setLeadHorizon} onStatus={setLeadStatus} onConvert={convertLead}/> : undefined}
     leadTitle={leadTitle} setLeadTitle={setLeadTitle} leadDetail={leadDetail} setLeadDetail={setLeadDetail}
     leadPriority={leadPriority} setLeadPriority={setLeadPriority} leadOwner={leadOwner} setLeadOwner={setLeadOwner}
     onCreateLead={createLead} onStatusChange={setLeadStatus} onTraceLink={traceLink} onTraceTask={traceTask} onTaskStatus={setTaskStatus} onConvert={convertLead}

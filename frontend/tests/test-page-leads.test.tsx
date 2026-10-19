@@ -84,18 +84,20 @@ function leadFixture(overrides: Record<string, unknown> = {}) {
   };
 }
 
-async function bootstrapWithOneLead(): Promise<MockApi> {
+async function bootstrapWithOneLead({byStatus = false}: {byStatus?: boolean} = {}): Promise<MockApi> {
   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 
   const Home = await importHome();
   render(<Home />);
   await screen.findByText('Who approved this contract?');
+  // The panel opens on Now / Next / Later; these checks are about the status columns.
+  if (byStatus) await userEvent.setup().click(screen.getByRole('button', {name: 'By status'}));
   return api;
 }
 
 describe('Home questions & reporting leads', () => {
   it('renders a queued lead with its triage state', async () => {
-    const api = await bootstrapWithOneLead();
+    const api = await bootstrapWithOneLead({byStatus: true});
 
     expect(screen.getByText('Who approved this contract?')).toBeInTheDocument();
     expect(screen.getByText('high')).toBeInTheDocument(); // priority badge
@@ -171,7 +173,7 @@ describe('Home questions & reporting leads', () => {
   // is unchanged pre-existing code, not something this refactor touched.
 
   it('converts a lead to a claim and reloads both leads and claims', async () => {
-    const api = await bootstrapWithOneLead();
+    const api = await bootstrapWithOneLead({byStatus: true});
 
     const converted = leadFixture({status: 'converted'});
     api.add({

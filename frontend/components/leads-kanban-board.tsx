@@ -67,6 +67,10 @@ interface LeadsKanbanBoardProps {
   onTraceTask: (task: TaskCard, leadTitle: string) => void;
   onTaskStatus: (id: string, status: 'in_progress' | 'blocked' | 'done') => void;
   onConvert: (id: string, kind: 'claim' | 'task') => void;
+  /** Drawn above the board (the panel's view switch). */
+  viewSwitch?: ReactNode;
+  /** Another view of the same leads (Now / Next / Later), drawn in place of the status columns. */
+  board?: ReactNode;
 }
 
 function LeadCardView({lead, onStatusChange, onTraceLink, onTraceTask, onTaskStatus, onConvert, dragHandleProps}: {
@@ -201,7 +205,7 @@ export function LeadsKanbanBoard(props: LeadsKanbanBoardProps): ReactElement {
     <Card className="card" id="leads">
       <CardHeader className="pb-3">
         <CardTitle>Questions & reporting leads</CardTitle>
-        <CardDescription>Questions stay separate from claims until evidence supports a conversion. Connector hits remain leads until reviewed. Drag a card to change its status.</CardDescription>
+        <CardDescription>Questions stay separate from claims until evidence supports a conversion. Connector hits remain leads until reviewed.{props.board ? '' : ' Drag a card to change its status.'}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="searchrow">
@@ -215,7 +219,9 @@ export function LeadsKanbanBoard(props: LeadsKanbanBoardProps): ReactElement {
         </div>
         <Textarea value={props.leadDetail} onChange={(e: ChangeEvent<HTMLTextAreaElement>) => props.setLeadDetail(e.target.value)} placeholder="What is known, what is missing, and why it matters?" />
         {props.problem && <p className="muted">{props.problem}</p>}
+        {props.viewSwitch}
 
+        {props.board ?? <>
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div className="flex gap-3 overflow-x-auto pb-2">
             {COLUMNS.map(column => (
@@ -243,6 +249,7 @@ export function LeadsKanbanBoard(props: LeadsKanbanBoardProps): ReactElement {
             ))}
           </div>
         )}
+        </>}
       </CardContent>
     </Card>
   );
